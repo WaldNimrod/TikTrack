@@ -18,7 +18,13 @@ from services.business_logic import (
     ExecutionBusinessService,
     AlertBusinessService,
     StatisticsBusinessService,
-    CashFlowBusinessService
+    CashFlowBusinessService,
+    NoteBusinessService,
+    TradingAccountBusinessService,
+    TradePlanBusinessService,
+    TickerBusinessService,
+    CurrencyBusinessService,
+    TagBusinessService
 )
 
 logger = logging.getLogger(__name__)
@@ -32,6 +38,12 @@ execution_service = ExecutionBusinessService()
 alert_service = AlertBusinessService()
 statistics_service = StatisticsBusinessService()
 cash_flow_service = CashFlowBusinessService()
+note_service = NoteBusinessService()
+trading_account_service = TradingAccountBusinessService()
+trade_plan_service = TradePlanBusinessService()
+ticker_service = TickerBusinessService()
+currency_service = CurrencyBusinessService()
+tag_service = TagBusinessService()
 
 
 # ============================================================================
@@ -668,6 +680,358 @@ def validate_cash_flow():
             
     except Exception as e:
         logger.error(f"Error validating cash flow: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# Note Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/note/validate', methods=['POST'])
+def validate_note():
+    """Validate note data."""
+    try:
+        data = request.get_json() or {}
+        
+        result = note_service.validate(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating note: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/note/validate-relation', methods=['POST'])
+def validate_note_relation():
+    """Validate note relation (related_type_id and related_id)."""
+    try:
+        data = request.get_json() or {}
+        
+        related_type_id = data.get('related_type_id')
+        related_id = data.get('related_id')
+        
+        # Convert to int if provided
+        if related_type_id is not None:
+            try:
+                related_type_id = int(related_type_id)
+            except (ValueError, TypeError):
+                related_type_id = None
+        
+        if related_id is not None:
+            try:
+                related_id = int(related_id)
+            except (ValueError, TypeError):
+                related_id = None
+        
+        result = note_service.validate_relation(related_type_id, related_id)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating note relation: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# TradingAccount Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/trading-account/validate', methods=['POST'])
+def validate_trading_account():
+    """Validate trading account data."""
+    try:
+        data = request.get_json() or {}
+        
+        result = trading_account_service.validate(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating trading account: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# TradePlan Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/trade-plan/validate', methods=['POST'])
+def validate_trade_plan():
+    """Validate trade plan data."""
+    try:
+        data = request.get_json() or {}
+        
+        result = trade_plan_service.validate(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating trade plan: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# Ticker Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/ticker/validate', methods=['POST'])
+def validate_ticker():
+    """Validate ticker data."""
+    try:
+        data = request.get_json() or {}
+        
+        result = ticker_service.validate(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating ticker: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/ticker/validate-symbol', methods=['POST'])
+def validate_ticker_symbol():
+    """Validate ticker symbol format."""
+    try:
+        data = request.get_json() or {}
+        
+        symbol = data.get('symbol')
+        
+        result = ticker_service.validate_symbol(symbol)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating ticker symbol: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# Currency Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/currency/validate-rate', methods=['POST'])
+def validate_currency_rate():
+    """Validate currency exchange rate."""
+    try:
+        data = request.get_json() or {}
+        
+        rate = data.get('exchange_rate')
+        
+        result = currency_service.validate_exchange_rate(rate)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating currency rate: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# Tag Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/tag/validate', methods=['POST'])
+def validate_tag():
+    """Validate tag data."""
+    try:
+        data = request.get_json() or {}
+        
+        result = tag_service.validate(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating tag: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/tag/validate-category', methods=['POST'])
+def validate_tag_category():
+    """Validate tag category."""
+    try:
+        data = request.get_json() or {}
+        
+        category = data.get('category')
+        
+        result = tag_service.validate_category(category)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating tag category: {str(e)}")
         return jsonify({
             'status': 'error',
             'error': {

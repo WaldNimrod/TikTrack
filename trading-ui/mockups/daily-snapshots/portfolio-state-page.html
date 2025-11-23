@@ -1846,30 +1846,38 @@
                 const mockData = generateMockPortfolioPerformanceData(currentPeriod['both'] || 'month');
                 portfolioPerformanceSeries.setData(mockData.performance);
                 
-                // Add markers for min/max points
+                // Add markers for multiple min/max points
                 const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
-                if (mockData.minIndex >= 0 && mockData.maxIndex >= 0 && lightweightCharts) {
+                if (mockData.minIndices && mockData.maxIndices && lightweightCharts) {
                     const markers = [];
-                    if (mockData.minIndex >= 0) {
-                        markers.push({
-                            time: mockData.performance[mockData.minIndex].time,
-                            position: 'belowBar',
-                            color: '#dc3545',
-                            shape: 'arrowUp',
-                            text: `מינימום: ${mockData.performance[mockData.minIndex].value.toFixed(2)}%`,
-                            size: 1
-                        });
-                    }
-                    if (mockData.maxIndex >= 0) {
-                        markers.push({
-                            time: mockData.performance[mockData.maxIndex].time,
-                            position: 'aboveBar',
-                            color: '#28a745',
-                            shape: 'arrowDown',
-                            text: `מקסימום: ${mockData.performance[mockData.maxIndex].value.toFixed(2)}%`,
-                            size: 1
-                        });
-                    }
+                    
+                    // Add markers for all min points
+                    mockData.minIndices.forEach((minIdx, idx) => {
+                        if (minIdx >= 0 && minIdx < mockData.performance.length) {
+                            markers.push({
+                                time: mockData.performance[minIdx].time,
+                                position: 'belowBar',
+                                color: '#dc3545',
+                                shape: 'arrowUp',
+                                text: `${mockData.performance[minIdx].value.toFixed(2)}%`,
+                                size: 1
+                            });
+                        }
+                    });
+                    
+                    // Add markers for all max points
+                    mockData.maxIndices.forEach((maxIdx, idx) => {
+                        if (maxIdx >= 0 && maxIdx < mockData.performance.length) {
+                            markers.push({
+                                time: mockData.performance[maxIdx].time,
+                                position: 'aboveBar',
+                                color: '#28a745',
+                                shape: 'arrowDown',
+                                text: `${mockData.performance[maxIdx].value.toFixed(2)}%`,
+                                size: 1
+                            });
+                        }
+                    });
                     
                     // Try to use createSeriesMarkers if available
                     if (typeof lightweightCharts.createSeriesMarkers === 'function') {
@@ -2033,30 +2041,38 @@
                 portfolioValueSeries.setData(mockData.values);
                 portfolioValuePercentSeries.setData(mockData.percentages);
                 
-                // Add markers for min/max points
+                // Add markers for multiple min/max points
                 const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
-                if (mockData.minIndex >= 0 && mockData.maxIndex >= 0 && lightweightCharts) {
+                if (mockData.minIndices && mockData.maxIndices && lightweightCharts) {
                     const markers = [];
-                    if (mockData.minIndex >= 0) {
-                        markers.push({
-                            time: mockData.values[mockData.minIndex].time,
-                            position: 'belowBar',
-                            color: '#dc3545',
-                            shape: 'arrowUp',
-                            text: `מינימום: $${mockData.values[mockData.minIndex].value.toLocaleString()}`,
-                            size: 1
-                        });
-                    }
-                    if (mockData.maxIndex >= 0) {
-                        markers.push({
-                            time: mockData.values[mockData.maxIndex].time,
-                            position: 'aboveBar',
-                            color: '#28a745',
-                            shape: 'arrowDown',
-                            text: `מקסימום: $${mockData.values[mockData.maxIndex].value.toLocaleString()}`,
-                            size: 1
-                        });
-                    }
+                    
+                    // Add markers for all min points
+                    mockData.minIndices.forEach((minIdx, idx) => {
+                        if (minIdx >= 0 && minIdx < mockData.values.length) {
+                            markers.push({
+                                time: mockData.values[minIdx].time,
+                                position: 'belowBar',
+                                color: '#dc3545',
+                                shape: 'arrowUp',
+                                text: `$${mockData.values[minIdx].value.toLocaleString()}`,
+                                size: 1
+                            });
+                        }
+                    });
+                    
+                    // Add markers for all max points
+                    mockData.maxIndices.forEach((maxIdx, idx) => {
+                        if (maxIdx >= 0 && maxIdx < mockData.values.length) {
+                            markers.push({
+                                time: mockData.values[maxIdx].time,
+                                position: 'aboveBar',
+                                color: '#28a745',
+                                shape: 'arrowDown',
+                                text: `$${mockData.values[maxIdx].value.toLocaleString()}`,
+                                size: 1
+                            });
+                        }
+                    });
                     
                     // Try to use createSeriesMarkers if available
                     if (typeof lightweightCharts.createSeriesMarkers === 'function') {
@@ -2277,30 +2293,38 @@
                 unrealizedPLPercentSeries.setData(mockData.unrealizedPercent);
                 totalPLPercentSeries.setData(mockData.totalPercent);
                 
-                // Add markers for min/max points on total PL
+                // Add markers for multiple min/max points on total PL
                 const lightweightChartsPL = window.LightweightCharts || window.lightweightCharts;
-                if (mockData.minIndex >= 0 && mockData.maxIndex >= 0 && lightweightChartsPL) {
+                if (mockData.minIndices && mockData.maxIndices && lightweightChartsPL) {
                     const markers = [];
-                    if (mockData.minIndex >= 0) {
-                        markers.push({
-                            time: mockData.total[mockData.minIndex].time,
-                            position: 'belowBar',
-                            color: '#dc3545',
-                            shape: 'arrowUp',
-                            text: `מינימום: $${mockData.total[mockData.minIndex].value.toLocaleString()}`,
-                            size: 1
-                        });
-                    }
-                    if (mockData.maxIndex >= 0) {
-                        markers.push({
-                            time: mockData.total[mockData.maxIndex].time,
-                            position: 'aboveBar',
-                            color: '#28a745',
-                            shape: 'arrowDown',
-                            text: `מקסימום: $${mockData.total[mockData.maxIndex].value.toLocaleString()}`,
-                            size: 1
-                        });
-                    }
+                    
+                    // Add markers for all min points
+                    mockData.minIndices.forEach((minIdx, idx) => {
+                        if (minIdx >= 0 && minIdx < mockData.total.length) {
+                            markers.push({
+                                time: mockData.total[minIdx].time,
+                                position: 'belowBar',
+                                color: '#dc3545',
+                                shape: 'arrowUp',
+                                text: `$${mockData.total[minIdx].value.toLocaleString()}`,
+                                size: 1
+                            });
+                        }
+                    });
+                    
+                    // Add markers for all max points
+                    mockData.maxIndices.forEach((maxIdx, idx) => {
+                        if (maxIdx >= 0 && maxIdx < mockData.total.length) {
+                            markers.push({
+                                time: mockData.total[maxIdx].time,
+                                position: 'aboveBar',
+                                color: '#28a745',
+                                shape: 'arrowDown',
+                                text: `$${mockData.total[maxIdx].value.toLocaleString()}`,
+                                size: 1
+                            });
+                        }
+                    });
                     
                     // Try to use createSeriesMarkers if available
                     if (typeof lightweightChartsPL.createSeriesMarkers === 'function') {
@@ -2529,10 +2553,11 @@
             }, 50000);
             
             const startValue = baseValue;
-            let minValue = Infinity;
-            let maxValue = -Infinity;
-            let minIndex = -1;
-            let maxIndex = -1;
+            
+            // Track multiple extreme points (3-5 min and max points)
+            const minPoints = []; // Array of {index, value}
+            const maxPoints = []; // Array of {index, value}
+            const numExtremePoints = Math.min(5, Math.max(3, Math.floor(days / 20))); // 3-5 points based on period length
             
             for (let i = days; i >= 0; i--) {
                 const date = new Date();
@@ -2540,14 +2565,24 @@
                 const value = startValue + (days - i) * 50 + Math.random() * 1000;
                 const roundedValue = Math.round(value);
                 
-                // Track min/max for markers
-                if (roundedValue < minValue) {
-                    minValue = roundedValue;
-                    minIndex = data.length;
+                const currentIndex = data.length;
+                
+                // Track multiple min points
+                if (minPoints.length < numExtremePoints) {
+                    minPoints.push({index: currentIndex, value: roundedValue});
+                    minPoints.sort((a, b) => a.value - b.value); // Sort ascending
+                } else if (roundedValue < minPoints[minPoints.length - 1].value) {
+                    minPoints[minPoints.length - 1] = {index: currentIndex, value: roundedValue};
+                    minPoints.sort((a, b) => a.value - b.value);
                 }
-                if (roundedValue > maxValue) {
-                    maxValue = roundedValue;
-                    maxIndex = data.length;
+                
+                // Track multiple max points
+                if (maxPoints.length < numExtremePoints) {
+                    maxPoints.push({index: currentIndex, value: roundedValue});
+                    maxPoints.sort((a, b) => b.value - a.value); // Sort descending
+                } else if (roundedValue > maxPoints[maxPoints.length - 1].value) {
+                    maxPoints[maxPoints.length - 1] = {index: currentIndex, value: roundedValue};
+                    maxPoints.sort((a, b) => b.value - a.value);
                 }
                 
                 // Calculate percentage change from start
@@ -2567,8 +2602,8 @@
             return {
                 values: data,
                 percentages: dataPercent,
-                minIndex: minIndex,
-                maxIndex: maxIndex,
+                minIndices: minPoints.map(p => p.index),
+                maxIndices: maxPoints.map(p => p.index),
                 startValue: startValue
             };
         }
@@ -2586,10 +2621,11 @@
             }, 50000);
             
             const startValue = baseValue;
-            let minPerformance = Infinity;
-            let maxPerformance = -Infinity;
-            let minIndex = -1;
-            let maxIndex = -1;
+            
+            // Track multiple extreme points (3-5 min and max points)
+            const minPoints = []; // Array of {index, value}
+            const maxPoints = []; // Array of {index, value}
+            const numExtremePoints = Math.min(5, Math.max(3, Math.floor(days / 20))); // 3-5 points based on period length
             
             // Mock cumulative deposits/withdrawals over time
             // In real implementation, this should come from account transactions API
@@ -2618,14 +2654,24 @@
                 const performanceValue = roundedTotalValue - cumulativeNetCashFlow;
                 const performancePercent = ((performanceValue - startValue) / startValue) * 100;
                 
-                // Track min/max for markers
-                if (performancePercent < minPerformance) {
-                    minPerformance = performancePercent;
-                    minIndex = data.length;
+                const currentIndex = data.length;
+                
+                // Track multiple min points
+                if (minPoints.length < numExtremePoints) {
+                    minPoints.push({index: currentIndex, value: performancePercent});
+                    minPoints.sort((a, b) => a.value - b.value); // Sort ascending
+                } else if (performancePercent < minPoints[minPoints.length - 1].value) {
+                    minPoints[minPoints.length - 1] = {index: currentIndex, value: performancePercent};
+                    minPoints.sort((a, b) => a.value - b.value);
                 }
-                if (performancePercent > maxPerformance) {
-                    maxPerformance = performancePercent;
-                    maxIndex = data.length;
+                
+                // Track multiple max points
+                if (maxPoints.length < numExtremePoints) {
+                    maxPoints.push({index: currentIndex, value: performancePercent});
+                    maxPoints.sort((a, b) => b.value - a.value); // Sort descending
+                } else if (performancePercent > maxPoints[maxPoints.length - 1].value) {
+                    maxPoints[maxPoints.length - 1] = {index: currentIndex, value: performancePercent};
+                    maxPoints.sort((a, b) => b.value - a.value);
                 }
                 
                 data.push({
@@ -2636,8 +2682,8 @@
             
             return {
                 performance: data,
-                minIndex: minIndex,
-                maxIndex: maxIndex,
+                minIndices: minPoints.map(p => p.index),
+                maxIndices: maxPoints.map(p => p.index),
                 startValue: startValue
             };
         }
@@ -2657,9 +2703,10 @@
             const baseRealizedPL = 10000; // Mock - should come from closed trades
             const baseTotalPL = baseRealizedPL + baseUnrealizedPL;
             
-            // Track min/max for markers
-            let minTotal = Infinity, maxTotal = -Infinity;
-            let minIndex = -1, maxIndex = -1;
+            // Track multiple extreme points (3-5 min and max points)
+            const minPoints = []; // Array of {index, value}
+            const maxPoints = []; // Array of {index, value}
+            const numExtremePoints = Math.min(5, Math.max(3, Math.floor(days / 20))); // 3-5 points based on period length
             
             for (let i = days; i >= 0; i--) {
                 const date = new Date();
@@ -2672,14 +2719,24 @@
                 const roundedUnrealized = Math.round(unrealizedValue);
                 const roundedTotal = Math.round(totalValue);
                 
-                // Track min/max for total PL
-                if (roundedTotal < minTotal) {
-                    minTotal = roundedTotal;
-                    minIndex = total.length;
+                const currentIndex = total.length;
+                
+                // Track multiple min points for total PL
+                if (minPoints.length < numExtremePoints) {
+                    minPoints.push({index: currentIndex, value: roundedTotal});
+                    minPoints.sort((a, b) => a.value - b.value); // Sort ascending
+                } else if (roundedTotal < minPoints[minPoints.length - 1].value) {
+                    minPoints[minPoints.length - 1] = {index: currentIndex, value: roundedTotal};
+                    minPoints.sort((a, b) => a.value - b.value);
                 }
-                if (roundedTotal > maxTotal) {
-                    maxTotal = roundedTotal;
-                    maxIndex = total.length;
+                
+                // Track multiple max points for total PL
+                if (maxPoints.length < numExtremePoints) {
+                    maxPoints.push({index: currentIndex, value: roundedTotal});
+                    maxPoints.sort((a, b) => b.value - a.value); // Sort descending
+                } else if (roundedTotal > maxPoints[maxPoints.length - 1].value) {
+                    maxPoints[maxPoints.length - 1] = {index: currentIndex, value: roundedTotal};
+                    maxPoints.sort((a, b) => b.value - a.value);
                 }
                 
                 // Calculate percentages
@@ -2701,7 +2758,8 @@
             return { 
                 realized, unrealized, total,
                 realizedPercent, unrealizedPercent, totalPercent,
-                minIndex, maxIndex,
+                minIndices: minPoints.map(p => p.index),
+                maxIndices: maxPoints.map(p => p.index),
                 baseRealizedPL, baseUnrealizedPL, baseTotalPL
             };
         }

@@ -90,7 +90,7 @@ class CacheSyncManager {
       'account-updated': ['accounts-data', 'trades-data', 'executions-data', 'dashboard-data'],
       'account-deleted': ['accounts-data', 'trades-data', 'executions-data', 'dashboard-data'],
       'trade-created': ['trades-data', 'dashboard-data'],
-      'trade-updated': ['trades-data', 'dashboard-data'],
+      'trade-updated': ['trades-data', 'dashboard-data', 'business:calculate-stop-price', 'business:calculate-target-price', 'business:calculate-percentage-from-price'],
       'trade-deleted': ['trades-data', 'dashboard-data'],
       'trade-plan-created': ['trade-plans-data', 'dashboard-data', 'trades-data'],
       'trade-plan-updated': ['trade-plans-data', 'dashboard-data', 'trades-data'],
@@ -106,9 +106,9 @@ class CacheSyncManager {
         'pending-trade-plan-assignments',
         'pending-trade-plan-creations',
       ],
-      'execution-created': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'positions-account-*', 'portfolio-*', 'portfolio-summary-*'],
-      'execution-updated': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'positions-account-*', 'portfolio-*', 'portfolio-summary-*'],
-      'execution-deleted': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'positions-account-*', 'portfolio-*', 'portfolio-summary-*'],
+      'execution-created': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'positions-account-*', 'portfolio-*', 'portfolio-summary-*', 'business:calculate-execution-values', 'business:calculate-average-price'],
+      'execution-updated': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'positions-account-*', 'portfolio-*', 'portfolio-summary-*', 'business:calculate-execution-values', 'business:calculate-average-price'],
+      'execution-deleted': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'positions-account-*', 'portfolio-*', 'portfolio-summary-*', 'business:calculate-execution-values', 'business:calculate-average-price'],
       'cash-flow-created': ['cash-flows-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'dashboard-data'],
       'cash-flow-updated': ['cash-flows-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'dashboard-data'],
       'cash-flow-deleted': ['cash-flows-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'dashboard-data'],
@@ -118,7 +118,7 @@ class CacheSyncManager {
       'note-deleted': ['notes-data'],
       'ticker-updated': ['tickers-data', 'market-data'],
       'alert-created': ['alerts-data', 'dashboard-data'],
-      'alert-updated': ['alerts-data', 'dashboard-data'],
+      'alert-updated': ['alerts-data', 'dashboard-data', 'business:validate-condition-value', 'business:validate-alert'],
       'alert-deleted': ['alerts-data', 'dashboard-data'],
       'import-session-deleted': ['data-import-data', 'data-import-accounts'],
     };
@@ -311,6 +311,26 @@ class CacheSyncManager {
     if (!patterns) {
       if (window.Logger) { window.Logger.warn(`⚠️ No invalidation patterns found for action: ${action}`, { page: 'cache' }); }
       return false;
+    }
+
+    // Clear frontend cache for Business Logic patterns
+    if (window.UnifiedCacheManager) {
+      for (const pattern of patterns) {
+        if (pattern.startsWith('business:')) {
+          try {
+            // Clear all cache keys that start with this pattern
+            if (typeof window.UnifiedCacheManager.invalidate === 'function') {
+              await window.UnifiedCacheManager.invalidate(pattern);
+            } else if (typeof window.UnifiedCacheManager.clearByPattern === 'function') {
+              await window.UnifiedCacheManager.clearByPattern(pattern);
+            }
+          } catch (error) {
+            if (window.Logger) {
+              window.Logger.warn(`⚠️ Failed to clear frontend cache for pattern ${pattern}:`, error, { page: 'cache' });
+            }
+          }
+        }
+      }
     }
 
     return await this.invalidateBackend(patterns);

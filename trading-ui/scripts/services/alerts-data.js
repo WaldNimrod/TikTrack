@@ -339,11 +339,40 @@
 
   /**
    * Validate alert data using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (60s TTL).
    * @param {Object} alertData - Alert data to validate
    * @returns {Promise<Object>} Validation result: {is_valid, errors}
    */
   async function validateAlert(alertData) {
+    const cacheKey = `business:validate-alert:${JSON.stringify(alertData)}`;
+    
     try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/alert/validate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(alertData)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            return {
+              is_valid: false,
+              errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+            };
+          }
+
+          const result = await response.json();
+          return {
+            is_valid: result.status === 'success',
+            errors: []
+          };
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
       const response = await fetch('/api/business/alert/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -374,12 +403,44 @@
 
   /**
    * Validate condition value using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (60s TTL).
    * @param {string} conditionAttribute - Condition attribute type ('price', 'change', 'volume')
    * @param {number} conditionNumber - Condition numeric value
    * @returns {Promise<Object>} Validation result: {is_valid, error}
    */
   async function validateConditionValue(conditionAttribute, conditionNumber) {
+    const cacheKey = `business:validate-condition-value:${conditionAttribute}:${conditionNumber}`;
+    
     try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/alert/validate-condition-value', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              condition_attribute: conditionAttribute,
+              condition_number: conditionNumber
+            })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            return {
+              is_valid: false,
+              error: errorData.error?.message || 'Validation failed'
+            };
+          }
+
+          const result = await response.json();
+          return {
+            is_valid: result.status === 'success',
+            error: null
+          };
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
       const response = await fetch('/api/business/alert/validate-condition-value', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

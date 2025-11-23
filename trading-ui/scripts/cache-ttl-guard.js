@@ -23,7 +23,16 @@
     'preference-data': { ttl: 120 * 1000, layer: 'localStorage' },
     'profile-data': { ttl: 120 * 1000 },
     'preference-groups': { ttl: 300 * 1000 },
-    'preference-types': { ttl: 900 * 1000 }
+    'preference-types': { ttl: 900 * 1000 },
+    // Business Logic API cache configs
+    'business:calculate-stop-price': { ttl: 30 * 1000 },
+    'business:calculate-target-price': { ttl: 30 * 1000 },
+    'business:calculate-percentage-from-price': { ttl: 30 * 1000 },
+    'business:calculate-execution-values': { ttl: 30 * 1000 },
+    'business:calculate-average-price': { ttl: 30 * 1000 },
+    'business:validate-execution': { ttl: 60 * 1000 },
+    'business:validate-condition-value': { ttl: 60 * 1000 },
+    'business:validate-alert': { ttl: 60 * 1000 }
   };
 
   async function ensure(key, loaderFn, options = {}) {

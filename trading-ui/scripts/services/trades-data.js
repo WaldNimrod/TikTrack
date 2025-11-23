@@ -256,13 +256,43 @@ async function invalidateTradesCache() {
 
 /**
  * Calculate stop price using backend business logic service.
+ * Uses UnifiedCacheManager for caching results (30s TTL).
  * @param {number} currentPrice - Current price
  * @param {number} stopPercentage - Stop percentage
  * @param {string} side - Trade side ('Long', 'Short', 'buy', 'sell')
  * @returns {Promise<number>} Calculated stop price
  */
 async function calculateStopPrice(currentPrice, stopPercentage, side = 'Long') {
+  const cacheKey = `business:calculate-stop-price:${currentPrice}:${stopPercentage}:${side}`;
+  
   try {
+    // Use CacheTTLGuard for automatic cache management
+    if (window.CacheTTLGuard?.ensure) {
+      return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+        const response = await fetch('/api/business/trade/calculate-stop-price', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            current_price: currentPrice,
+            stop_percentage: stopPercentage,
+            side: side
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        if (result.status === 'success' && result.data?.stop_price !== undefined) {
+          return result.data.stop_price;
+        } else {
+          throw new Error(result.error?.message || 'Invalid calculation result');
+        }
+      }, { ttl: 30 * 1000 });
+    }
+    
+    // Fallback if CacheTTLGuard not available
     const response = await fetch('/api/business/trade/calculate-stop-price', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -291,13 +321,43 @@ async function calculateStopPrice(currentPrice, stopPercentage, side = 'Long') {
 
 /**
  * Calculate target price using backend business logic service.
+ * Uses UnifiedCacheManager for caching results (30s TTL).
  * @param {number} currentPrice - Current price
  * @param {number} targetPercentage - Target percentage
  * @param {string} side - Trade side ('Long', 'Short', 'buy', 'sell')
  * @returns {Promise<number>} Calculated target price
  */
 async function calculateTargetPrice(currentPrice, targetPercentage, side = 'Long') {
+  const cacheKey = `business:calculate-target-price:${currentPrice}:${targetPercentage}:${side}`;
+  
   try {
+    // Use CacheTTLGuard for automatic cache management
+    if (window.CacheTTLGuard?.ensure) {
+      return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+        const response = await fetch('/api/business/trade/calculate-target-price', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            current_price: currentPrice,
+            target_percentage: targetPercentage,
+            side: side
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        if (result.status === 'success' && result.data?.target_price !== undefined) {
+          return result.data.target_price;
+        } else {
+          throw new Error(result.error?.message || 'Invalid calculation result');
+        }
+      }, { ttl: 30 * 1000 });
+    }
+    
+    // Fallback if CacheTTLGuard not available
     const response = await fetch('/api/business/trade/calculate-target-price', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -326,13 +386,43 @@ async function calculateTargetPrice(currentPrice, targetPercentage, side = 'Long
 
 /**
  * Calculate percentage from price using backend business logic service.
+ * Uses UnifiedCacheManager for caching results (30s TTL).
  * @param {number} currentPrice - Current price
  * @param {number} targetPrice - Target price
  * @param {string} side - Trade side ('Long', 'Short', 'buy', 'sell')
  * @returns {Promise<number>} Calculated percentage
  */
 async function calculatePercentageFromPrice(currentPrice, targetPrice, side = 'Long') {
+  const cacheKey = `business:calculate-percentage-from-price:${currentPrice}:${targetPrice}:${side}`;
+  
   try {
+    // Use CacheTTLGuard for automatic cache management
+    if (window.CacheTTLGuard?.ensure) {
+      return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+        const response = await fetch('/api/business/trade/calculate-percentage-from-price', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            current_price: currentPrice,
+            target_price: targetPrice,
+            side: side
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        if (result.status === 'success' && result.data?.percentage !== undefined) {
+          return result.data.percentage;
+        } else {
+          throw new Error(result.error?.message || 'Invalid calculation result');
+        }
+      }, { ttl: 30 * 1000 });
+    }
+    
+    // Fallback if CacheTTLGuard not available
     const response = await fetch('/api/business/trade/calculate-percentage-from-price', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

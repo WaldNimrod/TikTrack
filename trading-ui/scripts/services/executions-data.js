@@ -304,11 +304,37 @@
 
   /**
    * Calculate execution values using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (30s TTL).
    * @param {Object} params - Parameters: {quantity, price, commission, action, is_edit}
    * @returns {Promise<Object>} Calculated values: {total, label}
    */
   async function calculateExecutionValues(params = {}) {
+    const cacheKey = `business:calculate-execution-values:${JSON.stringify(params)}`;
+    
     try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/execution/calculate-values', {
+            method: 'POST',
+            headers: DEFAULT_HEADERS,
+            body: JSON.stringify(params)
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const result = await response.json();
+          if (result.status === 'success' && result.data) {
+            return result.data;
+          } else {
+            throw new Error(result.error?.message || 'Invalid calculation result');
+          }
+        }, { ttl: 30 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
       const response = await fetch('/api/business/execution/calculate-values', {
         method: 'POST',
         headers: DEFAULT_HEADERS,
@@ -333,11 +359,39 @@
 
   /**
    * Calculate average price from multiple executions using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (30s TTL).
    * @param {Array} executions - Array of execution objects with quantity and price
    * @returns {Promise<Object>} Calculated values: {average_price, total_quantity, total_amount}
    */
   async function calculateAveragePrice(executions = []) {
+    // Create cache key from executions array (sorted for consistency)
+    const executionsKey = JSON.stringify(executions.sort((a, b) => (a.id || 0) - (b.id || 0)));
+    const cacheKey = `business:calculate-average-price:${executionsKey}`;
+    
     try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/execution/calculate-average-price', {
+            method: 'POST',
+            headers: DEFAULT_HEADERS,
+            body: JSON.stringify({ executions })
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const result = await response.json();
+          if (result.status === 'success' && result.data) {
+            return result.data;
+          } else {
+            throw new Error(result.error?.message || 'Invalid calculation result');
+          }
+        }, { ttl: 30 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
       const response = await fetch('/api/business/execution/calculate-average-price', {
         method: 'POST',
         headers: DEFAULT_HEADERS,
@@ -362,11 +416,40 @@
 
   /**
    * Validate execution data using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (60s TTL).
    * @param {Object} executionData - Execution data to validate
    * @returns {Promise<Object>} Validation result: {is_valid, errors}
    */
   async function validateExecution(executionData) {
+    const cacheKey = `business:validate-execution:${JSON.stringify(executionData)}`;
+    
     try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/execution/validate', {
+            method: 'POST',
+            headers: DEFAULT_HEADERS,
+            body: JSON.stringify(executionData)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            return {
+              is_valid: false,
+              errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+            };
+          }
+
+          const result = await response.json();
+          return {
+            is_valid: result.status === 'success',
+            errors: []
+          };
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
       const response = await fetch('/api/business/execution/validate', {
         method: 'POST',
         headers: DEFAULT_HEADERS,

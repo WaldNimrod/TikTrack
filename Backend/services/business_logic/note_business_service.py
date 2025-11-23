@@ -94,8 +94,6 @@ class NoteBusinessService(BaseBusinessService):
         
         # Step 2: Validate against business rules registry (SECOND!)
         
-        errors = []
-        
         # Validate content
         content_validation = self.validate_content(data.get('content'))
         if not content_validation['is_valid']:

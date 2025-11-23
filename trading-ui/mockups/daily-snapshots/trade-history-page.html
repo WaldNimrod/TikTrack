@@ -479,7 +479,7 @@
         <div style="max-width: 1400px; margin: 0 auto;">
             <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                 <span style="font-weight: bold; color: #495057; font-size: 0.9rem; white-space: nowrap;">
-                    <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
+                    <img src="/trading-ui/images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
                 </span>
                 <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
                 <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
@@ -504,16 +504,16 @@
                 <div class="top-section" id="trade-history-top-section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <i class="bi bi-clock-history"></i>
+                            <img src="/trading-ui/images/icons/tabler/clock.svg" width="16" height="16" alt="clock" class="icon">
                             היסטוריית טרייד
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2">
                         <div class="table-actions">
                                 <button class="btn btn-sm btn-primary" onclick="openTradeSelectorModal()" title="בחר טרייד לניתוח">
-                                    <i class="bi bi-search"></i> בחר טרייד
+                                    <img src="/trading-ui/images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon"> בחר טרייד
                                 </button>
                                 <button class="btn btn-sm btn-outline-primary" onclick="exportData()" title="ייצא נתונים">
-                                    <i class="bi bi-download"></i> ייצא
+                                    <img src="/trading-ui/images/icons/tabler/download.svg" width="16" height="16" alt="download" class="icon"> ייצא
                                 </button>
                             </div>
                             <button class="filter-toggle-btn" onclick="toggleSection('trade-history-top-section')" title="הצג/הסתר סקשן">
@@ -531,7 +531,7 @@
                                     <span id="selectedTradeInfo">-</span>
                                 </div>
                                 <button class="btn btn-sm btn-outline-secondary" onclick="clearSelectedTrade()">
-                                    <i class="bi bi-x"></i> נקה בחירה
+                                    <img src="/trading-ui/images/icons/tabler/x.svg" width="16" height="16" alt="x" class="icon"> נקה בחירה
                                 </button>
                             </div>
                         </div>
@@ -571,10 +571,10 @@
                         <div class="card mb-4">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h5 class="card-title mb-0">
-                                    <i class="bi bi-info-circle"></i> פרטי הטרייד
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> פרטי הטרייד
                                 </h5>
                                 <button class="btn btn-sm btn-outline-primary ms-3" onclick="showTradeDetailsModal(); return false;" title="פתח מודול פרטים">
-                                    <i class="bi bi-box-arrow-up-right"></i> פרטים
+                                    <img src="/trading-ui/images/icons/tabler/external-link.svg" width="16" height="16" alt="external-link" class="icon"> פרטים
                                 </button>
                             </div>
                             <div class="card-body">
@@ -659,7 +659,7 @@
                         <!-- Timeline Absolute Section -->
                 <div class="content-section" id="timeline-absolute-section">
                     <div class="section-header">
-                        <h2><i class="bi bi-list-ul"></i> פירוט צעדים</h2>
+                        <h2><img src="/trading-ui/images/icons/tabler/list.svg" width="16" height="16" alt="list" class="icon"> פירוט צעדים</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('timeline-absolute-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -810,7 +810,7 @@
                 <!-- Timeline Section (Combined) -->
                 <div class="content-section" id="timeline-relative-section">
                     <div class="section-header">
-                        <h2><i class="bi bi-graph-up"></i> טיימליין</h2>
+                        <h2><img src="/trading-ui/images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon"> טיימליין</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('timeline-relative-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -821,19 +821,19 @@
                         <!-- Chart Controls -->
                         <div class="chart-controls mb-2" style="display: flex; gap: 5px; justify-content: flex-end; align-items: center;">
                             <button class="btn btn-sm btn-outline-secondary" id="timelineZoomIn" title="זום פנימה">
-                                <i class="bi bi-zoom-in"></i>
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                             </button>
                             <button class="btn btn-sm btn-outline-secondary" id="timelineZoomOut" title="זום החוצה">
-                                <i class="bi bi-zoom-out"></i>
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                             </button>
                             <button class="btn btn-sm btn-outline-secondary" id="timelineReset" title="איפוס זום">
-                                <i class="bi bi-arrow-counterclockwise"></i>
+                                <img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon">
                             </button>
                             <button class="btn btn-sm btn-outline-secondary" id="timelinePanLeft" title="תזוזה ימינה (לעבר העתיד)">
-                                <i class="bi bi-arrow-left"></i>
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                             </button>
                             <button class="btn btn-sm btn-outline-secondary" id="timelinePanRight" title="תזוזה שמאלה (לעבר העבר)">
-                                <i class="bi bi-arrow-right"></i>
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                             </button>
                         </div>
                         <!-- Timeline Chart (includes market price) -->
@@ -860,7 +860,7 @@
                 <!-- Plan vs Execution Comparison Section -->
                 <div class="content-section" id="plan-vs-execution-section">
                     <div class="section-header">
-                        <h2><i class="bi bi-clipboard-check"></i> תכנון מול ביצוע</h2>
+                        <h2><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> תכנון מול ביצוע</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('plan-vs-execution-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -884,7 +884,7 @@
                                         <!-- Entry Comparison -->
                                         <tr>
                                             <td>
-                                                <strong><i class="bi bi-box-arrow-in-right"></i> כניסה</strong>
+                                                <strong><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> כניסה</strong>
                                             </td>
                                             <td>
                                                 <div class="comparison-value planned">
@@ -910,7 +910,7 @@
                                             </td>
                                             <td>
                                                 <span class="status-badge status-match">
-                                                    <i class="bi bi-check-circle"></i> תואם
+                                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> תואם
                                                 </span>
                                             </td>
                                         </tr>
@@ -918,7 +918,7 @@
                                         <!-- Additional Entry Comparison -->
                                         <tr>
                                             <td>
-                                                <strong><i class="bi bi-plus-circle"></i> הוספה</strong>
+                                                <strong><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> הוספה</strong>
                                             </td>
                                             <td>
                                                 <div class="comparison-value planned">
@@ -940,7 +940,7 @@
                                             </td>
                                             <td>
                                                 <span class="status-badge status-additional">
-                                                    <i class="bi bi-info-circle"></i> הוספה לא מתוכננת
+                                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> הוספה לא מתוכננת
                                                 </span>
                                             </td>
                                         </tr>
@@ -948,7 +948,7 @@
                                         <!-- Partial Exit Comparison -->
                                         <tr>
                                             <td>
-                                                <strong><i class="bi bi-box-arrow-right"></i> יציאה חלקית</strong>
+                                                <strong><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> יציאה חלקית</strong>
                                             </td>
                                             <td>
                                                 <div class="comparison-value planned">
@@ -974,7 +974,7 @@
                                             </td>
                                             <td>
                                                 <span class="status-badge status-partial">
-                                                    <i class="bi bi-exclamation-triangle"></i> יציאה חלקית
+                                                    <img src="/trading-ui/images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> יציאה חלקית
                                                 </span>
                                             </td>
                                         </tr>
@@ -982,7 +982,7 @@
                                         <!-- Final Exit Comparison -->
                                         <tr>
                                             <td>
-                                                <strong><i class="bi bi-box-arrow-right"></i> יציאה סופית</strong>
+                                                <strong><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> יציאה סופית</strong>
                                             </td>
                                             <td>
                                                 <div class="comparison-value planned">
@@ -1008,7 +1008,7 @@
                                             </td>
                                             <td>
                                                 <span class="status-badge status-difference">
-                                                    <i class="bi bi-arrow-down"></i> מחיר נמוך מהמתוכנן
+                                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> מחיר נמוך מהמתוכנן
                                                 </span>
                                             </td>
                                         </tr>
@@ -1016,7 +1016,7 @@
                                         <!-- P/L Comparison -->
                                         <tr>
                                             <td>
-                                                <strong><i class="bi bi-graph-up-arrow"></i> רווח/הפסד</strong>
+                                                <strong><img src="/trading-ui/images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon"> רווח/הפסד</strong>
                                             </td>
                                             <td>
                                                 <div class="comparison-value planned">
@@ -1038,7 +1038,7 @@
                                             </td>
                                             <td>
                                                 <span class="status-badge status-difference">
-                                                    <i class="bi bi-arrow-down"></i> $390 פחות מהמתוכנן
+                                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> $390 פחות מהמתוכנן
                                                 </span>
                                             </td>
                                         </tr>
@@ -1053,7 +1053,7 @@
                 <!-- Linked Items Section -->
                 <div class="content-section" id="linked-items-section">
                     <div class="section-header">
-                        <h2><i class="bi bi-link-45deg"></i> פריטים מקושרים</h2>
+                        <h2><img src="/trading-ui/images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> פריטים מקושרים</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('linked-items-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -2036,7 +2036,7 @@
                     container.innerHTML = `
                         <div class="text-center py-4">
                             <button class="btn btn-primary" onclick="window.viewLinkedItemsForTrade(${tradeId})">
-                                <i class="bi bi-link-45deg"></i> הצג פריטים מקושרים
+                                <img src="/trading-ui/images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> הצג פריטים מקושרים
                             </button>
                         </div>
                     `;
@@ -2044,7 +2044,7 @@
                     // Fallback: show message
                     container.innerHTML = `
                         <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> מערכת המקושרים לא זמינה כרגע
+                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> מערכת המקושרים לא זמינה כרגע
                         </div>
                     `;
                 }
@@ -2052,7 +2052,7 @@
                 console.error('Error loading linked items:', error);
                 container.innerHTML = `
                     <div class="alert alert-danger">
-                        <i class="bi bi-exclamation-triangle"></i> שגיאה בטעינת פריטים מקושרים: ${error.message}
+                        <img src="/trading-ui/images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> שגיאה בטעינת פריטים מקושרים: ${error.message}
                     </div>
                 `;
             }
@@ -2063,7 +2063,7 @@
             if (!data || (!data.child_entities && !data.parent_entities)) {
                 container.innerHTML = `
                     <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> אין פריטים מקושרים לטרייד זה
+                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> אין פריטים מקושרים לטרייד זה
                     </div>
                 `;
                 return;
@@ -2077,7 +2077,7 @@
             if (allItems.length === 0) {
                 container.innerHTML = `
                     <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> אין פריטים מקושרים לטרייד זה
+                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> אין פריטים מקושרים לטרייד זה
                     </div>
                 `;
                 return;
@@ -2204,7 +2204,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="tradeSelectorModalLabel">
-                        <i class="bi bi-search"></i> בחירת טרייד לניתוח
+                        <img src="/trading-ui/images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon"> בחירת טרייד לניתוח
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור"></button>
                             </div>
@@ -2254,7 +2254,7 @@
                                 <!-- Clear Filters Button -->
                                 <div class="col-md-2 d-flex align-items-end">
                                     <button class="btn btn-outline-secondary btn-sm w-100" onclick="clearTradeFilters()">
-                                        <i class="bi bi-x-circle"></i> נקה
+                                        <img src="/trading-ui/images/icons/tabler/x.svg" width="16" height="16" alt="x" class="icon"> נקה
                                     </button>
                                         </div>
                                     </div>
@@ -2284,7 +2284,7 @@
                     
                     <!-- No Results Message -->
                     <div id="noTradesMessage" class="alert alert-info text-center" style="display: none;">
-                        <i class="bi bi-info-circle"></i> לא נמצאו טריידים התואמים למסננים
+                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> לא נמצאו טריידים התואמים למסננים
                     </div>
                 </div>
                 <div class="modal-footer">

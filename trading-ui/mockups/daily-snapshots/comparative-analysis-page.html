@@ -244,7 +244,7 @@
                 <div class="col-md-12">
                     <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                         <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
-                            <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
+                            <img src="/trading-ui/images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
                         </span>                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
                 <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
                 <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
@@ -270,7 +270,7 @@
                 <div class="top-section" id="comparative_analysis_page_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <i class="bi bi-bar-chart"></i>
+                            <img src="/trading-ui/images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon">
                             ניתוח השוואתי
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
@@ -287,9 +287,17 @@
                 <!-- Record Filter Panel (Upper) -->
                 <div class="content-section filter-panel-card" id="record-filter-panel">
                     <div class="section-header">
-                        <h3><i class="bi bi-funnel"></i> סינון רשומות להשוואה</h3>
-                        <p class="text-muted small mb-0">בחר איזה טריידים להכלל בניתוח</p>
-                        <div class="header-actions">
+                        <div class="header-title-section">
+                            <h3><img src="/trading-ui/images/icons/tabler/filter.svg" width="16" height="16" alt="filter" class="icon"> סינון רשומות להשוואה</h3>
+                            <p class="text-muted small mb-0">בחר איזה טריידים להכלל בניתוח</p>
+                        </div>
+                        <div class="header-actions d-flex align-items-center gap-2">
+                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 2px 4px !important; line-height: 1;" onclick="selectAllRecordFilters()" title="בחר הכל">
+                                <img src="/trading-ui/images/icons/tabler/check.svg" width="16" height="16" alt="check" class="icon">
+                            </button>
+                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 2px 4px !important; line-height: 1;" onclick="clearAllRecordFilters()" title="נקה הכל">
+                                <img src="/trading-ui/images/icons/tabler/x.svg" width="16" height="16" alt="x" class="icon">
+                            </button>
                             <button class="filter-toggle-btn" onclick="toggleSection('record-filter-panel')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
@@ -371,10 +379,10 @@
                                     <!-- Clear Filters Buttons (moved to first row, at the end - left side in RTL) -->
                                     <div class="col-md-2 me-auto d-flex align-items-end gap-2">
                                         <button class="btn btn-outline-secondary btn-sm flex-fill" onclick="resetRecordFilters()" title="נקה את כל הפילטרים">
-                                            <i class="bi bi-x-circle"></i> נקה
+                                            <img src="/trading-ui/images/icons/tabler/x.svg" width="16" height="16" alt="x" class="icon"> נקה
                                         </button>
                                         <button class="btn btn-outline-primary btn-sm flex-fill" onclick="resetRecordFiltersToDefaults()" title="איפוס לברירת מחדל">
-                                            <i class="bi bi-arrow-counterclockwise"></i> ברירת מחדל
+                                            <img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon"> ברירת מחדל
                                         </button>
                                     </div>
                                 </div>
@@ -387,11 +395,6 @@
                                         <select id="recordFilterTradingAccounts" class="form-select form-select-sm" multiple onchange="applyRecordFilters()" title="בחר חשבונות מסחר">
                                             <!-- Will be populated dynamically -->
                                         </select>
-                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('recordFilterTradingAccounts')" title="בחר הכל">הכל</button>
-                                            <span style="color: #dee2e6;">|</span>
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('recordFilterTradingAccounts')" title="נקה הכל">נקה</button>
-                                        </div>
                                     </div>
                                     
                                     <!-- Tags Filter -->
@@ -400,11 +403,6 @@
                                         <select id="recordFilterTags" class="form-select form-select-sm tag-multi-select" multiple onchange="applyRecordFilters()" title="בחר תגיות לסינון">
                                             <!-- Will be populated by TagUIManager -->
                                         </select>
-                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('recordFilterTags')" title="בחר הכל">הכל</button>
-                                            <span style="color: #dee2e6;">|</span>
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('recordFilterTags')" title="נקה הכל">נקה</button>
-                                        </div>
                                     </div>
                                     
                                     <!-- Side Filter -->
@@ -479,9 +477,17 @@
                 <!-- Comparison Parameters Panel (Lower) -->
                 <div class="content-section comparison-panel-card" id="comparison-parameters-panel">
                     <div class="section-header">
-                        <h3><i class="bi bi-bar-chart"></i> פרמטרים להשוואה</h3>
-                        <p class="text-muted small mb-0">בחר לפי מה להשוות את הטריידים (ניתן לבחור מספר פרמטרים במקביל)</p>
-                        <div class="header-actions">
+                        <div class="header-title-section">
+                            <h3><img src="/trading-ui/images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> פרמטרים להשוואה</h3>
+                            <p class="text-muted small mb-0">בחר לפי מה להשוות את הטריידים (ניתן לבחור מספר פרמטרים במקביל)</p>
+                        </div>
+                        <div class="header-actions d-flex align-items-center gap-2">
+                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 2px 4px !important; line-height: 1;" onclick="selectAllComparisonParameters()" title="בחר הכל">
+                                <img src="/trading-ui/images/icons/tabler/check.svg" width="16" height="16" alt="check" class="icon">
+                            </button>
+                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 2px 4px !important; line-height: 1;" onclick="clearAllComparisonParameters()" title="נקה הכל">
+                                <img src="/trading-ui/images/icons/tabler/x.svg" width="16" height="16" alt="x" class="icon">
+                            </button>
                             <button class="filter-toggle-btn" onclick="toggleSection('comparison-parameters-panel')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
@@ -502,11 +508,6 @@
                                             <option value="Swing">Swing</option>
                                             <option value="Passive">Passive</option>
                                         </select>
-                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('comparisonInvestmentTypes')" title="בחר הכל">הכל</button>
-                                            <span style="color: #dee2e6;">|</span>
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('comparisonInvestmentTypes')" title="נקה הכל">נקה</button>
-                                        </div>
                                     </div>
                                     
                                     <!-- Trading Methods Parameter -->
@@ -518,11 +519,6 @@
                                         <select id="comparisonTradingMethods" class="form-select form-select-sm" multiple onchange="applyComparisonParameters()" title="בחר שיטות מסחר להשוואה" disabled>
                                             <!-- Will be populated dynamically -->
                                         </select>
-                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('comparisonTradingMethods')" title="בחר הכל">הכל</button>
-                                            <span style="color: #dee2e6;">|</span>
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('comparisonTradingMethods')" title="נקה הכל">נקה</button>
-                                        </div>
                                     </div>
                                     
                                     <!-- Ticker Parameter -->
@@ -534,11 +530,6 @@
                                         <select id="comparisonTickers" class="form-select form-select-sm" multiple onchange="applyComparisonParameters()" title="בחר טיקרים להשוואה" disabled>
                                             <!-- Will be populated dynamically -->
                                         </select>
-                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('comparisonTickers')" title="בחר הכל">הכל</button>
-                                            <span style="color: #dee2e6;">|</span>
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('comparisonTickers')" title="נקה הכל">נקה</button>
-                                        </div>
                                     </div>
                                     
                                     <!-- Tags Parameter -->
@@ -550,11 +541,6 @@
                                         <select id="comparisonTags" class="form-select form-select-sm tag-multi-select" multiple onchange="applyComparisonParameters()" title="בחר תגיות להשוואה" disabled>
                                             <!-- Will be populated by TagUIManager -->
                                         </select>
-                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('comparisonTags')" title="בחר הכל">הכל</button>
-                                            <span style="color: #dee2e6;">|</span>
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('comparisonTags')" title="נקה הכל">נקה</button>
-                                        </div>
                                     </div>
                                     
                                     <!-- With/Without Plan Parameter -->
@@ -573,15 +559,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <!-- Clear All Comparison Parameters Button -->
-                                <div class="row mt-3">
-                                    <div class="col-12">
-                                        <button class="btn btn-outline-secondary btn-sm" onclick="clearAllComparisonParameters()" title="נקה את כל הפרמטרים להשוואה">
-                                            <i class="bi bi-x-circle"></i> נקה הכל
-                                        </button>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -590,7 +567,7 @@
                 <!-- Comparison Table Section -->
                 <div class="content-section" id="comparison-table-section">
                     <div class="section-header">
-                        <h2><i class="bi bi-table"></i> טבלת השוואות</h2>
+                        <h2><img src="/trading-ui/images/icons/tabler/table.svg" width="16" height="16" alt="table" class="icon"> טבלת השוואות</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('comparison-table-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -630,48 +607,10 @@
                     </div>
                 </div>
                 
-                <!-- Bar Chart Section -->
-                <div class="content-section" id="pl-by-category-section">
-                    <div class="section-header">
-                        <h2><i class="bi bi-bar-chart"></i> P/L לפי קטגוריה</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('pl-by-category-section')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                                <div id="pl-by-category-chart-container" class="chart-container" style="height: 300px; position: relative; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
-                                    <div class="chart-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6c757d;">
-                                        <i class="bi bi-hourglass-split"></i> טוען גרף...
-                                    </div>
-                                </div>
-                    </div>
-                </div>
-                
-                <!-- Pie Chart Section -->
-                <div class="content-section" id="category-distribution-section">
-                    <div class="section-header">
-                        <h2><i class="bi bi-pie-chart"></i> התפלגות לפי קטגוריה</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('category-distribution-section')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <div id="category-distribution-chart-container" class="chart-container" style="height: 300px; position: relative; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
-                            <div class="chart-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6c757d;">
-                                <i class="bi bi-hourglass-split"></i> טוען גרף...
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- Heatmap Section -->
                 <div class="content-section" id="heatmap-section">
                     <div class="section-header">
-                        <h2><i class="bi bi-grid-3x3"></i> Heatmap - מטריצת השוואות</h2>
+                        <h2><img src="/trading-ui/images/icons/tabler/grid.svg" width="16" height="16" alt="grid" class="icon"> Heatmap - מטריצת השוואות</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('heatmap-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -700,6 +639,44 @@
                                     <span class="badge bg-warning">🟡 = בינוני</span>
                                     <span class="badge bg-danger">🔴 = רע</span>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bar Chart Section -->
+                <div class="content-section" id="pl-by-category-section">
+                    <div class="section-header">
+                        <h2><img src="/trading-ui/images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> P/L לפי קטגוריה</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('pl-by-category-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                                <div id="pl-by-category-chart-container" class="chart-container" style="height: 300px; position: relative; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
+                                    <div class="chart-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6c757d;">
+                                        <img src="/trading-ui/images/icons/tabler/hourglass.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                    </div>
+                                </div>
+                    </div>
+                </div>
+                
+                <!-- Pie Chart Section -->
+                <div class="content-section" id="category-distribution-section">
+                    <div class="section-header">
+                        <h2><img src="/trading-ui/images/icons/tabler/chart-pie.svg" width="16" height="16" alt="chart-pie" class="icon"> התפלגות לפי קטגוריה</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('category-distribution-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div id="category-distribution-chart-container" class="chart-container" style="height: 300px; position: relative; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
+                            <div class="chart-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6c757d;">
+                                <img src="/trading-ui/images/icons/tabler/hourglass.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
                             </div>
                         </div>
                     </div>
@@ -822,6 +799,50 @@
         .form-check-input:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+        
+        /* Header actions styling - ensure buttons are on the left (end of line in RTL) */
+        .filter-panel-card .section-header,
+        .comparison-panel-card .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .filter-panel-card .section-header .header-title-section,
+        .comparison-panel-card .section-header .header-title-section {
+            flex: 1;
+        }
+        
+        .filter-panel-card .section-header .header-actions,
+        .comparison-panel-card .section-header .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        
+        /* Small icon buttons in header */
+        .filter-panel-card .section-header .header-actions .btn-link,
+        .comparison-panel-card .section-header .header-actions .btn-link {
+            font-size: 0.75rem !important;
+            padding: 2px 4px !important;
+            line-height: 1 !important;
+            min-width: auto !important;
+            width: auto !important;
+            height: auto !important;
+            color: inherit;
+        }
+        
+        .filter-panel-card .section-header .header-actions .btn-link:hover,
+        .comparison-panel-card .section-header .header-actions .btn-link:hover {
+            opacity: 0.7;
+        }
+        
+        .filter-panel-card .section-header .header-actions .btn-link i,
+        .comparison-panel-card .section-header .header-actions .btn-link i {
+            font-size: 0.85rem;
         }
     </style>
     
@@ -1918,7 +1939,27 @@
                 const totalMaxInvestment = data.reduce((sum, cat) => sum + (cat.maxInvestmentAtPoint || 0), 0);
                 const totalTotalPurchases = data.reduce((sum, cat) => sum + (cat.totalPurchases || 0), 0);
                 
-                tbody.innerHTML = data.map(cat => {
+                // Calculate summary totals and averages
+                const totalTrades = data.reduce((sum, cat) => sum + (cat.trades || 0), 0);
+                const totalAvgPL = data.reduce((sum, cat) => sum + (cat.avgPL || 0), 0);
+                const totalTotalPL = data.reduce((sum, cat) => sum + (cat.totalPL || 0), 0);
+                const totalSuccessRate = data.reduce((sum, cat) => sum + (cat.successRate || 0), 0);
+                
+                const avgTrades = data.length > 0 ? totalTrades / data.length : 0;
+                const avgAvgPL = data.length > 0 ? totalAvgPL / data.length : 0;
+                const avgTotalPL = data.length > 0 ? totalTotalPL / data.length : 0;
+                const avgSuccessRate = data.length > 0 ? totalSuccessRate / data.length : 0;
+                const avgMaxInvestment = data.length > 0 ? totalMaxInvestment / data.length : 0;
+                const avgTotalPurchases = data.length > 0 ? totalTotalPurchases / data.length : 0;
+                
+                // Calculate overall P/L percentage for summary
+                const totalInvestment = data.reduce((sum, cat) => sum + (cat.totalInvestment || 0), 0);
+                const summaryPLPercent = totalInvestment > 0 
+                    ? ((totalTotalPL / totalInvestment) * 100) 
+                    : null;
+                
+                // Build data rows
+                const dataRows = data.map(cat => {
                     // Build parameter value cells
                     const paramCells = paramHeaders.map(header => {
                         const value = cat.paramValues[header] || '';
@@ -1950,6 +1991,27 @@
                     
                     return `<tr style="animation: fadeIn 0.3s;">${paramCells}${dataCells}</tr>`;
                 }).join('');
+                
+                // Build summary row (last row, highlighted)
+                const summaryParamCells = paramHeaders.map(() => '<td><strong>סה"כ / ממוצע</strong></td>').join('');
+                
+                // Calculate percentages for summary investment values
+                const summaryMaxInvestmentPercent = totalMaxInvestment > 0 ? 100 : null; // Total is 100% of itself
+                const summaryTotalPurchasesPercent = totalTotalPurchases > 0 ? 100 : null;
+                
+                const summaryRow = `
+                    <tr class="table-info fw-bold" style="background-color: #d1ecf1; border-top: 2px solid #0c5460;">
+                        ${summaryParamCells}
+                        <td><strong>${totalTrades} / ${avgTrades.toFixed(1)}</strong></td>
+                        <td><strong>${formatPLWithPercent(totalAvgPL, summaryPLPercent)} / ${formatPLWithPercent(avgAvgPL, summaryPLPercent)}</strong></td>
+                        <td class="text-success"><strong>${formatPLWithPercent(totalTotalPL, summaryPLPercent)} / ${formatPLWithPercent(avgTotalPL, summaryPLPercent)}</strong></td>
+                        <td><strong>${avgSuccessRate.toFixed(1)}%</strong></td>
+                        <td class="text-end"><strong>${formatInvestmentWithPercent(totalMaxInvestment, summaryMaxInvestmentPercent)} / ${formatInvestmentWithPercent(avgMaxInvestment, null)}</strong></td>
+                        <td class="text-end"><strong>${formatInvestmentWithPercent(totalTotalPurchases, summaryTotalPurchasesPercent)} / ${formatInvestmentWithPercent(avgTotalPurchases, null)}</strong></td>
+                    </tr>
+                `;
+                
+                tbody.innerHTML = dataRows + summaryRow;
                 
                 // Fade in
                 tbody.style.opacity = '1';
@@ -2169,7 +2231,7 @@
                 if (container) {
                     const loading = container.querySelector('.chart-loading');
                     if (loading) {
-                        loading.innerHTML = '<i class="bi bi-exclamation-triangle"></i> שגיאה בטעינת גרף';
+                        loading.innerHTML = '<img src="/trading-ui/images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> שגיאה בטעינת גרף';
                         loading.style.color = '#dc3545';
                     }
                 }
@@ -2257,7 +2319,7 @@
                 if (container) {
                     const loading = container.querySelector('.chart-loading');
                     if (loading) {
-                        loading.innerHTML = '<i class="bi bi-exclamation-triangle"></i> שגיאה בטעינת גרף';
+                        loading.innerHTML = '<img src="/trading-ui/images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> שגיאה בטעינת גרף';
                         loading.style.color = '#dc3545';
                     }
                 }
@@ -2471,6 +2533,47 @@
             updateAllVisualizations();
         }
         
+        // Select all options in all record filter selects
+        function selectAllRecordFilters() {
+            // Trading accounts
+            const tradingAccounts = document.getElementById('recordFilterTradingAccounts');
+            if (tradingAccounts) {
+                Array.from(tradingAccounts.options).forEach(opt => opt.selected = true);
+            }
+            // Tags
+            const tagsSelect = document.getElementById('recordFilterTags');
+            if (tagsSelect) {
+                if (window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                    const allTagIds = Array.from(tagsSelect.options).map(opt => parseInt(opt.value)).filter(v => !isNaN(v));
+                    window.TagUIManager.setSelectedValues(tagsSelect, allTagIds);
+                } else {
+                    Array.from(tagsSelect.options).forEach(opt => opt.selected = true);
+                }
+            }
+            // Apply filters
+            applyRecordFilters();
+        }
+        
+        // Clear all options in all record filter selects
+        function clearAllRecordFilters() {
+            // Trading accounts
+            const tradingAccounts = document.getElementById('recordFilterTradingAccounts');
+            if (tradingAccounts) {
+                Array.from(tradingAccounts.options).forEach(opt => opt.selected = false);
+            }
+            // Tags
+            const tagsSelect = document.getElementById('recordFilterTags');
+            if (tagsSelect) {
+                if (window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                    window.TagUIManager.setSelectedValues(tagsSelect, []);
+                } else {
+                    Array.from(tagsSelect.options).forEach(opt => opt.selected = false);
+                }
+            }
+            // Apply filters
+            applyRecordFilters();
+        }
+        
         function resetRecordFilters() {
             // Clear date range preset
             const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
@@ -2669,6 +2772,37 @@
         function applyComparisonParameters() {
             saveComparisonParameterState();
             updateAllVisualizations();
+        }
+        
+        // Select all options in all comparison parameter selects
+        function selectAllComparisonParameters() {
+            // Investment types
+            const investmentTypes = document.getElementById('comparisonInvestmentTypes');
+            if (investmentTypes && !investmentTypes.disabled) {
+                Array.from(investmentTypes.options).forEach(opt => opt.selected = true);
+            }
+            // Trading methods
+            const tradingMethods = document.getElementById('comparisonTradingMethods');
+            if (tradingMethods && !tradingMethods.disabled) {
+                Array.from(tradingMethods.options).forEach(opt => opt.selected = true);
+            }
+            // Tickers
+            const tickers = document.getElementById('comparisonTickers');
+            if (tickers && !tickers.disabled) {
+                Array.from(tickers.options).forEach(opt => opt.selected = true);
+            }
+            // Tags
+            const tagsSelect = document.getElementById('comparisonTags');
+            if (tagsSelect && !tagsSelect.disabled) {
+                if (window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                    const allTagIds = Array.from(tagsSelect.options).map(opt => parseInt(opt.value)).filter(v => !isNaN(v));
+                    window.TagUIManager.setSelectedValues(tagsSelect, allTagIds);
+                } else {
+                    Array.from(tagsSelect.options).forEach(opt => opt.selected = true);
+                }
+            }
+            // Apply parameters
+            applyComparisonParameters();
         }
         
         function clearAllComparisonParameters() {
@@ -2914,8 +3048,11 @@
         window.applyRecordFilters = applyRecordFilters;
         window.resetRecordFilters = resetRecordFilters;
         window.resetRecordFiltersToDefaults = resetRecordFiltersToDefaults;
+        window.selectAllRecordFilters = selectAllRecordFilters;
+        window.clearAllRecordFilters = clearAllRecordFilters;
         window.toggleComparisonParameter = toggleComparisonParameter;
         window.applyComparisonParameters = applyComparisonParameters;
+        window.selectAllComparisonParameters = selectAllComparisonParameters;
         window.clearAllComparisonParameters = clearAllComparisonParameters;
         
         // Apply filters (called automatically on filter change) - backward compatibility

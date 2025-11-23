@@ -57,3 +57,6 @@ production/Backend/logs/
 production/Backend/logs-production/
 
 Backend/Backend/reports/user_imports/
+
+# Server PID file
+Backend/.tiktrack_server_pid

@@ -1102,6 +1102,20 @@ const PACKAGE_MANIFEST = {
         loadOrder: 6.7
       },
       {
+        file: 'services/trading-accounts-data.js',
+        globalCheck: 'window.TradingAccountsData',
+        description: 'שירות נתוני חשבונות מסחר',
+        required: false,
+        loadOrder: 6.8
+      },
+      {
+        file: 'services/cash-flows-data.js',
+        globalCheck: 'window.CashFlowsData',
+        description: 'שירות נתוני תזרימים',
+        required: false,
+        loadOrder: 6.9
+      },
+      {
         file: 'condition-translator.js',
         globalCheck: 'window.conditionTranslator',
         description: 'מתרגם תנאים',

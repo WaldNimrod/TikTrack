@@ -886,6 +886,49 @@ async function saveTicker() {
     return;
   }
 
+  // Business Logic API validation - validate ticker symbol
+  if (window.TickersData?.validateTickerSymbol) {
+    try {
+      const symbolValidation = await window.TickersData.validateTickerSymbol(symbol);
+      if (!symbolValidation.is_valid) {
+        const errorMessage = symbolValidation.errors?.join(', ') || 'ולידציה של סמל נכשלה';
+        window.showErrorNotification?.('שגיאת ולידציה', errorMessage);
+        return;
+      }
+    } catch (validationError) {
+      window.Logger?.warn('⚠️ Ticker symbol validation error (continuing with save)', {
+        error: validationError,
+        page: 'tickers'
+      });
+      // Continue with save even if validation fails (fallback)
+    }
+  }
+
+  // Business Logic API validation - validate ticker data
+  if (window.TickersData?.validateTicker) {
+    try {
+      const validationResult = await window.TickersData.validateTicker({
+        symbol,
+        name,
+        type,
+        currency_id: parseInt(currency_id),
+        status
+      });
+
+      if (!validationResult.is_valid) {
+        const errorMessage = validationResult.errors?.join(', ') || 'ולידציה נכשלה';
+        window.showErrorNotification?.('שגיאת ולידציה', errorMessage);
+        return;
+      }
+    } catch (validationError) {
+      window.Logger?.warn('⚠️ Ticker validation error (continuing with save)', {
+        error: validationError,
+        page: 'tickers'
+      });
+      // Continue with save even if validation fails (fallback)
+    }
+  }
+
   const finalStatus = status;
 
   try {

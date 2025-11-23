@@ -417,9 +417,9 @@ class StatisticsBusinessService(BaseBusinessService):
     @staticmethod
     def calculate_time_weighted_return(
         db: Session,
-        account_id: Optional[int] = None,
         start_date: datetime,
         end_date: datetime,
+        account_id: Optional[int] = None,
         include_cash_flows: bool = True
     ) -> Dict[str, Any]:
         """
@@ -452,9 +452,9 @@ class StatisticsBusinessService(BaseBusinessService):
         Example:
             result = StatisticsBusinessService.calculate_time_weighted_return(
                 db=db,
-                account_id=1,
                 start_date=datetime(2024, 1, 1),
-                end_date=datetime(2024, 12, 31)
+                end_date=datetime(2024, 12, 31),
+                account_id=1
             )
             if result['is_valid']:
                 twr = result['time_weighted_return']  # e.g., 5.5 for 5.5%

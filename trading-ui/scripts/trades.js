@@ -4258,6 +4258,40 @@ async function saveTrade() {
             return;
         }
         
+        // Business Logic API validation - prepare data in format expected by validateTrade
+        const businessValidationData = {
+            trading_account_id: tradeData.trading_account_id,
+            ticker_id: tradeData.ticker_id,
+            trade_plan_id: form.querySelector('#tradePlan')?.value ? parseInt(form.querySelector('#tradePlan').value) : null,
+            side: tradeData.side,
+            investment_type: tradeData.type, // Map 'type' to 'investment_type'
+            status: tradeData.status,
+            planned_quantity: tradeData.quantity ? parseFloat(tradeData.quantity) : null,
+            planned_amount: form.querySelector('#tradeAmount')?.value ? parseFloat(form.querySelector('#tradeAmount').value) : null,
+            entry_price: tradeData.entry_price ? parseFloat(tradeData.entry_price) : null,
+            stop_price: tradeData.stop_loss ? parseFloat(tradeData.stop_loss) : null,
+            target_price: tradeData.take_profit ? parseFloat(tradeData.take_profit) : null,
+            stop_percentage: form.querySelector('#tradeStopLossPercent')?.value ? parseFloat(form.querySelector('#tradeStopLossPercent').value) : null,
+            target_percentage: form.querySelector('#tradeTakeProfitPercent')?.value ? parseFloat(form.querySelector('#tradeTakeProfitPercent').value) : null
+        };
+        
+        if (window.TradesData?.validateTrade) {
+            try {
+                const businessValidationResult = await window.TradesData.validateTrade(businessValidationData);
+                if (!businessValidationResult.is_valid) {
+                    const errorMessage = businessValidationResult.errors?.join(', ') || 'ולידציה נכשלה';
+                    window.showErrorNotification?.('שגיאת ולידציה', errorMessage);
+                    return;
+                }
+            } catch (validationError) {
+                window.Logger?.warn('⚠️ Trade validation error (continuing with save)', {
+                    error: validationError,
+                    page: 'trades'
+                });
+                // Continue with save even if validation fails (fallback)
+            }
+        }
+        
         const tradeId = form.dataset.tradeId;
         
         // Prepare API call

@@ -38,6 +38,10 @@
     <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js" defer></script>
     <script src="../../scripts/charts/tradingview-theme.js" defer></script>
     <script src="../../scripts/charts/tradingview-adapter.js" defer></script>
+    
+    <!-- Action Buttons System -->
+    <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
+    <script src="../../scripts/button-system-init.js" defer></script>
 </head>
 <body class="price-history-page">
     <!-- Header System -->
@@ -90,7 +94,7 @@
                         <div class="card mb-4">
                             <div class="card-body">
                                 <div class="row mb-3">
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <label for="tickerSelect" class="form-label">בחירת טיקר:</label>
                                         <select id="tickerSelect" class="form-select">
                                             <option value="AAPL" selected>AAPL</option>
@@ -98,13 +102,15 @@
                                             <option value="MSFT">MSFT</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-4">
-                                        <label for="dateRangeStart" class="form-label">תקופה - מתאריך:</label>
-                                        <input type="date" id="dateRangeStart" class="form-control" value="2025-01-01">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="dateRangeEnd" class="form-label">עד תאריך:</label>
-                                        <input type="date" id="dateRangeEnd" class="form-control" value="2025-01-31">
+                                    <div class="col-md-6">
+                                        <label for="unitSize" class="form-label">גודל יחידה:</label>
+                                        <select id="unitSize" class="form-select">
+                                            <option value="hour">שעה</option>
+                                            <option value="day" selected>יום</option>
+                                            <option value="week">שבוע</option>
+                                            <option value="month">חודש</option>
+                                            <option value="year">שנה</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -125,22 +131,41 @@
                 <div class="content-section" id="price-chart-section">
                     <div class="section-header">
                         <h2><i class="bi bi-graph-up"></i> גרף מחירים לאורך זמן</h2>
-                        <div class="header-actions">
+                        <div class="header-actions" style="display: flex; align-items: center; gap: 8px;">
+                            <!-- Unit Size Buttons -->
+                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                <button class="unit-size-btn" data-unit="5min" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">5m</button>
+                                <button class="unit-size-btn" data-unit="hour" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1h</button>
+                                <button class="unit-size-btn active" data-unit="day" style="padding: 4px 8px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1D</button>
+                                <button class="unit-size-btn" data-unit="week" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1W</button>
+                                <button class="unit-size-btn" data-unit="month" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1M</button>
+                                <button class="unit-size-btn" data-unit="year" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1Y</button>
+                            </div>
+                            <!-- Time Range Buttons -->
+                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                <button class="chart-control-btn" data-range="day" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">יום</button>
+                                <button class="chart-control-btn" data-range="week" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">שבוע</button>
+                                <button class="chart-control-btn active" data-range="month" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">חודש</button>
+                                <button class="chart-control-btn" data-range="year" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">שנה</button>
+                                <button class="chart-control-btn" data-range="all" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">הכול</button>
+                            </div>
+                            <!-- Chart Type Buttons -->
+                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                <button class="chart-type-btn active" data-type="line" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="קו">
+                                    <i class="bi bi-graph-up"></i>
+                                </button>
+                                <button class="chart-type-btn" data-type="candlestick" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="נרות">
+                                    <i class="bi bi-bar-chart"></i>
+                                </button>
+                            </div>
                             <button class="filter-toggle-btn" onclick="toggleSection('price-chart-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
-                                <div class="mb-3">
-                                    <button class="btn btn-sm btn-outline-primary">שבוע</button>
-                                    <button class="btn btn-sm btn-primary">חודש</button>
-                                    <button class="btn btn-sm btn-outline-primary">3 חודשים</button>
-                                    <button class="btn btn-sm btn-outline-primary">שנה</button>
-                                    <button class="btn btn-sm btn-outline-primary">כל הזמן</button>
-                                </div>
-                                <div class="chart-container" style="height: 400px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                                    [גרף מחירים - Line Chart עם אפשרות השוואה בין טיקרים]
+                                <div id="price-chart-wrapper" style="position: relative; height: 500px; width: 100%; background: #fff; border-radius: 8px; overflow: hidden;">
+                                    <div id="price-chart-container" style="height: 100%; width: 100%;"></div>
                                 </div>
                                 <div class="mt-3">
                                     <span class="badge" style="background: #007bff;">● AAPL</span>
@@ -325,7 +350,488 @@
             } catch (error) {
                 console.warn('Preferences initialization failed (non-critical):', error);
             }
+            
+            // Initialize price chart
+            initPriceChart();
         });
+        
+        // Chart variables
+        let priceChart = null;
+        let priceChartSeries = null;
+        let comparisonSeries = [];
+        
+        // Initialize price chart
+        async function initPriceChart() {
+            try {
+                // Wait for TradingViewChartAdapter to be available
+                await waitForTradingViewAdapter();
+                
+                const container = document.getElementById('price-chart-container');
+                if (!container) {
+                    console.error('Price chart container not found');
+                    return;
+                }
+                
+                // Destroy existing chart if any
+                if (priceChart) {
+                    try {
+                        priceChart.remove();
+                    } catch (e) {
+                        console.warn('Error removing existing chart:', e);
+                    }
+                }
+                
+                // Get chart type from overlay buttons (default: line)
+                const activeChartTypeBtn = document.querySelector('.chart-type-btn.active');
+                const chartType = activeChartTypeBtn?.dataset.type || 'line';
+                
+                // Create chart
+                priceChart = window.TradingViewChartAdapter.createChart(container, {
+                    layout: {
+                        background: { type: 'solid', color: 'transparent' },
+                        textColor: getCSSVariableValue('--text-color', '#333')
+                    },
+                    grid: {
+                        vertLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') },
+                        horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
+                    },
+                    width: container.clientWidth,
+                    height: 500,
+                    timeScale: {
+                        timeVisible: true,
+                        secondsVisible: true
+                    },
+                    rightPriceScale: {
+                        borderVisible: true,
+                        borderColor: getCSSVariableValue('--border-color', '#e0e0e0')
+                    }
+                });
+                
+                // Get selected ticker
+                const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
+                
+                // Get time range from header buttons (default: month)
+                const activeRangeBtn = document.querySelector('.chart-control-btn.active[data-range]');
+                const timeRange = activeRangeBtn?.dataset.range || 'month';
+                
+                // Auto-set unit size based on time range
+                autoSetUnitSizeByTimeRange(timeRange);
+                
+                // Get unit size from header buttons
+                const activeUnitBtn = document.querySelector('.unit-size-btn.active[data-unit]');
+                const unitSize = activeUnitBtn?.dataset.unit || 'day';
+                
+                // Generate mock data
+                const mockData = generateMockPriceData(selectedTicker, unitSize, timeRange);
+                
+                // Add main series
+                if (chartType === 'candlestick') {
+                    priceChartSeries = window.TradingViewChartAdapter.addCandlestickSeries(priceChart, {
+                        upColor: '#26baac',
+                        downColor: '#ef5350',
+                        borderVisible: false,
+                        wickUpColor: '#26baac',
+                        wickDownColor: '#ef5350',
+                        title: selectedTicker
+                    });
+                    priceChartSeries.setData(mockData.candles);
+                } else {
+                    priceChartSeries = window.TradingViewChartAdapter.addLineSeries(priceChart, {
+                        color: getCSSVariableValue('--primary-color', '#007bff'),
+                        lineWidth: 2,
+                        title: selectedTicker,
+                        priceFormat: {
+                            type: 'price',
+                            precision: 2,
+                            minMove: 0.01
+                        }
+                    });
+                    priceChartSeries.setData(mockData.line);
+                }
+                
+                // Add comparison series if multiple tickers selected
+                const comparisonTickers = Array.from(document.getElementById('tickersCompare')?.selectedOptions || [])
+                    .map(opt => opt.value);
+                
+                if (comparisonTickers.length > 0) {
+                    const colors = ['#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1'];
+                    comparisonTickers.forEach((ticker, idx) => {
+                        const compData = generateMockPriceData(ticker, unitSize, timeRange);
+                        const compSeries = window.TradingViewChartAdapter.addLineSeries(priceChart, {
+                            color: colors[idx % colors.length],
+                            lineWidth: 1,
+                            title: ticker,
+                            priceFormat: {
+                                type: 'price',
+                                precision: 2,
+                                minMove: 0.01
+                            }
+                        });
+                        compSeries.setData(compData.line);
+                        comparisonSeries.push(compSeries);
+                    });
+                }
+                
+                // Fit content
+                priceChart.timeScale().fitContent();
+                
+                // Setup event listeners for filters and overlay buttons
+                setupChartFilters();
+                
+                console.log('✅ Price chart initialized');
+                
+            } catch (error) {
+                console.error('Error initializing price chart:', error);
+            }
+        }
+        
+        // Wait for TradingViewChartAdapter
+        function waitForTradingViewAdapter() {
+            return new Promise((resolve) => {
+                if (window.TradingViewChartAdapter && window.LightweightCharts) {
+                    resolve();
+                } else {
+                    const checkInterval = setInterval(() => {
+                        if (window.TradingViewChartAdapter && window.LightweightCharts) {
+                            clearInterval(checkInterval);
+                            resolve();
+                        }
+                    }, 100);
+                }
+            });
+        }
+        
+        // Auto-set unit size and chart type based on time range
+        function autoSetUnitSizeByTimeRange(timeRange) {
+            let targetUnit;
+            let targetChartType;
+            
+            // Automatic unit size and chart type logic
+            if (timeRange === 'day') {
+                targetUnit = '5min'; // יום אחד -> נקודות של 5 דקות
+                targetChartType = 'line'; // קו לגרף יומי
+            } else if (timeRange === 'week') {
+                targetUnit = 'hour'; // שבוע אחד -> נקודות של שעה
+                targetChartType = 'line'; // קו לגרף שבועי
+            } else if (timeRange === 'month' || timeRange === 'year') {
+                targetUnit = 'day'; // חודש או שנה -> נרות של יום
+                targetChartType = 'candlestick'; // נרות לחודש/שנה
+            } else if (timeRange === 'all') {
+                targetUnit = 'week'; // הכול -> נרות של שבוע
+                targetChartType = 'candlestick'; // נרות להכול
+            } else {
+                targetUnit = 'day'; // default
+                targetChartType = 'line';
+            }
+            
+            // Find and activate the target unit button
+            const targetUnitBtn = document.querySelector(`.unit-size-btn[data-unit="${targetUnit}"]`);
+            if (targetUnitBtn) {
+                // Remove active class from all unit buttons
+                document.querySelectorAll('.unit-size-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.style.border = '1px solid #ddd';
+                    btn.style.background = 'white';
+                    btn.style.color = '';
+                });
+                
+                // Activate target unit button
+                targetUnitBtn.classList.add('active');
+                targetUnitBtn.style.border = '1px solid #007bff';
+                targetUnitBtn.style.background = '#007bff';
+                targetUnitBtn.style.color = 'white';
+            }
+            
+            // Find and activate the target chart type button
+            const targetChartTypeBtn = document.querySelector(`.chart-type-btn[data-type="${targetChartType}"]`);
+            if (targetChartTypeBtn) {
+                // Remove active class from all chart type buttons
+                document.querySelectorAll('.chart-type-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.style.border = '1px solid #ddd';
+                    btn.style.background = 'white';
+                    btn.style.color = '';
+                });
+                
+                // Activate target chart type button
+                targetChartTypeBtn.classList.add('active');
+                targetChartTypeBtn.style.border = '1px solid #007bff';
+                targetChartTypeBtn.style.background = '#007bff';
+                targetChartTypeBtn.style.color = 'white';
+            }
+        }
+        
+        // Generate mock price data
+        function generateMockPriceData(ticker, unitSize, timeRange) {
+            const data = {
+                line: [],
+                candles: []
+            };
+            
+            // Calculate number of points based on time range and unit size
+            let numPoints = 30; // default
+            if (timeRange === 'day') {
+                if (unitSize === '5min') numPoints = 288; // 24 hours * 12 (5-min intervals per hour)
+                else numPoints = 24; // hourly for day
+            } else if (timeRange === 'week') {
+                if (unitSize === 'hour') numPoints = 168; // 7 days * 24 hours
+                else if (unitSize === 'day') numPoints = 7;
+                else numPoints = 168;
+            } else if (timeRange === 'month') {
+                if (unitSize === 'day') numPoints = 30;
+                else if (unitSize === 'hour') numPoints = 720; // 30 days * 24 hours
+                else if (unitSize === 'week') numPoints = 4;
+                else numPoints = 30;
+            } else if (timeRange === 'year') {
+                if (unitSize === 'day') numPoints = 365;
+                else if (unitSize === 'week') numPoints = 52;
+                else if (unitSize === 'month') numPoints = 12;
+                else numPoints = 365;
+            } else if (timeRange === 'all') {
+                if (unitSize === 'week') numPoints = 104; // 2 years
+                else if (unitSize === 'month') numPoints = 24;
+                else if (unitSize === 'year') numPoints = 5;
+                else numPoints = 104;
+            }
+            
+            // Base price for different tickers
+            const basePrices = {
+                'AAPL': 150,
+                'TSLA': 200,
+                'MSFT': 350
+            };
+            const basePrice = basePrices[ticker] || 100;
+            
+            // Generate data
+            let currentPrice = basePrice;
+            const startDate = new Date();
+            
+            // Adjust start date based on time range and unit size
+            if (timeRange === 'day') {
+                startDate.setDate(startDate.getDate() - 1);
+            } else if (timeRange === 'week') {
+                startDate.setDate(startDate.getDate() - 7);
+            } else if (timeRange === 'month') {
+                startDate.setMonth(startDate.getMonth() - 1);
+            } else if (timeRange === 'year') {
+                startDate.setFullYear(startDate.getFullYear() - 1);
+            } else if (timeRange === 'all') {
+                startDate.setFullYear(startDate.getFullYear() - 2);
+            }
+            
+            for (let i = 0; i < numPoints; i++) {
+                const date = new Date(startDate);
+                
+                // Adjust date based on unit size
+                if (unitSize === '5min') {
+                    date.setMinutes(date.getMinutes() + (i * 5));
+                } else if (unitSize === 'hour') {
+                    date.setHours(date.getHours() + i);
+                } else if (unitSize === 'day') {
+                    date.setDate(date.getDate() + i);
+                } else if (unitSize === 'week') {
+                    date.setDate(date.getDate() + (i * 7));
+                } else if (unitSize === 'month') {
+                    date.setMonth(date.getMonth() + i);
+                } else if (unitSize === 'year') {
+                    date.setFullYear(date.getFullYear() + i);
+                }
+                
+                // Simulate price movement
+                const change = (Math.random() - 0.5) * 4; // -2 to +2
+                currentPrice = Math.max(10, currentPrice + change);
+                
+                // Format time based on unit size (support minutes)
+                let timeStr;
+                if (unitSize === '5min' || unitSize === 'hour') {
+                    // For intraday, use full timestamp
+                    timeStr = Math.floor(date.getTime() / 1000); // Unix timestamp in seconds
+                } else {
+                    // For daily and above, use date only
+                    timeStr = date.toISOString().split('T')[0];
+                }
+                
+                // Line data
+                data.line.push({
+                    time: timeStr,
+                    value: Math.round(currentPrice * 100) / 100
+                });
+                
+                // Candlestick data
+                const open = currentPrice;
+                const close = currentPrice + (Math.random() - 0.5) * 2;
+                const high = Math.max(open, close) + Math.random() * 1;
+                const low = Math.min(open, close) - Math.random() * 1;
+                
+                data.candles.push({
+                    time: timeStr,
+                    open: Math.round(open * 100) / 100,
+                    high: Math.round(high * 100) / 100,
+                    low: Math.round(low * 100) / 100,
+                    close: Math.round(close * 100) / 100
+                });
+                
+                currentPrice = close;
+            }
+            
+            return data;
+        }
+        
+        // Setup chart filters and header buttons
+        function setupChartFilters() {
+            const tickerSelect = document.getElementById('tickerSelect');
+            const unitSizeSelect = document.getElementById('unitSize');
+            const tickersCompareSelect = document.getElementById('tickersCompare');
+            
+            // Setup unit size buttons in header
+            const unitSizeButtons = document.querySelectorAll('.unit-size-btn[data-unit]');
+            unitSizeButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Remove active class from all unit buttons
+                    unitSizeButtons.forEach(b => {
+                        b.classList.remove('active');
+                        b.style.border = '1px solid #ddd';
+                        b.style.background = 'white';
+                        b.style.color = '';
+                    });
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    btn.style.border = '1px solid #007bff';
+                    btn.style.background = '#007bff';
+                    btn.style.color = 'white';
+                    
+                    // Reload chart
+                    reloadChart();
+                });
+            });
+            
+            // Setup time range buttons in header
+            const timeRangeButtons = document.querySelectorAll('.chart-control-btn[data-range]');
+            timeRangeButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Remove active class from all range buttons
+                    timeRangeButtons.forEach(b => {
+                        b.classList.remove('active');
+                        b.style.border = '1px solid #ddd';
+                        b.style.background = 'white';
+                        b.style.color = '';
+                    });
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    btn.style.border = '1px solid #007bff';
+                    btn.style.background = '#007bff';
+                    btn.style.color = 'white';
+                    
+                    // Auto-set unit size based on time range
+                    const timeRange = btn.dataset.range;
+                    autoSetUnitSizeByTimeRange(timeRange);
+                    
+                    // Reload chart
+                    reloadChart();
+                });
+            });
+            
+            // Setup chart type buttons in header
+            const chartTypeButtons = document.querySelectorAll('.chart-type-btn[data-type]');
+            chartTypeButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Remove active class from all type buttons
+                    chartTypeButtons.forEach(b => {
+                        b.classList.remove('active');
+                        b.style.border = '1px solid #ddd';
+                        b.style.background = 'white';
+                        b.style.color = '';
+                        if (b.querySelector('i')) {
+                            b.style.color = '';
+                        }
+                    });
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    btn.style.border = '1px solid #007bff';
+                    btn.style.background = '#007bff';
+                    btn.style.color = 'white';
+                    
+                    // Reload chart
+                    reloadChart();
+                });
+            });
+            
+            // Setup regular filters
+            if (tickerSelect) {
+                tickerSelect.addEventListener('change', () => reloadChart());
+            }
+            if (unitSizeSelect) {
+                unitSizeSelect.addEventListener('change', () => reloadChart());
+            }
+            if (tickersCompareSelect) {
+                tickersCompareSelect.addEventListener('change', () => reloadChart());
+            }
+        }
+        
+        // Reload chart
+        function reloadChart() {
+            // Clear comparison series
+            comparisonSeries.forEach(series => {
+                try {
+                    priceChart.removeSeries(series);
+                } catch (e) {
+                    console.warn('Error removing comparison series:', e);
+                }
+            });
+            comparisonSeries = [];
+            
+            // Reinitialize chart
+            initPriceChart();
+        }
+        
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            if (priceChart) {
+                const container = document.getElementById('price-chart-container');
+                if (container) {
+                    priceChart.applyOptions({ width: container.clientWidth });
+                }
+            }
+        });
+        
+        // Toggle section function
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const body = section.querySelector('.section-body');
+                if (body) {
+                    const isVisible = body.style.display !== 'none';
+                    body.style.display = isVisible ? 'none' : 'block';
+                    
+                    const icon = section.querySelector('.section-toggle-icon');
+                    if (icon) {
+                        icon.textContent = isVisible ? '▶' : '▼';
+                    }
+                    
+                    // Resize chart if it's the price chart section
+                    if (sectionId === 'price-chart-section' && priceChart) {
+                        setTimeout(() => {
+                            const container = document.getElementById('price-chart-container');
+                            if (container) {
+                                priceChart.applyOptions({ width: container.clientWidth });
+                            }
+                        }, 100);
+                    }
+                }
+            }
+        }
     </script>
 </body>
 </html>

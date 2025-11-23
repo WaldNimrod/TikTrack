@@ -1153,7 +1153,8 @@ class HeaderSystem {
           }, 50);
         }, { capture: true });
         
-        // ניטור mouseleave
+        // ניטור mouseleave - סגירת תפריט כשיש יציאה מהפריט הראשי
+        let closeTimeout;
         item.addEventListener('mouseleave', (e) => {
           const computedStyle = window.getComputedStyle(menu);
           console.log(`🖱️ [HeaderSystem] MOUSELEAVE on dropdown ${index}:`, {
@@ -1163,7 +1164,60 @@ class HeaderSystem {
             visibility: computedStyle.visibility,
             display: computedStyle.display,
           });
+          
+          // בדיקה אם העכבר עבר לתפריט המשנה
+          const relatedTarget = e.relatedTarget;
+          const isMovingToMenu = relatedTarget && (
+            menu.contains(relatedTarget) || 
+            relatedTarget.closest('.tiktrack-dropdown-menu') === menu
+          );
+          
+          if (!isMovingToMenu) {
+            // סגירת התפריט אחרי עיכוב קצר
+            clearTimeout(closeTimeout);
+            closeTimeout = setTimeout(() => {
+              // בדיקה נוספת - אם העכבר עדיין לא בתפריט
+              const itemHovered = item.matches(':hover');
+              const menuHovered = menu.matches(':hover');
+              
+              if (!itemHovered && !menuHovered) {
+                menu.style.opacity = '0';
+                menu.style.visibility = 'hidden';
+                menu.style.transform = 'translateY(-10px)';
+                console.log(`✅ [HeaderSystem] Closed dropdown ${index} on mouseleave`);
+              }
+            }, 100);
+          }
         }, { capture: true });
+        
+        // שמירת התפריט פתוח כשיש hover עליו
+        menu.addEventListener('mouseenter', () => {
+          clearTimeout(closeTimeout);
+        });
+        
+        // סגירת התפריט כשיש יציאה מהתפריט עצמו
+        menu.addEventListener('mouseleave', (e) => {
+          const relatedTarget = e.relatedTarget;
+          const isMovingToItem = relatedTarget && (
+            item.contains(relatedTarget) || 
+            relatedTarget.closest('.tiktrack-nav-item.dropdown') === item
+          );
+          
+          if (!isMovingToItem) {
+            clearTimeout(closeTimeout);
+            closeTimeout = setTimeout(() => {
+              const itemHovered = item.matches(':hover');
+              const menuHovered = menu.matches(':hover');
+              
+              if (!itemHovered && !menuHovered) {
+                menu.style.opacity = '0';
+                menu.style.visibility = 'hidden';
+                menu.style.transform = 'translateY(-10px)';
+                console.log(`✅ [HeaderSystem] Closed dropdown ${index} on menu mouseleave`);
+              }
+            }, 100);
+          }
+        });
         
         // ניטור שינויים ב-CSS
         const observer = new MutationObserver((mutations) => {
@@ -3288,30 +3342,178 @@ function addPortalEventListeners(portal, originalMenu) {
     }
   });
 
-  portal.addEventListener('mouseleave', () => {
+  portal.addEventListener('mouseleave', (e) => {
     if (hoverTimeouts.has(menuId)) {
       clearTimeout(hoverTimeouts.get(menuId));
       hoverTimeouts.delete(menuId);
     }
 
+    // Deep debugging - log all relevant information
+    const relatedTarget = e?.relatedTarget;
+    const button = document.getElementById(menuId.replace('Menu', 'Toggle'));
+    const mouseX = e?.clientX || 0;
+    const mouseY = e?.clientY || 0;
+    
+    // Check if mouse is moving to button or away from portal
+    const isMovingToButton = relatedTarget && button && button.contains(relatedTarget);
+    const isMovingToMenu = relatedTarget && originalMenu.contains(relatedTarget);
+    
+    // Immediate check: is mouse below portal? If yes, close immediately
+    const portalRect = portal.getBoundingClientRect();
+    const buttonRect = button ? button.getBoundingClientRect() : null;
+    const isMouseBelowPortal = mouseY > portalRect.bottom + 3;
+    const isMouseAwayFromButton = buttonRect ? (
+      mouseX < buttonRect.left - 5 || 
+      mouseX > buttonRect.right + 5 ||
+      mouseY < buttonRect.top - 5
+    ) : true;
+    
+    // If mouse is clearly below portal and away from button, close immediately
+    if (isMouseBelowPortal && isMouseAwayFromButton && !isMovingToButton && !isMovingToMenu) {
+      console.log(`✅ [IMMEDIATE CLOSE] Portal ${menuId} - mouse below portal, closing immediately`, {
+        mouseY,
+        portalBottom: portalRect.bottom,
+        isMouseBelowPortal,
+        isMouseAwayFromButton
+      });
+      originalMenu.classList.remove('show');
+      closeFilterMenuPortal(originalMenu);
+      return; // Exit early, don't set timeout
+    }
+    
+    console.log(`🔍 [DEEP DEBUG] Portal mouseleave for ${menuId}:`, {
+      relatedTarget: relatedTarget ? {
+        tagName: relatedTarget.tagName,
+        id: relatedTarget.id,
+        className: relatedTarget.className,
+        isButton: button && button.contains(relatedTarget),
+        isMenu: originalMenu.contains(relatedTarget)
+      } : null,
+      mousePosition: { x: mouseX, y: mouseY },
+      isMovingToButton,
+      isMovingToMenu,
+      buttonExists: !!button,
+      isMouseBelowPortal,
+      isMouseAwayFromButton
+    });
+
     // Defer close with delay; only close if nothing is hovered
     hoverTimeouts.set(
       menuId,
       setTimeout(() => {
-        const button = document.getElementById(menuId.replace('Menu', 'Toggle'));
+        // Get current mouse position (may have changed since event)
+        const currentMouseX = mouseX; // Use event position as fallback
+        const currentMouseY = mouseY;
+        
+        // Try to get actual current mouse position from last known position
+        let actualMouseX = currentMouseX;
+        let actualMouseY = currentMouseY;
+        if (window.__headerSystemLastMouseX !== undefined) {
+          actualMouseX = window.__headerSystemLastMouseX;
+          actualMouseY = window.__headerSystemLastMouseY;
+        }
+        
         const buttonHovered = button ? button.matches(':hover') : false;
         const portalHovered = portal.matches(':hover');
         const originalMenuHovered = originalMenu.matches(':hover');
+        
+        // Additional check: get element under current mouse position
+        const elementUnderMouse = document.elementFromPoint(actualMouseX, actualMouseY);
+        const isElementUnderMouseButton = elementUnderMouse && button && button.contains(elementUnderMouse);
+        const isElementUnderMouseMenu = elementUnderMouse && originalMenu.contains(elementUnderMouse);
+        const isElementUnderMousePortal = elementUnderMouse && portal.contains(elementUnderMouse);
+        
+        // Additional check: is mouse below portal?
+        const portalRect = portal.getBoundingClientRect();
+        const buttonRect = button ? button.getBoundingClientRect() : null;
+        const isMouseBelowPortal = actualMouseY > portalRect.bottom + 3; // 3px buffer
+        const isMouseAwayFromButton = buttonRect ? (
+          actualMouseX < buttonRect.left - 5 || 
+          actualMouseX > buttonRect.right + 5 ||
+          actualMouseY < buttonRect.top - 5
+        ) : true;
+        
+        // Check if mouse is moving downward (negative delta means moving down in RTL)
+        const isMovingDownward = actualMouseY > portalRect.bottom;
+        
+        console.log(`🔍 [DEEP DEBUG] Portal timeout check for ${menuId}:`, {
+          buttonHovered,
+          portalHovered,
+          originalMenuHovered,
+          isMovingToButton,
+          isMovingToMenu,
+          mousePosition: { x: actualMouseX, y: actualMouseY },
+          eventPosition: { x: mouseX, y: mouseY },
+          portalRect: {
+            top: portalRect.top,
+            bottom: portalRect.bottom,
+            left: portalRect.left,
+            right: portalRect.right
+          },
+          buttonRect: buttonRect ? {
+            top: buttonRect.top,
+            bottom: buttonRect.bottom,
+            left: buttonRect.left,
+            right: buttonRect.right
+          } : null,
+          isMouseBelowPortal,
+          isMouseAwayFromButton,
+          isMovingDownward,
+          elementUnderMouse: elementUnderMouse ? {
+            tagName: elementUnderMouse.tagName,
+            id: elementUnderMouse.id,
+            className: elementUnderMouse.className
+          } : null,
+          isElementUnderMouseButton,
+          isElementUnderMouseMenu,
+          isElementUnderMousePortal,
+          menuHasShowClass: originalMenu.classList.contains('show'),
+          shouldClose: (
+            !buttonHovered &&
+            !portalHovered &&
+            !originalMenuHovered &&
+            !isMovingToButton &&
+            !isMovingToMenu &&
+            !isElementUnderMouseButton &&
+            !isElementUnderMouseMenu &&
+            !isElementUnderMousePortal &&
+            (isMouseBelowPortal || isMovingDownward) &&
+            isMouseAwayFromButton &&
+            originalMenu.classList.contains('show')
+          )
+        });
 
         if (
           !buttonHovered &&
           !portalHovered &&
           !originalMenuHovered &&
+          !isMovingToButton &&
+          !isMovingToMenu &&
+          !isElementUnderMouseButton &&
+          !isElementUnderMouseMenu &&
+          !isElementUnderMousePortal &&
+          (isMouseBelowPortal || isMovingDownward) &&
+          isMouseAwayFromButton &&
           originalMenu.classList.contains('show')
         ) {
           originalMenu.classList.remove('show');
           closeFilterMenuPortal(originalMenu);
-          console.log(`🖱️ Portal hover closed ${menuId}`);
+          console.log(`🖱️ Portal hover closed ${menuId} - mouse below portal`);
+        } else {
+          console.log(`⏭️ [TRACK] Portal ${menuId} not closed - still hovered`, {
+            buttonHovered,
+            portalHovered,
+            originalMenuHovered,
+            isMovingToButton,
+            isMovingToMenu,
+            isElementUnderMouseButton,
+            isElementUnderMouseMenu,
+            isElementUnderMousePortal,
+            isMouseBelowPortal,
+            isMouseAwayFromButton,
+            isMovingDownward,
+            menuHasShowClass: originalMenu.classList.contains('show')
+          });
         }
       }, 300)
     ); // Longer delay for portal
@@ -3439,6 +3641,109 @@ function setupHoverBehavior() {
   // Reset flag after cleanup
   __setupHoverBehaviorCalled = false;
   
+  // Add global mouse move listener to track mouse position and detect when leaving portal area
+  // This helps catch cases where mouse leaves portal downward
+  if (!window.__headerSystemMouseMoveHandler) {
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    let mouseMoveTimeout;
+    
+    window.__headerSystemMouseMoveHandler = (e) => {
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+      // Store globally for use in other handlers
+      window.__headerSystemLastMouseX = e.clientX;
+      window.__headerSystemLastMouseY = e.clientY;
+      
+      // Clear existing timeout
+      if (mouseMoveTimeout) {
+        clearTimeout(mouseMoveTimeout);
+      }
+      
+      // Check if mouse is outside all portals and buttons after a delay
+      mouseMoveTimeout = setTimeout(() => {
+        const elementUnderMouse = document.elementFromPoint(lastMouseX, lastMouseY);
+        
+        // Check all active portals
+        if (__headerFilterPortals && __headerFilterPortals.size > 0) {
+          __headerFilterPortals.forEach((portal, menuId) => {
+            const button = document.getElementById(menuId.replace('Menu', 'Toggle'));
+            const originalMenu = document.getElementById(menuId);
+            
+            if (!originalMenu || !originalMenu.classList.contains('show')) {
+              return; // Menu not open, skip
+            }
+            
+            const isMouseOverButton = button && button.contains(elementUnderMouse);
+            const isMouseOverPortal = portal && portal.contains(elementUnderMouse);
+            const isMouseOverMenu = originalMenu && originalMenu.contains(elementUnderMouse);
+            
+            // Check if mouse is below portal (moved down and away)
+            const portalRect = portal.getBoundingClientRect();
+            const buttonRect = button ? button.getBoundingClientRect() : null;
+            const isMouseBelowPortal = lastMouseY > portalRect.bottom + 3; // 3px buffer
+            const isMouseAwayFromButton = buttonRect ? (
+              lastMouseX < buttonRect.left - 5 || 
+              lastMouseX > buttonRect.right + 5 ||
+              lastMouseY < buttonRect.top - 5
+            ) : true;
+            
+            // Additional check: is mouse moving downward through portal?
+            const isMovingDownward = lastMouseY > portalRect.bottom;
+            
+            console.log(`🔍 [GLOBAL MOUSE] Checking portal ${menuId}:`, {
+              mouseY: lastMouseY,
+              portalBottom: portalRect.bottom,
+              buttonRect: buttonRect,
+              isMouseBelowPortal,
+              isMouseAwayFromButton,
+              isMovingDownward,
+              isMouseOverButton,
+              isMouseOverPortal,
+              isMouseOverMenu,
+              elementUnderMouse: elementUnderMouse ? {
+                tagName: elementUnderMouse.tagName,
+                id: elementUnderMouse.id,
+                className: elementUnderMouse.className
+              } : null,
+              shouldClose: (
+                !isMouseOverButton &&
+                !isMouseOverPortal &&
+                !isMouseOverMenu &&
+                (isMouseBelowPortal || isMovingDownward) &&
+                isMouseAwayFromButton &&
+                originalMenu.classList.contains('show')
+              )
+            });
+            
+            // If mouse is below portal and away from button, close menu
+            if (
+              !isMouseOverButton &&
+              !isMouseOverPortal &&
+              !isMouseOverMenu &&
+              (isMouseBelowPortal || isMovingDownward) &&
+              isMouseAwayFromButton &&
+              originalMenu.classList.contains('show')
+            ) {
+              console.log(`✅ [GLOBAL MOUSE] Closing menu ${menuId} - mouse below portal`, {
+                mouseY: lastMouseY,
+                portalBottom: portalRect.bottom,
+                isMouseBelowPortal,
+                isMovingDownward
+              });
+              
+              originalMenu.classList.remove('show');
+              closeFilterMenuPortal(originalMenu);
+            }
+          });
+        }
+      }, 100); // Check after 100ms of no movement (reduced from 150ms for faster response)
+    };
+    
+    document.addEventListener('mousemove', window.__headerSystemMouseMoveHandler, { passive: true });
+    console.log('✅ [GLOBAL MOUSE] Added global mouse move listener for portal detection');
+  }
+  
   // Now mark as called and proceed with setup
   __setupHoverBehaviorCalled = true;
   
@@ -3557,6 +3862,55 @@ function setupHoverBehavior() {
           e.stopPropagation();
         }
         
+        // Deep debugging - log all relevant information
+        const relatedTarget = e?.relatedTarget;
+        const portal = __headerFilterPortals && __headerFilterPortals.get(menuId);
+        const mouseX = e?.clientX || 0;
+        const mouseY = e?.clientY || 0;
+        
+        // Check if mouse is moving to menu/portal or away from button
+        const isMovingToMenu = relatedTarget && (
+          menu.contains(relatedTarget) || 
+          relatedTarget.closest('.filter-menu') === menu
+        );
+        const isMovingToPortal = relatedTarget && portal && (
+          portal.contains(relatedTarget) ||
+          relatedTarget.closest(`#${menuId}_portal`) === portal ||
+          relatedTarget.id === `${menuId}_portal`
+        );
+        const isMovingToButton = relatedTarget && button.contains(relatedTarget);
+        
+        // Check portal position to see if mouse is moving towards it
+        let isMovingTowardsPortal = false;
+        if (portal && portal.offsetParent !== null) {
+          const portalRect = portal.getBoundingClientRect();
+          const isMouseBelowButton = mouseY > button.getBoundingClientRect().bottom;
+          const isMouseInPortalXRange = mouseX >= portalRect.left && mouseX <= portalRect.right;
+          const isMouseInPortalYRange = mouseY >= portalRect.top && mouseY <= portalRect.bottom;
+          isMovingTowardsPortal = isMouseBelowButton && isMouseInPortalXRange && isMouseInPortalYRange;
+        }
+        
+        console.log(`🔍 [DEEP DEBUG] Button mouseleave for ${buttonId}:`, {
+          menuId,
+          relatedTarget: relatedTarget ? {
+            tagName: relatedTarget.tagName,
+            id: relatedTarget.id,
+            className: relatedTarget.className,
+            isMenu: menu.contains(relatedTarget),
+            isPortal: portal && portal.contains(relatedTarget),
+            isButton: button.contains(relatedTarget)
+          } : null,
+          mousePosition: { x: mouseX, y: mouseY },
+          isMovingToMenu,
+          isMovingToPortal,
+          isMovingToButton,
+          isMovingTowardsPortal,
+          portalExists: !!portal,
+          portalVisible: portal ? portal.offsetParent !== null : false,
+          portalRect: portal ? portal.getBoundingClientRect() : null,
+          buttonRect: button.getBoundingClientRect()
+        });
+        
         trackMenuOpen('mouseleave_HOVER', menuId, {
           buttonId,
           type,
@@ -3564,6 +3918,16 @@ function setupHoverBehavior() {
           hasExistingTimeout: hoverTimeouts.has(buttonId),
           eventTarget: e?.target?.tagName,
           eventCurrentTarget: e?.currentTarget?.tagName,
+          relatedTargetInfo: relatedTarget ? {
+            tagName: relatedTarget.tagName,
+            id: relatedTarget.id,
+            className: relatedTarget.className
+          } : null,
+          mousePosition: { x: mouseX, y: mouseY },
+          isMovingToMenu,
+          isMovingToPortal,
+          isMovingToButton,
+          isMovingTowardsPortal
         });
         
         // Clear open timeout
@@ -3576,10 +3940,38 @@ function setupHoverBehavior() {
 
         // Defer close; only close if neither button nor portal is hovered
         const timeoutId = setTimeout(() => {
-          const portal = __headerFilterPortals && __headerFilterPortals.get(menuId);
           const buttonHovered = button.matches(':hover');
           const portalHovered = portal ? portal.matches(':hover') : false;
           const menuHovered = menu.matches(':hover');
+          
+          // Additional check: get element under current mouse position
+          const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
+          const isElementUnderMousePortal = elementUnderMouse && portal && (
+            portal.contains(elementUnderMouse) ||
+            elementUnderMouse.closest(`#${menuId}_portal`) === portal ||
+            elementUnderMouse.id === `${menuId}_portal`
+          );
+          const isElementUnderMouseButton = elementUnderMouse && button.contains(elementUnderMouse);
+          const isElementUnderMouseMenu = elementUnderMouse && menu.contains(elementUnderMouse);
+          
+          console.log(`🔍 [DEEP DEBUG] Timeout check for ${buttonId}:`, {
+            buttonHovered,
+            portalHovered,
+            menuHovered,
+            isMovingToMenu,
+            isMovingToPortal,
+            isMovingToButton,
+            isMovingTowardsPortal,
+            elementUnderMouse: elementUnderMouse ? {
+              tagName: elementUnderMouse.tagName,
+              id: elementUnderMouse.id,
+              className: elementUnderMouse.className
+            } : null,
+            isElementUnderMousePortal,
+            isElementUnderMouseButton,
+            isElementUnderMouseMenu,
+            menuHasShowClass: menu.classList.contains('show')
+          });
           
           trackMenuOpen('mouseleaveTimeout_CHECK', menuId, {
             buttonId,
@@ -3589,12 +3981,31 @@ function setupHoverBehavior() {
             menuHovered,
             menuHasShowClass: menu.classList.contains('show'),
             hasPortal: !!portal,
+            isMovingToMenu,
+            isMovingToPortal,
+            isMovingToButton,
+            isMovingTowardsPortal,
+            elementUnderMouseInfo: elementUnderMouse ? {
+              tagName: elementUnderMouse.tagName,
+              id: elementUnderMouse.id,
+              className: elementUnderMouse.className
+            } : null,
+            isElementUnderMousePortal,
+            isElementUnderMouseButton,
+            isElementUnderMouseMenu
           });
           
           if (
             !buttonHovered &&
             !portalHovered &&
             !menuHovered &&
+            !isMovingToMenu &&
+            !isMovingToPortal &&
+            !isMovingToButton &&
+            !isMovingTowardsPortal &&
+            !isElementUnderMousePortal &&
+            !isElementUnderMouseButton &&
+            !isElementUnderMouseMenu &&
             menu.classList.contains('show')
           ) {
             trackMenuOpen('mouseleaveTimeout_CLOSING', menuId, {
@@ -3607,7 +4018,18 @@ function setupHoverBehavior() {
             closeFilterMenuPortal(menu);
             console.log(`🖱️ Hover closed ${menuId}`);
           } else {
-            console.log(`⏭️ [TRACK] Menu ${menuId} not closed - still hovered or not showing`);
+            console.log(`⏭️ [TRACK] Menu ${menuId} not closed - still hovered or not showing`, {
+              buttonHovered,
+              portalHovered,
+              menuHovered,
+              isMovingToMenu,
+              isMovingToPortal,
+              isMovingToButton,
+              isMovingTowardsPortal,
+              isElementUnderMousePortal,
+              isElementUnderMouseButton,
+              isElementUnderMouseMenu
+            });
           }
         }, 220); // short defer to allow cursor to enter portal
         
@@ -3625,29 +4047,111 @@ function setupHoverBehavior() {
         }
       });
 
-      menu.addEventListener('mouseleave', () => {
+      menu.addEventListener('mouseleave', (e) => {
         if (hoverTimeouts.has(buttonId)) {
           clearTimeout(hoverTimeouts.get(buttonId));
           hoverTimeouts.delete(buttonId);
         }
 
+        // Deep debugging - log all relevant information
+        const relatedTarget = e?.relatedTarget;
+        const portal = __headerFilterPortals && __headerFilterPortals.get(menuId);
+        const mouseX = e?.clientX || 0;
+        const mouseY = e?.clientY || 0;
+        
+        // Check if mouse is moving to button or away from menu
+        const isMovingToButton = relatedTarget && button.contains(relatedTarget);
+        const isMovingToPortal = relatedTarget && portal && (
+          portal.contains(relatedTarget) ||
+          relatedTarget.closest(`#${menuId}_portal`) === portal ||
+          relatedTarget.id === `${menuId}_portal`
+        );
+        
+        // Check portal position to see if mouse is moving towards it
+        let isMovingTowardsPortal = false;
+        if (portal && portal.offsetParent !== null) {
+          const portalRect = portal.getBoundingClientRect();
+          const isMouseInPortalXRange = mouseX >= portalRect.left && mouseX <= portalRect.right;
+          const isMouseInPortalYRange = mouseY >= portalRect.top && mouseY <= portalRect.bottom;
+          isMovingTowardsPortal = isMouseInPortalXRange && isMouseInPortalYRange;
+        }
+        
+        console.log(`🔍 [DEEP DEBUG] Menu mouseleave for ${menuId}:`, {
+          buttonId,
+          relatedTarget: relatedTarget ? {
+            tagName: relatedTarget.tagName,
+            id: relatedTarget.id,
+            className: relatedTarget.className,
+            isButton: button.contains(relatedTarget),
+            isPortal: portal && portal.contains(relatedTarget)
+          } : null,
+          mousePosition: { x: mouseX, y: mouseY },
+          isMovingToButton,
+          isMovingToPortal,
+          isMovingTowardsPortal,
+          portalExists: !!portal,
+          portalVisible: portal ? portal.offsetParent !== null : false
+        });
+
         // Defer close; only close if neither menu/portal nor button is hovered
         hoverTimeouts.set(
           buttonId,
           setTimeout(() => {
-            const portal = __headerFilterPortals && __headerFilterPortals.get(menuId);
             const buttonHovered = button.matches(':hover');
             const portalHovered = portal ? portal.matches(':hover') : false;
             const menuHovered = menu.matches(':hover');
+            
+            // Additional check: get element under current mouse position
+            const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
+            const isElementUnderMousePortal = elementUnderMouse && portal && (
+              portal.contains(elementUnderMouse) ||
+              elementUnderMouse.closest(`#${menuId}_portal`) === portal ||
+              elementUnderMouse.id === `${menuId}_portal`
+            );
+            const isElementUnderMouseButton = elementUnderMouse && button.contains(elementUnderMouse);
+            
+            console.log(`🔍 [DEEP DEBUG] Menu timeout check for ${menuId}:`, {
+              buttonHovered,
+              portalHovered,
+              menuHovered,
+              isMovingToButton,
+              isMovingToPortal,
+              isMovingTowardsPortal,
+              elementUnderMouse: elementUnderMouse ? {
+                tagName: elementUnderMouse.tagName,
+                id: elementUnderMouse.id,
+                className: elementUnderMouse.className
+              } : null,
+              isElementUnderMousePortal,
+              isElementUnderMouseButton,
+              menuHasShowClass: menu.classList.contains('show')
+            });
+            
             if (
               !buttonHovered &&
               !portalHovered &&
               !menuHovered &&
+              !isMovingToButton &&
+              !isMovingToPortal &&
+              !isMovingTowardsPortal &&
+              !isElementUnderMousePortal &&
+              !isElementUnderMouseButton &&
               menu.classList.contains('show')
             ) {
               menu.classList.remove('show');
               closeFilterMenuPortal(menu);
               console.log(`🖱️ Menu hover closed ${menuId}`);
+            } else {
+              console.log(`⏭️ [TRACK] Menu ${menuId} not closed - still hovered`, {
+                buttonHovered,
+                portalHovered,
+                menuHovered,
+                isMovingToButton,
+                isMovingToPortal,
+                isMovingTowardsPortal,
+                isElementUnderMousePortal,
+                isElementUnderMouseButton
+              });
             }
           }, 220)
         );

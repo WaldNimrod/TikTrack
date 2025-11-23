@@ -2472,6 +2472,30 @@ async function saveTradingAccount() {
         if (hasErrors) {
             return;
         }
+
+        // Business Logic API validation
+        if (window.TradingAccountsData?.validateTradingAccount) {
+            try {
+                const validationResult = await window.TradingAccountsData.validateTradingAccount({
+                    name: accountData.name,
+                    currency_id: accountData.currency_id,
+                    status: accountData.status,
+                    opening_balance: accountData.opening_balance
+                });
+
+                if (!validationResult.is_valid) {
+                    const errorMessage = validationResult.errors?.join(', ') || 'ולידציה נכשלה';
+                    window.showErrorNotification?.('שגיאת ולידציה', errorMessage);
+                    return;
+                }
+            } catch (validationError) {
+                window.Logger?.warn('⚠️ Trading account validation error (continuing with save)', {
+                    error: validationError,
+                    page: 'trading_accounts'
+                });
+                // Continue with save even if validation fails (fallback)
+            }
+        }
         
         // In edit mode, preserve the original currency_id (cannot be changed)
         if (isEdit) {

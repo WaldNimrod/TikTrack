@@ -3387,6 +3387,34 @@ async function saveTradePlan() {
             }
         }
 
+        // Business Logic API validation
+        if (window.TradePlansData?.validateTradePlan) {
+            try {
+                const validationResult = await window.TradePlansData.validateTradePlan({
+                    trading_account_id: tradePlanData.trading_account_id,
+                    ticker_id: tradePlanData.ticker_id,
+                    side: tradePlanData.side,
+                    entry_price: tradePlanData.entry_price,
+                    stop_price: tradePlanData.stop_price,
+                    target_price: tradePlanData.target_price,
+                    stop_percentage: tradePlanData.stop_percentage,
+                    target_percentage: tradePlanData.target_percentage
+                });
+
+                if (!validationResult.is_valid) {
+                    const errorMessage = validationResult.errors?.join(', ') || 'ולידציה נכשלה';
+                    window.showErrorNotification?.('שגיאת ולידציה', errorMessage);
+                    return;
+                }
+            } catch (validationError) {
+                window.Logger?.warn('⚠️ Trade plan validation error (continuing with save)', {
+                    error: validationError,
+                    page: 'trade_plans'
+                });
+                // Continue with save even if validation fails (fallback)
+            }
+        }
+
         const getNumericValue = (fieldId) => {
             const element = document.getElementById(fieldId);
             if (!element) {

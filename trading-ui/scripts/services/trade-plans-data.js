@@ -24,6 +24,12 @@
   const TRADE_PLANS_TTL = 45 * 1000; // 45 seconds per audit plan
   const PAGE_LOG_CONTEXT = { page: 'trade-plans-data' };
 
+  const DEFAULT_HEADERS = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache',
+  };
+
   async function loadTradePlansData(options = {}) {
     const { force = false, ttl = TRADE_PLANS_TTL, signal } = options;
     const loader = async () => {
@@ -305,6 +311,74 @@ async function invalidateTradePlansCache() {
   }
 }
 
+  // ========================================================================
+  // Business Logic API Wrappers
+  // ========================================================================
+
+  /**
+   * Validate trade plan data using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (60s TTL).
+   * @param {Object} planData - Trade plan data to validate
+   * @returns {Promise<Object>} Validation result: {is_valid, errors}
+   */
+  async function validateTradePlan(planData) {
+    const cacheKey = `business:validate-trade-plan:${JSON.stringify(planData)}`;
+    
+    try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/trade-plan/validate', {
+            method: 'POST',
+            headers: DEFAULT_HEADERS,
+            body: JSON.stringify(planData)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            return {
+              is_valid: false,
+              errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+            };
+          }
+
+          const result = await response.json();
+          return {
+            is_valid: result.status === 'success',
+            errors: []
+          };
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
+      const response = await fetch('/api/business/trade-plan/validate', {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify(planData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return {
+          is_valid: false,
+          errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+        };
+      }
+
+      const result = await response.json();
+      return {
+        is_valid: result.status === 'success',
+        errors: []
+      };
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating trade plan', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      return {
+        is_valid: false,
+        errors: [error?.message || 'Validation failed']
+      };
+    }
+  }
+
 window.TradePlansData = {
   KEY: TRADE_PLANS_DATA_KEY,
   TTL: TRADE_PLANS_TTL,
@@ -319,6 +393,7 @@ window.TradePlansData = {
   getCachedTradePlans,
   setCachedTradePlans,
   invalidateTradePlansCache,
+  validateTradePlan,
 };
 
 window.Logger?.info?.('✅ Trade Plans Data Service initialized', PAGE_LOG_CONTEXT);

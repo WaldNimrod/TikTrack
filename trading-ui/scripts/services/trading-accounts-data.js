@@ -273,6 +273,74 @@
     return fetchTradingAccount(accountId, options);
   }
 
+  // ========================================================================
+  // Business Logic API Wrappers
+  // ========================================================================
+
+  /**
+   * Validate trading account data using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (60s TTL).
+   * @param {Object} accountData - Trading account data to validate
+   * @returns {Promise<Object>} Validation result: {is_valid, errors}
+   */
+  async function validateTradingAccount(accountData) {
+    const cacheKey = `business:validate-trading-account:${JSON.stringify(accountData)}`;
+    
+    try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/trading-account/validate', {
+            method: 'POST',
+            headers: DEFAULT_HEADERS,
+            body: JSON.stringify(accountData)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            return {
+              is_valid: false,
+              errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+            };
+          }
+
+          const result = await response.json();
+          return {
+            is_valid: result.status === 'success',
+            errors: []
+          };
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
+      const response = await fetch('/api/business/trading-account/validate', {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify(accountData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return {
+          is_valid: false,
+          errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+        };
+      }
+
+      const result = await response.json();
+      return {
+        is_valid: result.status === 'success',
+        errors: []
+      };
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating trading account', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      return {
+        is_valid: false,
+        errors: [error?.message || 'Validation failed']
+      };
+    }
+  }
+
   window.TradingAccountsData = {
     KEY: PRIMARY_CACHE_KEY,
     TTL: DEFAULT_TTL,
@@ -287,6 +355,7 @@
     deleteTradingAccount,
     fetchTradingAccount,
     fetchTradingAccountDetails, // Alias for consistency
+    validateTradingAccount,
   };
 
   window.Logger?.info?.('✅ Trading Accounts Data Service initialized', PAGE_LOG_CONTEXT);

@@ -32,7 +32,20 @@
     'business:calculate-average-price': { ttl: 30 * 1000 },
     'business:validate-execution': { ttl: 60 * 1000 },
     'business:validate-condition-value': { ttl: 60 * 1000 },
-    'business:validate-alert': { ttl: 60 * 1000 }
+    'business:validate-alert': { ttl: 60 * 1000 },
+    // New Business Logic API cache configs
+    'business:validate-note': { ttl: 60 * 1000 },
+    'business:validate-note-relation': { ttl: 60 * 1000 },
+    'business:validate-trading-account': { ttl: 60 * 1000 },
+    'business:validate-trade-plan': { ttl: 60 * 1000 },
+    'business:validate-ticker': { ttl: 60 * 1000 },
+    'business:validate-ticker-symbol': { ttl: 60 * 1000 },
+    'business:validate-currency-rate': { ttl: 60 * 1000 },
+    'business:validate-tag': { ttl: 60 * 1000 },
+    'business:validate-tag-category': { ttl: 60 * 1000 },
+    'business:validate-cash-flow': { ttl: 60 * 1000 },
+    'business:calculate-cash-flow-balance': { ttl: 30 * 1000 },
+    'business:calculate-currency-conversion': { ttl: 30 * 1000 }
   };
 
   async function ensure(key, loaderFn, options = {}) {

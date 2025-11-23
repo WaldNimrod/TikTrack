@@ -124,3 +124,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-23T18:13:01+00:00 | 1.3.27.0 | 1.3.26.0 | 580e17f5467ab868965f23d49b1a7cd8ef838aca | b93669e17364847f334996f245b3d61627fcb7ea | patch | עדכון תיעוד מערכת ראש הדף |
 | 2025-11-23T18:26:22+00:00 | 1.3.28.0 | 1.3.27.0 | 2a4c11539f56b48122cd4fae643213b9e4006e8f | 580e17f5467ab868965f23d49b1a7cd8ef838aca | patch | Complete Phase 3.1-3.3 testing: Add test scripts and comprehensive reports |
 | 2025-11-23T20:02:06+00:00 | 1.3.29.0 | 1.3.28.0 | ac5dcf9bf4d5a9c4f8c43aae6cd3f4c86d7ac08a | 2a4c11539f56b48122cd4fae643213b9e4006e8f | patch | Add Business Logic Batch Operations endpoint and helper |
+| 2025-11-23T21:46:40+00:00 | 1.3.30.0 | 1.3.29.0 | c65a2355bfab7f541c1b0b8d7dbbd7e6c9ad4402 | ac5dcf9bf4d5a9c4f8c43aae6cd3f4c86d7ac08a | patch | Implement Tabler Icons integration - Phase 1 & 2: Core infrastructure and central systems |

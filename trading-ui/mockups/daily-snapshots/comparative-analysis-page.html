@@ -220,6 +220,9 @@
     <script src="../../scripts/services/tag-service.js" defer></script>
     <script src="../../scripts/tag-ui-manager.js" defer></script>
     
+    <!-- Conditions CRUD Manager (for trading methods) -->
+    <script src="../../scripts/conditions/conditions-crud-manager.js" defer></script>
+    
     <!-- Action Buttons System -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
     <script src="../../scripts/button-system-init.js" defer></script>
@@ -280,12 +283,13 @@
                     </div>
                 </div>
                 
-                <!-- Filters Section -->
-                <div class="content-section" id="comparative-analysis-filters-section">
+                <!-- Record Filter Panel (Upper) -->
+                <div class="content-section filter-panel-card" id="record-filter-panel">
                     <div class="section-header">
-                        <h2><i class="bi bi-funnel"></i> פילטרים</h2>
+                        <h3><i class="bi bi-funnel"></i> סינון רשומות להשוואה</h3>
+                        <p class="text-muted small mb-0">בחר איזה טריידים להכלל בניתוח</p>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('comparative-analysis-filters-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" onclick="toggleSection('record-filter-panel')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -365,75 +369,91 @@
                                     
                                     <!-- Clear Filters Buttons (moved to first row, at the end - left side in RTL) -->
                                     <div class="col-md-2 me-auto d-flex align-items-end gap-2">
-                                        <button class="btn btn-outline-secondary btn-sm flex-fill" onclick="resetFilters()" title="נקה את כל הפילטרים">
+                                        <button class="btn btn-outline-secondary btn-sm flex-fill" onclick="resetRecordFilters()" title="נקה את כל הפילטרים">
                                             <i class="bi bi-x-circle"></i> נקה
                                         </button>
-                                        <button class="btn btn-outline-primary btn-sm flex-fill" onclick="resetToDefaults()" title="איפוס לברירת מחדל">
+                                        <button class="btn btn-outline-primary btn-sm flex-fill" onclick="resetRecordFiltersToDefaults()" title="איפוס לברירת מחדל">
                                             <i class="bi bi-arrow-counterclockwise"></i> ברירת מחדל
                                         </button>
                                     </div>
                                 </div>
                                 
-                                <!-- Second Row: All Other Filters -->
+                                <!-- Second Row: All Other Record Filters -->
                                 <div class="row g-2">
                                     <!-- Trading Account Filter -->
                                     <div class="col-md-2">
                                         <label class="form-label" style="font-size: 0.85rem;">חשבון מסחר</label>
-                                        <select id="tradingAccounts" class="form-select form-select-sm" multiple onchange="applyFilters()" title="בחר חשבונות מסחר">
-                                            <option value="1" selected>Account #1</option>
-                                            <option value="2">Account #2</option>
-                                            <option value="3">Account #3</option>
+                                        <select id="recordFilterTradingAccounts" class="form-select form-select-sm" multiple onchange="applyRecordFilters()" title="בחר חשבונות מסחר">
+                                            <!-- Will be populated dynamically -->
                                         </select>
                                         <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('tradingAccounts')" title="בחר הכל">הכל</button>
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('recordFilterTradingAccounts')" title="בחר הכל">הכל</button>
                                             <span style="color: #dee2e6;">|</span>
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('tradingAccounts')" title="נקה הכל">נקה</button>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Investment Types Filter -->
-                                    <div class="col-md-2">
-                                        <label for="investmentTypes" class="form-label" style="font-size: 0.85rem;">סוג השקעה</label>
-                                        <select id="investmentTypes" class="form-select form-select-sm" multiple onchange="applyFilters()" title="בחר סוגי השקעות לניתוח">
-                                            <option value="Investment" selected>Investment</option>
-                                            <option value="Swing" selected>Swing</option>
-                                            <option value="Passive" selected>Passive</option>
-                                        </select>
-                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('investmentTypes')" title="בחר הכל">הכל</button>
-                                            <span style="color: #dee2e6;">|</span>
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('investmentTypes')" title="נקה הכל">נקה</button>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Trading Methods Filter -->
-                                    <div class="col-md-2">
-                                        <label for="tradingMethods" class="form-label" style="font-size: 0.85rem;">שיטות מסחר</label>
-                                        <select id="tradingMethods" class="form-select form-select-sm" multiple onchange="applyFilters()" title="בחר שיטות מסחר לניתוח">
-                                            <option value="Moving Averages" selected>ממוצעים נעים</option>
-                                            <option value="Volume Analysis" selected>ניתוח נפח</option>
-                                            <option value="Support & Resistance">תמיכה והתנגדות</option>
-                                            <option value="Trend Lines">קווי מגמה</option>
-                                            <option value="Technical Patterns">דפוסים טכניים</option>
-                                            <option value="Fibonacci Retracement">פיבונאצ'י</option>
-                                        </select>
-                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('tradingMethods')" title="בחר הכל">הכל</button>
-                                            <span style="color: #dee2e6;">|</span>
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('tradingMethods')" title="נקה הכל">נקה</button>
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('recordFilterTradingAccounts')" title="נקה הכל">נקה</button>
                                         </div>
                                     </div>
                                     
                                     <!-- Tags Filter -->
                                     <div class="col-md-2">
-                                        <label for="filterTags" class="form-label" style="font-size: 0.85rem;">תגיות</label>
-                                        <select id="filterTags" class="form-select form-select-sm tag-multi-select" multiple onchange="applyFilters()" title="בחר תגיות לסינון">
+                                        <label for="recordFilterTags" class="form-label" style="font-size: 0.85rem;">תגיות</label>
+                                        <select id="recordFilterTags" class="form-select form-select-sm tag-multi-select" multiple onchange="applyRecordFilters()" title="בחר תגיות לסינון">
                                             <!-- Will be populated by TagUIManager -->
                                         </select>
                                         <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('filterTags')" title="בחר הכל">הכל</button>
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('recordFilterTags')" title="בחר הכל">הכל</button>
                                             <span style="color: #dee2e6;">|</span>
-                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('filterTags')" title="נקה הכל">נקה</button>
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('recordFilterTags')" title="נקה הכל">נקה</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Side Filter -->
+                                    <div class="col-md-2">
+                                        <label class="form-label" style="font-size: 0.85rem;">צד</label>
+                                        <div class="filter-group side-filter">
+                                            <div class="filter-dropdown">
+                                                <button class="filter-toggle side-filter-toggle" id="sideFilterToggle" onclick="toggleSideFilterMenu()" style="max-width: 100%;">
+                                                    <span class="selected-value selected-side-text" id="selectedSide">כל הצדדים</span>
+                                                    <span class="dropdown-arrow">▼</span>
+                                                </button>
+                                                <div class="filter-menu" id="sideFilterMenu">
+                                                    <div class="side-filter-item" data-value="הכול" onclick="selectSideOption('הכול')">
+                                                        <span class="option-text">הכול</span>
+                                                    </div>
+                                                    <div class="side-filter-item" data-value="Long" onclick="selectSideOption('Long')">
+                                                        <span class="option-text">Long</span>
+                                                    </div>
+                                                    <div class="side-filter-item" data-value="Short" onclick="selectSideOption('Short')">
+                                                        <span class="option-text">Short</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Status Filter -->
+                                    <div class="col-md-2">
+                                        <label class="form-label" style="font-size: 0.85rem;">סטטוס</label>
+                                        <div class="filter-group status-filter">
+                                            <div class="filter-dropdown">
+                                                <button class="filter-toggle status-filter-toggle" id="statusFilterToggle" onclick="toggleStatusFilterMenu()" style="max-width: 100%;">
+                                                    <span class="selected-value selected-status-text" id="selectedStatus">כל הסטטוסים</span>
+                                                    <span class="dropdown-arrow">▼</span>
+                                                </button>
+                                                <div class="filter-menu" id="statusFilterMenu">
+                                                    <div class="status-filter-item" data-value="הכול" onclick="selectStatusOption('הכול')">
+                                                        <span class="option-text">הכול</span>
+                                                    </div>
+                                                    <div class="status-filter-item" data-value="open" onclick="selectStatusOption('open')">
+                                                        <span class="option-text">פתוח</span>
+                                                    </div>
+                                                    <div class="status-filter-item" data-value="closed" onclick="selectStatusOption('closed')">
+                                                        <span class="option-text">סגור</span>
+                                                    </div>
+                                                    <div class="status-filter-item" data-value="cancelled" onclick="selectStatusOption('cancelled')">
+                                                        <span class="option-text">מבוטל</span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     
@@ -441,13 +461,124 @@
                                     <div class="col-md-2">
                                         <label class="form-label" style="font-size: 0.85rem;">תוכנית מסחר</label>
                                         <div class="form-check">
-                                            <input type="checkbox" id="withPlan" class="form-check-input" checked onchange="applyFilters()">
-                                            <label for="withPlan" class="form-check-label" style="font-size: 0.85rem;">עם תוכנית</label>
+                                            <input type="checkbox" id="recordFilterWithPlan" class="form-check-input" checked onchange="applyRecordFilters()">
+                                            <label for="recordFilterWithPlan" class="form-check-label" style="font-size: 0.85rem;">עם תוכנית</label>
                                         </div>
                                         <div class="form-check">
-                                            <input type="checkbox" id="withoutPlan" class="form-check-input" checked onchange="applyFilters()">
-                                            <label for="withoutPlan" class="form-check-label" style="font-size: 0.85rem;">בלי תוכנית</label>
+                                            <input type="checkbox" id="recordFilterWithoutPlan" class="form-check-input" checked onchange="applyRecordFilters()">
+                                            <label for="recordFilterWithoutPlan" class="form-check-label" style="font-size: 0.85rem;">בלי תוכנית</label>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Comparison Parameters Panel (Lower) -->
+                <div class="content-section comparison-panel-card" id="comparison-parameters-panel">
+                    <div class="section-header">
+                        <h3><i class="bi bi-bar-chart"></i> פרמטרים להשוואה</h3>
+                        <p class="text-muted small mb-0">בחר לפי מה להשוות את הטריידים (ניתן לבחור מספר פרמטרים במקביל)</p>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('comparison-parameters-panel')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <!-- Investment Type Parameter -->
+                                    <div class="col-md-3">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" id="compareByInvestmentType" class="form-check-input" onchange="toggleComparisonParameter('investmentType')">
+                                            <label for="compareByInvestmentType" class="form-check-label fw-bold">סוג השקעה</label>
+                                        </div>
+                                        <select id="comparisonInvestmentTypes" class="form-select form-select-sm" multiple onchange="applyComparisonParameters()" title="בחר סוגי השקעות להשוואה" disabled>
+                                            <option value="Investment">Investment</option>
+                                            <option value="Swing">Swing</option>
+                                            <option value="Passive">Passive</option>
+                                        </select>
+                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('comparisonInvestmentTypes')" title="בחר הכל">הכל</button>
+                                            <span style="color: #dee2e6;">|</span>
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('comparisonInvestmentTypes')" title="נקה הכל">נקה</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Trading Methods Parameter -->
+                                    <div class="col-md-3">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" id="compareByTradingMethods" class="form-check-input" onchange="toggleComparisonParameter('tradingMethods')">
+                                            <label for="compareByTradingMethods" class="form-check-label fw-bold">שיטות מסחר</label>
+                                        </div>
+                                        <select id="comparisonTradingMethods" class="form-select form-select-sm" multiple onchange="applyComparisonParameters()" title="בחר שיטות מסחר להשוואה" disabled>
+                                            <!-- Will be populated dynamically -->
+                                        </select>
+                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('comparisonTradingMethods')" title="בחר הכל">הכל</button>
+                                            <span style="color: #dee2e6;">|</span>
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('comparisonTradingMethods')" title="נקה הכל">נקה</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Ticker Parameter -->
+                                    <div class="col-md-3">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" id="compareByTicker" class="form-check-input" onchange="toggleComparisonParameter('ticker')">
+                                            <label for="compareByTicker" class="form-check-label fw-bold">טיקר</label>
+                                        </div>
+                                        <select id="comparisonTickers" class="form-select form-select-sm" multiple onchange="applyComparisonParameters()" title="בחר טיקרים להשוואה" disabled>
+                                            <!-- Will be populated dynamically -->
+                                        </select>
+                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('comparisonTickers')" title="בחר הכל">הכל</button>
+                                            <span style="color: #dee2e6;">|</span>
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('comparisonTickers')" title="נקה הכל">נקה</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- With/Without Plan Parameter -->
+                                    <div class="col-md-3">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" id="compareByPlan" class="form-check-input" onchange="toggleComparisonParameter('withWithoutPlan')">
+                                            <label for="compareByPlan" class="form-check-label fw-bold">תוכנית מסחר</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="checkbox" id="comparisonWithPlan" class="form-check-input" onchange="applyComparisonParameters()" disabled>
+                                            <label for="comparisonWithPlan" class="form-check-label" style="font-size: 0.85rem;">עם תוכנית</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="checkbox" id="comparisonWithoutPlan" class="form-check-input" onchange="applyComparisonParameters()" disabled>
+                                            <label for="comparisonWithoutPlan" class="form-check-label" style="font-size: 0.85rem;">בלי תוכנית</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Tags Parameter -->
+                                    <div class="col-md-3">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" id="compareByTags" class="form-check-input" onchange="toggleComparisonParameter('tags')">
+                                            <label for="compareByTags" class="form-check-label fw-bold">תגיות</label>
+                                        </div>
+                                        <select id="comparisonTags" class="form-select form-select-sm tag-multi-select" multiple onchange="applyComparisonParameters()" title="בחר תגיות להשוואה" disabled>
+                                            <!-- Will be populated by TagUIManager -->
+                                        </select>
+                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('comparisonTags')" title="בחר הכל">הכל</button>
+                                            <span style="color: #dee2e6;">|</span>
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('comparisonTags')" title="נקה הכל">נקה</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Clear All Comparison Parameters Button -->
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <button class="btn btn-outline-secondary btn-sm" onclick="clearAllComparisonParameters()" title="נקה את כל הפרמטרים להשוואה">
+                                            <i class="bi bi-x-circle"></i> נקה הכל
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -470,12 +601,7 @@
                                     <table class="table table-hover">
                                         <thead>
                                             <tr>
-                                                <th>קטגוריה</th>
-                                                <th>טריידים</th>
-                                                <th>P/L ממוצע</th>
-                                                <th>P/L כולל</th>
-                                                <th>אחוז הצלחה</th>
-                                                <th>תגיות</th>
+                                                <!-- Headers will be populated dynamically based on selected comparison parameters -->
                                             </tr>
                                         </thead>
                                         <tbody id="comparison-table-body">
@@ -483,8 +609,18 @@
                                         </tbody>
                                         <tfoot>
                                             <tr class="table-info">
-                                                <td colspan="6" id="comparison-table-summary">
+                                                <td colspan="5" id="comparison-table-summary">
                                                     <strong>סיכום:</strong> טוען נתונים...
+                                                </td>
+                                            </tr>
+                                            <tr class="table-secondary" style="font-size: 0.85rem;">
+                                                <td colspan="5" id="comparison-table-filter-info">
+                                                    <strong>פרמטרי סינון:</strong> טוען נתונים...
+                                                </td>
+                                            </tr>
+                                            <tr class="table-secondary" style="font-size: 0.85rem;">
+                                                <td colspan="5" id="comparison-table-comparison-info">
+                                                    <strong>פרמטרי השוואה:</strong> טוען נתונים...
                                                 </td>
                                             </tr>
                                         </tfoot>
@@ -574,7 +710,7 @@
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
     
-    <!-- CSS Animations -->
+    <!-- CSS Animations and Panel Styling -->
     <style>
         @keyframes fadeIn {
             from {
@@ -607,6 +743,85 @@
         .table-hover tbody tr {
             transition: background-color 0.2s;
         }
+        
+        /* Panel Styling - Record Filter Panel (Blue) */
+        .filter-panel-card {
+            background-color: #E3F2FD;
+            border: 2px solid #2196F3;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-panel-card .section-header {
+            background-color: #BBDEFB;
+            padding: 12px 16px;
+            border-bottom: 2px solid #2196F3;
+        }
+        
+        .filter-panel-card .section-header h3 {
+            color: #1976D2;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        
+        .filter-panel-card .section-header .text-muted {
+            color: #1565C0;
+            font-size: 0.85rem;
+        }
+        
+        /* Panel Styling - Comparison Parameters Panel (Green) */
+        .comparison-panel-card {
+            background-color: #E8F5E9;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .comparison-panel-card .section-header {
+            background-color: #C8E6C9;
+            padding: 12px 16px;
+            border-bottom: 2px solid #4CAF50;
+        }
+        
+        .comparison-panel-card .section-header h3 {
+            color: #2E7D32;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        
+        .comparison-panel-card .section-header .text-muted {
+            color: #1B5E20;
+            font-size: 0.85rem;
+        }
+        
+        /* Side and Status Filter Styling (matching date range filter) */
+        .side-filter-item,
+        .status-filter-item {
+            padding: 6px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .side-filter-item:hover,
+        .status-filter-item:hover {
+            background: #f8f9ff;
+            color: #667eea;
+        }
+        
+        .side-filter-item.selected,
+        .status-filter-item.selected {
+            background: #e3f2fd;
+            color: #1976d2;
+            font-weight: 500;
+        }
+        
+        /* Disabled state for comparison parameters */
+        .form-select:disabled,
+        .form-check-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
     
     <!-- Initialize Preferences System and Dynamic Colors -->
@@ -627,8 +842,9 @@
         let categoryDistributionChart = null;
         let categoryDistributionSeries = null;
         
-        // Filter state
-        const FILTER_STORAGE_KEY = 'comparative-analysis-filters';
+        // Filter state - separated into record filters and comparison parameters
+        const RECORD_FILTER_STORAGE_KEY = 'comparative-analysis-record-filters';
+        const COMPARISON_PARAMS_STORAGE_KEY = 'comparative-analysis-comparison-params';
         
         // Wait for TradingView adapter
         async function waitForTradingViewAdapter() {
@@ -655,27 +871,21 @@
             console.log('✅ TradingView libraries loaded');
         }
         
-        // Get current filter values
-        function getFilterValues() {
-            const investmentTypes = Array.from(document.getElementById('investmentTypes')?.selectedOptions || [])
+        // Get current record filter values (for filtering which trades to include)
+        function getRecordFilterValues() {
+            const tradingAccounts = Array.from(document.getElementById('recordFilterTradingAccounts')?.selectedOptions || [])
                 .map(opt => opt.value);
-            const tradingMethods = Array.from(document.getElementById('tradingMethods')?.selectedOptions || [])
-                .map(opt => opt.value);
-            const tradingAccounts = Array.from(document.getElementById('tradingAccounts')?.selectedOptions || [])
-                .map(opt => opt.value);
-            const withPlan = document.getElementById('withPlan')?.checked || false;
-            const withoutPlan = document.getElementById('withoutPlan')?.checked || false;
             
             // Get selected tags
             let selectedTags = [];
             if (window.TagUIManager && typeof window.TagUIManager.getSelectedValues === 'function') {
-                const tagsSelect = document.getElementById('filterTags');
+                const tagsSelect = document.getElementById('recordFilterTags');
                 if (tagsSelect) {
                     selectedTags = window.TagUIManager.getSelectedValues(tagsSelect);
                 }
             } else {
                 // Fallback: get from select directly
-                const tagsSelect = document.getElementById('filterTags');
+                const tagsSelect = document.getElementById('recordFilterTags');
                 if (tagsSelect) {
                     selectedTags = Array.from(tagsSelect.selectedOptions || [])
                         .map(opt => parseInt(opt.value))
@@ -683,21 +893,109 @@
                 }
             }
             
+            // Get side filter
+            const selectedSideItem = document.querySelector('#sideFilterMenu .side-filter-item.selected');
+            const selectedSide = selectedSideItem ? selectedSideItem.getAttribute('data-value') : 'הכול';
+            const sides = selectedSide === 'הכול' ? ['Long', 'Short'] : [selectedSide];
+            
+            // Get status filter
+            const selectedStatusItem = document.querySelector('#statusFilterMenu .status-filter-item.selected');
+            const selectedStatus = selectedStatusItem ? selectedStatusItem.getAttribute('data-value') : 'הכול';
+            const statuses = selectedStatus === 'הכול' ? ['open', 'closed', 'cancelled'] : [selectedStatus];
+            
+            const withPlan = document.getElementById('recordFilterWithPlan')?.checked || false;
+            const withoutPlan = document.getElementById('recordFilterWithoutPlan')?.checked || false;
+            
             // Get date range
             const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
-            const dateRange = selectedItem ? selectedItem.getAttribute('data-value') : 'היום';
+            const dateRange = selectedItem ? selectedItem.getAttribute('data-value') : 'השנה';
             const { start, end } = getDateRange();
             
             return {
-                investmentTypes,
-                tradingMethods,
                 tradingAccounts,
+                tags: selectedTags,
+                side: sides,
+                status: statuses,
                 withPlan,
                 withoutPlan,
-                tags: selectedTags,
                 dateRange,
                 dateRangeStart: start ? start.toISOString().split('T')[0] : '',
                 dateRangeEnd: end ? end.toISOString().split('T')[0] : ''
+            };
+        }
+        
+        // Get current comparison parameter values (for selecting what to compare by)
+        function getComparisonParameterValues() {
+            const investmentType = {
+                enabled: document.getElementById('compareByInvestmentType')?.checked || false,
+                values: Array.from(document.getElementById('comparisonInvestmentTypes')?.selectedOptions || [])
+                    .map(opt => opt.value)
+            };
+            
+            const tradingMethods = {
+                enabled: document.getElementById('compareByTradingMethods')?.checked || false,
+                values: Array.from(document.getElementById('comparisonTradingMethods')?.selectedOptions || [])
+                    .map(opt => opt.value)
+            };
+            
+            const ticker = {
+                enabled: document.getElementById('compareByTicker')?.checked || false,
+                values: Array.from(document.getElementById('comparisonTickers')?.selectedOptions || [])
+                    .map(opt => opt.value)
+            };
+            
+            const withWithoutPlan = {
+                enabled: document.getElementById('compareByPlan')?.checked || false,
+                values: []
+            };
+            if (withWithoutPlan.enabled) {
+                if (document.getElementById('comparisonWithPlan')?.checked) {
+                    withWithoutPlan.values.push('with');
+                }
+                if (document.getElementById('comparisonWithoutPlan')?.checked) {
+                    withWithoutPlan.values.push('without');
+                }
+            }
+            
+            // Get selected tags for comparison
+            let selectedTags = [];
+            if (window.TagUIManager && typeof window.TagUIManager.getSelectedValues === 'function') {
+                const tagsSelect = document.getElementById('comparisonTags');
+                if (tagsSelect) {
+                    selectedTags = window.TagUIManager.getSelectedValues(tagsSelect);
+                }
+            } else {
+                // Fallback: get from select directly
+                const tagsSelect = document.getElementById('comparisonTags');
+                if (tagsSelect) {
+                    selectedTags = Array.from(tagsSelect.selectedOptions || [])
+                        .map(opt => parseInt(opt.value))
+                        .filter(v => !isNaN(v));
+                }
+            }
+            
+            const tags = {
+                enabled: document.getElementById('compareByTags')?.checked || false,
+                values: selectedTags
+            };
+            
+            return {
+                investmentType,
+                tradingMethods,
+                ticker,
+                withWithoutPlan,
+                tags
+            };
+        }
+        
+        // Get combined filter values (for backward compatibility and mock data generation)
+        function getFilterValues() {
+            const recordFilters = getRecordFilterValues();
+            const comparisonParams = getComparisonParameterValues();
+            
+            return {
+                recordFilters,
+                comparisonParameters: comparisonParams
             };
         }
         
@@ -745,7 +1043,7 @@
             }
             
             // Apply filters
-            applyFilters();
+            applyRecordFilters();
         }
         
         // Handle custom date from change
@@ -762,7 +1060,7 @@
             
             // Only apply if both dates are set
             if (fromDate && toDate) {
-                applyFilters();
+                applyRecordFilters();
             }
         }
         
@@ -780,7 +1078,7 @@
             
             // Only apply if both dates are set
             if (fromDate && toDate) {
-                applyFilters();
+                applyRecordFilters();
             }
         }
         
@@ -1057,128 +1355,169 @@
             }).join('');
         }
         
+        // Create comparison categories from enabled parameters (cross-product)
+        function createComparisonCategories(comparisonParams) {
+            const enabledParams = [];
+            
+            // Collect enabled parameters with their values
+            if (comparisonParams.investmentType.enabled && comparisonParams.investmentType.values.length > 0) {
+                enabledParams.push({
+                    name: 'סוג השקעה',
+                    values: comparisonParams.investmentType.values.map(v => {
+                        const labels = { 'Investment': 'Investment', 'Swing': 'Swing', 'Passive': 'Passive' };
+                        return labels[v] || v;
+                    })
+                });
+            }
+            
+            if (comparisonParams.tradingMethods.enabled && comparisonParams.tradingMethods.values.length > 0) {
+                // Get method names from select options
+                const methodSelect = document.getElementById('comparisonTradingMethods');
+                const methodNames = [];
+                if (methodSelect) {
+                    comparisonParams.tradingMethods.values.forEach(id => {
+                        const option = methodSelect.querySelector(`option[value="${id}"]`);
+                        if (option) methodNames.push(option.textContent.trim());
+                    });
+                }
+                if (methodNames.length > 0) {
+                    enabledParams.push({
+                        name: 'שיטות מסחר',
+                        values: methodNames
+                    });
+                }
+            }
+            
+            if (comparisonParams.ticker.enabled && comparisonParams.ticker.values.length > 0) {
+                // Get ticker symbols from select options
+                const tickerSelect = document.getElementById('comparisonTickers');
+                const tickerSymbols = [];
+                if (tickerSelect) {
+                    comparisonParams.ticker.values.forEach(id => {
+                        const option = tickerSelect.querySelector(`option[value="${id}"]`);
+                        if (option) tickerSymbols.push(option.textContent.trim());
+                    });
+                }
+                if (tickerSymbols.length > 0) {
+                    enabledParams.push({
+                        name: 'טיקר',
+                        values: tickerSymbols
+                    });
+                }
+            }
+            
+            if (comparisonParams.withWithoutPlan.enabled && comparisonParams.withWithoutPlan.values.length > 0) {
+                const planLabels = [];
+                if (comparisonParams.withWithoutPlan.values.includes('with')) {
+                    planLabels.push('עם תוכנית');
+                }
+                if (comparisonParams.withWithoutPlan.values.includes('without')) {
+                    planLabels.push('בלי תוכנית');
+                }
+                if (planLabels.length > 0) {
+                    enabledParams.push({
+                        name: 'תוכנית מסחר',
+                        values: planLabels
+                    });
+                }
+            }
+            
+            if (comparisonParams.tags.enabled && comparisonParams.tags.values.length > 0) {
+                // Get tag names from select options
+                const tagsSelect = document.getElementById('comparisonTags');
+                const tagNames = [];
+                if (tagsSelect) {
+                    comparisonParams.tags.values.forEach(id => {
+                        const option = tagsSelect.querySelector(`option[value="${id}"]`);
+                        if (option) tagNames.push(option.textContent.trim());
+                    });
+                }
+                if (tagNames.length > 0) {
+                    enabledParams.push({
+                        name: 'תגיות',
+                        values: tagNames
+                    });
+                }
+            }
+            
+            // If no parameters enabled, return empty array
+            if (enabledParams.length === 0) {
+                return { categories: [], paramHeaders: [] };
+            }
+            
+            // Create cross-product of all parameter combinations
+            function cartesianProduct(arrays) {
+                return arrays.reduce((acc, arr) => {
+                    const result = [];
+                    acc.forEach(accItem => {
+                        arr.forEach(arrItem => {
+                            result.push([...accItem, arrItem]);
+                        });
+                    });
+                    return result;
+                }, [[]]);
+            }
+            
+            const combinations = cartesianProduct(enabledParams.map(p => p.values));
+            
+            // Create category objects with parameter values separated
+            const categories = combinations.map(combo => {
+                const categoryName = combo.join(' • ');
+                const paramValues = {};
+                enabledParams.forEach((param, index) => {
+                    paramValues[param.name] = combo[index];
+                });
+                
+                return {
+                    name: categoryName, // Keep for backward compatibility (charts, heatmap)
+                    paramValues: paramValues, // New: separated parameter values
+                    paramHeaders: enabledParams.map(p => p.name), // Parameter headers
+                    trades: Math.floor(Math.random() * 30) + 10,
+                    avgPL: Math.floor(Math.random() * 500) + 200,
+                    totalPL: 0, // Will be calculated
+                    successRate: Math.floor(Math.random() * 30) + 50,
+                    totalInvestment: 0, // Will be calculated (max investment at point in time + total purchases)
+                    maxInvestmentAtPoint: 0, // Maximum investment at any point in time
+                    totalPurchases: 0, // Total purchases amount
+                    tags: generateMockTagsForCategory(categoryName)
+                };
+            });
+            
+            return {
+                categories: categories,
+                paramHeaders: enabledParams.map(p => p.name)
+            };
+        }
+        
         // Generate mock comparison table data
-        function generateMockComparisonTableData(filters) {
-            const categories = [];
+        function generateMockComparisonTableData(filterState) {
+            const recordFilters = filterState.recordFilters;
+            const comparisonParams = filterState.comparisonParameters;
             
-            // Investment types
-            if (filters.investmentTypes.includes('Investment')) {
-                categories.push({
-                    name: 'Investment',
-                    trades: 25,
-                    avgPL: 500,
-                    totalPL: 12500,
-                    successRate: 68,
-                    tags: generateMockTagsForCategory('Investment')
-                });
-            }
-            if (filters.investmentTypes.includes('Swing')) {
-                categories.push({
-                    name: 'Swing',
-                    trades: 20,
-                    avgPL: 450,
-                    totalPL: 9000,
-                    successRate: 65,
-                    tags: generateMockTagsForCategory('Swing')
-                });
-            }
-            if (filters.investmentTypes.includes('Passive')) {
-                categories.push({
-                    name: 'Passive',
-                    trades: 10,
-                    avgPL: 800,
-                    totalPL: 8000,
-                    successRate: 80,
-                    tags: generateMockTagsForCategory('Passive')
-                });
-            }
+            // Create categories from comparison parameters
+            const result = createComparisonCategories(comparisonParams);
+            const categories = result.categories;
+            const paramHeaders = result.paramHeaders;
             
-            // Trading methods
-            if (filters.tradingMethods.includes('Moving Averages')) {
-                categories.push({
-                    name: 'ממוצעים נעים',
-                    trades: 20,
-                    avgPL: 400,
-                    totalPL: 8000,
-                    successRate: 65,
-                    tags: generateMockTagsForCategory('Moving Averages')
-                });
-            }
-            if (filters.tradingMethods.includes('Volume Analysis')) {
-                categories.push({
-                    name: 'ניתוח נפח',
-                    trades: 15,
-                    avgPL: 350,
-                    totalPL: 5250,
-                    successRate: 67,
-                    tags: generateMockTagsForCategory('Volume Analysis')
-                });
-            }
-            if (filters.tradingMethods.includes('Support & Resistance')) {
-                categories.push({
-                    name: 'תמיכה והתנגדות',
-                    trades: 12,
-                    avgPL: 380,
-                    totalPL: 4560,
-                    successRate: 63,
-                    tags: generateMockTagsForCategory('Support & Resistance')
-                });
-            }
-            if (filters.tradingMethods.includes('Trend Lines')) {
-                categories.push({
-                    name: 'קווי מגמה',
-                    trades: 18,
-                    avgPL: 420,
-                    totalPL: 7560,
-                    successRate: 66,
-                    tags: generateMockTagsForCategory('Trend Lines')
-                });
-            }
-            if (filters.tradingMethods.includes('Technical Patterns')) {
-                categories.push({
-                    name: 'דפוסים טכניים',
-                    trades: 14,
-                    avgPL: 360,
-                    totalPL: 5040,
-                    successRate: 64,
-                    tags: generateMockTagsForCategory('Technical Patterns')
-                });
-            }
-            if (filters.tradingMethods.includes('Fibonacci Retracement')) {
-                categories.push({
-                    name: 'פיבונאצ\'י',
-                    trades: 11,
-                    avgPL: 390,
-                    totalPL: 4290,
-                    successRate: 62,
-                    tags: generateMockTagsForCategory('Fibonacci Retracement')
-                });
-            }
-            
-            // With/without plan
-            if (filters.withPlan) {
-                categories.push({
-                    name: 'עם תוכנית',
-                    trades: 30,
-                    avgPL: 600,
-                    totalPL: 18000,
-                    successRate: 70,
-                    tags: generateMockTagsForCategory('With Plan')
-                });
-            }
-            if (filters.withoutPlan) {
-                categories.push({
-                    name: 'בלי תוכנית',
-                    trades: 20,
-                    avgPL: 250,
-                    totalPL: 5000,
-                    successRate: 55,
-                    tags: generateMockTagsForCategory('Without Plan')
-                });
+            // If no comparison parameters enabled, show message
+            if (categories.length === 0) {
+                return {
+                    data: [{
+                        name: 'אין פרמטרים להשוואה נבחרים',
+                        paramValues: {},
+                        paramHeaders: [],
+                        trades: 0,
+                        avgPL: 0,
+                        totalPL: 0,
+                        successRate: 0,
+                        tags: []
+                    }],
+                    paramHeaders: []
+                };
             }
             
             // Apply variations based on filters
-            const seed = JSON.stringify(filters).split('').reduce((a, b) => {
+            const seed = JSON.stringify(filterState).split('').reduce((a, b) => {
                 a = ((a << 5) - a) + b.charCodeAt(0);
                 return a & a;
             }, 0);
@@ -1190,21 +1529,37 @@
                 return seedValue / 233280;
             }
             
-            // Add variations
+            // Add variations and calculate totalPL, totalInvestment
             categories.forEach(cat => {
                 const variation = (seededRandom() - 0.5) * 0.2; // ±10%
                 cat.trades = Math.max(1, Math.round(cat.trades * (1 + variation)));
                 cat.avgPL = Math.round(cat.avgPL * (1 + variation));
                 cat.totalPL = cat.trades * cat.avgPL;
                 cat.successRate = Math.max(0, Math.min(100, Math.round(cat.successRate + (seededRandom() - 0.5) * 10)));
+                
+                // Calculate investment metrics
+                // Total purchases: based on trades and average investment per trade
+                const avgInvestmentPerTrade = Math.floor(Math.random() * 5000) + 2000; // $2K-$7K per trade
+                cat.totalPurchases = cat.trades * avgInvestmentPerTrade;
+                
+                // Max investment at point in time: typically 60-80% of total purchases (some trades closed)
+                const maxInvestmentPercent = 0.6 + (seededRandom() * 0.2); // 60-80%
+                cat.maxInvestmentAtPoint = Math.round(cat.totalPurchases * maxInvestmentPercent);
+                
+                // Total investment: max investment + remaining (total purchases - max investment)
+                cat.totalInvestment = cat.maxInvestmentAtPoint + (cat.totalPurchases - cat.maxInvestmentAtPoint);
             });
             
-            return categories;
+            return {
+                data: categories,
+                paramHeaders: paramHeaders
+            };
         }
         
         // Generate mock P/L by category data for Bar Chart
         function generateMockPLByCategoryData(filters) {
-            const tableData = generateMockComparisonTableData(filters);
+            const tableResult = generateMockComparisonTableData(filters);
+            const tableData = tableResult.data;
             const data = [];
             
             tableData.forEach((cat, index) => {
@@ -1222,7 +1577,8 @@
         
         // Generate mock category distribution data for Pie Chart
         function generateMockCategoryDistributionData(filters) {
-            const tableData = generateMockComparisonTableData(filters);
+            const tableResult = generateMockComparisonTableData(filters);
+            const tableData = tableResult.data;
             const totalTrades = tableData.reduce((sum, cat) => sum + cat.trades, 0);
             
             const data = [];
@@ -1243,7 +1599,8 @@
         
         // Generate mock heatmap data
         function generateMockHeatmapData(filters) {
-            const tableData = generateMockComparisonTableData(filters);
+            const tableResult = generateMockComparisonTableData(filters);
+            const tableData = tableResult.data;
             
             // Calculate percentiles for coloring
             const allPLValues = tableData.map(cat => cat.totalPL);
@@ -1278,6 +1635,52 @@
             return `$${value.toFixed(0)}`;
         }
         
+        // Format P/L with percentage (using existing system pattern)
+        function formatPLWithPercent(plValue, plPercent) {
+            if (plValue === null || plValue === undefined) {
+                return '<span class="text-muted">-</span>';
+            }
+            
+            // Use FieldRendererService if available
+            let plFormatted;
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
+                plFormatted = window.FieldRendererService.renderAmount(plValue, '$', 2, true);
+            } else {
+                // Fallback formatting
+                const sign = plValue >= 0 ? '+' : '';
+                const absValue = Math.abs(plValue);
+                if (absValue >= 1000) {
+                    plFormatted = `${sign}$${(absValue / 1000).toFixed(1)}K`;
+                } else {
+                    plFormatted = `${sign}$${absValue.toFixed(0)}`;
+                }
+            }
+            
+            // Add percentage if available
+            if (plPercent !== null && plPercent !== undefined && !isNaN(plPercent)) {
+                const percentSign = plPercent >= 0 ? '+' : '';
+                return `${plFormatted} <span class="text-muted">(${percentSign}${plPercent.toFixed(2)}%)</span>`;
+            }
+            
+            return plFormatted;
+        }
+        
+        // Format total investment (max at point + total purchases)
+        function formatTotalInvestment(maxAtPoint, totalPurchases) {
+            // Format: "מקס: $X | סה"כ: $Y"
+            const formatValue = (val) => {
+                if (val >= 1000) {
+                    return `$${(val / 1000).toFixed(1)}K`;
+                }
+                return `$${val.toFixed(0)}`;
+            };
+            
+            return `<div class="d-flex flex-column align-items-end">
+                <small class="text-muted">מקס בנקודה: ${formatValue(maxAtPoint)}</small>
+                <small class="text-muted">סה"כ קניות: ${formatValue(totalPurchases)}</small>
+            </div>`;
+        }
+        
         // Get color class based on percentile
         function getColorClass(percentile) {
             if (percentile >= 0.7) return 'table-success';
@@ -1285,29 +1688,240 @@
             return 'table-danger';
         }
         
+        // Format filter info for display
+        function formatFilterInfo(recordFilters) {
+            const parts = [];
+            
+            // Date range
+            if (recordFilters.dateRangeStart && recordFilters.dateRangeEnd) {
+                const formatDate = (dateStr) => {
+                    const date = new Date(dateStr);
+                    return date.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                };
+                parts.push(`תאריכים: ${formatDate(recordFilters.dateRangeStart)} - ${formatDate(recordFilters.dateRangeEnd)}`);
+            } else if (recordFilters.dateRange) {
+                parts.push(`תאריכים: ${recordFilters.dateRange}`);
+            }
+            
+            // Trading accounts
+            if (recordFilters.tradingAccounts && recordFilters.tradingAccounts.length > 0) {
+                const accountSelect = document.getElementById('recordFilterTradingAccounts');
+                const accountNames = recordFilters.tradingAccounts.map(id => {
+                    if (accountSelect) {
+                        const option = accountSelect.querySelector(`option[value="${id}"]`);
+                        return option ? option.textContent.trim() : `Account #${id}`;
+                    }
+                    return `Account #${id}`;
+                });
+                parts.push(`חשבונות מסחר: ${accountNames.join(', ')}`);
+            }
+            
+            // Tags
+            if (recordFilters.tags && recordFilters.tags.length > 0) {
+                const tagsSelect = document.getElementById('recordFilterTags');
+                const tagNames = recordFilters.tags.map(id => {
+                    if (tagsSelect) {
+                        const option = tagsSelect.querySelector(`option[value="${id}"]`);
+                        return option ? option.textContent.trim() : `Tag #${id}`;
+                    }
+                    return `Tag #${id}`;
+                });
+                parts.push(`תגיות: ${tagNames.join(', ')}`);
+            }
+            
+            // Side
+            if (recordFilters.side && recordFilters.side.length > 0) {
+                const sideLabels = recordFilters.side.map(s => {
+                    if (s === 'Long') return 'קנייה';
+                    if (s === 'Short') return 'מכירה';
+                    return s;
+                });
+                if (sideLabels.length === 2) {
+                    parts.push(`צד: כל הצדדים`);
+                } else {
+                    parts.push(`צד: ${sideLabels.join(', ')}`);
+                }
+            }
+            
+            // Status
+            if (recordFilters.status && recordFilters.status.length > 0) {
+                const statusLabels = recordFilters.status.map(s => {
+                    if (s === 'open') return 'פתוח';
+                    if (s === 'closed') return 'סגור';
+                    if (s === 'cancelled') return 'מבוטל';
+                    return s;
+                });
+                if (statusLabels.length === 3) {
+                    parts.push(`סטטוס: כל הסטטוסים`);
+                } else {
+                    parts.push(`סטטוס: ${statusLabels.join(', ')}`);
+                }
+            }
+            
+            // Plan
+            const planParts = [];
+            if (recordFilters.withPlan) planParts.push('עם תוכנית');
+            if (recordFilters.withoutPlan) planParts.push('בלי תוכנית');
+            if (planParts.length > 0) {
+                parts.push(`תוכנית מסחר: ${planParts.join(', ')}`);
+            }
+            
+            return parts.length > 0 ? parts.join(' | ') : 'אין פרמטרי סינון';
+        }
+        
+        // Format comparison info for display
+        function formatComparisonInfo(comparisonParams) {
+            const parts = [];
+            
+            // Investment Type
+            if (comparisonParams.investmentType.enabled && comparisonParams.investmentType.values.length > 0) {
+                const typeLabels = comparisonParams.investmentType.values.map(v => {
+                    if (v === 'Investment') return 'Investment';
+                    if (v === 'Swing') return 'Swing';
+                    if (v === 'Passive') return 'Passive';
+                    return v;
+                });
+                parts.push(`סוג השקעה: ${typeLabels.join(', ')}`);
+            }
+            
+            // Trading Methods
+            if (comparisonParams.tradingMethods.enabled && comparisonParams.tradingMethods.values.length > 0) {
+                const methodSelect = document.getElementById('comparisonTradingMethods');
+                const methodNames = comparisonParams.tradingMethods.values.map(id => {
+                    if (methodSelect) {
+                        const option = methodSelect.querySelector(`option[value="${id}"]`);
+                        return option ? option.textContent.trim() : `Method #${id}`;
+                    }
+                    return `Method #${id}`;
+                });
+                parts.push(`שיטות מסחר: ${methodNames.join(', ')}`);
+            }
+            
+            // Ticker
+            if (comparisonParams.ticker.enabled && comparisonParams.ticker.values.length > 0) {
+                const tickerSelect = document.getElementById('comparisonTickers');
+                const tickerSymbols = comparisonParams.ticker.values.map(id => {
+                    if (tickerSelect) {
+                        const option = tickerSelect.querySelector(`option[value="${id}"]`);
+                        return option ? option.textContent.trim() : `Ticker #${id}`;
+                    }
+                    return `Ticker #${id}`;
+                });
+                parts.push(`טיקר: ${tickerSymbols.join(', ')}`);
+            }
+            
+            // With/Without Plan
+            if (comparisonParams.withWithoutPlan.enabled && comparisonParams.withWithoutPlan.values.length > 0) {
+                const planLabels = [];
+                if (comparisonParams.withWithoutPlan.values.includes('with')) {
+                    planLabels.push('עם תוכנית');
+                }
+                if (comparisonParams.withWithoutPlan.values.includes('without')) {
+                    planLabels.push('בלי תוכנית');
+                }
+                if (planLabels.length > 0) {
+                    parts.push(`תוכנית מסחר: ${planLabels.join(', ')}`);
+                }
+            }
+            
+            // Tags
+            if (comparisonParams.tags.enabled && comparisonParams.tags.values.length > 0) {
+                const tagsSelect = document.getElementById('comparisonTags');
+                const tagNames = comparisonParams.tags.values.map(id => {
+                    if (tagsSelect) {
+                        const option = tagsSelect.querySelector(`option[value="${id}"]`);
+                        return option ? option.textContent.trim() : `Tag #${id}`;
+                    }
+                    return `Tag #${id}`;
+                });
+                parts.push(`תגיות: ${tagNames.join(', ')}`);
+            }
+            
+            return parts.length > 0 ? parts.join(' | ') : 'אין פרמטרי השוואה';
+        }
+        
         // Update comparison table with animation
         function updateComparisonTable(filters) {
-            const data = generateMockComparisonTableData(filters);
-            const tbody = document.getElementById('comparison-table-body');
-            const summary = document.getElementById('comparison-table-summary');
+            const result = generateMockComparisonTableData(filters);
+            const data = result.data;
+            const paramHeaders = result.paramHeaders;
             
-            if (!tbody) return;
+            const tbody = document.getElementById('comparison-table-body');
+            const thead = document.querySelector('#comparison-table-section table thead tr');
+            const summary = document.getElementById('comparison-table-summary');
+            const filterInfo = document.getElementById('comparison-table-filter-info');
+            const comparisonInfo = document.getElementById('comparison-table-comparison-info');
+            const summaryRow = document.querySelector('#comparison-table-summary')?.parentElement;
+            const filterInfoRow = document.querySelector('#comparison-table-filter-info')?.parentElement;
+            const comparisonInfoRow = document.querySelector('#comparison-table-comparison-info')?.parentElement;
+            
+            if (!tbody || !thead) return;
+            
+            // Update table headers dynamically
+            const headerHTML = paramHeaders.map(header => `<th>${header}</th>`).join('') +
+                '<th>טריידים</th>' +
+                '<th>P/L ממוצע</th>' +
+                '<th>P/L כולל</th>' +
+                '<th>אחוז הצלחה</th>' +
+                '<th class="text-end">סה"כ השקעה</th>';
+            
+            thead.innerHTML = headerHTML;
+            
+            // Calculate colspan for summary and info rows
+            const summaryColspan = paramHeaders.length + 5; // param columns + 5 data columns (trades, avgPL, totalPL, successRate, totalInvestment)
+            
+            // Update summary colspan
+            if (summaryRow) {
+                const summaryCell = summaryRow.querySelector('td');
+                if (summaryCell) {
+                    summaryCell.setAttribute('colspan', summaryColspan);
+                }
+            }
+            
+            // Update filter info colspan
+            if (filterInfoRow) {
+                const filterInfoCell = filterInfoRow.querySelector('td');
+                if (filterInfoCell) {
+                    filterInfoCell.setAttribute('colspan', summaryColspan);
+                }
+            }
+            
+            // Update comparison info colspan
+            if (comparisonInfoRow) {
+                const comparisonInfoCell = comparisonInfoRow.querySelector('td');
+                if (comparisonInfoCell) {
+                    comparisonInfoCell.setAttribute('colspan', summaryColspan);
+                }
+            }
             
             // Fade out
             tbody.style.opacity = '0';
             tbody.style.transition = 'opacity 0.3s';
             
             setTimeout(() => {
-                tbody.innerHTML = data.map(cat => `
-                    <tr style="animation: fadeIn 0.3s;">
-                        <td><strong>${cat.name}</strong></td>
+                tbody.innerHTML = data.map(cat => {
+                    // Build parameter value cells
+                    const paramCells = paramHeaders.map(header => {
+                        const value = cat.paramValues[header] || '';
+                        return `<td><strong>${value}</strong></td>`;
+                    }).join('');
+                    
+                    // Calculate P/L percentage (based on total investment)
+                    const plPercent = cat.totalInvestment > 0 
+                        ? ((cat.totalPL / cat.totalInvestment) * 100) 
+                        : null;
+                    
+                    // Build data cells
+                    const dataCells = `
                         <td>${cat.trades}</td>
-                        <td>${formatCurrency(cat.avgPL)}</td>
-                        <td class="text-success">${formatCurrency(cat.totalPL)}</td>
+                        <td>${formatPLWithPercent(cat.avgPL, plPercent)}</td>
+                        <td class="text-success">${formatPLWithPercent(cat.totalPL, plPercent)}</td>
                         <td>${cat.successRate}%</td>
-                        <td>${renderTagsBadges(cat.tags || [])}</td>
-                    </tr>
-                `).join('');
+                        <td class="text-end">${formatTotalInvestment(cat.maxInvestmentAtPoint, cat.totalPurchases)}</td>
+                    `;
+                    
+                    return `<tr style="animation: fadeIn 0.3s;">${paramCells}${dataCells}</tr>`;
+                }).join('');
                 
                 // Fade in
                 tbody.style.opacity = '1';
@@ -1329,6 +1943,28 @@
                         P/L כולל: ${formatCurrency(totalPL)}
                     `;
                     summary.style.opacity = '1';
+                }, 150);
+            }
+            
+            // Update filter info
+            if (filterInfo) {
+                filterInfo.style.transition = 'opacity 0.3s';
+                filterInfo.style.opacity = '0';
+                setTimeout(() => {
+                    const filterText = formatFilterInfo(filters.recordFilters);
+                    filterInfo.innerHTML = `<strong>פרמטרי סינון:</strong> ${filterText}`;
+                    filterInfo.style.opacity = '1';
+                }, 150);
+            }
+            
+            // Update comparison info
+            if (comparisonInfo) {
+                comparisonInfo.style.transition = 'opacity 0.3s';
+                comparisonInfo.style.opacity = '0';
+                setTimeout(() => {
+                    const comparisonText = formatComparisonInfo(filters.comparisonParameters);
+                    comparisonInfo.innerHTML = `<strong>פרמטרי השוואה:</strong> ${comparisonText}`;
+                    comparisonInfo.style.opacity = '1';
                 }, 150);
             }
         }
@@ -1650,7 +2286,7 @@
             if (!select) return;
             
             // Special handling for tags (uses TagUIManager)
-            if (selectId === 'filterTags' && window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+            if ((selectId === 'filterTags' || selectId === 'recordFilterTags' || selectId === 'comparisonTags') && window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
                 const allTagIds = Array.from(select.options).map(opt => parseInt(opt.value)).filter(v => !isNaN(v));
                 window.TagUIManager.setSelectedValues(select, allTagIds);
             } else {
@@ -1660,8 +2296,14 @@
                 });
             }
             
-            // Trigger change event to apply filters
-            applyFilters();
+            // Trigger appropriate filter function based on select ID
+            if (selectId.startsWith('recordFilter')) {
+                applyRecordFilters();
+            } else if (selectId.startsWith('comparison')) {
+                applyComparisonParameters();
+            } else {
+                applyFilters();
+            }
         }
         
         // Clear all options in a multi-select
@@ -1670,7 +2312,7 @@
             if (!select) return;
             
             // Special handling for tags (uses TagUIManager)
-            if (selectId === 'filterTags' && window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+            if ((selectId === 'filterTags' || selectId === 'recordFilterTags' || selectId === 'comparisonTags') && window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
                 window.TagUIManager.setSelectedValues(select, []);
             } else {
                 // Standard multi-select: clear all selections
@@ -1679,18 +2321,579 @@
                 });
             }
             
-            // Trigger change event to apply filters
-            applyFilters();
+            // Trigger appropriate filter function based on select ID
+            if (selectId.startsWith('recordFilter')) {
+                applyRecordFilters();
+            } else if (selectId.startsWith('comparison')) {
+                applyComparisonParameters();
+            } else {
+                applyFilters();
+            }
         }
         
         // Make functions globally available
         window.selectAllOptions = selectAllOptions;
         window.clearAllOptions = clearAllOptions;
         
-        // Apply filters (called automatically on filter change)
-        function applyFilters() {
-            saveFilterState();
+        // ===== Side Filter Functions =====
+        function toggleSideFilterMenu() {
+            const menu = document.getElementById('sideFilterMenu');
+            if (menu) {
+                const isCurrentlyOpen = menu.classList.contains('show');
+                if (isCurrentlyOpen) {
+                    menu.classList.remove('show');
+                } else {
+                    menu.classList.add('show');
+                }
+            }
+        }
+        
+        function selectSideOption(side) {
+            const sideItems = document.querySelectorAll('#sideFilterMenu .side-filter-item');
+            sideItems.forEach(item => item.classList.remove('selected'));
+            
+            const clickedItem = Array.from(sideItems).find(
+                item => item.getAttribute('data-value') === side
+            );
+            if (clickedItem) {
+                clickedItem.classList.add('selected');
+            }
+            
+            updateSideFilterText();
+            
+            // Close menu
+            const sideMenu = document.getElementById('sideFilterMenu');
+            if (sideMenu) {
+                sideMenu.classList.remove('show');
+            }
+            
+            // Apply filters
+            applyRecordFilters();
+        }
+        
+        function updateSideFilterText() {
+            const selectedItem = document.querySelector('#sideFilterMenu .side-filter-item.selected');
+            const sideElement = document.getElementById('selectedSide');
+            
+            if (sideElement) {
+                if (selectedItem) {
+                    const optionText = selectedItem.querySelector('.option-text');
+                    const displayText = optionText ? optionText.textContent.trim() : selectedItem.getAttribute('data-value');
+                    sideElement.textContent = displayText;
+                } else {
+                    sideElement.textContent = 'כל הצדדים';
+                }
+            }
+        }
+        
+        // ===== Status Filter Functions =====
+        function toggleStatusFilterMenu() {
+            const menu = document.getElementById('statusFilterMenu');
+            if (menu) {
+                const isCurrentlyOpen = menu.classList.contains('show');
+                if (isCurrentlyOpen) {
+                    menu.classList.remove('show');
+                } else {
+                    menu.classList.add('show');
+                }
+            }
+        }
+        
+        function selectStatusOption(status) {
+            const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
+            statusItems.forEach(item => item.classList.remove('selected'));
+            
+            const clickedItem = Array.from(statusItems).find(
+                item => item.getAttribute('data-value') === status
+            );
+            if (clickedItem) {
+                clickedItem.classList.add('selected');
+            }
+            
+            updateStatusFilterText();
+            
+            // Close menu
+            const statusMenu = document.getElementById('statusFilterMenu');
+            if (statusMenu) {
+                statusMenu.classList.remove('show');
+            }
+            
+            // Apply filters
+            applyRecordFilters();
+        }
+        
+        function updateStatusFilterText() {
+            const selectedItem = document.querySelector('#statusFilterMenu .status-filter-item.selected');
+            const statusElement = document.getElementById('selectedStatus');
+            
+            if (statusElement) {
+                if (selectedItem) {
+                    const optionText = selectedItem.querySelector('.option-text');
+                    const displayText = optionText ? optionText.textContent.trim() : selectedItem.getAttribute('data-value');
+                    statusElement.textContent = displayText;
+                } else {
+                    statusElement.textContent = 'כל הסטטוסים';
+                }
+            }
+        }
+        
+        // ===== Record Filter Functions =====
+        function applyRecordFilters() {
+            saveRecordFilterState();
             updateAllVisualizations();
+        }
+        
+        function resetRecordFilters() {
+            // Clear date range preset
+            const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+            dateRangeItems.forEach(item => item.classList.remove('selected'));
+            
+            // Clear custom date inputs
+            const fromInput = document.getElementById('customDateFrom');
+            const toInput = document.getElementById('customDateTo');
+            if (fromInput) fromInput.value = '';
+            if (toInput) toInput.value = '';
+            updateDateRangeFilterText();
+            
+            // Clear trading accounts
+            const tradingAccounts = document.getElementById('recordFilterTradingAccounts');
+            if (tradingAccounts) {
+                Array.from(tradingAccounts.options).forEach(opt => opt.selected = false);
+            }
+            
+            // Clear tags
+            const tagsSelect = document.getElementById('recordFilterTags');
+            if (tagsSelect) {
+                if (window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                    window.TagUIManager.setSelectedValues(tagsSelect, []);
+                } else {
+                    Array.from(tagsSelect.options).forEach(opt => opt.selected = false);
+                }
+            }
+            
+            // Reset side filter to "הכול"
+            const sideItems = document.querySelectorAll('#sideFilterMenu .side-filter-item');
+            sideItems.forEach(item => item.classList.remove('selected'));
+            const allSideItem = document.querySelector('#sideFilterMenu .side-filter-item[data-value="הכול"]');
+            if (allSideItem) allSideItem.classList.add('selected');
+            updateSideFilterText();
+            
+            // Reset status filter to "הכול"
+            const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
+            statusItems.forEach(item => item.classList.remove('selected'));
+            const allStatusItem = document.querySelector('#statusFilterMenu .status-filter-item[data-value="הכול"]');
+            if (allStatusItem) allStatusItem.classList.add('selected');
+            updateStatusFilterText();
+            
+            // Clear plan checkboxes
+            if (document.getElementById('recordFilterWithPlan')) {
+                document.getElementById('recordFilterWithPlan').checked = false;
+            }
+            if (document.getElementById('recordFilterWithoutPlan')) {
+                document.getElementById('recordFilterWithoutPlan').checked = false;
+            }
+            
+            saveRecordFilterState();
+            updateAllVisualizations();
+        }
+        
+        function resetRecordFiltersToDefaults() {
+            // Set date range to "השנה"
+            const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+            dateRangeItems.forEach(item => item.classList.remove('selected'));
+            const yearItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item[data-value="השנה"]');
+            if (yearItem) yearItem.classList.add('selected');
+            
+            // Clear custom date inputs
+            const fromInput = document.getElementById('customDateFrom');
+            const toInput = document.getElementById('customDateTo');
+            if (fromInput) fromInput.value = '';
+            if (toInput) toInput.value = '';
+            updateDateRangeFilterText();
+            
+            // Set trading accounts to first account only
+            const tradingAccounts = document.getElementById('recordFilterTradingAccounts');
+            if (tradingAccounts) {
+                Array.from(tradingAccounts.options).forEach((opt, index) => {
+                    opt.selected = index === 0;
+                });
+            }
+            
+            // Clear tags
+            const tagsSelect = document.getElementById('recordFilterTags');
+            if (tagsSelect) {
+                if (window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                    window.TagUIManager.setSelectedValues(tagsSelect, []);
+                } else {
+                    Array.from(tagsSelect.options).forEach(opt => opt.selected = false);
+                }
+            }
+            
+            // Set side filter to "הכול"
+            const sideItems = document.querySelectorAll('#sideFilterMenu .side-filter-item');
+            sideItems.forEach(item => item.classList.remove('selected'));
+            const allSideItem = document.querySelector('#sideFilterMenu .side-filter-item[data-value="הכול"]');
+            if (allSideItem) allSideItem.classList.add('selected');
+            updateSideFilterText();
+            
+            // Set status filter to "הכול"
+            const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
+            statusItems.forEach(item => item.classList.remove('selected'));
+            const allStatusItem = document.querySelector('#statusFilterMenu .status-filter-item[data-value="הכול"]');
+            if (allStatusItem) allStatusItem.classList.add('selected');
+            updateStatusFilterText();
+            
+            // Set plan checkboxes to both checked
+            if (document.getElementById('recordFilterWithPlan')) {
+                document.getElementById('recordFilterWithPlan').checked = true;
+            }
+            if (document.getElementById('recordFilterWithoutPlan')) {
+                document.getElementById('recordFilterWithoutPlan').checked = true;
+            }
+            
+            saveRecordFilterState();
+            updateAllVisualizations();
+        }
+        
+        // ===== Comparison Parameter Functions =====
+        function toggleComparisonParameter(paramType) {
+            let checkbox, select, checkboxes;
+            
+            switch (paramType) {
+                case 'investmentType':
+                    checkbox = document.getElementById('compareByInvestmentType');
+                    select = document.getElementById('comparisonInvestmentTypes');
+                    if (checkbox && select) {
+                        select.disabled = !checkbox.checked;
+                        // If enabled, select all options by default
+                        if (checkbox.checked) {
+                            Array.from(select.options).forEach(opt => {
+                                opt.selected = true;
+                            });
+                        }
+                    }
+                    break;
+                case 'tradingMethods':
+                    checkbox = document.getElementById('compareByTradingMethods');
+                    select = document.getElementById('comparisonTradingMethods');
+                    if (checkbox && select) {
+                        select.disabled = !checkbox.checked;
+                        // If enabled, select all options by default
+                        if (checkbox.checked) {
+                            Array.from(select.options).forEach(opt => {
+                                opt.selected = true;
+                            });
+                        }
+                    }
+                    break;
+                case 'ticker':
+                    checkbox = document.getElementById('compareByTicker');
+                    select = document.getElementById('comparisonTickers');
+                    if (checkbox && select) {
+                        select.disabled = !checkbox.checked;
+                        // If enabled, select all options by default
+                        if (checkbox.checked) {
+                            Array.from(select.options).forEach(opt => {
+                                opt.selected = true;
+                            });
+                        }
+                    }
+                    break;
+                case 'withWithoutPlan':
+                    checkbox = document.getElementById('compareByPlan');
+                    const withPlan = document.getElementById('comparisonWithPlan');
+                    const withoutPlan = document.getElementById('comparisonWithoutPlan');
+                    if (checkbox && withPlan && withoutPlan) {
+                        withPlan.disabled = !checkbox.checked;
+                        withoutPlan.disabled = !checkbox.checked;
+                        // If enabled, select both options by default
+                        if (checkbox.checked) {
+                            withPlan.checked = true;
+                            withoutPlan.checked = true;
+                        }
+                    }
+                    break;
+                case 'tags':
+                    checkbox = document.getElementById('compareByTags');
+                    select = document.getElementById('comparisonTags');
+                    if (checkbox && select) {
+                        select.disabled = !checkbox.checked;
+                        // If enabled, select all options by default
+                        if (checkbox.checked) {
+                            // Use TagUIManager if available
+                            if (window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                                const allTagIds = Array.from(select.options).map(opt => parseInt(opt.value)).filter(v => !isNaN(v));
+                                window.TagUIManager.setSelectedValues(select, allTagIds);
+                            } else {
+                                // Fallback: select all options
+                                Array.from(select.options).forEach(opt => {
+                                    opt.selected = true;
+                                });
+                            }
+                        }
+                    }
+                    break;
+            }
+            
+            applyComparisonParameters();
+        }
+        
+        function applyComparisonParameters() {
+            saveComparisonParameterState();
+            updateAllVisualizations();
+        }
+        
+        function clearAllComparisonParameters() {
+            // Uncheck all parameter checkboxes
+            document.getElementById('compareByInvestmentType').checked = false;
+            document.getElementById('compareByTradingMethods').checked = false;
+            document.getElementById('compareByTicker').checked = false;
+            document.getElementById('compareByPlan').checked = false;
+            document.getElementById('compareByTags').checked = false;
+            
+            // Disable all selects and checkboxes
+            document.getElementById('comparisonInvestmentTypes').disabled = true;
+            document.getElementById('comparisonTradingMethods').disabled = true;
+            document.getElementById('comparisonTickers').disabled = true;
+            document.getElementById('comparisonWithPlan').disabled = true;
+            document.getElementById('comparisonWithoutPlan').disabled = true;
+            document.getElementById('comparisonTags').disabled = true;
+            
+            // Clear all selections
+            Array.from(document.getElementById('comparisonInvestmentTypes').options).forEach(opt => opt.selected = false);
+            Array.from(document.getElementById('comparisonTradingMethods').options).forEach(opt => opt.selected = false);
+            Array.from(document.getElementById('comparisonTickers').options).forEach(opt => opt.selected = false);
+            document.getElementById('comparisonWithPlan').checked = false;
+            document.getElementById('comparisonWithoutPlan').checked = false;
+            
+            // Clear tags selection
+            const tagsSelect = document.getElementById('comparisonTags');
+            if (tagsSelect) {
+                if (window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                    window.TagUIManager.setSelectedValues(tagsSelect, []);
+                } else {
+                    Array.from(tagsSelect.options).forEach(opt => opt.selected = false);
+                }
+            }
+            
+            saveComparisonParameterState();
+            updateAllVisualizations();
+        }
+        
+        // ===== Data Loading Functions =====
+        async function loadTradingAccounts() {
+            try {
+                const select = document.getElementById('recordFilterTradingAccounts');
+                if (!select) return;
+                
+                // Try to use trading-accounts-data service
+                if (window.tradingAccountsData && typeof window.tradingAccountsData.loadTradingAccountsData === 'function') {
+                    const accounts = await window.tradingAccountsData.loadTradingAccountsData();
+                    select.innerHTML = accounts.map(acc => 
+                        `<option value="${acc.id}">${acc.name || `Account #${acc.id}`}</option>`
+                    ).join('');
+                } else {
+                    // Fallback: fetch from API
+                    const response = await fetch('/api/trading-accounts/');
+                    if (response.ok) {
+                        const data = await response.json();
+                        const accounts = data.data || data || [];
+                        select.innerHTML = accounts.map(acc => 
+                            `<option value="${acc.id}">${acc.name || `Account #${acc.id}`}</option>`
+                        ).join('');
+                    } else {
+                        // Mock data fallback
+                        select.innerHTML = `
+                            <option value="1">Account #1</option>
+                            <option value="2">Account #2</option>
+                            <option value="3">Account #3</option>
+                        `;
+                    }
+                }
+                
+                console.log('✅ Trading accounts loaded');
+            } catch (error) {
+                console.error('❌ Error loading trading accounts:', error);
+                // Mock data fallback
+                const select = document.getElementById('recordFilterTradingAccounts');
+                if (select) {
+                    select.innerHTML = `
+                        <option value="1">Account #1</option>
+                        <option value="2">Account #2</option>
+                        <option value="3">Account #3</option>
+                    `;
+                }
+            }
+        }
+        
+        async function loadTradingMethods() {
+            try {
+                const select = document.getElementById('comparisonTradingMethods');
+                if (!select) return;
+                
+                // Wait for ConditionsCRUDManager to be available (it loads with defer)
+                let retries = 0;
+                const maxRetries = 50; // 5 seconds max
+                while (!window.ConditionsCRUDManager && retries < maxRetries) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    retries++;
+                }
+                
+                // Try to use ConditionsCRUDManager
+                if (window.ConditionsCRUDManager && typeof window.ConditionsCRUDManager.getTradingMethods === 'function') {
+                    try {
+                        const methods = await window.ConditionsCRUDManager.getTradingMethods();
+                        if (methods && methods.length > 0) {
+                            select.innerHTML = methods.map(method => 
+                                `<option value="${method.id}">${method.name_he || method.name || `Method #${method.id}`}</option>`
+                            ).join('');
+                            console.log('✅ Trading methods loaded via ConditionsCRUDManager');
+                            return;
+                        }
+                    } catch (crudError) {
+                        // ConditionsCRUDManager failed, fall through to mock data
+                        // Don't log error in console to avoid noise (this is a mockup page)
+                    }
+                }
+                
+                // Mock data fallback (always available for mockup)
+                // Note: In a real implementation, you might want to try direct API call here
+                // but for mockup purposes, we use mock data directly
+                select.innerHTML = `
+                    <option value="1">ממוצעים נעים</option>
+                    <option value="2">ניתוח נפח</option>
+                    <option value="3">תמיכה והתנגדות</option>
+                    <option value="4">קווי מגמה</option>
+                    <option value="5">דפוסים טכניים</option>
+                    <option value="6">פיבונאצ'י</option>
+                `;
+                console.log('✅ Trading methods loaded (mock data)');
+            } catch (error) {
+                // Silent fallback to mock data
+                const select = document.getElementById('comparisonTradingMethods');
+                if (select) {
+                    select.innerHTML = `
+                        <option value="1">ממוצעים נעים</option>
+                        <option value="2">ניתוח נפח</option>
+                        <option value="3">תמיכה והתנגדות</option>
+                        <option value="4">קווי מגמה</option>
+                        <option value="5">דפוסים טכניים</option>
+                        <option value="6">פיבונאצ'י</option>
+                    `;
+                }
+            }
+        }
+        
+        async function loadTickers() {
+            try {
+                const select = document.getElementById('comparisonTickers');
+                if (!select) return;
+                
+                // Try to use tickers-data service
+                if (window.tickersData && typeof window.tickersData.loadTickersData === 'function') {
+                    const tickers = await window.tickersData.loadTickersData();
+                    select.innerHTML = tickers.map(ticker => 
+                        `<option value="${ticker.id}">${ticker.symbol || `Ticker #${ticker.id}`}</option>`
+                    ).join('');
+                } else {
+                    // Fallback: fetch from API
+                    const response = await fetch('/api/tickers/');
+                    if (response.ok) {
+                        const data = await response.json();
+                        const tickers = data.data || data || [];
+                        select.innerHTML = tickers.map(ticker => 
+                            `<option value="${ticker.id}">${ticker.symbol || `Ticker #${ticker.id}`}</option>`
+                        ).join('');
+                    } else {
+                        // Mock data fallback
+                        select.innerHTML = `
+                            <option value="1">AAPL</option>
+                            <option value="2">TSLA</option>
+                            <option value="3">MSFT</option>
+                            <option value="4">GOOGL</option>
+                            <option value="5">AMZN</option>
+                        `;
+                    }
+                }
+                
+                console.log('✅ Tickers loaded');
+            } catch (error) {
+                console.error('❌ Error loading tickers:', error);
+                // Mock data fallback
+                const select = document.getElementById('comparisonTickers');
+                if (select) {
+                    select.innerHTML = `
+                        <option value="1">AAPL</option>
+                        <option value="2">TSLA</option>
+                        <option value="3">MSFT</option>
+                        <option value="4">GOOGL</option>
+                        <option value="5">AMZN</option>
+                    `;
+                }
+            }
+        }
+        
+        // ===== State Management Functions =====
+        function saveRecordFilterState() {
+            try {
+                const filters = getRecordFilterValues();
+                localStorage.setItem(RECORD_FILTER_STORAGE_KEY, JSON.stringify(filters));
+            } catch (error) {
+                console.warn('Failed to save record filter state:', error);
+            }
+        }
+        
+        function loadRecordFilterState() {
+            try {
+                const saved = localStorage.getItem(RECORD_FILTER_STORAGE_KEY);
+                if (!saved) return;
+                
+                const filters = JSON.parse(saved);
+                // Restore filters (implementation similar to loadFilterState)
+                // ... (to be implemented if needed)
+            } catch (error) {
+                console.warn('Failed to load record filter state:', error);
+            }
+        }
+        
+        function saveComparisonParameterState() {
+            try {
+                const params = getComparisonParameterValues();
+                localStorage.setItem(COMPARISON_PARAMS_STORAGE_KEY, JSON.stringify(params));
+            } catch (error) {
+                console.warn('Failed to save comparison parameter state:', error);
+            }
+        }
+        
+        function loadComparisonParameterState() {
+            try {
+                const saved = localStorage.getItem(COMPARISON_PARAMS_STORAGE_KEY);
+                if (!saved) return;
+                
+                const params = JSON.parse(saved);
+                // Restore parameters (implementation similar to loadFilterState)
+                // ... (to be implemented if needed)
+            } catch (error) {
+                console.warn('Failed to load comparison parameter state:', error);
+            }
+        }
+        
+        // Make functions globally available
+        window.toggleSideFilterMenu = toggleSideFilterMenu;
+        window.selectSideOption = selectSideOption;
+        window.toggleStatusFilterMenu = toggleStatusFilterMenu;
+        window.selectStatusOption = selectStatusOption;
+        window.applyRecordFilters = applyRecordFilters;
+        window.resetRecordFilters = resetRecordFilters;
+        window.resetRecordFiltersToDefaults = resetRecordFiltersToDefaults;
+        window.toggleComparisonParameter = toggleComparisonParameter;
+        window.applyComparisonParameters = applyComparisonParameters;
+        window.clearAllComparisonParameters = clearAllComparisonParameters;
+        
+        // Apply filters (called automatically on filter change) - backward compatibility
+        function applyFilters() {
+            applyRecordFilters();
+            applyComparisonParameters();
         }
         
         // Make functions globally available
@@ -1854,12 +3057,26 @@
         // Export functionality
         function exportComparativeAnalysis() {
             const filters = getFilterValues();
-            const tableData = generateMockComparisonTableData(filters);
+            const result = generateMockComparisonTableData(filters);
+            const tableData = result.data;
+            const paramHeaders = result.paramHeaders;
             
-            // Create CSV
-            let csv = 'קטגוריה,טריידים,P/L ממוצע,P/L כולל,אחוז הצלחה\n';
+            // Create CSV header
+            const csvHeaders = paramHeaders.join(',') + ',טריידים,P/L ממוצע,P/L כולל,אחוז הצלחה,סה"כ השקעה (מקס בנקודה),סה"כ השקעה (סה"כ קניות)';
+            let csv = csvHeaders + '\n';
+            
+            // Create CSV rows
             tableData.forEach(cat => {
-                csv += `${cat.name},${cat.trades},${cat.avgPL},${cat.totalPL},${cat.successRate}%\n`;
+                const paramValues = paramHeaders.map(header => {
+                    const value = cat.paramValues[header] || '';
+                    return `"${value}"`;
+                }).join(',');
+                const plPercent = cat.totalInvestment > 0 
+                    ? ((cat.totalPL / cat.totalInvestment) * 100) 
+                    : null;
+                const avgPLPercent = plPercent !== null ? plPercent.toFixed(2) : '';
+                const totalPLPercent = plPercent !== null ? plPercent.toFixed(2) : '';
+                csv += `${paramValues},${cat.trades},"${cat.avgPL}${avgPLPercent ? ' (' + (plPercent >= 0 ? '+' : '') + avgPLPercent + '%)' : ''}","${cat.totalPL}${totalPLPercent ? ' (' + (plPercent >= 0 ? '+' : '') + totalPLPercent + '%)' : ''}",${cat.successRate}%,${cat.maxInvestmentAtPoint},${cat.totalPurchases}\n`;
             });
             
             // Download
@@ -1924,6 +3141,74 @@
             }
         }
         
+        // Initialize tags filter for record filter panel
+        async function initializeRecordFilterTags() {
+            const tagsSelect = document.getElementById('recordFilterTags');
+            if (!tagsSelect) {
+                console.warn('⚠️ Record filter tags select not found');
+                return;
+            }
+            
+            // Wait for TagUIManager to be available
+            let retries = 0;
+            const maxRetries = 50;
+            while (!window.TagUIManager && retries < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+            
+            if (!window.TagUIManager) {
+                console.warn('⚠️ TagUIManager not available after waiting');
+                return;
+            }
+            
+            try {
+                // Initialize the tag select
+                if (typeof window.TagUIManager.refreshSelectOptions === 'function') {
+                    await window.TagUIManager.refreshSelectOptions(tagsSelect);
+                    console.log('✅ Record filter tags initialized');
+                } else {
+                    console.warn('⚠️ TagUIManager.refreshSelectOptions not available');
+                }
+            } catch (error) {
+                console.error('❌ Error initializing record filter tags:', error);
+            }
+        }
+        
+        // Initialize tags filter for comparison parameters panel
+        async function initializeComparisonTags() {
+            const tagsSelect = document.getElementById('comparisonTags');
+            if (!tagsSelect) {
+                console.warn('⚠️ Comparison tags select not found');
+                return;
+            }
+            
+            // Wait for TagUIManager to be available
+            let retries = 0;
+            const maxRetries = 50;
+            while (!window.TagUIManager && retries < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+            
+            if (!window.TagUIManager) {
+                console.warn('⚠️ TagUIManager not available after waiting');
+                return;
+            }
+            
+            try {
+                // Initialize the tag select
+                if (typeof window.TagUIManager.refreshSelectOptions === 'function') {
+                    await window.TagUIManager.refreshSelectOptions(tagsSelect);
+                    console.log('✅ Comparison tags initialized');
+                } else {
+                    console.warn('⚠️ TagUIManager.refreshSelectOptions not available');
+                }
+            } catch (error) {
+                console.error('❌ Error initializing comparison tags:', error);
+            }
+        }
+        
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', async () => {
             try {
@@ -1932,9 +3217,20 @@
                     await window.PreferencesCore.initializeWithLazyLoading();
                 }
                 
+                // Load dynamic data - IMPORTANT: loadTradingMethods must complete before setting defaults
+                await Promise.all([
+                    loadTradingAccounts(),
+                    loadTradingMethods(), // Must complete before selecting default options
+                    loadTickers(),
+                    initializeRecordFilterTags(),
+                    initializeComparisonTags()
+                ]);
+                
                 // Set default values (only if no saved state)
-                const saved = localStorage.getItem(FILTER_STORAGE_KEY);
-                if (!saved) {
+                const savedRecordFilters = localStorage.getItem(RECORD_FILTER_STORAGE_KEY);
+                const savedComparisonParams = localStorage.getItem(COMPARISON_PARAMS_STORAGE_KEY);
+                
+                if (!savedRecordFilters) {
                     // Set default date range to "השנה" (current year)
                     const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
                     dateRangeItems.forEach(item => item.classList.remove('selected'));
@@ -1942,46 +3238,41 @@
                     if (yearItem) {
                         yearItem.classList.add('selected');
                     }
-                    
-                    // Set default investment types to all selected
-                    const investmentTypes = document.getElementById('investmentTypes');
-                    if (investmentTypes) {
-                        Array.from(investmentTypes.options).forEach(opt => {
-                            opt.selected = ['Investment', 'Swing', 'Passive'].includes(opt.value);
-                        });
-                    }
+                    updateDateRangeFilterText();
                     
                     // Set default trading account to first account only
-                    const tradingAccounts = document.getElementById('tradingAccounts');
-                    if (tradingAccounts) {
+                    const tradingAccounts = document.getElementById('recordFilterTradingAccounts');
+                    if (tradingAccounts && tradingAccounts.options.length > 0) {
                         Array.from(tradingAccounts.options).forEach((opt, index) => {
                             opt.selected = index === 0; // First account only
                         });
                     }
                     
-                    // Clear trading methods, plan checkboxes, and tags (default: none selected)
-                    const tradingMethods = document.getElementById('tradingMethods');
-                    if (tradingMethods) {
-                        Array.from(tradingMethods.options).forEach(opt => {
-                            opt.selected = false;
-                        });
-                    }
+                    // Set side filter to "הכול"
+                    const allSideItem = document.querySelector('#sideFilterMenu .side-filter-item[data-value="הכול"]');
+                    if (allSideItem) allSideItem.classList.add('selected');
+                    updateSideFilterText();
                     
-                    if (document.getElementById('withPlan')) {
-                        document.getElementById('withPlan').checked = false;
-                    }
-                    if (document.getElementById('withoutPlan')) {
-                        document.getElementById('withoutPlan').checked = false;
-                    }
+                    // Set status filter to "הכול"
+                    const allStatusItem = document.querySelector('#statusFilterMenu .status-filter-item[data-value="הכול"]');
+                    if (allStatusItem) allStatusItem.classList.add('selected');
+                    updateStatusFilterText();
                     
-                    updateDateRangeFilterText();
+                    // Set plan checkboxes to both checked
+                    if (document.getElementById('recordFilterWithPlan')) {
+                        document.getElementById('recordFilterWithPlan').checked = true;
+                    }
+                    if (document.getElementById('recordFilterWithoutPlan')) {
+                        document.getElementById('recordFilterWithoutPlan').checked = true;
+                    }
+                } else {
+                    loadRecordFilterState();
                 }
                 
-                // Initialize tags filter
-                await initializeTagsFilter();
-                
-                // Load saved filter state (will override defaults if exists)
-                loadFilterState();
+                // No default comparison parameters - user must select manually
+                if (savedComparisonParams) {
+                    loadComparisonParameterState();
+                }
                 
                 // Initialize charts
                 await Promise.all([

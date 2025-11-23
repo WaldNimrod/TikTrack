@@ -11,10 +11,12 @@
 @import "01-settings/_typography.css";
 @import "01-settings/_breakpoints.css";
 @import "01-settings/_rtl-logical.css";
+@import "01-settings/_icons.css";
 
 /* 02 - TOOLS (Functions & Mixins) */
 @import "02-tools/_functions.css";
 @import "02-tools/_mixins.css";
+@import "02-tools/_icon-mixins.css";
 
 /* 03 - GENERIC (Reset & Base Styles) */
 @import "03-generic/_reset.css";
@@ -45,6 +47,7 @@
 @import "06-components/_entity-colors.css";
 @import "06-components/_constraints.css";
 @import "06-components/_chart-management.css";
+@import "06-components/_icons.css";
 
 /* 07 - TRUMPS (High Specificity Overrides) */
 @import "07-trumps/chart-management.css";

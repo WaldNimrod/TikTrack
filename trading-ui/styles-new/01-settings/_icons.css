@@ -1,0 +1,32 @@
+/**
+ * Icon Settings - ITCSS Settings Layer
+ * ====================================
+ * 
+ * CSS Variables for icon system
+ * 
+ * Related Documentation:
+ * - documentation/frontend/ICON_SYSTEM_ARCHITECTURE.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0.0
+ */
+
+:root {
+  /* Icon Sizes */
+  --icon-size-base: 16px;
+  --icon-size-small: 12px;
+  --icon-size-large: 24px;
+  --icon-size-xlarge: 32px;
+  
+  /* Icon Colors */
+  --icon-color-base: currentColor;
+  --icon-color-active: var(--primary-color, #26baac);
+  --icon-color-disabled: #6c757d;
+  --icon-color-error: #dc3545;
+  --icon-color-success: #28a745;
+  --icon-color-warning: #ffc107;
+  
+  /* Icon Spacing */
+  --icon-spacing: 4px;
+}
+

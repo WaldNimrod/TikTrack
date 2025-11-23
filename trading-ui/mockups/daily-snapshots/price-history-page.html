@@ -127,254 +127,7 @@
                     </div>
                 </div>
                 
-                <!-- Price Chart Section -->
-                <div class="content-section" id="price-chart-section">
-                    <div class="section-header">
-                        <h2><i class="bi bi-graph-up"></i> גרף מחירים לאורך זמן</h2>
-                        <div class="header-actions" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
-                            <!-- Row 1: Time Range & Chart Type -->
-                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                <!-- Unit Size Buttons -->
-                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                    <button class="unit-size-btn" data-unit="5min" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">5m</button>
-                                    <button class="unit-size-btn" data-unit="hour" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1h</button>
-                                    <button class="unit-size-btn active" data-unit="day" style="padding: 4px 8px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1D</button>
-                                    <button class="unit-size-btn" data-unit="week" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1W</button>
-                                    <button class="unit-size-btn" data-unit="month" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1M</button>
-                                    <button class="unit-size-btn" data-unit="year" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1Y</button>
-                                </div>
-                                <!-- Time Range Buttons -->
-                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                    <button class="chart-control-btn" data-range="day" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">יום</button>
-                                    <button class="chart-control-btn" data-range="week" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">שבוע</button>
-                                    <button class="chart-control-btn" data-range="month" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">חודש</button>
-                                    <button class="chart-control-btn" data-range="year" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">שנה</button>
-                                    <button class="chart-control-btn active" data-range="all" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">הכול</button>
-                                </div>
-                                <!-- Chart Type Buttons -->
-                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                    <button class="chart-type-btn" data-type="line" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="קו">
-                                        <i class="bi bi-graph-up"></i>
-                                    </button>
-                                    <button class="chart-type-btn" data-type="bar" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="בארים">
-                                        <i class="bi bi-bar-chart"></i>
-                                    </button>
-                                    <button class="chart-type-btn active" data-type="candlestick" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="נרות">
-                                        <i class="bi bi-square"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <!-- Row 2: Other Controls (all in one flex row, no wrap) -->
-                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;">
-                                <!-- View Mode Buttons (Price/Percentage) -->
-                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                    <button class="view-mode-btn active" data-mode="price" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="תצוגת מחיר">$</button>
-                                    <button class="view-mode-btn" data-mode="percent" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="תצוגת אחוזים">%</button>
-                                </div>
-                                <!-- Y-Axis Scale Buttons (Linear/Logarithmic) -->
-                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                    <button class="y-scale-btn active" data-scale="linear" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="ליניארי">
-                                        <i class="bi bi-graph-up-arrow"></i>
-                                    </button>
-                                    <button class="y-scale-btn" data-scale="log" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="לוגריתמי">
-                                        <i class="bi bi-bar-chart-line"></i>
-                                    </button>
-                                </div>
-                                <!-- Volume Toggle Button (always visible, default ON) -->
-                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                    <button class="volume-toggle-btn active" id="volumeToggle" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="הצג/הסתר נפח">
-                                        <i class="bi bi-bar-chart-fill"></i> Volume
-                                    </button>
-                                </div>
-                                <!-- Auto Scale Button -->
-                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                    <button class="auto-scale-btn" id="autoScaleBtn" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="התאמה אוטומטית">
-                                        <i class="bi bi-arrows-fullscreen"></i>
-                                    </button>
-                                </div>
-                                <!-- Zoom Controls -->
-                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                    <button class="zoom-btn" data-action="zoom-in" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="זום פנימה">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </button>
-                                    <button class="zoom-btn" data-action="zoom-out" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="זום החוצה">
-                                        <i class="bi bi-zoom-out"></i>
-                                    </button>
-                                    <button class="zoom-btn" data-action="reset" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="איפוס זום">
-                                        <i class="bi bi-arrow-counterclockwise"></i>
-                                    </button>
-                                </div>
-                                <!-- Indicators Toggle -->
-                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                    <button class="indicators-toggle-btn" id="indicatorsToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="מחוונים">
-                                        <i class="bi bi-graph-up-arrow"></i> Indicators
-                                    </button>
-                                </div>
-                                <!-- Series Visibility Toggle -->
-                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                    <button class="series-visibility-toggle-btn" id="seriesVisibilityToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="הצג/הסתר סדרות">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                </div>
-                                <!-- Export/Screenshot -->
-                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                    <button class="export-btn" data-action="screenshot" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="צילום מסך">
-                                        <i class="bi bi-camera"></i>
-                                    </button>
-                                    <button class="export-btn" data-action="export-image" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="ייצא תמונה">
-                                        <i class="bi bi-download"></i>
-                                    </button>
-                                </div>
-                                <!-- Drawing Tools Button -->
-                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                    <button class="drawing-tools-toggle-btn" id="drawingToolsToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="כלי ציור ומדידה">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                </div>
-                            <button class="filter-toggle-btn" onclick="toggleSection('price-chart-section')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                                <!-- Price Chart Container (Top Panel) -->
-                                <div id="price-chart-wrapper" style="position: relative; height: 450px; width: 100%; background: #fff; border-radius: 8px 8px 0 0; overflow: hidden; border-bottom: 2px solid #e0e0e0;">
-                                    <!-- Drawing Tools Toolbar -->
-                                    <div id="drawing-tools-toolbar" style="position: absolute; top: 10px; left: 10px; z-index: 20; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: none; flex-direction: column; gap: 4px;">
-                                        <div style="font-size: 0.7rem; font-weight: 600; margin-bottom: 4px; color: #495057;">כלי ציור:</div>
-                                        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
-                                            <button class="drawing-tool-btn" data-tool="line" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="קו">
-                                                <i class="bi bi-dash-lg"></i> קו
-                                            </button>
-                                            <button class="drawing-tool-btn" data-tool="horizontal-line" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="קו אופקי">
-                                                <i class="bi bi-horizontal-rule"></i>
-                                            </button>
-                                            <button class="drawing-tool-btn" data-tool="vertical-line" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="קו אנכי">
-                                                <i class="bi bi-vertical-rule"></i>
-                                            </button>
-                                            <button class="drawing-tool-btn" data-tool="arrow" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="חץ">
-                                                <i class="bi bi-arrow-right"></i>
-                                            </button>
-                                            <button class="drawing-tool-btn" data-tool="rectangle" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="מלבן">
-                                                <i class="bi bi-square"></i>
-                                            </button>
-                                            <button class="drawing-tool-btn" data-tool="text" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="טקסט">
-                                                <i class="bi bi-type"></i>
-                                            </button>
-                                            <button class="drawing-tool-btn" data-tool="measure" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="מדידה">
-                                                <i class="bi bi-rulers"></i>
-                                            </button>
-                                            <button class="drawing-tool-btn" data-tool="fibonacci" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="פיבונאצ'י">
-                                                <i class="bi bi-diagram-3"></i>
-                                            </button>
-                                            <button class="drawing-tool-btn" data-tool="trend-line" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="קו מגמה">
-                                                <i class="bi bi-graph-up"></i>
-                                            </button>
-                                            <button class="drawing-tool-btn" data-tool="support-resistance" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="תמיכה/התנגדות">
-                                                <i class="bi bi-arrows-expand"></i>
-                                            </button>
-                                            <button class="drawing-tool-btn" data-tool="marker" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="סימן">
-                                                <i class="bi bi-bookmark"></i>
-                                            </button>
-                                            <button class="drawing-tool-btn" data-tool="clear" style="padding: 4px 8px; border: 1px solid #dc3545; background: white; color: #dc3545; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="נקה הכל">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </div>
-                                        </div>
-                                    <!-- Drawing Canvas Overlay -->
-                                    <canvas id="drawing-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 15; pointer-events: none;"></canvas>
-                                    <div id="price-chart-container" style="height: 100%; width: 100%;"></div>
-                                </div>
-                                <!-- Volume Chart Container (Bottom Panel - Separate) -->
-                                <div id="volume-chart-wrapper" style="position: relative; height: 150px; width: 100%; background: #fff; border-radius: 0 0 8px 8px; overflow: hidden; border-top: 2px solid #e0e0e0; display: block;">
-                                    <div id="volume-chart-container" style="height: 100%; width: 100%;"></div>
-                                </div>
-                    </div>
-                </div>
-                
-                <!-- Daily Prices Table Section -->
-                <div class="content-section" id="daily-prices-table-section">
-                    <div class="section-header">
-                        <h2><i class="bi bi-table"></i> טבלת מחירים יומיים</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('daily-prices-table-section')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>תאריך</th>
-                                                <th>מחיר</th>
-                                                <th>שינוי (%)</th>
-                                                <th>שינוי ($)</th>
-                                                <th>נפח</th>
-                                                <th>High</th>
-                                                <th>Low</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>01/01</td>
-                                                <td>$150</td>
-                                                <td>-</td>
-                                                <td>-</td>
-                                                <td>1.2M</td>
-                                                <td>$152</td>
-                                                <td>$149</td>
-                                            </tr>
-                                            <tr>
-                                                <td>01/02</td>
-                                                <td>$151</td>
-                                                <td class="text-success">+0.67%</td>
-                                                <td class="text-success">+$1.00</td>
-                                                <td>1.5M</td>
-                                                <td>$152</td>
-                                                <td>$150</td>
-                                            </tr>
-                                            <tr>
-                                                <td>01/03</td>
-                                                <td>$152</td>
-                                                <td class="text-success">+0.66%</td>
-                                                <td class="text-success">+$1.00</td>
-                                                <td>1.3M</td>
-                                                <td>$153</td>
-                                                <td>$151</td>
-                                            </tr>
-                                            <tr>
-                                                <td>01/04</td>
-                                                <td>$154</td>
-                                                <td class="text-success">+1.32%</td>
-                                                <td class="text-success">+$2.00</td>
-                                                <td>1.8M</td>
-                                                <td>$155</td>
-                                                <td>$153</td>
-                                            </tr>
-                                            <tr>
-                                                <td>01/05</td>
-                                                <td>$155</td>
-                                                <td class="text-success">+0.65%</td>
-                                                <td class="text-success">+$1.00</td>
-                                                <td>1.4M</td>
-                                                <td>$156</td>
-                                                <td>$154</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="mt-3">
-                                    <button class="btn btn-sm btn-outline-secondary">מיון</button>
-                                    <button class="btn btn-sm btn-outline-secondary">פילטרים</button>
-                                    <button class="btn btn-sm btn-outline-primary">ייצא</button>
-                                </div>
-                    </div>
-                </div>
-                
-                <!-- Change Statistics Section -->
+                <!-- Change Statistics Section (Above Chart) -->
                 <div class="content-section" id="change-statistics-section">
                     <div class="section-header">
                         <h2><i class="bi bi-bar-chart"></i> סטטיסטיקות שינוי</h2>
@@ -385,41 +138,307 @@
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="row mb-4">
+                        <div class="row mb-4" id="statistics-cards-container">
+                            <!-- Statistics will be dynamically updated here -->
                             <div class="col-md-3">
                                 <div class="compact-stat-card">
                                     <div class="compact-stat-label">שינוי יומי</div>
-                                    <div class="compact-stat-number positive">+0.65%</div>
-                                    <div class="compact-stat-label" style="font-size: 0.8rem;">+$1.00</div>
-                                </div>
-                            </div>
+                                    <div class="compact-stat-number" id="stat-daily-change">-</div>
+                                    <div class="compact-stat-label" style="font-size: 0.8rem;" id="stat-daily-change-abs">-</div>
+                                        </div>
+                                        </div>
                             <div class="col-md-3">
                                 <div class="compact-stat-card">
                                     <div class="compact-stat-label">שינוי שבועי</div>
-                                    <div class="compact-stat-number positive">+3.33%</div>
-                                    <div class="compact-stat-label" style="font-size: 0.8rem;">+$5.00</div>
+                                    <div class="compact-stat-number" id="stat-weekly-change">-</div>
+                                    <div class="compact-stat-label" style="font-size: 0.8rem;" id="stat-weekly-change-abs">-</div>
+                                    </div>
                                 </div>
-                            </div>
                             <div class="col-md-3">
                                 <div class="compact-stat-card">
                                     <div class="compact-stat-label">שינוי חודשי</div>
-                                    <div class="compact-stat-number positive">+12.5%</div>
-                                    <div class="compact-stat-label" style="font-size: 0.8rem;">+$18.75</div>
+                                    <div class="compact-stat-number" id="stat-monthly-change">-</div>
+                                    <div class="compact-stat-label" style="font-size: 0.8rem;" id="stat-monthly-change-abs">-</div>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="compact-stat-card">
                                     <div class="compact-stat-label">שינוי שנתי</div>
-                                    <div class="compact-stat-number positive">+25.0%</div>
-                                    <div class="compact-stat-label" style="font-size: 0.8rem;">+$37.50</div>
+                                    <div class="compact-stat-number" id="stat-yearly-change">-</div>
+                                    <div class="compact-stat-label" style="font-size: 0.8rem;" id="stat-yearly-change-abs">-</div>
                                 </div>
                             </div>
+                                </div>
+                    </div>
+                </div>
+                
+                <!-- Price Chart Section -->
+                <div class="content-section" id="price-chart-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-graph-up"></i> גרף מחירים לאורך זמן</h2>
+                        <div class="header-actions" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
+                            <!-- Row 1: Time Range & Chart Type -->
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <!-- Unit Size Buttons -->
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="font-size: 0.65rem; color: #6c757d; font-weight: 600; padding: 0 2px;">יחידת זמן</div>
+                                    <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                        <button class="unit-size-btn" data-unit="5min" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">5m</button>
+                                        <button class="unit-size-btn" data-unit="hour" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1h</button>
+                                        <button class="unit-size-btn active" data-unit="day" style="padding: 4px 8px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1D</button>
+                                        <button class="unit-size-btn" data-unit="week" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1W</button>
+                                        <button class="unit-size-btn" data-unit="month" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1M</button>
+                                        <button class="unit-size-btn" data-unit="year" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1Y</button>
+                                    </div>
+                                </div>
+                                <!-- Time Range Buttons -->
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="font-size: 0.65rem; color: #6c757d; font-weight: 600; padding: 0 2px;">טווח זמן</div>
+                                    <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                        <button class="chart-control-btn" data-range="day" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">יום</button>
+                                        <button class="chart-control-btn" data-range="week" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">שבוע</button>
+                                        <button class="chart-control-btn" data-range="month" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">חודש</button>
+                                        <button class="chart-control-btn" data-range="year" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">שנה</button>
+                                        <button class="chart-control-btn active" data-range="all" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">הכול</button>
+                                    </div>
+                                </div>
+                                <!-- Chart Type Buttons -->
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="font-size: 0.65rem; color: #6c757d; font-weight: 600; padding: 0 2px;">סוג גרף</div>
+                                    <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                        <button class="chart-type-btn" data-type="line" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="קו">
+                                            <img src="/trading-ui/images/icons/chart-type-line.svg" style="width: 18px; height: 18px;" alt="קו">
+                                        </button>
+                                        <button class="chart-type-btn" data-type="bar" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="בארים">
+                                            <img src="/trading-ui/images/icons/chart-type-bar.svg" style="width: 18px; height: 18px;" alt="בארים">
+                                        </button>
+                                        <button class="chart-type-btn active" data-type="candlestick" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="נרות">
+                                            <img src="/trading-ui/images/icons/chart-type-candlestick.svg" style="width: 18px; height: 18px; filter: brightness(0) invert(1);" alt="נרות">
+                            </button>
+                        </div>
+                    </div>
+                                </div>
+                            <!-- Row 2: Other Controls (all in one flex row, no wrap) -->
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;">
+                                <!-- View Mode Buttons (Price/Percentage) -->
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="font-size: 0.65rem; color: #6c757d; font-weight: 600; padding: 0 2px;">מצב תצוגה</div>
+                                    <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                        <button class="view-mode-btn active" data-mode="price" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="תצוגת מחיר">$</button>
+                                        <button class="view-mode-btn" data-mode="percent" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="תצוגת אחוזים">%</button>
+                                </div>
+                    </div>
+                                <!-- Y-Axis Scale Buttons (Linear/Logarithmic) -->
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="font-size: 0.65rem; color: #6c757d; font-weight: 600; padding: 0 2px;">סולם Y</div>
+                                    <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                        <button class="y-scale-btn active" data-scale="linear" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="ליניארי">
+                                            <img src="/trading-ui/images/icons/chart-scale-linear.svg" style="width: 16px; height: 16px; filter: brightness(0) invert(1);" alt="ליניארי">
+                                        </button>
+                                        <button class="y-scale-btn" data-scale="log" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="לוגריתמי">
+                                            <img src="/trading-ui/images/icons/chart-scale-log.svg" style="width: 16px; height: 16px;" alt="לוגריתמי">
+                                        </button>
+                </div>
+                                </div>
+                                <!-- Volume Toggle Button (always visible, default ON) -->
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="font-size: 0.65rem; color: #6c757d; font-weight: 600; padding: 0 2px;">נפח</div>
+                                    <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                        <button class="volume-toggle-btn active" id="volumeToggle" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 4px;" title="הצג/הסתר נפח">
+                                            <img src="/trading-ui/images/icons/chart-volume-toggle.svg" style="width: 16px; height: 16px; filter: brightness(0) invert(1);" alt="Volume">
+                                            <span>Volume</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Auto Scale Button -->
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="font-size: 0.65rem; color: #6c757d; font-weight: 600; padding: 0 2px;">התאמה</div>
+                                    <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                        <button class="auto-scale-btn" id="autoScaleBtn" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="התאמה אוטומטית">
+                                            <img src="/trading-ui/images/icons/chart-auto-scale.svg" style="width: 16px; height: 16px;" alt="Auto Scale">
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Zoom Controls -->
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="font-size: 0.65rem; color: #6c757d; font-weight: 600; padding: 0 2px;">זום</div>
+                                    <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                        <button class="zoom-btn" data-action="zoom-in" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="זום פנימה">
+                                            <img src="/trading-ui/images/icons/chart-zoom-in.svg" style="width: 16px; height: 16px;" alt="Zoom In">
+                                        </button>
+                                        <button class="zoom-btn" data-action="zoom-out" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="זום החוצה">
+                                            <img src="/trading-ui/images/icons/chart-zoom-out.svg" style="width: 16px; height: 16px;" alt="Zoom Out">
+                                        </button>
+                                        <button class="zoom-btn" data-action="reset" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="איפוס זום">
+                                            <img src="/trading-ui/images/icons/chart-zoom-reset.svg" style="width: 16px; height: 16px;" alt="Reset Zoom">
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Indicators Toggle -->
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="font-size: 0.65rem; color: #6c757d; font-weight: 600; padding: 0 2px;">מחוונים</div>
+                                    <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                        <button class="indicators-toggle-btn" id="indicatorsToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 4px;" title="מחוונים">
+                                            <img src="/trading-ui/images/icons/chart-indicators.svg" style="width: 16px; height: 16px;" alt="Indicators">
+                                            <span>Indicators</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Series Visibility Toggle -->
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="font-size: 0.65rem; color: #6c757d; font-weight: 600; padding: 0 2px;">סדרות</div>
+                                    <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                        <button class="series-visibility-toggle-btn" id="seriesVisibilityToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="הצג/הסתר סדרות">
+                                            <img src="/trading-ui/images/icons/chart-series-toggle.svg" style="width: 16px; height: 16px;" alt="Series">
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Export/Screenshot -->
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="font-size: 0.65rem; color: #6c757d; font-weight: 600; padding: 0 2px;">ייצוא</div>
+                                    <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                        <button class="export-btn" data-action="screenshot" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="צילום מסך">
+                                            <img src="/trading-ui/images/icons/chart-screenshot.svg" style="width: 16px; height: 16px;" alt="Screenshot">
+                                        </button>
+                                        <button class="export-btn" data-action="export-image" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="ייצא תמונה">
+                                            <img src="/trading-ui/images/icons/chart-export-image.svg" style="width: 16px; height: 16px;" alt="Export">
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Drawing Tools Button -->
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="font-size: 0.65rem; color: #6c757d; font-weight: 600; padding: 0 2px;">כלי ציור</div>
+                                    <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                        <button class="drawing-tools-toggle-btn" id="drawingToolsToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="כלי ציור ומדידה">
+                                            <img src="/trading-ui/images/icons/chart-drawing-tools.svg" style="width: 18px; height: 18px;" alt="Drawing Tools">
+                                        </button>
+                                    </div>
+                                </div>
+                            <button class="filter-toggle-btn" onclick="toggleSection('price-chart-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                                <!-- Price Chart Container (Top Panel) -->
+                                <div id="price-chart-wrapper" style="position: relative; height: 450px; width: 100%; background: #fff; border-radius: 8px 8px 0 0; overflow: hidden; border-bottom: 2px solid #e0e0e0;">
+                                    <!-- Indicators Toolbar -->
+                                    <div id="indicators-toolbar" style="position: absolute; top: 10px; right: 10px; z-index: 20; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: none; flex-direction: column; gap: 4px; max-width: 280px;">
+                                        <div style="font-size: 0.7rem; font-weight: 600; margin-bottom: 4px; color: #495057; display: flex; justify-content: space-between; align-items: center;">
+                                            <span>מחוונים:</span>
+                                            <button id="closeIndicatorsToolbar" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #6c757d; padding: 0 4px;">×</button>
+                                </div>
+                                        <!-- Add Indicator Section -->
+                                        <div style="border-bottom: 1px solid #dee2e6; padding-bottom: 8px; margin-bottom: 8px;">
+                                            <div style="font-size: 0.65rem; font-weight: 600; margin-bottom: 4px; color: #6c757d;">הוסף מחוון:</div>
+                                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                                <!-- MA Selector -->
+                                                <div style="display: flex; gap: 4px; align-items: center;">
+                                                    <button class="indicator-add-btn" data-indicator="ma" style="flex: 1; padding: 6px 8px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;">
+                                                        ממוצע נע (MA)
+                                                    </button>
+                                                    <input type="number" id="maPeriodInput" value="20" min="2" max="200" style="width: 50px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.75rem; text-align: center;" placeholder="20">
+                            </div>
+                                </div>
+                            </div>
+                                        <!-- Active Indicators List -->
+                                        <div id="active-indicators-list" style="max-height: 200px; overflow-y: auto;">
+                                            <div style="font-size: 0.65rem; font-weight: 600; margin-bottom: 4px; color: #6c757d;">מחוונים פעילים:</div>
+                                            <div id="indicators-list-container" style="display: flex; flex-direction: column; gap: 4px;">
+                                                <!-- Active indicators will be listed here -->
+                                                <div style="font-size: 0.7rem; color: #6c757d; font-style: italic; padding: 4px;">אין מחוונים פעילים</div>
+                                </div>
+                            </div>
+                                </div>
+                                    <!-- Indicators Toolbar (Right Side) -->
+                                    <div id="indicators-toolbar" style="position: absolute; top: 10px; right: 10px; z-index: 20; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: none; flex-direction: column; gap: 4px; min-width: 250px; max-width: 300px;">
+                                        <div style="font-size: 0.7rem; font-weight: 600; margin-bottom: 4px; color: #495057; display: flex; justify-content: space-between; align-items: center;">
+                                            <span>מחוונים:</span>
+                                            <button id="closeIndicatorsToolbar" style="background: none; border: none; cursor: pointer; font-size: 1.2rem; color: #6c757d; padding: 0 4px; line-height: 1;">×</button>
+                            </div>
+                                        <!-- Add Indicator Section -->
+                                        <div style="border-bottom: 1px solid #dee2e6; padding-bottom: 8px; margin-bottom: 8px;">
+                                            <div style="font-size: 0.65rem; font-weight: 600; margin-bottom: 6px; color: #6c757d;">הוסף מחוון:</div>
+                                            <!-- MA (Moving Average) -->
+                                            <div style="display: flex; gap: 4px; align-items: center; margin-bottom: 4px;">
+                                                <button class="indicator-add-btn" data-indicator="ma" style="flex: 1; padding: 6px 8px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;">
+                                                    MA
+                                                </button>
+                                                <input type="number" id="maPeriodInput" value="20" min="2" max="200" style="width: 60px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.75rem; text-align: center;" placeholder="20" title="תקופה">
+                        </div>
+                                            <!-- Future indicators can be added here:
+                                            <div style="display: flex; gap: 4px; align-items: center; margin-bottom: 4px;">
+                                                <button class="indicator-add-btn" data-indicator="rsi">RSI</button>
+                                                <input type="number" id="rsiPeriodInput" value="14" min="2" max="50" style="width: 60px;">
+                                            </div>
+                                            -->
+                                        </div>
+                                        <!-- Active Indicators List -->
+                                        <div id="active-indicators-list" style="max-height: 200px; overflow-y: auto;">
+                                            <div style="font-size: 0.65rem; font-weight: 600; margin-bottom: 4px; color: #6c757d;">מחוונים פעילים:</div>
+                                            <div id="indicators-list-container" style="display: flex; flex-direction: column; gap: 4px;">
+                                                <!-- Active indicators will be dynamically listed here -->
+                                                <div class="no-indicators-message" style="font-size: 0.7rem; color: #6c757d; font-style: italic; padding: 4px;">אין מחוונים פעילים</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Drawing Tools Toolbar (Left Side) -->
+                                    <div id="drawing-tools-toolbar" style="position: absolute; top: 10px; left: 10px; z-index: 20; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: none; flex-direction: column; gap: 4px;">
+                                        <div style="font-size: 0.7rem; font-weight: 600; margin-bottom: 4px; color: #495057;">כלי ציור:</div>
+                                        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                                            <button class="drawing-tool-btn" data-tool="line" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; gap: 4px;" title="קו">
+                                                <img src="/trading-ui/images/icons/chart-line.svg" style="width: 16px; height: 16px;" alt="קו">
+                                                <span>קו</span>
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="horizontal-line" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="קו אופקי">
+                                                <img src="/trading-ui/images/icons/chart-line-horizontal.svg" style="width: 16px; height: 16px;" alt="קו אופקי">
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="vertical-line" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="קו אנכי">
+                                                <img src="/trading-ui/images/icons/chart-line-vertical.svg" style="width: 16px; height: 16px;" alt="קו אנכי">
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="arrow" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="חץ">
+                                                <img src="/trading-ui/images/icons/chart-arrow.svg" style="width: 16px; height: 16px;" alt="חץ">
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="rectangle" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="מלבן">
+                                                <img src="/trading-ui/images/icons/chart-rectangle.svg" style="width: 16px; height: 16px;" alt="מלבן">
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="text" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="טקסט">
+                                                <img src="/trading-ui/images/icons/chart-text.svg" style="width: 16px; height: 16px;" alt="טקסט">
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="measure" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="מדידה">
+                                                <img src="/trading-ui/images/icons/chart-measure.svg" style="width: 16px; height: 16px;" alt="מדידה">
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="fibonacci" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="פיבונאצ'י">
+                                                <img src="/trading-ui/images/icons/chart-fibonacci.svg" style="width: 16px; height: 16px;" alt="פיבונאצ'י">
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="trend-line" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="קו מגמה">
+                                                <img src="/trading-ui/images/icons/chart-trend-line.svg" style="width: 16px; height: 16px;" alt="קו מגמה">
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="support-resistance" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="תמיכה/התנגדות">
+                                                <img src="/trading-ui/images/icons/chart-support-resistance.svg" style="width: 16px; height: 16px;" alt="תמיכה/התנגדות">
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="marker" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="סימן">
+                                                <img src="/trading-ui/images/icons/chart-marker.svg" style="width: 16px; height: 16px;" alt="סימן">
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="clear" style="padding: 4px 8px; border: 1px solid #dc3545; background: white; color: #dc3545; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="נקה הכל">
+                                                <img src="/trading-ui/images/icons/chart-clear-all.svg" style="width: 16px; height: 16px;" alt="נקה הכל">
+                                            </button>
+                                </div>
+                            </div>
+                                    <!-- Drawing Canvas Overlay -->
+                                    <canvas id="drawing-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 15; pointer-events: none;"></canvas>
+                                    <div id="price-chart-container" style="height: 100%; width: 100%;"></div>
+                                </div>
+                                <!-- Volume Chart Container (Bottom Panel - Separate) -->
+                                <div id="volume-chart-wrapper" style="position: relative; height: 150px; width: 100%; background: #fff; border-radius: 0 0 8px 8px; overflow: hidden; border-top: 2px solid #e0e0e0; display: block;">
+                                    <div id="volume-chart-container" style="height: 100%; width: 100%;"></div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Comparison Chart Section (if multiple tickers selected) -->
-                <div class="content-section" id="comparison-chart-section">
+                <div class="content-section" id="comparison-chart-section" style="display: none;">
                     <div class="section-header">
                         <h2><i class="bi bi-arrow-left-right"></i> השוואה בין טיקרים</h2>
                         <div class="header-actions">
@@ -429,13 +448,11 @@
                         </div>
                     </div>
                     <div class="section-body">
-                                <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                                    [גרף השוואה - Line Chart עם מספר טיקרים]
+                        <div id="comparison-chart-container" style="height: 350px; width: 100%; position: relative;">
+                            <div id="comparison-chart-wrapper" style="height: 100%; width: 100%;"></div>
+                            <div id="comparison-legend" class="mt-3" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <!-- Legend will be dynamically generated here -->
                                 </div>
-                                <div class="mt-3">
-                                    <span class="badge" style="background: #007bff;">● AAPL</span>
-                                    <span class="badge" style="background: #28a745;">● TSLA</span>
-                                    <span class="badge" style="background: #dc3545;">● MSFT</span>
                                 </div>
                     </div>
                 </div>
@@ -544,6 +561,7 @@
                 // Get chart type from overlay buttons (default: candlestick)
                 const activeChartTypeBtn = document.querySelector('.chart-type-btn.active');
                 const chartType = activeChartTypeBtn?.dataset.type || 'candlestick';
+                console.log('📊 Chart type selected:', chartType, 'Active button:', activeChartTypeBtn);
                 
                 // Create chart
                 priceChart = window.TradingViewChartAdapter.createChart(container, {
@@ -556,7 +574,7 @@
                         horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
                     },
                     width: container.clientWidth,
-                    height: 600, // Increased height for better price/volume separation
+                    height: 450, // Price chart height - volume is in separate panel below
                     timeScale: {
                         timeVisible: true,
                         secondsVisible: true
@@ -682,8 +700,17 @@
                     });
                 }
                 
+                // Setup legend container first (before updating)
+                setupSeriesLegend();
+                
                 // Update legend after adding series
                 updateSeriesLegend();
+                
+                // Update statistics based on current ticker and time range
+                updateStatistics(mockData, timeRange);
+                
+                // Update comparison chart if needed
+                updateComparisonChart();
                 
                 // Fit content
                 priceChart.timeScale().fitContent();
@@ -959,9 +986,9 @@
                         b.style.border = '1px solid #ddd';
                         b.style.background = 'white';
                         b.style.color = '';
-                        if (b.querySelector('i')) {
-                            b.style.color = '';
-                        }
+                        // Update icon filter for inactive state
+                        const img = b.querySelector('img');
+                        if (img) img.style.filter = '';
                     });
                     
                     // Add active class to clicked button
@@ -969,6 +996,9 @@
                     btn.style.border = '1px solid #007bff';
                     btn.style.background = '#007bff';
                     btn.style.color = 'white';
+                    // Update icon filter for active state
+                    const img = btn.querySelector('img');
+                    if (img) img.style.filter = 'brightness(0) invert(1)';
                     
                     // Reload chart
                     reloadChart();
@@ -1014,6 +1044,9 @@
                         b.style.border = '1px solid #ddd';
                         b.style.background = 'white';
                         b.style.color = '';
+                        // Update icon filter for inactive state
+                        const img = b.querySelector('img');
+                        if (img) img.style.filter = '';
                     });
                     
                     // Add active class to clicked button
@@ -1021,6 +1054,9 @@
                     btn.style.border = '1px solid #007bff';
                     btn.style.background = '#007bff';
                     btn.style.color = 'white';
+                    // Update icon filter for active state
+                    const img = btn.querySelector('img');
+                    if (img) img.style.filter = 'brightness(0) invert(1)';
                     
                     // Update price scale mode
                     if (priceChart) {
@@ -1042,7 +1078,13 @@
                 unitSizeSelect.addEventListener('change', () => reloadChart());
             }
             if (tickersCompareSelect) {
-                tickersCompareSelect.addEventListener('change', () => reloadChart());
+                tickersCompareSelect.addEventListener('change', () => {
+                    reloadChart();
+                    // Update comparison chart separately (don't wait for full reload)
+                    setTimeout(() => {
+                        updateComparisonChart();
+                    }, 300);
+                });
             }
         }
         
@@ -1447,7 +1489,14 @@
                     if (volumeVisible) {
                         addVolumeSeries();
                     }
-                }, 200);
+                    // Update comparison chart after volume is restored
+                    updateComparisonChart();
+                }, 300);
+            } else {
+                // Update comparison chart even if volume was not visible
+                setTimeout(() => {
+                    updateComparisonChart();
+                }, 300);
             }
         }
         
@@ -1485,9 +1534,9 @@
                     if (sectionId === 'price-chart-section') {
                         setTimeout(() => {
                             if (priceChart) {
-                                const container = document.getElementById('price-chart-container');
-                                if (container) {
-                                    priceChart.applyOptions({ width: container.clientWidth });
+                            const container = document.getElementById('price-chart-container');
+                            if (container) {
+                                priceChart.applyOptions({ width: container.clientWidth });
                                 }
                             }
                             if (volumeChart) {
@@ -1814,13 +1863,26 @@
             }
         }
         
+        // Track active indicators with their IDs
+        let activeIndicators = []; // Array of {id, type, period, series}
+        
         // Feature 62: Moving Average Indicator
         function addMovingAverage(period = 20) {
-            if (!priceChart || !priceChartSeries) return;
+            if (!priceChart || !priceChartSeries) return null;
+            
+            // Check if this MA already exists
+            const existingMA = activeIndicators.find(ind => ind.type === 'ma' && ind.period === period);
+            if (existingMA) {
+                console.log(`MA(${period}) כבר קיים`);
+                return existingMA;
+            }
             
             try {
                 const data = priceChartSeries.data();
-                if (!data || data.length < period) return;
+                if (!data || data.length < period) {
+                    window.showErrorNotification?.('שגיאה', `נדרשים לפחות ${period} נקודות נתונים לממוצע נע ${period}`);
+                    return null;
+                }
                 
                 const maData = calculateMovingAverage(data, period);
                 
@@ -1832,14 +1894,103 @@
                 });
                 
                 newMaSeries.setData(maData);
-                newMaSeries.applyOptions({ visible: indicatorsVisible });
+                newMaSeries.applyOptions({ visible: true });
+                
+                const indicatorId = `ma-${period}-${Date.now()}`;
+                const indicator = {
+                    id: indicatorId,
+                    type: 'ma',
+                    period: period,
+                    series: newMaSeries,
+                    label: `MA(${period})`
+                };
                 
                 maSeries.push(newMaSeries);
-                seriesVisibility[`ma-${period}`] = true;
+                activeIndicators.push(indicator);
+                seriesVisibility[indicatorId] = true;
+                
                 updateSeriesLegend();
+                updateActiveIndicatorsList();
+                
+                return indicator;
             } catch (e) {
                 console.warn('Error adding moving average:', e);
+                window.showErrorNotification?.('שגיאה', 'שגיאה בהוספת ממוצע נע');
+                return null;
             }
+        }
+        
+        // Remove indicator
+        function removeIndicator(indicatorId) {
+            const indicator = activeIndicators.find(ind => ind.id === indicatorId);
+            if (!indicator) return;
+            
+            try {
+                // Remove series from chart
+                if (indicator.series) {
+                    priceChart.removeSeries(indicator.series);
+                }
+                
+                // Remove from arrays
+                activeIndicators = activeIndicators.filter(ind => ind.id !== indicatorId);
+                maSeries = maSeries.filter(series => series !== indicator.series);
+                delete seriesVisibility[indicatorId];
+                
+                updateSeriesLegend();
+                updateActiveIndicatorsList();
+            } catch (e) {
+                console.warn('Error removing indicator:', e);
+            }
+        }
+        
+        // Setup indicators toolbar
+        function setupIndicatorsToolbar() {
+            // Setup add MA button
+            const addMaBtn = document.querySelector('.indicator-add-btn[data-indicator="ma"]');
+            if (addMaBtn) {
+                addMaBtn.addEventListener('click', () => {
+                    const periodInput = document.getElementById('maPeriodInput');
+                    const period = periodInput ? parseInt(periodInput.value) || 20 : 20;
+                    if (period < 2 || period > 200) {
+                        window.showErrorNotification?.('שגיאה', 'תקופה חייבת להיות בין 2 ל-200');
+                        return;
+                    }
+                    addMovingAverage(period);
+                });
+            }
+            
+            updateActiveIndicatorsList();
+        }
+        
+        // Update active indicators list in toolbar
+        function updateActiveIndicatorsList() {
+            const container = document.getElementById('indicators-list-container');
+            if (!container) return;
+            
+            if (activeIndicators.length === 0) {
+                container.innerHTML = '<div class="no-indicators-message" style="font-size: 0.7rem; color: #6c757d; font-style: italic; padding: 4px;">אין מחוונים פעילים</div>';
+                return;
+            }
+            
+            let html = '';
+            activeIndicators.forEach(indicator => {
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 6px; background: #f8f9fa; border-radius: 4px; border: 1px solid #dee2e6;">
+                        <span style="font-size: 0.75rem; color: #495057;">${indicator.label}</span>
+                        <button class="remove-indicator-btn" data-indicator-id="${indicator.id}" style="background: #dc3545; color: white; border: none; border-radius: 3px; padding: 2px 6px; cursor: pointer; font-size: 0.7rem;" title="הסר">×</button>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+            // Setup remove buttons
+            container.querySelectorAll('.remove-indicator-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const indicatorId = btn.dataset.indicatorId;
+                    removeIndicator(indicatorId);
+                });
+            });
         }
         
         function calculateMovingAverage(data, period) {
@@ -2026,21 +2177,33 @@
             // Load preferences
             loadChartPreferences();
             
-            // Setup indicators toggle
+            // Setup indicators toggle - opens indicators toolbar
             const indicatorsToggle = document.getElementById('indicatorsToggle');
-            if (indicatorsToggle) {
+            const indicatorsToolbar = document.getElementById('indicators-toolbar');
+            const closeIndicatorsToolbar = document.getElementById('closeIndicatorsToolbar');
+            
+            if (indicatorsToggle && indicatorsToolbar) {
                 indicatorsToggle.addEventListener('click', () => {
-                    indicatorsVisible = !indicatorsVisible;
-                    if (indicatorsVisible) {
-                        addMovingAverage(20);
-                    } else {
-                        // Hide indicators
-                        maSeries.forEach(series => {
-                            if (series) series.applyOptions({ visible: false });
-                        });
+                    const isVisible = indicatorsToolbar.style.display !== 'none';
+                    indicatorsToolbar.style.display = isVisible ? 'none' : 'flex';
+                    // Hide drawing tools toolbar if open
+                    const drawingToolbar = document.getElementById('drawing-tools-toolbar');
+                    if (drawingToolbar) {
+                        drawingToolbar.style.display = 'none';
                     }
                 });
             }
+            
+            if (closeIndicatorsToolbar) {
+                closeIndicatorsToolbar.addEventListener('click', () => {
+                    if (indicatorsToolbar) {
+                        indicatorsToolbar.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Setup indicator management
+            setupIndicatorsToolbar();
             
             // Setup series visibility toggle
             const seriesVisibilityToggle = document.getElementById('seriesVisibilityToggle');
@@ -2080,15 +2243,22 @@
         }
         
         function setupSeriesLegend() {
-            const legendContainer = document.createElement('div');
-            legendContainer.id = 'chart-legend';
-            legendContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 10; font-size: 0.75rem;';
+            // Check if legend already exists
+            let legendContainer = document.getElementById('chart-legend');
             
-            const wrapper = document.getElementById('price-chart-wrapper');
-            if (wrapper) {
-                wrapper.appendChild(legendContainer);
-                updateSeriesLegend();
+            if (!legendContainer) {
+                legendContainer = document.createElement('div');
+                legendContainer.id = 'chart-legend';
+                legendContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 10; font-size: 0.75rem;';
+                
+                const wrapper = document.getElementById('price-chart-wrapper');
+                if (wrapper) {
+                    wrapper.appendChild(legendContainer);
+                }
             }
+            
+            // Update legend content
+            updateSeriesLegend();
         }
         
         function updateSeriesLegend() {
@@ -2134,6 +2304,275 @@
             }
             
             legendContainer.innerHTML = html;
+        }
+        
+        // Update statistics based on current ticker and time range
+        function updateStatistics(mockData, timeRange) {
+            const candles = mockData.candles || [];
+            if (candles.length === 0) return;
+            
+            // Get current price (last candle)
+            const currentPrice = candles[candles.length - 1].close;
+            
+            // Calculate changes for different periods based on timeRange
+            let dailyChange = { percent: 0, absolute: 0 };
+            let weeklyChange = { percent: 0, absolute: 0 };
+            let monthlyChange = { percent: 0, absolute: 0 };
+            let yearlyChange = { percent: 0, absolute: 0 };
+            
+            // Find prices at different periods
+            const now = new Date();
+            const oneDayAgo = new Date(now);
+            oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+            const oneWeekAgo = new Date(now);
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            const oneMonthAgo = new Date(now);
+            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+            const oneYearAgo = new Date(now);
+            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+            
+            // Find closest candle to each date
+            const findClosestPrice = (targetDate) => {
+                let closestCandle = candles[0];
+                let minDiff = Math.abs(new Date(closestCandle.time * 1000) - targetDate);
+                
+                for (const candle of candles) {
+                    const diff = Math.abs(new Date(candle.time * 1000) - targetDate);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        closestCandle = candle;
+                    }
+                }
+                return closestCandle.close;
+            };
+            
+            // Calculate changes based on available data in timeRange
+            if (timeRange === 'all' || candles.length > 365) {
+                const yearAgoPrice = findClosestPrice(oneYearAgo);
+                yearlyChange = {
+                    percent: ((currentPrice - yearAgoPrice) / yearAgoPrice) * 100,
+                    absolute: currentPrice - yearAgoPrice
+                };
+            }
+            
+            if (timeRange === 'all' || candles.length > 30) {
+                const monthAgoPrice = findClosestPrice(oneMonthAgo);
+                monthlyChange = {
+                    percent: ((currentPrice - monthAgoPrice) / monthAgoPrice) * 100,
+                    absolute: currentPrice - monthAgoPrice
+                };
+            }
+            
+            if (timeRange === 'all' || candles.length > 7) {
+                const weekAgoPrice = findClosestPrice(oneWeekAgo);
+                weeklyChange = {
+                    percent: ((currentPrice - weekAgoPrice) / weekAgoPrice) * 100,
+                    absolute: currentPrice - weekAgoPrice
+                };
+            }
+            
+            if (candles.length > 1) {
+                const dayAgoPrice = candles.length > 1 ? candles[candles.length - 2].close : candles[0].close;
+                dailyChange = {
+                    percent: ((currentPrice - dayAgoPrice) / dayAgoPrice) * 100,
+                    absolute: currentPrice - dayAgoPrice
+                };
+            }
+            
+            // Update DOM elements
+            const formatStat = (change) => {
+                const sign = change.percent >= 0 ? '+' : '';
+                const color = change.percent >= 0 ? 'positive' : 'negative';
+                return {
+                    percent: `${sign}${change.percent.toFixed(2)}%`,
+                    absolute: `${sign}$${change.absolute.toFixed(2)}`,
+                    color: color
+                };
+            };
+            
+            const daily = formatStat(dailyChange);
+            const weekly = formatStat(weeklyChange);
+            const monthly = formatStat(monthlyChange);
+            const yearly = formatStat(yearlyChange);
+            
+            // Update daily
+            const dailyEl = document.getElementById('stat-daily-change');
+            const dailyAbsEl = document.getElementById('stat-daily-change-abs');
+            if (dailyEl) {
+                dailyEl.textContent = daily.percent;
+                dailyEl.className = `compact-stat-number ${daily.color}`;
+            }
+            if (dailyAbsEl) dailyAbsEl.textContent = daily.absolute;
+            
+            // Update weekly
+            const weeklyEl = document.getElementById('stat-weekly-change');
+            const weeklyAbsEl = document.getElementById('stat-weekly-change-abs');
+            if (weeklyEl) {
+                weeklyEl.textContent = weekly.percent;
+                weeklyEl.className = `compact-stat-number ${weekly.color}`;
+            }
+            if (weeklyAbsEl) weeklyAbsEl.textContent = weekly.absolute;
+            
+            // Update monthly
+            const monthlyEl = document.getElementById('stat-monthly-change');
+            const monthlyAbsEl = document.getElementById('stat-monthly-change-abs');
+            if (monthlyEl) {
+                monthlyEl.textContent = monthly.percent;
+                monthlyEl.className = `compact-stat-number ${monthly.color}`;
+            }
+            if (monthlyAbsEl) monthlyAbsEl.textContent = monthly.absolute;
+            
+            // Update yearly
+            const yearlyEl = document.getElementById('stat-yearly-change');
+            const yearlyAbsEl = document.getElementById('stat-yearly-change-abs');
+            if (yearlyEl) {
+                yearlyEl.textContent = yearly.percent;
+                yearlyEl.className = `compact-stat-number ${yearly.color}`;
+            }
+            if (yearlyAbsEl) yearlyAbsEl.textContent = yearly.absolute;
+        }
+        
+        // Comparison chart variables
+        let comparisonChart = null;
+        let comparisonChartSeries = [];
+        
+        // Update comparison chart
+        function updateComparisonChart() {
+            const comparisonTickers = Array.from(document.getElementById('tickersCompare')?.selectedOptions || [])
+                .map(opt => opt.value);
+            
+            const comparisonSection = document.getElementById('comparison-chart-section');
+            if (!comparisonSection) return;
+            
+            // Show/hide section based on whether there are comparison tickers
+            if (comparisonTickers.length === 0) {
+                comparisonSection.style.display = 'none';
+                if (comparisonChart) {
+                    try {
+                        comparisonChart.remove();
+                        comparisonChart = null;
+                        comparisonChartSeries = [];
+                    } catch (e) {
+                        console.warn('Error removing comparison chart:', e);
+                    }
+                }
+                return;
+            }
+            
+            comparisonSection.style.display = 'block';
+            
+            // Get time range and unit size from active buttons
+            const activeRangeBtn = document.querySelector('.chart-control-btn.active[data-range]');
+            const timeRange = activeRangeBtn?.dataset.range || 'all';
+            const activeUnitBtn = document.querySelector('.unit-size-btn.active[data-unit]');
+            const unitSize = activeUnitBtn?.dataset.unit || 'day';
+            
+            // Wait for adapter and create comparison chart
+            waitForTradingViewAdapter().then(() => {
+                const container = document.getElementById('comparison-chart-wrapper');
+                if (!container) return;
+                
+                // Remove existing chart
+                if (comparisonChart) {
+                    try {
+                        comparisonChart.remove();
+                    } catch (e) {
+                        console.warn('Error removing existing comparison chart:', e);
+                    }
+                }
+                
+                // Create comparison chart
+                comparisonChart = window.TradingViewChartAdapter.createChart(container, {
+                    layout: {
+                        background: { type: 'solid', color: 'transparent' },
+                        textColor: getCSSVariableValue('--text-color', '#333')
+                    },
+                    grid: {
+                        vertLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') },
+                        horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
+                    },
+                    width: container.clientWidth,
+                    height: 350,
+                    timeScale: {
+                        timeVisible: true,
+                        secondsVisible: true
+                    },
+                    rightPriceScale: {
+                        borderVisible: true,
+                        borderColor: getCSSVariableValue('--border-color', '#e0e0e0')
+                    },
+                    leftPriceScale: {
+                        visible: false
+                    }
+                });
+                
+                // Colors for comparison series
+                const colors = ['#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1'];
+                comparisonChartSeries = [];
+                
+                // Add series for each comparison ticker
+                comparisonTickers.forEach((ticker, idx) => {
+                    const tickerData = generateMockPriceData(ticker, unitSize, timeRange);
+                    const compSeries = window.TradingViewChartAdapter.addLineSeries(comparisonChart, {
+                        color: colors[idx % colors.length],
+                        lineWidth: 2,
+                        title: ticker,
+                        priceFormat: {
+                            type: 'price',
+                            precision: 2,
+                            minMove: 0.01
+                        },
+                        priceScaleId: 'right'
+                    });
+                    compSeries.setData(tickerData.line);
+                    comparisonChartSeries.push(compSeries);
+                });
+                
+                // Add main ticker series as well
+                const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
+                const mainTickerData = generateMockPriceData(selectedTicker, unitSize, timeRange);
+                const mainSeries = window.TradingViewChartAdapter.addLineSeries(comparisonChart, {
+                    color: getCSSVariableValue('--primary-color', '#007bff'),
+                    lineWidth: 2,
+                    title: selectedTicker,
+                    priceFormat: {
+                        type: 'price',
+                        precision: 2,
+                        minMove: 0.01
+                    },
+                    priceScaleId: 'right'
+                });
+                mainSeries.setData(mainTickerData.line);
+                comparisonChartSeries.push(mainSeries);
+                
+                // Fit content
+                comparisonChart.timeScale().fitContent();
+                
+                // Update legend
+                const legendContainer = document.getElementById('comparison-legend');
+                if (legendContainer) {
+                    let html = '';
+                    
+                    // Main ticker
+                    html += `<span class="badge" style="background: ${getCSSVariableValue('--primary-color', '#007bff')}; margin-right: 8px;">● ${selectedTicker}</span>`;
+                    
+                    // Comparison tickers
+                    comparisonTickers.forEach((ticker, idx) => {
+                        html += `<span class="badge" style="background: ${colors[idx % colors.length]}; margin-right: 8px;">● ${ticker}</span>`;
+                    });
+                    
+                    legendContainer.innerHTML = html;
+                }
+                
+                // Sync time scale with main chart
+                if (priceChart) {
+                    priceChart.timeScale().subscribeVisibleTimeRangeChange((timeRange) => {
+                        if (comparisonChart && timeRange) {
+                            comparisonChart.timeScale().setVisibleRange(timeRange);
+                        }
+                    });
+                }
+            });
         }
         
         // Feature 74: Lazy Loading

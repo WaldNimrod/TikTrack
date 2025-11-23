@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <title>19. הצג/הסתר נפח</title>
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#284b63" stroke-width="10"/>
+  <g stroke="#26b7a9" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="60" y="90" width="15" height="60" rx="4" />
+    <rect x="90" y="80" width="15" height="70" rx="4" />
+    <rect x="120" y="100" width="15" height="50" rx="4" />
+  </g>
+</svg>

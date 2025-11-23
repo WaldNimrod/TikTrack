@@ -162,21 +162,33 @@ class LinkedItemsService {
      * @example
      * const iconPath = LinkedItemsService.getLinkedItemIcon('trade');
      */
-    static getLinkedItemIcon(entityType) {
+    static async getLinkedItemIcon(entityType) {
+        // Use IconSystem if available, fallback to old method
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.getEntityIcon) {
+            try {
+                return await window.IconSystem.getEntityIcon(entityType);
+            } catch (error) {
+                if (typeof window.Logger !== 'undefined') {
+                    window.Logger.warn('⚠️ Error getting linked item icon from IconSystem, using fallback', { entityType, error, page: 'linked-items-service' });
+                }
+            }
+        }
+        
+        // Fallback to old method
         const iconMappings = {
-            ticker: '/trading-ui/images/icons/tickers.svg',
-            trade: '/trading-ui/images/icons/trades.svg',
-            trade_plan: '/trading-ui/images/icons/trade_plans.svg',
-            execution: '/trading-ui/images/icons/executions.svg',
-            trading_account: '/trading-ui/images/icons/trading_accounts.svg',
-            account: '/trading-ui/images/icons/trading_accounts.svg',
-            alert: '/trading-ui/images/icons/alerts.svg',
-            cash_flow: '/trading-ui/images/icons/cash_flows.svg',
-            note: '/trading-ui/images/icons/notes.svg',
-            position: '/trading-ui/images/icons/trades.svg'
+            ticker: '/trading-ui/images/icons/entities/tickers.svg',
+            trade: '/trading-ui/images/icons/entities/trades.svg',
+            trade_plan: '/trading-ui/images/icons/entities/trade_plans.svg',
+            execution: '/trading-ui/images/icons/entities/executions.svg',
+            trading_account: '/trading-ui/images/icons/entities/trading_accounts.svg',
+            account: '/trading-ui/images/icons/entities/trading_accounts.svg',
+            alert: '/trading-ui/images/icons/entities/alerts.svg',
+            cash_flow: '/trading-ui/images/icons/entities/cash_flows.svg',
+            note: '/trading-ui/images/icons/entities/notes.svg',
+            position: '/trading-ui/images/icons/entities/trades.svg'
         };
         
-        return iconMappings[entityType] || '/trading-ui/images/icons/home.svg';
+        return iconMappings[entityType] || '/trading-ui/images/icons/entities/home.svg';
     }
     
     /**

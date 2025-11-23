@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <title>43. הצג/הסתר סקשן</title>
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#284b63" stroke-width="10"/>
+  <g stroke="#26b7a9" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <polyline points="70,85 100,115 130,85" />
+  </g>
+</svg>

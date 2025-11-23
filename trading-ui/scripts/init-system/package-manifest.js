@@ -150,6 +150,20 @@ const PACKAGE_MANIFEST = {
         loadOrder: 7
       },
       {
+        file: 'icon-mappings.js',
+        globalCheck: 'window.IconMappings',
+        description: 'מיפוי איקונים מרכזי',
+        required: true,
+        loadOrder: 7.5
+      },
+      {
+        file: 'icon-system.js',
+        globalCheck: 'window.IconSystem',
+        description: 'מערכת איקונים מרכזית',
+        required: true,
+        loadOrder: 7.6
+      },
+      {
         file: 'cache-clear-menu.js',
         globalCheck: 'window.CacheControlMenu',
         description: 'שליטת ניקוי מטמון(Stage B-Lite)',

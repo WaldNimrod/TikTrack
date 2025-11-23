@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <title>27. ייצוא תמונה</title>
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#284b63" stroke-width="10"/>
+  <g stroke="#26b7a9" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="55" y="70" width="70" height="70" rx="8" />
+    <polyline points="95,85 130,50 130,80" />
+    <line x1="120" y1="60" x2="150" y2="60" />
+  </g>
+</svg>

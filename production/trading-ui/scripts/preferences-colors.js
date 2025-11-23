@@ -180,6 +180,16 @@ class ColorManager {
         ? profileId
         : window.PreferencesCore?.currentProfileId ?? window.PreferencesUI?.currentProfileId ?? null;
 
+      // Check if PreferencesData is available
+      if (!window.PreferencesData || typeof window.PreferencesData.loadPreferencesByNames !== 'function') {
+        window.Logger?.warn?.('[ColorManager] PreferencesData.loadPreferencesByNames API is not available - using default colors', {
+          page: 'preferences-colors',
+          userId: finalUserId,
+          profileId: finalProfileId,
+        });
+        return this.defaultColors;
+      }
+
       const fetched = await window.PreferencesData.loadPreferencesByNames({
         names: colorNames,
         userId: finalUserId,
@@ -223,6 +233,16 @@ class ColorManager {
     const finalProfileId = profileId !== null && profileId !== undefined
       ? profileId
       : window.PreferencesCore?.currentProfileId ?? window.PreferencesUI?.currentProfileId ?? null;
+
+    // Check if PreferencesData is available
+    if (!window.PreferencesData || typeof window.PreferencesData.loadPreferencesByNames !== 'function') {
+      window.Logger?.warn?.('[ColorManager] PreferencesData.loadPreferencesByNames API is not available - using default group colors', {
+        page: 'preferences-colors',
+        userId: finalUserId,
+        profileId: finalProfileId,
+      });
+      return {};
+    }
 
     const fetched = await window.PreferencesData.loadPreferencesByNames({
       names: groupColors,

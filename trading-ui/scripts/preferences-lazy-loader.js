@@ -338,6 +338,16 @@ class LazyLoader {
 
       // If not from cache, load from API
       if (!fromCache) {
+        // Check if PreferencesData is available
+        if (!window.PreferencesData || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
+          window.Logger?.warn?.('[PreferencesLazyLoader] PreferencesData.loadAllPreferencesRaw API is not available - returning empty preferences', {
+            page: 'preferences-lazy-loader',
+            userId,
+            profileId,
+          });
+          return { preferences: {}, userId, profileId, fromCache: false };
+        }
+        
         // Use force: false to leverage cache - only call API if cache is missing or expired
         // This prevents unnecessary API calls and rate limiting
         const payload = await window.PreferencesData.loadAllPreferencesRaw({
@@ -653,6 +663,16 @@ class LazyLoader {
     // Load all low priority preferences at once to avoid multiple API calls
     // This prevents rate limiting after cache clear or hard refresh
     try {
+      // Check if PreferencesData is available
+      if (!window.PreferencesData || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
+        window.Logger?.warn?.('[PreferencesLazyLoader] PreferencesData.loadAllPreferencesRaw API is not available - skipping low priority preferences', {
+          page: 'preferences-lazy-loader',
+          userId,
+          profileId,
+        });
+        return;
+      }
+      
       // Use force: false to leverage cache - only call API if cache is missing or expired
       const payload = await window.PreferencesData.loadAllPreferencesRaw({
         userId,

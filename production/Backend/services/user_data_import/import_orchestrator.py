@@ -687,6 +687,8 @@ class ImportOrchestrator:
                         'linking_confirmed': False
                     })
                     self.db_session.flush()
+                    # Update local variable to reflect session state change
+                    linking_confirmed = False
         
         # CRITICAL: Always show account linking interface to allow user to see and change the account
         # Even if account is already linked and matches session, we still need user confirmation
@@ -714,6 +716,8 @@ class ImportOrchestrator:
                     requires_confirmation=True
                 )
 
+        # Re-read linking_confirmed from session to ensure we have the latest value after any updates above
+        linking_confirmed = bool(session.get_summary_data('linking_confirmed'))
         if matched_account_id and not linking_confirmed:
             matched_account = self.db_session.query(TradingAccount).filter(
                 TradingAccount.id == matched_account_id

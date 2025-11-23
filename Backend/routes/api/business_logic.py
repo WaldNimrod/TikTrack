@@ -1166,3 +1166,254 @@ def validate_tag_category():
             }
         }), 500
 
+
+# ============================================================================
+# Batch Operations Endpoint
+# ============================================================================
+
+@business_logic_bp.route('/batch', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=1.0)
+def batch_operations():
+    """
+    Execute multiple business logic operations in a single request.
+    
+    Request format:
+    {
+        "operations": [
+            {
+                "operation": "calculate-stop-price",
+                "service": "trade",
+                "data": {...}
+            },
+            {
+                "operation": "validate-trade",
+                "service": "trade",
+                "data": {...}
+            }
+        ]
+    }
+    
+    Response format:
+    {
+        "status": "success",
+        "results": [
+            {
+                "operation": "calculate-stop-price",
+                "status": "success",
+                "data": {...}
+            },
+            {
+                "operation": "validate-trade",
+                "status": "error",
+                "error": {...}
+            }
+        ],
+        "total": 2,
+        "successful": 1,
+        "failed": 1
+    }
+    """
+    try:
+        data = request.get_json() or {}
+        operations = data.get('operations', [])
+        
+        if not operations or not isinstance(operations, list):
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Operations list is required and must be an array'
+                }
+            }), 400
+        
+        if len(operations) > 50:  # Limit batch size
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Maximum 50 operations per batch request'
+                }
+            }), 400
+        
+        results = []
+        
+        # Service mapping
+        service_map = {
+            'trade': trade_service,
+            'execution': execution_service,
+            'alert': alert_service,
+            'statistics': statistics_service,
+            'cash-flow': cash_flow_service,
+            'note': note_service,
+            'trading-account': trading_account_service,
+            'trade-plan': trade_plan_service,
+            'ticker': ticker_service,
+            'currency': currency_service,
+            'tag': tag_service
+        }
+        
+        # Operation mapping
+        operation_map = {
+            # Trade operations
+            'calculate-stop-price': lambda svc, d: svc.calculate_stop_price(
+                float(d.get('current_price', 0)),
+                float(d.get('stop_percentage', 0)),
+                d.get('side', 'Long')
+            ),
+            'calculate-target-price': lambda svc, d: svc.calculate_target_price(
+                float(d.get('current_price', 0)),
+                float(d.get('target_percentage', 0)),
+                d.get('side', 'Long')
+            ),
+            'calculate-percentage-from-price': lambda svc, d: svc.calculate_percentage_from_price(
+                float(d.get('current_price', 0)),
+                float(d.get('target_price', 0)),
+                d.get('side', 'Long')
+            ),
+            'calculate-investment': lambda svc, d: svc.calculate_investment(
+                float(d.get('price', 0)),
+                float(d.get('quantity', 0))
+            ),
+            'validate-trade': lambda svc, d: svc.validate_trade(d),
+            
+            # Execution operations
+            'calculate-execution-values': lambda svc, d: svc.calculate_execution_values(d),
+            'calculate-average-price': lambda svc, d: svc.calculate_average_price(d.get('executions', [])),
+            'validate-execution': lambda svc, d: svc.validate_execution(d),
+            
+            # Alert operations
+            'validate-alert': lambda svc, d: svc.validate_alert(d),
+            'validate-condition-value': lambda svc, d: svc.validate_condition_value(
+                d.get('condition_attribute'),
+                d.get('condition_operator'),
+                d.get('condition_number')
+            ),
+            
+            # Statistics operations
+            'calculate-statistics': lambda svc, d: svc.calculate_statistics(
+                d.get('entity_type'),
+                d.get('calculation_type'),
+                d.get('field'),
+                d.get('filters', {})
+            ),
+            'calculate-sum': lambda svc, d: svc.calculate_sum(
+                d.get('entity_type'),
+                d.get('field'),
+                d.get('filters', {})
+            ),
+            'calculate-average': lambda svc, d: svc.calculate_average(
+                d.get('entity_type'),
+                d.get('field'),
+                d.get('filters', {})
+            ),
+            'count-records': lambda svc, d: svc.count_records(
+                d.get('entity_type'),
+                d.get('filters', {})
+            ),
+            
+            # Cash Flow operations
+            'calculate-account-balance': lambda svc, d: svc.calculate_account_balance(
+                d.get('account_id'),
+                d.get('as_of_date')
+            ),
+            'validate-cash-flow': lambda svc, d: svc.validate_cash_flow(d),
+            
+            # Note operations
+            'validate-note': lambda svc, d: svc.validate_note(d),
+            
+            # Trading Account operations
+            'validate-trading-account': lambda svc, d: svc.validate_trading_account(d),
+            
+            # Trade Plan operations
+            'validate-trade-plan': lambda svc, d: svc.validate_trade_plan(d),
+            
+            # Ticker operations
+            'validate-ticker': lambda svc, d: svc.validate_ticker(d),
+            
+            # Tag operations
+            'validate-tag': lambda svc, d: svc.validate_tag(d),
+        }
+        
+        # Process each operation
+        for op_data in operations:
+            operation = op_data.get('operation')
+            service_name = op_data.get('service')
+            op_payload = op_data.get('data', {})
+            
+            try:
+                # Get service
+                service = service_map.get(service_name)
+                if not service:
+                    results.append({
+                        'operation': operation,
+                        'status': 'error',
+                        'error': {
+                            'message': f'Unknown service: {service_name}'
+                        }
+                    })
+                    continue
+                
+                # Get operation handler
+                op_handler = operation_map.get(operation)
+                if not op_handler:
+                    results.append({
+                        'operation': operation,
+                        'status': 'error',
+                        'error': {
+                            'message': f'Unknown operation: {operation}'
+                        }
+                    })
+                    continue
+                
+                # Execute operation
+                result = op_handler(service, op_payload)
+                
+                # Format result
+                if isinstance(result, dict) and result.get('is_valid') is not None:
+                    # Validation result
+                    results.append({
+                        'operation': operation,
+                        'status': 'success' if result.get('is_valid') else 'error',
+                        'data': result
+                    })
+                elif isinstance(result, dict) and 'error' in result:
+                    # Error result
+                    results.append({
+                        'operation': operation,
+                        'status': 'error',
+                        'error': result.get('error', {})
+                    })
+                else:
+                    # Success result
+                    results.append({
+                        'operation': operation,
+                        'status': 'success',
+                        'data': result
+                    })
+                    
+            except Exception as e:
+                logger.error(f"Error executing batch operation {operation}: {str(e)}")
+                results.append({
+                    'operation': operation,
+                    'status': 'error',
+                    'error': {
+                        'message': str(e)
+                    }
+                })
+        
+        # Return batch results
+        return jsonify({
+            'status': 'success',
+            'results': results,
+            'total': len(results),
+            'successful': len([r for r in results if r.get('status') == 'success']),
+            'failed': len([r for r in results if r.get('status') == 'error'])
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error processing batch request: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+

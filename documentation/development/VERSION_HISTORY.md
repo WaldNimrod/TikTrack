@@ -123,3 +123,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-23T18:08:55+00:00 | 1.3.26.0 | 1.3.25.0 | b93669e17364847f334996f245b3d61627fcb7ea | 0620b022a535f7bcc267800162a33c0088f8b327 | patch | Fix: Currency validation required fields and HTML global functions |
 | 2025-11-23T18:13:01+00:00 | 1.3.27.0 | 1.3.26.0 | 580e17f5467ab868965f23d49b1a7cd8ef838aca | b93669e17364847f334996f245b3d61627fcb7ea | patch | עדכון תיעוד מערכת ראש הדף |
 | 2025-11-23T18:26:22+00:00 | 1.3.28.0 | 1.3.27.0 | 2a4c11539f56b48122cd4fae643213b9e4006e8f | 580e17f5467ab868965f23d49b1a7cd8ef838aca | patch | Complete Phase 3.1-3.3 testing: Add test scripts and comprehensive reports |
+| 2025-11-23T20:02:06+00:00 | 1.3.29.0 | 1.3.28.0 | ac5dcf9bf4d5a9c4f8c43aae6cd3f4c86d7ac08a | 2a4c11539f56b48122cd4fae643213b9e4006e8f | patch | Add Business Logic Batch Operations endpoint and helper |

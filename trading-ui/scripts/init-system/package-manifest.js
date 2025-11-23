@@ -1187,6 +1187,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 0
       },
       {
+        file: 'utils/business-logic-batch-helper.js',
+        globalCheck: 'window.BusinessLogicBatchHelper',
+        description: 'עזר ל-Batch Operations עם Business Logic API',
+        required: false,
+        loadOrder: 1
+      },
+      {
         file: 'currencies.js',
         globalCheck: 'window.openCurrencyDetails',
         description: 'מערכת מטבעות',

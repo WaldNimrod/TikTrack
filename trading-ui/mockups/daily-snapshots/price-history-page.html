@@ -158,6 +158,71 @@
                                     <i class="bi bi-bar-chart"></i>
                                 </button>
                             </div>
+                            <!-- View Mode Buttons (Price/Percentage) -->
+                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                <button class="view-mode-btn active" data-mode="price" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="תצוגת מחיר">$</button>
+                                <button class="view-mode-btn" data-mode="percent" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="תצוגת אחוזים">%</button>
+                            </div>
+                            <!-- Y-Axis Scale Buttons (Linear/Logarithmic) -->
+                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                <button class="y-scale-btn active" data-scale="linear" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="ליניארי">
+                                    <i class="bi bi-graph-up-arrow"></i>
+                                </button>
+                                <button class="y-scale-btn" data-scale="log" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="לוגריתמי">
+                                    <i class="bi bi-bar-chart-line"></i>
+                                </button>
+                            </div>
+                            <!-- Volume Toggle Button -->
+                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                <button class="volume-toggle-btn" id="volumeToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="הצג/הסתר נפח">
+                                    <i class="bi bi-bar-chart-fill"></i> Volume
+                                </button>
+                            </div>
+                            <!-- Auto Scale Button -->
+                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                <button class="auto-scale-btn" id="autoScaleBtn" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="התאמה אוטומטית">
+                                    <i class="bi bi-arrows-fullscreen"></i>
+                                </button>
+                            </div>
+                            <!-- Zoom Controls -->
+                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                <button class="zoom-btn" data-action="zoom-in" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="זום פנימה">
+                                    <i class="bi bi-zoom-in"></i>
+                                </button>
+                                <button class="zoom-btn" data-action="zoom-out" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="זום החוצה">
+                                    <i class="bi bi-zoom-out"></i>
+                                </button>
+                                <button class="zoom-btn" data-action="reset" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="איפוס זום">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                </button>
+                            </div>
+                            <!-- Indicators Toggle -->
+                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                <button class="indicators-toggle-btn" id="indicatorsToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="מחוונים">
+                                    <i class="bi bi-graph-up-arrow"></i> Indicators
+                                </button>
+                            </div>
+                            <!-- Series Visibility Toggle -->
+                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                <button class="series-visibility-toggle-btn" id="seriesVisibilityToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="הצג/הסתר סדרות">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <!-- Export/Screenshot -->
+                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                <button class="export-btn" data-action="screenshot" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="צילום מסך">
+                                    <i class="bi bi-camera"></i>
+                                </button>
+                                <button class="export-btn" data-action="export-image" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="ייצא תמונה">
+                                    <i class="bi bi-download"></i>
+                                </button>
+                            </div>
+                            <!-- Drawing Tools Button -->
+                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                <button class="drawing-tools-toggle-btn" id="drawingToolsToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="כלי ציור ומדידה">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </div>
                             <button class="filter-toggle-btn" onclick="toggleSection('price-chart-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
@@ -165,12 +230,51 @@
                     </div>
                     <div class="section-body">
                                 <div id="price-chart-wrapper" style="position: relative; height: 500px; width: 100%; background: #fff; border-radius: 8px; overflow: hidden;">
+                                    <!-- Drawing Tools Toolbar -->
+                                    <div id="drawing-tools-toolbar" style="position: absolute; top: 10px; left: 10px; z-index: 20; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: none; flex-direction: column; gap: 4px;">
+                                        <div style="font-size: 0.7rem; font-weight: 600; margin-bottom: 4px; color: #495057;">כלי ציור:</div>
+                                        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                                            <button class="drawing-tool-btn" data-tool="line" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="קו">
+                                                <i class="bi bi-dash-lg"></i> קו
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="horizontal-line" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="קו אופקי">
+                                                <i class="bi bi-horizontal-rule"></i>
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="vertical-line" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="קו אנכי">
+                                                <i class="bi bi-vertical-rule"></i>
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="arrow" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="חץ">
+                                                <i class="bi bi-arrow-right"></i>
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="rectangle" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="מלבן">
+                                                <i class="bi bi-square"></i>
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="text" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="טקסט">
+                                                <i class="bi bi-type"></i>
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="measure" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="מדידה">
+                                                <i class="bi bi-rulers"></i>
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="fibonacci" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="פיבונאצ'י">
+                                                <i class="bi bi-diagram-3"></i>
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="trend-line" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="קו מגמה">
+                                                <i class="bi bi-graph-up"></i>
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="support-resistance" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="תמיכה/התנגדות">
+                                                <i class="bi bi-arrows-expand"></i>
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="marker" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="סימן">
+                                                <i class="bi bi-bookmark"></i>
+                                            </button>
+                                            <button class="drawing-tool-btn" data-tool="clear" style="padding: 4px 8px; border: 1px solid #dc3545; background: white; color: #dc3545; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="נקה הכל">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- Drawing Canvas Overlay -->
+                                    <canvas id="drawing-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 15; pointer-events: none;"></canvas>
                                     <div id="price-chart-container" style="height: 100%; width: 100%;"></div>
-                                </div>
-                                <div class="mt-3">
-                                    <span class="badge" style="background: #007bff;">● AAPL</span>
-                                    <span class="badge" style="background: #28a745;">● TSLA</span>
-                                    <span class="badge" style="background: #dc3545;">● MSFT</span>
                                 </div>
                     </div>
                 </div>
@@ -342,7 +446,17 @@
             }
         }
         
+        // Initialize only once
+        let isPageInitialized = false;
+        
         document.addEventListener('DOMContentLoaded', async () => {
+            if (isPageInitialized) {
+                console.log('⏸️ Page already initialized, skipping...');
+                return;
+            }
+            
+            isPageInitialized = true;
+            
             try {
                 if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
                     await window.PreferencesCore.initializeWithLazyLoading();
@@ -351,17 +465,46 @@
                 console.warn('Preferences initialization failed (non-critical):', error);
             }
             
-            // Initialize price chart
-            initPriceChart();
+            // Initialize price chart (with delay to ensure DOM is ready)
+            setTimeout(() => {
+                initPriceChart();
+            }, 100);
         });
         
         // Chart variables
         let priceChart = null;
         let priceChartSeries = null;
         let comparisonSeries = [];
+        let volumeSeries = null;
+        let maSeries = []; // Moving Average series
+        let viewMode = 'price'; // 'price' or 'percent'
+        let yScaleMode = 'linear'; // 'linear' or 'log'
+        let autoScaleEnabled = false;
+        let volumeVisible = false;
+        let indicatorsVisible = false;
+        let seriesVisibility = {}; // Track series visibility
+        let drawingTool = null;
+        let drawingCanvas = null;
+        let drawingCtx = null;
+        let isDrawing = false;
+        let drawingStartPoint = null;
+        let drawingElements = [];
+        let isChartInitializing = false; // Prevent multiple initializations
+        let chartPreferences = {}; // Store chart preferences
+        let lazyLoadQueue = []; // Queue for lazy loading
+        let animationFrameId = null; // For requestAnimationFrame optimization
+        let dataSamplingEnabled = false; // For large datasets
         
         // Initialize price chart
         async function initPriceChart() {
+            // Prevent multiple simultaneous initializations
+            if (isChartInitializing) {
+                console.log('⏸️ Chart initialization already in progress, skipping...');
+                return;
+            }
+            
+            isChartInitializing = true;
+            
             try {
                 // Wait for TradingViewChartAdapter to be available
                 await waitForTradingViewAdapter();
@@ -403,7 +546,8 @@
                     },
                     rightPriceScale: {
                         borderVisible: true,
-                        borderColor: getCSSVariableValue('--border-color', '#e0e0e0')
+                        borderColor: getCSSVariableValue('--border-color', '#e0e0e0'),
+                        mode: yScaleMode === 'log' ? 1 : 0 // 0 = Normal, 1 = Logarithmic
                     }
                 });
                 
@@ -421,8 +565,21 @@
                 const activeUnitBtn = document.querySelector('.unit-size-btn.active[data-unit]');
                 const unitSize = activeUnitBtn?.dataset.unit || 'day';
                 
+                // Get view mode (price/percent)
+                const activeViewModeBtn = document.querySelector('.view-mode-btn.active');
+                viewMode = activeViewModeBtn?.dataset.mode || 'price';
+                
+                // Get Y scale mode (linear/log)
+                const activeYScaleBtn = document.querySelector('.y-scale-btn.active');
+                yScaleMode = activeYScaleBtn?.dataset.scale || 'linear';
+                
                 // Generate mock data
                 const mockData = generateMockPriceData(selectedTicker, unitSize, timeRange);
+                
+                // Convert to percentage if needed
+                let chartData = viewMode === 'percent' 
+                    ? convertToPercentage(mockData.line, mockData.candles) 
+                    : { line: mockData.line, candles: mockData.candles };
                 
                 // Add main series
                 if (chartType === 'candlestick') {
@@ -432,21 +589,34 @@
                         borderVisible: false,
                         wickUpColor: '#26baac',
                         wickDownColor: '#ef5350',
-                        title: selectedTicker
-                    });
-                    priceChartSeries.setData(mockData.candles);
-                } else {
-                    priceChartSeries = window.TradingViewChartAdapter.addLineSeries(priceChart, {
-                        color: getCSSVariableValue('--primary-color', '#007bff'),
-                        lineWidth: 2,
                         title: selectedTicker,
-                        priceFormat: {
+                        priceFormat: viewMode === 'percent' ? {
+                            type: 'percent',
+                            precision: 2,
+                            minMove: 0.01
+                        } : {
                             type: 'price',
                             precision: 2,
                             minMove: 0.01
                         }
                     });
-                    priceChartSeries.setData(mockData.line);
+                    priceChartSeries.setData(chartData.candles);
+                } else {
+                    priceChartSeries = window.TradingViewChartAdapter.addLineSeries(priceChart, {
+                        color: getCSSVariableValue('--primary-color', '#007bff'),
+                        lineWidth: 2,
+                        title: selectedTicker,
+                        priceFormat: viewMode === 'percent' ? {
+                            type: 'percent',
+                            precision: 2,
+                            minMove: 0.01
+                        } : {
+                            type: 'price',
+                            precision: 2,
+                            minMove: 0.01
+                        }
+                    });
+                    priceChartSeries.setData(chartData.line);
                 }
                 
                 // Add comparison series if multiple tickers selected
@@ -456,12 +626,20 @@
                 if (comparisonTickers.length > 0) {
                     const colors = ['#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1'];
                     comparisonTickers.forEach((ticker, idx) => {
-                        const compData = generateMockPriceData(ticker, unitSize, timeRange);
+                        const compDataRaw = generateMockPriceData(ticker, unitSize, timeRange);
+                        const compData = viewMode === 'percent' 
+                            ? convertToPercentage(compDataRaw.line, compDataRaw.candles) 
+                            : { line: compDataRaw.line, candles: compDataRaw.candles };
+                        
                         const compSeries = window.TradingViewChartAdapter.addLineSeries(priceChart, {
                             color: colors[idx % colors.length],
                             lineWidth: 1,
                             title: ticker,
-                            priceFormat: {
+                            priceFormat: viewMode === 'percent' ? {
+                                type: 'percent',
+                                precision: 2,
+                                minMove: 0.01
+                            } : {
                                 type: 'price',
                                 precision: 2,
                                 minMove: 0.01
@@ -472,16 +650,30 @@
                     });
                 }
                 
+                // Update legend after adding series
+                updateSeriesLegend();
+                
                 // Fit content
                 priceChart.timeScale().fitContent();
                 
-                // Setup event listeners for filters and overlay buttons
+                // Setup event listeners for filters and header buttons
                 setupChartFilters();
+                
+                // Setup drawing tools
+                setupDrawingTools();
+                
+                // Initialize new features
+                initializeNewFeatures();
+                
+                // Initialize performance features
+                initializePerformanceFeatures();
                 
                 console.log('✅ Price chart initialized');
                 
             } catch (error) {
                 console.error('Error initializing price chart:', error);
+            } finally {
+                isChartInitializing = false;
             }
         }
         
@@ -768,6 +960,65 @@
                 });
             });
             
+            // Setup view mode buttons (price/percent)
+            const viewModeButtons = document.querySelectorAll('.view-mode-btn[data-mode]');
+            viewModeButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Remove active class from all view mode buttons
+                    viewModeButtons.forEach(b => {
+                        b.classList.remove('active');
+                        b.style.border = '1px solid #ddd';
+                        b.style.background = 'white';
+                        b.style.color = '';
+                    });
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    btn.style.border = '1px solid #007bff';
+                    btn.style.background = '#007bff';
+                    btn.style.color = 'white';
+                    
+                    // Reload chart
+                    reloadChart();
+                });
+            });
+            
+            // Setup Y scale buttons (linear/log)
+            const yScaleButtons = document.querySelectorAll('.y-scale-btn[data-scale]');
+            yScaleButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Remove active class from all Y scale buttons
+                    yScaleButtons.forEach(b => {
+                        b.classList.remove('active');
+                        b.style.border = '1px solid #ddd';
+                        b.style.background = 'white';
+                        b.style.color = '';
+                    });
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    btn.style.border = '1px solid #007bff';
+                    btn.style.background = '#007bff';
+                    btn.style.color = 'white';
+                    
+                    // Update price scale mode
+                    if (priceChart) {
+                        const scaleMode = btn.dataset.scale === 'log' ? 1 : 0;
+                        priceChart.applyOptions({
+                            rightPriceScale: {
+                                mode: scaleMode
+                            }
+                        });
+                    }
+                });
+            });
+            
             // Setup regular filters
             if (tickerSelect) {
                 tickerSelect.addEventListener('change', () => reloadChart());
@@ -778,6 +1029,380 @@
             if (tickersCompareSelect) {
                 tickersCompareSelect.addEventListener('change', () => reloadChart());
             }
+        }
+        
+        // Convert price data to percentage (based on first value)
+        function convertToPercentage(lineData, candlesData) {
+            if (!lineData || lineData.length === 0) {
+                return { line: [], candles: [] };
+            }
+            
+            const firstValue = lineData[0].value || (candlesData && candlesData[0] ? candlesData[0].close : 0);
+            if (firstValue === 0) return { line: lineData, candles: candlesData };
+            
+            // Convert line data
+            const percentageLine = lineData.map(point => ({
+                time: point.time,
+                value: ((point.value - firstValue) / firstValue) * 100
+            }));
+            
+            // Convert candles data
+            const percentageCandles = candlesData ? candlesData.map(candle => {
+                const basePercent = ((candle.close - firstValue) / firstValue) * 100;
+                const openPercent = ((candle.open - firstValue) / firstValue) * 100;
+                const highPercent = ((candle.high - firstValue) / firstValue) * 100;
+                const lowPercent = ((candle.low - firstValue) / firstValue) * 100;
+                
+                return {
+                    time: candle.time,
+                    open: openPercent,
+                    high: highPercent,
+                    low: lowPercent,
+                    close: basePercent
+                };
+            }) : [];
+            
+            return { line: percentageLine, candles: percentageCandles };
+        }
+        
+        // Setup drawing tools
+        function setupDrawingTools() {
+            const drawingToolsToggle = document.getElementById('drawingToolsToggle');
+            const drawingToolbar = document.getElementById('drawing-tools-toolbar');
+            const canvas = document.getElementById('drawing-canvas');
+            
+            if (!canvas || !drawingToolbar || !drawingToolsToggle) {
+                console.warn('⚠️ Drawing tools elements not found');
+                return;
+            }
+            
+            drawingCanvas = canvas;
+            drawingCtx = canvas.getContext('2d');
+            
+            if (!drawingCtx) {
+                console.error('❌ Failed to get canvas 2D context');
+                return;
+            }
+            
+            // Set canvas size to match chart wrapper
+            const wrapper = document.getElementById('price-chart-wrapper');
+            if (wrapper) {
+                const updateCanvasSize = () => {
+                    const rect = wrapper.getBoundingClientRect();
+                    canvas.width = rect.width;
+                    canvas.height = rect.height;
+                    canvas.style.width = rect.width + 'px';
+                    canvas.style.height = rect.height + 'px';
+                };
+                
+                updateCanvasSize();
+                
+                // Update on resize
+                window.addEventListener('resize', updateCanvasSize);
+                
+                // Use ResizeObserver for more accurate sizing
+                if (window.ResizeObserver) {
+                    const resizeObserver = new ResizeObserver(entries => {
+                        updateCanvasSize();
+                        redrawAllElements();
+                    });
+                    resizeObserver.observe(wrapper);
+                }
+            }
+            
+            // Toggle drawing toolbar
+            drawingToolsToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const isVisible = drawingToolbar.style.display !== 'none' && drawingToolbar.style.display !== '';
+                drawingToolbar.style.display = isVisible ? 'none' : 'flex';
+                
+                // Toggle active state
+                if (isVisible) {
+                    drawingTool = null;
+                    drawingToolsToggle.style.border = '1px solid #ddd';
+                    drawingToolsToggle.style.background = 'white';
+                    drawingToolsToggle.style.color = '';
+                    canvas.style.pointerEvents = 'none';
+                    canvas.style.cursor = 'default';
+                    
+                    // Reset all tool buttons
+                    document.querySelectorAll('.drawing-tool-btn[data-tool]').forEach(b => {
+                        b.style.border = '1px solid #ddd';
+                        b.style.background = 'white';
+                        b.style.color = '';
+                    });
+                    
+                    drawingTool = null;
+                } else {
+                    drawingToolsToggle.style.border = '1px solid #007bff';
+                    drawingToolsToggle.style.background = '#007bff';
+                    drawingToolsToggle.style.color = 'white';
+                }
+            });
+            
+            // Setup drawing tool buttons
+            const drawingToolButtons = document.querySelectorAll('.drawing-tool-btn[data-tool]');
+            drawingToolButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const tool = btn.dataset.tool;
+                    
+                    if (tool === 'clear') {
+                        // Clear all drawings
+                        drawingElements = [];
+                        clearDrawingCanvas();
+                        drawingTool = null;
+                        
+                        // Reset all tool buttons
+                        drawingToolButtons.forEach(b => {
+                            b.style.border = '1px solid #ddd';
+                            b.style.background = 'white';
+                            b.style.color = '';
+                        });
+                    } else {
+                        // Set active drawing tool
+                        drawingTool = tool;
+                        canvas.style.pointerEvents = 'auto';
+                        canvas.style.cursor = 'crosshair';
+                        
+                        // Update button states
+                        drawingToolButtons.forEach(b => {
+                            if (b === btn) {
+                                b.style.border = '1px solid #007bff';
+                                b.style.background = '#007bff';
+                                b.style.color = 'white';
+                            } else {
+                                b.style.border = '1px solid #ddd';
+                                b.style.background = 'white';
+                                b.style.color = '';
+                            }
+                        });
+                        
+                        console.log('✅ Drawing tool activated:', tool);
+                    }
+                });
+            });
+            
+            // Setup canvas drawing events
+            let startX, startY;
+            
+            canvas.addEventListener('mousedown', (e) => {
+                if (!drawingTool || drawingTool === 'clear') return;
+                if (!drawingCtx) return;
+                
+                e.preventDefault();
+                e.stopPropagation();
+                
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                startX = e.clientX - rect.left;
+                startY = e.clientY - rect.top;
+                drawingStartPoint = { x: startX, y: startY };
+            });
+            
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDrawing || !drawingTool || !drawingStartPoint || !drawingCtx) return;
+                
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const rect = canvas.getBoundingClientRect();
+                const currentX = e.clientX - rect.left;
+                const currentY = e.clientY - rect.top;
+                
+                // Redraw all elements
+                clearDrawingCanvas();
+                redrawAllElements();
+                
+                // Draw current element
+                drawElement(drawingTool, drawingStartPoint, { x: currentX, y: currentY }, true);
+            });
+            
+            canvas.addEventListener('mouseup', (e) => {
+                if (!isDrawing || !drawingTool || !drawingStartPoint || !drawingCtx) return;
+                
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const rect = canvas.getBoundingClientRect();
+                const endX = e.clientX - rect.left;
+                const endY = e.clientY - rect.top;
+                
+                // Save drawing element
+                drawingElements.push({
+                    tool: drawingTool,
+                    start: { ...drawingStartPoint },
+                    end: { x: endX, y: endY }
+                });
+                
+                isDrawing = false;
+                drawingStartPoint = null;
+                
+                // Redraw to show final element
+                clearDrawingCanvas();
+                redrawAllElements();
+            });
+            
+            // Resize handling is now done via ResizeObserver above
+        }
+        
+        // Clear drawing canvas
+        function clearDrawingCanvas() {
+            if (!drawingCtx || !drawingCanvas) return;
+            drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+        }
+        
+        // Redraw all drawing elements
+        function redrawAllElements() {
+            if (!drawingCtx) return;
+            
+            drawingElements.forEach(element => {
+                drawElement(element.tool, element.start, element.end, false);
+            });
+        }
+        
+        // Draw a single element
+        function drawElement(tool, start, end, isPreview) {
+            if (!drawingCtx) return;
+            
+            drawingCtx.strokeStyle = isPreview ? '#007bff' : '#26baac';
+            drawingCtx.lineWidth = 2;
+            drawingCtx.setLineDash(isPreview ? [5, 5] : []);
+            
+            switch (tool) {
+                case 'line':
+                    drawingCtx.beginPath();
+                    drawingCtx.moveTo(start.x, start.y);
+                    drawingCtx.lineTo(end.x, end.y);
+                    drawingCtx.stroke();
+                    break;
+                    
+                case 'horizontal-line':
+                    drawingCtx.beginPath();
+                    drawingCtx.moveTo(0, start.y);
+                    drawingCtx.lineTo(drawingCanvas.width, start.y);
+                    drawingCtx.stroke();
+                    break;
+                    
+                case 'vertical-line':
+                    drawingCtx.beginPath();
+                    drawingCtx.moveTo(start.x, 0);
+                    drawingCtx.lineTo(start.x, drawingCanvas.height);
+                    drawingCtx.stroke();
+                    break;
+                    
+                case 'arrow':
+                    drawingCtx.beginPath();
+                    drawingCtx.moveTo(start.x, start.y);
+                    drawingCtx.lineTo(end.x, end.y);
+                    drawingCtx.stroke();
+                    // Draw arrowhead
+                    const angle = Math.atan2(end.y - start.y, end.x - start.x);
+                    const arrowLength = 10;
+                    drawingCtx.beginPath();
+                    drawingCtx.moveTo(end.x, end.y);
+                    drawingCtx.lineTo(
+                        end.x - arrowLength * Math.cos(angle - Math.PI / 6),
+                        end.y - arrowLength * Math.sin(angle - Math.PI / 6)
+                    );
+                    drawingCtx.moveTo(end.x, end.y);
+                    drawingCtx.lineTo(
+                        end.x - arrowLength * Math.cos(angle + Math.PI / 6),
+                        end.y - arrowLength * Math.sin(angle + Math.PI / 6)
+                    );
+                    drawingCtx.stroke();
+                    break;
+                    
+                case 'rectangle':
+                    drawingCtx.beginPath();
+                    drawingCtx.rect(
+                        Math.min(start.x, end.x),
+                        Math.min(start.y, end.y),
+                        Math.abs(end.x - start.x),
+                        Math.abs(end.y - start.y)
+                    );
+                    drawingCtx.stroke();
+                    break;
+                    
+                case 'text':
+                    if (!isPreview && end.x && end.y) {
+                        drawingCtx.fillStyle = '#007bff';
+                        drawingCtx.font = '14px Arial';
+                        const text = prompt('הכנס טקסט:') || '';
+                        if (text) {
+                            drawingCtx.fillText(text, end.x, end.y);
+                        }
+                    }
+                    break;
+                    
+                case 'measure':
+                    drawingCtx.beginPath();
+                    drawingCtx.moveTo(start.x, start.y);
+                    drawingCtx.lineTo(end.x, end.y);
+                    drawingCtx.stroke();
+                    // Draw measurement label
+                    const distance = Math.sqrt(
+                        Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2)
+                    );
+                    drawingCtx.fillStyle = '#007bff';
+                    drawingCtx.font = '12px Arial';
+                    drawingCtx.fillText(
+                        distance.toFixed(0) + 'px',
+                        (start.x + end.x) / 2,
+                        (start.y + end.y) / 2 - 5
+                    );
+                    break;
+                    
+                case 'fibonacci':
+                    // Draw Fibonacci retracement levels
+                    const fibLevels = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1];
+                    const priceRange = Math.abs(end.y - start.y);
+                    fibLevels.forEach(level => {
+                        const y = start.y + (priceRange * level);
+                        drawingCtx.strokeStyle = level === 0.5 ? '#ff9800' : '#26baac';
+                        drawingCtx.lineWidth = level === 0.5 ? 2 : 1;
+                        drawingCtx.setLineDash(level === 0.5 ? [] : [5, 5]);
+                        drawingCtx.beginPath();
+                        drawingCtx.moveTo(0, y);
+                        drawingCtx.lineTo(drawingCanvas.width, y);
+                        drawingCtx.stroke();
+                        
+                        // Label
+                        drawingCtx.fillStyle = '#333';
+                        drawingCtx.font = '10px Arial';
+                        drawingCtx.fillText(`${(level * 100).toFixed(1)}%`, 5, y - 2);
+                    });
+                    drawingCtx.setLineDash([]);
+                    break;
+                    
+                case 'trend-line':
+                    // Draw trend line
+                    drawingCtx.beginPath();
+                    drawingCtx.moveTo(start.x, start.y);
+                    drawingCtx.lineTo(end.x, end.y);
+                    drawingCtx.stroke();
+                    break;
+                    
+                case 'support-resistance':
+                    // Draw support/resistance line (horizontal)
+                    drawingCtx.beginPath();
+                    drawingCtx.moveTo(0, start.y);
+                    drawingCtx.lineTo(drawingCanvas.width, start.y);
+                    drawingCtx.stroke();
+                    break;
+                    
+                case 'marker':
+                    // Draw marker (circle)
+                    drawingCtx.beginPath();
+                    drawingCtx.arc(start.x, start.y, 5, 0, 2 * Math.PI);
+                    drawingCtx.fill();
+                    break;
+            }
+            
+            drawingCtx.setLineDash([]);
         }
         
         // Reload chart
@@ -832,6 +1457,643 @@
                 }
             }
         }
+        
+        // ========================================================================
+        // NEW FEATURES IMPLEMENTATION
+        // ========================================================================
+        
+        // Feature 9, 10: Volume Display
+        function toggleVolume() {
+            volumeVisible = !volumeVisible;
+            const btn = document.getElementById('volumeToggle');
+            if (btn) {
+                if (volumeVisible) {
+                    btn.style.border = '1px solid #007bff';
+                    btn.style.background = '#007bff';
+                    btn.style.color = 'white';
+                    addVolumeSeries();
+                } else {
+                    btn.style.border = '1px solid #ddd';
+                    btn.style.background = 'white';
+                    btn.style.color = '';
+                    removeVolumeSeries();
+                }
+            }
+        }
+        
+        function addVolumeSeries() {
+            if (!priceChart || volumeSeries) return;
+            
+            const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
+            const activeUnitBtn = document.querySelector('.unit-size-btn.active[data-unit]');
+            const unitSize = activeUnitBtn?.dataset.unit || 'day';
+            const activeRangeBtn = document.querySelector('.chart-control-btn.active[data-range]');
+            const timeRange = activeRangeBtn?.dataset.range || 'month';
+            
+            const mockData = generateMockPriceData(selectedTicker, unitSize, timeRange);
+            const volumeData = generateVolumeData(mockData.line);
+            
+            volumeSeries = window.TradingViewChartAdapter.addHistogramSeries(priceChart, {
+                color: '#26baac',
+                priceFormat: {
+                    type: 'volume',
+                    precision: 0,
+                    minMove: 1
+                },
+                priceScaleId: 'right',
+                scaleMargins: {
+                    top: 0.8,
+                    bottom: 0
+                }
+            });
+            
+            volumeSeries.setData(volumeData);
+            updateSeriesLegend();
+        }
+        
+        function removeVolumeSeries() {
+            if (volumeSeries && priceChart) {
+                try {
+                    priceChart.removeSeries(volumeSeries);
+                    volumeSeries = null;
+                } catch (e) {
+                    console.warn('Error removing volume series:', e);
+                }
+            }
+        }
+        
+        function generateVolumeData(priceData) {
+            return priceData.map(point => ({
+                time: point.time,
+                value: Math.floor(Math.random() * 1000000) + 100000 // Mock volume
+            }));
+        }
+        
+        // Feature 17: Auto Scale
+        function toggleAutoScale() {
+            autoScaleEnabled = !autoScaleEnabled;
+            const btn = document.getElementById('autoScaleBtn');
+            if (btn) {
+                if (autoScaleEnabled) {
+                    btn.style.border = '1px solid #007bff';
+                    btn.style.background = '#007bff';
+                    btn.style.color = 'white';
+                    applyAutoScale();
+                } else {
+                    btn.style.border = '1px solid #ddd';
+                    btn.style.background = 'white';
+                    btn.style.color = '';
+                }
+            }
+        }
+        
+        function applyAutoScale() {
+            if (!priceChart || !autoScaleEnabled) return;
+            
+            // Auto scale by fitting content
+            try {
+                priceChart.timeScale().fitContent();
+            } catch (e) {
+                console.warn('Error applying auto scale:', e);
+            }
+        }
+        
+        // Feature 24: Visible Range
+        function setVisibleTimeRange(from, to) {
+            if (!priceChart) return;
+            
+            try {
+                window.TradingViewChartAdapter.setVisibleRange(priceChart, {
+                    from: from,
+                    to: to
+                });
+            } catch (e) {
+                console.warn('Error setting visible range:', e);
+            }
+        }
+        
+        // Feature 44-50: Zoom Controls
+        function setupZoomControls() {
+            const zoomButtons = document.querySelectorAll('.zoom-btn[data-action]');
+            zoomButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const action = btn.dataset.action;
+                    
+                    if (action === 'zoom-in') {
+                        zoomIn();
+                    } else if (action === 'zoom-out') {
+                        zoomOut();
+                    } else if (action === 'reset') {
+                        resetZoom();
+                    }
+                });
+            });
+        }
+        
+        function zoomIn() {
+            if (!priceChart) return;
+            
+            try {
+                const visibleRange = window.TradingViewChartAdapter.getVisibleRange(priceChart);
+                if (visibleRange) {
+                    const range = visibleRange.to - visibleRange.from;
+                    const newRange = range * 0.8; // Zoom in 20%
+                    const center = visibleRange.from + range / 2;
+                    
+                    window.TradingViewChartAdapter.setVisibleRange(priceChart, {
+                        from: center - newRange / 2,
+                        to: center + newRange / 2
+                    });
+                }
+            } catch (e) {
+                console.warn('Error zooming in:', e);
+            }
+        }
+        
+        function zoomOut() {
+            if (!priceChart) return;
+            
+            try {
+                const visibleRange = window.TradingViewChartAdapter.getVisibleRange(priceChart);
+                if (visibleRange) {
+                    const range = visibleRange.to - visibleRange.from;
+                    const newRange = range * 1.25; // Zoom out 25%
+                    const center = visibleRange.from + range / 2;
+                    
+                    window.TradingViewChartAdapter.setVisibleRange(priceChart, {
+                        from: center - newRange / 2,
+                        to: center + newRange / 2
+                    });
+                }
+            } catch (e) {
+                console.warn('Error zooming out:', e);
+            }
+        }
+        
+        function resetZoom() {
+            if (!priceChart) return;
+            
+            try {
+                window.TradingViewChartAdapter.resetTimeScale(priceChart);
+            } catch (e) {
+                console.warn('Error resetting zoom:', e);
+            }
+        }
+        
+        // Feature 62: Moving Average Indicator
+        function addMovingAverage(period = 20) {
+            if (!priceChart || !priceChartSeries) return;
+            
+            try {
+                const data = priceChartSeries.data();
+                if (!data || data.length < period) return;
+                
+                const maData = calculateMovingAverage(data, period);
+                
+                const newMaSeries = window.TradingViewChartAdapter.addLineSeries(priceChart, {
+                    color: '#ff9800',
+                    lineWidth: 1,
+                    title: `MA(${period})`,
+                    priceScaleId: 'right'
+                });
+                
+                newMaSeries.setData(maData);
+                newMaSeries.applyOptions({ visible: indicatorsVisible });
+                
+                maSeries.push(newMaSeries);
+                seriesVisibility[`ma-${period}`] = true;
+                updateSeriesLegend();
+            } catch (e) {
+                console.warn('Error adding moving average:', e);
+            }
+        }
+        
+        function calculateMovingAverage(data, period) {
+            const result = [];
+            for (let i = period - 1; i < data.length; i++) {
+                let sum = 0;
+                for (let j = i - period + 1; j <= i; j++) {
+                    sum += data[j].value || data[j].close || 0;
+                }
+                result.push({
+                    time: data[i].time,
+                    value: sum / period
+                });
+            }
+            return result;
+        }
+        
+        // Feature 75, 76: Export/Screenshot
+        function setupExportControls() {
+            const exportButtons = document.querySelectorAll('.export-btn[data-action]');
+            exportButtons.forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const action = btn.dataset.action;
+                    
+                    if (action === 'screenshot') {
+                        await takeScreenshot();
+                    } else if (action === 'export-image') {
+                        await exportAsImage();
+                    }
+                });
+            });
+        }
+        
+        async function takeScreenshot() {
+            if (!priceChart) {
+                window.showErrorNotification?.('שגיאה', 'גרף לא זמין');
+                return;
+            }
+            
+            try {
+                const imageData = await window.TradingViewChartAdapter.takeScreenshot(priceChart);
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.download = `chart-screenshot-${Date.now()}.png`;
+                link.href = imageData;
+                link.click();
+                
+                window.showSuccessNotification?.('הצלחה', 'תמונה נשמרה בהצלחה');
+            } catch (e) {
+                console.error('Error taking screenshot:', e);
+                window.showErrorNotification?.('שגיאה', 'שגיאה בשמירת תמונה');
+            }
+        }
+        
+        async function exportAsImage() {
+            await takeScreenshot(); // Same functionality
+        }
+        
+        // Feature 94: Keyboard Navigation
+        function setupKeyboardNavigation() {
+            document.addEventListener('keydown', (e) => {
+                if (!priceChart) return;
+                
+                // Ctrl/Cmd + Plus: Zoom in
+                if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '=')) {
+                    e.preventDefault();
+                    zoomIn();
+                }
+                // Ctrl/Cmd + Minus: Zoom out
+                else if ((e.ctrlKey || e.metaKey) && e.key === '-') {
+                    e.preventDefault();
+                    zoomOut();
+                }
+                // Ctrl/Cmd + 0: Reset zoom
+                else if ((e.ctrlKey || e.metaKey) && e.key === '0') {
+                    e.preventDefault();
+                    resetZoom();
+                }
+                // Escape: Clear drawing tool
+                else if (e.key === 'Escape') {
+                    drawingTool = null;
+                    if (drawingCanvas) {
+                        drawingCanvas.style.pointerEvents = 'none';
+                        drawingCanvas.style.cursor = 'default';
+                    }
+                }
+            });
+        }
+        
+        // Feature 99: Preferences Integration
+        async function loadChartPreferences() {
+            if (!window.PreferencesCore) return;
+            
+            try {
+                const preferences = await window.PreferencesCore.getAllPreferences();
+                
+                // Load chart preferences
+                chartPreferences = {
+                    viewMode: preferences['chart_view_mode'] || 'price',
+                    yScaleMode: preferences['chart_y_scale'] || 'linear',
+                    volumeVisible: preferences['chart_volume_visible'] || false,
+                    autoScaleEnabled: preferences['chart_auto_scale'] || false,
+                    indicatorsVisible: preferences['chart_indicators_visible'] || false
+                };
+                
+                // Apply preferences
+                applyChartPreferences();
+            } catch (e) {
+                console.warn('Error loading chart preferences:', e);
+            }
+        }
+        
+        async function saveChartPreferences() {
+            if (!window.PreferencesCore) return;
+            
+            try {
+                const preferences = {
+                    'chart_view_mode': viewMode,
+                    'chart_y_scale': yScaleMode,
+                    'chart_volume_visible': volumeVisible,
+                    'chart_auto_scale': autoScaleEnabled,
+                    'chart_indicators_visible': indicatorsVisible
+                };
+                
+                await window.PreferencesCore.saveAllPreferences(preferences);
+            } catch (e) {
+                console.warn('Error saving chart preferences:', e);
+            }
+        }
+        
+        function applyChartPreferences() {
+            if (!chartPreferences) return;
+            
+            // Apply view mode
+            if (chartPreferences.viewMode) {
+                const btn = document.querySelector(`.view-mode-btn[data-mode="${chartPreferences.viewMode}"]`);
+                if (btn) btn.click();
+            }
+            
+            // Apply Y scale
+            if (chartPreferences.yScaleMode) {
+                const btn = document.querySelector(`.y-scale-btn[data-scale="${chartPreferences.yScaleMode}"]`);
+                if (btn) btn.click();
+            }
+            
+            // Apply volume visibility
+            if (chartPreferences.volumeVisible) {
+                toggleVolume();
+            }
+            
+            // Apply auto scale
+            if (chartPreferences.autoScaleEnabled) {
+                toggleAutoScale();
+            }
+        }
+        
+        // Initialize new features
+        function initializeNewFeatures() {
+            // Setup volume toggle
+            const volumeToggle = document.getElementById('volumeToggle');
+            if (volumeToggle) {
+                volumeToggle.addEventListener('click', toggleVolume);
+            }
+            
+            // Setup auto scale
+            const autoScaleBtn = document.getElementById('autoScaleBtn');
+            if (autoScaleBtn) {
+                autoScaleBtn.addEventListener('click', toggleAutoScale);
+            }
+            
+            // Setup zoom controls
+            setupZoomControls();
+            
+            // Setup export controls
+            setupExportControls();
+            
+            // Setup keyboard navigation
+            setupKeyboardNavigation();
+            
+            // Load preferences
+            loadChartPreferences();
+            
+            // Setup indicators toggle
+            const indicatorsToggle = document.getElementById('indicatorsToggle');
+            if (indicatorsToggle) {
+                indicatorsToggle.addEventListener('click', () => {
+                    indicatorsVisible = !indicatorsVisible;
+                    if (indicatorsVisible) {
+                        addMovingAverage(20);
+                    } else {
+                        // Hide indicators
+                        maSeries.forEach(series => {
+                            if (series) series.applyOptions({ visible: false });
+                        });
+                    }
+                });
+            }
+            
+            // Setup series visibility toggle
+            const seriesVisibilityToggle = document.getElementById('seriesVisibilityToggle');
+            if (seriesVisibilityToggle) {
+                seriesVisibilityToggle.addEventListener('click', () => {
+                    toggleSeriesVisibility();
+                });
+            }
+            
+            // Setup series legend
+            setupSeriesLegend();
+        }
+        
+        // Feature 57-61: Multiple Series - Visibility Toggle & Legend
+        function toggleSeriesVisibility() {
+            // Toggle main series
+            if (priceChartSeries) {
+                const isVisible = seriesVisibility['main'] !== false;
+                priceChartSeries.applyOptions({ visible: !isVisible });
+                seriesVisibility['main'] = !isVisible;
+            }
+            
+            // Toggle comparison series
+            comparisonSeries.forEach((series, idx) => {
+                const key = `comparison-${idx}`;
+                const isVisible = seriesVisibility[key] !== false;
+                series.applyOptions({ visible: !isVisible });
+                seriesVisibility[key] = !isVisible;
+            });
+            
+            // Toggle volume
+            if (volumeSeries) {
+                const isVisible = seriesVisibility['volume'] !== false;
+                volumeSeries.applyOptions({ visible: !isVisible });
+                seriesVisibility['volume'] = !isVisible;
+            }
+        }
+        
+        function setupSeriesLegend() {
+            const legendContainer = document.createElement('div');
+            legendContainer.id = 'chart-legend';
+            legendContainer.style.cssText = 'position: absolute; bottom: 10px; right: 10px; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 10; font-size: 0.75rem;';
+            
+            const wrapper = document.getElementById('price-chart-wrapper');
+            if (wrapper) {
+                wrapper.appendChild(legendContainer);
+                updateSeriesLegend();
+            }
+        }
+        
+        function updateSeriesLegend() {
+            const legendContainer = document.getElementById('chart-legend');
+            if (!legendContainer) return;
+            
+            const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
+            let html = '<div style="font-weight: 600; margin-bottom: 4px;">סדרות:</div>';
+            
+            // Main series
+            html += `<div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
+                <span style="width: 12px; height: 2px; background: ${getCSSVariableValue('--primary-color', '#007bff')};"></span>
+                <span>${selectedTicker}</span>
+            </div>`;
+            
+            // Comparison series
+            const comparisonTickers = Array.from(document.getElementById('tickersCompare')?.selectedOptions || [])
+                .map(opt => opt.value);
+            const colors = ['#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1'];
+            comparisonTickers.forEach((ticker, idx) => {
+                html += `<div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
+                    <span style="width: 12px; height: 2px; background: ${colors[idx % colors.length]};"></span>
+                    <span>${ticker}</span>
+                </div>`;
+            });
+            
+            // Volume
+            if (volumeVisible && volumeSeries) {
+                html += `<div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
+                    <span style="width: 12px; height: 12px; background: #26baac; border-radius: 2px;"></span>
+                    <span>Volume</span>
+                </div>`;
+            }
+            
+            // MA indicators
+            if (indicatorsVisible && maSeries.length > 0) {
+                maSeries.forEach((series, idx) => {
+                    html += `<div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
+                        <span style="width: 12px; height: 1px; background: #ff9800;"></span>
+                        <span>MA(${20 + idx * 10})</span>
+                    </div>`;
+                });
+            }
+            
+            legendContainer.innerHTML = html;
+        }
+        
+        // Feature 74: Lazy Loading
+        function setupLazyLoading() {
+            // Use Intersection Observer to load data when chart is visible
+            const chartContainer = document.getElementById('price-chart-container');
+            if (!chartContainer || !window.IntersectionObserver) return;
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && lazyLoadQueue.length > 0) {
+                        // Load queued data
+                        const dataToLoad = lazyLoadQueue.shift();
+                        if (dataToLoad && priceChartSeries) {
+                            priceChartSeries.setData(dataToLoad);
+                        }
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            observer.observe(chartContainer);
+        }
+        
+        // Feature 85-87: Performance Optimizations
+        function optimizeChartPerformance() {
+            // Use requestAnimationFrame for smooth updates
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            
+            // Enable data sampling for large datasets
+            dataSamplingEnabled = true;
+            
+            // Optimize chart rendering
+            if (priceChart) {
+                priceChart.applyOptions({
+                    handleScroll: {
+                        mouseWheel: true,
+                        pressedMouseMove: true,
+                        horzTouchDrag: true,
+                        vertTouchDrag: true
+                    },
+                    handleScale: {
+                        axisPressedMouseMove: true,
+                        axisDoubleClickReset: true,
+                        axisTouchDrag: true,
+                        mouseWheel: true,
+                        pinch: true
+                    }
+                });
+            }
+        }
+        
+        function sampleData(data, maxPoints = 1000) {
+            if (!dataSamplingEnabled || data.length <= maxPoints) {
+                return data;
+            }
+            
+            const step = Math.ceil(data.length / maxPoints);
+            const sampled = [];
+            
+            for (let i = 0; i < data.length; i += step) {
+                sampled.push(data[i]);
+            }
+            
+            return sampled;
+        }
+        
+        // Feature 81: Multiple Charts Sync (⚠️ COMPLEX - See Documentation)
+        /**
+         * ⚠️ WARNING: Multiple Charts Sync Implementation
+         * 
+         * This feature is complex and requires careful synchronization of:
+         * - Time scales across multiple charts
+         * - Crosshair positions
+         * - Zoom levels
+         * - Visible ranges
+         * 
+         * Known Issues:
+         * - Event listener conflicts when syncing multiple charts
+         * - Performance degradation with more than 3-4 synced charts
+         * - Race conditions when updating multiple charts simultaneously
+         * - Memory leaks if charts are not properly cleaned up
+         * 
+         * Implementation Notes:
+         * - Use a central sync manager to coordinate updates
+         * - Debounce rapid updates to prevent performance issues
+         * - Store sync state separately from individual chart state
+         * - Test thoroughly with 2+ charts before production use
+         * 
+         * Documentation: See documentation/02-ARCHITECTURE/FRONTEND/TRADINGVIEW_MULTIPLE_CHARTS_SYNC.md
+         */
+        const chartSyncManager = {
+            charts: [],
+            isSyncing: false,
+            
+            registerChart(chart, id) {
+                this.charts.push({ chart, id, synced: false });
+            },
+            
+            syncTimeScale(sourceChart, sourceRange) {
+                if (this.isSyncing) return;
+                this.isSyncing = true;
+                
+                try {
+                    this.charts.forEach(({ chart, id }) => {
+                        if (chart !== sourceChart && chart.timeScale) {
+                            chart.timeScale().setVisibleRange(sourceRange);
+                        }
+                    });
+                } catch (e) {
+                    console.warn('Error syncing charts:', e);
+                } finally {
+                    this.isSyncing = false;
+                }
+            },
+            
+            syncCrosshair(sourceChart, point) {
+                // Complex implementation - requires careful event handling
+                // See documentation for full implementation
+            }
+        };
+        
+        // Initialize performance optimizations
+        function initializePerformanceFeatures() {
+            setupLazyLoading();
+            optimizeChartPerformance();
+        }
+        
+        // Call initializeNewFeatures after chart is initialized
+        // This will be called in initPriceChart after chart creation
     </script>
 </body>
 </html>

@@ -34,6 +34,18 @@
     <!-- Dynamic Colors System -->
     <script src="../../scripts/color-scheme-system-clean.js" defer></script>
     
+    <!-- TradingView Lightweight Charts -->
+    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js" defer></script>
+    <script src="../../scripts/charts/tradingview-theme.js" defer></script>
+    <script src="../../scripts/charts/tradingview-adapter.js" defer></script>
+    
+    <!-- Field Renderer Service -->
+    <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    
+    <!-- Action Buttons System -->
+    <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
+    <script src="../../scripts/button-system-init.js" defer></script>
+    
     <!-- Linked Items System -->
     <script src="../../scripts/linked-items.js" defer></script>
     <script src="../../scripts/services/linked-items-service.js" defer></script>
@@ -83,7 +95,7 @@
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
                             <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
                             <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה"></button>
-                        </div><button class="filter-toggle-btn" onclick="toggleSection(\'comparative_analysis_page_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                        </div><button class="filter-toggle-btn" onclick="toggleSection('comparative_analysis_page_top_section')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
@@ -112,23 +124,35 @@
                     <div class="section-body">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="investmentTypes" class="form-label">סוגי השקעות:</label>
-                                        <select id="investmentTypes" class="form-select" multiple>
+                                        <label for="investmentTypes" class="form-label">
+                                            <i class="bi bi-info-circle" style="font-size: 0.85rem; color: #6c757d; cursor: help;" 
+                                               title="בחר סוגי השקעות לניתוח. ניתן לבחור מספר אפשרויות."></i>
+                                            סוגי השקעות:
+                                        </label>
+                                        <select id="investmentTypes" class="form-select" multiple title="בחר סוגי השקעות לניתוח">
                                             <option value="swing" selected>swing</option>
                                             <option value="day" selected>day</option>
                                             <option value="long-term" selected>long-term</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label for="tradingMethods" class="form-label">שיטות מסחר:</label>
-                                        <select id="tradingMethods" class="form-select" multiple>
+                                        <label for="tradingMethods" class="form-label">
+                                            <i class="bi bi-info-circle" style="font-size: 0.85rem; color: #6c757d; cursor: help;" 
+                                               title="בחר שיטות מסחר לניתוח. ניתן לבחור מספר אפשרויות."></i>
+                                            שיטות מסחר:
+                                        </label>
+                                        <select id="tradingMethods" class="form-select" multiple title="בחר שיטות מסחר לניתוח">
                                             <option value="Moving Average" selected>Moving Average</option>
                                             <option value="RSI" selected>RSI</option>
                                             <option value="MACD">MACD</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label">עם/בלי תוכנית:</label>
+                                        <label class="form-label">
+                                            <i class="bi bi-info-circle" style="font-size: 0.85rem; color: #6c757d; cursor: help;" 
+                                               title="בחר האם לכלול טריידים עם או בלי תוכנית מסחר."></i>
+                                            עם/בלי תוכנית:
+                                        </label>
                                         <div>
                                             <input type="checkbox" id="withPlan" class="form-check-input" checked>
                                             <label for="withPlan" class="form-check-label">עם תוכנית</label>
@@ -139,8 +163,12 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label for="timeToEntry" class="form-label">משך זמן מתכנון לכניסה:</label>
-                                        <select id="timeToEntry" class="form-select">
+                                        <label for="timeToEntry" class="form-label">
+                                            <i class="bi bi-info-circle" style="font-size: 0.85rem; color: #6c757d; cursor: help;" 
+                                               title="מסנן לפי זמן שחלף מתכנון הטרייד לכניסה בפועל."></i>
+                                            משך זמן מתכנון לכניסה:
+                                        </label>
+                                        <select id="timeToEntry" class="form-select" title="מסנן לפי זמן מתכנון לכניסה">
                                             <option value="">כל הזמנים</option>
                                             <option value="<1">פחות מיום</option>
                                             <option value="1-7">1-7 ימים</option>
@@ -148,8 +176,8 @@
                                         </select>
                                     </div>
                                     <div class="col-md-12">
-                                        <button class="btn btn-primary">החל פילטרים</button>
-                                        <button class="btn btn-outline-secondary">איפוס</button>
+                                        <button class="btn btn-primary" onclick="applyFilters()">החל פילטרים</button>
+                                        <button class="btn btn-outline-secondary" onclick="resetFilters()">איפוס</button>
                                     </div>
                                 </div>
                     </div>
@@ -177,63 +205,14 @@
                                                 <th>אחוז הצלחה</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><strong>swing</strong></td>
-                                                <td>25</td>
-                                                <td>$500</td>
-                                                <td class="text-success">$12,500</td>
-                                                <td>68%</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>day</strong></td>
-                                                <td>15</td>
-                                                <td>$300</td>
-                                                <td class="text-success">$4,500</td>
-                                                <td>60%</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>long-term</strong></td>
-                                                <td>10</td>
-                                                <td>$800</td>
-                                                <td class="text-success">$8,000</td>
-                                                <td>80%</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Moving Average</strong></td>
-                                                <td>20</td>
-                                                <td>$400</td>
-                                                <td class="text-success">$8,000</td>
-                                                <td>65%</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>RSI</strong></td>
-                                                <td>15</td>
-                                                <td>$350</td>
-                                                <td class="text-success">$5,250</td>
-                                                <td>67%</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>עם תוכנית</strong></td>
-                                                <td>30</td>
-                                                <td>$600</td>
-                                                <td class="text-success">$18,000</td>
-                                                <td>70%</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>בלי תוכנית</strong></td>
-                                                <td>20</td>
-                                                <td>$250</td>
-                                                <td class="text-success">$5,000</td>
-                                                <td>55%</td>
-                                            </tr>
+                                        <tbody id="comparison-table-body">
+                                            <!-- Will be populated dynamically -->
                                         </tbody>
                                         <tfoot>
                                             <tr class="table-info">
-                                                <td><strong>סיכום:</strong></td>
-                                                <td><strong>סה"כ קטגוריות: 7</strong></td>
-                                                <td><strong>סה"כ טריידים: 50</strong></td>
-                                                <td colspan="2"><strong>P/L כולל: $25,000</strong></td>
+                                                <td colspan="5" id="comparison-table-summary">
+                                                    <strong>סיכום:</strong> טוען נתונים...
+                                                </td>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -252,8 +231,10 @@
                         </div>
                     </div>
                     <div class="section-body">
-                                <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                                    [גרף Bar Chart - P/L לפי קטגוריה]
+                                <div id="pl-by-category-chart-container" class="chart-container" style="height: 300px; position: relative; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
+                                    <div class="chart-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6c757d;">
+                                        <i class="bi bi-hourglass-split"></i> טוען גרף...
+                                    </div>
                                 </div>
                     </div>
                 </div>
@@ -269,8 +250,10 @@
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                            [גרף Pie Chart - התפלגות לפי קטגוריה]
+                        <div id="category-distribution-chart-container" class="chart-container" style="height: 300px; position: relative; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
+                            <div class="chart-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6c757d;">
+                                <i class="bi bi-hourglass-split"></i> טוען גרף...
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -297,42 +280,8 @@
                                                 <th>טריידים</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><strong>swing</strong></td>
-                                                <td class="table-success">12.5K</td>
-                                                <td class="table-warning">68%</td>
-                                                <td class="table-success">$500</td>
-                                                <td class="table-success">25</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>day</strong></td>
-                                                <td class="table-warning">4.5K</td>
-                                                <td class="table-warning">60%</td>
-                                                <td class="table-warning">$300</td>
-                                                <td class="table-warning">15</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>long-term</strong></td>
-                                                <td class="table-success">8.0K</td>
-                                                <td class="table-success">80%</td>
-                                                <td class="table-success">$800</td>
-                                                <td class="table-warning">10</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>MA</strong></td>
-                                                <td class="table-warning">8.0K</td>
-                                                <td class="table-warning">65%</td>
-                                                <td class="table-warning">$400</td>
-                                                <td class="table-success">20</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>RSI</strong></td>
-                                                <td class="table-warning">5.25K</td>
-                                                <td class="table-warning">67%</td>
-                                                <td class="table-warning">$350</td>
-                                                <td class="table-warning">15</td>
-                                            </tr>
+                                        <tbody id="heatmap-table-body">
+                                            <!-- Will be populated dynamically -->
                                         </tbody>
                                     </table>
                                 </div>
@@ -352,6 +301,41 @@
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
     
+    <!-- CSS Animations -->
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .chart-container {
+            transition: opacity 0.3s ease;
+        }
+        
+        .heatmap-row {
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        
+        .heatmap-row:hover {
+            transform: scale(1.01);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .table-hover tbody tr {
+            transition: background-color 0.2s;
+        }
+    </style>
+    
     <!-- Initialize Preferences System and Dynamic Colors -->
     <script>
         // Helper function to get CSS variable value
@@ -364,13 +348,813 @@
             }
         }
         
+        // Chart variables
+        let plByCategoryChart = null;
+        let plByCategorySeries = null;
+        let categoryDistributionChart = null;
+        let categoryDistributionSeries = null;
+        
+        // Filter state
+        const FILTER_STORAGE_KEY = 'comparative-analysis-filters';
+        
+        // Wait for TradingView adapter
+        async function waitForTradingViewAdapter() {
+            let retries = 0;
+            const maxRetries = 100; // 5 seconds max
+            
+            while ((typeof window.TradingViewChartAdapter === 'undefined' || 
+                   (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined')) && 
+                   retries < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+                retries++;
+            }
+            
+            if (typeof window.TradingViewChartAdapter === 'undefined') {
+                console.error('❌ TradingViewChartAdapter not available after', maxRetries * 50, 'ms');
+                throw new Error('TradingViewChartAdapter not loaded');
+            }
+            
+            if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
+                console.error('❌ LightweightCharts not available after', maxRetries * 50, 'ms');
+                throw new Error('LightweightCharts not loaded');
+            }
+            
+            console.log('✅ TradingView libraries loaded');
+        }
+        
+        // Get current filter values
+        function getFilterValues() {
+            const investmentTypes = Array.from(document.getElementById('investmentTypes')?.selectedOptions || [])
+                .map(opt => opt.value);
+            const tradingMethods = Array.from(document.getElementById('tradingMethods')?.selectedOptions || [])
+                .map(opt => opt.value);
+            const withPlan = document.getElementById('withPlan')?.checked || false;
+            const withoutPlan = document.getElementById('withoutPlan')?.checked || false;
+            const timeToEntry = document.getElementById('timeToEntry')?.value || '';
+            const dateRangeStart = document.getElementById('dateRangeStart')?.value || '';
+            const dateRangeEnd = document.getElementById('dateRangeEnd')?.value || '';
+            
+            return {
+                investmentTypes,
+                tradingMethods,
+                withPlan,
+                withoutPlan,
+                timeToEntry,
+                dateRangeStart,
+                dateRangeEnd
+            };
+        }
+        
+        // Save filter state to localStorage
+        function saveFilterState() {
+            try {
+                const filters = getFilterValues();
+                localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
+            } catch (error) {
+                console.warn('Failed to save filter state:', error);
+            }
+        }
+        
+        // Load filter state from localStorage
+        function loadFilterState() {
+            try {
+                const saved = localStorage.getItem(FILTER_STORAGE_KEY);
+                if (!saved) return;
+                
+                const filters = JSON.parse(saved);
+                
+                // Restore investment types
+                if (filters.investmentTypes) {
+                    const select = document.getElementById('investmentTypes');
+                    if (select) {
+                        Array.from(select.options).forEach(opt => {
+                            opt.selected = filters.investmentTypes.includes(opt.value);
+                        });
+                    }
+                }
+                
+                // Restore trading methods
+                if (filters.tradingMethods) {
+                    const select = document.getElementById('tradingMethods');
+                    if (select) {
+                        Array.from(select.options).forEach(opt => {
+                            opt.selected = filters.tradingMethods.includes(opt.value);
+                        });
+                    }
+                }
+                
+                // Restore checkboxes
+                if (document.getElementById('withPlan')) {
+                    document.getElementById('withPlan').checked = filters.withPlan !== false;
+                }
+                if (document.getElementById('withoutPlan')) {
+                    document.getElementById('withoutPlan').checked = filters.withoutPlan !== false;
+                }
+                
+                // Restore time to entry
+                if (filters.timeToEntry && document.getElementById('timeToEntry')) {
+                    document.getElementById('timeToEntry').value = filters.timeToEntry;
+                }
+                
+                // Restore date range
+                if (filters.dateRangeStart && document.getElementById('dateRangeStart')) {
+                    document.getElementById('dateRangeStart').value = filters.dateRangeStart;
+                }
+                if (filters.dateRangeEnd && document.getElementById('dateRangeEnd')) {
+                    document.getElementById('dateRangeEnd').value = filters.dateRangeEnd;
+                }
+            } catch (error) {
+                console.warn('Failed to load filter state:', error);
+            }
+        }
+        
+        // Generate mock comparison table data
+        function generateMockComparisonTableData(filters) {
+            const categories = [];
+            
+            // Investment types
+            if (filters.investmentTypes.includes('swing')) {
+                categories.push({
+                    name: 'swing',
+                    trades: 25,
+                    avgPL: 500,
+                    totalPL: 12500,
+                    successRate: 68
+                });
+            }
+            if (filters.investmentTypes.includes('day')) {
+                categories.push({
+                    name: 'day',
+                    trades: 15,
+                    avgPL: 300,
+                    totalPL: 4500,
+                    successRate: 60
+                });
+            }
+            if (filters.investmentTypes.includes('long-term')) {
+                categories.push({
+                    name: 'long-term',
+                    trades: 10,
+                    avgPL: 800,
+                    totalPL: 8000,
+                    successRate: 80
+                });
+            }
+            
+            // Trading methods
+            if (filters.tradingMethods.includes('Moving Average')) {
+                categories.push({
+                    name: 'Moving Average',
+                    trades: 20,
+                    avgPL: 400,
+                    totalPL: 8000,
+                    successRate: 65
+                });
+            }
+            if (filters.tradingMethods.includes('RSI')) {
+                categories.push({
+                    name: 'RSI',
+                    trades: 15,
+                    avgPL: 350,
+                    totalPL: 5250,
+                    successRate: 67
+                });
+            }
+            if (filters.tradingMethods.includes('MACD')) {
+                categories.push({
+                    name: 'MACD',
+                    trades: 12,
+                    avgPL: 380,
+                    totalPL: 4560,
+                    successRate: 63
+                });
+            }
+            
+            // With/without plan
+            if (filters.withPlan) {
+                categories.push({
+                    name: 'עם תוכנית',
+                    trades: 30,
+                    avgPL: 600,
+                    totalPL: 18000,
+                    successRate: 70
+                });
+            }
+            if (filters.withoutPlan) {
+                categories.push({
+                    name: 'בלי תוכנית',
+                    trades: 20,
+                    avgPL: 250,
+                    totalPL: 5000,
+                    successRate: 55
+                });
+            }
+            
+            // Apply variations based on filters
+            const seed = JSON.stringify(filters).split('').reduce((a, b) => {
+                a = ((a << 5) - a) + b.charCodeAt(0);
+                return a & a;
+            }, 0);
+            
+            // Simple seeded random
+            let seedValue = seed;
+            function seededRandom() {
+                seedValue = (seedValue * 9301 + 49297) % 233280;
+                return seedValue / 233280;
+            }
+            
+            // Add variations
+            categories.forEach(cat => {
+                const variation = (seededRandom() - 0.5) * 0.2; // ±10%
+                cat.trades = Math.max(1, Math.round(cat.trades * (1 + variation)));
+                cat.avgPL = Math.round(cat.avgPL * (1 + variation));
+                cat.totalPL = cat.trades * cat.avgPL;
+                cat.successRate = Math.max(0, Math.min(100, Math.round(cat.successRate + (seededRandom() - 0.5) * 10)));
+            });
+            
+            return categories;
+        }
+        
+        // Generate mock P/L by category data for Bar Chart
+        function generateMockPLByCategoryData(filters) {
+            const tableData = generateMockComparisonTableData(filters);
+            const data = [];
+            
+            tableData.forEach((cat, index) => {
+                data.push({
+                    time: index.toString(),
+                    value: cat.totalPL
+                });
+            });
+            
+            return {
+                data,
+                categories: tableData.map(cat => cat.name)
+            };
+        }
+        
+        // Generate mock category distribution data for Pie Chart
+        function generateMockCategoryDistributionData(filters) {
+            const tableData = generateMockComparisonTableData(filters);
+            const totalTrades = tableData.reduce((sum, cat) => sum + cat.trades, 0);
+            
+            const data = [];
+            tableData.forEach((cat, index) => {
+                const percentage = totalTrades > 0 ? (cat.trades / totalTrades) * 100 : 0;
+                data.push({
+                    time: index.toString(),
+                    value: percentage
+                });
+            });
+            
+            return {
+                data,
+                categories: tableData.map(cat => cat.name),
+                totalTrades
+            };
+        }
+        
+        // Generate mock heatmap data
+        function generateMockHeatmapData(filters) {
+            const tableData = generateMockComparisonTableData(filters);
+            
+            // Calculate percentiles for coloring
+            const allPLValues = tableData.map(cat => cat.totalPL);
+            const allSuccessRates = tableData.map(cat => cat.successRate);
+            const allAvgPL = tableData.map(cat => cat.avgPL);
+            const allTrades = tableData.map(cat => cat.trades);
+            
+            const getPercentile = (value, arr) => {
+                const sorted = [...arr].sort((a, b) => a - b);
+                const index = sorted.findIndex(v => v >= value);
+                return index === -1 ? 1 : index / sorted.length;
+            };
+            
+            return tableData.map(cat => ({
+                category: cat.name,
+                totalPL: cat.totalPL,
+                successRate: cat.successRate,
+                avgPL: cat.avgPL,
+                trades: cat.trades,
+                plPercentile: getPercentile(cat.totalPL, allPLValues),
+                successPercentile: getPercentile(cat.successRate, allSuccessRates),
+                avgPLPercentile: getPercentile(cat.avgPL, allAvgPL),
+                tradesPercentile: getPercentile(cat.trades, allTrades)
+            }));
+        }
+        
+        // Format currency
+        function formatCurrency(value) {
+            if (value >= 1000) {
+                return `$${(value / 1000).toFixed(1)}K`;
+            }
+            return `$${value.toFixed(0)}`;
+        }
+        
+        // Get color class based on percentile
+        function getColorClass(percentile) {
+            if (percentile >= 0.7) return 'table-success';
+            if (percentile >= 0.3) return 'table-warning';
+            return 'table-danger';
+        }
+        
+        // Update comparison table with animation
+        function updateComparisonTable(filters) {
+            const data = generateMockComparisonTableData(filters);
+            const tbody = document.getElementById('comparison-table-body');
+            const summary = document.getElementById('comparison-table-summary');
+            
+            if (!tbody) return;
+            
+            // Fade out
+            tbody.style.opacity = '0';
+            tbody.style.transition = 'opacity 0.3s';
+            
+            setTimeout(() => {
+                tbody.innerHTML = data.map(cat => `
+                    <tr style="animation: fadeIn 0.3s;">
+                        <td><strong>${cat.name}</strong></td>
+                        <td>${cat.trades}</td>
+                        <td>${formatCurrency(cat.avgPL)}</td>
+                        <td class="text-success">${formatCurrency(cat.totalPL)}</td>
+                        <td>${cat.successRate}%</td>
+                    </tr>
+                `).join('');
+                
+                // Fade in
+                tbody.style.opacity = '1';
+            }, 150);
+            
+            // Update summary
+            const totalCategories = data.length;
+            const totalTrades = data.reduce((sum, cat) => sum + cat.trades, 0);
+            const totalPL = data.reduce((sum, cat) => sum + cat.totalPL, 0);
+            
+            if (summary) {
+                summary.style.transition = 'opacity 0.3s';
+                summary.style.opacity = '0';
+                setTimeout(() => {
+                    summary.innerHTML = `
+                        <strong>סיכום:</strong>
+                        סה"כ קטגוריות: ${totalCategories} |
+                        סה"כ טריידים: ${totalTrades} |
+                        P/L כולל: ${formatCurrency(totalPL)}
+                    `;
+                    summary.style.opacity = '1';
+                }, 150);
+            }
+        }
+        
+        // Update heatmap
+        function updateHeatmap(filters) {
+            const data = generateMockHeatmapData(filters);
+            const tbody = document.getElementById('heatmap-table-body');
+            
+            if (!tbody) return;
+            
+            tbody.innerHTML = data.map((item, index) => `
+                <tr class="heatmap-row" data-category="${item.category}" data-index="${index}" 
+                    onmouseover="showHeatmapTooltip(event, ${JSON.stringify(item).replace(/"/g, '&quot;')})"
+                    onmouseout="hideHeatmapTooltip()"
+                    onclick="filterByCategory('${item.category}')"
+                    style="cursor: pointer; transition: background-color 0.2s;">
+                    <td><strong>${item.category}</strong></td>
+                    <td class="${getColorClass(item.plPercentile)}" data-value="${item.totalPL}">${formatCurrency(item.totalPL)}</td>
+                    <td class="${getColorClass(item.successPercentile)}" data-value="${item.successRate}">${item.successRate}%</td>
+                    <td class="${getColorClass(item.avgPLPercentile)}" data-value="${item.avgPL}">${formatCurrency(item.avgPL)}</td>
+                    <td class="${getColorClass(item.tradesPercentile)}" data-value="${item.trades}">${item.trades}</td>
+                </tr>
+            `).join('');
+            
+            // Add hover effects
+            tbody.querySelectorAll('.heatmap-row').forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = '#f8f9fa';
+                });
+                row.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = '';
+                });
+            });
+        }
+        
+        // Show heatmap tooltip
+        function showHeatmapTooltip(event, item) {
+            // Remove existing tooltip
+            const existing = document.getElementById('heatmap-tooltip');
+            if (existing) existing.remove();
+            
+            // Create tooltip
+            const tooltip = document.createElement('div');
+            tooltip.id = 'heatmap-tooltip';
+            tooltip.style.cssText = `
+                position: absolute;
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 4px;
+                font-size: 0.85rem;
+                z-index: 1000;
+                pointer-events: none;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            `;
+            tooltip.innerHTML = `
+                <strong>${item.category}</strong><br>
+                P/L כולל: ${formatCurrency(item.totalPL)}<br>
+                אחוז הצלחה: ${item.successRate}%<br>
+                P/L ממוצע: ${formatCurrency(item.avgPL)}<br>
+                טריידים: ${item.trades}
+            `;
+            
+            document.body.appendChild(tooltip);
+            
+            // Position tooltip
+            const rect = event.target.getBoundingClientRect();
+            tooltip.style.left = (rect.left + rect.width / 2 - tooltip.offsetWidth / 2) + 'px';
+            tooltip.style.top = (rect.top - tooltip.offsetHeight - 10) + 'px';
+        }
+        
+        // Hide heatmap tooltip
+        function hideHeatmapTooltip() {
+            const tooltip = document.getElementById('heatmap-tooltip');
+            if (tooltip) tooltip.remove();
+        }
+        
+        // Filter by category
+        function filterByCategory(category) {
+            // This is a placeholder - in a real implementation, this would filter the data
+            console.log('Filtering by category:', category);
+            // For now, just show a notification
+            if (window.showNotification) {
+                window.showNotification(`מסנן לפי קטגוריה: ${category}`, 'info');
+            }
+        }
+        
+        // Initialize Bar Chart
+        async function initBarChart() {
+            try {
+                await waitForTradingViewAdapter();
+                
+                const container = document.getElementById('pl-by-category-chart-container');
+                if (!container) {
+                    console.error('Bar chart container not found');
+                    return;
+                }
+                
+                // Remove loading indicator
+                const loading = container.querySelector('.chart-loading');
+                if (loading) loading.remove();
+                
+                // Destroy existing chart if any
+                if (plByCategoryChart) {
+                    try {
+                        if (window.TradingViewChartAdapter && typeof window.TradingViewChartAdapter.destroyChart === 'function') {
+                            window.TradingViewChartAdapter.destroyChart(plByCategoryChart);
+                        } else {
+                            plByCategoryChart.remove();
+                        }
+                    } catch (e) {
+                        console.warn('Error removing existing bar chart:', e);
+                    }
+                }
+                
+                const filters = getFilterValues();
+                const chartData = generateMockPLByCategoryData(filters);
+                
+                // Create chart
+                plByCategoryChart = window.TradingViewChartAdapter.createChart(container, {
+                    layout: {
+                        background: { type: 'solid', color: 'transparent' },
+                        textColor: getCSSVariableValue('--text-color', '#333')
+                    },
+                    grid: {
+                        vertLines: { visible: false },
+                        horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
+                    },
+                    width: container.clientWidth,
+                    height: 300,
+                    timeScale: {
+                        visible: false
+                    },
+                    rightPriceScale: {
+                        borderVisible: true,
+                        borderColor: getCSSVariableValue('--border-color', '#e0e0e0')
+                    }
+                });
+                
+                // Add bar series (using histogram series if available, otherwise area series)
+                const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
+                if (lightweightCharts && lightweightCharts.HistogramSeries) {
+                    plByCategorySeries = plByCategoryChart.addSeries(lightweightCharts.HistogramSeries, {
+                        color: getCSSVariableValue('--primary-color', '#26baac'),
+                        priceFormat: {
+                            type: 'price',
+                            precision: 0,
+                            minMove: 1
+                        }
+                    });
+                    plByCategorySeries.setData(chartData.data);
+                } else {
+                    // Fallback to area series for bar-like visualization
+                    plByCategorySeries = window.TradingViewChartAdapter.addAreaSeries(plByCategoryChart, {
+                        lineColor: getCSSVariableValue('--primary-color', '#26baac'),
+                        topColor: getCSSVariableValue('--primary-color', '#26baac'),
+                        bottomColor: getCSSVariableValue('--primary-color', '#26baac') + '28',
+                        priceFormat: {
+                            type: 'price',
+                            precision: 0,
+                            minMove: 1
+                        }
+                    });
+                    plByCategorySeries.setData(chartData.data);
+                }
+                
+                plByCategoryChart.timeScale().fitContent();
+                console.log('✅ Bar chart initialized');
+                
+            } catch (error) {
+                console.error('Error initializing bar chart:', error);
+                const container = document.getElementById('pl-by-category-chart-container');
+                if (container) {
+                    const loading = container.querySelector('.chart-loading');
+                    if (loading) {
+                        loading.innerHTML = '<i class="bi bi-exclamation-triangle"></i> שגיאה בטעינת גרף';
+                        loading.style.color = '#dc3545';
+                    }
+                }
+            }
+        }
+        
+        // Initialize Pie Chart (using area chart as approximation)
+        async function initPieChart() {
+            try {
+                await waitForTradingViewAdapter();
+                
+                const container = document.getElementById('category-distribution-chart-container');
+                if (!container) {
+                    console.error('Pie chart container not found');
+                    return;
+                }
+                
+                // Remove loading indicator
+                const loading = container.querySelector('.chart-loading');
+                if (loading) loading.remove();
+                
+                // Destroy existing chart if any
+                if (categoryDistributionChart) {
+                    try {
+                        if (window.TradingViewChartAdapter && typeof window.TradingViewChartAdapter.destroyChart === 'function') {
+                            window.TradingViewChartAdapter.destroyChart(categoryDistributionChart);
+                        } else {
+                            categoryDistributionChart.remove();
+                        }
+                    } catch (e) {
+                        console.warn('Error removing existing pie chart:', e);
+                    }
+                }
+                
+                const filters = getFilterValues();
+                const chartData = generateMockCategoryDistributionData(filters);
+                
+                // Create chart
+                categoryDistributionChart = window.TradingViewChartAdapter.createChart(container, {
+                    layout: {
+                        background: { type: 'solid', color: 'transparent' },
+                        textColor: getCSSVariableValue('--text-color', '#333')
+                    },
+                    grid: {
+                        vertLines: { visible: false },
+                        horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
+                    },
+                    width: container.clientWidth,
+                    height: 300,
+                    timeScale: {
+                        visible: false
+                    },
+                    rightPriceScale: {
+                        borderVisible: true,
+                        borderColor: getCSSVariableValue('--border-color', '#e0e0e0'),
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    }
+                });
+                
+                // Add area series for pie-like visualization
+                const colors = ['#26baac', '#fc5a06', '#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1'];
+                chartData.categories.forEach((cat, index) => {
+                    const color = colors[index % colors.length];
+                    const series = window.TradingViewChartAdapter.addAreaSeries(categoryDistributionChart, {
+                        lineColor: color,
+                        topColor: color,
+                        bottomColor: color + '28',
+                        title: cat
+                    });
+                    series.setData([{
+                        time: '0',
+                        value: chartData.data[index]?.value || 0
+                    }]);
+                });
+                
+                categoryDistributionChart.timeScale().fitContent();
+                console.log('✅ Pie chart initialized');
+                
+            } catch (error) {
+                console.error('Error initializing pie chart:', error);
+                const container = document.getElementById('category-distribution-chart-container');
+                if (container) {
+                    const loading = container.querySelector('.chart-loading');
+                    if (loading) {
+                        loading.innerHTML = '<i class="bi bi-exclamation-triangle"></i> שגיאה בטעינת גרף';
+                        loading.style.color = '#dc3545';
+                    }
+                }
+            }
+        }
+        
+        // Update all visualizations
+        function updateAllVisualizations() {
+            const filters = getFilterValues();
+            
+            // Update table
+            updateComparisonTable(filters);
+            
+            // Update heatmap
+            updateHeatmap(filters);
+            
+            // Update charts
+            requestAnimationFrame(() => {
+                updateBarChart(filters);
+                updatePieChart(filters);
+            });
+        }
+        
+        // Update Bar Chart
+        function updateBarChart(filters) {
+            if (!plByCategoryChart || !plByCategorySeries) {
+                initBarChart();
+                return;
+            }
+            
+            try {
+                const chartData = generateMockPLByCategoryData(filters);
+                plByCategorySeries.setData(chartData.data);
+                plByCategoryChart.timeScale().fitContent();
+            } catch (error) {
+                console.error('Error updating bar chart:', error);
+            }
+        }
+        
+        // Update Pie Chart
+        function updatePieChart(filters) {
+            if (!categoryDistributionChart) {
+                initPieChart();
+                return;
+            }
+            
+            // For simplicity, reinitialize the chart
+            initPieChart();
+        }
+        
+        // Apply filters with visual feedback
+        function applyFilters() {
+            // Show loading state
+            const applyBtn = document.querySelector('button[onclick="applyFilters()"]');
+            if (applyBtn) {
+                const originalText = applyBtn.textContent;
+                applyBtn.disabled = true;
+                applyBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> מעבד...';
+                
+                setTimeout(() => {
+                    applyBtn.disabled = false;
+                    applyBtn.textContent = originalText;
+                }, 500);
+            }
+            
+            saveFilterState();
+            updateAllVisualizations();
+            
+            // Show success notification if available
+            if (window.showNotification) {
+                window.showNotification('הפילטרים הוחלו בהצלחה', 'success');
+            }
+        }
+        
+        // Reset filters
+        function resetFilters() {
+            // Reset to defaults
+            const investmentTypes = document.getElementById('investmentTypes');
+            if (investmentTypes) {
+                Array.from(investmentTypes.options).forEach(opt => {
+                    opt.selected = ['swing', 'day', 'long-term'].includes(opt.value);
+                });
+            }
+            
+            const tradingMethods = document.getElementById('tradingMethods');
+            if (tradingMethods) {
+                Array.from(tradingMethods.options).forEach(opt => {
+                    opt.selected = ['Moving Average', 'RSI'].includes(opt.value);
+                });
+            }
+            
+            if (document.getElementById('withPlan')) {
+                document.getElementById('withPlan').checked = true;
+            }
+            if (document.getElementById('withoutPlan')) {
+                document.getElementById('withoutPlan').checked = true;
+            }
+            if (document.getElementById('timeToEntry')) {
+                document.getElementById('timeToEntry').value = '';
+            }
+            
+            saveFilterState();
+            updateAllVisualizations();
+        }
+        
+        // Toggle section
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const body = section.querySelector('.section-body');
+                if (body) {
+                    body.style.display = body.style.display === 'none' ? 'block' : 'none';
+                    const icon = section.querySelector('.section-toggle-icon');
+                    if (icon) {
+                        icon.textContent = body.style.display === 'none' ? '▶' : '▼';
+                    }
+                }
+            }
+        }
+        
+        // Export functionality
+        function exportComparativeAnalysis() {
+            const filters = getFilterValues();
+            const tableData = generateMockComparisonTableData(filters);
+            
+            // Create CSV
+            let csv = 'קטגוריה,טריידים,P/L ממוצע,P/L כולל,אחוז הצלחה\n';
+            tableData.forEach(cat => {
+                csv += `${cat.name},${cat.trades},${cat.avgPL},${cat.totalPL},${cat.successRate}%\n`;
+            });
+            
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `comparative-analysis-${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (plByCategoryChart) {
+                const container = document.getElementById('pl-by-category-chart-container');
+                if (container) {
+                    plByCategoryChart.applyOptions({ width: container.clientWidth });
+                }
+            }
+            if (categoryDistributionChart) {
+                const container = document.getElementById('category-distribution-chart-container');
+                if (container) {
+                    categoryDistributionChart.applyOptions({ width: container.clientWidth });
+                }
+            }
+        });
+        
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', async () => {
             try {
+                // Initialize preferences
                 if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
                     await window.PreferencesCore.initializeWithLazyLoading();
                 }
+                
+                // Load saved filter state
+                loadFilterState();
+                
+                // Initialize charts
+                await Promise.all([
+                    initBarChart(),
+                    initPieChart()
+                ]);
+                
+                // Update all visualizations with initial filters
+                updateAllVisualizations();
+                
+                // Setup export button
+                const exportBtn = document.querySelector('button[data-button-type="EXPORT"]');
+                if (exportBtn) {
+                    exportBtn.addEventListener('click', exportComparativeAnalysis);
+                }
+                
+                console.log('✅ Comparative analysis page initialized');
+                
             } catch (error) {
-                console.warn('Preferences initialization failed (non-critical):', error);
+                console.error('Error initializing page:', error);
             }
         });
     </script>

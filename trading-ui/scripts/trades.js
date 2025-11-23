@@ -4151,7 +4151,8 @@ function generateDetailedLog() {
  * // Form with trade_plan_id
  * // Backend will snapshot planning fields from plan automatically
  */
-async function saveTrade() {
+// Define saveTrade directly on window to ensure it's available
+window.saveTrade = async function saveTrade() {
     window.Logger.debug('saveTrade called', { page: 'trades' });
     
     try {
@@ -4188,6 +4189,19 @@ async function saveTrade() {
             }
         }
         
+        // Map investment_type from lowercase (swing/investment/passive) to capitalized (Swing/Investment/Passive)
+        let investmentType = tradeData.type;
+        if (investmentType) {
+            const typeLower = String(investmentType).toLowerCase().trim();
+            if (typeLower === 'swing') {
+                investmentType = 'Swing';
+            } else if (typeLower === 'investment') {
+                investmentType = 'Investment';
+            } else if (typeLower === 'passive') {
+                investmentType = 'Passive';
+            }
+        }
+        
         // Calculate planned_amount from quantity and entry_price if not provided directly
         let plannedAmount = tradeData.planned_amount;
         if (!plannedAmount && tradeData.quantity && tradeData.entry_price) {
@@ -4200,7 +4214,7 @@ async function saveTrade() {
             ticker_id: tradeData.ticker_id,
             status: tradeData.status,
             side: tradeData.side,
-            investment_type: tradeData.type,
+            investment_type: investmentType, // Capitalized: 'Swing', 'Investment', 'Passive'
             // Planning fields (snapshot from form or from trade_plan)
             planned_quantity: tradeData.quantity ? parseFloat(tradeData.quantity) : null,
             planned_amount: plannedAmount ? parseFloat(plannedAmount) : null,
@@ -4259,16 +4273,32 @@ async function saveTrade() {
         }
         
         // Business Logic API validation - prepare data in format expected by validateTrade
+        // investmentType is already defined and mapped above (line 4192-4202), reuse it
+        
+        // Ensure price and quantity are available for validation
+        const entryPrice = tradeData.entry_price ? parseFloat(tradeData.entry_price) : null;
+        const quantity = tradeData.quantity ? parseFloat(tradeData.quantity) : null;
+        
+        // Backend validation requires 'price' and 'quantity' - these are required fields
+        if (!entryPrice || !quantity) {
+            window.showErrorNotification?.('שגיאת ולידציה', 'מחיר כניסה וכמות הם שדות חובה');
+            return;
+        }
+        
         const businessValidationData = {
             trading_account_id: tradeData.trading_account_id,
             ticker_id: tradeData.ticker_id,
             trade_plan_id: form.querySelector('#tradePlan')?.value ? parseInt(form.querySelector('#tradePlan').value) : null,
             side: tradeData.side,
-            investment_type: tradeData.type, // Map 'type' to 'investment_type'
+            investment_type: investmentType, // Capitalized: 'Swing', 'Investment', 'Passive'
             status: tradeData.status,
-            planned_quantity: tradeData.quantity ? parseFloat(tradeData.quantity) : null,
+            // Backend validation expects 'price' and 'quantity' - these are required
+            price: entryPrice,
+            quantity: quantity,
+            // Also include the original fields for completeness
+            planned_quantity: quantity,
             planned_amount: form.querySelector('#tradeAmount')?.value ? parseFloat(form.querySelector('#tradeAmount').value) : null,
-            entry_price: tradeData.entry_price ? parseFloat(tradeData.entry_price) : null,
+            entry_price: entryPrice,
             stop_price: tradeData.stop_loss ? parseFloat(tradeData.stop_loss) : null,
             target_price: tradeData.take_profit ? parseFloat(tradeData.take_profit) : null,
             stop_percentage: form.querySelector('#tradeStopLossPercent')?.value ? parseFloat(form.querySelector('#tradeStopLossPercent').value) : null,
@@ -4354,7 +4384,7 @@ async function saveTrade() {
     } catch (error) {
         CRUDResponseHandler.handleError(error, 'שמירת טרייד');
     }
-}
+};
 
 /**
  * מחיקת טרייד - alias ל-deleteTradeRecord
@@ -4483,10 +4513,16 @@ window.showEditTradeModal = function(tradeId) {
 };
 
 // Export functions to window for global access
-window.saveTrade = saveTrade;
-window.deleteTrade = deleteTrade;
-window.performTradeDeletion = performTradeDeletion;
-window.setupTradeConditionsButton = setupTradeConditionsButton;
+// saveTrade is already exported above as window.saveTrade (line 4155)
+if (typeof deleteTrade === 'function') {
+    window.deleteTrade = deleteTrade;
+}
+if (typeof performTradeDeletion === 'function') {
+    window.performTradeDeletion = performTradeDeletion;
+}
+if (typeof setupTradeConditionsButton === 'function') {
+    window.setupTradeConditionsButton = setupTradeConditionsButton;
+}
 
 /**
  * Register trades table with UnifiedTableSystem

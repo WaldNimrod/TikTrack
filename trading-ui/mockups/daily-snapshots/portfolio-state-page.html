@@ -2617,34 +2617,41 @@
             
             // Select distributed points across the entire period
             const selectDistributed = (candidates, numToSelect) => {
-                if (candidates.length <= numToSelect) {
-                    return candidates.map(p => p.index);
+                // Create a copy to avoid mutating the input array
+                const candidatesCopy = candidates.slice();
+                
+                if (candidatesCopy.length <= numToSelect) {
+                    return candidatesCopy.map(p => p.index);
                 }
                 
                 // Sort by index to ensure distribution
-                candidates.sort((a, b) => a.index - b.index);
+                candidatesCopy.sort((a, b) => a.index - b.index);
                 
                 // Select points distributed across the time range
                 const selected = [];
-                const step = Math.floor(candidates.length / numToSelect);
+                const step = Math.floor(candidatesCopy.length / numToSelect);
                 
-                for (let i = 0; i < candidates.length && selected.length < numToSelect; i += step) {
-                    selected.push(candidates[i].index);
+                for (let i = 0; i < candidatesCopy.length && selected.length < numToSelect; i += step) {
+                    selected.push(candidatesCopy[i].index);
                 }
                 
                 // Fill remaining slots with best candidates
-                while (selected.length < numToSelect && candidates.length > 0) {
-                    const best = candidates.reduce((best, current) => {
+                while (selected.length < numToSelect && candidatesCopy.length > 0) {
+                    const best = candidatesCopy.reduce((best, current) => {
                         // Choose point that's furthest from already selected points
                         const minDistance = selected.length === 0 ? Infinity : 
                             Math.min(...selected.map(s => Math.abs(current.index - s)));
                         const bestMinDistance = selected.length === 0 ? Infinity :
                             Math.min(...selected.map(s => Math.abs(best.index - s)));
                         return minDistance > bestMinDistance ? current : best;
-                    }, candidates[0]);
+                    }, candidatesCopy[0]);
                     
                     selected.push(best.index);
-                    candidates = candidates.filter(c => c.index !== best.index);
+                    // Remove selected candidate from copy (doesn't affect original)
+                    const indexToRemove = candidatesCopy.findIndex(c => c.index === best.index);
+                    if (indexToRemove !== -1) {
+                        candidatesCopy.splice(indexToRemove, 1);
+                    }
                 }
                 
                 return selected.sort((a, b) => a - b);
@@ -2748,34 +2755,41 @@
             
             // Select distributed points across the entire period
             const selectDistributed = (candidates, numToSelect) => {
-                if (candidates.length <= numToSelect) {
-                    return candidates.map(p => p.index);
+                // Create a copy to avoid mutating the input array
+                const candidatesCopy = candidates.slice();
+                
+                if (candidatesCopy.length <= numToSelect) {
+                    return candidatesCopy.map(p => p.index);
                 }
                 
                 // Sort by index to ensure distribution
-                candidates.sort((a, b) => a.index - b.index);
+                candidatesCopy.sort((a, b) => a.index - b.index);
                 
                 // Select points distributed across the time range
                 const selected = [];
-                const step = Math.floor(candidates.length / numToSelect);
+                const step = Math.floor(candidatesCopy.length / numToSelect);
                 
-                for (let i = 0; i < candidates.length && selected.length < numToSelect; i += step) {
-                    selected.push(candidates[i].index);
+                for (let i = 0; i < candidatesCopy.length && selected.length < numToSelect; i += step) {
+                    selected.push(candidatesCopy[i].index);
                 }
                 
                 // Fill remaining slots with best candidates
-                while (selected.length < numToSelect && candidates.length > 0) {
-                    const best = candidates.reduce((best, current) => {
+                while (selected.length < numToSelect && candidatesCopy.length > 0) {
+                    const best = candidatesCopy.reduce((best, current) => {
                         // Choose point that's furthest from already selected points
                         const minDistance = selected.length === 0 ? Infinity : 
                             Math.min(...selected.map(s => Math.abs(current.index - s)));
                         const bestMinDistance = selected.length === 0 ? Infinity :
                             Math.min(...selected.map(s => Math.abs(best.index - s)));
                         return minDistance > bestMinDistance ? current : best;
-                    }, candidates[0]);
+                    }, candidatesCopy[0]);
                     
                     selected.push(best.index);
-                    candidates = candidates.filter(c => c.index !== best.index);
+                    // Remove selected candidate from copy (doesn't affect original)
+                    const indexToRemove = candidatesCopy.findIndex(c => c.index === best.index);
+                    if (indexToRemove !== -1) {
+                        candidatesCopy.splice(indexToRemove, 1);
+                    }
                 }
                 
                 return selected.sort((a, b) => a - b);
@@ -2875,34 +2889,41 @@
             
             // Select distributed points across the entire period
             const selectDistributed = (candidates, numToSelect) => {
-                if (candidates.length <= numToSelect) {
-                    return candidates.map(p => p.index);
+                // Create a copy to avoid mutating the input array
+                const candidatesCopy = candidates.slice();
+                
+                if (candidatesCopy.length <= numToSelect) {
+                    return candidatesCopy.map(p => p.index);
                 }
                 
                 // Sort by index to ensure distribution
-                candidates.sort((a, b) => a.index - b.index);
+                candidatesCopy.sort((a, b) => a.index - b.index);
                 
                 // Select points distributed across the time range
                 const selected = [];
-                const step = Math.floor(candidates.length / numToSelect);
+                const step = Math.floor(candidatesCopy.length / numToSelect);
                 
-                for (let i = 0; i < candidates.length && selected.length < numToSelect; i += step) {
-                    selected.push(candidates[i].index);
+                for (let i = 0; i < candidatesCopy.length && selected.length < numToSelect; i += step) {
+                    selected.push(candidatesCopy[i].index);
                 }
                 
                 // Fill remaining slots with best candidates
-                while (selected.length < numToSelect && candidates.length > 0) {
-                    const best = candidates.reduce((best, current) => {
+                while (selected.length < numToSelect && candidatesCopy.length > 0) {
+                    const best = candidatesCopy.reduce((best, current) => {
                         // Choose point that's furthest from already selected points
                         const minDistance = selected.length === 0 ? Infinity : 
                             Math.min(...selected.map(s => Math.abs(current.index - s)));
                         const bestMinDistance = selected.length === 0 ? Infinity :
                             Math.min(...selected.map(s => Math.abs(best.index - s)));
                         return minDistance > bestMinDistance ? current : best;
-                    }, candidates[0]);
+                    }, candidatesCopy[0]);
                     
                     selected.push(best.index);
-                    candidates = candidates.filter(c => c.index !== best.index);
+                    // Remove selected candidate from copy (doesn't affect original)
+                    const indexToRemove = candidatesCopy.findIndex(c => c.index === best.index);
+                    if (indexToRemove !== -1) {
+                        candidatesCopy.splice(indexToRemove, 1);
+                    }
                 }
                 
                 return selected.sort((a, b) => a - b);

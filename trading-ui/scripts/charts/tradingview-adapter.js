@@ -248,6 +248,79 @@
         }
 
         /**
+         * Add histogram series to chart (for Volume)
+         * @function addHistogramSeries
+         * @param {Object} chart - Chart instance
+         * @param {Object} options - Series options
+         * @returns {Object} Series instance
+         */
+        addHistogramSeries(chart, options = {}) {
+            if (!chart) {
+                throw new Error('Chart instance required');
+            }
+            
+            if (typeof chart.addSeries !== 'function') {
+                throw new Error('Chart does not have addSeries method');
+            }
+
+            const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
+            if (!lightweightCharts || !lightweightCharts.HistogramSeries) {
+                throw new Error('TradingView Lightweight Charts HistogramSeries not available');
+            }
+
+            const colors = window.TradingViewTheme 
+                ? window.TradingViewTheme.getChartColors() 
+                : { primary: '#26baac' };
+
+            const seriesOptions = {
+                color: options.color || colors.primary,
+                priceFormat: options.priceFormat || {
+                    type: 'volume',
+                    precision: 0,
+                    minMove: 1
+                },
+                priceScaleId: options.priceScaleId || 'right',
+                ...options,
+            };
+
+            return chart.addSeries(lightweightCharts.HistogramSeries, seriesOptions);
+        }
+
+        /**
+         * Add bar series to chart
+         * @function addBarSeries
+         * @param {Object} chart - Chart instance
+         * @param {Object} options - Series options
+         * @returns {Object} Series instance
+         */
+        addBarSeries(chart, options = {}) {
+            if (!chart) {
+                throw new Error('Chart instance required');
+            }
+            
+            if (typeof chart.addSeries !== 'function') {
+                throw new Error('Chart does not have addSeries method');
+            }
+
+            const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
+            if (!lightweightCharts || !lightweightCharts.BarSeries) {
+                throw new Error('TradingView Lightweight Charts BarSeries not available');
+            }
+
+            const colors = window.TradingViewTheme 
+                ? window.TradingViewTheme.getChartColors() 
+                : { success: '#28a745', danger: '#dc3545' };
+
+            const seriesOptions = {
+                upColor: options.upColor || colors.success,
+                downColor: options.downColor || colors.danger,
+                ...options,
+            };
+
+            return chart.addSeries(lightweightCharts.BarSeries, seriesOptions);
+        }
+
+        /**
          * Update series data
          * @function updateData
          * @param {Object} series - Series instance
@@ -323,6 +396,124 @@
          */
         getAllCharts() {
             return Array.from(this.charts.values());
+        }
+
+        /**
+         * Take screenshot of chart
+         * @function takeScreenshot
+         * @param {Object} chart - Chart instance
+         * @returns {Promise<string>} Base64 image data URL
+         */
+        async takeScreenshot(chart) {
+            if (!chart) {
+                throw new Error('Chart instance required');
+            }
+
+            if (typeof chart.takeScreenshot !== 'function') {
+                throw new Error('Chart does not have takeScreenshot method');
+            }
+
+            try {
+                return await chart.takeScreenshot();
+            } catch (error) {
+                console.error('Error taking screenshot:', error);
+                throw error;
+            }
+        }
+
+        /**
+         * Set visible time range
+         * @function setVisibleRange
+         * @param {Object} chart - Chart instance
+         * @param {Object} range - Time range {from, to} (Unix timestamps)
+         * @returns {void}
+         */
+        setVisibleRange(chart, range) {
+            if (!chart) {
+                throw new Error('Chart instance required');
+            }
+
+            if (!chart.timeScale || typeof chart.timeScale().setVisibleRange !== 'function') {
+                throw new Error('Chart does not have timeScale.setVisibleRange method');
+            }
+
+            try {
+                chart.timeScale().setVisibleRange(range);
+            } catch (error) {
+                console.error('Error setting visible range:', error);
+                throw error;
+            }
+        }
+
+        /**
+         * Reset time scale (zoom reset)
+         * @function resetTimeScale
+         * @param {Object} chart - Chart instance
+         * @returns {void}
+         */
+        resetTimeScale(chart) {
+            if (!chart) {
+                throw new Error('Chart instance required');
+            }
+
+            if (!chart.timeScale || typeof chart.timeScale().resetTimeScale !== 'function') {
+                throw new Error('Chart does not have timeScale.resetTimeScale method');
+            }
+
+            try {
+                chart.timeScale().resetTimeScale();
+            } catch (error) {
+                console.error('Error resetting time scale:', error);
+                throw error;
+            }
+        }
+
+        /**
+         * Scroll to position
+         * @function scrollToPosition
+         * @param {Object} chart - Chart instance
+         * @param {number} position - Scroll position (0-1)
+         * @param {boolean} animated - Animate scroll
+         * @returns {void}
+         */
+        scrollToPosition(chart, position, animated = true) {
+            if (!chart) {
+                throw new Error('Chart instance required');
+            }
+
+            if (!chart.timeScale || typeof chart.timeScale().scrollToPosition !== 'function') {
+                throw new Error('Chart does not have timeScale.scrollToPosition method');
+            }
+
+            try {
+                chart.timeScale().scrollToPosition(position, animated);
+            } catch (error) {
+                console.error('Error scrolling to position:', error);
+                throw error;
+            }
+        }
+
+        /**
+         * Get visible range
+         * @function getVisibleRange
+         * @param {Object} chart - Chart instance
+         * @returns {Object|null} Visible range {from, to} or null
+         */
+        getVisibleRange(chart) {
+            if (!chart) {
+                throw new Error('Chart instance required');
+            }
+
+            if (!chart.timeScale || typeof chart.timeScale().getVisibleRange !== 'function') {
+                throw new Error('Chart does not have timeScale.getVisibleRange method');
+            }
+
+            try {
+                return chart.timeScale().getVisibleRange();
+            } catch (error) {
+                console.error('Error getting visible range:', error);
+                return null;
+            }
         }
     }
 

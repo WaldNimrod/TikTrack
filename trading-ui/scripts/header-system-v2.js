@@ -212,7 +212,7 @@ class FilterManager {
     this.updateStatusFilterText();
     this.saveFilters();
     this.applyFilters();
-    // Don't close filter menu for multiselect - only close on mouse leave
+    this.closeFilter('statusFilterMenu');
   }
 
   selectTypeOption(type) {
@@ -242,7 +242,7 @@ class FilterManager {
     this.updateTypeFilterText();
     this.saveFilters();
     this.applyFilters();
-    // Don't close filter menu for multiselect - only close on mouse leave
+    this.closeFilter('typeFilterMenu');
   }
 
   selectAccountOption(accountId) {
@@ -272,7 +272,7 @@ class FilterManager {
     this.updateAccountFilterText();
     this.saveFilters();
     this.applyFilters();
-    // Don't close filter menu for multiselect - only close on mouse leave
+    this.closeFilter('accountFilterMenu');
   }
 
   selectDateRangeOption(dateRange) {
@@ -736,7 +736,7 @@ class HeaderSystem {
     window.Logger?.info?.('🔧 HeaderSystem.init() called', { page: 'header-system' });
 
     try {
-      HeaderSystem.createHeader();
+      this.createHeader();
       this.setupEventListeners();
       this.menuManager.init();
       this.filterManager.init();
@@ -937,7 +937,6 @@ class HeaderSystem {
                   <div class="status-filter-item" data-value="מבוטל">
                     <span class="option-text">מבוטל</span>
                   </div>
-                  <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter('statusFilterMenu')" title="סגור">×</button>
                 </div>
               </div>
             </div>
@@ -961,7 +960,6 @@ class HeaderSystem {
                   <div class="type-filter-item" data-value="פסיבי">
                     <span class="option-text">פסיבי</span>
                   </div>
-                  <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter('typeFilterMenu')" title="סגור">×</button>
                 </div>
               </div>
             </div>
@@ -976,7 +974,6 @@ class HeaderSystem {
                   <div class="account-filter-item" data-value="הכול">
                     <span class="option-text">הכול</span>
                   </div>
-                  <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter('accountFilterMenu')" title="סגור">×</button>
                 </div>
               </div>
             </div>
@@ -1024,7 +1021,6 @@ class HeaderSystem {
                   <div class="date-range-filter-item" data-value="שנה קודמת">
                     <span class="option-text">שנה שעברה</span>
                   </div>
-                  <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter('dateRangeFilterMenu')" title="סגור">×</button>
                 </div>
               </div>
             </div>

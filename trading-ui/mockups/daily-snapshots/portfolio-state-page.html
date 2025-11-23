@@ -2553,11 +2553,7 @@
             }, 50000);
             
             const startValue = baseValue;
-            
-            // Track multiple extreme points (3-5 min and max points)
-            const minPoints = []; // Array of {index, value}
-            const maxPoints = []; // Array of {index, value}
-            const numExtremePoints = Math.min(5, Math.max(3, Math.floor(days / 20))); // 3-5 points based on period length
+            const values = []; // Store all values first to find local extremes
             
             for (let i = days; i >= 0; i--) {
                 const date = new Date();
@@ -2565,28 +2561,10 @@
                 const value = startValue + (days - i) * 50 + Math.random() * 1000;
                 const roundedValue = Math.round(value);
                 
-                const currentIndex = data.length;
-                
-                // Track multiple min points
-                if (minPoints.length < numExtremePoints) {
-                    minPoints.push({index: currentIndex, value: roundedValue});
-                    minPoints.sort((a, b) => a.value - b.value); // Sort ascending
-                } else if (roundedValue < minPoints[minPoints.length - 1].value) {
-                    minPoints[minPoints.length - 1] = {index: currentIndex, value: roundedValue};
-                    minPoints.sort((a, b) => a.value - b.value);
-                }
-                
-                // Track multiple max points
-                if (maxPoints.length < numExtremePoints) {
-                    maxPoints.push({index: currentIndex, value: roundedValue});
-                    maxPoints.sort((a, b) => b.value - a.value); // Sort descending
-                } else if (roundedValue > maxPoints[maxPoints.length - 1].value) {
-                    maxPoints[maxPoints.length - 1] = {index: currentIndex, value: roundedValue};
-                    maxPoints.sort((a, b) => b.value - a.value);
-                }
-                
                 // Calculate percentage change from start
                 const percentChange = ((roundedValue - startValue) / startValue) * 100;
+                
+                values.push(roundedValue);
                 
                 data.push({
                     time: date.toISOString().split('T')[0],
@@ -2599,11 +2577,84 @@
                 });
             }
             
+            // Find local minima and maxima distributed across the entire period
+            const windowSize = Math.max(3, Math.floor(days / 10)); // Window size for local extremes
+            const numPoints = Math.min(5, Math.max(3, Math.floor(days / 15))); // 3-5 points based on period length
+            
+            const localMinima = [];
+            const localMaxima = [];
+            
+            // Find local extremes
+            for (let i = windowSize; i < values.length - windowSize; i++) {
+                const currentValue = values[i];
+                
+                // Check if it's a local minimum (lower than neighbors)
+                let isLocalMin = true;
+                for (let j = i - windowSize; j <= i + windowSize; j++) {
+                    if (j !== i && values[j] <= currentValue) {
+                        isLocalMin = false;
+                        break;
+                    }
+                }
+                
+                if (isLocalMin) {
+                    localMinima.push({index: i, value: currentValue});
+                }
+                
+                // Check if it's a local maximum (higher than neighbors)
+                let isLocalMax = true;
+                for (let j = i - windowSize; j <= i + windowSize; j++) {
+                    if (j !== i && values[j] >= currentValue) {
+                        isLocalMax = false;
+                        break;
+                    }
+                }
+                
+                if (isLocalMax) {
+                    localMaxima.push({index: i, value: currentValue});
+                }
+            }
+            
+            // Select distributed points across the entire period
+            const selectDistributed = (candidates, numToSelect) => {
+                if (candidates.length <= numToSelect) {
+                    return candidates.map(p => p.index);
+                }
+                
+                // Sort by index to ensure distribution
+                candidates.sort((a, b) => a.index - b.index);
+                
+                // Select points distributed across the time range
+                const selected = [];
+                const step = Math.floor(candidates.length / numToSelect);
+                
+                for (let i = 0; i < candidates.length && selected.length < numToSelect; i += step) {
+                    selected.push(candidates[i].index);
+                }
+                
+                // Fill remaining slots with best candidates
+                while (selected.length < numToSelect && candidates.length > 0) {
+                    const best = candidates.reduce((best, current) => {
+                        // Choose point that's furthest from already selected points
+                        const minDistance = selected.length === 0 ? Infinity : 
+                            Math.min(...selected.map(s => Math.abs(current.index - s)));
+                        const bestMinDistance = selected.length === 0 ? Infinity :
+                            Math.min(...selected.map(s => Math.abs(best.index - s)));
+                        return minDistance > bestMinDistance ? current : best;
+                    }, candidates[0]);
+                    
+                    selected.push(best.index);
+                    candidates = candidates.filter(c => c.index !== best.index);
+                }
+                
+                return selected.sort((a, b) => a - b);
+            };
+            
             return {
                 values: data,
                 percentages: dataPercent,
-                minIndices: minPoints.map(p => p.index),
-                maxIndices: maxPoints.map(p => p.index),
+                minIndices: selectDistributed(localMinima, numPoints),
+                maxIndices: selectDistributed(localMaxima, numPoints),
                 startValue: startValue
             };
         }
@@ -2622,16 +2673,11 @@
             
             const startValue = baseValue;
             
-            // Track multiple extreme points (3-5 min and max points)
-            const minPoints = []; // Array of {index, value}
-            const maxPoints = []; // Array of {index, value}
-            const numExtremePoints = Math.min(5, Math.max(3, Math.floor(days / 20))); // 3-5 points based on period length
-            
             // Mock cumulative deposits/withdrawals over time
             // In real implementation, this should come from account transactions API
             const totalDeposits = days * 20; // Mock: cumulative deposits over period
             const totalWithdrawals = days * 5; // Mock: cumulative withdrawals over period
-            const netCashFlow = totalDeposits - totalWithdrawals;
+            const values = []; // Store all values first to find local extremes
             
             for (let i = days; i >= 0; i--) {
                 const date = new Date();
@@ -2654,25 +2700,7 @@
                 const performanceValue = roundedTotalValue - cumulativeNetCashFlow;
                 const performancePercent = ((performanceValue - startValue) / startValue) * 100;
                 
-                const currentIndex = data.length;
-                
-                // Track multiple min points
-                if (minPoints.length < numExtremePoints) {
-                    minPoints.push({index: currentIndex, value: performancePercent});
-                    minPoints.sort((a, b) => a.value - b.value); // Sort ascending
-                } else if (performancePercent < minPoints[minPoints.length - 1].value) {
-                    minPoints[minPoints.length - 1] = {index: currentIndex, value: performancePercent};
-                    minPoints.sort((a, b) => a.value - b.value);
-                }
-                
-                // Track multiple max points
-                if (maxPoints.length < numExtremePoints) {
-                    maxPoints.push({index: currentIndex, value: performancePercent});
-                    maxPoints.sort((a, b) => b.value - a.value); // Sort descending
-                } else if (performancePercent > maxPoints[maxPoints.length - 1].value) {
-                    maxPoints[maxPoints.length - 1] = {index: currentIndex, value: performancePercent};
-                    maxPoints.sort((a, b) => b.value - a.value);
-                }
+                values.push(performancePercent);
                 
                 data.push({
                     time: date.toISOString().split('T')[0],
@@ -2680,10 +2708,83 @@
                 });
             }
             
+            // Find local minima and maxima distributed across the entire period
+            const windowSize = Math.max(3, Math.floor(days / 10)); // Window size for local extremes
+            const numPoints = Math.min(5, Math.max(3, Math.floor(days / 15))); // 3-5 points based on period length
+            
+            const localMinima = [];
+            const localMaxima = [];
+            
+            // Find local extremes
+            for (let i = windowSize; i < values.length - windowSize; i++) {
+                const currentValue = values[i];
+                
+                // Check if it's a local minimum (lower than neighbors)
+                let isLocalMin = true;
+                for (let j = i - windowSize; j <= i + windowSize; j++) {
+                    if (j !== i && values[j] <= currentValue) {
+                        isLocalMin = false;
+                        break;
+                    }
+                }
+                
+                if (isLocalMin) {
+                    localMinima.push({index: i, value: currentValue});
+                }
+                
+                // Check if it's a local maximum (higher than neighbors)
+                let isLocalMax = true;
+                for (let j = i - windowSize; j <= i + windowSize; j++) {
+                    if (j !== i && values[j] >= currentValue) {
+                        isLocalMax = false;
+                        break;
+                    }
+                }
+                
+                if (isLocalMax) {
+                    localMaxima.push({index: i, value: currentValue});
+                }
+            }
+            
+            // Select distributed points across the entire period
+            const selectDistributed = (candidates, numToSelect) => {
+                if (candidates.length <= numToSelect) {
+                    return candidates.map(p => p.index);
+                }
+                
+                // Sort by index to ensure distribution
+                candidates.sort((a, b) => a.index - b.index);
+                
+                // Select points distributed across the time range
+                const selected = [];
+                const step = Math.floor(candidates.length / numToSelect);
+                
+                for (let i = 0; i < candidates.length && selected.length < numToSelect; i += step) {
+                    selected.push(candidates[i].index);
+                }
+                
+                // Fill remaining slots with best candidates
+                while (selected.length < numToSelect && candidates.length > 0) {
+                    const best = candidates.reduce((best, current) => {
+                        // Choose point that's furthest from already selected points
+                        const minDistance = selected.length === 0 ? Infinity : 
+                            Math.min(...selected.map(s => Math.abs(current.index - s)));
+                        const bestMinDistance = selected.length === 0 ? Infinity :
+                            Math.min(...selected.map(s => Math.abs(best.index - s)));
+                        return minDistance > bestMinDistance ? current : best;
+                    }, candidates[0]);
+                    
+                    selected.push(best.index);
+                    candidates = candidates.filter(c => c.index !== best.index);
+                }
+                
+                return selected.sort((a, b) => a - b);
+            };
+            
             return {
                 performance: data,
-                minIndices: minPoints.map(p => p.index),
-                maxIndices: maxPoints.map(p => p.index),
+                minIndices: selectDistributed(localMinima, numPoints),
+                maxIndices: selectDistributed(localMaxima, numPoints),
                 startValue: startValue
             };
         }
@@ -2703,10 +2804,7 @@
             const baseRealizedPL = 10000; // Mock - should come from closed trades
             const baseTotalPL = baseRealizedPL + baseUnrealizedPL;
             
-            // Track multiple extreme points (3-5 min and max points)
-            const minPoints = []; // Array of {index, value}
-            const maxPoints = []; // Array of {index, value}
-            const numExtremePoints = Math.min(5, Math.max(3, Math.floor(days / 20))); // 3-5 points based on period length
+            const totalValues = []; // Store all total values first to find local extremes
             
             for (let i = days; i >= 0; i--) {
                 const date = new Date();
@@ -2719,25 +2817,7 @@
                 const roundedUnrealized = Math.round(unrealizedValue);
                 const roundedTotal = Math.round(totalValue);
                 
-                const currentIndex = total.length;
-                
-                // Track multiple min points for total PL
-                if (minPoints.length < numExtremePoints) {
-                    minPoints.push({index: currentIndex, value: roundedTotal});
-                    minPoints.sort((a, b) => a.value - b.value); // Sort ascending
-                } else if (roundedTotal < minPoints[minPoints.length - 1].value) {
-                    minPoints[minPoints.length - 1] = {index: currentIndex, value: roundedTotal};
-                    minPoints.sort((a, b) => a.value - b.value);
-                }
-                
-                // Track multiple max points for total PL
-                if (maxPoints.length < numExtremePoints) {
-                    maxPoints.push({index: currentIndex, value: roundedTotal});
-                    maxPoints.sort((a, b) => b.value - a.value); // Sort descending
-                } else if (roundedTotal > maxPoints[maxPoints.length - 1].value) {
-                    maxPoints[maxPoints.length - 1] = {index: currentIndex, value: roundedTotal};
-                    maxPoints.sort((a, b) => b.value - a.value);
-                }
+                totalValues.push(roundedTotal);
                 
                 // Calculate percentages
                 const realizedPercentValue = baseRealizedPL > 0 ? ((roundedRealized - baseRealizedPL) / baseRealizedPL) * 100 : 0;
@@ -2755,11 +2835,84 @@
                 totalPercent.push({ time: timeStr, value: totalPercentValue });
             }
             
+            // Find local minima and maxima distributed across the entire period
+            const windowSize = Math.max(3, Math.floor(days / 10)); // Window size for local extremes
+            const numPoints = Math.min(5, Math.max(3, Math.floor(days / 15))); // 3-5 points based on period length
+            
+            const localMinima = [];
+            const localMaxima = [];
+            
+            // Find local extremes
+            for (let i = windowSize; i < totalValues.length - windowSize; i++) {
+                const currentValue = totalValues[i];
+                
+                // Check if it's a local minimum (lower than neighbors)
+                let isLocalMin = true;
+                for (let j = i - windowSize; j <= i + windowSize; j++) {
+                    if (j !== i && totalValues[j] <= currentValue) {
+                        isLocalMin = false;
+                        break;
+                    }
+                }
+                
+                if (isLocalMin) {
+                    localMinima.push({index: i, value: currentValue});
+                }
+                
+                // Check if it's a local maximum (higher than neighbors)
+                let isLocalMax = true;
+                for (let j = i - windowSize; j <= i + windowSize; j++) {
+                    if (j !== i && totalValues[j] >= currentValue) {
+                        isLocalMax = false;
+                        break;
+                    }
+                }
+                
+                if (isLocalMax) {
+                    localMaxima.push({index: i, value: currentValue});
+                }
+            }
+            
+            // Select distributed points across the entire period
+            const selectDistributed = (candidates, numToSelect) => {
+                if (candidates.length <= numToSelect) {
+                    return candidates.map(p => p.index);
+                }
+                
+                // Sort by index to ensure distribution
+                candidates.sort((a, b) => a.index - b.index);
+                
+                // Select points distributed across the time range
+                const selected = [];
+                const step = Math.floor(candidates.length / numToSelect);
+                
+                for (let i = 0; i < candidates.length && selected.length < numToSelect; i += step) {
+                    selected.push(candidates[i].index);
+                }
+                
+                // Fill remaining slots with best candidates
+                while (selected.length < numToSelect && candidates.length > 0) {
+                    const best = candidates.reduce((best, current) => {
+                        // Choose point that's furthest from already selected points
+                        const minDistance = selected.length === 0 ? Infinity : 
+                            Math.min(...selected.map(s => Math.abs(current.index - s)));
+                        const bestMinDistance = selected.length === 0 ? Infinity :
+                            Math.min(...selected.map(s => Math.abs(best.index - s)));
+                        return minDistance > bestMinDistance ? current : best;
+                    }, candidates[0]);
+                    
+                    selected.push(best.index);
+                    candidates = candidates.filter(c => c.index !== best.index);
+                }
+                
+                return selected.sort((a, b) => a - b);
+            };
+            
             return { 
                 realized, unrealized, total,
                 realizedPercent, unrealizedPercent, totalPercent,
-                minIndices: minPoints.map(p => p.index),
-                maxIndices: maxPoints.map(p => p.index),
+                minIndices: selectDistributed(localMinima, numPoints),
+                maxIndices: selectDistributed(localMaxima, numPoints),
                 baseRealizedPL, baseUnrealizedPL, baseTotalPL
             };
         }

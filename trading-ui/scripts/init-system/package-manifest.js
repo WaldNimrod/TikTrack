@@ -1194,6 +1194,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 1
       },
       {
+        file: 'utils/request-deduplication-helper.js',
+        globalCheck: 'window.RequestDeduplicationHelper',
+        description: 'עזר ל-Request Deduplication',
+        required: false,
+        loadOrder: 2
+      },
+      {
         file: 'currencies.js',
         globalCheck: 'window.openCurrencyDetails',
         description: 'מערכת מטבעות',

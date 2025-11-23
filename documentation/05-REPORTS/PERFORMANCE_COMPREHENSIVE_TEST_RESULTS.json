@@ -1,0 +1,306 @@
+{
+  "timestamp": "2025-11-23 22:17:08",
+  "response_time": {
+    "/api/business/trade/calculate-stop-price": {
+      "endpoint": "/api/business/trade/calculate-stop-price",
+      "iterations": 10,
+      "errors": 0,
+      "success_rate": 100.0,
+      "min": 4.268884658813477,
+      "max": 14.35708999633789,
+      "avg": 6.3369035720825195,
+      "median": 5.644559860229492,
+      "p95": 14.35708999633789,
+      "p99": 14.35708999633789
+    },
+    "/api/business/trade/calculate-target-price": {
+      "endpoint": "/api/business/trade/calculate-target-price",
+      "iterations": 10,
+      "errors": 0,
+      "success_rate": 100.0,
+      "min": 3.8306713104248047,
+      "max": 6.253957748413086,
+      "avg": 4.481720924377441,
+      "median": 4.357457160949707,
+      "p95": 6.253957748413086,
+      "p99": 6.253957748413086
+    },
+    "/api/business/trade/calculate-percentage-from-price": {
+      "endpoint": "/api/business/trade/calculate-percentage-from-price",
+      "iterations": 10,
+      "errors": 0,
+      "success_rate": 100.0,
+      "min": 3.380298614501953,
+      "max": 4.124879837036133,
+      "avg": 3.728008270263672,
+      "median": 3.7140846252441406,
+      "p95": 4.124879837036133,
+      "p99": 4.124879837036133
+    },
+    "/api/business/trade/calculate-investment": {
+      "endpoint": "/api/business/trade/calculate-investment",
+      "iterations": 10,
+      "errors": 0,
+      "success_rate": 100.0,
+      "min": 3.429889678955078,
+      "max": 3.844022750854492,
+      "avg": 3.5645008087158203,
+      "median": 3.5294294357299805,
+      "p95": 3.844022750854492,
+      "p99": 3.844022750854492
+    },
+    "/api/business/trade/validate-trade": {
+      "endpoint": "/api/business/trade/validate-trade",
+      "iterations": 10,
+      "errors": 10,
+      "success_rate": 0.0,
+      "min": 3.676176071166992,
+      "max": 4.672050476074219,
+      "avg": 4.106593132019043,
+      "median": 4.146575927734375,
+      "p95": 4.672050476074219,
+      "p99": 4.672050476074219
+    },
+    "/api/business/execution/calculate-execution-values": {
+      "endpoint": "/api/business/execution/calculate-execution-values",
+      "iterations": 10,
+      "errors": 10,
+      "success_rate": 0.0,
+      "min": 3.443002700805664,
+      "max": 3.9076805114746094,
+      "avg": 3.754901885986328,
+      "median": 3.781437873840332,
+      "p95": 3.9076805114746094,
+      "p99": 3.9076805114746094
+    },
+    "/api/business/execution/calculate-average-price": {
+      "endpoint": "/api/business/execution/calculate-average-price",
+      "iterations": 10,
+      "errors": 0,
+      "success_rate": 100.0,
+      "min": 3.203153610229492,
+      "max": 3.6363601684570312,
+      "avg": 3.4751176834106445,
+      "median": 3.466367721557617,
+      "p95": 3.6363601684570312,
+      "p99": 3.6363601684570312
+    },
+    "/api/business/execution/validate-execution": {
+      "endpoint": "/api/business/execution/validate-execution",
+      "iterations": 10,
+      "errors": 10,
+      "success_rate": 0.0,
+      "min": 3.604888916015625,
+      "max": 4.410028457641602,
+      "avg": 3.9127588272094727,
+      "median": 3.8900375366210938,
+      "p95": 4.410028457641602,
+      "p99": 4.410028457641602
+    },
+    "/api/business/alert/validate-alert": {
+      "endpoint": "/api/business/alert/validate-alert",
+      "iterations": 10,
+      "errors": 10,
+      "success_rate": 0.0,
+      "min": 3.584146499633789,
+      "max": 4.359960556030273,
+      "avg": 3.8572311401367188,
+      "median": 3.8164854049682617,
+      "p95": 4.359960556030273,
+      "p99": 4.359960556030273
+    },
+    "/api/business/alert/validate-condition-value": {
+      "endpoint": "/api/business/alert/validate-condition-value",
+      "iterations": 10,
+      "errors": 0,
+      "success_rate": 100.0,
+      "min": 3.2320022583007812,
+      "max": 3.5262107849121094,
+      "avg": 3.382539749145508,
+      "median": 3.411531448364258,
+      "p95": 3.5262107849121094,
+      "p99": 3.5262107849121094
+    },
+    "/api/business/statistics/calculate-sum": {
+      "endpoint": "/api/business/statistics/calculate-sum",
+      "iterations": 10,
+      "errors": 10,
+      "success_rate": 0.0,
+      "min": 3.4689903259277344,
+      "max": 4.079103469848633,
+      "avg": 3.7845373153686523,
+      "median": 3.800511360168457,
+      "p95": 4.079103469848633,
+      "p99": 4.079103469848633
+    },
+    "/api/business/statistics/calculate-average": {
+      "endpoint": "/api/business/statistics/calculate-average",
+      "iterations": 10,
+      "errors": 10,
+      "success_rate": 0.0,
+      "min": 3.4530162811279297,
+      "max": 3.910064697265625,
+      "avg": 3.6901235580444336,
+      "median": 3.6748647689819336,
+      "p95": 3.910064697265625,
+      "p99": 3.910064697265625
+    },
+    "/api/business/statistics/count-records": {
+      "endpoint": "/api/business/statistics/count-records",
+      "iterations": 10,
+      "errors": 10,
+      "success_rate": 0.0,
+      "min": 3.5619735717773438,
+      "max": 3.866910934448242,
+      "avg": 3.734707832336426,
+      "median": 3.7539005279541016,
+      "p95": 3.866910934448242,
+      "p99": 3.866910934448242
+    },
+    "/api/business/cash-flow/calculate-account-balance": {
+      "endpoint": "/api/business/cash-flow/calculate-account-balance",
+      "iterations": 10,
+      "errors": 10,
+      "success_rate": 0.0,
+      "min": 3.608226776123047,
+      "max": 4.03594970703125,
+      "avg": 3.778815269470215,
+      "median": 3.7697553634643555,
+      "p95": 4.03594970703125,
+      "p99": 4.03594970703125
+    },
+    "/api/business/cash-flow/validate-cash-flow": {
+      "endpoint": "/api/business/cash-flow/validate-cash-flow",
+      "iterations": 10,
+      "errors": 10,
+      "success_rate": 0.0,
+      "min": 3.2868385314941406,
+      "max": 3.932952880859375,
+      "avg": 3.532290458679199,
+      "median": 3.54766845703125,
+      "p95": 3.932952880859375,
+      "p99": 3.932952880859375
+    },
+    "/api/business/note/validate-note": {
+      "endpoint": "/api/business/note/validate-note",
+      "iterations": 10,
+      "errors": 10,
+      "success_rate": 0.0,
+      "min": 3.63922119140625,
+      "max": 4.097700119018555,
+      "avg": 3.786325454711914,
+      "median": 3.7376880645751953,
+      "p95": 4.097700119018555,
+      "p99": 4.097700119018555
+    },
+    "/api/business/trading-account/validate-trading-account": {
+      "endpoint": "/api/business/trading-account/validate-trading-account",
+      "iterations": 10,
+      "errors": 10,
+      "success_rate": 0.0,
+      "min": 3.7131309509277344,
+      "max": 4.862070083618164,
+      "avg": 4.151630401611328,
+      "median": 4.024028778076172,
+      "p95": 4.862070083618164,
+      "p99": 4.862070083618164
+    },
+    "/api/business/trade-plan/validate-trade-plan": {
+      "endpoint": "/api/business/trade-plan/validate-trade-plan",
+      "iterations": 10,
+      "errors": 10,
+      "success_rate": 0.0,
+      "min": 3.432035446166992,
+      "max": 3.9789676666259766,
+      "avg": 3.7018299102783203,
+      "median": 3.7109851837158203,
+      "p95": 3.9789676666259766,
+      "p99": 3.9789676666259766
+    },
+    "/api/business/ticker/validate-ticker": {
+      "endpoint": "/api/business/ticker/validate-ticker",
+      "iterations": 10,
+      "errors": 10,
+      "success_rate": 0.0,
+      "min": 3.595113754272461,
+      "max": 3.989696502685547,
+      "avg": 3.7543535232543945,
+      "median": 3.7358999252319336,
+      "p95": 3.989696502685547,
+      "p99": 3.989696502685547
+    }
+  },
+  "throughput": {
+    "duration_seconds": 10.022640228271484,
+    "total_requests": 2250,
+    "errors": 450,
+    "throughput_rps": 224.49174556353776,
+    "error_rate": 20.0
+  },
+  "bundle_size": {
+    "total_size_bytes": 9839136,
+    "total_size_mb": 9.383331298828125,
+    "file_count": 285,
+    "large_files": [
+      {
+        "path": "import-user-data.js",
+        "size": 389074,
+        "size_kb": 379.955078125
+      },
+      {
+        "path": "modal-manager-v2.js",
+        "size": 377439,
+        "size_kb": 368.5927734375
+      },
+      {
+        "path": "entity-details-renderer.js",
+        "size": 316294,
+        "size_kb": 308.880859375
+      },
+      {
+        "path": "executions.js",
+        "size": 208605,
+        "size_kb": 203.7158203125
+      },
+      {
+        "path": "header-system-old.js",
+        "size": 202391,
+        "size_kb": 197.6474609375
+      },
+      {
+        "path": "modules/core-systems.js",
+        "size": 184499,
+        "size_kb": 180.1748046875
+      },
+      {
+        "path": "trades.js",
+        "size": 183366,
+        "size_kb": 179.068359375
+      },
+      {
+        "path": "charts/vendor/lightweight-charts.standalone.production.js",
+        "size": 182311,
+        "size_kb": 178.0380859375
+      },
+      {
+        "path": "alerts.js",
+        "size": 168669,
+        "size_kb": 164.7158203125
+      },
+      {
+        "path": "cash_flows.js",
+        "size": 167150,
+        "size_kb": 163.232421875
+      }
+    ]
+  },
+  "summary": {
+    "response_time": {
+      "avg_all": 3.921836300900108,
+      "min": 3.382539749145508,
+      "max": 6.3369035720825195,
+      "p95": 6.3369035720825195,
+      "target_met": true
+    }
+  }
+}

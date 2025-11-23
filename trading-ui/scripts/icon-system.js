@@ -30,7 +30,10 @@
             this.initialized = false;
             this.mappings = null;
             this.cacheEnabled = false;
-            this.defaultIcon = '/trading-ui/images/icons/home.svg';
+            this.basePath = '/trading-ui/images/icons/';
+            this.tablerPath = this.basePath + 'tabler/';
+            this.entityPath = this.basePath + 'entities/';
+            this.defaultIcon = '/trading-ui/images/icons/entities/home.svg';
         }
 
         /**
@@ -111,19 +114,35 @@
             let iconPath = null;
 
             // Special handling for entities - always check entities/ first
-            if (type === 'entity') {
-                if (this.mappings.entities && this.mappings.entities[name]) {
-                    iconPath = this.mappings.entities[name];
+            if (type === 'entity' || type === 'entities') {
+                // Check if entity mapping exists (should be a path)
+                if (this.mappings?.entities && this.mappings.entities[name]) {
+                    const mappedPath = this.mappings.entities[name];
+                    // If it's already a full path, use it
+                    if (mappedPath.startsWith('/')) {
+                        iconPath = mappedPath;
+                    } else {
+                        // Otherwise assume it's in entities/
+                        iconPath = `${this.entityPath}${mappedPath}`;
+                    }
                 } else {
-                    // Fallback to Tabler
-                    const tablerName = this.mappings.entities?.[name] || name;
-                    iconPath = `/trading-ui/images/icons/tabler/${tablerName}.svg`;
+                    // Fallback: try entities/ directory directly
+                    iconPath = `${this.entityPath}${name}.svg`;
                 }
             } else {
-                // For other types, use Tabler Icons
-                const mapping = this.mappings[type]?.[name];
+                // For other types (button, category, chart, page), use Tabler Icons
+                const mapping = this.mappings?.[type]?.[name];
                 if (mapping) {
-                    iconPath = `/trading-ui/images/icons/tabler/${mapping}.svg`;
+                    // Check if it's already a path
+                    if (mapping.startsWith('/')) {
+                        iconPath = mapping;
+                    } else {
+                        // Tabler icon name
+                        iconPath = `${this.tablerPath}${mapping}.svg`;
+                    }
+                } else {
+                    // Try direct Tabler name
+                    iconPath = `${this.tablerPath}${name}.svg`;
                 }
             }
 
@@ -200,7 +219,9 @@
          * @returns {Promise<string>} Icon path
          */
         async getPageIcon(pageName) {
-            return await this.getIconPath('page', pageName);
+            // Normalize pageName (e.g., 'index.html' -> 'index.html' or just 'index')
+            const normalizedPageName = pageName.split('/').pop();
+            return await this.getIconPath('pages', normalizedPageName);
         }
 
         /**

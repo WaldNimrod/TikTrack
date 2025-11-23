@@ -18,7 +18,8 @@ const path = require('path');
 
 // Paths
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
-const TABLER_PACKAGE = path.join(PROJECT_ROOT, 'node_modules', '@tabler', 'icons', 'icons');
+const TABLER_OUTLINE = path.join(PROJECT_ROOT, 'node_modules', '@tabler', 'icons', 'icons', 'outline');
+const TABLER_FILLED = path.join(PROJECT_ROOT, 'node_modules', '@tabler', 'icons', 'icons', 'filled');
 const DEST_DIR = path.join(PROJECT_ROOT, 'trading-ui', 'images', 'icons', 'tabler');
 
 // Load icon mappings
@@ -86,9 +87,9 @@ function extractIconNames() {
  */
 function copyTablerIcons() {
     // Check if Tabler package exists
-    if (!fs.existsSync(TABLER_PACKAGE)) {
+    if (!fs.existsSync(TABLER_OUTLINE)) {
         console.error('❌ Tabler Icons package not found!');
-        console.error(`   Expected location: ${TABLER_PACKAGE}`);
+        console.error(`   Expected location: ${TABLER_OUTLINE}`);
         console.error('   Please run: npm install @tabler/icons --no-save');
         process.exit(1);
     }
@@ -127,12 +128,24 @@ function copyTablerIcons() {
     let missingCount = 0;
     const missingIcons = [];
     
-    // Copy each icon
+    // Copy each icon - try outline first, then filled
     for (const iconName of iconNames) {
-        const sourceFile = path.join(TABLER_PACKAGE, `${iconName}.svg`);
-        const destFile = path.join(DEST_DIR, `${iconName}.svg`);
+        let sourceFile = path.join(TABLER_OUTLINE, `${iconName}.svg`);
+        let found = false;
         
+        // Try outline first
         if (fs.existsSync(sourceFile)) {
+            found = true;
+        } else {
+            // Try filled
+            sourceFile = path.join(TABLER_FILLED, `${iconName}.svg`);
+            if (fs.existsSync(sourceFile)) {
+                found = true;
+            }
+        }
+        
+        if (found) {
+            const destFile = path.join(DEST_DIR, `${iconName}.svg`);
             try {
                 fs.copyFileSync(sourceFile, destFile);
                 copiedCount++;
@@ -168,7 +181,8 @@ function copyTablerIcons() {
 // Run script
 if (require.main === module) {
     console.log('🚀 Starting Tabler Icons setup...\n');
-    console.log(`📁 Source: ${TABLER_PACKAGE}`);
+    console.log(`📁 Source (outline): ${TABLER_OUTLINE}`);
+    console.log(`📁 Source (filled): ${TABLER_FILLED}`);
     console.log(`📁 Destination: ${DEST_DIR}\n`);
     
     const result = copyTablerIcons();

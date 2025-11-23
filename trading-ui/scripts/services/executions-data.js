@@ -365,7 +365,8 @@
    */
   async function calculateAveragePrice(executions = []) {
     // Create cache key from executions array (sorted for consistency)
-    const executionsKey = JSON.stringify(executions.sort((a, b) => (a.id || 0) - (b.id || 0)));
+    // Use spread operator to avoid mutating the input array
+    const executionsKey = JSON.stringify([...executions].sort((a, b) => (a.id || 0) - (b.id || 0)));
     const cacheKey = `business:calculate-average-price:${executionsKey}`;
     
     try {

@@ -211,8 +211,8 @@ class TradingAccountBusinessService(BaseBusinessService):
         
         try:
             balance = float(opening_balance)
-            if not isinstance(balance, (int, float)):
-                errors.append('Opening balance must be a number')
+            # float() always returns a float (or raises an exception)
+            # No need to check isinstance - if we reach here, balance is valid
         except (ValueError, TypeError):
             errors.append('Opening balance must be a valid number')
             return {'is_valid': False, 'errors': errors}

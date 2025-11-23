@@ -131,101 +131,110 @@
                 <div class="content-section" id="price-chart-section">
                     <div class="section-header">
                         <h2><i class="bi bi-graph-up"></i> גרף מחירים לאורך זמן</h2>
-                        <div class="header-actions" style="display: flex; align-items: center; gap: 8px;">
-                            <!-- Unit Size Buttons -->
-                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                <button class="unit-size-btn" data-unit="5min" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">5m</button>
-                                <button class="unit-size-btn" data-unit="hour" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1h</button>
-                                <button class="unit-size-btn active" data-unit="day" style="padding: 4px 8px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1D</button>
-                                <button class="unit-size-btn" data-unit="week" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1W</button>
-                                <button class="unit-size-btn" data-unit="month" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1M</button>
-                                <button class="unit-size-btn" data-unit="year" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1Y</button>
+                        <div class="header-actions" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
+                            <!-- Row 1: Time Range & Chart Type -->
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <!-- Unit Size Buttons -->
+                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <button class="unit-size-btn" data-unit="5min" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">5m</button>
+                                    <button class="unit-size-btn" data-unit="hour" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1h</button>
+                                    <button class="unit-size-btn active" data-unit="day" style="padding: 4px 8px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1D</button>
+                                    <button class="unit-size-btn" data-unit="week" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1W</button>
+                                    <button class="unit-size-btn" data-unit="month" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1M</button>
+                                    <button class="unit-size-btn" data-unit="year" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; min-width: 40px;">1Y</button>
+                                </div>
+                                <!-- Time Range Buttons -->
+                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <button class="chart-control-btn" data-range="day" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">יום</button>
+                                    <button class="chart-control-btn" data-range="week" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">שבוע</button>
+                                    <button class="chart-control-btn" data-range="month" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">חודש</button>
+                                    <button class="chart-control-btn" data-range="year" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">שנה</button>
+                                    <button class="chart-control-btn active" data-range="all" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">הכול</button>
+                                </div>
+                                <!-- Chart Type Buttons -->
+                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <button class="chart-type-btn" data-type="line" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="קו">
+                                        <i class="bi bi-graph-up"></i>
+                                    </button>
+                                    <button class="chart-type-btn active" data-type="bar" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="בארים">
+                                        <i class="bi bi-bar-chart"></i>
+                                    </button>
+                                    <button class="chart-type-btn" data-type="candlestick" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="נרות">
+                                        <i class="bi bi-box"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <!-- Time Range Buttons -->
-                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                <button class="chart-control-btn" data-range="day" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">יום</button>
-                                <button class="chart-control-btn" data-range="week" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">שבוע</button>
-                                <button class="chart-control-btn active" data-range="month" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">חודש</button>
-                                <button class="chart-control-btn" data-range="year" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">שנה</button>
-                                <button class="chart-control-btn" data-range="all" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.2s;">הכול</button>
-                            </div>
-                            <!-- Chart Type Buttons -->
-                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                <button class="chart-type-btn active" data-type="line" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="קו">
-                                    <i class="bi bi-graph-up"></i>
-                                </button>
-                                <button class="chart-type-btn" data-type="candlestick" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="נרות">
-                                    <i class="bi bi-bar-chart"></i>
-                                </button>
-                            </div>
-                            <!-- View Mode Buttons (Price/Percentage) -->
-                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                <button class="view-mode-btn active" data-mode="price" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="תצוגת מחיר">$</button>
-                                <button class="view-mode-btn" data-mode="percent" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="תצוגת אחוזים">%</button>
-                            </div>
-                            <!-- Y-Axis Scale Buttons (Linear/Logarithmic) -->
-                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                <button class="y-scale-btn active" data-scale="linear" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="ליניארי">
-                                    <i class="bi bi-graph-up-arrow"></i>
-                                </button>
-                                <button class="y-scale-btn" data-scale="log" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="לוגריתמי">
-                                    <i class="bi bi-bar-chart-line"></i>
-                                </button>
-                            </div>
-                            <!-- Volume Toggle Button -->
-                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                <button class="volume-toggle-btn" id="volumeToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="הצג/הסתר נפח">
-                                    <i class="bi bi-bar-chart-fill"></i> Volume
-                                </button>
-                            </div>
-                            <!-- Auto Scale Button -->
-                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                <button class="auto-scale-btn" id="autoScaleBtn" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="התאמה אוטומטית">
-                                    <i class="bi bi-arrows-fullscreen"></i>
-                                </button>
-                            </div>
-                            <!-- Zoom Controls -->
-                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                <button class="zoom-btn" data-action="zoom-in" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="זום פנימה">
-                                    <i class="bi bi-zoom-in"></i>
-                                </button>
-                                <button class="zoom-btn" data-action="zoom-out" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="זום החוצה">
-                                    <i class="bi bi-zoom-out"></i>
-                                </button>
-                                <button class="zoom-btn" data-action="reset" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="איפוס זום">
-                                    <i class="bi bi-arrow-counterclockwise"></i>
-                                </button>
-                            </div>
-                            <!-- Indicators Toggle -->
-                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                <button class="indicators-toggle-btn" id="indicatorsToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="מחוונים">
-                                    <i class="bi bi-graph-up-arrow"></i> Indicators
-                                </button>
-                            </div>
-                            <!-- Series Visibility Toggle -->
-                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                <button class="series-visibility-toggle-btn" id="seriesVisibilityToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="הצג/הסתר סדרות">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </div>
-                            <!-- Export/Screenshot -->
-                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                <button class="export-btn" data-action="screenshot" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="צילום מסך">
-                                    <i class="bi bi-camera"></i>
-                                </button>
-                                <button class="export-btn" data-action="export-image" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="ייצא תמונה">
-                                    <i class="bi bi-download"></i>
-                                </button>
-                            </div>
-                            <!-- Drawing Tools Button -->
-                            <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
-                                <button class="drawing-tools-toggle-btn" id="drawingToolsToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="כלי ציור ומדידה">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                            </div>
+                            <!-- Row 2: Other Controls (all in one flex row, no wrap) -->
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;">
+                                <!-- View Mode Buttons (Price/Percentage) -->
+                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <button class="view-mode-btn active" data-mode="price" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="תצוגת מחיר">$</button>
+                                    <button class="view-mode-btn" data-mode="percent" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="תצוגת אחוזים">%</button>
+                                </div>
+                                <!-- Y-Axis Scale Buttons (Linear/Logarithmic) -->
+                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <button class="y-scale-btn active" data-scale="linear" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="ליניארי">
+                                        <i class="bi bi-graph-up-arrow"></i>
+                                    </button>
+                                    <button class="y-scale-btn" data-scale="log" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="לוגריתמי">
+                                        <i class="bi bi-bar-chart-line"></i>
+                                    </button>
+                                </div>
+                                <!-- Volume Toggle Button (always visible, default ON) -->
+                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <button class="volume-toggle-btn active" id="volumeToggle" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="הצג/הסתר נפח">
+                                        <i class="bi bi-bar-chart-fill"></i> Volume
+                                    </button>
+                                </div>
+                                <!-- Auto Scale Button -->
+                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <button class="auto-scale-btn" id="autoScaleBtn" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="התאמה אוטומטית">
+                                        <i class="bi bi-arrows-fullscreen"></i>
+                                    </button>
+                                </div>
+                                <!-- Zoom Controls -->
+                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <button class="zoom-btn" data-action="zoom-in" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="זום פנימה">
+                                        <i class="bi bi-zoom-in"></i>
+                                    </button>
+                                    <button class="zoom-btn" data-action="zoom-out" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="זום החוצה">
+                                        <i class="bi bi-zoom-out"></i>
+                                    </button>
+                                    <button class="zoom-btn" data-action="reset" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="איפוס זום">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </button>
+                                </div>
+                                <!-- Indicators Toggle -->
+                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <button class="indicators-toggle-btn" id="indicatorsToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="מחוונים">
+                                        <i class="bi bi-graph-up-arrow"></i> Indicators
+                                    </button>
+                                </div>
+                                <!-- Series Visibility Toggle -->
+                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <button class="series-visibility-toggle-btn" id="seriesVisibilityToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;" title="הצג/הסתר סדרות">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <!-- Export/Screenshot -->
+                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <button class="export-btn" data-action="screenshot" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="צילום מסך">
+                                        <i class="bi bi-camera"></i>
+                                    </button>
+                                    <button class="export-btn" data-action="export-image" style="padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; transition: all 0.2s;" title="ייצא תמונה">
+                                        <i class="bi bi-download"></i>
+                                    </button>
+                                </div>
+                                <!-- Drawing Tools Button -->
+                                <div style="display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;">
+                                    <button class="drawing-tools-toggle-btn" id="drawingToolsToggle" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="כלי ציור ומדידה">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                </div>
                             <button class="filter-toggle-btn" onclick="toggleSection('price-chart-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
+                            </div>
                         </div>
                     </div>
                     <div class="section-body">
@@ -271,7 +280,7 @@
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
-                                    </div>
+                                        </div>
                                     <!-- Drawing Canvas Overlay -->
                                     <canvas id="drawing-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 15; pointer-events: none;"></canvas>
                                     <div id="price-chart-container" style="height: 100%; width: 100%;"></div>
@@ -467,7 +476,7 @@
             
             // Initialize price chart (with delay to ensure DOM is ready)
             setTimeout(() => {
-                initPriceChart();
+            initPriceChart();
             }, 100);
         });
         
@@ -476,11 +485,13 @@
         let priceChartSeries = null;
         let comparisonSeries = [];
         let volumeSeries = null;
+        let volumeSeriesGreen = null;
+        let volumeSeriesRed = null;
         let maSeries = []; // Moving Average series
         let viewMode = 'price'; // 'price' or 'percent'
         let yScaleMode = 'linear'; // 'linear' or 'log'
         let autoScaleEnabled = false;
-        let volumeVisible = false;
+        let volumeVisible = true; // Default: Volume visible
         let indicatorsVisible = false;
         let seriesVisibility = {}; // Track series visibility
         let drawingTool = null;
@@ -524,9 +535,9 @@
                     }
                 }
                 
-                // Get chart type from overlay buttons (default: line)
+                // Get chart type from overlay buttons (default: bar)
                 const activeChartTypeBtn = document.querySelector('.chart-type-btn.active');
-                const chartType = activeChartTypeBtn?.dataset.type || 'line';
+                const chartType = activeChartTypeBtn?.dataset.type || 'bar';
                 
                 // Create chart
                 priceChart = window.TradingViewChartAdapter.createChart(container, {
@@ -539,7 +550,7 @@
                         horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
                     },
                     width: container.clientWidth,
-                    height: 500,
+                    height: 600, // Increased height for better price/volume separation
                     timeScale: {
                         timeVisible: true,
                         secondsVisible: true
@@ -548,15 +559,18 @@
                         borderVisible: true,
                         borderColor: getCSSVariableValue('--border-color', '#e0e0e0'),
                         mode: yScaleMode === 'log' ? 1 : 0 // 0 = Normal, 1 = Logarithmic
+                    },
+                    leftPriceScale: {
+                        visible: false // Hide left scale - we'll use right scale for both
                     }
                 });
                 
                 // Get selected ticker
                 const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
                 
-                // Get time range from header buttons (default: month)
+                // Get time range from header buttons (default: all)
                 const activeRangeBtn = document.querySelector('.chart-control-btn.active[data-range]');
-                const timeRange = activeRangeBtn?.dataset.range || 'month';
+                const timeRange = activeRangeBtn?.dataset.range || 'all';
                 
                 // Auto-set unit size based on time range
                 autoSetUnitSizeByTimeRange(timeRange);
@@ -581,40 +595,56 @@
                     ? convertToPercentage(mockData.line, mockData.candles) 
                     : { line: mockData.line, candles: mockData.candles };
                 
-                // Add main series
+                // Add main series (Price chart - top 75% of space)
+                const priceSeriesOptions = {
+                    title: selectedTicker,
+                    priceFormat: viewMode === 'percent' ? {
+                        type: 'percent',
+                        precision: 2,
+                        minMove: 0.01
+                    } : {
+                        type: 'price',
+                        precision: 2,
+                        minMove: 0.01
+                    },
+                    priceScaleId: 'right',
+                    // Reserve bottom 25% for volume - price chart uses top 75%
+                    scaleMargins: {
+                        top: 0.05,
+                        bottom: 0.25 // Reserve 25% at bottom for volume
+                    }
+                };
+                
                 if (chartType === 'candlestick') {
                     priceChartSeries = window.TradingViewChartAdapter.addCandlestickSeries(priceChart, {
+                        ...priceSeriesOptions,
                         upColor: '#26baac',
                         downColor: '#ef5350',
                         borderVisible: false,
                         wickUpColor: '#26baac',
-                        wickDownColor: '#ef5350',
-                        title: selectedTicker,
-                        priceFormat: viewMode === 'percent' ? {
-                            type: 'percent',
-                            precision: 2,
-                            minMove: 0.01
-                        } : {
-                            type: 'price',
-                            precision: 2,
-                            minMove: 0.01
-                        }
+                        wickDownColor: '#ef5350'
                     });
                     priceChartSeries.setData(chartData.candles);
+                } else if (chartType === 'bar') {
+                    // Generate bar data from candles
+                    const barData = chartData.candles.map(candle => ({
+                        time: candle.time,
+                        open: candle.open,
+                        high: candle.high,
+                        low: candle.low,
+                        close: candle.close
+                    }));
+                    priceChartSeries = window.TradingViewChartAdapter.addBarSeries(priceChart, {
+                        ...priceSeriesOptions,
+                        upColor: '#26baac',
+                        downColor: '#ef5350'
+                    });
+                    priceChartSeries.setData(barData);
                 } else {
                     priceChartSeries = window.TradingViewChartAdapter.addLineSeries(priceChart, {
+                        ...priceSeriesOptions,
                         color: getCSSVariableValue('--primary-color', '#007bff'),
-                        lineWidth: 2,
-                        title: selectedTicker,
-                        priceFormat: viewMode === 'percent' ? {
-                            type: 'percent',
-                            precision: 2,
-                            minMove: 0.01
-                        } : {
-                            type: 'price',
-                            precision: 2,
-                            minMove: 0.01
-                        }
+                        lineWidth: 2
                     });
                     priceChartSeries.setData(chartData.line);
                 }
@@ -635,6 +665,11 @@
                             color: colors[idx % colors.length],
                             lineWidth: 1,
                             title: ticker,
+                            priceScaleId: 'right',
+                            scaleMargins: {
+                                top: 0.1,
+                                bottom: 0.25 // Same as main price series - reserve bottom for volume
+                            },
                             priceFormat: viewMode === 'percent' ? {
                                 type: 'percent',
                                 precision: 2,
@@ -667,6 +702,11 @@
                 
                 // Initialize performance features
                 initializePerformanceFeatures();
+                
+                // Add volume by default
+                if (volumeVisible) {
+                    addVolumeSeries();
+                }
                 
                 console.log('✅ Price chart initialized');
                 
@@ -1407,6 +1447,9 @@
         
         // Reload chart
         function reloadChart() {
+            // Store volume visibility state
+            const wasVolumeVisible = volumeVisible;
+            
             // Clear comparison series
             comparisonSeries.forEach(series => {
                 try {
@@ -1417,8 +1460,20 @@
             });
             comparisonSeries = [];
             
+            // Clear volume series
+            removeVolumeSeries();
+            
             // Reinitialize chart
             initPriceChart();
+            
+            // Restore volume visibility after chart initialization
+            if (wasVolumeVisible) {
+                setTimeout(() => {
+                    if (volumeVisible) {
+                        addVolumeSeries();
+                    }
+                }, 200);
+            }
         }
         
         // Window resize handler
@@ -1482,51 +1537,147 @@
         }
         
         function addVolumeSeries() {
-            if (!priceChart || volumeSeries) return;
+            if (!priceChart || (volumeSeriesGreen || volumeSeriesRed)) return;
             
             const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
             const activeUnitBtn = document.querySelector('.unit-size-btn.active[data-unit]');
             const unitSize = activeUnitBtn?.dataset.unit || 'day';
             const activeRangeBtn = document.querySelector('.chart-control-btn.active[data-range]');
-            const timeRange = activeRangeBtn?.dataset.range || 'month';
+            const timeRange = activeRangeBtn?.dataset.range || 'all';
             
             const mockData = generateMockPriceData(selectedTicker, unitSize, timeRange);
-            const volumeData = generateVolumeData(mockData.line);
+            const { greenData, redData } = generateVolumeDataWithColors(mockData.line, mockData.candles);
             
-            volumeSeries = window.TradingViewChartAdapter.addHistogramSeries(priceChart, {
-                color: '#26baac',
+            const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
+            if (!lightweightCharts || !lightweightCharts.HistogramSeries) {
+                console.warn('HistogramSeries not available');
+                return;
+            }
+            
+            const volumeOptions = {
                 priceFormat: {
                     type: 'volume',
                     precision: 0,
                     minMove: 1
                 },
-                priceScaleId: 'right',
+                // Use right price scale for volume (same as price chart)
+                priceScaleId: 'right', // Same scale ID - separation via scaleMargins
+                // Volume chart uses bottom 25% of space
                 scaleMargins: {
-                    top: 0.8,
-                    bottom: 0
+                    top: 0.75, // Start from 75% down - reserves top 75% for price chart
+                    bottom: 0.05 // Small bottom margin
                 }
-            });
+            };
             
-            volumeSeries.setData(volumeData);
+            // Create green volume series (up bars)
+            if (greenData.length > 0) {
+                volumeSeriesGreen = priceChart.addSeries(lightweightCharts.HistogramSeries, {
+                    ...volumeOptions,
+                    color: '#26baac' // Green
+                });
+                volumeSeriesGreen.setData(greenData);
+            }
+            
+            // Create red volume series (down bars)
+            if (redData.length > 0) {
+                volumeSeriesRed = priceChart.addSeries(lightweightCharts.HistogramSeries, {
+                    ...volumeOptions,
+                    color: '#ef5350' // Red
+                });
+                volumeSeriesRed.setData(redData);
+            }
+            
+            // Mark as volume series for tracking
+            volumeSeries = volumeSeriesGreen || volumeSeriesRed;
+            
+            // Ensure proper separation - apply scale margins after adding series
+            if (priceChartSeries) {
+                priceChartSeries.applyOptions({
+                    scaleMargins: {
+                        top: 0.05,
+                        bottom: 0.25 // Reserve bottom 25% for volume
+                    }
+                });
+            }
+            
+            // Apply volume scale margins
+            if (volumeSeriesGreen) {
+                volumeSeriesGreen.applyOptions({
+                    scaleMargins: {
+                        top: 0.75,
+                        bottom: 0.05
+                    }
+                });
+            }
+            if (volumeSeriesRed) {
+                volumeSeriesRed.applyOptions({
+                    scaleMargins: {
+                        top: 0.75,
+                        bottom: 0.05
+                    }
+                });
+            }
+            
             updateSeriesLegend();
         }
         
         function removeVolumeSeries() {
-            if (volumeSeries && priceChart) {
+            if (volumeSeriesGreen && priceChart) {
                 try {
-                    priceChart.removeSeries(volumeSeries);
-                    volumeSeries = null;
+                    priceChart.removeSeries(volumeSeriesGreen);
+                    volumeSeriesGreen = null;
                 } catch (e) {
-                    console.warn('Error removing volume series:', e);
+                    console.warn('Error removing green volume series:', e);
                 }
             }
+            if (volumeSeriesRed && priceChart) {
+                try {
+                    priceChart.removeSeries(volumeSeriesRed);
+                    volumeSeriesRed = null;
+                } catch (e) {
+                    console.warn('Error removing red volume series:', e);
+                }
+            }
+            volumeSeries = null;
         }
         
-        function generateVolumeData(priceData) {
-            return priceData.map(point => ({
-                time: point.time,
-                value: Math.floor(Math.random() * 1000000) + 100000 // Mock volume
-            }));
+        function generateVolumeDataWithColors(priceData, candlesData) {
+            const greenData = [];
+            const redData = [];
+            const candles = candlesData || [];
+            
+            for (let i = 0; i < priceData.length; i++) {
+                const point = priceData[i];
+                const volume = Math.floor(Math.random() * 1000000) + 100000; // Mock volume
+                
+                // Determine if price went up or down
+                let isUp = true; // Default green
+                if (candles.length > i && i > 0) {
+                    const currentCandle = candles[i];
+                    const prevCandle = candles[i - 1];
+                    if (prevCandle && currentCandle) {
+                        isUp = currentCandle.close >= prevCandle.close;
+                    }
+                } else if (i > 0) {
+                    // Use line data if candles not available
+                    const currentPrice = point.value;
+                    const prevPrice = priceData[i - 1].value;
+                    isUp = currentPrice >= prevPrice;
+                }
+                
+                const volumeBar = {
+                    time: point.time,
+                    value: volume
+                };
+                
+                if (isUp) {
+                    greenData.push(volumeBar);
+                } else {
+                    redData.push(volumeBar);
+                }
+            }
+            
+            return { greenData, redData };
         }
         
         // Feature 17: Auto Scale
@@ -1773,7 +1924,7 @@
                 chartPreferences = {
                     viewMode: preferences['chart_view_mode'] || 'price',
                     yScaleMode: preferences['chart_y_scale'] || 'linear',
-                    volumeVisible: preferences['chart_volume_visible'] || false,
+                    volumeVisible: preferences['chart_volume_visible'] !== undefined ? preferences['chart_volume_visible'] : true, // Default: true
                     autoScaleEnabled: preferences['chart_auto_scale'] || false,
                     indicatorsVisible: preferences['chart_indicators_visible'] || false
                 };

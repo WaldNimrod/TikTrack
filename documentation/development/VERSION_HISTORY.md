@@ -121,3 +121,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-23T16:13:24+00:00 | 1.3.24.0 | 1.3.23.0 | 934883048c1e099ae296260709a6c23cf9c5e291 | be24b9e8e731f7f396eb5f11319db110658a6b82 | patch | Phase 2 Final Testing Report - All pages tested successfully |
 | 2025-11-23T18:07:23+00:00 | 1.3.25.0 | 1.3.24.0 | 0620b022a535f7bcc267800162a33c0088f8b327 | 934883048c1e099ae296260709a6c23cf9c5e291 | patch | תיקוני עיצוב ותפקוד למערכת ראש הדף |
 | 2025-11-23T18:08:55+00:00 | 1.3.26.0 | 1.3.25.0 | b93669e17364847f334996f245b3d61627fcb7ea | 0620b022a535f7bcc267800162a33c0088f8b327 | patch | Fix: Currency validation required fields and HTML global functions |
+| 2025-11-23T18:13:01+00:00 | 1.3.27.0 | 1.3.26.0 | 580e17f5467ab868965f23d49b1a7cd8ef838aca | b93669e17364847f334996f245b3d61627fcb7ea | patch | עדכון תיעוד מערכת ראש הדף |

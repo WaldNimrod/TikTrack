@@ -6,6 +6,24 @@ Welcome to the comprehensive documentation for the TikTrack Trading Management S
 
 ## 🚀 Recent Updates
 
+**Version 2.7** - *November 2025*
+
+### ✅ **Header System Complete Rewrite - Finalized**
+
+#### **🎯 Major Achievements**
+- **Code Reduction**: ✅ **73% reduction** - From 5265 lines to 1429 lines (JavaScript)
+- **CSS Optimization**: ✅ **19% reduction** - From 654 lines to 528 lines
+- **Architecture**: ✅ **Modular Design** - Clean class-based architecture (HeaderSystem, FilterManager, MenuManager)
+- **Performance**: ✅ **Significantly Improved** - Reduced complexity, no duplicate event listeners
+- **Maintainability**: ✅ **Much Better** - Clean, simple, well-organized code
+
+#### **📊 Recent Improvements (November 2025)**
+1. **✅ Menu Alignment** - Menu aligned to start of row (right in RTL)
+2. **✅ Filter Close Button** - Added close button to all filters (round, secondary color, small, centered on bottom line)
+3. **✅ Multiselect Behavior** - Multiselect filters (status, type, account) stay open after selection, close only on mouse leave
+4. **✅ Toggle Button** - Secondary toggle button redesigned (round, secondary color, 50% smaller, centered, always visible)
+5. **✅ Search Field** - Search field width reduced by 50% (300px → 150px)
+
 **Version 2.6** - *October 2025*
 
 ### ✅ **Header Filters Layout Fixes**
@@ -219,7 +237,7 @@ Welcome to the comprehensive documentation for the TikTrack Trading Management S
 - **[API Architecture](api/README.md)** - API design and endpoints
 
 #### **Frontend Architecture**
-- **[Header System](frontend/HEADER_SYSTEM_README.md)** - Navigation and filter interface
+- **[Header System](frontend/HEADER_SYSTEM_SPEC.md)** - Complete header system specification and documentation ✅ **עודכן נובמבר 2025**
 - **[Filter System](frontend/FILTER_SYSTEM_README.md)** - Advanced filtering system
 - **[JavaScript Architecture](frontend/JAVASCRIPT_ARCHITECTURE.md)** - JS module organization
 

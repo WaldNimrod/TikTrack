@@ -33,3 +33,4 @@ This log records every production version update, including manual major/minor a
 | 2025-11-22T22:49:41+00:00 | 1.3.1.0 | 1.3.0.0 | 6ce17ac3a123d40b815a28c39f7e0b9bedf9b455 | 997679b3129b635a7d1c489ca7b9ca9f3d8ce044 | patch | Fix account linking modal - always show interface for user confirmation |
 | 2025-11-23T00:34:13+00:00 | 1.3.2.0 | 1.3.1.0 | f1400d1362076eb88952fbaff62993d861431707 | 6ce17ac3a123d40b815a28c39f7e0b9bedf9b455 | patch | Fix preferences cache version and delete trades with linking issues |
 | 2025-11-23T18:07:27+00:00 | 1.3.3.0 | 1.3.2.0 | 0620b022a535f7bcc267800162a33c0088f8b327 | f1400d1362076eb88952fbaff62993d861431707 | patch | Business Logic Phase 2 - הושלם במלואן: תיקון ולידציה, סקריפטי בדיקות, דוחות מקיפים |
+| 2025-11-23T18:26:01+00:00 | 1.3.4.0 | 1.3.3.0 | 2a4c11539f56b48122cd4fae643213b9e4006e8f | 0620b022a535f7bcc267800162a33c0088f8b327 | patch | Complete Phase 3.1-3.3 testing: Add test scripts and comprehensive reports |

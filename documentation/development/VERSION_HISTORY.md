@@ -119,3 +119,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-23T00:54:54+00:00 | 1.3.22.0 | 1.3.21.0 | a7f1c28a3668818d85ee97a4784f3686c850ad47 | 7d198752bf637f8405006822166ea5f63c2e6e8d | patch | Fix: Filter business logic patterns from backend cache invalidation |
 | 2025-11-23T16:10:55+00:00 | 1.3.23.0 | 1.3.22.0 | be24b9e8e731f7f396eb5f11319db110658a6b82 | a7f1c28a3668818d85ee97a4784f3686c850ad47 | patch | Complete Phase 2: Business Logic Layer Refactoring - All Data Services and Page Scripts updated with Business Logic API |
 | 2025-11-23T16:13:24+00:00 | 1.3.24.0 | 1.3.23.0 | 934883048c1e099ae296260709a6c23cf9c5e291 | be24b9e8e731f7f396eb5f11319db110658a6b82 | patch | Phase 2 Final Testing Report - All pages tested successfully |
+| 2025-11-23T18:07:23+00:00 | 1.3.25.0 | 1.3.24.0 | 0620b022a535f7bcc267800162a33c0088f8b327 | 934883048c1e099ae296260709a6c23cf9c5e291 | patch | תיקוני עיצוב ותפקוד למערכת ראש הדף |

@@ -906,13 +906,6 @@ class HeaderSystem {
                   <span class="logo-text">פשוט לנהל תיק</span>
                 </div>
               </div>
-              
-              <div class="filter-toggle-section filter-toggle-main">
-                <button class="header-filter-toggle-btn" id="headerFilterToggleBtnMain" title="הצג/הסתר פילטרים" 
-                        data-onclick="toggleHeaderFilters()">
-                  <span class="header-filter-arrow">▲</span>
-                </button>
-              </div>
             </div>
           </div>
 
@@ -1045,14 +1038,14 @@ class HeaderSystem {
                 <span class="btn-text">×</span>
               </button>
             </div>
-            
-            <div class="filter-toggle-section filter-toggle-secondary">
-              <button class="header-filter-toggle-btn" id="headerFilterToggleBtnSecondary" title="הצג/הסתר פילטרים" 
-                      data-onclick="toggleHeaderFilters()">
-                <span class="header-filter-arrow">▼</span>
-              </button>
-            </div>
           </div>
+        </div>
+        
+        <div class="filter-toggle-section filter-toggle-secondary">
+          <button class="header-filter-toggle-btn" id="headerFilterToggleBtnSecondary" title="הצג/הסתר פילטרים" 
+                  data-onclick="toggleHeaderFilters()">
+            <span class="header-filter-arrow">▼</span>
+          </button>
         </div>
         
         </div>

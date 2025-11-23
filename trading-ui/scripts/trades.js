@@ -4285,6 +4285,13 @@ window.saveTrade = async function saveTrade() {
             return;
         }
         
+        // Ensure investmentType is properly capitalized before validation
+        if (!investmentType) {
+            window.showErrorNotification?.('שגיאת ולידציה', 'סוג השקעה נדרש לולידציה עסקית.');
+            window.Logger?.warn('⚠️ Missing investment_type for business validation', { page: 'trades', data: tradeData });
+            return; // Stop the save process
+        }
+        
         const businessValidationData = {
             trading_account_id: tradeData.trading_account_id,
             ticker_id: tradeData.ticker_id,

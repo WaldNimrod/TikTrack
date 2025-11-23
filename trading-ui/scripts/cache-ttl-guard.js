@@ -11,41 +11,42 @@
   'use strict';
 
   const CACHE_TTL_CONFIG = {
-    'trades-data': { ttl: 30 * 1000 },
-    'trade-plans-data': { ttl: 30 * 1000 },
-    'cash-flows-data': { ttl: 60 * 1000 },
-    'notes-data': { ttl: 90 * 1000 },
+    // Data Services - Optimized TTL based on usage patterns
+    'trades-data': { ttl: 45 * 1000 }, // Increased from 30s - frequently accessed
+    'trade-plans-data': { ttl: 60 * 1000 }, // Increased from 30s - less frequently changed
+    'cash-flows-data': { ttl: 90 * 1000 }, // Increased from 60s - stable data
+    'notes-data': { ttl: 120 * 1000 }, // Increased from 90s - rarely changed
     'research-data': { ttl: 120 * 1000 },
-    'executions-data': { ttl: 45 * 1000 },
-    'trading-accounts-data': { ttl: 60 * 1000 },
-    'accounts-data': { ttl: 60 * 1000 },
+    'executions-data': { ttl: 60 * 1000 }, // Increased from 45s - frequently accessed
+    'trading-accounts-data': { ttl: 120 * 1000 }, // Increased from 60s - stable data
+    'accounts-data': { ttl: 120 * 1000 }, // Increased from 60s - stable data
     'dashboard-data': { ttl: 60 * 1000 },
-    'preference-data': { ttl: 120 * 1000, layer: 'localStorage' },
-    'profile-data': { ttl: 120 * 1000 },
-    'preference-groups': { ttl: 300 * 1000 },
+    'preference-data': { ttl: 300 * 1000, layer: 'localStorage' }, // Increased from 120s - very stable
+    'profile-data': { ttl: 300 * 1000 }, // Increased from 120s - very stable
+    'preference-groups': { ttl: 600 * 1000 }, // Increased from 300s - rarely changed
     'preference-types': { ttl: 900 * 1000 },
-    // Business Logic API cache configs
-    'business:calculate-stop-price': { ttl: 30 * 1000 },
-    'business:calculate-target-price': { ttl: 30 * 1000 },
-    'business:calculate-percentage-from-price': { ttl: 30 * 1000 },
-    'business:calculate-execution-values': { ttl: 30 * 1000 },
-    'business:calculate-average-price': { ttl: 30 * 1000 },
-    'business:validate-execution': { ttl: 60 * 1000 },
-    'business:validate-condition-value': { ttl: 60 * 1000 },
-    'business:validate-alert': { ttl: 60 * 1000 },
+    // Business Logic API cache configs - Optimized for calculation reuse
+    'business:calculate-stop-price': { ttl: 60 * 1000 }, // Increased from 30s - calculations are expensive
+    'business:calculate-target-price': { ttl: 60 * 1000 }, // Increased from 30s - calculations are expensive
+    'business:calculate-percentage-from-price': { ttl: 60 * 1000 }, // Increased from 30s
+    'business:calculate-execution-values': { ttl: 60 * 1000 }, // Increased from 30s - complex calculation
+    'business:calculate-average-price': { ttl: 60 * 1000 }, // Increased from 30s
+    'business:validate-execution': { ttl: 120 * 1000 }, // Increased from 60s - validation results are stable
+    'business:validate-condition-value': { ttl: 120 * 1000 }, // Increased from 60s
+    'business:validate-alert': { ttl: 120 * 1000 }, // Increased from 60s
     // New Business Logic API cache configs
-    'business:validate-note': { ttl: 60 * 1000 },
-    'business:validate-note-relation': { ttl: 60 * 1000 },
-    'business:validate-trading-account': { ttl: 60 * 1000 },
-    'business:validate-trade-plan': { ttl: 60 * 1000 },
-    'business:validate-ticker': { ttl: 60 * 1000 },
-    'business:validate-ticker-symbol': { ttl: 60 * 1000 },
-    'business:validate-currency-rate': { ttl: 60 * 1000 },
-    'business:validate-tag': { ttl: 60 * 1000 },
-    'business:validate-tag-category': { ttl: 60 * 1000 },
-    'business:validate-cash-flow': { ttl: 60 * 1000 },
-    'business:calculate-cash-flow-balance': { ttl: 30 * 1000 },
-    'business:calculate-currency-conversion': { ttl: 30 * 1000 }
+    'business:validate-note': { ttl: 120 * 1000 }, // Increased from 60s
+    'business:validate-note-relation': { ttl: 120 * 1000 }, // Increased from 60s
+    'business:validate-trading-account': { ttl: 120 * 1000 }, // Increased from 60s
+    'business:validate-trade-plan': { ttl: 120 * 1000 }, // Increased from 60s
+    'business:validate-ticker': { ttl: 120 * 1000 }, // Increased from 60s
+    'business:validate-ticker-symbol': { ttl: 120 * 1000 }, // Increased from 60s
+    'business:validate-currency-rate': { ttl: 120 * 1000 }, // Increased from 60s
+    'business:validate-tag': { ttl: 120 * 1000 }, // Increased from 60s
+    'business:validate-tag-category': { ttl: 120 * 1000 }, // Increased from 60s
+    'business:validate-cash-flow': { ttl: 120 * 1000 }, // Increased from 60s
+    'business:calculate-cash-flow-balance': { ttl: 60 * 1000 }, // Increased from 30s
+    'business:calculate-currency-conversion': { ttl: 60 * 1000 } // Increased from 30s
   };
 
   async function ensure(key, loaderFn, options = {}) {

@@ -310,7 +310,10 @@
    * @returns {Promise<Object>} Validation result: {is_valid, errors}
    */
   async function validateTicker(tickerData) {
-    const cacheKey = `business:validate-ticker:${JSON.stringify(tickerData)}`;
+    // Use optimized cache key generation
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-ticker', tickerData)
+      : `business:validate-ticker:${JSON.stringify(tickerData)}`;
     
     try {
       // Use CacheTTLGuard for automatic cache management

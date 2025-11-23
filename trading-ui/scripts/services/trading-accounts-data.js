@@ -284,7 +284,10 @@
    * @returns {Promise<Object>} Validation result: {is_valid, errors}
    */
   async function validateTradingAccount(accountData) {
-    const cacheKey = `business:validate-trading-account:${JSON.stringify(accountData)}`;
+    // Use optimized cache key generation
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-trading-account', accountData)
+      : `business:validate-trading-account:${JSON.stringify(accountData)}`;
     
     try {
       // Use CacheTTLGuard for automatic cache management

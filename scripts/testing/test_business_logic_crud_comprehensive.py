@@ -172,7 +172,8 @@ def test_execution_crud():
     result = test_api_endpoint("POST", f"{BUSINESS_API_BASE}/execution/validate", {
         "quantity": 10.0,
         "price": 100.0,
-        "action": "buy"
+        "action": "buy",
+        "status": "pending"
     })
     log_test("Validate Execution (Valid)", result.get("status") == "success")
     
@@ -254,7 +255,8 @@ def test_cash_flow_crud():
     print("\n3. Testing Business Logic API - Validate Cash Flow")
     result = test_api_endpoint("POST", f"{BUSINESS_API_BASE}/cash-flow/validate", {
         "amount": 100.0,
-        "type": "income"
+        "type": "income",
+        "source": "manual"
     })
     log_test("Validate Cash Flow (Valid)", result.get("status") == "success")
     
@@ -277,7 +279,9 @@ def test_note_crud():
     # Test 1: Business Logic API - Validate Note
     print("\n1. Testing Business Logic API - Validate Note")
     result = test_api_endpoint("POST", f"{BUSINESS_API_BASE}/note/validate", {
-        "content": "Test note"
+        "content": "Test note",
+        "related_type_id": 2,
+        "related_id": 1
     })
     log_test("Validate Note (Valid)", result.get("status") == "success")
     
@@ -308,6 +312,30 @@ def test_trading_account_crud():
     # Test 1: Business Logic API - Validate Trading Account
     print("\n1. Testing Business Logic API - Validate Trading Account")
     result = test_api_endpoint("POST", f"{BUSINESS_API_BASE}/trading-account/validate", {
+        "name": "Test Account",
+        "currency_id": 1
+    })
+    log_test("Validate Trading Account (Valid)", result.get("status") == "success")
+    
+    # Test 2: Read Trading Accounts
+    print("\n2. Testing Read Trading Accounts")
+    result = test_api_endpoint("GET", f"{API_BASE}/trading-accounts/")
+    log_test("Read Trading Accounts", result is not None)
+
+
+# ============================================================================
+# Trade Plan CRUD Tests
+# ============================================================================
+
+def test_trade_plan_crud():
+    """Test Trade Plan CRUD operations with Business Logic validation."""
+    print("\n" + "="*60)
+    print("Testing Trade Plan CRUD Operations")
+    print("="*60)
+    
+    # Test 1: Business Logic API - Validate Trade Plan
+    print("\n1. Testing Business Logic API - Validate Trade Plan")
+    result = test_api_endpoint("POST", f"{BUSINESS_API_BASE}/trade-plan/validate", {
         "name": "Test Account",
         "currency": "USD"
     })

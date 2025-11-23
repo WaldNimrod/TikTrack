@@ -12,7 +12,9 @@ Documentation:
 from flask import Blueprint, jsonify, request, g
 from typing import Dict, Any
 import logging
+import time
 
+from routes.api.base_entity_decorators import monitor_performance
 from services.business_logic import (
     TradeBusinessService,
     ExecutionBusinessService,
@@ -51,6 +53,7 @@ tag_service = TagBusinessService()
 # ============================================================================
 
 @business_logic_bp.route('/trade/calculate-stop-price', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
 def calculate_stop_price():
     """Calculate stop price based on percentage."""
     try:
@@ -88,6 +91,7 @@ def calculate_stop_price():
 
 
 @business_logic_bp.route('/trade/calculate-target-price', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
 def calculate_target_price():
     """Calculate target price based on percentage."""
     try:
@@ -565,6 +569,129 @@ def calculate_statistics():
             
     except Exception as e:
         logger.error(f"Error calculating statistics: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/statistics/calculate-sum', methods=['POST'])
+def calculate_sum():
+    """Calculate sum of a field."""
+    try:
+        data = request.get_json() or {}
+        
+        records = data.get('data', [])
+        field = data.get('field')
+        
+        if not field:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Field is required'
+                }
+            }), 400
+        
+        result = statistics_service.calculate_sum(records, field)
+        
+        if result.get('is_valid', True):
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'sum': result.get('sum', 0.0)
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': result.get('error', 'Invalid calculation')
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error calculating sum: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/statistics/calculate-average', methods=['POST'])
+def calculate_average():
+    """Calculate average of a field."""
+    try:
+        data = request.get_json() or {}
+        
+        records = data.get('data', [])
+        field = data.get('field')
+        
+        if not field:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Field is required'
+                }
+            }), 400
+        
+        result = statistics_service.calculate_average(records, field)
+        
+        if result.get('is_valid', True):
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'average': result.get('average', 0.0)
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': result.get('error', 'Invalid calculation')
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error calculating average: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/statistics/count-records', methods=['POST'])
+def count_records():
+    """Count records."""
+    try:
+        data = request.get_json() or {}
+        
+        records = data.get('data', [])
+        
+        result = statistics_service.count_records(records)
+        
+        if result.get('is_valid', True):
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'count': result.get('count', 0)
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': result.get('error', 'Invalid calculation')
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error counting records: {str(e)}")
         return jsonify({
             'status': 'error',
             'error': {

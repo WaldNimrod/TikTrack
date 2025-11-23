@@ -1,22 +1,22 @@
 {
   "production": {
-    "version": "1.3.4.0",
+    "version": "1.3.5.0",
     "major": 1,
     "minor": 3,
-    "patch": 4,
+    "patch": 5,
     "build": 0,
-    "commit": "2a4c11539f56b48122cd4fae643213b9e4006e8f",
-    "updated_at": "2025-11-23T18:26:01+00:00",
-    "notes": "Complete Phase 3.1-3.3 testing: Add test scripts and comprehensive reports"
+    "commit": "3133a7f076d9d1047fca0c7fed4459add8c7204f",
+    "updated_at": "2025-11-23T19:52:04+00:00",
+    "notes": "Phase 3.4.1-3.4.2: Cache and Response Time optimization"
   },
   "development": {
-    "version": "1.3.27.0",
+    "version": "1.3.28.0",
     "major": 1,
     "minor": 3,
-    "patch": 27,
+    "patch": 28,
     "build": 0,
-    "commit": "580e17f5467ab868965f23d49b1a7cd8ef838aca",
-    "updated_at": "2025-11-23T18:13:01+00:00",
-    "notes": "עדכון תיעוד מערכת ראש הדף"
+    "commit": "2a4c11539f56b48122cd4fae643213b9e4006e8f",
+    "updated_at": "2025-11-23T18:26:22+00:00",
+    "notes": "Complete Phase 3.1-3.3 testing: Add test scripts and comprehensive reports"
   }
 }

@@ -344,7 +344,10 @@
    * @returns {Promise<Object>} Validation result: {is_valid, errors}
    */
   async function validateAlert(alertData) {
-    const cacheKey = `business:validate-alert:${JSON.stringify(alertData)}`;
+    // Use optimized cache key generation
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-alert', alertData)
+      : `business:validate-alert:${JSON.stringify(alertData)}`;
     
     try {
       // Use CacheTTLGuard for automatic cache management

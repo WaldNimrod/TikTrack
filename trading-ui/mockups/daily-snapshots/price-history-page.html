@@ -156,11 +156,11 @@
                                     <button class="chart-type-btn" data-type="line" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="קו">
                                         <i class="bi bi-graph-up"></i>
                                     </button>
-                                    <button class="chart-type-btn active" data-type="bar" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="בארים">
+                                    <button class="chart-type-btn" data-type="bar" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="בארים">
                                         <i class="bi bi-bar-chart"></i>
                                     </button>
-                                    <button class="chart-type-btn" data-type="candlestick" style="padding: 4px 10px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="נרות">
-                                        <i class="bi bi-box"></i>
+                                    <button class="chart-type-btn active" data-type="candlestick" style="padding: 4px 10px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center;" title="נרות">
+                                        <i class="bi bi-square"></i>
                                     </button>
                                 </div>
                             </div>
@@ -238,7 +238,8 @@
                         </div>
                     </div>
                     <div class="section-body">
-                                <div id="price-chart-wrapper" style="position: relative; height: 500px; width: 100%; background: #fff; border-radius: 8px; overflow: hidden;">
+                                <!-- Price Chart Container (Top Panel) -->
+                                <div id="price-chart-wrapper" style="position: relative; height: 450px; width: 100%; background: #fff; border-radius: 8px 8px 0 0; overflow: hidden; border-bottom: 2px solid #e0e0e0;">
                                     <!-- Drawing Tools Toolbar -->
                                     <div id="drawing-tools-toolbar" style="position: absolute; top: 10px; left: 10px; z-index: 20; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: none; flex-direction: column; gap: 4px;">
                                         <div style="font-size: 0.7rem; font-weight: 600; margin-bottom: 4px; color: #495057;">כלי ציור:</div>
@@ -284,6 +285,10 @@
                                     <!-- Drawing Canvas Overlay -->
                                     <canvas id="drawing-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 15; pointer-events: none;"></canvas>
                                     <div id="price-chart-container" style="height: 100%; width: 100%;"></div>
+                                </div>
+                                <!-- Volume Chart Container (Bottom Panel - Separate) -->
+                                <div id="volume-chart-wrapper" style="position: relative; height: 150px; width: 100%; background: #fff; border-radius: 0 0 8px 8px; overflow: hidden; border-top: 2px solid #e0e0e0; display: block;">
+                                    <div id="volume-chart-container" style="height: 100%; width: 100%;"></div>
                                 </div>
                     </div>
                 </div>
@@ -482,6 +487,7 @@
         
         // Chart variables
         let priceChart = null;
+        let volumeChart = null; // Separate chart for volume panel
         let priceChartSeries = null;
         let comparisonSeries = [];
         let volumeSeries = null;
@@ -535,9 +541,9 @@
                     }
                 }
                 
-                // Get chart type from overlay buttons (default: bar)
+                // Get chart type from overlay buttons (default: candlestick)
                 const activeChartTypeBtn = document.querySelector('.chart-type-btn.active');
-                const chartType = activeChartTypeBtn?.dataset.type || 'bar';
+                const chartType = activeChartTypeBtn?.dataset.type || 'candlestick';
                 
                 // Create chart
                 priceChart = window.TradingViewChartAdapter.createChart(container, {
@@ -607,12 +613,7 @@
                         precision: 2,
                         minMove: 0.01
                     },
-                    priceScaleId: 'right',
-                    // Reserve bottom 25% for volume - price chart uses top 75%
-                    scaleMargins: {
-                        top: 0.05,
-                        bottom: 0.25 // Reserve 25% at bottom for volume
-                    }
+                    priceScaleId: 'right' // No scaleMargins needed - volume is in separate panel below
                 };
                 
                 if (chartType === 'candlestick') {
@@ -665,11 +666,7 @@
                             color: colors[idx % colors.length],
                             lineWidth: 1,
                             title: ticker,
-                            priceScaleId: 'right',
-                            scaleMargins: {
-                                top: 0.1,
-                                bottom: 0.25 // Same as main price series - reserve bottom for volume
-                            },
+                            priceScaleId: 'right', // No scaleMargins needed - volume is in separate panel
                             priceFormat: viewMode === 'percent' ? {
                                 type: 'percent',
                                 precision: 2,
@@ -736,24 +733,18 @@
         // Auto-set unit size and chart type based on time range
         function autoSetUnitSizeByTimeRange(timeRange) {
             let targetUnit;
-            let targetChartType;
             
-            // Automatic unit size and chart type logic
+            // Automatic unit size logic (chart type is NOT changed automatically)
             if (timeRange === 'day') {
                 targetUnit = '5min'; // יום אחד -> נקודות של 5 דקות
-                targetChartType = 'line'; // קו לגרף יומי
             } else if (timeRange === 'week') {
                 targetUnit = 'hour'; // שבוע אחד -> נקודות של שעה
-                targetChartType = 'line'; // קו לגרף שבועי
             } else if (timeRange === 'month' || timeRange === 'year') {
                 targetUnit = 'day'; // חודש או שנה -> נרות של יום
-                targetChartType = 'candlestick'; // נרות לחודש/שנה
             } else if (timeRange === 'all') {
                 targetUnit = 'week'; // הכול -> נרות של שבוע
-                targetChartType = 'candlestick'; // נרות להכול
             } else {
                 targetUnit = 'day'; // default
-                targetChartType = 'line';
             }
             
             // Find and activate the target unit button
@@ -774,23 +765,7 @@
                 targetUnitBtn.style.color = 'white';
             }
             
-            // Find and activate the target chart type button
-            const targetChartTypeBtn = document.querySelector(`.chart-type-btn[data-type="${targetChartType}"]`);
-            if (targetChartTypeBtn) {
-                // Remove active class from all chart type buttons
-                document.querySelectorAll('.chart-type-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                    btn.style.border = '1px solid #ddd';
-                    btn.style.background = 'white';
-                    btn.style.color = '';
-                });
-                
-                // Activate target chart type button
-                targetChartTypeBtn.classList.add('active');
-                targetChartTypeBtn.style.border = '1px solid #007bff';
-                targetChartTypeBtn.style.background = '#007bff';
-                targetChartTypeBtn.style.color = 'white';
-            }
+            // Chart type is NOT changed automatically - only by user click
         }
         
         // Generate mock price data
@@ -1484,6 +1459,12 @@
                     priceChart.applyOptions({ width: container.clientWidth });
                 }
             }
+            if (volumeChart) {
+                const volumeContainer = document.getElementById('volume-chart-container');
+                if (volumeContainer) {
+                    volumeChart.applyOptions({ width: volumeContainer.clientWidth });
+                }
+            }
         });
         
         // Toggle section function
@@ -1500,12 +1481,20 @@
                         icon.textContent = isVisible ? '▶' : '▼';
                     }
                     
-                    // Resize chart if it's the price chart section
-                    if (sectionId === 'price-chart-section' && priceChart) {
+                    // Resize charts if it's the price chart section
+                    if (sectionId === 'price-chart-section') {
                         setTimeout(() => {
-                            const container = document.getElementById('price-chart-container');
-                            if (container) {
-                                priceChart.applyOptions({ width: container.clientWidth });
+                            if (priceChart) {
+                                const container = document.getElementById('price-chart-container');
+                                if (container) {
+                                    priceChart.applyOptions({ width: container.clientWidth });
+                                }
+                            }
+                            if (volumeChart) {
+                                const volumeContainer = document.getElementById('volume-chart-container');
+                                if (volumeContainer) {
+                                    volumeChart.applyOptions({ width: volumeContainer.clientWidth });
+                                }
                             }
                         }, 100);
                     }
@@ -1521,23 +1510,39 @@
         function toggleVolume() {
             volumeVisible = !volumeVisible;
             const btn = document.getElementById('volumeToggle');
+            const volumeWrapper = document.getElementById('volume-chart-wrapper');
+            
             if (btn) {
                 if (volumeVisible) {
                     btn.style.border = '1px solid #007bff';
                     btn.style.background = '#007bff';
                     btn.style.color = 'white';
+                    btn.classList.add('active');
+                    if (volumeWrapper) {
+                        volumeWrapper.style.display = 'block';
+                    }
                     addVolumeSeries();
                 } else {
                     btn.style.border = '1px solid #ddd';
                     btn.style.background = 'white';
                     btn.style.color = '';
+                    btn.classList.remove('active');
+                    if (volumeWrapper) {
+                        volumeWrapper.style.display = 'none';
+                    }
                     removeVolumeSeries();
                 }
             }
         }
         
         function addVolumeSeries() {
-            if (!priceChart || (volumeSeriesGreen || volumeSeriesRed)) return;
+            if (!priceChart || volumeChart) return; // Volume chart already exists
+            
+            const volumeContainer = document.getElementById('volume-chart-container');
+            if (!volumeContainer) {
+                console.warn('Volume chart container not found');
+                return;
+            }
             
             const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
             const activeUnitBtn = document.querySelector('.unit-size-btn.active[data-unit]');
@@ -1549,40 +1554,78 @@
             const { greenData, redData } = generateVolumeDataWithColors(mockData.line, mockData.candles);
             
             const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
-            if (!lightweightCharts || !lightweightCharts.HistogramSeries) {
-                console.warn('HistogramSeries not available');
+            if (!lightweightCharts || !lightweightCharts.createChart) {
+                console.warn('LightweightCharts not available');
                 return;
             }
             
-            const volumeOptions = {
-                priceFormat: {
-                    type: 'volume',
-                    precision: 0,
-                    minMove: 1
+            // Create separate volume chart in bottom panel
+            volumeChart = lightweightCharts.createChart(volumeContainer, {
+                layout: {
+                    background: { type: 'solid', color: 'transparent' },
+                    textColor: getCSSVariableValue('--text-color', '#333')
                 },
-                // Use right price scale for volume (same as price chart)
-                priceScaleId: 'right', // Same scale ID - separation via scaleMargins
-                // Volume chart uses bottom 25% of space
-                scaleMargins: {
-                    top: 0.75, // Start from 75% down - reserves top 75% for price chart
-                    bottom: 0.05 // Small bottom margin
+                grid: {
+                    vertLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') },
+                    horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
+                },
+                width: volumeContainer.clientWidth,
+                height: volumeContainer.clientHeight,
+                timeScale: {
+                    timeVisible: true,
+                    secondsVisible: false,
+                    // Sync with price chart time scale
+                    visible: true
+                },
+                rightPriceScale: {
+                    borderVisible: true,
+                    borderColor: getCSSVariableValue('--border-color', '#e0e0e0'),
+                    visible: true
+                },
+                leftPriceScale: {
+                    visible: false
                 }
-            };
+            });
+            
+            // Sync time scale with price chart
+            if (priceChart) {
+                priceChart.timeScale().subscribeVisibleTimeRangeChange((timeRange) => {
+                    if (volumeChart && timeRange) {
+                        volumeChart.timeScale().setVisibleRange(timeRange);
+                    }
+                });
+                
+                volumeChart.timeScale().subscribeVisibleTimeRangeChange((timeRange) => {
+                    if (priceChart && timeRange) {
+                        priceChart.timeScale().setVisibleRange(timeRange);
+                    }
+                });
+            }
             
             // Create green volume series (up bars)
             if (greenData.length > 0) {
-                volumeSeriesGreen = priceChart.addSeries(lightweightCharts.HistogramSeries, {
-                    ...volumeOptions,
-                    color: '#26baac' // Green
+                volumeSeriesGreen = volumeChart.addSeries(lightweightCharts.HistogramSeries, {
+                    color: '#26baac', // Green
+                    priceFormat: {
+                        type: 'volume',
+                        precision: 0,
+                        minMove: 1
+                    },
+                    priceScaleId: 'right'
                 });
                 volumeSeriesGreen.setData(greenData);
             }
             
             // Create red volume series (down bars)
             if (redData.length > 0) {
-                volumeSeriesRed = priceChart.addSeries(lightweightCharts.HistogramSeries, {
-                    ...volumeOptions,
-                    color: '#ef5350' // Red
+                volumeSeriesRed = volumeChart.addSeries(lightweightCharts.HistogramSeries, {
+                    color: '#ef5350', // Red
+                    priceFormat: {
+                        type: 'volume',
+                        precision: 0,
+                        minMove: 1
+                    },
+                    priceScaleId: 'right'
                 });
                 volumeSeriesRed.setData(redData);
             }
@@ -1590,54 +1633,31 @@
             // Mark as volume series for tracking
             volumeSeries = volumeSeriesGreen || volumeSeriesRed;
             
-            // Ensure proper separation - apply scale margins after adding series
-            if (priceChartSeries) {
-                priceChartSeries.applyOptions({
-                    scaleMargins: {
-                        top: 0.05,
-                        bottom: 0.25 // Reserve bottom 25% for volume
-                    }
-                });
-            }
+            // Fit content
+            volumeChart.timeScale().fitContent();
             
-            // Apply volume scale margins
-            if (volumeSeriesGreen) {
-                volumeSeriesGreen.applyOptions({
-                    scaleMargins: {
-                        top: 0.75,
-                        bottom: 0.05
-                    }
-                });
-            }
-            if (volumeSeriesRed) {
-                volumeSeriesRed.applyOptions({
-                    scaleMargins: {
-                        top: 0.75,
-                        bottom: 0.05
-                    }
-                });
+            // Sync visible range with price chart
+            if (priceChart) {
+                const priceRange = priceChart.timeScale().getVisibleRange();
+                if (priceRange) {
+                    volumeChart.timeScale().setVisibleRange(priceRange);
+                }
             }
             
             updateSeriesLegend();
         }
         
         function removeVolumeSeries() {
-            if (volumeSeriesGreen && priceChart) {
+            if (volumeChart) {
                 try {
-                    priceChart.removeSeries(volumeSeriesGreen);
-                    volumeSeriesGreen = null;
+                    volumeChart.remove();
+                    volumeChart = null;
                 } catch (e) {
-                    console.warn('Error removing green volume series:', e);
+                    console.warn('Error removing volume chart:', e);
                 }
             }
-            if (volumeSeriesRed && priceChart) {
-                try {
-                    priceChart.removeSeries(volumeSeriesRed);
-                    volumeSeriesRed = null;
-                } catch (e) {
-                    console.warn('Error removing red volume series:', e);
-                }
-            }
+            volumeSeriesGreen = null;
+            volumeSeriesRed = null;
             volumeSeries = null;
         }
         
@@ -2062,7 +2082,7 @@
         function setupSeriesLegend() {
             const legendContainer = document.createElement('div');
             legendContainer.id = 'chart-legend';
-            legendContainer.style.cssText = 'position: absolute; bottom: 10px; right: 10px; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 10; font-size: 0.75rem;';
+            legendContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 10; font-size: 0.75rem;';
             
             const wrapper = document.getElementById('price-chart-wrapper');
             if (wrapper) {

@@ -404,7 +404,10 @@
    * @returns {Promise<Object>} Validation result: {is_valid, errors}
    */
   async function validateCashFlow(cashFlowData) {
-    const cacheKey = `business:validate-cash-flow:${JSON.stringify(cashFlowData)}`;
+    // Use optimized cache key generation
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-cash-flow', cashFlowData)
+      : `business:validate-cash-flow:${JSON.stringify(cashFlowData)}`;
     
     try {
       // Use CacheTTLGuard for automatic cache management
@@ -469,7 +472,10 @@
    * @returns {Promise<Object>} Calculated balance
    */
   async function calculateCashFlowBalance(accountId, params = {}) {
-    const cacheKey = `business:calculate-cash-flow-balance:${accountId}:${JSON.stringify(params)}`;
+    // Use optimized cache key generation
+    const cacheKey = window.CacheKeyHelper?.generateCacheKey 
+      ? window.CacheKeyHelper.generateCacheKey('business:calculate-cash-flow-balance', accountId, params)
+      : `business:calculate-cash-flow-balance:${accountId}:${JSON.stringify(params)}`;
     
     try {
       // Use CacheTTLGuard for automatic cache management

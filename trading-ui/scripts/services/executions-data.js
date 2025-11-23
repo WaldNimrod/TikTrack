@@ -309,7 +309,10 @@
    * @returns {Promise<Object>} Calculated values: {total, label}
    */
   async function calculateExecutionValues(params = {}) {
-    const cacheKey = `business:calculate-execution-values:${JSON.stringify(params)}`;
+    // Use optimized cache key generation
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:calculate-execution-values', params)
+      : `business:calculate-execution-values:${JSON.stringify(params)}`;
     
     try {
       // Use CacheTTLGuard for automatic cache management
@@ -422,7 +425,10 @@
    * @returns {Promise<Object>} Validation result: {is_valid, errors}
    */
   async function validateExecution(executionData) {
-    const cacheKey = `business:validate-execution:${JSON.stringify(executionData)}`;
+    // Use optimized cache key generation
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-execution', executionData)
+      : `business:validate-execution:${JSON.stringify(executionData)}`;
     
     try {
       // Use CacheTTLGuard for automatic cache management

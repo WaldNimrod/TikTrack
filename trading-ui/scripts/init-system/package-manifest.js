@@ -1180,6 +1180,13 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base', 'services'],
     scripts: [
       {
+        file: 'utils/cache-key-helper.js',
+        globalCheck: 'window.CacheKeyHelper',
+        description: 'עזר ליצירת מפתחות מטמון אופטימליים',
+        required: false,
+        loadOrder: 0
+      },
+      {
         file: 'currencies.js',
         globalCheck: 'window.openCurrencyDetails',
         description: 'מערכת מטבעות',

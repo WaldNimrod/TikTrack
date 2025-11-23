@@ -161,10 +161,44 @@
         .filter-toggle:hover .dropdown-arrow {
             transform: translateY(2px);
         }
+        
+        /* Multi-select quick action buttons */
+        .multi-select-actions {
+            display: flex;
+            gap: 0.25rem;
+            margin-top: 0.25rem;
+            font-size: 0.75rem;
+        }
+        
+        .multi-select-actions button {
+            color: #26baac;
+            text-decoration: none;
+            padding: 0;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .multi-select-actions button:hover {
+            color: #fc5a06;
+            text-decoration: underline;
+        }
+        
+        .multi-select-actions span {
+            color: #dee2e6;
+        }
     </style>
+    
+    <!-- Bootstrap JS for Modal and Tooltip -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Header System -->
     <script src="../../scripts/header-system.js" defer></script>
+    
+    <!-- Core Systems (Must load first) -->
+    <script src="../../scripts/logger-service.js?v=1.0.0"></script>
+    <script src="../../scripts/button-icons.js?v=1.0.0"></script>
     
     <!-- Preferences System -->
     <script src="../../scripts/services/preferences-data.js" defer></script>
@@ -194,7 +228,6 @@
     <script src="../../scripts/linked-items.js" defer></script>
     <script src="../../scripts/services/linked-items-service.js" defer></script>
     <script src="../../scripts/entity-details-modal.js" defer></script>
-    <script src="../../scripts/services/entity-details-api.js" defer></script>
 </head>
 <body class="comparative-analysis-page">
     <!-- Header System -->
@@ -259,9 +292,6 @@
                     </div>
                     <div class="section-body">
                         <div class="card mb-4">
-                            <div class="card-header">
-                                <h6 class="mb-0"><i class="bi bi-funnel"></i> מסננים</h6>
-                            </div>
                             <div class="card-body">
                                 <!-- First Row: Date Filters -->
                                 <div class="row g-2 mb-3">
@@ -332,6 +362,16 @@
                                             </div>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Clear Filters Buttons (moved to first row, at the end - left side in RTL) -->
+                                    <div class="col-md-2 me-auto d-flex align-items-end gap-2">
+                                        <button class="btn btn-outline-secondary btn-sm flex-fill" onclick="resetFilters()" title="נקה את כל הפילטרים">
+                                            <i class="bi bi-x-circle"></i> נקה
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm flex-fill" onclick="resetToDefaults()" title="איפוס לברירת מחדל">
+                                            <i class="bi bi-arrow-counterclockwise"></i> ברירת מחדל
+                                        </button>
+                                    </div>
                                 </div>
                                 
                                 <!-- Second Row: All Other Filters -->
@@ -344,6 +384,11 @@
                                             <option value="2">Account #2</option>
                                             <option value="3">Account #3</option>
                                         </select>
+                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('tradingAccounts')" title="בחר הכל">הכל</button>
+                                            <span style="color: #dee2e6;">|</span>
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('tradingAccounts')" title="נקה הכל">נקה</button>
+                                        </div>
                                     </div>
                                     
                                     <!-- Investment Types Filter -->
@@ -354,6 +399,11 @@
                                             <option value="Swing" selected>Swing</option>
                                             <option value="Passive" selected>Passive</option>
                                         </select>
+                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('investmentTypes')" title="בחר הכל">הכל</button>
+                                            <span style="color: #dee2e6;">|</span>
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('investmentTypes')" title="נקה הכל">נקה</button>
+                                        </div>
                                     </div>
                                     
                                     <!-- Trading Methods Filter -->
@@ -367,9 +417,27 @@
                                             <option value="Technical Patterns">דפוסים טכניים</option>
                                             <option value="Fibonacci Retracement">פיבונאצ'י</option>
                                         </select>
+                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('tradingMethods')" title="בחר הכל">הכל</button>
+                                            <span style="color: #dee2e6;">|</span>
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('tradingMethods')" title="נקה הכל">נקה</button>
+                                        </div>
                                     </div>
                                     
-                                    <!-- With/Without Plan Filter -->
+                                    <!-- Tags Filter -->
+                                    <div class="col-md-2">
+                                        <label for="filterTags" class="form-label" style="font-size: 0.85rem;">תגיות</label>
+                                        <select id="filterTags" class="form-select form-select-sm tag-multi-select" multiple onchange="applyFilters()" title="בחר תגיות לסינון">
+                                            <!-- Will be populated by TagUIManager -->
+                                        </select>
+                                        <div class="d-flex gap-1 mt-1" style="font-size: 0.75rem;">
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('filterTags')" title="בחר הכל">הכל</button>
+                                            <span style="color: #dee2e6;">|</span>
+                                            <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('filterTags')" title="נקה הכל">נקה</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- With/Without Plan Filter (last in row) -->
                                     <div class="col-md-2">
                                         <label class="form-label" style="font-size: 0.85rem;">תוכנית מסחר</label>
                                         <div class="form-check">
@@ -380,24 +448,6 @@
                                             <input type="checkbox" id="withoutPlan" class="form-check-input" checked onchange="applyFilters()">
                                             <label for="withoutPlan" class="form-check-label" style="font-size: 0.85rem;">בלי תוכנית</label>
                                         </div>
-                                    </div>
-                                    
-                                    <!-- Tags Filter -->
-                                    <div class="col-md-2">
-                                        <label for="filterTags" class="form-label" style="font-size: 0.85rem;">תגיות</label>
-                                        <select id="filterTags" class="form-select form-select-sm tag-multi-select" multiple onchange="applyFilters()" title="בחר תגיות לסינון">
-                                            <!-- Will be populated by TagUIManager -->
-                                        </select>
-                                    </div>
-                                    
-                                    <!-- Clear Filters Buttons -->
-                                    <div class="col-md-2 d-flex align-items-end gap-2">
-                                        <button class="btn btn-outline-secondary btn-sm flex-fill" onclick="resetFilters()" title="נקה את כל הפילטרים">
-                                            <i class="bi bi-x-circle"></i> נקה
-                                        </button>
-                                        <button class="btn btn-outline-primary btn-sm flex-fill" onclick="resetToDefaults()" title="איפוס לברירת מחדל">
-                                            <i class="bi bi-arrow-counterclockwise"></i> ברירת מחדל
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -1593,6 +1643,49 @@
             // For simplicity, reinitialize the chart
             initPieChart();
         }
+        
+        // Select all options in a multi-select
+        function selectAllOptions(selectId) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            
+            // Special handling for tags (uses TagUIManager)
+            if (selectId === 'filterTags' && window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                const allTagIds = Array.from(select.options).map(opt => parseInt(opt.value)).filter(v => !isNaN(v));
+                window.TagUIManager.setSelectedValues(select, allTagIds);
+            } else {
+                // Standard multi-select: select all options
+                Array.from(select.options).forEach(opt => {
+                    opt.selected = true;
+                });
+            }
+            
+            // Trigger change event to apply filters
+            applyFilters();
+        }
+        
+        // Clear all options in a multi-select
+        function clearAllOptions(selectId) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            
+            // Special handling for tags (uses TagUIManager)
+            if (selectId === 'filterTags' && window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                window.TagUIManager.setSelectedValues(select, []);
+            } else {
+                // Standard multi-select: clear all selections
+                Array.from(select.options).forEach(opt => {
+                    opt.selected = false;
+                });
+            }
+            
+            // Trigger change event to apply filters
+            applyFilters();
+        }
+        
+        // Make functions globally available
+        window.selectAllOptions = selectAllOptions;
+        window.clearAllOptions = clearAllOptions;
         
         // Apply filters (called automatically on filter change)
         function applyFilters() {

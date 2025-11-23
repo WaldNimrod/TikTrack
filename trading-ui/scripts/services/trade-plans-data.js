@@ -322,7 +322,10 @@ async function invalidateTradePlansCache() {
    * @returns {Promise<Object>} Validation result: {is_valid, errors}
    */
   async function validateTradePlan(planData) {
-    const cacheKey = `business:validate-trade-plan:${JSON.stringify(planData)}`;
+    // Use optimized cache key generation
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-trade-plan', planData)
+      : `business:validate-trade-plan:${JSON.stringify(planData)}`;
     
     try {
       // Use CacheTTLGuard for automatic cache management

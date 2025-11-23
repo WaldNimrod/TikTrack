@@ -298,7 +298,8 @@ def test_execution_business_service():
     result = test_api_endpoint("POST", f"{BUSINESS_API_BASE}/execution/validate", {
         "quantity": 10.0,
         "price": 100.0,
-        "action": "buy"
+        "action": "buy",
+        "status": "pending"
     })
     log_test("Validate Execution", result.get("status") == "success", 
             result.get("error"), result.get("response_time"))
@@ -402,7 +403,8 @@ def test_statistics_cashflow_business_service():
     print("\n6. Testing CashFlow - Validate")
     result = test_api_endpoint("POST", f"{BUSINESS_API_BASE}/cash-flow/validate", {
         "amount": 100.0,
-        "type": "income"
+        "type": "income",
+        "source": "manual"
     })
     log_test("CashFlow - Validate", result.get("status") == "success", 
             result.get("error"), result.get("response_time"))

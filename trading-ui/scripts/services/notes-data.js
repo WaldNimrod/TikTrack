@@ -353,7 +353,10 @@
    * @returns {Promise<Object>} Validation result: {is_valid, errors}
    */
   async function validateNote(noteData) {
-    const cacheKey = `business:validate-note:${JSON.stringify(noteData)}`;
+    // Use optimized cache key generation
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-note', noteData)
+      : `business:validate-note:${JSON.stringify(noteData)}`;
     
     try {
       // Use CacheTTLGuard for automatic cache management

@@ -99,10 +99,30 @@ class DuplicateDetectionService:
                 records, i, processed_indices
             )
             
-            # Check for existing records
+            # Check for existing records for the current record
             existing_matches = self._find_system_duplicates(
                 record, existing_executions
             )
+            
+            # CRITICAL FIX: Also check if any within-file duplicate records already exist in database
+            # This prevents re-detecting duplicates that were already imported in a previous session
+            if within_file_matches:
+                for within_match in within_file_matches:
+                    match_record = within_match.get('record')
+                    if match_record:
+                        # Check if this duplicate record already exists in database
+                        match_existing_matches = self._find_system_duplicates(
+                            match_record, existing_executions
+                        )
+                        if match_existing_matches:
+                            # Add to existing_matches if not already there
+                            for match_existing in match_existing_matches:
+                                # Avoid duplicates in existing_matches list
+                                if not any(
+                                    em.get('execution_id') == match_existing.get('execution_id')
+                                    for em in existing_matches
+                                ):
+                                    existing_matches.append(match_existing)
             
             if within_file_matches or existing_matches:
                 # This is a duplicate

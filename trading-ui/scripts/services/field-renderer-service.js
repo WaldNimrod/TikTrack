@@ -710,15 +710,15 @@ class FieldRendererService {
 
         // Select icon path by entity type (using existing icons set)
         const iconMap = {
-            'trade': '/trading-ui/images/icons/trades.svg',
-            'trading_account': '/trading-ui/images/icons/trading_accounts.svg',
-            'ticker': '/trading-ui/images/icons/tickers.svg',
-            'alert': '/trading-ui/images/icons/alerts.svg',
-            'cash_flow': '/trading-ui/images/icons/cash_flows.svg',
-            'note': '/trading-ui/images/icons/notes.svg',
-            'trade_plan': '/trading-ui/images/icons/trade_plans.svg',
-            'execution': '/trading-ui/images/icons/executions.svg',
-            'default': '/trading-ui/images/icons/home.svg',
+            'trade': '/trading-ui/images/icons/entities/trades.svg',
+            'trading_account': '/trading-ui/images/icons/entities/trading_accounts.svg',
+            'ticker': '/trading-ui/images/icons/entities/tickers.svg',
+            'alert': '/trading-ui/images/icons/entities/alerts.svg',
+            'cash_flow': '/trading-ui/images/icons/entities/cash_flows.svg',
+            'note': '/trading-ui/images/icons/entities/notes.svg',
+            'trade_plan': '/trading-ui/images/icons/entities/trade_plans.svg',
+            'execution': '/trading-ui/images/icons/entities/executions.svg',
+            'default': '/trading-ui/images/icons/entities/home.svg',
         };
 
         const iconPath = iconMap[type] || iconMap['default'];

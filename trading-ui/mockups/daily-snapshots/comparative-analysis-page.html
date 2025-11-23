@@ -244,7 +244,7 @@
                 <div class="col-md-12">
                     <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                         <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
-                            <img src="/trading-ui/images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                            <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
                         </span>                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
                 <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
                 <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
@@ -270,7 +270,7 @@
                 <div class="top-section" id="comparative_analysis_page_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <img src="/trading-ui/images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon">
+                            <img src="../../images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon">
                             ניתוח השוואתי
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
@@ -288,15 +288,15 @@
                 <div class="content-section filter-panel-card" id="record-filter-panel">
                     <div class="section-header">
                         <div class="header-title-section">
-                            <h3><img src="/trading-ui/images/icons/tabler/filter.svg" width="16" height="16" alt="filter" class="icon"> סינון רשומות להשוואה</h3>
+                            <h3><img src="../../images/icons/tabler/filter.svg" width="16" height="16" alt="filter" class="icon"> סינון רשומות להשוואה</h3>
                             <p class="text-muted small mb-0">בחר איזה טריידים להכלל בניתוח</p>
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2">
-                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 2px 4px !important; line-height: 1;" onclick="selectAllRecordFilters()" title="בחר הכל">
-                                <img src="/trading-ui/images/icons/tabler/check.svg" width="16" height="16" alt="check" class="icon">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="resetRecordFilters()" title="נקה את כל הפילטרים">
+                                <img src="../../images/icons/tabler/x.svg" width="14" height="14" alt="x" class="icon"> נקה
                             </button>
-                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 2px 4px !important; line-height: 1;" onclick="clearAllRecordFilters()" title="נקה הכל">
-                                <img src="/trading-ui/images/icons/tabler/x.svg" width="16" height="16" alt="x" class="icon">
+                            <button class="btn btn-outline-primary btn-sm" onclick="resetRecordFiltersToDefaults()" title="איפוס לברירת מחדל">
+                                <img src="../../images/icons/tabler/refresh.svg" width="14" height="14" alt="refresh" class="icon"> ברירת מחדל
                             </button>
                             <button class="filter-toggle-btn" onclick="toggleSection('record-filter-panel')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -376,22 +376,21 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Clear Filters Buttons (moved to first row, at the end - left side in RTL) -->
-                                    <div class="col-md-2 me-auto d-flex align-items-end gap-2">
-                                        <button class="btn btn-outline-secondary btn-sm flex-fill" onclick="resetRecordFilters()" title="נקה את כל הפילטרים">
-                                            <img src="/trading-ui/images/icons/tabler/x.svg" width="16" height="16" alt="x" class="icon"> נקה
-                                        </button>
-                                        <button class="btn btn-outline-primary btn-sm flex-fill" onclick="resetRecordFiltersToDefaults()" title="איפוס לברירת מחדל">
-                                            <img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon"> ברירת מחדל
-                                        </button>
-                                    </div>
                                 </div>
                                 
                                 <!-- Second Row: All Other Record Filters -->
                                 <div class="row g-2">
                                     <!-- Trading Account Filter -->
                                     <div class="col-md-2">
-                                        <label class="form-label" style="font-size: 0.85rem;">חשבון מסחר</label>
+                                        <div class="d-flex align-items-center gap-1 mb-1">
+                                            <label class="form-label mb-0" style="font-size: 0.85rem;">חשבון מסחר</label>
+                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="selectAllOptions('recordFilterTradingAccounts')" title="בחר הכל">
+                                                <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
+                                            </button>
+                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="clearAllOptions('recordFilterTradingAccounts')" title="נקה הכל">
+                                                <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
+                                            </button>
+                                        </div>
                                         <select id="recordFilterTradingAccounts" class="form-select form-select-sm" multiple onchange="applyRecordFilters()" title="בחר חשבונות מסחר">
                                             <!-- Will be populated dynamically -->
                                         </select>
@@ -399,7 +398,15 @@
                                     
                                     <!-- Tags Filter -->
                                     <div class="col-md-2">
-                                        <label for="recordFilterTags" class="form-label" style="font-size: 0.85rem;">תגיות</label>
+                                        <div class="d-flex align-items-center gap-1 mb-1">
+                                            <label for="recordFilterTags" class="form-label mb-0" style="font-size: 0.85rem;">תגיות</label>
+                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="selectAllOptions('recordFilterTags')" title="בחר הכל">
+                                                <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
+                                            </button>
+                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="clearAllOptions('recordFilterTags')" title="נקה הכל">
+                                                <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
+                                            </button>
+                                        </div>
                                         <select id="recordFilterTags" class="form-select form-select-sm tag-multi-select" multiple onchange="applyRecordFilters()" title="בחר תגיות לסינון">
                                             <!-- Will be populated by TagUIManager -->
                                         </select>
@@ -478,15 +485,15 @@
                 <div class="content-section comparison-panel-card" id="comparison-parameters-panel">
                     <div class="section-header">
                         <div class="header-title-section">
-                            <h3><img src="/trading-ui/images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> פרמטרים להשוואה</h3>
+                            <h3><img src="../../images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> פרמטרים להשוואה</h3>
                             <p class="text-muted small mb-0">בחר לפי מה להשוות את הטריידים (ניתן לבחור מספר פרמטרים במקביל)</p>
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2">
-                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 2px 4px !important; line-height: 1;" onclick="selectAllComparisonParameters()" title="בחר הכל">
-                                <img src="/trading-ui/images/icons/tabler/check.svg" width="16" height="16" alt="check" class="icon">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="resetComparisonParameters()" title="נקה את כל הפרמטרים">
+                                <img src="../../images/icons/tabler/x.svg" width="14" height="14" alt="x" class="icon"> נקה
                             </button>
-                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 2px 4px !important; line-height: 1;" onclick="clearAllComparisonParameters()" title="נקה הכל">
-                                <img src="/trading-ui/images/icons/tabler/x.svg" width="16" height="16" alt="x" class="icon">
+                            <button class="btn btn-outline-primary btn-sm" onclick="resetComparisonParametersToDefaults()" title="איפוס לברירת מחדל">
+                                <img src="../../images/icons/tabler/refresh.svg" width="14" height="14" alt="refresh" class="icon"> ברירת מחדל
                             </button>
                             <button class="filter-toggle-btn" onclick="toggleSection('comparison-parameters-panel')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -499,9 +506,15 @@
                                 <div class="row g-3">
                                     <!-- Investment Type Parameter -->
                                     <div class="col-md-3">
-                                        <div class="form-check mb-2">
+                                        <div class="form-check mb-2 d-flex align-items-center gap-1">
                                             <input type="checkbox" id="compareByInvestmentType" class="form-check-input" onchange="toggleComparisonParameter('investmentType')">
-                                            <label for="compareByInvestmentType" class="form-check-label fw-bold">סוג השקעה</label>
+                                            <label for="compareByInvestmentType" class="form-check-label fw-bold mb-0">סוג השקעה</label>
+                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="selectAllOptions('comparisonInvestmentTypes')" title="בחר הכל" disabled id="btn-select-all-investment-types">
+                                                <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
+                                            </button>
+                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="clearAllOptions('comparisonInvestmentTypes')" title="נקה הכל" disabled id="btn-clear-all-investment-types">
+                                                <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
+                                            </button>
                                         </div>
                                         <select id="comparisonInvestmentTypes" class="form-select form-select-sm" multiple onchange="applyComparisonParameters()" title="בחר סוגי השקעות להשוואה" disabled>
                                             <option value="Investment">Investment</option>
@@ -512,9 +525,15 @@
                                     
                                     <!-- Trading Methods Parameter -->
                                     <div class="col-md-3">
-                                        <div class="form-check mb-2">
+                                        <div class="form-check mb-2 d-flex align-items-center gap-1">
                                             <input type="checkbox" id="compareByTradingMethods" class="form-check-input" onchange="toggleComparisonParameter('tradingMethods')">
-                                            <label for="compareByTradingMethods" class="form-check-label fw-bold">שיטות מסחר</label>
+                                            <label for="compareByTradingMethods" class="form-check-label fw-bold mb-0">שיטות מסחר</label>
+                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="selectAllOptions('comparisonTradingMethods')" title="בחר הכל" disabled id="btn-select-all-trading-methods">
+                                                <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
+                                            </button>
+                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="clearAllOptions('comparisonTradingMethods')" title="נקה הכל" disabled id="btn-clear-all-trading-methods">
+                                                <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
+                                            </button>
                                         </div>
                                         <select id="comparisonTradingMethods" class="form-select form-select-sm" multiple onchange="applyComparisonParameters()" title="בחר שיטות מסחר להשוואה" disabled>
                                             <!-- Will be populated dynamically -->
@@ -523,9 +542,15 @@
                                     
                                     <!-- Ticker Parameter -->
                                     <div class="col-md-3">
-                                        <div class="form-check mb-2">
+                                        <div class="form-check mb-2 d-flex align-items-center gap-1">
                                             <input type="checkbox" id="compareByTicker" class="form-check-input" onchange="toggleComparisonParameter('ticker')">
-                                            <label for="compareByTicker" class="form-check-label fw-bold">טיקר</label>
+                                            <label for="compareByTicker" class="form-check-label fw-bold mb-0">טיקר</label>
+                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="selectAllOptions('comparisonTickers')" title="בחר הכל" disabled id="btn-select-all-tickers">
+                                                <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
+                                            </button>
+                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="clearAllOptions('comparisonTickers')" title="נקה הכל" disabled id="btn-clear-all-tickers">
+                                                <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
+                                            </button>
                                         </div>
                                         <select id="comparisonTickers" class="form-select form-select-sm" multiple onchange="applyComparisonParameters()" title="בחר טיקרים להשוואה" disabled>
                                             <!-- Will be populated dynamically -->
@@ -534,9 +559,15 @@
                                     
                                     <!-- Tags Parameter -->
                                     <div class="col-md-3">
-                                        <div class="form-check mb-2">
+                                        <div class="form-check mb-2 d-flex align-items-center gap-1">
                                             <input type="checkbox" id="compareByTags" class="form-check-input" onchange="toggleComparisonParameter('tags')">
-                                            <label for="compareByTags" class="form-check-label fw-bold">תגיות</label>
+                                            <label for="compareByTags" class="form-check-label fw-bold mb-0">תגיות</label>
+                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="selectAllOptions('comparisonTags')" title="בחר הכל" disabled id="btn-select-all-comparison-tags">
+                                                <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
+                                            </button>
+                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="clearAllOptions('comparisonTags')" title="נקה הכל" disabled id="btn-clear-all-comparison-tags">
+                                                <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
+                                            </button>
                                         </div>
                                         <select id="comparisonTags" class="form-select form-select-sm tag-multi-select" multiple onchange="applyComparisonParameters()" title="בחר תגיות להשוואה" disabled>
                                             <!-- Will be populated by TagUIManager -->
@@ -567,7 +598,7 @@
                 <!-- Comparison Table Section -->
                 <div class="content-section" id="comparison-table-section">
                     <div class="section-header">
-                        <h2><img src="/trading-ui/images/icons/tabler/table.svg" width="16" height="16" alt="table" class="icon"> טבלת השוואות</h2>
+                        <h2><img src="../../images/icons/tabler/table.svg" width="16" height="16" alt="table" class="icon"> טבלת השוואות</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('comparison-table-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -610,7 +641,7 @@
                 <!-- Heatmap Section -->
                 <div class="content-section" id="heatmap-section">
                     <div class="section-header">
-                        <h2><img src="/trading-ui/images/icons/tabler/grid.svg" width="16" height="16" alt="grid" class="icon"> Heatmap - מטריצת השוואות</h2>
+                        <h2><img src="../../images/icons/tabler/grid.svg" width="16" height="16" alt="grid" class="icon"> Heatmap - מטריצת השוואות</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('heatmap-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -637,9 +668,22 @@
                                     </table>
                                 </div>
                                 <div class="mt-3">
-                                    <span class="badge bg-success">🟢 = טוב</span>
-                                    <span class="badge bg-warning">🟡 = בינוני</span>
-                                    <span class="badge bg-danger">🔴 = רע</span>
+                                    <div style="margin-bottom: 8px;">
+                                        <strong>ערכים חיוביים (ירוק):</strong>
+                                        <span class="badge" style="background-color: rgba(40, 167, 69, 0.7); margin-right: 4px;">מצוין</span>
+                                        <span class="badge" style="background-color: rgba(40, 167, 69, 0.55); margin-right: 4px;">טוב מאוד</span>
+                                        <span class="badge" style="background-color: rgba(40, 167, 69, 0.4); margin-right: 4px;">טוב</span>
+                                        <span class="badge" style="background-color: rgba(40, 167, 69, 0.3); margin-right: 4px;">בינוני</span>
+                                        <span class="badge" style="background-color: rgba(40, 167, 69, 0.2);">חלש</span>
+                                    </div>
+                                    <div>
+                                        <strong>ערכים שליליים (אדום):</strong>
+                                        <span class="badge" style="background-color: rgba(220, 53, 69, 0.7); margin-right: 4px;">גרוע מאוד</span>
+                                        <span class="badge" style="background-color: rgba(220, 53, 69, 0.55); margin-right: 4px;">גרוע</span>
+                                        <span class="badge" style="background-color: rgba(220, 53, 69, 0.4); margin-right: 4px;">בינוני</span>
+                                        <span class="badge" style="background-color: rgba(220, 53, 69, 0.3); margin-right: 4px;">פחות גרוע</span>
+                                        <span class="badge" style="background-color: rgba(220, 53, 69, 0.2);">הכי פחות גרוע</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -649,7 +693,7 @@
                 <!-- Bar Chart Section -->
                 <div class="content-section" id="pl-by-category-section">
                     <div class="section-header">
-                        <h2><img src="/trading-ui/images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> P/L לפי קטגוריה</h2>
+                        <h2><img src="../../images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> P/L לפי קטגוריה</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('pl-by-category-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -659,26 +703,26 @@
                     <div class="section-body">
                                 <div id="pl-by-category-chart-container" class="chart-container" style="height: 300px; position: relative; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
                                     <div class="chart-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6c757d;">
-                                        <img src="/trading-ui/images/icons/tabler/hourglass.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                        <img src="../../images/icons/tabler/hourglass.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
                                     </div>
                                 </div>
                     </div>
                 </div>
                 
-                <!-- Pie Chart Section -->
-                <div class="content-section" id="category-distribution-section">
+                <!-- Success Rate Chart Section -->
+                <div class="content-section" id="success-rate-section">
                     <div class="section-header">
-                        <h2><img src="/trading-ui/images/icons/tabler/chart-pie.svg" width="16" height="16" alt="chart-pie" class="icon"> התפלגות לפי קטגוריה</h2>
+                        <h2><img src="../../images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> אחוז הצלחה לפי קטגוריה</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('category-distribution-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" onclick="toggleSection('success-rate-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
-                        <div id="category-distribution-chart-container" class="chart-container" style="height: 300px; position: relative; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
+                        <div id="success-rate-chart-container" class="chart-container" style="height: 300px; position: relative; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
                             <div class="chart-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6c757d;">
-                                <img src="/trading-ui/images/icons/tabler/hourglass.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                <img src="../../images/icons/tabler/hourglass.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
                             </div>
                         </div>
                     </div>
@@ -828,13 +872,38 @@
         /* Small icon buttons in header */
         .filter-panel-card .section-header .header-actions .btn-link,
         .comparison-panel-card .section-header .header-actions .btn-link {
-            font-size: 0.75rem !important;
-            padding: 2px 4px !important;
-            line-height: 1 !important;
+            font-size: 0.8rem !important;
+            padding: 4px 6px !important;
+            line-height: 1.2 !important;
             min-width: auto !important;
             width: auto !important;
             height: auto !important;
-            color: inherit;
+            color: #495057 !important;
+            background-color: rgba(255, 255, 255, 0.7) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            border-radius: 4px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .filter-panel-card .section-header .header-actions .btn-link:hover,
+        .comparison-panel-card .section-header .header-actions .btn-link:hover {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            border-color: rgba(0, 0, 0, 0.2) !important;
+            opacity: 1 !important;
+            transform: scale(1.05);
+        }
+        
+        .filter-panel-card .section-header .header-actions .btn-link img,
+        .comparison-panel-card .section-header .header-actions .btn-link img {
+            width: 16px !important;
+            height: 16px !important;
+            display: block !important;
+            margin-left: 2px !important;
         }
         
         .filter-panel-card .section-header .header-actions .btn-link:hover,
@@ -845,6 +914,35 @@
         .filter-panel-card .section-header .header-actions .btn-link i,
         .comparison-panel-card .section-header .header-actions .btn-link i {
             font-size: 0.85rem;
+        }
+        
+        /* Heatmap gradient colors */
+        .heatmap-excellent {
+            background-color: rgba(40, 167, 69, 0.7) !important;
+        }
+        
+        .heatmap-very-good {
+            background-color: rgba(40, 167, 69, 0.55) !important;
+        }
+        
+        .heatmap-good {
+            background-color: rgba(40, 167, 69, 0.4) !important;
+        }
+        
+        .heatmap-average {
+            background-color: rgba(255, 193, 7, 0.4) !important;
+        }
+        
+        .heatmap-below-avg {
+            background-color: rgba(255, 193, 7, 0.55) !important;
+        }
+        
+        .heatmap-poor {
+            background-color: rgba(220, 53, 69, 0.55) !important;
+        }
+        
+        .heatmap-very-poor {
+            background-color: rgba(220, 53, 69, 0.7) !important;
         }
     </style>
     
@@ -863,8 +961,8 @@
         // Chart variables
         let plByCategoryChart = null;
         let plByCategorySeries = null;
-        let categoryDistributionChart = null;
-        let categoryDistributionSeries = null;
+        let successRateChart = null;
+        let successRateSeries = null;
         
         // Filter state - separated into record filters and comparison parameters
         const RECORD_FILTER_STORAGE_KEY = 'comparative-analysis-record-filters';
@@ -1497,7 +1595,7 @@
                     paramValues: paramValues, // New: separated parameter values
                     paramHeaders: enabledParams.map(p => p.name), // Parameter headers
                     trades: Math.floor(Math.random() * 30) + 10,
-                    avgPL: Math.floor(Math.random() * 500) + 200,
+                    avgPL: 0, // Will be calculated (can be positive or negative)
                     totalPL: 0, // Will be calculated
                     successRate: Math.floor(Math.random() * 30) + 50,
                     totalInvestment: 0, // Will be calculated (max investment at point in time + total purchases)
@@ -1554,16 +1652,35 @@
             }
             
             // Add variations and calculate totalPL, totalInvestment
-            categories.forEach(cat => {
+            // Include both positive and negative P/L values for realistic data
+            categories.forEach((cat, index) => {
                 const variation = (seededRandom() - 0.5) * 0.2; // ±10%
                 cat.trades = Math.max(1, Math.round(cat.trades * (1 + variation)));
-                cat.avgPL = Math.round(cat.avgPL * (1 + variation));
+                
+                // Generate P/L values: mix of positive and negative
+                // About 40% will be negative (losses), 60% positive (profits)
+                const isNegative = seededRandom() < 0.4;
+                
+                if (isNegative) {
+                    // Negative P/L (losses): -$50 to -$500 per trade
+                    cat.avgPL = -Math.round(seededRandom() * 450 + 50);
+                } else {
+                    // Positive P/L (profits): $50 to $500 per trade
+                    cat.avgPL = Math.round(seededRandom() * 450 + 50);
+                }
+                
                 cat.totalPL = cat.trades * cat.avgPL;
-                cat.successRate = Math.max(0, Math.min(100, Math.round(cat.successRate + (seededRandom() - 0.5) * 10)));
+                
+                // Success rate: lower for negative P/L categories
+                if (isNegative) {
+                    cat.successRate = Math.max(20, Math.min(50, Math.round(35 + (seededRandom() - 0.5) * 15)));
+                } else {
+                    cat.successRate = Math.max(50, Math.min(100, Math.round(65 + (seededRandom() - 0.5) * 20)));
+                }
                 
                 // Calculate investment metrics
                 // Total purchases: based on trades and average investment per trade
-                const avgInvestmentPerTrade = Math.floor(Math.random() * 5000) + 2000; // $2K-$7K per trade
+                const avgInvestmentPerTrade = Math.floor(seededRandom() * 5000) + 2000; // $2K-$7K per trade
                 cat.totalPurchases = cat.trades * avgInvestmentPerTrade;
                 
                 // Max investment at point in time: typically 60-80% of total purchases (some trades closed)
@@ -1580,7 +1697,7 @@
             };
         }
         
-        // Generate mock P/L by category data for Bar Chart
+        // Generate mock P/L by category data for Bar Chart (with positive/negative colors)
         function generateMockPLByCategoryData(filters) {
             const tableResult = generateMockComparisonTableData(filters);
             const tableData = tableResult.data;
@@ -1589,7 +1706,8 @@
             tableData.forEach((cat, index) => {
                 data.push({
                     time: index.toString(),
-                    value: cat.totalPL
+                    value: cat.totalPL,
+                    color: cat.totalPL >= 0 ? '#28a745' : '#dc3545' // Green for positive, red for negative
                 });
             });
             
@@ -1599,25 +1717,22 @@
             };
         }
         
-        // Generate mock category distribution data for Pie Chart
-        function generateMockCategoryDistributionData(filters) {
+        // Generate mock success rate data for Bar Chart
+        function generateMockSuccessRateData(filters) {
             const tableResult = generateMockComparisonTableData(filters);
             const tableData = tableResult.data;
-            const totalTrades = tableData.reduce((sum, cat) => sum + cat.trades, 0);
             
             const data = [];
             tableData.forEach((cat, index) => {
-                const percentage = totalTrades > 0 ? (cat.trades / totalTrades) * 100 : 0;
                 data.push({
                     time: index.toString(),
-                    value: percentage
+                    value: cat.successRate
                 });
             });
             
             return {
                 data,
-                categories: tableData.map(cat => cat.name),
-                totalTrades
+                categories: tableData.map(cat => cat.name)
             };
         }
         
@@ -1626,18 +1741,58 @@
             const tableResult = generateMockComparisonTableData(filters);
             const tableData = tableResult.data;
             
-            // Calculate percentiles for coloring
+            // Separate positive and negative values for percentile calculation
             const allPLValues = tableData.map(cat => cat.totalPL);
-            const allSuccessRates = tableData.map(cat => cat.successRate);
             const allAvgPL = tableData.map(cat => cat.avgPL);
+            const allSuccessRates = tableData.map(cat => cat.successRate);
             const allTrades = tableData.map(cat => cat.trades);
             const allMaxInvestment = tableData.map(cat => cat.maxInvestmentAtPoint || 0);
             const allTotalPurchases = tableData.map(cat => cat.totalPurchases || 0);
             
+            // Separate positive and negative arrays
+            const positivePLValues = allPLValues.filter(v => v >= 0);
+            const negativePLValues = allPLValues.filter(v => v < 0);
+            const positiveAvgPL = allAvgPL.filter(v => v >= 0);
+            const negativeAvgPL = allAvgPL.filter(v => v < 0);
+            
             const getPercentile = (value, arr) => {
+                if (arr.length === 0) return 0.5;
                 const sorted = [...arr].sort((a, b) => a - b);
                 const index = sorted.findIndex(v => v >= value);
                 return index === -1 ? 1 : index / sorted.length;
+            };
+            
+            // Get percentile for P/L values - separate positive and negative
+            const getPLPercentile = (value) => {
+                if (value >= 0) {
+                    // Positive: higher is better, percentile 1 = best
+                    if (positivePLValues.length === 0) return 0.5;
+                    return getPercentile(value, positivePLValues);
+                } else {
+                    // Negative: lower (more negative) is worse, percentile 1 = worst
+                    // Invert so that less negative = better percentile
+                    if (negativePLValues.length === 0) return 0.5;
+                    const sorted = [...negativePLValues].sort((a, b) => a - b); // Sort ascending (most negative first)
+                    const index = sorted.findIndex(v => v <= value); // Find first value <= current (more negative)
+                    const percentile = index === -1 ? 1 : index / sorted.length;
+                    return 1 - percentile; // Invert: less negative = higher percentile
+                }
+            };
+            
+            // Get percentile for Avg P/L values - separate positive and negative
+            const getAvgPLPercentile = (value) => {
+                if (value >= 0) {
+                    // Positive: higher is better
+                    if (positiveAvgPL.length === 0) return 0.5;
+                    return getPercentile(value, positiveAvgPL);
+                } else {
+                    // Negative: lower (more negative) is worse
+                    if (negativeAvgPL.length === 0) return 0.5;
+                    const sorted = [...negativeAvgPL].sort((a, b) => a - b);
+                    const index = sorted.findIndex(v => v <= value);
+                    const percentile = index === -1 ? 1 : index / sorted.length;
+                    return 1 - percentile; // Invert: less negative = higher percentile
+                }
             };
             
             return tableData.map(cat => ({
@@ -1649,9 +1804,9 @@
                 maxInvestmentAtPoint: cat.maxInvestmentAtPoint || 0,
                 totalPurchases: cat.totalPurchases || 0,
                 totalInvestment: cat.totalInvestment || 0,
-                plPercentile: getPercentile(cat.totalPL, allPLValues),
+                plPercentile: getPLPercentile(cat.totalPL),
                 successPercentile: getPercentile(cat.successRate, allSuccessRates),
-                avgPLPercentile: getPercentile(cat.avgPL, allAvgPL),
+                avgPLPercentile: getAvgPLPercentile(cat.avgPL),
                 tradesPercentile: getPercentile(cat.trades, allTrades),
                 maxInvestmentPercentile: getPercentile(cat.maxInvestmentAtPoint || 0, allMaxInvestment),
                 totalPurchasesPercentile: getPercentile(cat.totalPurchases || 0, allTotalPurchases)
@@ -1725,11 +1880,33 @@
             return valueFormatted;
         }
         
-        // Get color class based on percentile
+        // Get color class based on percentile - more sensitive gradient
         function getColorClass(percentile) {
-            if (percentile >= 0.7) return 'table-success';
-            if (percentile >= 0.3) return 'table-warning';
-            return 'table-danger';
+            // More granular gradient: 7 levels instead of 3
+            if (percentile >= 0.9) return 'heatmap-excellent';      // Top 10%
+            if (percentile >= 0.75) return 'heatmap-very-good';     // Top 25%
+            if (percentile >= 0.6) return 'heatmap-good';           // Top 40%
+            if (percentile >= 0.4) return 'heatmap-average';        // Middle 20%
+            if (percentile >= 0.25) return 'heatmap-below-avg';    // Bottom 25%
+            if (percentile >= 0.1) return 'heatmap-poor';           // Bottom 10%
+            return 'heatmap-very-poor';                              // Bottom 10%
+        }
+        
+        // Get color style based on percentile and value sign for inline gradient
+        // IMPORTANT: Positive values cannot be below 0, negative values cannot be above 0
+        function getColorStyle(percentile, value) {
+            // Separate handling for positive and negative values
+            if (value >= 0) {
+                // Positive values: only green gradient (0 to 1, where 1 = best positive)
+                const opacity = 0.2 + (percentile * 0.5); // 0.2 to 0.7
+                return `background-color: rgba(40, 167, 69, ${opacity.toFixed(2)});`;
+            } else {
+                // Negative values: only red gradient (0 to 1, where 1 = worst negative)
+                // For negatives, higher percentile means worse (more negative), so invert
+                const invertedPercentile = 1 - percentile;
+                const opacity = 0.2 + (invertedPercentile * 0.5); // 0.2 to 0.7
+                return `background-color: rgba(220, 53, 69, ${opacity.toFixed(2)});`;
+            }
         }
         
         // Format filter info for display
@@ -1989,10 +2166,14 @@
                         : null;
                     
                     // Build data cells
+                    // Determine color class for P/L columns based on sign
+                    const totalPLClass = cat.totalPL >= 0 ? 'text-success' : 'text-danger';
+                    const avgPLClass = cat.avgPL >= 0 ? 'text-success' : 'text-danger';
+                    
                     const dataCells = `
                         <td>${cat.trades}</td>
-                        <td>${formatPLWithPercent(cat.avgPL, plPercent)}</td>
-                        <td class="text-success">${formatPLWithPercent(cat.totalPL, plPercent)}</td>
+                        <td class="${avgPLClass}">${formatPLWithPercent(cat.avgPL, plPercent)}</td>
+                        <td class="${totalPLClass}">${formatPLWithPercent(cat.totalPL, plPercent)}</td>
                         <td>${cat.successRate}%</td>
                         <td class="text-end">${formatInvestmentWithPercent(cat.maxInvestmentAtPoint, maxInvestmentPercent)}</td>
                         <td class="text-end">${formatInvestmentWithPercent(cat.totalPurchases, totalPurchasesPercent)}</td>
@@ -2008,12 +2189,16 @@
                 const summaryMaxInvestmentPercent = totalMaxInvestment > 0 ? 100 : null; // Total is 100% of itself
                 const summaryTotalPurchasesPercent = totalTotalPurchases > 0 ? 100 : null;
                 
+                // Determine color class for summary P/L based on sign
+                const summaryTotalPLClass = totalTotalPL >= 0 ? 'text-success' : 'text-danger';
+                const summaryAvgPLClass = totalAvgPL >= 0 ? 'text-success' : 'text-danger';
+                
                 const summaryRow = `
                     <tr class="table-info fw-bold" style="background-color: #d1ecf1; border-top: 2px solid #0c5460;">
                         ${summaryParamCells}
                         <td><strong>${totalTrades}<br>${avgTrades.toFixed(1)}</strong></td>
-                        <td><strong>${formatPLWithPercent(totalAvgPL, summaryPLPercent)}<br>${formatPLWithPercent(avgAvgPL, summaryPLPercent)}</strong></td>
-                        <td class="text-success"><strong>${formatPLWithPercent(totalTotalPL, summaryPLPercent)}<br>${formatPLWithPercent(avgTotalPL, summaryPLPercent)}</strong></td>
+                        <td class="${summaryAvgPLClass}"><strong>${formatPLWithPercent(totalAvgPL, summaryPLPercent)}<br>${formatPLWithPercent(avgAvgPL, summaryPLPercent)}</strong></td>
+                        <td class="${summaryTotalPLClass}"><strong>${formatPLWithPercent(totalTotalPL, summaryPLPercent)}<br>${formatPLWithPercent(avgTotalPL, summaryPLPercent)}</strong></td>
                         <td><strong>${avgSuccessRate.toFixed(1)}%</strong></td>
                         <td class="text-end"><strong>${formatInvestmentWithPercent(totalMaxInvestment, summaryMaxInvestmentPercent)}<br>${formatInvestmentWithPercent(avgMaxInvestment, null)}</strong></td>
                         <td class="text-end"><strong>${formatInvestmentWithPercent(totalTotalPurchases, summaryTotalPurchasesPercent)}<br>${formatInvestmentWithPercent(avgTotalPurchases, null)}</strong></td>
@@ -2098,12 +2283,12 @@
                     onclick="filterByCategory('${item.category}')"
                     style="cursor: pointer; transition: background-color 0.2s;">
                     <td><strong>${item.category}</strong></td>
-                    <td class="${getColorClass(item.tradesPercentile)}" data-value="${item.trades}">${item.trades}</td>
-                    <td class="${getColorClass(item.avgPLPercentile)}" data-value="${item.avgPL}">${formatPLWithPercent(item.avgPL, plPercent)}</td>
-                    <td class="${getColorClass(item.plPercentile)} text-success" data-value="${item.totalPL}">${formatPLWithPercent(item.totalPL, plPercent)}</td>
-                    <td class="${getColorClass(item.successPercentile)}" data-value="${item.successRate}">${item.successRate}%</td>
-                    <td class="${getColorClass(item.maxInvestmentPercentile)} text-end" data-value="${item.maxInvestmentAtPoint || 0}">${formatInvestmentWithPercent(item.maxInvestmentAtPoint || 0, maxInvestmentPercent)}</td>
-                    <td class="${getColorClass(item.totalPurchasesPercentile)} text-end" data-value="${item.totalPurchases || 0}">${formatInvestmentWithPercent(item.totalPurchases || 0, totalPurchasesPercent)}</td>
+                    <td style="${getColorStyle(item.tradesPercentile, item.trades)}" data-value="${item.trades}">${item.trades}</td>
+                    <td style="${getColorStyle(item.avgPLPercentile, item.avgPL)}" data-value="${item.avgPL}">${formatPLWithPercent(item.avgPL, plPercent)}</td>
+                    <td style="${getColorStyle(item.plPercentile, item.totalPL)}" data-value="${item.totalPL}">${formatPLWithPercent(item.totalPL, plPercent)}</td>
+                    <td style="${getColorStyle(item.successPercentile, item.successRate)}" data-value="${item.successRate}">${item.successRate}%</td>
+                    <td class="text-end" style="${getColorStyle(item.maxInvestmentPercentile, item.maxInvestmentAtPoint || 0)}" data-value="${item.maxInvestmentAtPoint || 0}">${formatInvestmentWithPercent(item.maxInvestmentAtPoint || 0, maxInvestmentPercent)}</td>
+                    <td class="text-end" style="${getColorStyle(item.totalPurchasesPercentile, item.totalPurchases || 0)}" data-value="${item.totalPurchases || 0}">${formatInvestmentWithPercent(item.totalPurchases || 0, totalPurchasesPercent)}</td>
                 </tr>
             `;
             }).join('');
@@ -2225,31 +2410,73 @@
                     }
                 });
                 
-                // Add bar series (using histogram series if available, otherwise area series)
+                // Add bar series with dynamic colors (positive/negative)
                 const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
                 if (lightweightCharts && lightweightCharts.HistogramSeries) {
-                    plByCategorySeries = plByCategoryChart.addSeries(lightweightCharts.HistogramSeries, {
-                        color: getCSSVariableValue('--primary-color', '#26baac'),
-                        priceFormat: {
-                            type: 'price',
-                            precision: 0,
-                            minMove: 1
-                        }
-                    });
-                    plByCategorySeries.setData(chartData.data);
+                    // Create separate series for positive and negative values
+                    const positiveData = chartData.data.filter(d => d.value >= 0);
+                    const negativeData = chartData.data.filter(d => d.value < 0);
+                    
+                    // Positive series (green)
+                    if (positiveData.length > 0) {
+                        plByCategorySeries = plByCategoryChart.addSeries(lightweightCharts.HistogramSeries, {
+                            color: '#28a745', // Green for positive
+                            priceFormat: {
+                                type: 'price',
+                                precision: 0,
+                                minMove: 1
+                            },
+                            title: 'P/L חיובי'
+                        });
+                        plByCategorySeries.setData(positiveData);
+                    }
+                    
+                    // Negative series (red) - if exists
+                    if (negativeData.length > 0) {
+                        const negativeSeries = plByCategoryChart.addSeries(lightweightCharts.HistogramSeries, {
+                            color: '#dc3545', // Red for negative
+                            priceFormat: {
+                                type: 'price',
+                                precision: 0,
+                                minMove: 1
+                            },
+                            title: 'P/L שלילי'
+                        });
+                        negativeSeries.setData(negativeData);
+                    }
                 } else {
-                    // Fallback to area series for bar-like visualization
-                    plByCategorySeries = window.TradingViewChartAdapter.addAreaSeries(plByCategoryChart, {
-                        lineColor: getCSSVariableValue('--primary-color', '#26baac'),
-                        topColor: getCSSVariableValue('--primary-color', '#26baac'),
-                        bottomColor: getCSSVariableValue('--primary-color', '#26baac') + '28',
-                        priceFormat: {
-                            type: 'price',
-                            precision: 0,
-                            minMove: 1
-                        }
-                    });
-                    plByCategorySeries.setData(chartData.data);
+                    // Fallback: use area series with dynamic colors
+                    // Group by positive/negative
+                    const positiveData = chartData.data.filter(d => d.value >= 0);
+                    const negativeData = chartData.data.filter(d => d.value < 0);
+                    
+                    if (positiveData.length > 0) {
+                        plByCategorySeries = window.TradingViewChartAdapter.addAreaSeries(plByCategoryChart, {
+                            lineColor: '#28a745',
+                            topColor: '#28a745',
+                            bottomColor: '#28a745' + '28',
+                            priceFormat: {
+                                type: 'price',
+                                precision: 0,
+                                minMove: 1
+                            }
+                        });
+                        plByCategorySeries.setData(positiveData);
+                    }
+                    
+                    if (negativeData.length > 0) {
+                        const negativeSeries = window.TradingViewChartAdapter.addAreaSeries(plByCategoryChart, {
+                            lineColor: '#dc3545',
+                            topColor: '#dc3545',
+                            bottomColor: '#dc3545' + '28',
+                            priceFormat: {
+                                type: 'price',
+                                precision: 0,
+                                minMove: 1
+                            }
+                        });
+                        negativeSeries.setData(negativeData);
+                    }
                 }
                 
                 plByCategoryChart.timeScale().fitContent();
@@ -2261,21 +2488,21 @@
                 if (container) {
                     const loading = container.querySelector('.chart-loading');
                     if (loading) {
-                        loading.innerHTML = '<img src="/trading-ui/images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> שגיאה בטעינת גרף';
+                        loading.innerHTML = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> שגיאה בטעינת גרף';
                         loading.style.color = '#dc3545';
                     }
                 }
             }
         }
         
-        // Initialize Pie Chart (using area chart as approximation)
-        async function initPieChart() {
+        // Initialize Success Rate Chart (Bar Chart)
+        async function initSuccessRateChart() {
             try {
                 await waitForTradingViewAdapter();
                 
-                const container = document.getElementById('category-distribution-chart-container');
+                const container = document.getElementById('success-rate-chart-container');
                 if (!container) {
-                    console.error('Pie chart container not found');
+                    console.error('Success rate chart container not found');
                     return;
                 }
                 
@@ -2284,23 +2511,23 @@
                 if (loading) loading.remove();
                 
                 // Destroy existing chart if any
-                if (categoryDistributionChart) {
+                if (successRateChart) {
                     try {
                         if (window.TradingViewChartAdapter && typeof window.TradingViewChartAdapter.destroyChart === 'function') {
-                            window.TradingViewChartAdapter.destroyChart(categoryDistributionChart);
+                            window.TradingViewChartAdapter.destroyChart(successRateChart);
                         } else {
-                            categoryDistributionChart.remove();
+                            successRateChart.remove();
                         }
                     } catch (e) {
-                        console.warn('Error removing existing pie chart:', e);
+                        console.warn('Error removing existing success rate chart:', e);
                     }
                 }
                 
                 const filters = getFilterValues();
-                const chartData = generateMockCategoryDistributionData(filters);
+                const chartData = generateMockSuccessRateData(filters);
                 
                 // Create chart
-                categoryDistributionChart = window.TradingViewChartAdapter.createChart(container, {
+                successRateChart = window.TradingViewChartAdapter.createChart(container, {
                     layout: {
                         background: { type: 'solid', color: 'transparent' },
                         textColor: getCSSVariableValue('--text-color', '#333')
@@ -2324,32 +2551,43 @@
                     }
                 });
                 
-                // Add area series for pie-like visualization
-                const colors = ['#26baac', '#fc5a06', '#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1'];
-                chartData.categories.forEach((cat, index) => {
-                    const color = colors[index % colors.length];
-                    const series = window.TradingViewChartAdapter.addAreaSeries(categoryDistributionChart, {
-                        lineColor: color,
-                        topColor: color,
-                        bottomColor: color + '28',
-                        title: cat
+                // Add bar series (using histogram series if available, otherwise area series)
+                const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
+                if (lightweightCharts && lightweightCharts.HistogramSeries) {
+                    successRateSeries = successRateChart.addSeries(lightweightCharts.HistogramSeries, {
+                        color: getCSSVariableValue('--primary-color', '#26baac'),
+                        priceFormat: {
+                            type: 'price',
+                            precision: 0,
+                            minMove: 1
+                        }
                     });
-                    series.setData([{
-                        time: '0',
-                        value: chartData.data[index]?.value || 0
-                    }]);
-                });
+                    successRateSeries.setData(chartData.data);
+                } else {
+                    // Fallback to area series for bar-like visualization
+                    successRateSeries = window.TradingViewChartAdapter.addAreaSeries(successRateChart, {
+                        lineColor: getCSSVariableValue('--primary-color', '#26baac'),
+                        topColor: getCSSVariableValue('--primary-color', '#26baac'),
+                        bottomColor: getCSSVariableValue('--primary-color', '#26baac') + '28',
+                        priceFormat: {
+                            type: 'price',
+                            precision: 0,
+                            minMove: 1
+                        }
+                    });
+                    successRateSeries.setData(chartData.data);
+                }
                 
-                categoryDistributionChart.timeScale().fitContent();
-                console.log('✅ Pie chart initialized');
+                successRateChart.timeScale().fitContent();
+                console.log('✅ Success rate chart initialized');
                 
             } catch (error) {
-                console.error('Error initializing pie chart:', error);
-                const container = document.getElementById('category-distribution-chart-container');
+                console.error('Error initializing success rate chart:', error);
+                const container = document.getElementById('success-rate-chart-container');
                 if (container) {
                     const loading = container.querySelector('.chart-loading');
                     if (loading) {
-                        loading.innerHTML = '<img src="/trading-ui/images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> שגיאה בטעינת גרף';
+                        loading.innerHTML = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> שגיאה בטעינת גרף';
                         loading.style.color = '#dc3545';
                     }
                 }
@@ -2369,35 +2607,86 @@
             // Update charts
             requestAnimationFrame(() => {
                 updateBarChart(filters);
-                updatePieChart(filters);
+                updateSuccessRateChart(filters);
             });
         }
         
         // Update Bar Chart
         function updateBarChart(filters) {
-            if (!plByCategoryChart || !plByCategorySeries) {
+            if (!plByCategoryChart) {
                 initBarChart();
                 return;
             }
             
             try {
                 const chartData = generateMockPLByCategoryData(filters);
-                plByCategorySeries.setData(chartData.data);
+                
+                // Remove all existing series
+                const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
+                if (lightweightCharts && lightweightCharts.HistogramSeries) {
+                    // Remove all series and recreate
+                    plByCategoryChart.removeSeries(plByCategorySeries);
+                    if (plByCategoryChart.series().length > 0) {
+                        plByCategoryChart.series().forEach(series => plByCategoryChart.removeSeries(series));
+                    }
+                    
+                    // Create separate series for positive and negative values
+                    const positiveData = chartData.data.filter(d => d.value >= 0);
+                    const negativeData = chartData.data.filter(d => d.value < 0);
+                    
+                    // Positive series (green)
+                    if (positiveData.length > 0) {
+                        plByCategorySeries = plByCategoryChart.addSeries(lightweightCharts.HistogramSeries, {
+                            color: '#28a745',
+                            priceFormat: {
+                                type: 'price',
+                                precision: 0,
+                                minMove: 1
+                            }
+                        });
+                        plByCategorySeries.setData(positiveData);
+                    }
+                    
+                    // Negative series (red)
+                    if (negativeData.length > 0) {
+                        const negativeSeries = plByCategoryChart.addSeries(lightweightCharts.HistogramSeries, {
+                            color: '#dc3545',
+                            priceFormat: {
+                                type: 'price',
+                                precision: 0,
+                                minMove: 1
+                            }
+                        });
+                        negativeSeries.setData(negativeData);
+                    }
+                } else {
+                    // Fallback: reinitialize chart
+                    initBarChart();
+                    return;
+                }
+                
                 plByCategoryChart.timeScale().fitContent();
             } catch (error) {
                 console.error('Error updating bar chart:', error);
+                // Fallback: reinitialize
+                initBarChart();
             }
         }
         
-        // Update Pie Chart
-        function updatePieChart(filters) {
-            if (!categoryDistributionChart) {
-                initPieChart();
+        // Update Success Rate Chart
+        function updateSuccessRateChart(filters) {
+            if (!successRateChart || !successRateSeries) {
+                initSuccessRateChart();
                 return;
             }
             
-            // For simplicity, reinitialize the chart
-            initPieChart();
+            try {
+                const chartData = generateMockSuccessRateData(filters);
+                successRateSeries.setData(chartData.data);
+                successRateChart.timeScale().fitContent();
+            } catch (error) {
+                console.error('Error updating success rate chart:', error);
+            }
         }
         
         // Select all options in a multi-select
@@ -2724,8 +3013,12 @@
                 case 'investmentType':
                     checkbox = document.getElementById('compareByInvestmentType');
                     select = document.getElementById('comparisonInvestmentTypes');
+                    const btnSelectAllInvestment = document.getElementById('btn-select-all-investment-types');
+                    const btnClearAllInvestment = document.getElementById('btn-clear-all-investment-types');
                     if (checkbox && select) {
                         select.disabled = !checkbox.checked;
+                        if (btnSelectAllInvestment) btnSelectAllInvestment.disabled = !checkbox.checked;
+                        if (btnClearAllInvestment) btnClearAllInvestment.disabled = !checkbox.checked;
                         // If enabled, select all options by default
                         if (checkbox.checked) {
                             Array.from(select.options).forEach(opt => {
@@ -2737,8 +3030,12 @@
                 case 'tradingMethods':
                     checkbox = document.getElementById('compareByTradingMethods');
                     select = document.getElementById('comparisonTradingMethods');
+                    const btnSelectAllMethods = document.getElementById('btn-select-all-trading-methods');
+                    const btnClearAllMethods = document.getElementById('btn-clear-all-trading-methods');
                     if (checkbox && select) {
                         select.disabled = !checkbox.checked;
+                        if (btnSelectAllMethods) btnSelectAllMethods.disabled = !checkbox.checked;
+                        if (btnClearAllMethods) btnClearAllMethods.disabled = !checkbox.checked;
                         // If enabled, select all options by default
                         if (checkbox.checked) {
                             Array.from(select.options).forEach(opt => {
@@ -2750,8 +3047,12 @@
                 case 'ticker':
                     checkbox = document.getElementById('compareByTicker');
                     select = document.getElementById('comparisonTickers');
+                    const btnSelectAllTickers = document.getElementById('btn-select-all-tickers');
+                    const btnClearAllTickers = document.getElementById('btn-clear-all-tickers');
                     if (checkbox && select) {
                         select.disabled = !checkbox.checked;
+                        if (btnSelectAllTickers) btnSelectAllTickers.disabled = !checkbox.checked;
+                        if (btnClearAllTickers) btnClearAllTickers.disabled = !checkbox.checked;
                         // If enabled, select all options by default
                         if (checkbox.checked) {
                             Array.from(select.options).forEach(opt => {
@@ -2777,8 +3078,12 @@
                 case 'tags':
                     checkbox = document.getElementById('compareByTags');
                     select = document.getElementById('comparisonTags');
+                    const btnSelectAllTags = document.getElementById('btn-select-all-comparison-tags');
+                    const btnClearAllTags = document.getElementById('btn-clear-all-comparison-tags');
                     if (checkbox && select) {
                         select.disabled = !checkbox.checked;
+                        if (btnSelectAllTags) btnSelectAllTags.disabled = !checkbox.checked;
+                        if (btnClearAllTags) btnClearAllTags.disabled = !checkbox.checked;
                         // If enabled, select all options by default
                         if (checkbox.checked) {
                             // Use TagUIManager if available
@@ -2870,6 +3175,69 @@
             
             saveComparisonParameterState();
             updateAllVisualizations();
+        }
+        
+        // Reset comparison parameters (clear all)
+        function resetComparisonParameters() {
+            // Uncheck all parameter checkboxes
+            document.getElementById('compareByInvestmentType').checked = false;
+            document.getElementById('compareByTradingMethods').checked = false;
+            document.getElementById('compareByTicker').checked = false;
+            document.getElementById('compareByPlan').checked = false;
+            document.getElementById('compareByTags').checked = false;
+            
+            // Disable all selects and checkboxes
+            document.getElementById('comparisonInvestmentTypes').disabled = true;
+            document.getElementById('comparisonTradingMethods').disabled = true;
+            document.getElementById('comparisonTickers').disabled = true;
+            document.getElementById('comparisonWithPlan').disabled = true;
+            document.getElementById('comparisonWithoutPlan').disabled = true;
+            document.getElementById('comparisonTags').disabled = true;
+            
+            // Disable all "Select All" and "Clear All" buttons for individual selects
+            const btnSelectAllInvestment = document.getElementById('btn-select-all-investment-types');
+            const btnClearAllInvestment = document.getElementById('btn-clear-all-investment-types');
+            const btnSelectAllMethods = document.getElementById('btn-select-all-trading-methods');
+            const btnClearAllMethods = document.getElementById('btn-clear-all-trading-methods');
+            const btnSelectAllTickers = document.getElementById('btn-select-all-tickers');
+            const btnClearAllTickers = document.getElementById('btn-clear-all-tickers');
+            const btnSelectAllTags = document.getElementById('btn-select-all-comparison-tags');
+            const btnClearAllTags = document.getElementById('btn-clear-all-comparison-tags');
+            
+            if (btnSelectAllInvestment) btnSelectAllInvestment.disabled = true;
+            if (btnClearAllInvestment) btnClearAllInvestment.disabled = true;
+            if (btnSelectAllMethods) btnSelectAllMethods.disabled = true;
+            if (btnClearAllMethods) btnClearAllMethods.disabled = true;
+            if (btnSelectAllTickers) btnSelectAllTickers.disabled = true;
+            if (btnClearAllTickers) btnClearAllTickers.disabled = true;
+            if (btnSelectAllTags) btnSelectAllTags.disabled = true;
+            if (btnClearAllTags) btnClearAllTags.disabled = true;
+            
+            // Clear all selections
+            Array.from(document.getElementById('comparisonInvestmentTypes').options).forEach(opt => opt.selected = false);
+            Array.from(document.getElementById('comparisonTradingMethods').options).forEach(opt => opt.selected = false);
+            Array.from(document.getElementById('comparisonTickers').options).forEach(opt => opt.selected = false);
+            document.getElementById('comparisonWithPlan').checked = false;
+            document.getElementById('comparisonWithoutPlan').checked = false;
+            
+            // Clear tags selection
+            const tagsSelect = document.getElementById('comparisonTags');
+            if (tagsSelect) {
+                if (window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                    window.TagUIManager.setSelectedValues(tagsSelect, []);
+                } else {
+                    Array.from(tagsSelect.options).forEach(opt => opt.selected = false);
+                }
+            }
+            
+            saveComparisonParameterState();
+            updateAllVisualizations();
+        }
+        
+        // Reset comparison parameters to defaults (no defaults - same as clear)
+        function resetComparisonParametersToDefaults() {
+            // For comparison parameters, there are no defaults - just clear everything
+            resetComparisonParameters();
         }
         
         // ===== Data Loading Functions =====
@@ -3084,6 +3452,8 @@
         window.applyComparisonParameters = applyComparisonParameters;
         window.selectAllComparisonParameters = selectAllComparisonParameters;
         window.clearAllComparisonParameters = clearAllComparisonParameters;
+        window.resetComparisonParameters = resetComparisonParameters;
+        window.resetComparisonParametersToDefaults = resetComparisonParametersToDefaults;
         
         // Apply filters (called automatically on filter change) - backward compatibility
         function applyFilters() {
@@ -3294,10 +3664,10 @@
                     plByCategoryChart.applyOptions({ width: container.clientWidth });
                 }
             }
-            if (categoryDistributionChart) {
-                const container = document.getElementById('category-distribution-chart-container');
+            if (successRateChart) {
+                const container = document.getElementById('success-rate-chart-container');
                 if (container) {
-                    categoryDistributionChart.applyOptions({ width: container.clientWidth });
+                    successRateChart.applyOptions({ width: container.clientWidth });
                 }
             }
         });
@@ -3472,7 +3842,7 @@
                 // Initialize charts
                 await Promise.all([
                     initBarChart(),
-                    initPieChart()
+                    initSuccessRateChart()
                 ]);
                 
                 // Update all visualizations with initial filters

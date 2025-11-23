@@ -784,7 +784,7 @@ class HeaderSystem {
                   <ul class="tiktrack-nav-list">
                     <li class="tiktrack-nav-item">
                       <a href="/" class="tiktrack-nav-link" data-page="home">
-                        <img src="${imagePathPrefix}images/icons/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only">
+                        <img src="${imagePathPrefix}images/icons/entities/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only">
                       </a>
                     </li>
                     <li class="tiktrack-nav-item">
@@ -1197,10 +1197,10 @@ window.toggleHeaderFilters = function() {
 
     if (toggleBtn && arrow) {
       if (isVisible) {
-        arrow.textContent = '▼';
+        updateChevronIcon(arrow, true);
         toggleBtn.classList.add('collapsed');
       } else {
-        arrow.textContent = '▲';
+        updateChevronIcon(arrow, false);
         toggleBtn.classList.remove('collapsed');
       }
     }

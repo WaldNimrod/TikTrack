@@ -87,7 +87,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h1 class="mb-0">בדיקת TradingView Lightweight Charts</h1>
                     <button class="btn btn-primary" id="copyLogBtn" title="העתק לוג מפורט">
-                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
+                        <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                         העתק לוג מפורט
                     </button>
                 </div>
@@ -995,7 +995,7 @@
                     const copyBtn = document.getElementById('copyLogBtn');
                     if (copyBtn) {
                         copyBtn.disabled = true;
-                        copyBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/hourglass.svg" width="16" height="16" alt="hourglass" class="icon"> מעתיק...';
+                        copyBtn.innerHTML = '<img src="../../images/icons/tabler/hourglass.svg" width="16" height="16" alt="hourglass" class="icon"> מעתיק...';
                     }
                     
                     testResults.endTime = new Date();
@@ -1075,9 +1075,9 @@
                     
                     if (copyBtn) {
                         copyBtn.disabled = false;
-                        copyBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> הועתק!';
+                        copyBtn.innerHTML = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> הועתק!';
                         setTimeout(() => {
-                            copyBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> העתק לוג מפורט';
+                            copyBtn.innerHTML = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> העתק לוג מפורט';
                         }, 2000);
                     }
                     
@@ -1097,7 +1097,7 @@
                     const copyBtn = document.getElementById('copyLogBtn');
                     if (copyBtn) {
                         copyBtn.disabled = false;
-                        copyBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> העתק לוג מפורט';
+                        copyBtn.innerHTML = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> העתק לוג מפורט';
                     }
                 }
             }

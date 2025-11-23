@@ -367,7 +367,7 @@
                                             <div class="compact-stat-number" id="total-cash-balance">$50,000</div>
                                         </div>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="toggleCardDetails('cash-balance-details')" title="הצג/הסתר פרטים">
-                                            <i class="bi bi-chevron-down" id="cash-balance-chevron"></i>
+                                            <img src="/trading-ui/images/icons/tabler/chevron-down.svg" width="16" height="16" alt="chevron-down" class="icon" id="cash-balance-chevron">
                                         </button>
                                     </div>
                                 </div>
@@ -403,7 +403,7 @@
                                             <div class="compact-stat-label" style="font-size: 0.8rem; color: #28a745;" id="pl-percentage">(+50%)</div>
                                         </div>
                                         <button class="btn btn-sm btn-outline-secondary" onclick="toggleCardDetails('pl-details')" title="הצג/הסתר פרטים">
-                                            <i class="bi bi-chevron-down" id="pl-chevron"></i>
+                                            <img src="/trading-ui/images/icons/tabler/chevron-down.svg" width="16" height="16" alt="chevron-down" class="icon" id="pl-chevron">
                                         </button>
                                     </div>
                                 </div>
@@ -432,7 +432,7 @@
                                     <div class="compact-stat-label">פוזיציות</div>
                                     <div class="compact-stat-number" id="total-positions-count">5</div>
                                     <div class="compact-stat-label" style="font-size: 0.75rem; color: #6c757d; margin-top: 5px;">
-                                        <i class="bi bi-chevron-down" id="positions-chevron"></i> לחץ לפרטים
+                                        <img src="/trading-ui/images/icons/tabler/chevron-down.svg" width="16" height="16" alt="chevron-down" class="icon" id="positions-chevron"> לחץ לפרטים
                                     </div>
                                 </div>
                                 <!-- Expanded Details -->
@@ -665,7 +665,9 @@
                 const isVisible = details.style.display !== 'none';
                 details.style.display = isVisible ? 'none' : 'block';
                 if (chevron) {
-                    chevron.className = isVisible ? 'bi bi-chevron-down' : 'bi bi-chevron-up';
+                    // Update icon source instead of className
+                    const iconPath = isVisible ? '/trading-ui/images/icons/tabler/chevron-down.svg' : '/trading-ui/images/icons/tabler/chevron-up.svg';
+                    chevron.src = iconPath;
                 }
             }
         }
@@ -3005,19 +3007,8 @@
         }
         
         // Toggle section
-        function toggleSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            if (section) {
-                const body = section.querySelector('.section-body');
-                if (body) {
-                    body.style.display = body.style.display === 'none' ? 'block' : 'none';
-                    const icon = section.querySelector('.section-toggle-icon');
-                    if (icon) {
-                        icon.textContent = body.style.display === 'none' ? '▶' : '▼';
-                    }
-                }
-            }
-        }
+        // Note: toggleSection is now provided by ui-utils.js
+        // No local function needed
         
         // Load user preferences
         async function loadUserPreferences() {

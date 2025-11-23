@@ -40,6 +40,12 @@
     <script src="../../scripts/charts/tradingview-theme.js" defer></script>
     <script src="../../scripts/charts/tradingview-adapter.js" defer></script>
     
+    <!-- Notification System -->
+    <script src="../../scripts/notification-system.js" defer></script>
+    
+    <!-- Logger Service -->
+    <script src="../../scripts/logger-service.js" defer></script>
+    
     <!-- Action Buttons System -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
     <script src="../../scripts/button-system-init.js" defer></script>
@@ -87,7 +93,7 @@
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
                             <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
                             <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה"></button>
-                        </div><button class="filter-toggle-btn" onclick="toggleSection(\'price_history_page_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                        </div><button class="filter-toggle-btn" onclick="toggleSection('price_history_page_top_section')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
@@ -324,34 +330,6 @@
                     <div class="section-body">
                                 <!-- Price Chart Container (Top Panel) -->
                                 <div id="price-chart-wrapper" style="position: relative; height: 450px; width: 100%; background: #fff; border-radius: 8px 8px 0 0; overflow: hidden; border-bottom: 2px solid #e0e0e0;">
-                                    <!-- Indicators Toolbar -->
-                                    <div id="indicators-toolbar" style="position: absolute; top: 10px; right: 10px; z-index: 20; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: none; flex-direction: column; gap: 4px; max-width: 280px;">
-                                        <div style="font-size: 0.7rem; font-weight: 600; margin-bottom: 4px; color: #495057; display: flex; justify-content: space-between; align-items: center;">
-                                            <span>מחוונים:</span>
-                                            <button id="closeIndicatorsToolbar" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: #6c757d; padding: 0 4px;">×</button>
-                                </div>
-                                        <!-- Add Indicator Section -->
-                                        <div style="border-bottom: 1px solid #dee2e6; padding-bottom: 8px; margin-bottom: 8px;">
-                                            <div style="font-size: 0.65rem; font-weight: 600; margin-bottom: 4px; color: #6c757d;">הוסף מחוון:</div>
-                                            <div style="display: flex; flex-direction: column; gap: 4px;">
-                                                <!-- MA Selector -->
-                                                <div style="display: flex; gap: 4px; align-items: center;">
-                                                    <button class="indicator-add-btn" data-indicator="ma" style="flex: 1; padding: 6px 8px; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.2s;">
-                                                        ממוצע נע (MA)
-                                                    </button>
-                                                    <input type="number" id="maPeriodInput" value="20" min="2" max="200" style="width: 50px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.75rem; text-align: center;" placeholder="20">
-                            </div>
-                                </div>
-                            </div>
-                                        <!-- Active Indicators List -->
-                                        <div id="active-indicators-list" style="max-height: 200px; overflow-y: auto;">
-                                            <div style="font-size: 0.65rem; font-weight: 600; margin-bottom: 4px; color: #6c757d;">מחוונים פעילים:</div>
-                                            <div id="indicators-list-container" style="display: flex; flex-direction: column; gap: 4px;">
-                                                <!-- Active indicators will be listed here -->
-                                                <div style="font-size: 0.7rem; color: #6c757d; font-style: italic; padding: 4px;">אין מחוונים פעילים</div>
-                                </div>
-                            </div>
-                                </div>
                                     <!-- Indicators Toolbar (Right Side) -->
                                     <div id="indicators-toolbar" style="position: absolute; top: 10px; right: 10px; z-index: 20; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: none; flex-direction: column; gap: 4px; min-width: 250px; max-width: 300px;">
                                         <div style="font-size: 0.7rem; font-weight: 600; margin-bottom: 4px; color: #495057; display: flex; justify-content: space-between; align-items: center;">
@@ -483,7 +461,9 @@
         
         document.addEventListener('DOMContentLoaded', async () => {
             if (isPageInitialized) {
-                console.log('⏸️ Page already initialized, skipping...');
+                if (window.Logger) {
+                    window.Logger.info('⏸️ Page already initialized, skipping...', { page: 'price-history-page' });
+                }
                 return;
             }
             
@@ -494,7 +474,9 @@
                     await window.PreferencesCore.initializeWithLazyLoading();
                 }
             } catch (error) {
-                console.warn('Preferences initialization failed (non-critical):', error);
+                if (window.Logger) {
+                    window.Logger.warn('Preferences initialization failed (non-critical)', { page: 'price-history-page', error });
+                }
             }
             
             // Initialize price chart (with delay to ensure DOM is ready)
@@ -534,7 +516,9 @@
         async function initPriceChart() {
             // Prevent multiple simultaneous initializations
             if (isChartInitializing) {
-                console.log('⏸️ Chart initialization already in progress, skipping...');
+                if (window.Logger) {
+                    window.Logger.info('⏸️ Chart initialization already in progress, skipping...', { page: 'price-history-page' });
+                }
                 return;
             }
             
@@ -546,7 +530,9 @@
                 
                 const container = document.getElementById('price-chart-container');
                 if (!container) {
-                    console.error('Price chart container not found');
+                    if (window.Logger) {
+                        window.Logger.error('Price chart container not found', { page: 'price-history-page' });
+                    }
                     return;
                 }
                 
@@ -555,14 +541,18 @@
                     try {
                         priceChart.remove();
                     } catch (e) {
-                        console.warn('Error removing existing chart:', e);
+                        if (window.Logger) {
+                            window.Logger.warn('Error removing existing chart', { page: 'price-history-page', error: e });
+                        }
                     }
                 }
                 
                 // Get chart type from overlay buttons (default: candlestick)
                 const activeChartTypeBtn = document.querySelector('.chart-type-btn.active');
                 const chartType = activeChartTypeBtn?.dataset.type || 'candlestick';
-                console.log('📊 Chart type selected:', chartType, 'Active button:', activeChartTypeBtn);
+                if (window.Logger) {
+                    window.Logger.info('📊 Chart type selected', { page: 'price-history-page', chartType, activeButton: activeChartTypeBtn });
+                }
                 
                 // Create chart
                 priceChart = window.TradingViewChartAdapter.createChart(container, {
@@ -733,10 +723,14 @@
                     addVolumeSeries();
                 }
                 
-                console.log('✅ Price chart initialized');
+                if (window.Logger) {
+                    window.Logger.info('✅ Price chart initialized', { page: 'price-history-page' });
+                }
                 
             } catch (error) {
-                console.error('Error initializing price chart:', error);
+                if (window.Logger) {
+                    window.Logger.error('Error initializing price chart', { page: 'price-history-page', error });
+                }
             } finally {
                 isChartInitializing = false;
             }
@@ -1130,7 +1124,9 @@
             const canvas = document.getElementById('drawing-canvas');
             
             if (!canvas || !drawingToolbar || !drawingToolsToggle) {
-                console.warn('⚠️ Drawing tools elements not found');
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Drawing tools elements not found', { page: 'price-history-page' });
+                }
                 return;
             }
             
@@ -1138,7 +1134,9 @@
             drawingCtx = canvas.getContext('2d');
             
             if (!drawingCtx) {
-                console.error('❌ Failed to get canvas 2D context');
+                if (window.Logger) {
+                    window.Logger.error('❌ Failed to get canvas 2D context', { page: 'price-history-page' });
+                }
                 return;
             }
             
@@ -1239,7 +1237,9 @@
                             }
                         });
                         
-                        console.log('✅ Drawing tool activated:', tool);
+                        if (window.Logger) {
+                            window.Logger.info('✅ Drawing tool activated', { page: 'price-history-page', tool });
+                        }
                     }
                 });
             });
@@ -1473,7 +1473,9 @@
                 try {
                     priceChart.removeSeries(series);
                 } catch (e) {
-                    console.warn('Error removing comparison series:', e);
+                    if (window.Logger) {
+                        window.Logger.warn('Error removing comparison series', { page: 'price-history-page', error: e });
+                    }
                 }
             });
             comparisonSeries = [];
@@ -1517,40 +1519,44 @@
             }
         });
         
-        // Toggle section function
-        function toggleSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            if (section) {
-                const body = section.querySelector('.section-body');
-                if (body) {
-                    const isVisible = body.style.display !== 'none';
-                    body.style.display = isVisible ? 'none' : 'block';
-                    
-                    const icon = section.querySelector('.section-toggle-icon');
-                    if (icon) {
-                        icon.textContent = isVisible ? '▶' : '▼';
-                    }
-                    
-                    // Resize charts if it's the price chart section
-                    if (sectionId === 'price-chart-section') {
-                        setTimeout(() => {
-                            if (priceChart) {
-                            const container = document.getElementById('price-chart-container');
-                            if (container) {
-                                priceChart.applyOptions({ width: container.clientWidth });
-                                }
-                            }
-                            if (volumeChart) {
-                                const volumeContainer = document.getElementById('volume-chart-container');
-                                if (volumeContainer) {
-                                    volumeChart.applyOptions({ width: volumeContainer.clientWidth });
-                                }
-                            }
-                        }, 100);
+        // Chart resize handler for price-chart-section toggle
+        // Note: toggleSection is now provided by ui-utils.js
+        // This handler is called after section toggle to resize charts
+        function handlePriceChartSectionToggle() {
+            setTimeout(() => {
+                if (priceChart) {
+                    const container = document.getElementById('price-chart-container');
+                    if (container) {
+                        priceChart.applyOptions({ width: container.clientWidth });
                     }
                 }
-            }
+                if (volumeChart) {
+                    const volumeContainer = document.getElementById('volume-chart-container');
+                    if (volumeContainer) {
+                        volumeChart.applyOptions({ width: volumeContainer.clientWidth });
+                    }
+                }
+            }, 100);
         }
+        
+        // Listen for section toggle events on price-chart-section
+        document.addEventListener('DOMContentLoaded', () => {
+            const priceChartSection = document.getElementById('price-chart-section');
+            if (priceChartSection) {
+                // Use MutationObserver to detect when section-body display changes
+                const observer = new MutationObserver(() => {
+                    handlePriceChartSectionToggle();
+                });
+                
+                const sectionBody = priceChartSection.querySelector('.section-body');
+                if (sectionBody) {
+                    observer.observe(sectionBody, {
+                        attributes: true,
+                        attributeFilter: ['style']
+                    });
+                }
+            }
+        });
         
         // ========================================================================
         // NEW FEATURES IMPLEMENTATION
@@ -1590,7 +1596,9 @@
             
             const volumeContainer = document.getElementById('volume-chart-container');
             if (!volumeContainer) {
-                console.warn('Volume chart container not found');
+                if (window.Logger) {
+                    window.Logger.warn('Volume chart container not found', { page: 'price-history-page' });
+                }
                 return;
             }
             
@@ -1605,7 +1613,9 @@
             
             const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
             if (!lightweightCharts || !lightweightCharts.createChart) {
-                console.warn('LightweightCharts not available');
+                if (window.Logger) {
+                    window.Logger.warn('LightweightCharts not available', { page: 'price-history-page' });
+                }
                 return;
             }
             
@@ -1703,7 +1713,9 @@
                     volumeChart.remove();
                     volumeChart = null;
                 } catch (e) {
-                    console.warn('Error removing volume chart:', e);
+                    if (window.Logger) {
+                        window.Logger.warn('Error removing volume chart', { page: 'price-history-page', error: e });
+                    }
                 }
             }
             volumeSeriesGreen = null;
@@ -1775,7 +1787,9 @@
             try {
                 priceChart.timeScale().fitContent();
             } catch (e) {
-                console.warn('Error applying auto scale:', e);
+                if (window.Logger) {
+                    window.Logger.warn('Error applying auto scale', { page: 'price-history-page', error: e });
+                }
             }
         }
         
@@ -1789,7 +1803,9 @@
                     to: to
                 });
             } catch (e) {
-                console.warn('Error setting visible range:', e);
+                if (window.Logger) {
+                    window.Logger.warn('Error setting visible range', { page: 'price-history-page', error: e });
+                }
             }
         }
         
@@ -1830,7 +1846,9 @@
                     });
                 }
             } catch (e) {
-                console.warn('Error zooming in:', e);
+                if (window.Logger) {
+                    window.Logger.warn('Error zooming in', { page: 'price-history-page', error: e });
+                }
             }
         }
         
@@ -1850,7 +1868,9 @@
                     });
                 }
             } catch (e) {
-                console.warn('Error zooming out:', e);
+                if (window.Logger) {
+                    window.Logger.warn('Error zooming out', { page: 'price-history-page', error: e });
+                }
             }
         }
         
@@ -1860,7 +1880,9 @@
             try {
                 window.TradingViewChartAdapter.resetTimeScale(priceChart);
             } catch (e) {
-                console.warn('Error resetting zoom:', e);
+                if (window.Logger) {
+                    window.Logger.warn('Error resetting zoom', { page: 'price-history-page', error: e });
+                }
             }
         }
         
@@ -1874,14 +1896,18 @@
             // Check if this MA already exists
             const existingMA = activeIndicators.find(ind => ind.type === 'ma' && ind.period === period);
             if (existingMA) {
-                console.log(`MA(${period}) כבר קיים`);
+                if (window.Logger) {
+                    window.Logger.info(`MA(${period}) כבר קיים`, { page: 'price-history-page', period });
+                }
                 return existingMA;
             }
             
             try {
                 const data = priceChartSeries.data();
                 if (!data || data.length < period) {
-                    window.showErrorNotification?.('שגיאה', `נדרשים לפחות ${period} נקודות נתונים לממוצע נע ${period}`);
+                    if (window.NotificationSystem) {
+                        window.NotificationSystem.showError('שגיאה', `נדרשים לפחות ${period} נקודות נתונים לממוצע נע ${period}`);
+                    }
                     return null;
                 }
                 
@@ -1915,8 +1941,12 @@
                 
                 return indicator;
             } catch (e) {
-                console.warn('Error adding moving average:', e);
-                window.showErrorNotification?.('שגיאה', 'שגיאה בהוספת ממוצע נע');
+                if (window.Logger) {
+                    window.Logger.warn('Error adding moving average', { page: 'price-history-page', error: e });
+                }
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError('שגיאה', 'שגיאה בהוספת ממוצע נע');
+                }
                 return null;
             }
         }
@@ -1940,7 +1970,9 @@
                 updateSeriesLegend();
                 updateActiveIndicatorsList();
             } catch (e) {
-                console.warn('Error removing indicator:', e);
+                if (window.Logger) {
+                    window.Logger.warn('Error removing indicator', { page: 'price-history-page', error: e });
+                }
             }
         }
         
@@ -1953,7 +1985,9 @@
                     const periodInput = document.getElementById('maPeriodInput');
                     const period = periodInput ? parseInt(periodInput.value) || 20 : 20;
                     if (period < 2 || period > 200) {
-                        window.showErrorNotification?.('שגיאה', 'תקופה חייבת להיות בין 2 ל-200');
+                        if (window.NotificationSystem) {
+                            window.NotificationSystem.showError('שגיאה', 'תקופה חייבת להיות בין 2 ל-200');
+                        }
                         return;
                     }
                     addMovingAverage(period);
@@ -2030,7 +2064,9 @@
         
         async function takeScreenshot() {
             if (!priceChart) {
-                window.showErrorNotification?.('שגיאה', 'גרף לא זמין');
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError('שגיאה', 'גרף לא זמין');
+                }
                 return;
             }
             
@@ -2043,10 +2079,16 @@
                 link.href = imageData;
                 link.click();
                 
-                window.showSuccessNotification?.('הצלחה', 'תמונה נשמרה בהצלחה');
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showSuccess('הצלחה', 'תמונה נשמרה בהצלחה');
+                }
             } catch (e) {
-                console.error('Error taking screenshot:', e);
-                window.showErrorNotification?.('שגיאה', 'שגיאה בשמירת תמונה');
+                if (window.Logger) {
+                    window.Logger.error('Error taking screenshot', { page: 'price-history-page', error: e });
+                }
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError('שגיאה', 'שגיאה בשמירת תמונה');
+                }
             }
         }
         
@@ -2104,7 +2146,9 @@
                 // Apply preferences
                 applyChartPreferences();
             } catch (e) {
-                console.warn('Error loading chart preferences:', e);
+                if (window.Logger) {
+                    window.Logger.warn('Error loading chart preferences', { page: 'price-history-page', error: e });
+                }
             }
         }
         
@@ -2122,7 +2166,9 @@
                 
                 await window.PreferencesCore.saveAllPreferences(preferences);
             } catch (e) {
-                console.warn('Error saving chart preferences:', e);
+                if (window.Logger) {
+                    window.Logger.warn('Error saving chart preferences', { page: 'price-history-page', error: e });
+                }
             }
         }
         
@@ -2454,7 +2500,9 @@
                         comparisonChart = null;
                         comparisonChartSeries = [];
                     } catch (e) {
-                        console.warn('Error removing comparison chart:', e);
+                        if (window.Logger) {
+                            window.Logger.warn('Error removing comparison chart', { page: 'price-history-page', error: e });
+                        }
                     }
                 }
                 return;
@@ -2478,7 +2526,9 @@
                     try {
                         comparisonChart.remove();
                     } catch (e) {
-                        console.warn('Error removing existing comparison chart:', e);
+                        if (window.Logger) {
+                            window.Logger.warn('Error removing existing comparison chart', { page: 'price-history-page', error: e });
+                        }
                     }
                 }
                 
@@ -2685,7 +2735,9 @@
                         }
                     });
                 } catch (e) {
-                    console.warn('Error syncing charts:', e);
+                    if (window.Logger) {
+                        window.Logger.warn('Error syncing charts', { page: 'price-history-page', error: e });
+                    }
                 } finally {
                     this.isSyncing = false;
                 }

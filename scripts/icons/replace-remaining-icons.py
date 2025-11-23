@@ -38,6 +38,10 @@ BI_TO_TABLER = {
     'bi-person-circle': 'user-circle',
     'bi-sliders': 'sliders',
     'bi-broadcast-pin': 'broadcast',
+    'bi-tags-fill': 'tags',
+    'bi-collection': 'layers',
+    'bi-chevron-down': 'chevron-down',
+    'bi-chevron-up': 'chevron-up',
 }
 
 # Mapping of FontAwesome to Tabler Icons
@@ -58,6 +62,13 @@ FA_TO_TABLER = {
     'fa-file-alt': 'file-text',
     'fa-search': 'search',
     'fa-mouse-pointer': 'cursor',
+    'fa-cogs': 'settings',
+    'fa-cog': 'settings',
+    'fa-info-circle': 'info-circle',
+    'fa-briefcase': 'briefcase',
+    'fa-tags': 'tags',
+    'fa-circle': 'circle',
+    'fa-sort': 'arrows-sort',
 }
 
 def replace_bootstrap_icons(content):

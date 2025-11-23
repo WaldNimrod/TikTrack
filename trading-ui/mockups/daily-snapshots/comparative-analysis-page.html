@@ -197,6 +197,10 @@
     <!-- Header System -->
     <script src="../../scripts/header-system.js" defer></script>
     
+    <!-- Icon System -->
+    <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
+    <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    
     <!-- Core Systems (Must load first) -->
     <script src="../../scripts/logger-service.js?v=1.0.0"></script>
     <script src="../../scripts/button-icons.js?v=1.0.0"></script>
@@ -690,39 +694,31 @@
                     </div>
                 </div>
                 
-                <!-- Bar Chart Section -->
-                <div class="content-section" id="pl-by-category-section">
+                <!-- Combined Chart Section -->
+                <div class="content-section" id="comparison-chart-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> P/L לפי קטגוריה</h2>
+                        <h2><img src="../../images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> השוואה לפי קטגוריה</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('pl-by-category-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" onclick="toggleSection('comparison-chart-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
-                                <div id="pl-by-category-chart-container" class="chart-container" style="height: 300px; position: relative; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
-                                    <div class="chart-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6c757d;">
-                                        <img src="../../images/icons/tabler/hourglass.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
-                                    </div>
-                                </div>
-                    </div>
-                </div>
-                
-                <!-- Success Rate Chart Section -->
-                <div class="content-section" id="success-rate-section">
-                    <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> אחוז הצלחה לפי קטגוריה</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('success-rate-section')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                        <div id="comparison-chart-legend" class="chart-legend mb-2" style="display: flex; gap: 15px; flex-wrap: wrap; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                            <!-- Legend will be populated dynamically -->
                         </div>
-                    </div>
-                    <div class="section-body">
-                        <div id="success-rate-chart-container" class="chart-container" style="height: 300px; position: relative; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
+                        <div id="comparison-chart-container" class="chart-container" style="height: 300px; position: relative; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
                             <div class="chart-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6c757d;">
                                 <img src="../../images/icons/tabler/hourglass.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                            </div>
+                            <div id="chart-scale-labels" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 10;">
+                                <div id="left-scale-label" style="position: absolute; left: 8px; top: 8px; font-size: 0.75rem; color: #6c757d; font-weight: 500; background: rgba(255, 255, 255, 0.8); padding: 2px 6px; border-radius: 3px;">
+                                    אחוז הצלחה (%)
+                                </div>
+                                <div id="right-scale-label" style="position: absolute; right: 8px; top: 8px; font-size: 0.75rem; color: #6c757d; font-weight: 500; background: rgba(255, 255, 255, 0.8); padding: 2px 6px; border-radius: 3px;">
+                                    P/L כולל ($)
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -959,9 +955,8 @@
         }
         
         // Chart variables
-        let plByCategoryChart = null;
-        let plByCategorySeries = null;
-        let successRateChart = null;
+        let comparisonChart = null;
+        let plSeries = null;
         let successRateSeries = null;
         
         // Filter state - separated into record filters and comparison parameters
@@ -1703,11 +1698,13 @@
             const tableData = tableResult.data;
             const data = [];
             
+            // Create grouped bars: for each category, create two time points (one for P/L, one for Success Rate)
+            // P/L bars will be at time: index * 2, Success Rate bars at time: index * 2 + 0.5
             tableData.forEach((cat, index) => {
                 data.push({
-                    time: index.toString(),
-                    value: cat.totalPL,
-                    color: cat.totalPL >= 0 ? '#28a745' : '#dc3545' // Green for positive, red for negative
+                    time: (index * 2).toString(), // P/L bar position
+                    value: cat.totalPL
+                    // No color - will use series color
                 });
             });
             
@@ -1723,9 +1720,10 @@
             const tableData = tableResult.data;
             
             const data = [];
+            // Success Rate bars will be at time: index * 2 + 0.5 (next to P/L bars)
             tableData.forEach((cat, index) => {
                 data.push({
-                    time: index.toString(),
+                    time: (index * 2 + 0.5).toString(), // Success Rate bar position (next to P/L)
                     value: cat.successRate
                 });
             });
@@ -2358,14 +2356,14 @@
             }
         }
         
-        // Initialize Bar Chart
-        async function initBarChart() {
+        // Initialize Combined Chart (P/L + Success Rate)
+        async function initComparisonChart() {
             try {
                 await waitForTradingViewAdapter();
                 
-                const container = document.getElementById('pl-by-category-chart-container');
+                const container = document.getElementById('comparison-chart-container');
                 if (!container) {
-                    console.error('Bar chart container not found');
+                    console.error('Comparison chart container not found');
                     return;
                 }
                 
@@ -2374,23 +2372,24 @@
                 if (loading) loading.remove();
                 
                 // Destroy existing chart if any
-                if (plByCategoryChart) {
+                if (comparisonChart) {
                     try {
                         if (window.TradingViewChartAdapter && typeof window.TradingViewChartAdapter.destroyChart === 'function') {
-                            window.TradingViewChartAdapter.destroyChart(plByCategoryChart);
+                            window.TradingViewChartAdapter.destroyChart(comparisonChart);
                         } else {
-                            plByCategoryChart.remove();
+                            comparisonChart.remove();
                         }
                     } catch (e) {
-                        console.warn('Error removing existing bar chart:', e);
+                        console.warn('Error removing existing comparison chart:', e);
                     }
                 }
                 
                 const filters = getFilterValues();
-                const chartData = generateMockPLByCategoryData(filters);
+                const plData = generateMockPLByCategoryData(filters);
+                const successRateData = generateMockSuccessRateData(filters);
                 
-                // Create chart
-                plByCategoryChart = window.TradingViewChartAdapter.createChart(container, {
+                // Create chart with dual price scales
+                comparisonChart = window.TradingViewChartAdapter.createChart(container, {
                     layout: {
                         background: { type: 'solid', color: 'transparent' },
                         textColor: getCSSVariableValue('--text-color', '#333')
@@ -2402,56 +2401,85 @@
                     width: container.clientWidth,
                     height: 300,
                     timeScale: {
-                        visible: false
+                        visible: true,
+                        timeVisible: true,
+                        secondsVisible: false
                     },
                     rightPriceScale: {
                         borderVisible: true,
-                        borderColor: getCSSVariableValue('--border-color', '#e0e0e0')
+                        borderColor: getCSSVariableValue('--border-color', '#e0e0e0'),
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    },
+                    leftPriceScale: {
+                        visible: true,
+                        borderVisible: true,
+                        borderColor: getCSSVariableValue('--border-color', '#e0e0e0'),
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
                     }
                 });
                 
-                // Add bar series with dynamic colors (positive/negative)
+                // Add bar series - one series for P/L, one for Success Rate
+                // Use grouped bars: P/L at time index*2, Success Rate at time index*2+0.5
                 const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
                 if (lightweightCharts && lightweightCharts.HistogramSeries) {
-                    // Create separate series for positive and negative values
-                    const positiveData = chartData.data.filter(d => d.value >= 0);
-                    const negativeData = chartData.data.filter(d => d.value < 0);
-                    
-                    // Positive series (green)
-                    if (positiveData.length > 0) {
-                        plByCategorySeries = plByCategoryChart.addSeries(lightweightCharts.HistogramSeries, {
-                            color: '#28a745', // Green for positive
+                    // Single P/L series (all values, one color) - right scale
+                    if (plData.data.length > 0) {
+                        plSeries = comparisonChart.addSeries(lightweightCharts.HistogramSeries, {
+                            color: getCSSVariableValue('--primary-color', '#26baac'), // Single color for all P/L values
                             priceFormat: {
                                 type: 'price',
                                 precision: 0,
                                 minMove: 1
                             },
-                            title: 'P/L חיובי'
+                            title: 'P/L כולל',
+                            priceScaleId: 'right',
+                            baseLineVisible: false
                         });
-                        plByCategorySeries.setData(positiveData);
+                        plSeries.setData(plData.data);
                     }
                     
-                    // Negative series (red) - if exists
-                    if (negativeData.length > 0) {
-                        const negativeSeries = plByCategoryChart.addSeries(lightweightCharts.HistogramSeries, {
-                            color: '#dc3545', // Red for negative
+                    // Success Rate series (blue) - left scale
+                    // Success Rate bars are at time: index * 2 + 0.5 (next to P/L bars)
+                    if (successRateData.data.length > 0) {
+                        successRateSeries = comparisonChart.addSeries(lightweightCharts.HistogramSeries, {
+                            color: '#28a745', // Green for success rate
                             priceFormat: {
                                 type: 'price',
                                 precision: 0,
                                 minMove: 1
                             },
-                            title: 'P/L שלילי'
+                            title: 'אחוז הצלחה',
+                            priceScaleId: 'left',
+                            baseLineVisible: false
                         });
-                        negativeSeries.setData(negativeData);
+                        successRateSeries.setData(successRateData.data);
                     }
                 } else {
-                    // Fallback: use area series with dynamic colors
-                    // Group by positive/negative
-                    const positiveData = chartData.data.filter(d => d.value >= 0);
-                    const negativeData = chartData.data.filter(d => d.value < 0);
+                    // Fallback: use area series
+                    if (plData.data.length > 0) {
+                        plSeries = window.TradingViewChartAdapter.addAreaSeries(comparisonChart, {
+                            lineColor: getCSSVariableValue('--primary-color', '#26baac'),
+                            topColor: getCSSVariableValue('--primary-color', '#26baac'),
+                            bottomColor: getCSSVariableValue('--primary-color', '#26baac') + '28',
+                            priceFormat: {
+                                type: 'price',
+                                precision: 0,
+                                minMove: 1
+                            },
+                            title: 'P/L כולל',
+                            priceScaleId: 'right'
+                        });
+                        plSeries.setData(plData.data);
+                    }
                     
-                    if (positiveData.length > 0) {
-                        plByCategorySeries = window.TradingViewChartAdapter.addAreaSeries(plByCategoryChart, {
+                    if (successRateData.data.length > 0) {
+                        successRateSeries = window.TradingViewChartAdapter.addAreaSeries(comparisonChart, {
                             lineColor: '#28a745',
                             topColor: '#28a745',
                             bottomColor: '#28a745' + '28',
@@ -2459,32 +2487,40 @@
                                 type: 'price',
                                 precision: 0,
                                 minMove: 1
-                            }
+                            },
+                            title: 'אחוז הצלחה',
+                            priceScaleId: 'left'
                         });
-                        plByCategorySeries.setData(positiveData);
-                    }
-                    
-                    if (negativeData.length > 0) {
-                        const negativeSeries = window.TradingViewChartAdapter.addAreaSeries(plByCategoryChart, {
-                            lineColor: '#dc3545',
-                            topColor: '#dc3545',
-                            bottomColor: '#dc3545' + '28',
-                            priceFormat: {
-                                type: 'price',
-                                precision: 0,
-                                minMove: 1
-                            }
-                        });
-                        negativeSeries.setData(negativeData);
+                        successRateSeries.setData(successRateData.data);
                     }
                 }
                 
-                plByCategoryChart.timeScale().fitContent();
-                console.log('✅ Bar chart initialized');
+                // Update legend
+                updateChartLegend(plData, successRateData);
+                
+                // Set custom time formatter to show category names (centered for each category group)
+                const categories = plData.categories || [];
+                comparisonChart.timeScale().applyOptions({
+                    timeVisible: true,
+                    tickMarkFormatter: (time, tickMarkType, locale) => {
+                        const timeNum = parseFloat(time);
+                        const categoryIndex = Math.floor(timeNum / 2);
+                        // Only show label at the center of each category group (at time index*2 + 1)
+                        if (Math.abs(timeNum - (categoryIndex * 2 + 1)) < 0.1) {
+                            if (categoryIndex >= 0 && categoryIndex < categories.length) {
+                                return categories[categoryIndex];
+                            }
+                        }
+                        return '';
+                    }
+                });
+                
+                comparisonChart.timeScale().fitContent();
+                console.log('✅ Comparison chart initialized');
                 
             } catch (error) {
-                console.error('Error initializing bar chart:', error);
-                const container = document.getElementById('pl-by-category-chart-container');
+                console.error('Error initializing comparison chart:', error);
+                const container = document.getElementById('comparison-chart-container');
                 if (container) {
                     const loading = container.querySelector('.chart-loading');
                     if (loading) {
@@ -2495,104 +2531,37 @@
             }
         }
         
-        // Initialize Success Rate Chart (Bar Chart)
-        async function initSuccessRateChart() {
-            try {
-                await waitForTradingViewAdapter();
-                
-                const container = document.getElementById('success-rate-chart-container');
-                if (!container) {
-                    console.error('Success rate chart container not found');
-                    return;
-                }
-                
-                // Remove loading indicator
-                const loading = container.querySelector('.chart-loading');
-                if (loading) loading.remove();
-                
-                // Destroy existing chart if any
-                if (successRateChart) {
-                    try {
-                        if (window.TradingViewChartAdapter && typeof window.TradingViewChartAdapter.destroyChart === 'function') {
-                            window.TradingViewChartAdapter.destroyChart(successRateChart);
-                        } else {
-                            successRateChart.remove();
-                        }
-                    } catch (e) {
-                        console.warn('Error removing existing success rate chart:', e);
-                    }
-                }
-                
-                const filters = getFilterValues();
-                const chartData = generateMockSuccessRateData(filters);
-                
-                // Create chart
-                successRateChart = window.TradingViewChartAdapter.createChart(container, {
-                    layout: {
-                        background: { type: 'solid', color: 'transparent' },
-                        textColor: getCSSVariableValue('--text-color', '#333')
-                    },
-                    grid: {
-                        vertLines: { visible: false },
-                        horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
-                    },
-                    width: container.clientWidth,
-                    height: 300,
-                    timeScale: {
-                        visible: false
-                    },
-                    rightPriceScale: {
-                        borderVisible: true,
-                        borderColor: getCSSVariableValue('--border-color', '#e0e0e0'),
-                        scaleMargins: {
-                            top: 0.1,
-                            bottom: 0.1
-                        }
-                    }
-                });
-                
-                // Add bar series (using histogram series if available, otherwise area series)
-                const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
-                if (lightweightCharts && lightweightCharts.HistogramSeries) {
-                    successRateSeries = successRateChart.addSeries(lightweightCharts.HistogramSeries, {
-                        color: getCSSVariableValue('--primary-color', '#26baac'),
-                        priceFormat: {
-                            type: 'price',
-                            precision: 0,
-                            minMove: 1
-                        }
-                    });
-                    successRateSeries.setData(chartData.data);
-                } else {
-                    // Fallback to area series for bar-like visualization
-                    successRateSeries = window.TradingViewChartAdapter.addAreaSeries(successRateChart, {
-                        lineColor: getCSSVariableValue('--primary-color', '#26baac'),
-                        topColor: getCSSVariableValue('--primary-color', '#26baac'),
-                        bottomColor: getCSSVariableValue('--primary-color', '#26baac') + '28',
-                        priceFormat: {
-                            type: 'price',
-                            precision: 0,
-                            minMove: 1
-                        }
-                    });
-                    successRateSeries.setData(chartData.data);
-                }
-                
-                successRateChart.timeScale().fitContent();
-                console.log('✅ Success rate chart initialized');
-                
-            } catch (error) {
-                console.error('Error initializing success rate chart:', error);
-                const container = document.getElementById('success-rate-chart-container');
-                if (container) {
-                    const loading = container.querySelector('.chart-loading');
-                    if (loading) {
-                        loading.innerHTML = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> שגיאה בטעינת גרף';
-                        loading.style.color = '#dc3545';
-                    }
-                }
+        // Update chart legend
+        function updateChartLegend(plData, successRateData) {
+            const legend = document.getElementById('comparison-chart-legend');
+            if (!legend) return;
+            
+            const legendItems = [];
+            
+            // P/L Series (single color)
+            if (plData.data.length > 0) {
+                const primaryColor = getCSSVariableValue('--primary-color', '#26baac');
+                legendItems.push(`
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div style="width: 16px; height: 16px; background-color: ${primaryColor}; border-radius: 2px;"></div>
+                        <span style="font-size: 0.9rem;"><strong>P/L כולל</strong></span>
+                    </div>
+                `);
             }
+            
+            // Success Rate
+            if (successRateData.data.length > 0) {
+                legendItems.push(`
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div style="width: 16px; height: 16px; background-color: #28a745; border-radius: 2px;"></div>
+                        <span style="font-size: 0.9rem;"><strong>אחוז הצלחה</strong></span>
+                    </div>
+                `);
+            }
+            
+            legend.innerHTML = legendItems.join('');
         }
+        
         
         // Update all visualizations
         function updateAllVisualizations() {
@@ -2606,86 +2575,95 @@
             
             // Update charts
             requestAnimationFrame(() => {
-                updateBarChart(filters);
-                updateSuccessRateChart(filters);
+                updateComparisonChart(filters);
             });
         }
         
-        // Update Bar Chart
-        function updateBarChart(filters) {
-            if (!plByCategoryChart) {
-                initBarChart();
+        // Update Comparison Chart
+        function updateComparisonChart(filters) {
+            if (!comparisonChart) {
+                initComparisonChart();
                 return;
             }
             
             try {
-                const chartData = generateMockPLByCategoryData(filters);
+                const plData = generateMockPLByCategoryData(filters);
+                const successRateData = generateMockSuccessRateData(filters);
                 
                 // Remove all existing series
                 const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
                 if (lightweightCharts && lightweightCharts.HistogramSeries) {
-                    // Remove all series and recreate
-                    plByCategoryChart.removeSeries(plByCategorySeries);
-                    if (plByCategoryChart.series().length > 0) {
-                        plByCategoryChart.series().forEach(series => plByCategoryChart.removeSeries(series));
+                    // Remove all series
+                    const allSeries = comparisonChart.series();
+                    allSeries.forEach(series => comparisonChart.removeSeries(series));
+                    
+                    // Reset series references
+                    plSeries = null;
+                    successRateSeries = null;
+                    
+                    // Single P/L series (all values, one color) - right scale
+                    if (plData.data.length > 0) {
+                        plSeries = comparisonChart.addSeries(lightweightCharts.HistogramSeries, {
+                            color: getCSSVariableValue('--primary-color', '#26baac'),
+                            priceFormat: {
+                                type: 'price',
+                                precision: 0,
+                                minMove: 1
+                            },
+                            title: 'P/L כולל',
+                            priceScaleId: 'right',
+                            baseLineVisible: false
+                        });
+                        plSeries.setData(plData.data);
                     }
                     
-                    // Create separate series for positive and negative values
-                    const positiveData = chartData.data.filter(d => d.value >= 0);
-                    const negativeData = chartData.data.filter(d => d.value < 0);
-                    
-                    // Positive series (green)
-                    if (positiveData.length > 0) {
-                        plByCategorySeries = plByCategoryChart.addSeries(lightweightCharts.HistogramSeries, {
+                    // Success Rate series (green) - left scale
+                    // Success Rate bars are at time: index * 2 + 0.5 (next to P/L bars)
+                    if (successRateData.data.length > 0) {
+                        successRateSeries = comparisonChart.addSeries(lightweightCharts.HistogramSeries, {
                             color: '#28a745',
                             priceFormat: {
                                 type: 'price',
                                 precision: 0,
                                 minMove: 1
-                            }
+                            },
+                            title: 'אחוז הצלחה',
+                            priceScaleId: 'left',
+                            baseLineVisible: false
                         });
-                        plByCategorySeries.setData(positiveData);
-                    }
-                    
-                    // Negative series (red)
-                    if (negativeData.length > 0) {
-                        const negativeSeries = plByCategoryChart.addSeries(lightweightCharts.HistogramSeries, {
-                            color: '#dc3545',
-                            priceFormat: {
-                                type: 'price',
-                                precision: 0,
-                                minMove: 1
-                            }
-                        });
-                        negativeSeries.setData(negativeData);
+                        successRateSeries.setData(successRateData.data);
                     }
                 } else {
                     // Fallback: reinitialize chart
-                    initBarChart();
+                    initComparisonChart();
                     return;
                 }
                 
-                plByCategoryChart.timeScale().fitContent();
+                // Update legend
+                updateChartLegend(plData, successRateData);
+                
+                // Set custom time formatter to show category names (centered for each category group)
+                const categories = plData.categories || [];
+                comparisonChart.timeScale().applyOptions({
+                    timeVisible: true,
+                    tickMarkFormatter: (time, tickMarkType, locale) => {
+                        const timeNum = parseFloat(time);
+                        const categoryIndex = Math.floor(timeNum / 2);
+                        // Only show label at the center of each category group (at time index*2 + 1)
+                        if (Math.abs(timeNum - (categoryIndex * 2 + 1)) < 0.1) {
+                            if (categoryIndex >= 0 && categoryIndex < categories.length) {
+                                return categories[categoryIndex];
+                            }
+                        }
+                        return '';
+                    }
+                });
+                
+                comparisonChart.timeScale().fitContent();
             } catch (error) {
-                console.error('Error updating bar chart:', error);
+                console.error('Error updating comparison chart:', error);
                 // Fallback: reinitialize
-                initBarChart();
-            }
-        }
-        
-        // Update Success Rate Chart
-        function updateSuccessRateChart(filters) {
-            if (!successRateChart || !successRateSeries) {
-                initSuccessRateChart();
-                return;
-            }
-            
-            try {
-                const chartData = generateMockSuccessRateData(filters);
-                successRateSeries.setData(chartData.data);
-                successRateChart.timeScale().fitContent();
-            } catch (error) {
-                console.error('Error updating success rate chart:', error);
+                initComparisonChart();
             }
         }
         
@@ -3604,20 +3582,8 @@
         window.resetFilters = resetFilters;
         window.resetToDefaults = resetToDefaults;
         
-        // Toggle section
-        function toggleSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            if (section) {
-                const body = section.querySelector('.section-body');
-                if (body) {
-                    body.style.display = body.style.display === 'none' ? 'block' : 'none';
-                    const icon = section.querySelector('.section-toggle-icon');
-                    if (icon) {
-                        icon.textContent = body.style.display === 'none' ? '▶' : '▼';
-                    }
-                }
-            }
-        }
+        // Note: toggleSection is now provided by ui-utils.js
+        // No local function needed
         
         // Export functionality
         function exportComparativeAnalysis() {
@@ -3658,16 +3624,10 @@
         
         // Handle window resize
         window.addEventListener('resize', () => {
-            if (plByCategoryChart) {
-                const container = document.getElementById('pl-by-category-chart-container');
+            if (comparisonChart) {
+                const container = document.getElementById('comparison-chart-container');
                 if (container) {
-                    plByCategoryChart.applyOptions({ width: container.clientWidth });
-                }
-            }
-            if (successRateChart) {
-                const container = document.getElementById('success-rate-chart-container');
-                if (container) {
-                    successRateChart.applyOptions({ width: container.clientWidth });
+                    comparisonChart.applyOptions({ width: container.clientWidth });
                 }
             }
         });
@@ -3839,11 +3799,8 @@
                     loadComparisonParameterState();
                 }
                 
-                // Initialize charts
-                await Promise.all([
-                    initBarChart(),
-                    initSuccessRateChart()
-                ]);
+                // Initialize chart
+                await initComparisonChart();
                 
                 // Update all visualizations with initial filters
                 updateAllVisualizations();

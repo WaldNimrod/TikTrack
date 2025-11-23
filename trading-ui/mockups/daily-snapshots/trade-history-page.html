@@ -29,6 +29,10 @@
     <script src="../../scripts/charts/tradingview-theme.js" defer></script>
     <script src="../../scripts/charts/tradingview-adapter.js" defer></script>
     
+    <!-- Icon System -->
+    <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
+    <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    
     <!-- Preferences System -->
     <script src="../../scripts/services/preferences-data.js" defer></script>
     <script src="../../scripts/preferences-core-new.js" defer></script>
@@ -39,11 +43,18 @@
     
     <!-- Action Buttons System -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
+    <script src="../../scripts/button-system-init.js" defer></script>
     
     <!-- Linked Items System -->
     <script src="../../scripts/linked-items.js" defer></script>
     <script src="../../scripts/services/linked-items-service.js" defer></script>
     <script src="../../scripts/entity-details-modal.js" defer></script>
+    
+    <!-- Notification System -->
+    <script src="../../scripts/notification-system.js" defer></script>
+    
+    <!-- Logger Service -->
+    <script src="../../scripts/logger-service.js" defer></script>
     
     <!-- Field Renderer Service -->
     <script src="../../scripts/services/field-renderer-service.js" defer></script>
@@ -674,7 +685,7 @@
                                     <div class="timeline-point-absolute"></div>
                                     <div class="timeline-step-info">
                                         <div class="timeline-step-title">
-                                            <img src="../../images/icons/trade_plans.svg" alt="תכנון" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            <img src="/trading-ui/images/icons/entities/trade_plans.svg" alt="תכנון" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
                                             תכנון
                                         </div>
                                         <div class="timeline-step-date">01/01/2025</div>
@@ -689,7 +700,7 @@
                                     <div class="timeline-point-absolute"></div>
                                     <div class="timeline-step-info">
                                         <div class="timeline-step-title execution-title">
-                                            <img src="../../images/icons/executions.svg" alt="ביצוע" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            <img src="/trading-ui/images/icons/entities/executions.svg" alt="ביצוע" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
                                             Buy | 100#
                                 </div>
                                         <div class="timeline-step-date">05/01/2025</div>
@@ -707,7 +718,7 @@
                                     <div class="timeline-point-absolute" style="background-color: var(--info-color, #17a2b8);"></div>
                                     <div class="timeline-step-info">
                                         <div class="timeline-step-title">
-                                            <img src="../../images/icons/notes.svg" alt="הערה" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            <img src="/trading-ui/images/icons/entities/notes.svg" alt="הערה" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
                                             הערה
                                         </div>
                                         <div class="timeline-step-date">07/01/2025</div>
@@ -722,7 +733,7 @@
                                     <div class="timeline-point-absolute" style="background-color: var(--secondary-color, #fc5a06);"></div>
                                     <div class="timeline-step-info">
                                         <div class="timeline-step-title cashflow-title">
-                                            <img src="../../images/icons/cash_flows.svg" alt="תזרים מזומן" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            <img src="/trading-ui/images/icons/entities/cash_flows.svg" alt="תזרים מזומן" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
                                             Deposit | $5,000
                                         </div>
                                         <div class="timeline-step-date">08/01/2025</div>
@@ -739,7 +750,7 @@
                                     <div class="timeline-point-absolute"></div>
                                     <div class="timeline-step-info">
                                         <div class="timeline-step-title execution-title">
-                                            <img src="../../images/icons/executions.svg" alt="ביצוע" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            <img src="/trading-ui/images/icons/entities/executions.svg" alt="ביצוע" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
                                             Buy | 50#
                                         </div>
                                         <div class="timeline-step-date">10/01/2025</div>
@@ -757,7 +768,7 @@
                                     <div class="timeline-point-absolute" style="background-color: var(--warning-color, #ffc107);"></div>
                                     <div class="timeline-step-info">
                                         <div class="timeline-step-title">
-                                            <img src="../../images/icons/alerts.svg" alt="התראה" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            <img src="/trading-ui/images/icons/entities/alerts.svg" alt="התראה" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
                                             התראה
                                         </div>
                                         <div class="timeline-step-date">12/01/2025</div>
@@ -772,7 +783,7 @@
                                     <div class="timeline-point-absolute"></div>
                                     <div class="timeline-step-info">
                                         <div class="timeline-step-title execution-title">
-                                            <img src="../../images/icons/executions.svg" alt="ביצוע" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            <img src="/trading-ui/images/icons/entities/executions.svg" alt="ביצוע" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
                                             Sell | 30#
                                         </div>
                                         <div class="timeline-step-date">15/01/2025</div>
@@ -790,7 +801,7 @@
                                     <div class="timeline-point-absolute"></div>
                                     <div class="timeline-step-info">
                                         <div class="timeline-step-title execution-title">
-                                            <img src="../../images/icons/executions.svg" alt="ביצוע" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            <img src="/trading-ui/images/icons/entities/executions.svg" alt="ביצוע" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
                                             Sell | 120#
                                         </div>
                                         <div class="timeline-step-date">20/01/2025</div>
@@ -1094,24 +1105,32 @@
                     }
                 }
             } catch (error) {
-                console.warn('Failed to read CSS variable', variableName, error);
+                if (window.Logger) {
+                    window.Logger.warn('Failed to read CSS variable', { page: 'trade-history-page', variableName, error });
+                }
             }
             return fallback;
         }
         
         // Helper functions for notes, alerts, and cash flows
         function showNoteDetails(id) {
-            console.log('Show note details:', id);
+            if (window.Logger) {
+                window.Logger.info('Show note details', { page: 'trade-history-page', id });
+            }
             // TODO: Implement note details modal
         }
         
         function showAlertDetails(id) {
-            console.log('Show alert details:', id);
+            if (window.Logger) {
+                window.Logger.info('Show alert details', { page: 'trade-history-page', id });
+            }
             // TODO: Implement alert details modal
         }
         
         function showCashFlowDetails(id) {
-            console.log('Show cash flow details:', id);
+            if (window.Logger) {
+                window.Logger.info('Show cash flow details', { page: 'trade-history-page', id });
+            }
             // TODO: Implement cash flow details modal
         }
         
@@ -1146,7 +1165,9 @@
                     
                     // Prevent multiple simultaneous initializations
                     if (isInitializingTimelineChart) {
-                        console.log('Timeline chart initialization already in progress, skipping...');
+                        if (window.Logger) {
+                            window.Logger.info('Timeline chart initialization already in progress, skipping...', { page: 'trade-history-page' });
+                        }
                         return;
                     }
                     
@@ -1161,7 +1182,9 @@
                                 try {
                                     window.TradingViewChartAdapter.destroyChart(timelineChart);
                                 } catch (e) {
-                                    console.warn('Error destroying timeline chart:', e);
+                                    if (window.Logger) {
+                                        window.Logger.warn('Error destroying timeline chart', { page: 'trade-history-page', error: e });
+                                    }
                                 }
                                 timelineChart = null;
                             }
@@ -1205,13 +1228,17 @@
         async function initTimelineChart() {
             const container = document.getElementById('timelineChart');
             if (!container) {
-                console.warn('Timeline chart container not found');
+                if (window.Logger) {
+                    window.Logger.warn('Timeline chart container not found', { page: 'trade-history-page' });
+                }
                 return;
             }
             
             // Prevent multiple simultaneous initializations
             if (isInitializingTimelineChart) {
-                console.log('Timeline chart initialization already in progress, skipping...');
+                if (window.Logger) {
+                    window.Logger.info('Timeline chart initialization already in progress, skipping...', { page: 'trade-history-page' });
+                }
                 return;
             }
             
@@ -1232,7 +1259,9 @@
                 }
                 
                 if (typeof window.TradingViewChartAdapter === 'undefined') {
-                    console.error('TradingViewChartAdapter not available');
+                    if (window.Logger) {
+                        window.Logger.error('TradingViewChartAdapter not available', { page: 'trade-history-page' });
+                    }
                     isInitializingTimelineChart = false;
                     return;
                 }
@@ -1242,7 +1271,9 @@
                     try {
                         window.TradingViewChartAdapter.destroyChart(timelineChart);
                     } catch (e) {
-                        console.warn('Error destroying timeline chart:', e);
+                        if (window.Logger) {
+                            window.Logger.warn('Error destroying timeline chart', { page: 'trade-history-page', error: e });
+                        }
                     }
                     timelineChart = null;
                 }
@@ -1250,7 +1281,9 @@
                 // Clear container
                 container.innerHTML = '';
             } catch (e) {
-                console.warn('Error during chart cleanup:', e);
+                if (window.Logger) {
+                    window.Logger.warn('Error during chart cleanup', { page: 'trade-history-page', error: e });
+                }
             } finally {
                 isInitializingTimelineChart = false;
             }
@@ -1503,11 +1536,15 @@
                 
                 // Try to use createSeriesMarkers if available
                 if (lightweightCharts && typeof lightweightCharts.createSeriesMarkers === 'function') {
-                    console.log('✅ [Timeline Chart] Using createSeriesMarkers for markers');
+                    if (window.Logger) {
+                        window.Logger.info('✅ [Timeline Chart] Using createSeriesMarkers for markers', { page: 'trade-history-page' });
+                    }
                     try {
                         markersPrimitive = lightweightCharts.createSeriesMarkers(positionSizeSeries);
                     } catch (error) {
-                        console.warn('⚠️ [Timeline Chart] Failed to create markers primitive:', error);
+                        if (window.Logger) {
+                            window.Logger.warn('⚠️ [Timeline Chart] Failed to create markers primitive', { page: 'trade-history-page', error });
+                        }
                     }
                 }
                 
@@ -1564,26 +1601,38 @@
                 if (markersPrimitive && timelineMarkers.length > 0) {
                     try {
                         markersPrimitive.setMarkers(timelineMarkers);
-                        console.log(`✅ [Timeline Chart] Added ${timelineMarkers.length} markers`);
+                        if (window.Logger) {
+                            window.Logger.info(`✅ [Timeline Chart] Added ${timelineMarkers.length} markers`, { page: 'trade-history-page', count: timelineMarkers.length });
+                        }
                     } catch (error) {
-                        console.error('❌ [Timeline Chart] Error setting markers:', error);
+                        if (window.Logger) {
+                            window.Logger.error('❌ [Timeline Chart] Error setting markers', { page: 'trade-history-page', error });
+                        }
                     }
                 } else if (typeof positionSizeSeries.setMarkers === 'function' && timelineMarkers.length > 0) {
                     try {
                         positionSizeSeries.setMarkers(timelineMarkers);
-                        console.log(`✅ [Timeline Chart] Added ${timelineMarkers.length} markers using series.setMarkers`);
+                        if (window.Logger) {
+                            window.Logger.info(`✅ [Timeline Chart] Added ${timelineMarkers.length} markers using series.setMarkers`, { page: 'trade-history-page', count: timelineMarkers.length });
+                        }
                     } catch (error) {
-                        console.error('❌ [Timeline Chart] Error setting markers on series:', error);
+                        if (window.Logger) {
+                            window.Logger.error('❌ [Timeline Chart] Error setting markers on series', { page: 'trade-history-page', error });
+                        }
                     }
                 } else {
-                    console.warn('⚠️ [Timeline Chart] Cannot set markers - method not available');
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ [Timeline Chart] Cannot set markers - method not available', { page: 'trade-history-page' });
+                    }
                 }
                 
                 // Fit content to show all data
                 try {
                     timelineChart.timeScale().fitContent();
                 } catch (error) {
-                    console.error('❌ [Timeline Chart] Error calling fitContent():', error);
+                    if (window.Logger) {
+                        window.Logger.error('❌ [Timeline Chart] Error calling fitContent()', { page: 'trade-history-page', error });
+                    }
                 }
                 
                 // Store timelineData for tooltip and click handlers
@@ -1643,7 +1692,9 @@
                 });
                 
             } catch (error) {
-                console.error('Error creating timeline chart with TradingView:', error);
+                if (window.Logger) {
+                    window.Logger.error('Error creating timeline chart with TradingView', { page: 'trade-history-page', error });
+                }
                 timelineChart = null;
             }
         }
@@ -1937,8 +1988,8 @@
             // פותח מודל להוספת ביצוע חדש
             if (window.ModalManagerV2) {
                 window.ModalManagerV2.showModal('executionModal', 'create', {});
-            } else if (window.showSuccessNotification) {
-                window.showSuccessNotification('פתיחת טופס הוספת ביצוע - ייושם בעתיד');
+            } else if (window.NotificationSystem) {
+                window.NotificationSystem.showInfo('פתיחת טופס הוספת ביצוע - ייושם בעתיד');
             } else {
                 alert('פתיחת טופס הוספת ביצוע - ייושם בעתיד');
             }

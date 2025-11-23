@@ -2141,7 +2141,7 @@ window.disableAllPreferencesInterface = function() {
   // Add visual indicator to all save buttons
   const saveButtons = document.querySelectorAll('button[onclick*="saveAllPreferences"], #savePreferencesBtn');
   saveButtons.forEach(saveButton => {
-    saveButton.innerHTML = '<i class="bi bi-lock"></i> פרופיל ברירת מחדל - לא ניתן לערוך';
+    saveButton.innerHTML = '<img src="/trading-ui/images/icons/tabler/lock.svg" width="16" height="16" alt="lock" class="icon me-2"> פרופיל ברירת מחדל - לא ניתן לערוך';
     saveButton.classList.add('btn-secondary', 'disabled');
     saveButton.classList.remove('btn-success');
     window.Logger.info(`🔒 Disabled save button: ${saveButton.id || 'unnamed'}`, { page: 'preferences-ui' });
@@ -2184,7 +2184,7 @@ window.enableAllPreferencesInterface = function() {
   // Restore all save buttons
   const saveButtons = document.querySelectorAll('button[onclick*="saveAllPreferences"], #savePreferencesBtn');
   saveButtons.forEach(saveButton => {
-    saveButton.innerHTML = '<i class="bi bi-save me-2"></i>שמור העדפות';
+    saveButton.innerHTML = '<img src="/trading-ui/images/icons/tabler/device-floppy.svg" width="16" height="16" alt="save" class="icon me-2">שמור העדפות';
     saveButton.classList.add('btn-success');
     saveButton.classList.remove('btn-secondary', 'disabled');
     window.Logger.info(`✅ Enabled save button: ${saveButton.id || 'unnamed'}`, { page: 'preferences-ui' });
@@ -2205,7 +2205,7 @@ function showDefaultProfileWarning() {
   warningDiv.id = 'defaultProfileWarning';
   warningDiv.className = 'alert alert-warning alert-dismissible fade show';
   warningDiv.innerHTML = `
-        <i class="bi bi-exclamation-triangle me-2"></i>
+        <img src="/trading-ui/images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="warning" class="icon me-2">
         <strong>פרופיל ברירת מחדל פעיל!</strong>
         לא ניתן לערוך הגדרות בפרופיל ברירת מחדל. 
         החלף לפרופיל משתמש כדי לערוך הגדרות.

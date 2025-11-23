@@ -10,13 +10,13 @@
     "notes": "Fix preferences cache version and delete trades with linking issues"
   },
   "development": {
-    "version": "1.3.21.0",
+    "version": "1.3.22.0",
     "major": 1,
     "minor": 3,
-    "patch": 21,
+    "patch": 22,
     "build": 0,
-    "commit": "7d198752bf637f8405006822166ea5f63c2e6e8d",
-    "updated_at": "2025-11-23T00:49:40+00:00",
-    "notes": "Fix: Array mutation, cache invalidation patterns, and dead code in business logic"
+    "commit": "a7f1c28a3668818d85ee97a4784f3686c850ad47",
+    "updated_at": "2025-11-23T00:54:54+00:00",
+    "notes": "Fix: Filter business logic patterns from backend cache invalidation"
   }
 }

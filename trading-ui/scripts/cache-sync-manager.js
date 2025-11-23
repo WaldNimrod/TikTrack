@@ -313,27 +313,39 @@ class CacheSyncManager {
       return false;
     }
 
+    // Separate frontend-only patterns (business logic) from backend patterns
+    const frontendOnlyPatterns = [];
+    const backendPatterns = [];
+
+    for (const pattern of patterns) {
+      if (pattern.startsWith('business:')) {
+        frontendOnlyPatterns.push(pattern);
+      } else {
+        backendPatterns.push(pattern);
+      }
+    }
+
     // Clear frontend cache for Business Logic patterns
-    if (window.UnifiedCacheManager) {
-      for (const pattern of patterns) {
-        if (pattern.startsWith('business:')) {
-          try {
-            // Clear all cache keys that start with this pattern
-            if (typeof window.UnifiedCacheManager.invalidate === 'function') {
-              await window.UnifiedCacheManager.invalidate(pattern);
-            } else if (typeof window.UnifiedCacheManager.clearByPattern === 'function') {
-              await window.UnifiedCacheManager.clearByPattern(pattern);
-            }
-          } catch (error) {
-            if (window.Logger) {
-              window.Logger.warn(`⚠️ Failed to clear frontend cache for pattern ${pattern}:`, error, { page: 'cache' });
-            }
+    if (window.UnifiedCacheManager && frontendOnlyPatterns.length > 0) {
+      for (const pattern of frontendOnlyPatterns) {
+        try {
+          // Clear all cache keys that start with this pattern
+          if (typeof window.UnifiedCacheManager.invalidate === 'function') {
+            await window.UnifiedCacheManager.invalidate(pattern);
+          } else if (typeof window.UnifiedCacheManager.clearByPattern === 'function') {
+            await window.UnifiedCacheManager.clearByPattern(pattern);
+          }
+        } catch (error) {
+          if (window.Logger) {
+            window.Logger.warn(`⚠️ Failed to clear frontend cache for pattern ${pattern}:`, error, { page: 'cache' });
           }
         }
       }
     }
 
-    return await this.invalidateBackend(patterns);
+    // Only send backend patterns to backend invalidation endpoint
+    // Business logic patterns are frontend-only and should not be sent
+    return await this.invalidateBackend(backendPatterns);
   }
 
   /**

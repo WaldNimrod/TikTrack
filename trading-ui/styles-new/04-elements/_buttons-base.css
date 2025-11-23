@@ -29,7 +29,7 @@ button,.btn{
   min-width: calc(0.375rem * 2 + 0.875rem * 1.5); /* רוחב מינימום = גובה */
 }
 
-/* כפתורים רק עם איקונים (ללא טקסט) - מרובעים */
+/* כפתורים רק עם איקונים (ללא טקסט) - מרובעים וממורכזים */
 /* כפתורים empty או עם רק emoji/icon - יהיו מרובעים */
 button:empty,
 .btn:empty {
@@ -38,6 +38,58 @@ button:empty,
   width: calc(0.375rem * 2 + 0.875rem * 1.5);
   padding-left: 0.375rem;
   padding-right: 0.375rem;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* כפתורים עם רק איקון (SVG או img) ללא טקסט - מירכוז */
+/* Using more specific selectors for better browser compatibility */
+button:not(:empty):has(> .icon:only-child),
+button:not(:empty):has(> img.icon:only-child),
+button:not(:empty):has(> svg.icon:only-child),
+.btn:not(:empty):has(> .icon:only-child),
+.btn:not(:empty):has(> img.icon:only-child),
+.btn:not(:empty):has(> svg.icon:only-child),
+/* Fallback for browsers that don't support :has() - check if button has only one child which is icon */
+button .icon:only-child,
+.btn .icon:only-child {
+  /* The parent button will be centered via display: inline-flex + justify-content: center */
+}
+
+/* Ensure icon-only buttons are centered */
+button:not(:empty) > .icon:only-child,
+button:not(:empty) > img.icon:only-child,
+button:not(:empty) > svg.icon:only-child,
+.btn:not(:empty) > .icon:only-child,
+.btn:not(:empty) > img.icon:only-child,
+.btn:not(:empty) > svg.icon:only-child {
+  margin: 0 !important; /* Remove all margins for centered icon */
+}
+
+/* Parent button centering when only icon */
+button:not(:empty):has(> .icon:only-child),
+button:not(:empty):has(> img.icon:only-child),
+button:not(:empty):has(> svg.icon:only-child),
+.btn:not(:empty):has(> .icon:only-child),
+.btn:not(:empty):has(> img.icon:only-child),
+.btn:not(:empty):has(> svg.icon:only-child) {
+  justify-content: center !important;
+  align-items: center !important;
+  padding-left: 0.375rem;
+  padding-right: 0.375rem;
+}
+
+/* כפתורים small עם רק איקון */
+button[data-variant="small"]:has(> .icon:only-child),
+button[data-variant="small"]:has(> img.icon:only-child),
+button[data-variant="small"]:has(> svg.icon:only-child),
+.btn[data-variant="small"]:has(> .icon:only-child),
+.btn[data-variant="small"]:has(> img.icon:only-child),
+.btn[data-variant="small"]:has(> svg.icon:only-child) {
+  justify-content: center !important;
+  align-items: center !important;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
 }
 
 /* כפתורים עם רק emoji או איקון (ללא טקסט) - מרובעים */

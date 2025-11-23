@@ -167,6 +167,8 @@
 
         /**
          * Render icon as HTML
+         * For Tabler Icons: Returns inline SVG to support color customization via CSS
+         * For Entity Icons: Returns img tag (entity icons have fixed colors)
          * @param {string} type - Icon type
          * @param {string} name - Icon name
          * @param {Object} options - Options (size, alt, class, etc.)
@@ -179,7 +181,130 @@
             const className = options.class ? ` class="${options.class}"` : '';
             const style = options.style ? ` style="${options.style}"` : '';
 
+            // For Entity Icons - use img tag (they have fixed colors)
+            if (type === 'entity' || type === 'entities') {
+                return `<img src="${path}" width="${size}" height="${size}" alt="${alt}"${className}${style}>`;
+            }
+
+            // For Tabler Icons - try to load as inline SVG to support color customization
+            // Check if path is a Tabler icon
+            if (path && path.includes('/tabler/')) {
+                try {
+                    const svgContent = await this._loadSVGContent(path);
+                    if (svgContent) {
+                        // Extract SVG content and modify attributes for inline use
+                        const inlineSVG = this._prepareInlineSVG(svgContent, size, alt, className, style);
+                        return inlineSVG;
+                    }
+                } catch (error) {
+                    // If loading fails, fallback to img tag
+                    if (typeof window.Logger !== 'undefined') {
+                        window.Logger.debug(`⚠️ Failed to load SVG inline for ${path}, using img tag:`, error, { page: 'icon-system' });
+                    }
+                }
+            }
+
+            // Fallback to img tag
             return `<img src="${path}" width="${size}" height="${size}" alt="${alt}"${className}${style}>`;
+        }
+
+        /**
+         * Load SVG file content
+         * @private
+         * @param {string} path - SVG file path
+         * @returns {Promise<string|null>} SVG content or null
+         */
+        async _loadSVGContent(path) {
+            // Try cache first
+            const cacheKey = `icon-svg-content:${path}`;
+            if (this.cacheEnabled) {
+                try {
+                    const cached = await window.UnifiedCacheManager.get(cacheKey, {
+                        ttl: 60 * 60 * 1000 // 1 hour - SVG content doesn't change often
+                    });
+                    if (cached) {
+                        return cached;
+                    }
+                } catch (error) {
+                    // Cache error - continue without cache
+                }
+            }
+
+            // Load SVG file via fetch
+            try {
+                const response = await fetch(path);
+                if (!response.ok) {
+                    return null;
+                }
+                const svgContent = await response.text();
+
+                // Cache the content
+                if (this.cacheEnabled && svgContent) {
+                    try {
+                        await window.UnifiedCacheManager.save(cacheKey, svgContent, {
+                            ttl: 60 * 60 * 1000 // 1 hour
+                        });
+                    } catch (error) {
+                        // Cache save error - ignore
+                    }
+                }
+
+                return svgContent;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        /**
+         * Prepare inline SVG for embedding
+         * @private
+         * @param {string} svgContent - Raw SVG content
+         * @param {string} size - Icon size
+         * @param {string} alt - Alt text
+         * @param {string} className - CSS classes
+         * @param {string} style - Inline styles
+         * @returns {string} Prepared inline SVG HTML
+         */
+        _prepareInlineSVG(svgContent, size, alt, className, style) {
+            // Create a temporary div to parse and modify SVG
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = svgContent.trim();
+            const svgElement = tempDiv.querySelector('svg');
+
+            if (!svgElement) {
+                return svgContent; // Return original if parsing fails
+            }
+
+            // Set attributes
+            svgElement.setAttribute('width', size);
+            svgElement.setAttribute('height', size);
+            svgElement.setAttribute('aria-label', alt);
+            svgElement.setAttribute('role', 'img');
+            
+            // Add class (preserve existing classes, add icon class)
+            const existingClasses = svgElement.getAttribute('class') || '';
+            svgElement.setAttribute('class', `icon ${existingClasses} ${className}`.trim());
+
+            // Add style
+            if (style) {
+                const existingStyle = svgElement.getAttribute('style') || '';
+                svgElement.setAttribute('style', `${existingStyle} ${style}`.trim());
+            }
+
+            // Ensure currentColor support for Tabler icons
+            // Tabler icons already use stroke="currentColor", but we ensure it
+            svgElement.setAttribute('fill', 'none');
+            svgElement.setAttribute('stroke', 'currentColor');
+            
+            // Ensure all paths use currentColor
+            const paths = svgElement.querySelectorAll('path');
+            paths.forEach(path => {
+                if (path.getAttribute('stroke') && path.getAttribute('stroke') !== 'none') {
+                    path.setAttribute('stroke', 'currentColor');
+                }
+            });
+
+            return svgElement.outerHTML;
         }
 
         /**

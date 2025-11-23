@@ -63,11 +63,39 @@
 /* Icon in Buttons */
 .btn .icon {
   margin-right: var(--icon-spacing, 4px);
+  color: inherit; /* Inherit color from button for Tabler icons (currentColor) */
+}
+
+/* Remove margin when icon is only child (icon-only button) */
+.btn:has(> .icon:only-child) .icon,
+.btn:has(> img.icon:only-child) .icon,
+.btn:has(> svg.icon:only-child) .icon {
+  margin-right: 0;
+  margin-left: 0;
 }
 
 [dir="rtl"] .btn .icon {
   margin-right: 0;
   margin-left: var(--icon-spacing, 4px);
+}
+
+[dir="rtl"] .btn:has(> .icon:only-child) .icon,
+[dir="rtl"] .btn:has(> img.icon:only-child) .icon,
+[dir="rtl"] .btn:has(> svg.icon:only-child) .icon {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+/* SVG icons (inline) - inherit color from parent */
+.btn svg.icon {
+  color: inherit;
+  fill: none;
+  stroke: currentColor;
+}
+
+/* Ensure Tabler icons use currentColor for dynamic coloring */
+svg.icon[stroke="currentColor"] {
+  stroke: currentColor;
 }
 
 /* Icon Alignment */

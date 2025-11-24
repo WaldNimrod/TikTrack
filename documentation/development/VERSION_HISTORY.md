@@ -142,3 +142,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-24T16:26:35+00:00 | 1.3.23.0 | 1.3.22.0 | 1881fe220d81445abb31a074a1de5028f3360f18 | cdb459489028b38653238068d25594d9502b0dfc | patch | Complete TradingView Widgets System: Fix showcase page structure, all mockup pages registered, 13 widgets configured |
 | 2025-11-24T16:37:09+00:00 | 1.3.24.0 | 1.3.23.0 | a942a059ab39d5bc95b48f3cf3d40a944c942f88 | 1881fe220d81445abb31a074a1de5028f3360f18 | patch | Additional updates before production sync |
 | 2025-11-24T16:47:49+00:00 | 1.3.25.0 | 1.3.24.0 | fdc60f2eabbca916f2b4a23c9b3089f2bfc1530b | a942a059ab39d5bc95b48f3cf3d40a944c942f88 | patch | Add visual heatmap to comparative analysis page with separate color scales |
+| 2025-11-24T21:49:34+00:00 | 1.3.26.0 | 1.3.25.0 | 190df99c0505093760df5295d171d69ea537d46b | fdc60f2eabbca916f2b4a23c9b3089f2bfc1530b | patch | מימוש מלא של עמוד ניתוח אסטרטגיות - מוקאפ פונקציונלי |

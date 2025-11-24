@@ -86,14 +86,19 @@ function toggleSeries(seriesKey, visible) {
     updateStrategyPerformanceChart(getFilterValues());
 }
 
-// Save series visibility state using PreferencesCore
+// Save series visibility state using UnifiedCacheManager
 async function saveSeriesVisibilityState() {
     try {
-        if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
-            await window.PreferencesCore.savePreference(PREF_SERIES_VISIBILITY, seriesVisibility);
+        if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
+            await window.UnifiedCacheManager.save(CACHE_KEY_SERIES_VISIBILITY, seriesVisibility, {
+                layer: 'localStorage',
+                ttl: null, // persistent
+                syncToBackend: false
+            });
         } else {
-            // Fallback to localStorage
-            localStorage.setItem(PREF_SERIES_VISIBILITY, JSON.stringify(seriesVisibility));
+            if (window.Logger) {
+                window.Logger.warn('UnifiedCacheManager not available, cannot save series visibility state', { page: 'strategy-analysis-page' });
+            }
         }
     } catch (error) {
         if (window.Logger) {
@@ -102,31 +107,28 @@ async function saveSeriesVisibilityState() {
     }
 }
 
-// Load series visibility state using PreferencesCore
+// Load series visibility state using UnifiedCacheManager
 async function loadSeriesVisibilityState() {
     try {
-        let savedState = null;
-        if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
-            savedState = await window.PreferencesCore.getPreference(PREF_SERIES_VISIBILITY);
-        } else {
-            // Fallback to localStorage
-            const saved = localStorage.getItem(PREF_SERIES_VISIBILITY);
-            if (saved) {
-                savedState = JSON.parse(saved);
+        if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
+            const savedState = await window.UnifiedCacheManager.get(CACHE_KEY_SERIES_VISIBILITY);
+            if (savedState && typeof savedState === 'object') {
+                Object.keys(savedState).forEach(key => {
+                    if (seriesVisibility.hasOwnProperty(key)) {
+                        seriesVisibility[key] = savedState[key];
+                    }
+                });
             }
-        }
-        
-        if (savedState) {
-            Object.keys(savedState).forEach(key => {
-                if (seriesVisibility.hasOwnProperty(key)) {
-                    seriesVisibility[key] = savedState[key];
-                }
-            });
+        } else {
+            // Use defaults if cache not available
+            seriesVisibility = { ...DEFAULT_SERIES_VISIBILITY };
         }
     } catch (error) {
         if (window.Logger) {
-            window.Logger.warn('Failed to load series visibility state', { page: 'strategy-analysis-page', error });
+            window.Logger.warn('Failed to load series visibility state, using defaults', { page: 'strategy-analysis-page', error });
         }
+        // Use defaults on error
+        seriesVisibility = { ...DEFAULT_SERIES_VISIBILITY };
     }
 }
 
@@ -144,18 +146,23 @@ const AVAILABLE_SERIES = [
     { key: 'totalPurchases', label: 'סה"כ קניות', entityType: 'cash_flow', priceScaleId: 'right', format: 'currency' }
 ];
 
-// Series visibility state (default: all visible)
-let seriesVisibility = {};
-AVAILABLE_SERIES.forEach(series => {
-    seriesVisibility[series.key] = true;
-});
+// Cache keys for saving state (using UnifiedCacheManager, not PreferencesCore)
+const CACHE_KEY_SERIES_VISIBILITY = 'strategy-analysis-page_seriesVisibility';
+const CACHE_KEY_RECORD_FILTERS = 'strategy-analysis-page_recordFilters';
+const CACHE_KEY_COMPARISON_PARAMS = 'strategy-analysis-page_comparisonParams';
 
-// Filter state - separated into record filters and comparison parameters
-// Using PreferencesCore preference names
-const PREF_SERIES_VISIBILITY = 'strategy-analysis-series-visibility';
-const PREF_FILTERS = 'strategy-analysis-filters';
-const PREF_RECORD_FILTERS = 'strategy-analysis-record-filters';
-const PREF_COMPARISON_PARAMS = 'strategy-analysis-comparison-params';
+// Default values
+const DEFAULT_SERIES_VISIBILITY = {
+    trades: true,
+    avgPL: true,
+    totalPL: true,
+    successRate: true,
+    maxInvestmentAtPoint: true,
+    totalPurchases: true
+};
+
+// Series visibility state (will be loaded from cache or use defaults)
+let seriesVisibility = { ...DEFAULT_SERIES_VISIBILITY };
 
 // Wait for TradingView adapter
 async function waitForTradingViewAdapter() {
@@ -189,42 +196,42 @@ async function waitForTradingViewAdapter() {
 }
 
 // Initialize Header System
-async function initializeHeader() {
-    // Wait for HeaderSystem to be available
-    if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
-        try {
-            await window.HeaderSystem.initialize();
-            if (window.Logger) {
-                window.Logger.info('✅ Header System initialized', { page: 'strategy-analysis-page' });
-            }
-        } catch (error) {
-            if (window.Logger) {
-                window.Logger.error('Error initializing Header System', { 
-                    page: 'strategy-analysis-page', 
-                    error 
-                });
-            }
-        }
-    } else {
-        // Retry after a short delay if HeaderSystem not loaded yet
-        setTimeout(() => {
-            if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
-                window.HeaderSystem.initialize().catch((error) => {
-                    if (window.Logger) {
-                        window.Logger.error('Error initializing Header System (retry)', { 
-                            page: 'strategy-analysis-page', 
-                            error 
-                        });
-                    }
-                });
-            } else {
+    async function initializeHeader() {
+        // Wait for HeaderSystem to be available
+        if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+            try {
+                await window.HeaderSystem.initialize();
                 if (window.Logger) {
-                    window.Logger.warn('HeaderSystem not available after retry', { page: 'strategy-analysis-page' });
+                    window.Logger.info('✅ Header System initialized', { page: 'strategy-analysis-page' });
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('Error initializing Header System', { 
+                        page: 'strategy-analysis-page', 
+                        error 
+                    });
                 }
             }
-        }, 500);
+        } else {
+            // Retry after a short delay if HeaderSystem not loaded yet
+            setTimeout(() => {
+                if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+                    window.HeaderSystem.initialize().catch((error) => {
+                        if (window.Logger) {
+                            window.Logger.error('Error initializing Header System (retry)', { 
+                                page: 'strategy-analysis-page', 
+                                error 
+                            });
+                        }
+                    });
+                } else {
+                    if (window.Logger) {
+                        window.Logger.warn('HeaderSystem not available after retry', { page: 'strategy-analysis-page' });
+                    }
+                }
+            }, 500);
+        }
     }
-}
 
 // Get current record filter values (for filtering which strategies to include)
 function getRecordFilterValues() {
@@ -646,7 +653,7 @@ function resetRecordFilters() {
     updateAllVisualizations();
 }
 
-function resetRecordFiltersToDefaults() {
+async function resetRecordFiltersToDefaults() {
     // Set date range to "השנה" (current year)
     const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
     dateRangeItems.forEach(item => item.classList.remove('selected'));
@@ -662,12 +669,51 @@ function resetRecordFiltersToDefaults() {
     if (toInput) toInput.value = '';
     updateDateRangeFilterText();
     
-    // Set default trading account to first account only
+    // Set default trading account from user preferences
     const tradingAccounts = document.getElementById('recordFilterTradingAccounts');
     if (tradingAccounts && tradingAccounts.options.length > 0) {
-        Array.from(tradingAccounts.options).forEach((opt, index) => {
-            opt.selected = index === 0; // First account only
-        });
+        // Get default trading account from preferences
+        let defaultAccountId = null;
+        try {
+            if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                const prefValue = await window.PreferencesCore.getPreference('default_trading_account');
+                if (prefValue) {
+                    defaultAccountId = parseInt(prefValue);
+                }
+            } else if (window.currentPreferences?.default_trading_account) {
+                defaultAccountId = parseInt(window.currentPreferences.default_trading_account);
+            } else if (typeof window.getPreference === 'function') {
+                const prefValue = await window.getPreference('default_trading_account');
+                if (prefValue) {
+                    defaultAccountId = parseInt(prefValue);
+                }
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to get default trading account from preferences, using first account', { page: 'strategy-analysis-page', error });
+            }
+        }
+        
+        // Clear all selections first
+        Array.from(tradingAccounts.options).forEach(opt => opt.selected = false);
+        
+        // Select default account if found, otherwise first account
+        if (defaultAccountId) {
+            const defaultOption = Array.from(tradingAccounts.options).find(opt => parseInt(opt.value) === defaultAccountId);
+            if (defaultOption) {
+                defaultOption.selected = true;
+            } else {
+                // If default account not found in list, select first account
+                if (tradingAccounts.options.length > 0) {
+                    tradingAccounts.options[0].selected = true;
+                }
+            }
+        } else {
+            // No default account preference, select first account
+            if (tradingAccounts.options.length > 0) {
+                tradingAccounts.options[0].selected = true;
+            }
+        }
     }
     
     // Set status filter to "הכול"
@@ -675,7 +721,7 @@ function resetRecordFiltersToDefaults() {
     if (allStatusItem) allStatusItem.classList.add('selected');
     updateStatusFilterText();
     
-    saveRecordFilterState();
+    await saveRecordFilterState();
     updateAllVisualizations();
 }
 
@@ -788,9 +834,9 @@ function resetComparisonParametersToDefaults() {
         // Save the default state
         saveComparisonParameterState();
         
-        if (window.Logger) {
+                if (window.Logger) {
             window.Logger.info('✅ Default comparison parameters set (Trading Methods - first)', { 
-                page: 'strategy-analysis-page',
+                        page: 'strategy-analysis-page', 
                 methodsCount: comparisonTradingMethods.options.length,
                 selectedCount: Array.from(comparisonTradingMethods.selectedOptions).length
             });
@@ -913,7 +959,7 @@ function createStrategyCategories(comparisonParams) {
             });
         }
     }
-    
+
     if (comparisonParams.ticker.enabled && comparisonParams.ticker.values.length > 0) {
         // Get ticker symbols from select options
         const tickerSelect = document.getElementById('comparisonTickers');
@@ -1073,7 +1119,7 @@ function generateMockStrategyComparisonTableData(filterState) {
         if (isNegative) {
             // Negative P/L (losses): -$50 to -$500 per trade
             cat.avgPL = -Math.round(seededRandom() * 450 + 50);
-        } else {
+    } else {
             // Positive P/L (profits): $50 to $500 per trade
             cat.avgPL = Math.round(seededRandom() * 450 + 50);
         }
@@ -1877,12 +1923,19 @@ async function initStrategyPerformanceChart() {
         
         // Clear existing series - remove all series we've stored
         Object.values(chartSeries).forEach(series => {
-            if (series) {
+            if (series && typeof series === 'object' && strategyPerformanceChart) {
                 try {
-                    strategyPerformanceChart.removeSeries(series);
+                    // Check if series is still attached to chart before removing
+                    if (strategyPerformanceChart.removeSeries) {
+                        strategyPerformanceChart.removeSeries(series);
+                    }
                 } catch (e) {
-                    if (window.Logger) {
-                        window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: e });
+                    // Silently ignore errors when removing series (series might already be removed)
+                    // Only log if it's not a common "series not found" error
+                    if (e.message && !e.message.includes('undefined') && !e.message.includes('not found')) {
+                        if (window.Logger) {
+                            window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: e.message });
+                        }
                     }
                 }
             }
@@ -2043,12 +2096,19 @@ async function updateStrategyPerformanceChart(filters) {
     try {
         // Clear existing series - remove all series we've stored
         Object.values(chartSeries).forEach(series => {
-            if (series) {
+            if (series && typeof series === 'object' && strategyPerformanceChart) {
                 try {
-                    strategyPerformanceChart.removeSeries(series);
+                    // Check if series is still attached to chart before removing
+                    if (strategyPerformanceChart.removeSeries) {
+                        strategyPerformanceChart.removeSeries(series);
+                    }
                 } catch (e) {
-                    if (window.Logger) {
-                        window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: e });
+                    // Silently ignore errors when removing series (series might already be removed)
+                    // Only log if it's not a common "series not found" error
+                    if (e.message && !e.message.includes('undefined') && !e.message.includes('not found')) {
+                        if (window.Logger) {
+                            window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: e.message });
+                        }
                     }
                 }
             }
@@ -2180,8 +2240,8 @@ function updateStrategyInsights(filters) {
         const bestSuccessRate = document.getElementById('best-success-rate-insight');
         const recommendation = document.getElementById('recommendation-insight');
         
-        if (bestStrategy) bestStrategy.innerHTML = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"><strong>אסטרטגיה הטובה ביותר:</strong> אין נתונים';
-        if (bestSuccessRate) bestSuccessRate.innerHTML = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"><strong>אחוז הצלחה הגבוה ביותר:</strong> אין נתונים';
+        if (bestStrategy) bestStrategy.innerHTML = '<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon"><strong>אסטרטגיה הטובה ביותר:</strong> אין נתונים';
+        if (bestSuccessRate) bestSuccessRate.innerHTML = '<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="info-circle" class="icon"><strong>אחוז הצלחה הגבוה ביותר:</strong> אין נתונים';
         if (recommendation) recommendation.innerHTML = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"><strong>המלצה:</strong> אין נתונים להצגה';
         return;
     }
@@ -2207,14 +2267,14 @@ function updateStrategyInsights(filters) {
     
     if (bestStrategyEl) {
         bestStrategyEl.innerHTML = `
-            <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
+            <img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">
             <strong>אסטרטגיה הטובה ביותר:</strong> ${bestStrategy.name || 'לא זמין'} עם P/L כולל של ${formatCurrency(bestStrategy.totalPL)}
         `;
     }
     
     if (bestSuccessRateEl) {
         bestSuccessRateEl.innerHTML = `
-            <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon">
+            <img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="info-circle" class="icon">
             <strong>אחוז הצלחה הגבוה ביותר:</strong> ${bestSuccessRateStrategy.name || 'לא זמין'} עם ${bestSuccessRateStrategy.successRate}%
         `;
     }
@@ -2232,15 +2292,20 @@ function updateStrategyInsights(filters) {
 
 // ===== Preferences Management =====
 
-// Save record filter state
+// Save record filter state using UnifiedCacheManager
 async function saveRecordFilterState() {
     try {
         const recordFilters = getRecordFilterValues();
-        if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
-            await window.PreferencesCore.savePreference(PREF_RECORD_FILTERS, recordFilters);
+        if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
+            await window.UnifiedCacheManager.save(CACHE_KEY_RECORD_FILTERS, recordFilters, {
+                layer: 'localStorage',
+                ttl: null, // persistent
+                syncToBackend: false
+            });
         } else {
-            // Fallback to localStorage
-            localStorage.setItem(PREF_RECORD_FILTERS, JSON.stringify(recordFilters));
+            if (window.Logger) {
+                window.Logger.warn('UnifiedCacheManager not available, cannot save record filter state', { page: 'strategy-analysis-page' });
+            }
         }
     } catch (error) {
         if (window.Logger) {
@@ -2249,18 +2314,12 @@ async function saveRecordFilterState() {
     }
 }
 
-// Load record filter state
+// Load record filter state using UnifiedCacheManager
 async function loadRecordFilterState() {
     try {
         let savedState = null;
-        if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
-            savedState = await window.PreferencesCore.getPreference(PREF_RECORD_FILTERS);
-        } else {
-            // Fallback to localStorage
-            const saved = localStorage.getItem(PREF_RECORD_FILTERS);
-            if (saved) {
-                savedState = JSON.parse(saved);
-            }
+        if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
+            savedState = await window.UnifiedCacheManager.get(CACHE_KEY_RECORD_FILTERS);
         }
         
         if (savedState) {
@@ -2332,15 +2391,20 @@ async function loadRecordFilterState() {
     }
 }
 
-// Save comparison parameter state
+// Save comparison parameter state using UnifiedCacheManager
 async function saveComparisonParameterState() {
     try {
         const comparisonParams = getComparisonParameterValues();
-        if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
-            await window.PreferencesCore.savePreference(PREF_COMPARISON_PARAMS, comparisonParams);
+        if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
+            await window.UnifiedCacheManager.save(CACHE_KEY_COMPARISON_PARAMS, comparisonParams, {
+                layer: 'localStorage',
+                ttl: null, // persistent
+                syncToBackend: false
+            });
         } else {
-            // Fallback to localStorage
-            localStorage.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(comparisonParams));
+            if (window.Logger) {
+                window.Logger.warn('UnifiedCacheManager not available, cannot save comparison parameter state', { page: 'strategy-analysis-page' });
+            }
         }
     } catch (error) {
         if (window.Logger) {
@@ -2349,18 +2413,12 @@ async function saveComparisonParameterState() {
     }
 }
 
-// Load comparison parameter state
+// Load comparison parameter state using UnifiedCacheManager
 async function loadComparisonParameterState() {
     try {
         let savedState = null;
-        if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
-            savedState = await window.PreferencesCore.getPreference(PREF_COMPARISON_PARAMS);
-        } else {
-            // Fallback to localStorage
-            const saved = localStorage.getItem(PREF_COMPARISON_PARAMS);
-            if (saved) {
-                savedState = JSON.parse(saved);
-            }
+        if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
+            savedState = await window.UnifiedCacheManager.get(CACHE_KEY_COMPARISON_PARAMS);
         }
         
         if (savedState) {
@@ -2464,6 +2522,47 @@ async function loadTradingAccounts() {
             option.textContent = account.name;
             select.appendChild(option);
         });
+        
+        // Set default account from preferences (if no saved state exists)
+        // This will be overridden by loadRecordFilterState if there's a saved state
+        try {
+            let defaultAccountId = null;
+            if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                const prefValue = await window.PreferencesCore.getPreference('default_trading_account');
+                if (prefValue) {
+                    defaultAccountId = parseInt(prefValue);
+                }
+            } else if (window.currentPreferences?.default_trading_account) {
+                defaultAccountId = parseInt(window.currentPreferences.default_trading_account);
+            } else if (typeof window.getPreference === 'function') {
+                const prefValue = await window.getPreference('default_trading_account');
+                if (prefValue) {
+                    defaultAccountId = parseInt(prefValue);
+                }
+            }
+            
+            // Select default account if found
+            if (defaultAccountId && select.options.length > 0) {
+                const defaultOption = Array.from(select.options).find(opt => parseInt(opt.value) === defaultAccountId);
+                if (defaultOption) {
+                    defaultOption.selected = true;
+                } else if (select.options.length > 0) {
+                    // If default account not in list, select first account
+                    select.options[0].selected = true;
+                }
+            } else if (select.options.length > 0) {
+                // No default preference, select first account
+                select.options[0].selected = true;
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to get default trading account, using first account', { page: 'strategy-analysis-page', error });
+            }
+            // Fallback: select first account
+            if (select.options.length > 0) {
+                select.options[0].selected = true;
+            }
+        }
     }
 }
 
@@ -2578,12 +2677,12 @@ async function initializePage() {
         // Initialize Header System first
         await initializeHeader();
         
-        // Wait for Preferences to be loaded
+        // Wait for Preferences to be loaded (needed for default_trading_account)
         if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
             await window.PreferencesCore.initializeWithLazyLoading();
         }
         
-        // Load dynamic data
+        // Load dynamic data (loadTradingAccounts will set default account from preferences)
         await loadTradingAccounts();
         await loadTradingMethods();
         await loadTickers();
@@ -2663,11 +2762,11 @@ function setupEventListeners() {
     if (comparisonTagsSelect) {
         comparisonTagsSelect.addEventListener('change', applyComparisonParameters);
     }
-}
+    }
 
-// Export functions to window for debugging
-window.strategyAnalysisPage = {
-    getCSSVariableValue,
+    // Export functions to window for debugging
+    window.strategyAnalysisPage = {
+        getCSSVariableValue,
     getEntityColor,
     initializeHeader,
     getRecordFilterValues,

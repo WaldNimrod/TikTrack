@@ -262,29 +262,7 @@
     
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
-    <!-- Initialize Preferences System and Dynamic Colors -->
-    <script>
-        // Helper function to get CSS variable value
-        function getCSSVariableValue(variableName, fallback) {
-            try {
-                const value = getComputedStyle(document.documentElement).getPropertyValue(variableName);
-                return value && value.trim() ? value.trim() : fallback;
-            } catch (error) {
-                return fallback;
-            }
-        }
-        
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
-                    await window.PreferencesCore.initializeWithLazyLoading();
-                }
-            } catch (error) {
-                if (window.Logger) {
-                    window.Logger.warn('Preferences initialization failed (non-critical)', { page: 'strategy-analysis-page', error });
-                }
-            }
-        });
-    </script>
+    <!-- Page-specific script -->
+    <script src="../../scripts/strategy-analysis-page.js" defer></script>
 </body>
 </html>

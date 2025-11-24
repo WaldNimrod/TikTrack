@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" class="tradingview-widgets-showcase-page">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -142,37 +142,60 @@
         }
     </style>
 </head>
-<body>
+<body class="tradingview-widgets-showcase-page">
     <!-- Header System -->
     <div id="unified-header"></div>
     
-    <div class="container-fluid mt-4">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1>🎯 תצוגת ווידג'טים של TradingView</h1>
-            <p>עמוד זמני להצגת 13 ווידג'טים של TradingView (iFrame Widgets) עם תיאור הפרמטרים</p>
-        </div>
-        
-        <!-- Note -->
-        <div class="note-box">
-            <strong>⚠️ הערה חשובה:</strong>
-            <ul>
-                <li>כל הווידג'טים הם <strong>iFrame בלבד</strong> - נטענים ישירות מ-TradingView</li>
-                <li>כל הווידג'טים מגיעים <strong>עם נתונים היסטוריים מלאים</strong> - אבל רק לצפייה בתוך הווידג'ט</li>
-                <li><strong>אי אפשר למשוך נתונים</strong> מהווידג'טים לשימוש בקוד שלך</li>
-                <li><strong>אי אפשר overlay</strong> של טריידים משלך על הגרפים</li>
-                <li>הווידג'טים מציגים נתונים בזמן אמת</li>
-            </ul>
-        </div>
-
-        <!-- Core System Testing Interface -->
-        <div class="widget-section" style="background: #e7f3ff; border: 2px solid #26baac;">
-            <h2>🧪 ממשק בדיקה - Core System</h2>
-            <p>ממשק זה משתמש ב-<code>TradingViewWidgetsManager</code> ליצירה וניהול ווידג'טים</p>
-            
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    <h3>יצירת ווידג'ט חדש</h3>
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <div class="main-content">
+                <!-- Top Section: Page Header and Info -->
+                <div class="top-section" data-section="top">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/entities/trade_plans.svg" alt="תצוגת ווידג'טים של TradingView" class="section-icon">
+                            תצוגת ווידג'טים של TradingView
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <p class="text-muted mb-3">עמוד להצגת 13 ווידג'טים של TradingView (iFrame Widgets) עם תיאור הפרמטרים</p>
+                        
+                        <!-- Note -->
+                        <div class="note-box">
+                            <strong>⚠️ הערה חשובה:</strong>
+                            <ul>
+                                <li>כל הווידג'טים הם <strong>iFrame בלבד</strong> - נטענים ישירות מ-TradingView</li>
+                                <li>כל הווידג'טים מגיעים <strong>עם נתונים היסטוריים מלאים</strong> - אבל רק לצפייה בתוך הווידג'ט</li>
+                                <li><strong>אי אפשר למשוך נתונים</strong> מהווידג'טים לשימוש בקוד שלך</li>
+                                <li><strong>אי אפשר overlay</strong> של טריידים משלך על הגרפים</li>
+                                <li>הווידג'טים מציגים נתונים בזמן אמת</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Content Section: Core System Testing -->
+                <div class="content-section" id="core-system-testing">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/entities/trade_plans.svg" alt="ממשק בדיקה - Core System" class="section-icon">
+                            ממשק בדיקה - Core System
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('core-system-testing')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="widget-section" style="background: #e7f3ff; border: 2px solid #26baac; padding: 1.5rem; border-radius: 8px;">
+                            <p>ממשק זה משתמש ב-<code>TradingViewWidgetsManager</code> ליצירה וניהול ווידג'טים</p>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <h3>יצירת ווידג'ט חדש</h3>
                     <div class="mb-3">
                         <label class="form-label">סוג ווידג'ט:</label>
                         <select id="testWidgetType" class="form-select">
@@ -218,13 +241,27 @@
                 <div id="testWidgetsContainer" class="widget-container" style="min-height: 200px;">
                     <p class="text-muted">אין ווידג'טים שנוצרו עדיין. השתמש בטופס למעלה ליצירת ווידג'ט.</p>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Widget 1: Advanced Real-Time Chart -->
-        <div class="widget-section" id="widget-advanced-chart">
-            <h2>1. Advanced Real-Time Chart Widget (הגרף המלא) ⭐ הכי פופולרי</h2>
-            <div class="widget-description">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Content Section: Widgets Showcase -->
+                <div class="content-section" id="widgets-showcase">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/entities/trade_plans.svg" alt="ווידג'טים של TradingView" class="section-icon">
+                            ווידג'טים של TradingView
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('widgets-showcase')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Widget 1: Advanced Real-Time Chart -->
+                        <div class="widget-section" id="widget-advanced-chart">
+                            <h2>1. Advanced Real-Time Chart Widget (הגרף המלא) ⭐ הכי פופולרי</h2>
+                            <div class="widget-description">
                 <p><strong>מה הוא עושה:</strong></p>
                 <ul>
                     <li>גרף מלא כמו באתר TradingView (candles, indicators, overlays)</li>
@@ -380,9 +417,9 @@
         </div>
         
         <!-- Widget 2: Symbol Overview -->
-        <div class="widget-section" id="widget-symbol-overview">
-            <h2>2. Symbol Overview Widget (סקירת נכס)</h2>
-            <div class="widget-description">
+                        <div class="widget-section" id="widget-symbol-overview">
+                            <h2>2. Symbol Overview Widget (סקירת נכס)</h2>
+                            <div class="widget-description">
                 <p><strong>מה הוא עושה:</strong></p>
                 <ul>
                     <li>גרף קטן + מידע בסיסי על הנכס</li>
@@ -501,9 +538,9 @@
         </div>
         
         <!-- Widget 3: Mini Chart -->
-        <div class="widget-section" id="widget-mini-chart">
-            <h2>3. Mini Chart Widget (גרף מיני)</h2>
-            <div class="widget-description">
+                        <div class="widget-section" id="widget-mini-chart">
+                            <h2>3. Mini Chart Widget (גרף מיני)</h2>
+                            <div class="widget-description">
                 <p><strong>מה הוא עושה:</strong></p>
                 <ul>
                     <li>גרף קטן בלבד</li>
@@ -602,9 +639,9 @@
         </div>
         
         <!-- Widget 4: Ticker Widget -->
-        <div class="widget-section" id="widget-ticker">
-            <h2>4. Ticker Widget (טיקר - פס גלילה)</h2>
-            <div class="widget-description">
+                        <div class="widget-section" id="widget-ticker">
+                            <h2>4. Ticker Widget (טיקר - פס גלילה)</h2>
+                            <div class="widget-description">
                 <p><strong>מה הוא עושה:</strong></p>
                 <ul>
                     <li>פס נע עם מחירים</li>
@@ -703,9 +740,9 @@
         </div>
         
         <!-- Widget 5: Market Overview -->
-        <div class="widget-section" id="widget-market-overview">
-            <h2>5. Market Overview Widget (סקירת שווקים)</h2>
-            <div class="widget-description">
+                        <div class="widget-section" id="widget-market-overview">
+                            <h2>5. Market Overview Widget (סקירת שווקים)</h2>
+                            <div class="widget-description">
                 <p><strong>מה הוא עושה:</strong></p>
                 <ul>
                     <li>מראה רשימת שווקים בענפים</li>
@@ -863,9 +900,9 @@
         </div>
         
         <!-- Widget 6: Market Data Widgets -->
-        <div class="widget-section" id="widget-market-data">
-            <h2>6. Market Data Widgets (נתוני שוק)</h2>
-            <div class="widget-description">
+                        <div class="widget-section" id="widget-market-data">
+                            <h2>6. Market Data Widgets (נתוני שוק)</h2>
+                            <div class="widget-description">
                 <p><strong>מה הם עושים:</strong></p>
                 <ul>
                     <li><strong>Market Quotes widget:</strong> רשימת נכסים + שינוי יומי, לא גרפי</li>
@@ -999,9 +1036,9 @@
         </div>
         
         <!-- Widget 7: Economic Calendar -->
-        <div class="widget-section" id="widget-economic-calendar">
-            <h2>7. Economic Calendar Widget (לוח אירועים כלכליים)</h2>
-            <div class="widget-description">
+                        <div class="widget-section" id="widget-economic-calendar">
+                            <h2>7. Economic Calendar Widget (לוח אירועים כלכליים)</h2>
+                            <div class="widget-description">
                 <p><strong>מה הוא עושה:</strong></p>
                 <ul>
                     <li>מציג אירועים מקרו עתידיים</li>
@@ -1093,9 +1130,9 @@
         </div>
         
         <!-- Widget 8: Financials Widget -->
-        <div class="widget-section" id="widget-financials">
-            <h2>8. Financials Widget (נתונים פיננסיים)</h2>
-            <div class="widget-description">
+                        <div class="widget-section" id="widget-financials">
+                            <h2>8. Financials Widget (נתונים פיננסיים)</h2>
+                            <div class="widget-description">
                 <p><strong>מה הוא עושה:</strong></p>
                 <ul>
                     <li>נתונים כמו הכנסות, רווח נקי, EPS</li>
@@ -1180,9 +1217,9 @@
         </div>
         
         <!-- Widget 9: Screener Widget -->
-        <div class="widget-section" id="widget-screener">
-            <h2>9. Screener Widget (מסנן מניות)</h2>
-            <div class="widget-description">
+                        <div class="widget-section" id="widget-screener">
+                            <h2>9. Screener Widget (מסנן מניות)</h2>
+                            <div class="widget-description">
                 <p><strong>מה הוא עושה:</strong></p>
                 <ul>
                     <li>סורק מניות בסיסי</li>
@@ -1278,9 +1315,9 @@
         </div>
         
         <!-- Widget 10: Heatmap Widget -->
-        <div class="widget-section" id="widget-heatmap">
-            <h2>10. Heatmap Widget (מפת חום)</h2>
-            <div class="widget-description">
+                        <div class="widget-section" id="widget-heatmap">
+                            <h2>10. Heatmap Widget (מפת חום)</h2>
+                            <div class="widget-description">
                 <p><strong>מה הוא עושה:</strong></p>
                 <ul>
                     <li>מפת חום של השוק</li>
@@ -1386,9 +1423,9 @@
         </div>
         
         <!-- Widget 11: Single Ticker Profile -->
-        <div class="widget-section" id="widget-ticker-profile">
-            <h2>11. Single Ticker Profile Widget (פרופיל נכס)</h2>
-            <div class="widget-description">
+                        <div class="widget-section" id="widget-ticker-profile">
+                            <h2>11. Single Ticker Profile Widget (פרופיל נכס)</h2>
+                            <div class="widget-description">
                 <p><strong>מה הוא עושה:</strong></p>
                 <ul>
                     <li>פרופיל מלא של החברה</li>
@@ -1470,9 +1507,9 @@
         </div>
         
         <!-- Widget 12: Symbol Search -->
-        <div class="widget-section" id="widget-symbol-search">
-            <h2>12. Symbol Search Widget (חיפוש סמלים)</h2>
-            <div class="widget-description">
+                        <div class="widget-section" id="widget-symbol-search">
+                            <h2>12. Symbol Search Widget (חיפוש סמלים)</h2>
+                            <div class="widget-description">
                 <p><strong>מה הוא עושה:</strong></p>
                 <ul>
                     <li>תיבת חיפוש לחיפוש נכסים - מניות, מטבעות, קריפטו ועוד</li>
@@ -1570,9 +1607,9 @@
         </div>
         
         <!-- Widget 13: Technical Analysis -->
-        <div class="widget-section" id="widget-technical-analysis">
-            <h2>13. Technical Analysis Widget (אנליזה טכנית)</h2>
-            <div class="widget-description">
+                        <div class="widget-section" id="widget-technical-analysis">
+                            <h2>13. Technical Analysis Widget (אנליזה טכנית)</h2>
+                            <div class="widget-description">
                 <p><strong>מה הוא עושה:</strong></p>
                 <ul>
                     <li>סיכום אנליזה טכנית אוטומטית עם המלצות מסחר</li>
@@ -1658,7 +1695,7 @@
         </div>
         
         <!-- Summary Section -->
-        <div class="widget-section" style="background: #e7f3ff; border: 2px solid #26baac;">
+                        <div class="widget-section" style="background: #e7f3ff; border: 2px solid #26baac;">
             <h2 style="color: #26baac;">📊 סיכום: מה הכי מתאים ל-TikTrack?</h2>
             
             <div style="margin-top: 1.5rem;">
@@ -1693,18 +1730,22 @@
             </div>
         </div>
         
-        <!-- Footer Note -->
-        <div class="note-box mt-4">
-            <strong>📝 הערות חשובות:</strong>
-            <ul>
-                <li>כל הווידג'טים הם <strong>iFrame בלבד</strong> - נטענים ישירות מ-TradingView</li>
-                <li>כל הווידג'טים מגיעים <strong>עם נתונים היסטוריים מלאים</strong> - אבל רק לצפייה בתוך הווידג'ט</li>
-                <li><strong>אי אפשר למשוך נתונים</strong> מהווידג'טים לשימוש בקוד שלך</li>
-                <li><strong>אי אפשר overlay</strong> של טריידים משלך על הגרפים</li>
-                <li>הווידג'טים מציגים נתונים בזמן אמת</li>
-                <li>חלק מהווידג'טים דורשים הרשאות או מנוי TradingView לשימוש מלא</li>
-                <li>לשימוש מסחרי או ייצור, יש לבדוק את תנאי השימוש של TradingView</li>
-            </ul>
+                        <!-- Footer Note -->
+                        <div class="note-box mt-4">
+                            <strong>📝 הערות חשובות:</strong>
+                            <ul>
+                                <li>כל הווידג'טים הם <strong>iFrame בלבד</strong> - נטענים ישירות מ-TradingView</li>
+                                <li>כל הווידג'טים מגיעים <strong>עם נתונים היסטוריים מלאים</strong> - אבל רק לצפייה בתוך הווידג'ט</li>
+                                <li><strong>אי אפשר למשוך נתונים</strong> מהווידג'טים לשימוש בקוד שלך</li>
+                                <li><strong>אי אפשר overlay</strong> של טריידים משלך על הגרפים</li>
+                                <li>הווידג'טים מציגים נתונים בזמן אמת</li>
+                                <li>חלק מהווידג'טים דורשים הרשאות או מנוי TradingView לשימוש מלא</li>
+                                <li>לשימוש מסחרי או ייצור, יש לבדוק את תנאי השימוש של TradingView</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     

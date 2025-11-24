@@ -83,11 +83,11 @@
  */
 
 const PACKAGE_MANIFEST = {
-  // 1. BASE PACKAGE - חובה לכל עמוד
+  // 1. BASE PACKAGE - Required for all pages
   base: {
     id: 'base',
     name: 'Base Package',
-    description: 'מערכות ליבה חובה לכל עמוד',
+    description: 'Core systems required for all pages',
     version: '2.0.0',
     critical: true,
     loadOrder: 1,
@@ -96,35 +96,35 @@ const PACKAGE_MANIFEST = {
       {
         file: 'api-config.js',
         globalCheck: 'window.API_BASE_URL',
-        description: 'הגדרות API מרכזיות',
+        description: 'Central API configuration',
         required: true,
         loadOrder: 0
       },
       {
         file: 'global-favicon.js',
         globalCheck: 'window.setFavicon',
-        description: 'ניהול favicon',
+        description: 'Favicon management',
         required: true,
         loadOrder: 1
       },
       {
         file: 'notification-system.js',
         globalCheck: 'window.NotificationSystem',
-        description: 'מערכת התראות',
+        description: 'Notification system',
         required: true,
         loadOrder: 2
       },
       {
         file: 'cache-sync-manager.js',
         globalCheck: 'window.CacheSyncManager',
-        description: 'מנהל סנכרון מטמון',
+        description: 'Cache synchronization manager',
         required: true,
         loadOrder: 3
       },
       {
         file: 'ui-utils.js',
         globalCheck: 'window.toggleSection',
-        description: 'כלי עזר UI',
+        description: 'UI utilities',
         required: true,
         loadOrder: 4
       },
@@ -138,35 +138,35 @@ const PACKAGE_MANIFEST = {
       {
         file: 'error-handlers.js',
         globalCheck: 'window.handleApiError',
-        description: 'מערכת טיפול בשגיאות',
+        description: 'Error handling system',
         required: true,
         loadOrder: 6
       },
       {
         file: 'unified-cache-manager.js',
         globalCheck: 'window.UnifiedCacheManager',
-        description: 'מנהל מטמון מאוחד',
+        description: 'Unified cache manager',
         required: true,
         loadOrder: 7
       },
       {
         file: 'icon-mappings.js',
         globalCheck: 'window.IconMappings',
-        description: 'מיפוי איקונים מרכזי',
+        description: 'Central icon mappings',
         required: true,
         loadOrder: 7.5
       },
       {
         file: 'icon-system.js',
         globalCheck: 'window.IconSystem',
-        description: 'מערכת איקונים מרכזית',
+        description: 'Central icon system',
         required: true,
         loadOrder: 7.6
       },
       {
         file: 'cache-clear-menu.js',
         globalCheck: 'window.CacheControlMenu',
-        description: 'שליטת ניקוי מטמון(Stage B-Lite)',
+        description: 'Cache clearing control (Stage B-Lite)',
         required: true,
         loadOrder: 8
       },
@@ -180,42 +180,42 @@ const PACKAGE_MANIFEST = {
       {
         file: 'logger-service.js',
         globalCheck: 'window.Logger',
-        description: 'שירות לוגים מתקדם',
+        description: 'Advanced logging service',
         required: true,
         loadOrder: 10
       },
       {
         file: 'header-system.js',
         globalCheck: 'window.HeaderSystem',
-        description: 'מערכת כותרת',
+        description: 'Header system',
         required: true,
         loadOrder: 11
       },
       {
         file: 'page-state-manager.js',
         globalCheck: 'window.PageStateManager',
-        description: 'מנהל מצב עמודים מאוחד',
+        description: 'Unified page state manager',
         required: true,
         loadOrder: 12
       },
       {
         file: 'page-utils.js',
         globalCheck: 'window.loadPageState',
-        description: 'כלי עזר עמוד',
+        description: 'Page utilities',
         required: true,
         loadOrder: 13
       },
       {
         file: 'translation-utils.js',
         globalCheck: 'window.translateStatus',
-        description: 'תרגומים',
+        description: 'Translations',
         required: true,
         loadOrder: 14
       },
       {
         file: 'button-icons.js',
         globalCheck: 'window.BUTTON_ICONS',
-        description: 'מערכת איקונים וכפתורים',
+        description: 'Icon and button system',
         required: true,
         loadOrder: 15
       },
@@ -230,35 +230,35 @@ const PACKAGE_MANIFEST = {
       {
         file: 'event-handler-manager.js',
         globalCheck: 'window.EventHandlerManager',
-        description: 'מערכת ניהול אירועים מרכזית',
+        description: 'Central event management system',
         required: true,
         loadOrder: 17
       },
       {
         file: 'button-system-init.js',
         globalCheck: 'window.ButtonSystem',
-        description: 'מערכת כפתורים',
+        description: 'Button system',
         required: true,
         loadOrder: 18
       },
       {
         file: 'color-scheme-system.js',
         globalCheck: 'window.loadDynamicColors',
-        description: 'מערכת צבעים דינמית',
+        description: 'Dynamic color system',
         required: true,
         loadOrder: 19
       },
       {
         file: 'debug-modal-z-index.js',
         globalCheck: 'window.debugModalZIndex',
-        description: 'כלי דיבאג לבדיקת שכבות z-index של מודלים',
+        description: 'Debug tool for checking modal z-index layers',
         required: false,
         loadOrder: 20
       },
       {
         file: 'modules/core-systems.js',
         globalCheck: 'window.UnifiedAppInitializer',
-        description: 'מערכת אתחול מאוחדת - נקודת כניסה אחת (חובה לכל עמוד)',
+        description: 'Unified initialization system - single entry point (required for all pages)',
         required: true,
         loadOrder: 21
       }
@@ -267,11 +267,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~150ms'
   },
 
-  // 2. SERVICES PACKAGE - שירותים כלליים
+  // 2. SERVICES PACKAGE - General services
   services: {
     id: 'services',
     name: 'Services Package',
-    description: 'שירותים כלליים',
+    description: 'General services',
     version: '2.0.0',
     critical: false,
     loadOrder: 2,
@@ -280,105 +280,105 @@ const PACKAGE_MANIFEST = {
       {
         file: 'services/data-collection-service.js',
         globalCheck: 'window.DataCollectionService',
-        description: 'שירות איסוף נתונים',
+        description: 'Data collection service',
         required: true,
         loadOrder: 1
       },
       {
         file: 'services/field-renderer-service.js',
         globalCheck: 'window.FieldRendererService',
-        description: 'שירות רנדור שדות',
+        description: 'Field rendering service',
         required: true,
         loadOrder: 2
       },
       {
         file: 'services/select-populator-service.js',
         globalCheck: 'window.SelectPopulatorService',
-        description: 'שירות מילוי select boxes',
+        description: 'Select box population service',
         required: true,
         loadOrder: 3
       },
       {
         file: 'services/statistics-calculator.js',
         globalCheck: 'window.StatisticsCalculator',
-        description: 'מחשבון סטטיסטיקות',
+        description: 'Statistics calculator',
         required: true,
         loadOrder: 4
       },
       {
         file: 'services/default-value-setter.js',
         globalCheck: 'window.DefaultValueSetter',
-        description: 'שירות ברירות מחדל',
+        description: 'Default value service',
         required: true,
         loadOrder: 5
       },
       {
         file: 'services/preferences-data.js',
         globalCheck: 'window.PreferencesData',
-        description: 'שירות נתוני העדפות (API + Cache)',
+        description: 'Preferences data service (API + Cache)',
         required: true,
         loadOrder: 5.1
       },
       {
         file: 'services/executions-data.js',
         globalCheck: 'window.loadExecutionsData',
-        description: 'שירות נתונים לביצועים',
+        description: 'Executions data service',
         required: false,
         loadOrder: 5.2
       },
       {
         file: 'services/crud-response-handler.js',
         globalCheck: 'window.CrudResponseHandler',
-        description: 'מטפל בתגובות CRUD',
+        description: 'CRUD response handler',
         required: true,
         loadOrder: 6
       },
       {
         file: 'services/unified-crud-service.js',
         globalCheck: 'window.UnifiedCRUDService',
-        description: 'שירות CRUD מאוחד לכל הישויות',
+        description: 'Unified CRUD service for all entities',
         required: true,
         loadOrder: 6.5
       },
       {
         file: 'services/research-data.js',
         globalCheck: 'window.ResearchData',
-        description: 'שירות נתוני תחקיר',
+        description: 'Research data service',
         required: false,
         loadOrder: 6.6
       },
       {
         file: 'services/investment-calculation-service.js',
         globalCheck: 'window.InvestmentCalculationService',
-        description: 'חישובי סכום ↔ כמות לטפסי השקעות',
+        description: 'Investment form amount ↔ quantity calculations',
         required: true,
         loadOrder: 7
       },
       {
         file: 'services/tag-service.js',
         globalCheck: 'window.TagService',
-        description: 'שירות תגיות מרכזי (ניהול ואחזור תגיות)',
+        description: 'Central tag service (tag management and retrieval)',
         required: true,
         loadOrder: 8
       },
       {
         file: 'services/table-sort-value-adapter.js',
         globalCheck: 'window.TableSortValueAdapter',
-        description: 'Adapter למסירת ערכי מיון אחידים (DateEnvelope, legacy)',
+        description: 'Adapter for unified sort values (DateEnvelope, legacy)',
         required: true,
         loadOrder: 9
       },
       {
         file: 'services/lint-status-service.js',
         globalCheck: 'window.LintStatusService',
-        description: 'שירות סטטוס לינטר מאוחד (קריאת API והמרת נתונים)',
+        description: 'Unified linter status service (API reading and data conversion)',
         required: true,
         loadOrder: 10
       },
       {
         file: 'services/alert-condition-renderer.js',
         globalCheck: 'window.AlertConditionRenderer',
-        description: 'מציג תנאי התראות',
+        description: 'Alert condition renderer',
         required: false,
         loadOrder: 11
       },
@@ -401,7 +401,7 @@ const PACKAGE_MANIFEST = {
       {
         file: 'services/rich-text-editor-service.js',
         globalCheck: 'window.RichTextEditorService',
-        description: 'שירות עורך טקסט עשיר',
+        description: 'Rich text editor service',
         required: true,
         loadOrder: 14
       }
@@ -410,11 +410,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~100ms'
   },
 
-  // 3. UI-ADVANCED PACKAGE - ממשק מתקדם
+  // 3. UI-ADVANCED PACKAGE - Advanced interface
   'ui-advanced': {
     id: 'ui-advanced',
     name: 'UI Advanced Package',
-    description: 'ממשק משתמש מתקדם',
+    description: 'Advanced user interface',
     version: '2.0.0',
     critical: false,
     loadOrder: 3,
@@ -423,35 +423,35 @@ const PACKAGE_MANIFEST = {
       {
         file: 'table-mappings.js',
         globalCheck: 'window.TABLE_COLUMN_MAPPINGS',
-        description: 'מיפוי טבלאות',
+        description: 'Table mappings',
         required: true,
         loadOrder: 0
       },
       {
         file: 'tables.js',
         globalCheck: 'window.sortTableData',
-        description: 'מערכת טבלאות',
+        description: 'Table system',
         required: true,
         loadOrder: 1
       },
       {
         file: 'table-data-registry.js',
         globalCheck: 'window.TableDataRegistry',
-        description: 'רישום נתוני טבלאות',
+        description: 'Table data registry',
         required: true,
         loadOrder: 2
       },
       {
         file: 'pagination-system.js',
         globalCheck: 'window.PaginationSystem',
-        description: 'מערכת עימוד',
+        description: 'Pagination system',
         required: true,
         loadOrder: 3
       },
       {
         file: 'modules/actions-menu-system.js',
         globalCheck: 'window.ActionsMenuSystem',
-        description: 'מערכת תפריט פעולות',
+        description: 'Actions menu system',
         required: true,
         loadOrder: 4
       }
@@ -460,11 +460,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~50ms'
   },
 
-  // 3.5. MODULES PACKAGE - מודולים
+  // 3.5. MODULES PACKAGE - Modules
   modules: {
     id: 'modules',
     name: 'Modules Package',
-    description: 'מודולים כלליים',
+    description: 'General modules',
     version: '2.0.0',
     critical: false,
     loadOrder: 3.5,
@@ -473,56 +473,56 @@ const PACKAGE_MANIFEST = {
       {
         file: 'modal-navigation-manager.js',
         globalCheck: 'window.modalNavigationManager',
-        description: 'מערכת ניווט מודולים מקוננים',
+        description: 'Nested modal navigation system',
         required: true,
         loadOrder: 1
       },
       {
         file: 'modal-manager-v2.js',
         globalCheck: 'window.ModalManagerV2',
-        description: 'מנהל מודלים V2',
+        description: 'Modal manager V2',
         required: true,
         loadOrder: 2
       },
       {
         file: 'tag-ui-manager.js',
         globalCheck: 'window.TagUIManager',
-        description: 'ניהול בחירת תגיות במודלים',
+        description: 'Tag selection management in modals',
         required: true,
         loadOrder: 3
       },
       {
         file: 'tag-events.js',
         globalCheck: 'window.TagEvents',
-        description: 'מערכת אירועים גלובלית לתגיות',
+        description: 'Global tag events system',
         required: true,
         loadOrder: 4
       },
       {
         file: 'modules/data-basic.js',
         globalCheck: 'window.DataBasic',
-        description: 'נתונים בסיסיים',
+        description: 'Basic data',
         required: true,
         loadOrder: 6
       },
       {
         file: 'modules/ui-basic.js',
         globalCheck: 'window.UIBasic',
-        description: 'ממשק בסיסי',
+        description: 'Basic interface',
         required: true,
         loadOrder: 7
       },
       {
         file: 'modules/data-advanced.js',
         globalCheck: 'window.DataAdvanced',
-        description: 'נתונים מתקדמים',
+        description: 'Advanced data',
         required: true,
         loadOrder: 8
       },
       {
         file: 'modules/ui-advanced.js',
         globalCheck: 'window.UIAdvanced',
-        description: 'ממשק מתקדם',
+        description: 'Advanced interface',
         required: true,
         loadOrder: 9,
         exports: ['window.loadUserPreferences'] // Explicitly document that this script exports loadUserPreferences
@@ -530,105 +530,105 @@ const PACKAGE_MANIFEST = {
       {
         file: 'modules/communication-module.js',
         globalCheck: 'window.CommunicationModule',
-        description: 'מודול תקשורת',
+        description: 'Communication module',
         required: true,
         loadOrder: 10
       },
       {
         file: 'modules/business-module.js',
         globalCheck: 'window.BusinessModule',
-        description: 'מודול עסקי',
+        description: 'Business module',
         required: true,
         loadOrder: 11
       },
       {
         file: 'modules/localstorage-sync.js',
         globalCheck: 'window.LocalStorageSync',
-        description: 'סנכרון localStorage',
+        description: 'localStorage synchronization',
         required: true,
         loadOrder: 12
       },
       {
         file: 'modules/dynamic-loader-config.js',
         globalCheck: 'window.DynamicLoaderConfig',
-        description: 'תצורת טעינה דינמית',
+        description: 'Dynamic loader configuration',
         required: true,
         loadOrder: 13
       },
       {
         file: 'import-user-data.js',
         globalCheck: 'window.openImportUserDataModal',
-        description: 'מודל ייבוא נתוני ביצועים',
+        description: 'Execution data import modal',
         required: true,
         loadOrder: 14
       },
       {
         file: 'modal-configs/trading-accounts-config.js',
         globalCheck: 'window.tradingAccountsModalConfig',
-        description: 'קונפיגורציית מודל חשבונות מסחר',
+        description: 'Trading accounts modal configuration',
         required: false,
         loadOrder: 15
       },
       {
         file: 'modal-configs/alerts-config.js',
         globalCheck: 'window.alertsModalConfig',
-        description: 'קונפיגורציית מודל התראות',
+        description: 'Alerts modal configuration',
         required: false,
         loadOrder: 16
       },
       {
         file: 'modal-configs/trades-config.js',
         globalCheck: 'window.tradesModalConfig',
-        description: 'קונפיגורציית מודל טריידים',
+        description: 'Trades modal configuration',
         required: true,
         loadOrder: 17
       },
       {
         file: 'modal-configs/executions-config.js',
         globalCheck: 'window.executionsModalConfig',
-        description: 'קונפיגורציית מודל ביצועים (ספציפי לעמוד executions)',
+        description: 'Executions modal configuration (specific to executions page)',
         required: false,
         loadOrder: 18
       },
       {
         file: 'modal-configs/trade-plans-config.js',
         globalCheck: 'window.tradePlansModalConfig',
-        description: 'קונפיגורציית מודל תוכניות מסחר',
+        description: 'Trade plans modal configuration',
         required: true,
         loadOrder: 19
       },
       {
         file: 'modal-configs/tickers-config.js',
         globalCheck: 'window.tickersModalConfig',
-        description: 'קונפיגורציית מודל טיקרים',
+        description: 'Tickers modal configuration',
         required: false,
         loadOrder: 20
       },
       {
         file: 'modal-configs/cash-flows-config.js',
         globalCheck: 'window.cashFlowModalConfig',
-        description: 'קונפיגורציית מודל תזרימי מזומנים',
+        description: 'Cash flows modal configuration',
         required: false,
         loadOrder: 21
       },
       {
         file: 'modal-configs/notes-config.js',
         globalCheck: 'window.notesModalConfig',
-        description: 'קונפיגורציית מודל הערות',
+        description: 'Notes modal configuration',
         required: false, // Not required for tag-management page
         loadOrder: 22
       },
       {
         file: 'modal-configs/tag-management-config.js',
         globalCheck: 'window.tagModalConfig',
-        description: 'קונפיגורציית מודלים למערכת התגיות',
+        description: 'Tag system modal configuration',
         required: true,
         loadOrder: 23
       },
       {
         file: 'trade-selector-modal.js',
         globalCheck: 'window.tradeSelectorModal',
-        description: 'מודל בחירת טרייד',
+        description: 'Trade selector modal',
         required: false,
         loadOrder: 24
       }
@@ -637,11 +637,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~140ms'
   },
 
-  // 4. CRUD PACKAGE - עמודים עם טבלאות
+  // 4. CRUD PACKAGE - Pages with tables
   crud: {
     id: 'crud',
     name: 'CRUD Operations Package',
-    description: 'מערכות לניהול נתונים וטבלאות',
+    description: 'Data and table management systems',
     version: '2.0.0',
     critical: false,
     loadOrder: 4,
@@ -650,21 +650,21 @@ const PACKAGE_MANIFEST = {
       {
         file: 'date-utils.js',
         globalCheck: 'window.formatDate',
-        description: 'כלי עזר תאריכים',
+        description: 'Date utilities',
         required: true,
         loadOrder: 1
       },
       {
         file: 'data-utils.js',
         globalCheck: 'window.isNumeric',
-        description: 'כלי עזר נתונים כלליים',
+        description: 'General data utilities',
         required: true,
         loadOrder: 2
       },
       {
         file: 'unified-table-system.js',
         globalCheck: 'window.UnifiedTableSystem',
-        description: 'מערכת טבלאות מרכזית מאוחדת',
+        description: 'Unified central table system',
         required: true,
         loadOrder: 3
       }
@@ -673,11 +673,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~80ms'
   },
 
-  // 4.2. TAG MANAGEMENT PAGE PACKAGE - ניהול תגיות
+  // 4.2. TAG MANAGEMENT PAGE PACKAGE - Tag management
   'tag-management': {
     id: 'tag-management',
     name: 'Tag Management Page Package',
-    description: 'לוגיקה ייעודית לעמוד ניהול תגיות',
+    description: 'Dedicated logic for tag management page',
     version: '1.0.0',
     critical: false,
     loadOrder: 4.2,
@@ -686,7 +686,7 @@ const PACKAGE_MANIFEST = {
       {
         file: 'tag-management-page.js',
         globalCheck: 'window.TagManagementPage',
-        description: 'ניהול תצוגת עמוד ניהול התגיות',
+        description: 'Tag management page display management',
         required: true,
         loadOrder: 1
       }
@@ -695,11 +695,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~35ms'
   },
 
-  // 5. PREFERENCES PACKAGE - העדפות
+  // 5. PREFERENCES PACKAGE - Preferences
   preferences: {
     id: 'preferences',
     name: 'Preferences Package',
-    description: 'מערכת העדפות משתמש v2.0 (6 קבצים)',
+    description: 'User preferences system v2.0 (6 files)',
     version: '2.0.0',
     critical: false,
     loadOrder: 5,
@@ -715,21 +715,21 @@ const PACKAGE_MANIFEST = {
       {
         file: 'preferences-core-new.js',
         globalCheck: 'window.PreferencesCore',
-        description: 'ליבת העדפות (ללא צבעים)',
+        description: 'Preferences core (without colors)',
         required: true,
         loadOrder: 1
       },
       {
         file: 'preferences-colors.js',
         globalCheck: 'window.ColorManager',
-        description: 'מערכת צבעים (60+ העדפות)',
+        description: 'Color system (60+ preferences)',
         required: true,
         loadOrder: 2
       },
       {
         file: 'preferences-profiles.js',
         globalCheck: 'window.ProfileManager',
-        description: 'ניהול פרופילים',
+        description: 'Profile management',
         required: true,
         loadOrder: 3
       },
@@ -750,35 +750,35 @@ const PACKAGE_MANIFEST = {
       {
         file: 'preferences-ui-v4.js',
         globalCheck: 'window.PreferencesUIV4',
-        description: 'ממשק משתמש V4 (Group-First)',
+        description: 'User interface V4 (Group-First)',
         required: true,
         loadOrder: 5.5  // Must load before preferences-ui.js and preferences-group-manager.js
       },
       {
         file: 'preferences-ui.js',
         globalCheck: 'window.PreferencesUI',
-        description: 'ממשק משתמש',
+        description: 'User interface',
         required: true,
         loadOrder: 6
       },
       {
         file: 'preferences-page.js',
         globalCheck: 'window.loadAccountsForPreferences',
-        description: 'פונקציות ספציפיות לעמוד העדפות',
+        description: 'Preferences page specific functions',
         required: false,
         loadOrder: 7
       },
       {
         file: 'preferences-debug-monitor.js',
         globalCheck: 'window.PreferencesDebugMonitor',
-        description: 'קוד ניטור ובדיקה לבעיות העדפות',
+        description: 'Monitoring and debugging code for preferences issues',
         required: false,
         loadOrder: 7.1
       },
       {
         file: 'preferences-group-manager.js',
         globalCheck: 'window.PreferencesGroupManager',
-        description: 'מנהל קבוצות העדפות',
+        description: 'Preferences group manager',
         required: true,
         loadOrder: 8
       }
@@ -787,11 +787,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~90ms'
   },
 
-  // 6. VALIDATION PACKAGE - ולידציה
+  // 6. VALIDATION PACKAGE - Validation
   validation: {
     id: 'validation',
     name: 'Validation Package',
-    description: 'מערכות ולידציה',
+    description: 'Validation systems',
     version: '2.0.0',
     critical: false,
     loadOrder: 6,
@@ -800,7 +800,7 @@ const PACKAGE_MANIFEST = {
       {
         file: 'validation-utils.js',
         globalCheck: 'window.validateSelectField',
-        description: 'כלי ולידציה',
+        description: 'Validation utilities',
         required: true
       }
     ],
@@ -808,11 +808,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~10ms'
   },
 
-  // 6.5. CONDITIONS PACKAGE - תנאים
+  // 6.5. CONDITIONS PACKAGE - Conditions
   conditions: {
     id: 'conditions',
     name: 'Conditions Package',
-    description: 'מערכות תנאים',
+    description: 'Condition systems',
     version: '2.0.0',
     critical: false,
     loadOrder: 6.5,
@@ -821,56 +821,56 @@ const PACKAGE_MANIFEST = {
       {
         file: 'conditions/conditions-translations.js',
         globalCheck: 'window.conditionsTranslations',
-        description: 'תרגומי תנאים',
+        description: 'Condition translations',
         required: true,
         loadOrder: 1
       },
       {
         file: 'conditions/conditions-validator.js',
         globalCheck: 'window.conditionsValidator',
-        description: 'ולידטור תנאים',
+        description: 'Condition validator',
         required: true,
         loadOrder: 2
       },
       {
         file: 'conditions/conditions-form-generator.js',
         globalCheck: 'window.conditionsFormGenerator',
-        description: 'מחולל טפסי תנאים',
+        description: 'Condition form generator',
         required: true,
         loadOrder: 3
       },
       {
         file: 'conditions/conditions-crud-manager.js',
         globalCheck: 'window.conditionsCRUDManager',
-        description: 'מנהל CRUD תנאים',
+        description: 'Condition CRUD manager',
         required: true,
         loadOrder: 4
       },
       {
         file: 'conditions/conditions-initializer.js',
         globalCheck: 'window.conditionsInitializer',
-        description: 'מאתחל תנאים',
+        description: 'Condition initializer',
         required: true,
         loadOrder: 5
       },
       {
         file: 'modal-configs/conditions-config.js',
         globalCheck: 'window.conditionsModalConfig',
-        description: 'קונפיגורציית מודל תנאים',
+        description: 'Condition modal configuration',
         required: true,
         loadOrder: 6
       },
       {
         file: 'conditions/conditions-ui-manager.js',
         globalCheck: 'window.ConditionsUIManager',
-        description: 'מנהל ממשק תנאים',
+        description: 'Condition UI manager',
         required: true,
         loadOrder: 7
       },
       {
         file: 'conditions/conditions-modal-controller.js',
         globalCheck: 'window.ConditionsModalController',
-        description: 'בקר מודל תנאים',
+        description: 'Condition modal controller',
         required: true,
         loadOrder: 8
       }
@@ -879,11 +879,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~80ms'
   },
 
-  // 7. EXTERNAL-DATA PACKAGE - נתונים חיצוניים
+  // 7. EXTERNAL-DATA PACKAGE - External data
   'external-data': {
     id: 'external-data',
     name: 'External Data Package',
-    description: 'מערכות נתונים חיצוניים',
+    description: 'External data systems',
     version: '2.0.0',
     critical: false,
     loadOrder: 7,
@@ -892,19 +892,19 @@ const PACKAGE_MANIFEST = {
       {
         file: 'yahoo-finance-service.js',
         globalCheck: 'window.YahooFinanceService',
-        description: 'שירות Yahoo Finance',
+        description: 'Yahoo Finance service',
         required: true
       },
       {
         file: 'external-data-service.js',
         globalCheck: 'window.ExternalDataService',
-        description: 'שירות נתונים חיצוניים',
+        description: 'External data service',
         required: true
       },
       {
         file: 'external-data-settings-service.js',
         globalCheck: 'window.ExternalDataSettingsService',
-        description: 'הגדרות נתונים חיצוניים',
+        description: 'External data settings',
         required: true
       }
     ],
@@ -912,11 +912,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~120ms'
   },
 
-  // 8. CHARTS PACKAGE - גרפים
+  // 8. CHARTS PACKAGE - Charts
   charts: {
     id: 'charts',
     name: 'Charts Package',
-    description: 'מערכות גרפים ותרשימים',
+    description: 'Chart and graph systems',
     version: '2.0.0',
     critical: false,
     loadOrder: 8,
@@ -925,7 +925,7 @@ const PACKAGE_MANIFEST = {
       {
         file: 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
         globalCheck: 'window.Chart',
-        description: 'ספריית Chart.js (CDN)',
+        description: 'Chart.js library (CDN)',
         required: true,
         loadOrder: 0,
         external: true
@@ -933,42 +933,42 @@ const PACKAGE_MANIFEST = {
       {
         file: 'charts/chart-theme.js',
         globalCheck: 'window.ChartTheme',
-        description: 'ערכת גרפים',
+        description: 'Chart theme',
         required: true,
         loadOrder: 1
       },
       {
         file: 'charts/chart-system.js',
         globalCheck: 'window.ChartSystem',
-        description: 'מערכת גרפים',
+        description: 'Chart system',
         required: true,
         loadOrder: 2
       },
       {
         file: 'charts/chart-loader.js',
         globalCheck: 'window.ChartLoader',
-        description: 'טוען גרפים',
+        description: 'Chart loader',
         required: true,
         loadOrder: 3
       },
       {
         file: 'charts/chart-export.js',
         globalCheck: 'window.ChartExport',
-        description: 'ייצוא גרפים',
+        description: 'Chart export',
         required: true,
         loadOrder: 4
       },
       {
         file: 'charts/adapters/performance-adapter.js',
         globalCheck: 'window.PerformanceAdapter',
-        description: 'מתאם ביצועים',
+        description: 'Performance adapter',
         required: true,
         loadOrder: 5
       },
       {
         file: 'charts/adapters/trades-adapter.js',
         globalCheck: 'window.TradesAdapter',
-        description: 'מתאם עסקאות',
+        description: 'Trades adapter',
         required: true,
         loadOrder: 6
       }
@@ -977,11 +977,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~150ms'
   },
 
-  // 9. LOGS PACKAGE - לוגים
+  // 9. LOGS PACKAGE - Logs
   logs: {
     id: 'logs',
     name: 'Logs Package',
-    description: 'מערכות לוגים',
+    description: 'Log systems',
     version: '2.0.0',
     critical: false,
     loadOrder: 9,
@@ -990,21 +990,21 @@ const PACKAGE_MANIFEST = {
       {
         file: 'unified-log-api.js',
         globalCheck: 'window.UnifiedLogAPI',
-        description: 'API לוגים מאוחד',
+        description: 'Unified log API',
         required: true,
         loadOrder: 1
       },
       {
         file: 'unified-log-manager.js',
         globalCheck: 'window.UnifiedLogManager',
-        description: 'מנהל לוגים מאוחד',
+        description: 'Unified log manager',
         required: true,
         loadOrder: 2
       },
       {
         file: 'unified-log-display.js',
         globalCheck: 'window.UnifiedLogDisplay',
-        description: 'תצוגת לוגים מאוחדת',
+        description: 'Unified log display',
         required: true,
         loadOrder: 3
       }
@@ -1013,11 +1013,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~50ms'
   },
 
-  // 9. CACHE PACKAGE - מטמון
+  // 9. CACHE PACKAGE - Cache
   cache: {
     id: 'cache',
     name: 'Cache Package',
-    description: 'מערכות מטמון',
+    description: 'Cache systems',
     version: '2.0.0',
     critical: false,
     loadOrder: 9,
@@ -1026,14 +1026,14 @@ const PACKAGE_MANIFEST = {
       {
         file: 'cache-policy-manager.js',
         globalCheck: 'window.CachePolicyManager',
-        description: 'מנהל מדיניות מטמון',
+        description: 'Cache policy manager',
         required: true,
         loadOrder: 1
       },
       {
         file: 'cache-management.js',
         globalCheck: 'window.cacheManagementPage',
-        description: 'ניהול מטמון',
+        description: 'Cache management',
         required: true,
         loadOrder: 2
       }
@@ -1042,11 +1042,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~25ms'
   },
 
-  // 10. ENTITY-SERVICES PACKAGE - שירותי ישויות
+  // 10. ENTITY-SERVICES PACKAGE - Entity services
   'entity-services': {
     id: 'entity-services',
     name: 'Entity Services Package',
-    description: 'שירותי ישויות',
+    description: 'Entity services',
     version: '2.0.0',
     critical: false,
     loadOrder: 10,
@@ -1055,126 +1055,126 @@ const PACKAGE_MANIFEST = {
       {
         file: 'services/trades-data.js',
         globalCheck: 'window.TradesData',
-        description: 'שירות נתוני טריידים (CRUD + Cache)',
+        description: 'Trades data service (CRUD + Cache)',
         required: false,  // Required only for trades page, not all pages
         loadOrder: 0
       },
       {
         file: 'account-service.js',
         globalCheck: 'window.getAccounts',
-        description: 'שירות חשבונות',
+        description: 'Account service',
         required: true,
         loadOrder: 1
       },
       {
         file: 'alert-service.js',
         globalCheck: 'window.getAlertState',
-        description: 'שירות התראות',
+        description: 'Alert service',
         required: true,
         loadOrder: 3
       },
       {
         file: 'ticker-service.js',
         globalCheck: 'window.tickerService',
-        description: 'שירות טיקרים',
+        description: 'Ticker service',
         required: true,
         loadOrder: 4
       },
       {
         file: 'trade-plan-service.js',
         globalCheck: 'window.getTradePlans',
-        description: 'שירות תכניות מסחר',
+        description: 'Trade plan service',
         required: true,
         loadOrder: 5
       },
       {
         file: 'services/trade-plans-data.js',
         globalCheck: 'window.TradePlansData',
-        description: 'שירות נתוני תוכניות מסחר',
+        description: 'Trade plans data service',
         required: false,
         loadOrder: 6
       },
       {
         file: 'services/notes-data.js',
         globalCheck: 'window.NotesData',
-        description: 'שירות נתוני הערות',
+        description: 'Notes data service',
         required: false,
         loadOrder: 6.5
       },
       {
         file: 'services/alerts-data.js',
         globalCheck: 'window.AlertsData',
-        description: 'שירות נתוני התראות',
+        description: 'Alerts data service',
         required: false,
         loadOrder: 6.6
       },
       {
         file: 'services/tickers-data.js',
         globalCheck: 'window.TickersData',
-        description: 'שירות נתוני טיקרים',
+        description: 'Tickers data service',
         required: false,
         loadOrder: 6.7
       },
       {
         file: 'services/trading-accounts-data.js',
         globalCheck: 'window.TradingAccountsData',
-        description: 'שירות נתוני חשבונות מסחר',
+        description: 'Trading accounts data service',
         required: false,
         loadOrder: 6.8
       },
       {
         file: 'services/cash-flows-data.js',
         globalCheck: 'window.CashFlowsData',
-        description: 'שירות נתוני תזרימים',
+        description: 'Cash flows data service',
         required: false,
         loadOrder: 6.9
       },
       {
         file: 'condition-translator.js',
         globalCheck: 'window.conditionTranslator',
-        description: 'מתרגם תנאים',
+        description: 'Condition translator',
         required: true,
         loadOrder: 7
       },
       {
         file: 'constraints.js',
         globalCheck: 'window.toggleLayer',
-        description: 'מערכת אילוצים',
+        description: 'Constraints system',
         required: true,
         loadOrder: 8
       },
       {
         file: 'services/linked-items-service.js',
         globalCheck: 'window.LinkedItemsService',
-        description: 'שירות לוגיקה משותפת לפריטים מקושרים',
+        description: 'Shared logic service for linked items',
         required: true,
         loadOrder: 9
       },
       {
         file: 'linked-items.js',
         globalCheck: 'window.viewLinkedItems',
-        description: 'פריטים מקושרים',
+        description: 'Linked items',
         required: true,
         loadOrder: 10
       },
       {
         file: 'related-object-filters.js',
         globalCheck: 'window.filterByRelatedObjectType',
-        description: 'פילטרים של אובייקטים קשורים',
+        description: 'Related object filters',
         required: true,
         loadOrder: 11
       },
       {
         file: 'account-activity.js',
         globalCheck: 'window.initAccountActivity',
-        description: 'מערכת תנועות חשבון',
+        description: 'Account activity system',
         required: false,
         loadOrder: 12
       },
       {
         file: 'positions-portfolio.js',
         globalCheck: 'window.initPositionsPortfolio',
-        description: 'מערכת פוזיציות ופורטפוליו',
+        description: 'Positions and portfolio system',
         required: false,
         loadOrder: 13
       }
@@ -1183,11 +1183,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~110ms'
   },
 
-  // 11. HELPER PACKAGE - עזר
+  // 11. HELPER PACKAGE - Helper
   helper: {
     id: 'helper',
     name: 'Helper Package',
-    description: 'מערכות עזר',
+    description: 'Helper systems',
     version: '2.0.0',
     critical: false,
     loadOrder: 11,
@@ -1196,42 +1196,42 @@ const PACKAGE_MANIFEST = {
       {
         file: 'utils/cache-key-helper.js',
         globalCheck: 'window.CacheKeyHelper',
-        description: 'עזר ליצירת מפתחות מטמון אופטימליים',
+        description: 'Helper for creating optimal cache keys',
         required: false,
         loadOrder: 0
       },
       {
         file: 'utils/business-logic-batch-helper.js',
         globalCheck: 'window.BusinessLogicBatchHelper',
-        description: 'עזר ל-Batch Operations עם Business Logic API',
+        description: 'Helper for Batch Operations with Business Logic API',
         required: false,
         loadOrder: 1
       },
       {
         file: 'utils/request-deduplication-helper.js',
         globalCheck: 'window.RequestDeduplicationHelper',
-        description: 'עזר ל-Request Deduplication',
+        description: 'Helper for Request Deduplication',
         required: false,
         loadOrder: 2
       },
       {
         file: 'currencies.js',
         globalCheck: 'window.openCurrencyDetails',
-        description: 'מערכת מטבעות',
+        description: 'Currency system',
         required: true,
         loadOrder: 1
       },
       {
         file: 'designs.js',
         globalCheck: 'window.generateDetailedLog',
-        description: 'מערכת עיצובים',
+        description: 'Design system',
         required: true,
         loadOrder: 2
       },
       {
         file: 'research.js',
         globalCheck: 'window.initializeResearchPage',
-        description: 'מערכת מחקר',
+        description: 'Research system',
         required: true,
         loadOrder: 3
       }
@@ -1240,11 +1240,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~30ms'
   },
 
-  // 12. SYSTEM-MANAGEMENT PACKAGE - ניהול מערכת
+  // 12. SYSTEM-MANAGEMENT PACKAGE - System management
   'system-management': {
     id: 'system-management',
     name: 'System Management Package',
-    description: 'ניהול מערכת מתקדם',
+    description: 'Advanced system management',
     version: '2.0.0',
     critical: false,
     loadOrder: 12,
@@ -1253,79 +1253,79 @@ const PACKAGE_MANIFEST = {
       {
         file: 'system-management/system-management-main.js',
         globalCheck: 'window.SystemManagementMain',
-        description: 'ניהול מערכת ראשי',
+        description: 'Main system management',
         required: true
       },
       {
         file: 'system-management/core/sm-base.js',
         globalCheck: 'window.SMBaseSection',
-        description: 'בסיס ניהול מערכת',
+        description: 'System management base',
         required: true
       },
       {
         file: 'system-management/core/sm-error-handler.js',
         globalCheck: 'window.SMErrorHandler',
-        description: 'מטפל שגיאות ניהול מערכת',
+        description: 'System management error handler',
         required: true
       },
       {
         file: 'system-management/core/sm-ui-components.js',
         globalCheck: 'window.SMUIComponents',
-        description: 'רכיבי UI ניהול מערכת',
+        description: 'System management UI components',
         required: true
       },
       {
         file: 'system-management/sections/sm-section-alerts.js',
         globalCheck: 'window.SMSectionAlerts',
-        description: 'סקציית התראות',
+        description: 'Alerts section',
         required: true
       },
       {
         file: 'system-management/sections/sm-section-background-tasks.js',
         globalCheck: 'window.SMSectionBackgroundTasks',
-        description: 'סקציית משימות רקע',
+        description: 'Background tasks section',
         required: true
       },
       {
         file: 'system-management/sections/sm-section-cache.js',
         globalCheck: 'window.SMSectionCache',
-        description: 'סקציית מטמון',
+        description: 'Cache section',
         required: true
       },
       {
         file: 'system-management/sections/sm-section-dashboard.js',
         globalCheck: 'window.SMSectionDashboard',
-        description: 'סקציית דשבורד',
+        description: 'Dashboard section',
         required: true
       },
       {
         file: 'system-management/sections/sm-section-database.js',
         globalCheck: 'window.SMSectionDatabase',
-        description: 'סקציית מסד נתונים',
+        description: 'Database section',
         required: true
       },
       {
         file: 'system-management/sections/sm-section-external-data.js',
         globalCheck: 'window.SMSectionExternalData',
-        description: 'סקציית נתונים חיצוניים',
+        description: 'External data section',
         required: true
       },
       {
         file: 'system-management/sections/sm-section-operations.js',
         globalCheck: 'window.SMSectionOperations',
-        description: 'סקציית פעולות',
+        description: 'Operations section',
         required: true
       },
       {
         file: 'system-management/sections/sm-section-performance.js',
         globalCheck: 'window.SMSectionPerformance',
-        description: 'סקציית ביצועים',
+        description: 'Performance section',
         required: true
       },
       {
         file: 'system-management/sections/sm-section-server.js',
         globalCheck: 'window.SMSectionServer',
-        description: 'סקציית שרת',
+        description: 'Server section',
         required: true
       }
     ],
@@ -1333,11 +1333,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~200ms'
   },
 
-  // 13. MANAGEMENT PACKAGE - ניהול
+  // 13. MANAGEMENT PACKAGE - Management
   management: {
     id: 'management',
     name: 'Management Package',
-    description: 'מערכות ניהול',
+    description: 'Management systems',
     version: '2.0.0',
     critical: false,
     loadOrder: 13,
@@ -1346,14 +1346,14 @@ const PACKAGE_MANIFEST = {
       {
         file: 'auth.js',
         globalCheck: 'window.login',
-        description: 'מערכת אימות',
+        description: 'Authentication system',
         required: true,
         loadOrder: 1
       },
       {
         file: 'background-tasks.js',
         globalCheck: 'window.startScheduler',
-        description: 'משימות רקע',
+        description: 'Background tasks',
         required: true,
         loadOrder: 2
       }
@@ -1362,11 +1362,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~100ms'
   },
 
-  // 14. DEV-TOOLS PACKAGE - כלי פיתוח
+  // 14. DEV-TOOLS PACKAGE - Development tools
   'dev-tools': {
     id: 'dev-tools',
     name: 'Development Tools Package',
-    description: 'כלי פיתוח ודיבאג',
+    description: 'Development and debugging tools',
     version: '2.0.0',
     critical: false,
     loadOrder: 14,
@@ -1375,13 +1375,13 @@ const PACKAGE_MANIFEST = {
       {
         file: 'init-system/dev-tools/page-template-generator.js',
         globalCheck: 'window.PageTemplateGenerator',
-        description: 'מחולל תבניות עמודים',
+        description: 'Page template generator',
         required: true
       },
       {
         file: 'init-system/dev-tools/script-analyzer.js',
         globalCheck: 'window.ScriptAnalyzer',
-        description: 'מנתח סקריפטים',
+        description: 'Script analyzer',
         required: true
       },
       {
@@ -1618,11 +1618,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~30ms'
   },
 
-  // 19.5 DASHBOARD WIDGETS PACKAGE - רכיבי דף הבית
+  // 19.5 DASHBOARD WIDGETS PACKAGE - Dashboard page components
   'dashboard-widgets': {
     id: 'dashboard-widgets',
     name: 'Dashboard Widgets',
-    description: 'ווידג'טים וממשקי דף הבית (Pending Executions, Trade Creation)',
+    description: 'Widgets and dashboard interfaces (Pending Executions, Trade Creation)',
     version: '1.0.0',
     critical: false,
     loadOrder: 19.5,
@@ -1725,11 +1725,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~10ms'
   },
 
-  // 21. TRADINGVIEW WIDGETS PACKAGE - ווידג'טים של TradingView
+  // 21. TRADINGVIEW WIDGETS PACKAGE - TradingView widgets
   'tradingview-widgets': {
     id: 'tradingview-widgets',
     name: 'TradingView Widgets Package',
-    description: 'מערכת מרכזית לניהול ווידג'טים של TradingView',
+    description: 'Central system for managing TradingView widgets',
     version: '1.0.0',
     critical: false,
     loadOrder: 21,
@@ -1738,28 +1738,28 @@ const PACKAGE_MANIFEST = {
       {
         file: 'tradingview-widgets/tradingview-widgets-config.js',
         globalCheck: 'window.TradingViewWidgetsConfig',
-        description: 'הגדרות ווידג'טים',
+        description: 'Widget configuration',
         required: true,
         loadOrder: 1
       },
       {
         file: 'tradingview-widgets/tradingview-widgets-colors.js',
         globalCheck: 'window.TradingViewWidgetsColors',
-        description: 'אינטגרציה עם מערכת הצבעים',
+        description: 'Color system integration',
         required: true,
         loadOrder: 2
       },
       {
         file: 'tradingview-widgets/tradingview-widgets-factory.js',
         globalCheck: 'window.TradingViewWidgetsFactory',
-        description: 'Factory ליצירת ווידג'טים',
+        description: 'Factory for creating widgets',
         required: true,
         loadOrder: 3
       },
       {
         file: 'tradingview-widgets/tradingview-widgets-core.js',
         globalCheck: 'window.TradingViewWidgetsManager',
-        description: 'מערכת ניהול מרכזית לווידג'טים',
+        description: 'Central widget management system',
         required: true,
         loadOrder: 4
       }

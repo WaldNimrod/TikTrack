@@ -24,7 +24,17 @@
       const FieldRenderer = window.FieldRendererService;
       const { onSelectionChange } = options;
 
-      const rows = (cluster.executions || []).map(execution => {
+      // Sort executions by date (oldest first)
+      const sortedExecutions = [...(cluster.executions || [])].sort((a, b) => {
+        const dateA = this._getExecutionDateValue(a.date);
+        const dateB = this._getExecutionDateValue(b.date);
+        if (!dateA && !dateB) return 0;
+        if (!dateA) return 1;
+        if (!dateB) return -1;
+        return dateA - dateB;
+      });
+
+      const rows = sortedExecutions.map(execution => {
         const executionId = execution.id;
         const isChecked = selectedIds.has(executionId);
         const price = typeof FieldRenderer?.renderAmount === 'function'
@@ -35,8 +45,11 @@
           ? FieldRenderer.renderShares(execution.quantity)
           : execution.quantity;
 
-        const executionDate = FieldRenderer?.renderDateShort?.(execution.date)
-          || FieldRenderer?.renderDate?.(execution.date, false)
+        // Use renderExecutionDate for consistent date formatting (same as main executions table)
+        const executionDate = FieldRenderer?.renderExecutionDate?.(execution.date)
+          || window.renderExecutionDate?.(execution.date)
+          || FieldRenderer?.renderDate?.(execution.date, true)
+          || window.renderDate?.(execution.date, true)
           || execution.date?.display
           || execution.date?.local
           || execution.date?.utc
@@ -45,6 +58,15 @@
 
         const valueDisplay = execution.value ? `$${execution.value.toFixed(2)}` : '-';
         const feeDisplay = execution.fee ? `$${Number(execution.fee).toFixed(2)}` : '$0.00';
+
+        // Render created_at date using FieldRendererService
+        const createdDate = FieldRenderer?.renderDate?.(execution.created_at, false)
+          || window.renderDate?.(execution.created_at, false)
+          || execution.created_at?.display
+          || execution.created_at?.local
+          || execution.created_at?.utc
+          || execution.created_at
+          || '-';
 
         return `
           <tr data-execution-id="${executionId}">
@@ -58,6 +80,7 @@
                 ${isChecked ? 'checked' : ''}>
             </td>
             <td>${executionDate}</td>
+            <td>${createdDate}</td>
             <td>${this.getActionDisplayText(execution)}</td>
             <td>${quantity ?? '-'}</td>
             <td>${price ?? '-'}</td>
@@ -76,6 +99,7 @@
               <tr>
                 <th class="text-center" style="width: 48px;"></th>
                 <th>תאריך</th>
+                <th>תאריך יצירה</th>
                 <th>פעולה</th>
                 <th>כמות</th>
                 <th>מחיר</th>
@@ -101,9 +125,23 @@
      */
     renderExecutionsList(cluster, options = {}) {
       const FieldRenderer = window.FieldRendererService;
-      return (cluster.executions || []).map(execution => {
-        const date = FieldRenderer?.renderDateShort?.(execution.date)
-          || FieldRenderer?.renderDate?.(execution.date, false)
+      
+      // Sort executions by date (oldest first)
+      const sortedExecutions = [...(cluster.executions || [])].sort((a, b) => {
+        const dateA = this._getExecutionDateValue(a.date);
+        const dateB = this._getExecutionDateValue(b.date);
+        if (!dateA && !dateB) return 0;
+        if (!dateA) return 1;
+        if (!dateB) return -1;
+        return dateA - dateB;
+      });
+      
+      return sortedExecutions.map(execution => {
+        // Use renderExecutionDate for consistent date formatting (same as main executions table)
+        const date = FieldRenderer?.renderExecutionDate?.(execution.date)
+          || window.renderExecutionDate?.(execution.date)
+          || FieldRenderer?.renderDate?.(execution.date, true)
+          || window.renderDate?.(execution.date, true)
           || execution.date?.display
           || execution.date?.local
           || execution.date?.utc
@@ -133,6 +171,25 @@
         'cover': 'כיסוי'
       };
       return actionMap[action.toLowerCase()] || 'קניה';
+    },
+
+    /**
+     * Get numeric date value for sorting
+     * @param {string|Date|Object} date - Date value
+     * @returns {number} Timestamp for sorting
+     */
+    _getExecutionDateValue(date) {
+      if (!date) return null;
+      if (typeof date === 'object' && date.epochMs) {
+        return date.epochMs;
+      }
+      if (typeof date === 'object' && (date.utc || date.local)) {
+        return new Date(date.utc || date.local).getTime();
+      }
+      if (typeof date === 'string' || date instanceof Date) {
+        return new Date(date).getTime();
+      }
+      return null;
     }
   };
 

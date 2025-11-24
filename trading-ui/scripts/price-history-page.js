@@ -172,9 +172,52 @@
     }
 
     /**
+     * Initialize Header System
+     */
+    async function initializeHeader() {
+        // Wait for HeaderSystem to be available
+        if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+            try {
+                await window.HeaderSystem.initialize();
+                if (window.Logger) {
+                    window.Logger.info('✅ Header System initialized', { page: 'price-history-page' });
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('Error initializing Header System', { 
+                        page: 'price-history-page', 
+                        error 
+                    });
+                }
+            }
+        } else {
+            // Retry after a short delay if HeaderSystem not loaded yet
+            setTimeout(() => {
+                if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+                    window.HeaderSystem.initialize().catch((error) => {
+                        if (window.Logger) {
+                            window.Logger.error('Error initializing Header System (retry)', { 
+                                page: 'price-history-page', 
+                                error 
+                            });
+                        }
+                    });
+                } else {
+                    if (window.Logger) {
+                        window.Logger.warn('HeaderSystem not available after retry', { page: 'price-history-page' });
+                    }
+                }
+            }, 500);
+        }
+    }
+
+    /**
      * Initialize page
      */
     function initializePage() {
+        // Initialize Header System first
+        initializeHeader();
+        
         // Wait for Preferences to be loaded
         if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
             window.PreferencesCore.initializeWithLazyLoading().then(() => {

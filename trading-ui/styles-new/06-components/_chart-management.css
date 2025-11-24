@@ -1533,50 +1533,70 @@
     position: relative;
     height: 450px;
     width: 100%;
+    min-width: 0;
     background: var(--apple-bg-primary);
     border-radius: var(--apple-radius-small) var(--apple-radius-small) 0 0;
     overflow: hidden;
     border-bottom: 2px solid var(--apple-border-light);
-    display: block; /* Ensure block display */
-    clear: both; /* Clear any floats */
-}
-
-/* Ensure section-body displays chart below controls */
-#price-chart-section .section-body {
-    display: block !important; /* Force block display */
-    flex-direction: column; /* Stack vertically */
+    display: block;
+    clear: both;
+    box-sizing: border-box;
 }
 
 /* Ensure section-header and section-body stack vertically */
 #price-chart-section {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 #price-chart-section .section-header {
-    flex: 0 0 auto; /* Don't grow or shrink */
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+#price-chart-section .section-header .header-actions {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 #price-chart-section .section-body {
-    flex: 1 1 auto; /* Take remaining space */
-    display: block !important; /* Force block display */
+    flex: 1 1 auto;
+    display: block;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 #volume-chart-wrapper {
     position: relative;
     height: 150px;
     width: 100%;
+    min-width: 0;
     background: var(--apple-bg-primary);
     border-radius: 0 0 var(--apple-radius-small) var(--apple-radius-small);
     overflow: hidden;
     border-top: 2px solid var(--apple-border-light);
     display: block;
+    box-sizing: border-box;
 }
 
 #price-chart-container,
 #volume-chart-container {
     height: 100%;
     width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    position: relative;
+    display: block;
 }
 
 #drawing-canvas {

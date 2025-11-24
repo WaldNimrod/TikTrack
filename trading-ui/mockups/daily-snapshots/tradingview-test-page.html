@@ -191,6 +191,12 @@
     <!-- Dynamic Colors System -->
     <script src="../../scripts/color-scheme-system-clean.js" defer></script>
     
+    <!-- Logger Service -->
+    <script src="../../scripts/logger-service.js" defer></script>
+    
+    <!-- Field Renderer Service -->
+    <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    
     <!-- Preferences System (defer - not blocking) -->
     <script src="../../scripts/services/preferences-data.js" defer></script>
     <script src="../../scripts/preferences-core-new.js" defer></script>
@@ -378,8 +384,9 @@
                                             if (!chart || typeof chart.addSeries !== 'function') {
                                                 status.className = 'test-status error';
                                                 status.textContent = `❌ הגרף לא נוצר נכון - חסר addSeries`;
-                                                console.error('Chart object:', chart);
-                                                console.error('Chart methods:', chart ? Object.getOwnPropertyNames(chart) : 'null');
+                                                if (window.Logger) {
+                                                    window.Logger.error('Chart object', { page: 'tradingview-test-page', chart, methods: chart ? Object.getOwnPropertyNames(chart) : 'null' });
+                                                }
                                                 resolve(false);
                                                 return;
                                             }
@@ -408,14 +415,18 @@
                                         } catch (error) {
                                             status.className = 'test-status error';
                                             status.textContent = `❌ שגיאה: ${error.message}`;
-                                            console.error('Basic Chart Error:', error);
+                                            if (window.Logger) {
+                                                window.Logger.error('Basic Chart Error', { page: 'tradingview-test-page', error });
+                                            }
                                             resolve(false);
                                         }
                                     }
                                 } catch (error) {
                                     status.className = 'test-status error';
                                     status.textContent = `❌ שגיאה: ${error.message}`;
-                                    console.error('Basic Chart Error:', error);
+                                    if (window.Logger) {
+                                        window.Logger.error('Basic Chart Error', { page: 'tradingview-test-page', error });
+                                    }
                                     resolve(false);
                                 }
                             });
@@ -466,14 +477,18 @@
                                         } catch (error) {
                                             status.className = 'test-status error';
                                             status.textContent = `❌ שגיאה: ${error.message}`;
-                                            console.error('Line Series Error:', error);
+                                            if (window.Logger) {
+                                                window.Logger.error('Line Series Error', { page: 'tradingview-test-page', error });
+                                            }
                                             resolve(false);
                                         }
                                     }
                                 } catch (error) {
                                     status.className = 'test-status error';
                                     status.textContent = `❌ שגיאה: ${error.message}`;
-                                    console.error('Line Series Error:', error);
+                                    if (window.Logger) {
+                                        window.Logger.error('Line Series Error', { page: 'tradingview-test-page', error });
+                                    }
                                     resolve(false);
                                 }
                             });
@@ -527,14 +542,18 @@
                                         } catch (error) {
                                             status.className = 'test-status error';
                                             status.textContent = `❌ שגיאה: ${error.message}`;
-                                            console.error('Stepped Line Error:', error);
+                                            if (window.Logger) {
+                                                window.Logger.error('Stepped Line Error', { page: 'tradingview-test-page', error });
+                                            }
                                             resolve(false);
                                         }
                                     }
                                 } catch (error) {
                                     status.className = 'test-status error';
                                     status.textContent = `❌ שגיאה: ${error.message}`;
-                                    console.error('Stepped Line Error:', error);
+                                    if (window.Logger) {
+                                        window.Logger.error('Stepped Line Error', { page: 'tradingview-test-page', error });
+                                    }
                                     resolve(false);
                                 }
                             });
@@ -601,14 +620,18 @@
                                         } catch (error) {
                                             status.className = 'test-status error';
                                             status.textContent = `❌ שגיאה: ${error.message}`;
-                                            console.error('Dual Y-Axes Error:', error);
+                                            if (window.Logger) {
+                                                window.Logger.error('Dual Y-Axes Error', { page: 'tradingview-test-page', error });
+                                            }
                                             resolve(false);
                                         }
                                     }
                                 } catch (error) {
                                     status.className = 'test-status error';
                                     status.textContent = `❌ שגיאה: ${error.message}`;
-                                    console.error('Dual Y-Axes Error:', error);
+                                    if (window.Logger) {
+                                        window.Logger.error('Dual Y-Axes Error', { page: 'tradingview-test-page', error });
+                                    }
                                     resolve(false);
                                 }
                             });
@@ -823,7 +846,9 @@
                         testResult.info = infoEl.innerHTML || '';
                     }
                 } catch (error) {
-                    console.error(`Test ${test.name} failed:`, error);
+                    if (window.Logger) {
+                        window.Logger.error(`Test ${test.name} failed`, { page: 'tradingview-test-page', error });
+                    }
                     testResults.failed++;
                     testResult.status = 'failed';
                     testResult.error = error.message;
@@ -835,10 +860,9 @@
             
             // Update test summary
             function updateTestSummary() {
-                console.log(`\n📊 Test Summary:`);
-                console.log(`✅ Passed: ${testResults.passed}`);
-                console.log(`❌ Failed: ${testResults.failed}`);
-                console.log(`📈 Total: ${testResults.total}`);
+                if (window.Logger) {
+                    window.Logger.info(`\n📊 Test Summary:`, { page: 'tradingview-test-page', passed: testResults.passed, failed: testResults.failed, total: testResults.total });
+                }
                 
                 // Update summary display
                 const summaryPassed = document.getElementById('summary-passed');
@@ -852,7 +876,9 @@
             
             // Run all tests
             async function runAllTests(preferencesPromise = null) {
-                console.log('🧪 Starting TradingView Lightweight Charts tests...');
+                if (window.Logger) {
+                    window.Logger.info('🧪 Starting TradingView Lightweight Charts tests...', { page: 'tradingview-test-page' });
+                }
                 
                 testResults.startTime = new Date();
                 testResults.passed = 0;
@@ -893,19 +919,27 @@
                 const preferencesPromise = (async () => {
                     try {
                         if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
-                            console.log('📄 Initializing preferences with lazy loading...');
+                            if (window.Logger) {
+                                window.Logger.info('📄 Initializing preferences with lazy loading...', { page: 'tradingview-test-page' });
+                            }
                             await window.PreferencesCore.initializeWithLazyLoading();
-                            console.log('✅ Preferences initialized successfully');
+                            if (window.Logger) {
+                                window.Logger.info('✅ Preferences initialized successfully', { page: 'tradingview-test-page' });
+                            }
                             
                             // Reload TradingView theme preferences after preferences are loaded
                             if (window.TradingViewTheme && typeof window.TradingViewTheme.loadPreferences === 'function') {
                                 await window.TradingViewTheme.loadPreferences();
-                                console.log('✅ TradingView theme preferences reloaded');
+                                if (window.Logger) {
+                                    window.Logger.info('✅ TradingView theme preferences reloaded', { page: 'tradingview-test-page' });
+                                }
                             }
                             return true;
                         }
                     } catch (error) {
-                        console.warn('⚠️ Preferences initialization failed:', error);
+                        if (window.Logger) {
+                            window.Logger.warn('⚠️ Preferences initialization failed', { page: 'tradingview-test-page', error });
+                        }
                         return false;
                     }
                     return false;
@@ -1087,7 +1121,9 @@
                         alert('לוג מפורט הועתק ללוח');
                     }
                 } catch (error) {
-                    console.error('Error copying log:', error);
+                    if (window.Logger) {
+                        window.Logger.error('Error copying log', { page: 'tradingview-test-page', error });
+                    }
                     if (window.NotificationSystem) {
                         window.NotificationSystem.showError('שגיאה בהעתקת הלוג: ' + error.message, 'בדיקת TradingView');
                     } else {

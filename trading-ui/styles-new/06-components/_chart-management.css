@@ -390,3 +390,1068 @@
     border-right: 4px solid var(--danger-color);
 }
 
+/* ===== Mockups Navigation Bar ===== */
+.mockups-navigation {
+    background: var(--apple-bg-secondary);
+    border-bottom: 2px solid var(--apple-border-light);
+    padding: 15px 0;
+    margin-bottom: var(--spacing-lg);
+}
+
+.mockups-navigation-content {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.mockups-navigation-label {
+    font-weight: bold;
+    color: var(--color-text-primary-dark);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.mockups-navigation-link {
+    text-decoration: none;
+    padding: 6px 12px;
+    display: inline-block;
+    background-color: var(--apple-gray-6);
+    color: white;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.mockups-navigation-link:hover {
+    background-color: var(--apple-gray-7);
+    color: white;
+}
+
+.mockups-navigation-link.active {
+    background-color: var(--brand-primary-color, var(--apple-blue));
+}
+
+/* RTL Support */
+[dir="rtl"] .mockups-navigation-content {
+    direction: rtl;
+}
+
+/* ===== Chart Control Groups ===== */
+.chart-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.chart-control-label {
+    font-size: 0.65rem;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    padding: 0 var(--spacing-xs);
+}
+
+.chart-control-buttons {
+    display: flex;
+    gap: 3px;
+    background: var(--apple-bg-secondary);
+    padding: var(--spacing-xs);
+    border-radius: var(--apple-radius-small);
+    border: 1px solid var(--apple-border-light);
+}
+
+.chart-control-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--apple-border);
+    background: var(--apple-bg-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    color: var(--color-text-primary);
+}
+
+.chart-control-btn:hover {
+    background: var(--apple-bg-secondary);
+}
+
+.chart-control-btn.active {
+    border: 1px solid var(--brand-primary-color, var(--apple-blue));
+    background: var(--brand-primary-color, var(--apple-blue));
+    color: white;
+}
+
+/* Chart Unit Size Buttons */
+.chart-unit-size-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.chart-unit-size-label {
+    font-size: 0.65rem;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    padding: 0 var(--spacing-xs);
+}
+
+.chart-unit-size-buttons {
+    display: flex;
+    gap: 3px;
+    background: var(--apple-bg-secondary);
+    padding: var(--spacing-xs);
+    border-radius: var(--apple-radius-small);
+    border: 1px solid var(--apple-border-light);
+}
+
+.chart-unit-size-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--apple-border);
+    background: var(--apple-bg-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    min-width: 40px;
+    color: var(--color-text-primary);
+}
+
+.chart-unit-size-btn:hover {
+    background: var(--apple-bg-secondary);
+}
+
+.chart-unit-size-btn.active {
+    border: 1px solid var(--brand-primary-color, var(--apple-blue));
+    background: var(--brand-primary-color, var(--apple-blue));
+    color: white;
+}
+
+/* Chart Time Range Buttons */
+.chart-time-range-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.chart-time-range-label {
+    font-size: 0.65rem;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    padding: 0 var(--spacing-xs);
+}
+
+.chart-time-range-buttons {
+    display: flex;
+    gap: 3px;
+    background: var(--apple-bg-secondary);
+    padding: var(--spacing-xs);
+    border-radius: var(--apple-radius-small);
+    border: 1px solid var(--apple-border-light);
+}
+
+.chart-time-range-btn {
+    padding: var(--spacing-xs) 10px;
+    border: 1px solid var(--apple-border);
+    background: var(--apple-bg-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    color: var(--color-text-primary);
+}
+
+.chart-time-range-btn:hover {
+    background: var(--apple-bg-secondary);
+}
+
+.chart-time-range-btn.active {
+    border: 1px solid var(--brand-primary-color, var(--apple-blue));
+    background: var(--brand-primary-color, var(--apple-blue));
+    color: white;
+}
+
+/* Chart Type Buttons */
+.chart-type-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.chart-type-label {
+    font-size: 0.65rem;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    padding: 0 var(--spacing-xs);
+}
+
+.chart-type-buttons {
+    display: flex;
+    gap: 3px;
+    background: var(--apple-bg-secondary);
+    padding: var(--spacing-xs);
+    border-radius: var(--apple-radius-small);
+    border: 1px solid var(--apple-border-light);
+}
+
+.chart-type-btn {
+    padding: var(--spacing-xs) 10px;
+    border: 1px solid var(--apple-border);
+    background: var(--apple-bg-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-primary);
+}
+
+.chart-type-btn:hover {
+    background: var(--apple-bg-secondary);
+}
+
+.chart-type-btn.active {
+    border: 1px solid var(--brand-primary-color, var(--apple-blue));
+    background: var(--brand-primary-color, var(--apple-blue));
+    color: white;
+}
+
+.chart-type-btn.active img {
+    filter: brightness(0) invert(1);
+}
+
+/* Chart View Mode Buttons */
+.chart-view-mode-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.chart-view-mode-label {
+    font-size: 0.65rem;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    padding: 0 var(--spacing-xs);
+}
+
+.chart-view-mode-buttons {
+    display: flex;
+    gap: 3px;
+    background: var(--apple-bg-secondary);
+    padding: var(--spacing-xs);
+    border-radius: var(--apple-radius-small);
+    border: 1px solid var(--apple-border-light);
+}
+
+.chart-view-mode-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--apple-border);
+    background: var(--apple-bg-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    color: var(--color-text-primary);
+}
+
+.chart-view-mode-btn:hover {
+    background: var(--apple-bg-secondary);
+}
+
+.chart-view-mode-btn.active {
+    border: 1px solid var(--brand-primary-color, var(--apple-blue));
+    background: var(--brand-primary-color, var(--apple-blue));
+    color: white;
+}
+
+/* Chart Y-Scale Buttons */
+.chart-y-scale-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.chart-y-scale-label {
+    font-size: 0.65rem;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    padding: 0 var(--spacing-xs);
+}
+
+.chart-y-scale-buttons {
+    display: flex;
+    gap: 3px;
+    background: var(--apple-bg-secondary);
+    padding: var(--spacing-xs);
+    border-radius: var(--apple-radius-small);
+    border: 1px solid var(--apple-border-light);
+}
+
+.chart-y-scale-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--apple-border);
+    background: var(--apple-bg-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    color: var(--color-text-primary);
+}
+
+.chart-y-scale-btn:hover {
+    background: var(--apple-bg-secondary);
+}
+
+.chart-y-scale-btn.active {
+    border: 1px solid var(--brand-primary-color, var(--apple-blue));
+    background: var(--brand-primary-color, var(--apple-blue));
+    color: white;
+}
+
+/* ===== Chart Toolbars ===== */
+.chart-toolbar {
+    position: absolute;
+    top: 10px;
+    z-index: 20;
+    background: var(--apple-bg-primary);
+    opacity: 0.95;
+    padding: var(--spacing-sm);
+    border-radius: var(--apple-radius-small);
+    box-shadow: var(--apple-shadow-medium);
+    display: none;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    min-width: 250px;
+    max-width: 300px;
+}
+
+.chart-toolbar-right {
+    inset-inline-end: 10px;
+}
+
+.chart-toolbar-left {
+    inset-inline-start: 10px;
+}
+
+.chart-toolbar-header {
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text-primary-dark);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chart-toolbar-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--color-text-secondary);
+    padding: 0 var(--spacing-xs);
+    line-height: 1;
+    transition: all 0.2s;
+}
+
+.chart-toolbar-close:hover {
+    color: var(--color-text-primary);
+}
+
+.chart-toolbar-section {
+    border-bottom: 1px solid var(--apple-border-light);
+    padding-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.chart-toolbar-section-title {
+    font-size: 0.65rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--color-text-secondary);
+}
+
+/* RTL Support for Chart Toolbars */
+[dir="rtl"] .chart-toolbar-right {
+    right: auto;
+    left: 10px;
+}
+
+[dir="rtl"] .chart-toolbar-left {
+    left: auto;
+    right: 10px;
+}
+
+/* ===== Filter Menus ===== */
+.filter-group {
+    position: relative;
+    display: inline-block;
+}
+
+.filter-toggle {
+    padding: var(--spacing-xs) var(--spacing-md);
+    border: 1px solid var(--apple-border);
+    background: var(--apple-bg-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--color-text-primary);
+    text-align: right;
+    direction: rtl;
+    transition: all 0.2s;
+}
+
+.filter-toggle:hover {
+    border-color: var(--brand-secondary-color, var(--logo-orange));
+    color: var(--brand-secondary-color, var(--logo-orange));
+    background: var(--apple-bg-primary);
+}
+
+.filter-menu {
+    position: absolute;
+    top: 100%;
+    inset-inline-end: 0;
+    background: var(--apple-bg-primary);
+    border: 1px solid var(--apple-border);
+    border-radius: 4px;
+    box-shadow: var(--apple-shadow-medium);
+    min-width: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s;
+    display: none;
+    direction: rtl;
+}
+
+.filter-group:hover .filter-menu,
+.filter-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    display: block;
+}
+
+.filter-item {
+    padding: 6px 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-bottom: 1px solid var(--apple-border-light);
+}
+
+.filter-item:hover {
+    background: var(--apple-bg-secondary);
+    color: var(--brand-primary-color, var(--apple-blue));
+}
+
+.filter-item:last-child {
+    border-bottom: none;
+}
+
+.filter-item.selected {
+    background-color: var(--apple-bg-secondary);
+    color: var(--brand-primary-color, var(--apple-green));
+    font-weight: 500;
+}
+
+.filter-item.selected::before {
+    content: "✓";
+    margin-inline-end: var(--spacing-sm);
+    color: var(--brand-primary-color, var(--apple-green));
+    font-weight: bold;
+}
+
+/* Filter Variants */
+.account-filter-item {
+    /* Uses .filter-item base styles */
+}
+
+.date-range-filter-item {
+    /* Uses .filter-item base styles */
+}
+
+/* ===== Timeline Components ===== */
+.timeline-container {
+    position: relative;
+    padding: var(--spacing-lg) 0;
+}
+
+.timeline-view-toggle {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.timeline-view-toggle button {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--apple-border-light);
+    background: var(--apple-bg-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: var(--color-text-primary);
+}
+
+.timeline-view-toggle button:hover {
+    background: var(--apple-bg-secondary);
+}
+
+.timeline-view-toggle button.active {
+    background: var(--brand-primary-color, var(--apple-green));
+    color: white;
+    border-color: var(--brand-primary-color, var(--apple-green));
+}
+
+.timeline-absolute-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--spacing-sm) 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+.timeline-absolute-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.timeline-absolute-wrapper::-webkit-scrollbar-track {
+    background: var(--apple-bg-secondary);
+    border-radius: 4px;
+}
+
+.timeline-absolute-wrapper::-webkit-scrollbar-thumb {
+    background: var(--brand-primary-color, var(--apple-green));
+    border-radius: 4px;
+}
+
+.timeline-absolute-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-primary-dark, var(--apple-green-dark));
+}
+
+.timeline-absolute {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-xl);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    position: relative;
+    min-width: max-content;
+    width: 100%;
+}
+
+.timeline-absolute::before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    height: 2px;
+    background: var(--apple-border-light);
+    z-index: 0;
+}
+
+.timeline-step-absolute {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    min-width: 200px;
+    max-width: 250px;
+}
+
+/* ===== Widget Styles ===== */
+.widget-container {
+    background: var(--apple-bg-primary);
+    border: 1px solid var(--apple-border-light);
+    border-radius: var(--apple-radius-small);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--apple-border-light);
+}
+
+.widget-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.widget-content {
+    /* Widget content styles */
+}
+
+.widget-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+/* ===== Additional Chart Control Buttons ===== */
+.view-mode-btn,
+.y-scale-btn,
+.volume-toggle-btn,
+.auto-scale-btn,
+.zoom-btn,
+.indicators-toggle-btn,
+.series-visibility-toggle-btn,
+.export-btn,
+.drawing-tools-toggle-btn {
+    padding: var(--spacing-xs) 10px;
+    border: 1px solid var(--apple-border);
+    background: var(--apple-bg-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-primary);
+}
+
+.view-mode-btn:hover,
+.y-scale-btn:hover,
+.volume-toggle-btn:hover,
+.auto-scale-btn:hover,
+.zoom-btn:hover,
+.indicators-toggle-btn:hover,
+.series-visibility-toggle-btn:hover,
+.export-btn:hover,
+.drawing-tools-toggle-btn:hover {
+    background: var(--apple-bg-secondary);
+}
+
+.view-mode-btn.active,
+.y-scale-btn.active,
+.volume-toggle-btn.active {
+    border: 1px solid var(--brand-primary-color, var(--apple-blue));
+    background: var(--brand-primary-color, var(--apple-blue));
+    color: white;
+}
+
+.view-mode-btn.active img,
+.y-scale-btn.active img,
+.volume-toggle-btn.active img {
+    filter: brightness(0) invert(1);
+}
+
+.zoom-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.volume-toggle-btn,
+.indicators-toggle-btn {
+    gap: var(--spacing-xs);
+}
+
+.chart-type-btn img,
+.y-scale-btn img,
+.volume-toggle-btn img,
+.auto-scale-btn img,
+.zoom-btn img,
+.indicators-toggle-btn img,
+.series-visibility-toggle-btn img,
+.export-btn img,
+.drawing-tools-toggle-btn img {
+    width: 16px;
+    height: 16px;
+}
+
+.chart-type-btn img {
+    width: 18px;
+    height: 18px;
+}
+
+.drawing-tools-toggle-btn img {
+    width: 18px;
+    height: 18px;
+}
+
+/* ===== Chart Wrapper and Toolbars ===== */
+#price-chart-wrapper {
+    position: relative;
+    height: 450px;
+    width: 100%;
+    background: var(--apple-bg-primary);
+    border-radius: var(--apple-radius-small) var(--apple-radius-small) 0 0;
+    overflow: hidden;
+    border-bottom: 2px solid var(--apple-border-light);
+}
+
+#volume-chart-wrapper {
+    position: relative;
+    height: 150px;
+    width: 100%;
+    background: var(--apple-bg-primary);
+    border-radius: 0 0 var(--apple-radius-small) var(--apple-radius-small);
+    overflow: hidden;
+    border-top: 2px solid var(--apple-border-light);
+    display: block;
+}
+
+#price-chart-container,
+#volume-chart-container {
+    height: 100%;
+    width: 100%;
+}
+
+#drawing-canvas {
+    position: absolute;
+    top: 0;
+    inset-inline-start: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 15;
+    pointer-events: none;
+}
+
+/* Indicators Toolbar */
+#indicators-toolbar {
+    position: absolute;
+    top: 10px;
+    inset-inline-end: 10px;
+    z-index: 20;
+    background: var(--apple-bg-primary);
+    opacity: 0.95;
+    padding: var(--spacing-sm);
+    border-radius: var(--apple-radius-small);
+    box-shadow: var(--apple-shadow-medium);
+    display: none;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    min-width: 250px;
+    max-width: 300px;
+}
+
+#indicators-toolbar .chart-toolbar-header {
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text-primary-dark);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#closeIndicatorsToolbar {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--color-text-secondary);
+    padding: 0 var(--spacing-xs);
+    line-height: 1;
+    transition: all 0.2s;
+}
+
+#closeIndicatorsToolbar:hover {
+    color: var(--color-text-primary);
+}
+
+#indicators-toolbar .chart-toolbar-section {
+    border-bottom: 1px solid var(--apple-border-light);
+    padding-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+#indicators-toolbar .chart-toolbar-section-title {
+    font-size: 0.65rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--color-text-secondary);
+}
+
+.indicator-add-btn {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid var(--brand-primary-color, var(--apple-blue));
+    background: var(--brand-primary-color, var(--apple-blue));
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.indicator-add-btn:hover {
+    background: var(--brand-primary-dark, var(--apple-blue-dark));
+}
+
+#maPeriodInput,
+#rsiPeriodInput {
+    width: 60px;
+    padding: var(--spacing-xs);
+    border: 1px solid var(--apple-border);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+#active-indicators-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#indicators-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.no-indicators-message {
+    font-size: 0.7rem;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    padding: var(--spacing-xs);
+}
+
+/* Drawing Tools Toolbar */
+#drawing-tools-toolbar {
+    position: absolute;
+    top: 10px;
+    inset-inline-start: 10px;
+    z-index: 20;
+    background: var(--apple-bg-primary);
+    opacity: 0.95;
+    padding: var(--spacing-sm);
+    border-radius: var(--apple-radius-small);
+    box-shadow: var(--apple-shadow-medium);
+    display: none;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+#drawing-tools-toolbar .chart-toolbar-header {
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text-primary-dark);
+}
+
+.drawing-tools-buttons {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+}
+
+.drawing-tool-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--apple-border);
+    background: var(--apple-bg-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--color-text-primary);
+}
+
+.drawing-tool-btn:hover {
+    background: var(--apple-bg-secondary);
+}
+
+.drawing-tool-btn[data-tool="clear"] {
+    border: 1px solid var(--apple-red);
+    background: var(--apple-bg-primary);
+    color: var(--apple-red);
+}
+
+.drawing-tool-btn[data-tool="clear"]:hover {
+    background: var(--apple-red);
+    color: white;
+}
+
+.drawing-tool-btn img {
+    width: 16px;
+    height: 16px;
+}
+
+/* RTL Support for Toolbars */
+[dir="rtl"] #indicators-toolbar {
+    right: auto;
+    left: 10px;
+}
+
+[dir="rtl"] #drawing-tools-toolbar {
+    left: auto;
+    right: 10px;
+}
+
+/* ===== Comparison Chart Styles ===== */
+#comparison-chart-container {
+    height: 350px;
+    width: 100%;
+    position: relative;
+}
+
+#comparison-chart-wrapper {
+    height: 100%;
+    width: 100%;
+}
+
+#comparison-legend {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ===== Indicator Item Styles ===== */
+.indicator-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-xs) 6px;
+    background: var(--apple-bg-secondary);
+    border-radius: 4px;
+    border: 1px solid var(--apple-border-light);
+}
+
+.indicator-item-label {
+    font-size: 0.75rem;
+    color: var(--color-text-primary-dark);
+}
+
+.remove-indicator-btn {
+    background: var(--apple-red);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: all 0.2s;
+}
+
+.remove-indicator-btn:hover {
+    background: var(--apple-red-dark);
+}
+
+/* ===== Series Legend Styles ===== */
+.series-legend-title {
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+}
+
+.series-legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-bottom: 2px;
+}
+
+.series-legend-color {
+    width: 12px;
+    height: 2px;
+    background: var(--brand-primary-color, var(--apple-blue));
+}
+
+.series-legend-color-square {
+    width: 12px;
+    height: 12px;
+    background: var(--brand-primary-color, var(--apple-green));
+    border-radius: 2px;
+}
+
+.series-legend-color-line {
+    width: 12px;
+    height: 1px;
+    background: var(--brand-secondary-color, var(--logo-orange));
+}
+
+/* ===== Modal Styles for Mockups ===== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+}
+
+.modal-container {
+    background: var(--apple-bg-primary);
+    border-radius: var(--apple-radius-medium);
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--apple-shadow-heavy);
+}
+
+.modal-header {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--apple-border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--color-text-primary);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: var(--apple-bg-secondary);
+    color: var(--color-text-primary);
+}
+
+.modal-body {
+    padding: var(--spacing-md);
+}
+
+.modal-footer {
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--apple-border-light);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+}
+

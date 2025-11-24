@@ -348,30 +348,43 @@
 
 /* כרטיסי סטטיסטיקות */
 .compact-stat-card {
-  background: var(--apple-bg-secondary);
-  padding: 1rem;
+  background: var(--apple-bg-primary);
+  padding: var(--spacing-md);
   border-radius: var(--apple-radius-medium);
   border: 1px solid var(--apple-border-light);
   text-align: center;
+  transition: all 0.2s ease;
+}
+
+.compact-stat-card:hover {
+  box-shadow: var(--apple-shadow-light);
+  transform: translateY(-2px);
 }
 
 .compact-stat-number {
   font-size: 1.8rem;
   font-weight: 600;
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-text-primary);
 }
 
 .compact-stat-number.positive {
-  color: var(--apple-green);
+  color: var(--user-value-positive-color, var(--apple-green));
 }
 
 .compact-stat-number.negative {
-  color: var(--apple-red);
+  color: var(--user-value-negative-color, var(--apple-red));
 }
 
 .compact-stat-label {
   font-size: 0.9rem;
-  color: var(--apple-text-secondary);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.compact-stat-absolute {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
 }
 
 /* כרטיסי גרף */

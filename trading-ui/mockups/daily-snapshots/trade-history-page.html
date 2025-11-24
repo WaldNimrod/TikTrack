@@ -1701,112 +1701,162 @@
         
         // Test function to check series methods (can be called from console)
         window.testSeriesMethods = function(seriesName = 'positionSize') {
-            console.log(`🧪 Testing series methods for: ${seriesName}`);
+            if (window.Logger) {
+                window.Logger.info(`🧪 Testing series methods for: ${seriesName}`, { page: 'trade-history-page' });
+            }
             
             if (!timelineChart || !timelineChart._series) {
-                console.error('❌ Timeline chart or series not available');
+                if (window.Logger) {
+                    window.Logger.error('❌ Timeline chart or series not available', { page: 'trade-history-page' });
+                }
                 return;
             }
             
             const series = timelineChart._series[seriesName];
             if (!series) {
-                console.error(`❌ Series ${seriesName} not found. Available series:`, Object.keys(timelineChart._series));
+                if (window.Logger) {
+                    window.Logger.error(`❌ Series ${seriesName} not found`, { page: 'trade-history-page', availableSeries: Object.keys(timelineChart._series) });
+                }
                 return;
             }
             
-            console.log(`✅ Found series: ${seriesName}`);
-            console.log('Series object:', series);
-            console.log('Series methods:', Object.keys(series));
-            console.log('Series prototype methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(series)));
+            if (window.Logger) {
+                window.Logger.info(`✅ Found series: ${seriesName}`, { page: 'trade-history-page', series, methods: Object.keys(series), prototypeMethods: Object.getOwnPropertyNames(Object.getPrototypeOf(series)) });
+            }
             
             // Check for setMarkers
-            console.log('setMarkers type:', typeof series.setMarkers);
+            if (window.Logger) {
+                window.Logger.info('setMarkers type', { page: 'trade-history-page', type: typeof series.setMarkers });
+            }
             if (typeof series.setMarkers === 'function') {
-                console.log('✅ setMarkers is a function');
+                if (window.Logger) {
+                    window.Logger.info('✅ setMarkers is a function', { page: 'trade-history-page' });
+                }
             } else {
-                console.warn('⚠️ setMarkers is not a function');
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ setMarkers is not a function', { page: 'trade-history-page' });
+                }
             }
             
             // Check for createSeriesMarkers
             const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
             if (lightweightCharts) {
-                console.log('LightweightCharts.createSeriesMarkers type:', typeof lightweightCharts.createSeriesMarkers);
+                if (window.Logger) {
+                    window.Logger.info('LightweightCharts.createSeriesMarkers type', { page: 'trade-history-page', type: typeof lightweightCharts.createSeriesMarkers });
+                }
                 if (typeof lightweightCharts.createSeriesMarkers === 'function') {
-                    console.log('✅ createSeriesMarkers is available');
+                    if (window.Logger) {
+                        window.Logger.info('✅ createSeriesMarkers is available', { page: 'trade-history-page' });
+                    }
                     try {
                         const markersPrimitive = lightweightCharts.createSeriesMarkers(series);
-                        console.log('✅ createSeriesMarkers worked! Primitive:', markersPrimitive);
-                        console.log('Primitive methods:', Object.keys(markersPrimitive));
-                        console.log('Primitive setMarkers type:', typeof markersPrimitive.setMarkers);
+                        if (window.Logger) {
+                            window.Logger.info('✅ createSeriesMarkers worked!', { page: 'trade-history-page', primitive: markersPrimitive, methods: Object.keys(markersPrimitive), setMarkersType: typeof markersPrimitive.setMarkers });
+                        }
                     } catch (error) {
-                        console.error('❌ createSeriesMarkers failed:', error);
+                        if (window.Logger) {
+                            window.Logger.error('❌ createSeriesMarkers failed', { page: 'trade-history-page', error });
+                        }
                     }
                 } else {
-                    console.warn('⚠️ createSeriesMarkers is not available');
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ createSeriesMarkers is not available', { page: 'trade-history-page' });
+                    }
                 }
             } else {
-                console.error('❌ LightweightCharts not available');
+                if (window.Logger) {
+                    window.Logger.error('❌ LightweightCharts not available', { page: 'trade-history-page' });
+                }
             }
         };
         
         // Debug function to check chart state (can be called from console)
         window.debugCharts = function() {
-            console.log('=== 📊 CHART DEBUG INFO ===');
-            console.log('Timeline Chart:', timelineChart);
+            if (window.Logger) {
+                window.Logger.info('=== 📊 CHART DEBUG INFO ===', { page: 'trade-history-page' });
+            }
             
             if (timelineChart) {
                 const timelineTimeScale = timelineChart.timeScale();
-                console.log('Timeline TimeScale:', timelineTimeScale);
-                console.log('Timeline Visible Range:', timelineTimeScale.getVisibleRange());
-                console.log('Timeline TimeScale methods:', Object.keys(timelineTimeScale));
-                console.log('Timeline fitContent type:', typeof timelineTimeScale.fitContent);
-                console.log('Timeline subscribeVisibleTimeRangeChange type:', typeof timelineTimeScale.subscribeVisibleTimeRangeChange);
+                const visibleRange = timelineTimeScale.getVisibleRange();
+                const timeScaleMethods = Object.keys(timelineTimeScale);
+                const seriesKeys = timelineChart._series ? Object.keys(timelineChart._series) : [];
+                const seriesData = {};
                 
                 // Try to get all series data
                 if (timelineChart._series) {
-                    console.log('Timeline Series:', Object.keys(timelineChart._series));
                     Object.keys(timelineChart._series).forEach(key => {
                         const series = timelineChart._series[key];
                         if (series && typeof series.data === 'function') {
                             try {
                                 const data = series.data();
-                                console.log(`Timeline Series ${key} data points:`, data ? data.length : 0);
+                                seriesData[key] = data ? data.length : 0;
                             } catch (e) {
-                                console.log(`Timeline Series ${key} - cannot get data:`, e.message);
+                                seriesData[key] = `Error: ${e.message}`;
                             }
                         }
                     });
                 }
+                
+                if (window.Logger) {
+                    window.Logger.info('Chart debug info', { 
+                        page: 'trade-history-page',
+                        timelineChart,
+                        timelineTimeScale,
+                        visibleRange,
+                        timeScaleMethods,
+                        fitContentType: typeof timelineTimeScale.fitContent,
+                        subscribeType: typeof timelineTimeScale.subscribeVisibleTimeRangeChange,
+                        seriesKeys,
+                        seriesData
+                    });
+                }
             }
             
-            console.log('=== END DEBUG INFO ===');
+            if (window.Logger) {
+                window.Logger.info('=== END DEBUG INFO ===', { page: 'trade-history-page' });
+            }
         };
         
         // Test function to manually trigger fitContent (can be called from console)
         window.testFitContent = function(chartName = 'timeline') {
-            console.log(`🧪 Testing fitContent for: ${chartName}`);
+            if (window.Logger) {
+                window.Logger.info(`🧪 Testing fitContent for: ${chartName}`, { page: 'trade-history-page' });
+            }
             
             if (timelineChart) {
                 try {
-                    console.log('🔍 Testing Timeline Chart fitContent...');
+                    if (window.Logger) {
+                        window.Logger.info('🔍 Testing Timeline Chart fitContent...', { page: 'trade-history-page' });
+                    }
                     const timeScale = timelineChart.timeScale();
                     const before = timeScale.getVisibleRange();
-                    console.log('Before fitContent:', before);
+                    if (window.Logger) {
+                        window.Logger.info('Before fitContent', { page: 'trade-history-page', before });
+                    }
                     
                     timeScale.fitContent();
                     
                     setTimeout(() => {
                         const after = timeScale.getVisibleRange();
-                        console.log('After fitContent:', after);
+                        if (window.Logger) {
+                            window.Logger.info('After fitContent', { page: 'trade-history-page', after });
+                        }
                         if (before && after && 
                             (before.from !== after.from || before.to !== after.to)) {
-                            console.log('✅ Timeline Chart fitContent worked!');
+                            if (window.Logger) {
+                                window.Logger.info('✅ Timeline Chart fitContent worked!', { page: 'trade-history-page' });
+                            }
                         } else {
-                            console.warn('⚠️ Timeline Chart fitContent may not have changed the range');
+                            if (window.Logger) {
+                                window.Logger.warn('⚠️ Timeline Chart fitContent may not have changed the range', { page: 'trade-history-page' });
+                            }
                         }
                     }, 100);
                 } catch (error) {
-                    console.error('❌ Error testing Timeline fitContent:', error);
+                    if (window.Logger) {
+                        window.Logger.error('❌ Error testing Timeline fitContent', { page: 'trade-history-page', error });
+                    }
                 }
             }
         };
@@ -1860,7 +1910,9 @@
                             });
                         }
                     } catch (error) {
-                        console.warn('Error zooming in:', error);
+                        if (window.Logger) {
+                            window.Logger.warn('Error zooming in', { page: 'trade-history-page', error });
+                        }
                     }
                 });
             }
@@ -1899,10 +1951,14 @@
                                 from: newFrom,
                                 to: newTo
                             });
-                            console.log('🔍 [Zoom Out] Range expanded:', { from: newFrom, to: newTo });
+                            if (window.Logger) {
+                                window.Logger.info('🔍 [Zoom Out] Range expanded', { page: 'trade-history-page', from: newFrom, to: newTo });
+                            }
                         }
                     } catch (error) {
-                        console.warn('Error zooming out:', error);
+                        if (window.Logger) {
+                            window.Logger.warn('Error zooming out', { page: 'trade-history-page', error });
+                        }
                     }
                 });
             }
@@ -1914,7 +1970,9 @@
                     try {
                         timeScale.fitContent();
                     } catch (error) {
-                        console.warn('Error resetting zoom:', error);
+                        if (window.Logger) {
+                            window.Logger.warn('Error resetting zoom', { page: 'trade-history-page', error });
+                        }
                     }
                 });
             }
@@ -1935,10 +1993,14 @@
                                 from: newFrom,
                                 to: newTo
                             });
-                            console.log('⬅️ [Pan Left] Moved right (later data):', { from: newFrom, to: newTo });
+                            if (window.Logger) {
+                                window.Logger.info('⬅️ [Pan Left] Moved right (later data)', { page: 'trade-history-page', from: newFrom, to: newTo });
+                            }
                         }
                     } catch (error) {
-                        console.warn('Error panning left:', error);
+                        if (window.Logger) {
+                            window.Logger.warn('Error panning left', { page: 'trade-history-page', error });
+                        }
                     }
                 });
             }
@@ -1959,10 +2021,14 @@
                                 from: newFrom,
                                 to: newTo
                             });
-                            console.log('➡️ [Pan Right] Moved left (earlier data):', { from: newFrom, to: newTo });
+                            if (window.Logger) {
+                                window.Logger.info('➡️ [Pan Right] Moved left (earlier data)', { page: 'trade-history-page', from: newFrom, to: newTo });
+                            }
                         }
                     } catch (error) {
-                        console.warn('Error panning right:', error);
+                        if (window.Logger) {
+                            window.Logger.warn('Error panning right', { page: 'trade-history-page', error });
+                        }
                     }
                 });
             }
@@ -2006,7 +2072,9 @@
             try {
                 await initTimelineChart();
             } catch (e) {
-                console.error('Error initializing timeline chart:', e);
+                if (window.Logger) {
+                    window.Logger.error('Error initializing timeline chart', { page: 'trade-history-page', error: e });
+                }
             }
             
             // P/L Chart removed - no longer needed
@@ -2100,7 +2168,9 @@
                     `;
                 }
             } catch (error) {
-                console.error('Error loading linked items:', error);
+                if (window.Logger) {
+                    window.Logger.error('Error loading linked items', { page: 'trade-history-page', error });
+                }
                 container.innerHTML = `
                     <div class="alert alert-danger">
                         <img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> שגיאה בטעינת פריטים מקושרים: ${error.message}
@@ -2198,7 +2268,9 @@
                         showDelete: false
                     });
                 } catch (e) {
-                    console.error('Error loading action buttons for linked items:', e);
+                    if (window.Logger) {
+                        window.Logger.error('Error loading action buttons for linked items', { page: 'trade-history-page', error: e });
+                    }
                 }
             }
         }
@@ -2383,7 +2455,9 @@
                     }
                 }
             } catch (error) {
-                console.error('Error loading tickers:', error);
+                if (window.Logger) {
+                    window.Logger.error('Error loading tickers', { page: 'trade-history-page', error });
+                }
             }
         }
         
@@ -2428,7 +2502,9 @@
                     loadMockTrades();
                 }
             } catch (error) {
-                console.error('Error loading trades:', error);
+                if (window.Logger) {
+                    window.Logger.error('Error loading trades', { page: 'trade-history-page', error });
+                }
                 // Fallback to mock data
                 loadMockTrades();
             }
@@ -2509,10 +2585,21 @@
             
             noResults.style.display = 'none';
             tbody.innerHTML = filteredTrades.map(trade => {
-                const plClass = trade.pl >= 0 ? 'text-success' : 'text-danger';
-                const plSign = trade.pl >= 0 ? '+' : '';
                 const sideText = trade.side || '-';
                 const investmentTypeText = getInvestmentTypeText(trade.investment_type);
+                
+                // Use FieldRendererService for P/L display
+                let plDisplay;
+                if (window.FieldRendererService) {
+                    const plAmount = window.FieldRendererService.renderAmount(trade.pl, '$', 0, true);
+                    const plPercent = window.FieldRendererService.renderNumericValue(trade.pl_percent || 0, '%', true);
+                    plDisplay = `<strong>${plAmount}</strong> <small>(${plPercent})</small>`;
+                } else {
+                    // Fallback
+                    const plClass = trade.pl >= 0 ? 'text-success' : 'text-danger';
+                    const plSign = trade.pl >= 0 ? '+' : '';
+                    plDisplay = `<strong class="${plClass}">${plSign}$${Math.abs(trade.pl).toLocaleString()}</strong> <small class="${plClass}">(${plSign}${trade.pl_percent}%)</small>`;
+                }
                 
                 return `
                     <tr>
@@ -2522,10 +2609,7 @@
                         <td>${investmentTypeText}</td>
                         <td>${formatDate(trade.created_at)}</td>
                         <td>${formatDate(trade.closed_at)}</td>
-                        <td class="${plClass}">
-                            <strong>${plSign}$${Math.abs(trade.pl).toLocaleString()}</strong>
-                            <small>(${plSign}${trade.pl_percent}%)</small>
-                        </td>
+                        <td>${plDisplay}</td>
                         <td>
                             <div class="btn-group">
                                 <button class="btn btn-sm" onclick="viewTradeDetails(${trade.id})" title="פרטים">
@@ -2641,7 +2725,9 @@
         
         // Load trade for analysis (placeholder - in production would load real data)
         function loadTradeForAnalysis(tradeId) {
-            console.log(`Loading trade ${tradeId} for analysis...`);
+            if (window.Logger) {
+                window.Logger.info(`Loading trade ${tradeId} for analysis...`, { page: 'trade-history-page', tradeId });
+            }
             // In production, this would:
             // 1. Fetch trade data from API
             // 2. Update all charts
@@ -2679,9 +2765,12 @@
                     await window.PreferencesCore.initializeWithLazyLoading();
                 }
             } catch (error) {
-                console.warn('Preferences initialization failed (non-critical):', error);
+                if (window.Logger) {
+                    window.Logger.warn('Preferences initialization failed (non-critical)', { page: 'trade-history-page', error });
+                }
             }
         });
     </script>
 </body>
 </html>
+

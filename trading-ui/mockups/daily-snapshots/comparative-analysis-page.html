@@ -602,7 +602,7 @@
                 <!-- Comparison Table Section -->
                 <div class="content-section" id="comparison-table-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/table.svg" width="16" height="16" alt="table" class="icon"> טבלת השוואות</h2>
+                        <h2><img src="../../images/icons/tabler/clipboard-list.svg" width="16" height="16" alt="table" class="icon"> טבלת השוואות</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('comparison-table-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -645,7 +645,7 @@
                 <!-- Heatmap Section -->
                 <div class="content-section" id="heatmap-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/grid.svg" width="16" height="16" alt="grid" class="icon"> Heatmap - מטריצת השוואות</h2>
+                        <h2><img src="../../images/icons/tabler/chart-dots.svg" width="16" height="16" alt="grid" class="icon"> Heatmap - מטריצת השוואות</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('heatmap-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -716,7 +716,7 @@
                         </div>
                         <div id="comparison-chart-container" class="chart-container" style="height: 300px; position: relative; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
                             <div class="chart-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6c757d;">
-                                <img src="../../images/icons/tabler/hourglass.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
                             </div>
                             <div id="chart-scale-labels" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 10;">
                                 <div id="left-scale-label" style="position: absolute; left: 8px; top: 8px; font-size: 0.75rem; color: #6c757d; font-weight: 500; background: rgba(255, 255, 255, 0.8); padding: 2px 6px; border-radius: 3px;">
@@ -1970,10 +1970,17 @@
                 }
             }
             
-            // Add percentage if available
+            // Add percentage if available - using FieldRendererService
             if (plPercent !== null && plPercent !== undefined && !isNaN(plPercent)) {
-                const percentSign = plPercent >= 0 ? '+' : '';
-                return `${plFormatted} <span class="text-muted">(${percentSign}${plPercent.toFixed(2)}%)</span>`;
+                let percentHtml;
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'function') {
+                    percentHtml = window.FieldRendererService.renderNumericValue(plPercent, '%', true);
+                } else {
+                    // Fallback
+                    const percentSign = plPercent >= 0 ? '+' : '';
+                    percentHtml = `<span class="text-muted">(${percentSign}${plPercent.toFixed(2)}%)</span>`;
+                }
+                return `${plFormatted} ${percentHtml}`;
             }
             
             return plFormatted;
@@ -1998,11 +2005,18 @@
                 }
             }
             
-            // Add percentage if available
+            // Add percentage if available - using FieldRendererService
             if (percent !== null && percent !== undefined && !isNaN(percent)) {
-                const percentFormatted = percent.toFixed(1);
-                const percentClass = percent >= 0 ? 'text-success' : 'text-danger';
-                return `${valueFormatted} <span class="${percentClass}" style="font-size: 0.85em; opacity: 0.8;">(${percent >= 0 ? '+' : ''}${percentFormatted}%)</span>`;
+                let percentHtml;
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'function') {
+                    percentHtml = window.FieldRendererService.renderNumericValue(percent, '%', true);
+                } else {
+                    // Fallback
+                    const percentFormatted = percent.toFixed(1);
+                    const percentClass = percent >= 0 ? 'text-success' : 'text-danger';
+                    percentHtml = `<span class="${percentClass}" style="font-size: 0.85em; opacity: 0.8;">(${percent >= 0 ? '+' : ''}${percentFormatted}%)</span>`;
+                }
+                return `${valueFormatted} ${percentHtml}`;
             }
             
             return valueFormatted;
@@ -2294,14 +2308,11 @@
                         : null;
                     
                     // Build data cells
-                    // Determine color class for P/L columns based on sign
-                    const totalPLClass = cat.totalPL >= 0 ? 'text-success' : 'text-danger';
-                    const avgPLClass = cat.avgPL >= 0 ? 'text-success' : 'text-danger';
-                    
+                    // Note: formatPLWithPercent already returns HTML with colors via FieldRendererService
                     const dataCells = `
                         <td>${cat.trades}</td>
-                        <td class="${avgPLClass}">${formatPLWithPercent(cat.avgPL, plPercent)}</td>
-                        <td class="${totalPLClass}">${formatPLWithPercent(cat.totalPL, plPercent)}</td>
+                        <td>${formatPLWithPercent(cat.avgPL, plPercent)}</td>
+                        <td>${formatPLWithPercent(cat.totalPL, plPercent)}</td>
                         <td>${cat.successRate}%</td>
                         <td class="text-end">${formatInvestmentWithPercent(cat.maxInvestmentAtPoint, maxInvestmentPercent)}</td>
                         <td class="text-end">${formatInvestmentWithPercent(cat.totalPurchases, totalPurchasesPercent)}</td>
@@ -2317,16 +2328,13 @@
                 const summaryMaxInvestmentPercent = totalMaxInvestment > 0 ? 100 : null; // Total is 100% of itself
                 const summaryTotalPurchasesPercent = totalTotalPurchases > 0 ? 100 : null;
                 
-                // Determine color class for summary P/L based on sign
-                const summaryTotalPLClass = totalTotalPL >= 0 ? 'text-success' : 'text-danger';
-                const summaryAvgPLClass = totalAvgPL >= 0 ? 'text-success' : 'text-danger';
-                
+                // Note: formatPLWithPercent already returns HTML with colors via FieldRendererService
                 const summaryRow = `
                     <tr class="table-info fw-bold" style="background-color: #d1ecf1; border-top: 2px solid #0c5460;">
                         ${summaryParamCells}
                         <td><strong>${totalTrades}<br>${avgTrades.toFixed(1)}</strong></td>
-                        <td class="${summaryAvgPLClass}"><strong>${formatPLWithPercent(totalAvgPL, summaryPLPercent)}<br>${formatPLWithPercent(avgAvgPL, summaryPLPercent)}</strong></td>
-                        <td class="${summaryTotalPLClass}"><strong>${formatPLWithPercent(totalTotalPL, summaryPLPercent)}<br>${formatPLWithPercent(avgTotalPL, summaryPLPercent)}</strong></td>
+                        <td><strong>${formatPLWithPercent(totalAvgPL, summaryPLPercent)}<br>${formatPLWithPercent(avgAvgPL, summaryPLPercent)}</strong></td>
+                        <td><strong>${formatPLWithPercent(totalTotalPL, summaryPLPercent)}<br>${formatPLWithPercent(avgTotalPL, summaryPLPercent)}</strong></td>
                         <td><strong>${avgSuccessRate.toFixed(1)}%</strong></td>
                         <td class="text-end"><strong>${formatInvestmentWithPercent(totalMaxInvestment, summaryMaxInvestmentPercent)}<br>${formatInvestmentWithPercent(avgMaxInvestment, null)}</strong></td>
                         <td class="text-end"><strong>${formatInvestmentWithPercent(totalTotalPurchases, summaryTotalPurchasesPercent)}<br>${formatInvestmentWithPercent(avgTotalPurchases, null)}</strong></td>
@@ -3980,8 +3988,46 @@
                     loadRecordFilterState();
                 }
                 
-                // No default comparison parameters - user must select manually
-                if (savedComparisonParams) {
+                // Set default comparison parameters if no saved state
+                if (!savedComparisonParams) {
+                    // Default: Compare by trading methods (all methods selected)
+                    const compareByTradingMethods = document.getElementById('compareByTradingMethods');
+                    const comparisonTradingMethods = document.getElementById('comparisonTradingMethods');
+                    const btnSelectAllMethods = document.getElementById('btn-select-all-trading-methods');
+                    const btnClearAllMethods = document.getElementById('btn-clear-all-trading-methods');
+                    
+                    if (compareByTradingMethods && comparisonTradingMethods && comparisonTradingMethods.options.length > 0) {
+                        // Enable the checkbox
+                        compareByTradingMethods.checked = true;
+                        
+                        // Enable the select and buttons
+                        comparisonTradingMethods.disabled = false;
+                        if (btnSelectAllMethods) btnSelectAllMethods.disabled = false;
+                        if (btnClearAllMethods) btnClearAllMethods.disabled = false;
+                        
+                        // Select all trading methods
+                        Array.from(comparisonTradingMethods.options).forEach(opt => {
+                            opt.selected = true;
+                        });
+                        
+                        // Save the default state
+                        saveComparisonParameterState();
+                        
+                        if (window.Logger) {
+                            window.Logger.info('✅ Default comparison parameters set (Trading Methods - all)', { page: 'comparative-analysis-page' });
+                        }
+                    } else {
+                        if (window.Logger) {
+                            window.Logger.warn('⚠️ Could not set default comparison parameters - elements not ready', { 
+                                page: 'comparative-analysis-page',
+                                compareByTradingMethods: !!compareByTradingMethods,
+                                comparisonTradingMethods: !!comparisonTradingMethods,
+                                optionsCount: comparisonTradingMethods?.options?.length || 0
+                            });
+                        }
+                    }
+                } else {
+                    // Load saved comparison parameters
                     loadComparisonParameterState();
                 }
                 
@@ -3991,10 +4037,10 @@
                 // Initialize series controls UI
                 initializeSeriesControls();
                 
-                // Initialize chart
+                // Initialize chart (will use current filter values)
                 await initComparisonChart();
                 
-                // Update all visualizations with initial filters
+                // Update all visualizations with initial filters (this will update chart with correct data)
                 updateAllVisualizations();
                 
                 // Setup export button

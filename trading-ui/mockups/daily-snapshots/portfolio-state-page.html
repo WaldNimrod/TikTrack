@@ -1660,29 +1660,80 @@
         
         // Update summary cards
         function updateSummaryCards(data) {
-            // Cash balance
-            document.getElementById('total-cash-balance').textContent = formatCurrency(data.total_cash_balance);
-            document.getElementById('cash-balance-total').textContent = formatCurrency(data.total_cash_balance);
+            // Cash balance - using FieldRendererService
+            if (window.FieldRendererService) {
+                const totalCashEl = document.getElementById('total-cash-balance');
+                const cashBalanceTotalEl = document.getElementById('cash-balance-total');
+                if (totalCashEl) {
+                    totalCashEl.innerHTML = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
+                }
+                if (cashBalanceTotalEl) {
+                    cashBalanceTotalEl.innerHTML = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
+                }
+            } else {
+                // Fallback
+                document.getElementById('total-cash-balance').textContent = formatCurrency(data.total_cash_balance);
+                document.getElementById('cash-balance-total').textContent = formatCurrency(data.total_cash_balance);
+            }
             
             // Cash balance by account
             const cashByAccount = document.getElementById('cash-balance-by-account');
             if (cashByAccount && data.cash_balance_by_account) {
-                cashByAccount.innerHTML = data.cash_balance_by_account.map(acc => `
-                    <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
-                        <span>${acc.account_name}:</span>
-                        <span>${formatCurrency(acc.balance)}</span>
-                    </div>
-                `).join('');
+                if (window.FieldRendererService) {
+                    cashByAccount.innerHTML = data.cash_balance_by_account.map(acc => `
+                        <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
+                            <span>${acc.account_name}:</span>
+                            <span>${window.FieldRendererService.renderAmount(acc.balance, '$', 0, false)}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    // Fallback
+                    cashByAccount.innerHTML = data.cash_balance_by_account.map(acc => `
+                        <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
+                            <span>${acc.account_name}:</span>
+                            <span>${formatCurrency(acc.balance)}</span>
+                        </div>
+                    `).join('');
+                }
             }
             
-            // Portfolio value
-            document.getElementById('total-portfolio-value').textContent = formatCurrency(data.total_portfolio_value);
+            // Portfolio value - using FieldRendererService
+            const portfolioValueEl = document.getElementById('total-portfolio-value');
+            if (portfolioValueEl) {
+                if (window.FieldRendererService) {
+                    portfolioValueEl.innerHTML = window.FieldRendererService.renderAmount(data.total_portfolio_value, '$', 0, false);
+                } else {
+                    // Fallback
+                    portfolioValueEl.textContent = formatCurrency(data.total_portfolio_value);
+                }
+            }
             
-            // P/L
-            document.getElementById('total-pl').textContent = formatCurrency(data.total_pl);
-            document.getElementById('total-pl-detail').textContent = formatCurrency(data.total_pl);
-            document.getElementById('realized-pl').textContent = formatCurrency(data.total_realized_pl);
-            document.getElementById('unrealized-pl').textContent = formatCurrency(data.total_unrealized_pl);
+            // P/L - using FieldRendererService
+            if (window.FieldRendererService) {
+                const totalPlEl = document.getElementById('total-pl');
+                const totalPlDetailEl = document.getElementById('total-pl-detail');
+                const realizedPlEl = document.getElementById('realized-pl');
+                const unrealizedPlEl = document.getElementById('unrealized-pl');
+                
+                if (totalPlEl) {
+                    totalPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_pl, '$', 0, true);
+                }
+                if (totalPlDetailEl) {
+                    totalPlDetailEl.innerHTML = window.FieldRendererService.renderAmount(data.total_pl, '$', 0, true);
+                }
+                if (realizedPlEl) {
+                    realizedPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_realized_pl, '$', 0, true);
+                }
+                if (unrealizedPlEl) {
+                    unrealizedPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_unrealized_pl, '$', 0, true);
+                }
+            } else {
+                // Fallback
+                document.getElementById('total-pl').textContent = formatCurrency(data.total_pl);
+                document.getElementById('total-pl-detail').textContent = formatCurrency(data.total_pl);
+                document.getElementById('realized-pl').textContent = formatCurrency(data.total_realized_pl);
+                document.getElementById('unrealized-pl').textContent = formatCurrency(data.total_unrealized_pl);
+            }
             
             // Calculate P/L percentage with zero-division check
             const denominator = data.total_portfolio_value - data.total_pl;
@@ -1694,14 +1745,21 @@
                 plPercent = ((data.total_pl / denominator) * 100).toFixed(1);
             }
             
-            // Display P/L percentage
-            if (plPercent === '-') {
-                document.getElementById('pl-percentage').textContent = '(-)';
-                document.getElementById('pl-percentage').style.color = '#6c757d';
-            } else {
-                const plPercentNum = parseFloat(plPercent);
-                document.getElementById('pl-percentage').textContent = `(${plPercentNum >= 0 ? '+' : ''}${plPercent}%)`;
-                document.getElementById('pl-percentage').style.color = plPercentNum >= 0 ? '#28a745' : '#dc3545';
+            // Display P/L percentage using FieldRendererService
+            const plPercentEl = document.getElementById('pl-percentage');
+            if (plPercentEl) {
+                if (plPercent === '-') {
+                    plPercentEl.innerHTML = '<span class="numeric-value-zero">(-)</span>';
+                } else {
+                    const plPercentNum = parseFloat(plPercent);
+                    if (window.FieldRendererService) {
+                        plPercentEl.innerHTML = `(${window.FieldRendererService.renderNumericValue(plPercentNum, '%', true)})`;
+                    } else {
+                        // Fallback
+                        plPercentEl.textContent = `(${plPercentNum >= 0 ? '+' : ''}${plPercent}%)`;
+                        plPercentEl.style.color = plPercentNum >= 0 ? '#28a745' : '#dc3545';
+                    }
+                }
             }
             
             // Positions count
@@ -3079,16 +3137,31 @@
             tbody.innerHTML = comparisonData.map(item => {
                 const change = item.value1 - item.value2;
                 const changePercent = ((change / item.value2) * 100).toFixed(1);
-                const isPositive = change >= 0;
-                const changeClass = isPositive ? 'text-success' : 'text-danger';
-                const changeSign = isPositive ? '+' : '';
+                
+                // Use FieldRendererService if available
+                let changeDisplay, value1Display, value2Display;
+                if (window.FieldRendererService) {
+                    value1Display = window.FieldRendererService.renderAmount(item.value1, '$', 0, false);
+                    value2Display = window.FieldRendererService.renderAmount(item.value2, '$', 0, false);
+                    const changeAmount = window.FieldRendererService.renderAmount(change, '$', 0, true);
+                    const changePercentHtml = window.FieldRendererService.renderNumericValue(parseFloat(changePercent), '%', true);
+                    changeDisplay = `${changeAmount} (${changePercentHtml})`;
+                } else {
+                    // Fallback
+                    const isPositive = change >= 0;
+                    const changeClass = isPositive ? 'text-success' : 'text-danger';
+                    const changeSign = isPositive ? '+' : '';
+                    value1Display = formatCurrency(item.value1);
+                    value2Display = formatCurrency(item.value2);
+                    changeDisplay = `<span class="${changeClass}">${changeSign}${formatCurrency(change)} (${changeSign}${changePercent}%)</span>`;
+                }
                 
                 return `
                     <tr>
                         <td>${item.metric}</td>
-                        <td>${formatCurrency(item.value1)}</td>
-                        <td>${formatCurrency(item.value2)}</td>
-                        <td class="${changeClass}">${changeSign}${formatCurrency(change)} (${changeSign}${changePercent}%)</td>
+                        <td>${value1Display}</td>
+                        <td>${value2Display}</td>
+                        <td>${changeDisplay}</td>
                     </tr>
                 `;
             }).join('');

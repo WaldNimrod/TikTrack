@@ -10,18 +10,18 @@
 
 | עמוד | NotificationSystem | toggleSection | Button System | FieldRenderer | InfoSummary | Logger | Preferences | Cache | ColorScheme | Icon | PageState | Header |
 |------|-------------------|---------------|--------------|---------------|-------------|--------|-------------|-------|-------------|------|-----------|--------|
-| **trade-history** | ✅ | ✅ | ✅ | ✅ | ❌ | ⏳ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
-| **portfolio-state** | ✅ | ✅ | ⏳ | ❌ | ❌ | ⏳ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
-| **price-history** | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
-| **comparative-analysis** | ✅ | ✅ | ✅ | ❌ | ❌ | ⏳ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
-| **trading-journal** | ✅ | ✅ | ✅ | ✅ | ❌ | ⏳ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
-| **strategy-analysis** | ✅ | ✅ | ⏳ | ❌ | ❌ | ⏳ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
-| **economic-calendar** | ✅ | ✅ | ⏳ | ❌ | ❌ | ⏳ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
-| **history-widget** | ✅ | ✅ | ✅ | ❌ | ❌ | ⏳ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
-| **emotional-tracking** | ✅ | ✅ | ✅ | ❌ | ❌ | ⏳ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
-| **date-comparison-modal** | ✅ | ✅ | ⏳ | ❌ | ❌ | ⏳ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
-| **journal-entry-modal** | ✅ | ✅ | ⏳ | ❌ | ❌ | ⏳ | ⚠️ | ❌ | ⚠️ | ⏳ | ❌ | ✅ |
-| **tradingview-test** | ✅ | ✅ | ⏳ | ❌ | ❌ | ⏳ | ⚠️ | ❌ | ⚠️ | ⏳ | ❌ | ✅ |
+| **trade-history** | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
+| **portfolio-state** | ✅ | ✅ | ⏳ | ✅ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
+| **price-history** | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
+| **comparative-analysis** | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
+| **trading-journal** | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
+| **strategy-analysis** | ✅ | ✅ | ⏳ | ⚠️ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
+| **economic-calendar** | ✅ | ✅ | ⏳ | ⚠️ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
+| **history-widget** | ✅ | ✅ | ✅ | ⚠️ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
+| **emotional-tracking** | ✅ | ✅ | ✅ | ⚠️ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
+| **date-comparison-modal** | ✅ | ✅ | ⏳ | ⚠️ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
+| **journal-entry-modal** | ✅ | ✅ | ⏳ | ⚠️ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ⏳ | ❌ | ✅ |
+| **tradingview-test** | ✅ | ✅ | ⏳ | ⚠️ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ⏳ | ❌ | ✅ |
 
 **סימון:**
 - ✅ = משולב כראוי
@@ -39,9 +39,9 @@
 - **Button System:** ✅ הושלם - כל 12 עמודים (נוסף button-system-init.js לכל העמודים)
 
 ### שלב 2 - אינטגרציות חשובות (4 מערכות):
-- **FieldRendererService:** ⏳ בתהליך - 2/12 עמודים (trade-history, trading-journal)
+- **FieldRendererService:** ✅ הושלם - 12/12 עמודים (כל העמודים טוענים את המערכת, 4 עמודים משתמשים בה בפועל: price-history, portfolio-state, comparative-analysis, trade-history)
 - **InfoSummarySystem:** ❌ לא התחיל
-- **Logger Service:** ⏳ בתהליך - 2/12 עמודים (price-history-page ✅, trade-history-page ⏳)
+- **Logger Service:** ✅ הושלם - 12/12 עמודים
 - **PreferencesCore:** ⚠️ שימוש חלקי - כל העמודים
 
 ### שלב 3 - אינטגרציות אופציונליות (5 מערכות):
@@ -55,9 +55,9 @@
 
 ## הערות
 
-1. **Logger Service:** הוחל על price-history-page.html (29 שימושים). נדרש להמשיך לשאר 11 העמודים (203 שימושים נוספים).
+1. **Logger Service:** ✅ הושלם - כל 12 העמודים. כל השימושים ב-console.* הוחלפו ל-window.Logger.*
 
-2. **FieldRendererService:** trade-history-page.html ו-trading-journal-page.html כבר טוענים את המערכת, אך לא בהכרח משתמשים בה.
+2. **FieldRendererService:** ✅ הושלם - כל 12 העמודים טוענים את המערכת. 4 עמודים משתמשים בה בפועל: price-history-page (סטטיסטיקות שינוי), portfolio-state-page (P/L values, טבלת השוואה), comparative-analysis-page (P/L עם אחוזים), trade-history-page (P/L בטבלה).
 
 3. **PreferencesCore:** כל העמודים טוענים את המערכת, אך חלקם עדיין משתמשים ב-localStorage ישירות.
 

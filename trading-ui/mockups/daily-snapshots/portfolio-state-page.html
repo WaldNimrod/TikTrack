@@ -189,6 +189,12 @@
     <!-- Field Renderer Service -->
     <script src="../../scripts/services/field-renderer-service.js" defer></script>
     
+    <!-- Notification System -->
+    <script src="../../scripts/notification-system.js" defer></script>
+    
+    <!-- Logger Service -->
+    <script src="../../scripts/logger-service.js" defer></script>
+    
     <!-- Action Buttons System -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
 </head>
@@ -652,7 +658,9 @@
                     }
                 }
             } catch (error) {
-                console.warn('Failed to read CSS variable', variableName, error);
+                if (window.Logger) {
+                    window.Logger.warn('Failed to read CSS variable', { variableName, error });
+                }
             }
             return fallback;
         }
@@ -675,7 +683,9 @@
         // Load trading accounts
         async function loadTradingAccounts() {
             try {
-                console.log('🔧 Loading trading accounts...');
+                if (window.Logger) {
+                    window.Logger.info('🔧 Loading trading accounts...', { page: 'portfolio-state-page' });
+                }
                 
                 // Try multiple methods like header system
                 let accounts = [];
@@ -684,9 +694,13 @@
                 if (window.DataImportData?.loadTradingAccountsForImport) {
                     try {
                         accounts = await window.DataImportData.loadTradingAccountsForImport();
-                        console.log(`📊 Loaded ${accounts.length} accounts via DataImportData`);
+                        if (window.Logger) {
+                            window.Logger.info(`📊 Loaded ${accounts.length} accounts via DataImportData`, { page: 'portfolio-state-page' });
+                        }
                     } catch (error) {
-                        console.warn('⚠️ Failed to load accounts via DataImportData, trying fallback', error);
+                        if (window.Logger) {
+                            window.Logger.warn('⚠️ Failed to load accounts via DataImportData, trying fallback', { page: 'portfolio-state-page', error });
+                        }
                     }
                 }
                 
@@ -695,9 +709,13 @@
                     try {
                         await window.loadTradingAccountsFromServer();
                         accounts = window.trading_accountsData || [];
-                        console.log(`📊 Loaded ${accounts.length} accounts via loadTradingAccountsFromServer`);
+                        if (window.Logger) {
+                            window.Logger.info(`📊 Loaded ${accounts.length} accounts via loadTradingAccountsFromServer`, { page: 'portfolio-state-page' });
+                        }
                     } catch (error) {
-                        console.warn('⚠️ Failed to load accounts via loadTradingAccountsFromServer', error);
+                        if (window.Logger) {
+                            window.Logger.warn('⚠️ Failed to load accounts via loadTradingAccountsFromServer', { page: 'portfolio-state-page', error });
+                        }
                     }
                 }
                 
@@ -707,30 +725,40 @@
                     if (response.ok) {
                         const data = await response.json();
                         accounts = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
-                        console.log(`📊 Loaded ${accounts.length} accounts via direct API call`);
+                        if (window.Logger) {
+                            window.Logger.info(`📊 Loaded ${accounts.length} accounts via direct API call`, { page: 'portfolio-state-page' });
+                        }
                     } else {
-                        console.error('❌ Failed to load trading accounts:', response.status, response.statusText);
+                        if (window.Logger) {
+                            window.Logger.error('❌ Failed to load trading accounts', { page: 'portfolio-state-page', status: response.status, statusText: response.statusText });
+                        }
                     }
                 }
                 
                 // Filter only open accounts (same as header system)
                 // במערכת יש רק שלושה סטטוסים: open, closed, cancelled
                 const openAccounts = accounts.filter(account => account.status === 'open');
-                console.log(`📊 Found ${openAccounts.length} open accounts out of ${accounts.length} total`);
+                if (window.Logger) {
+                    window.Logger.info(`📊 Found ${openAccounts.length} open accounts out of ${accounts.length} total`, { page: 'portfolio-state-page' });
+                }
                 
                 allTradingAccounts = openAccounts.map(acc => ({
                     id: acc.id,
                     name: acc.name || acc.account_name || `Account #${acc.id}`
                 })).sort((a, b) => a.name.localeCompare(b.name));
                 
-                console.log(`✅ Processed ${allTradingAccounts.length} trading accounts:`, allTradingAccounts.map(a => a.name));
+                if (window.Logger) {
+                    window.Logger.info(`✅ Processed ${allTradingAccounts.length} trading accounts`, { page: 'portfolio-state-page', accounts: allTradingAccounts.map(a => a.name) });
+                }
                 
                 // Populate account filter menu (same as header system)
                 const accountMenu = document.getElementById('accountFilterMenu');
                 if (accountMenu) {
                     // Remove all items except "הכול"
                     const existingItems = accountMenu.querySelectorAll('.account-filter-item:not([data-value="הכול"])');
-                    console.log(`🧹 Removing ${existingItems.length} existing account items`);
+                    if (window.Logger) {
+                        window.Logger.info(`🧹 Removing ${existingItems.length} existing account items`, { page: 'portfolio-state-page' });
+                    }
                     existingItems.forEach(item => item.remove());
                     
                     // Add all accounts (same as header system)
@@ -742,12 +770,16 @@
                         accountItem.onclick = () => selectAccountOption(account.id.toString());
                         accountItem.innerHTML = `<span class="option-text">${account.name}</span>`;
                         accountMenu.appendChild(accountItem);
-                        console.log(`✅ Added account to menu: ${account.name} (ID: ${account.id})`);
+                        if (window.Logger) {
+                            window.Logger.info(`✅ Added account to menu: ${account.name} (ID: ${account.id})`, { page: 'portfolio-state-page' });
+                        }
                     });
                     
                     // Verify items were added
                     const allItems = accountMenu.querySelectorAll('.account-filter-item');
-                    console.log(`📋 Total items in menu: ${allItems.length} (should be ${allTradingAccounts.length + 1} including "הכול")`);
+                    if (window.Logger) {
+                        window.Logger.info(`📋 Total items in menu: ${allItems.length} (should be ${allTradingAccounts.length + 1} including "הכול")`, { page: 'portfolio-state-page' });
+                    }
                     
                     // Select all accounts by default (select "הכול")
                     const allItem = accountMenu.querySelector('.account-filter-item[data-value="הכול"]');
@@ -758,12 +790,18 @@
                     // Update filter text
                     updateAccountFilterText();
                     
-                    console.log(`✅ Loaded ${allTradingAccounts.length} trading accounts for filter`);
+                    if (window.Logger) {
+                        window.Logger.info(`✅ Loaded ${allTradingAccounts.length} trading accounts for filter`, { page: 'portfolio-state-page' });
+                    }
                 } else {
-                    console.error('❌ accountFilterMenu not found!');
+                    if (window.Logger) {
+                        window.Logger.error('❌ accountFilterMenu not found!', { page: 'portfolio-state-page' });
+                    }
                 }
             } catch (error) {
-                console.error('❌ Error loading trading accounts:', error);
+                if (window.Logger) {
+                    window.Logger.error('❌ Error loading trading accounts', { page: 'portfolio-state-page', error });
+                }
             }
         }
         
@@ -1117,7 +1155,9 @@
                     }
                 }
             } else {
-                console.warn('⚠️ Account item not found for:', accountStr);
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Account item not found', { page: 'portfolio-state-page', accountStr });
+                }
             }
             
             updateAccountFilterText();
@@ -1275,7 +1315,9 @@
                     try {
                         chartPrefs = await window.getGroupPreferences('ui').catch(() => null);
                     } catch (e) {
-                        console.warn('Error loading preferences via getGroupPreferences:', e);
+                        if (window.Logger) {
+                            window.Logger.warn('Error loading preferences via getGroupPreferences', { page: 'portfolio-state-page', error: e });
+                        }
                     }
                 }
                 
@@ -1284,7 +1326,9 @@
                     try {
                         chartPrefs = await window.PreferencesCore.loadGroupPreferences('ui').catch(() => null);
                     } catch (e) {
-                        console.warn('Error loading preferences via PreferencesCore:', e);
+                        if (window.Logger) {
+                            window.Logger.warn('Error loading preferences via PreferencesCore', { page: 'portfolio-state-page', error: e });
+                        }
                     }
                 }
                 
@@ -1293,7 +1337,9 @@
                     try {
                         chartPrefs = await window.PreferencesData.loadPreferenceGroup({ groupName: 'ui' }).catch(() => null);
                     } catch (e) {
-                        console.warn('Error loading preferences via PreferencesData:', e);
+                        if (window.Logger) {
+                            window.Logger.warn('Error loading preferences via PreferencesData', { page: 'portfolio-state-page', error: e });
+                        }
                     }
                 }
                 
@@ -1326,7 +1372,9 @@
                     await setChartPeriod(periodButton, 'both', null);
                 }
             } catch (error) {
-                console.warn('Could not load chart default period from preferences:', error);
+                if (window.Logger) {
+                    window.Logger.warn('Could not load chart default period from preferences', { page: 'portfolio-state-page', error });
+                }
                 // Default to month if preferences fail
                 document.querySelectorAll('[data-onclick*="setChartPeriod(\'month\'"]').forEach(btn => {
                     btn.classList.add('active');
@@ -1441,7 +1489,9 @@
                     }
                 ];
             } catch (error) {
-                console.error('Error loading trades:', error);
+                if (window.Logger) {
+                    window.Logger.error('Error loading trades', { page: 'portfolio-state-page', error });
+                }
                 allTrades = [];
             }
         }
@@ -1740,7 +1790,9 @@
         async function initPortfolioPerformanceChart() {
             const container = document.getElementById('portfolio-performance-chart-container');
             if (!container) {
-                console.warn('Portfolio performance chart container not found');
+                if (window.Logger) {
+                    window.Logger.warn('Portfolio performance chart container not found', { page: 'portfolio-state-page' });
+                }
                 return;
             }
             
@@ -1756,12 +1808,16 @@
             }
             
             if (typeof window.TradingViewChartAdapter === 'undefined') {
-                console.error('❌ TradingViewChartAdapter not available after', maxRetries * 50, 'ms');
+                if (window.Logger) {
+                    window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'portfolio-state-page', timeout: maxRetries * 50 });
+                }
                 return;
             }
             
             if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
-                console.error('❌ LightweightCharts library not available');
+                if (window.Logger) {
+                    window.Logger.error('❌ LightweightCharts library not available', { page: 'portfolio-state-page' });
+                }
                 return;
             }
             
@@ -1770,7 +1826,9 @@
                 try {
                     window.TradingViewChartAdapter.destroyChart(portfolioPerformanceChart);
                 } catch (e) {
-                    console.warn('Error destroying portfolio performance chart:', e);
+                    if (window.Logger) {
+                        window.Logger.warn('Error destroying portfolio performance chart', { page: 'portfolio-state-page', error: e });
+                    }
                 }
                 portfolioPerformanceChart = null;
             }
@@ -1784,7 +1842,9 @@
                 const containerHeight = container.clientHeight || container.offsetHeight || 200;
                 
                 if (containerWidth === 0 || containerHeight === 0) {
-                    console.warn('Portfolio performance chart container has zero dimensions, waiting...');
+                    if (window.Logger) {
+                        window.Logger.warn('Portfolio performance chart container has zero dimensions, waiting...', { page: 'portfolio-state-page' });
+                    }
                     setTimeout(() => initPortfolioPerformanceChart(), 100);
                     return;
                 }
@@ -1886,7 +1946,9 @@
                                 markersPrimitive.setMarkers(markers);
                             }
                         } catch (error) {
-                            console.warn('⚠️ Failed to create markers primitive:', error);
+                            if (window.Logger) {
+                                window.Logger.warn('⚠️ Failed to create markers primitive', { page: 'portfolio-state-page', error });
+                            }
                         }
                     } else if (typeof portfolioPerformanceSeries.setMarkers === 'function') {
                         // Fallback to direct setMarkers if available
@@ -1901,7 +1963,9 @@
                 setupChartSynchronization();
                 
             } catch (error) {
-                console.error('Error creating portfolio performance chart:', error);
+                if (window.Logger) {
+                    window.Logger.error('Error creating portfolio performance chart', { page: 'portfolio-state-page', error });
+                }
                 portfolioPerformanceChart = null;
             }
         }
@@ -1910,7 +1974,9 @@
         async function initPortfolioValueChart() {
             const container = document.getElementById('portfolio-value-chart-container');
             if (!container) {
-                console.warn('Portfolio value chart container not found');
+                if (window.Logger) {
+                    window.Logger.warn('Portfolio value chart container not found', { page: 'portfolio-state-page' });
+                }
                 return;
             }
             
@@ -1926,13 +1992,17 @@
             }
             
             if (typeof window.TradingViewChartAdapter === 'undefined') {
-                console.error('❌ TradingViewChartAdapter not available after', maxRetries * 50, 'ms');
-                console.error('Available window objects:', Object.keys(window).filter(k => k.toLowerCase().includes('chart') || k.toLowerCase().includes('trading')));
+                if (window.Logger) {
+                    const availableObjects = Object.keys(window).filter(k => k.toLowerCase().includes('chart') || k.toLowerCase().includes('trading'));
+                    window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'portfolio-state-page', timeout: maxRetries * 50, availableObjects });
+                }
                 return;
             }
             
             if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
-                console.error('❌ LightweightCharts library not available');
+                if (window.Logger) {
+                    window.Logger.error('❌ LightweightCharts library not available', { page: 'portfolio-state-page' });
+                }
                 return;
             }
             
@@ -1941,7 +2011,9 @@
                 try {
                     window.TradingViewChartAdapter.destroyChart(portfolioValueChart);
                 } catch (e) {
-                    console.warn('Error destroying portfolio value chart:', e);
+                    if (window.Logger) {
+                        window.Logger.warn('Error destroying portfolio value chart', { page: 'portfolio-state-page', error: e });
+                    }
                 }
                 portfolioValueChart = null;
             }
@@ -1954,7 +2026,9 @@
                 const containerHeight = container.clientHeight || container.offsetHeight || 200;
                 
                 if (containerWidth === 0 || containerHeight === 0) {
-                    console.warn('Portfolio value chart container has zero dimensions, waiting...');
+                    if (window.Logger) {
+                        window.Logger.warn('Portfolio value chart container has zero dimensions, waiting...', { page: 'portfolio-state-page' });
+                    }
                     setTimeout(() => initPortfolioValueChart(), 100);
                     return;
                 }
@@ -2081,7 +2155,9 @@
                                 markersPrimitive.setMarkers(markers);
                             }
                         } catch (error) {
-                            console.warn('⚠️ Failed to create markers primitive:', error);
+                            if (window.Logger) {
+                                window.Logger.warn('⚠️ Failed to create markers primitive', { page: 'portfolio-state-page', error });
+                            }
                         }
                     } else if (typeof portfolioValueSeries.setMarkers === 'function') {
                         // Fallback to direct setMarkers if available
@@ -2096,7 +2172,9 @@
                 setupChartSynchronization();
                 
             } catch (error) {
-                console.error('Error creating portfolio value chart:', error);
+                if (window.Logger) {
+                    window.Logger.error('Error creating portfolio value chart', { page: 'portfolio-state-page', error });
+                }
                 portfolioValueChart = null;
             }
         }
@@ -2105,7 +2183,9 @@
         async function initPLTrendChart() {
             const container = document.getElementById('pl-trend-chart-container');
             if (!container) {
-                console.warn('P/L trend chart container not found');
+                if (window.Logger) {
+                    window.Logger.warn('P/L trend chart container not found', { page: 'portfolio-state-page' });
+                }
                 return;
             }
             
@@ -2121,12 +2201,16 @@
             }
             
             if (typeof window.TradingViewChartAdapter === 'undefined') {
-                console.error('❌ TradingViewChartAdapter not available after', maxRetries * 50, 'ms');
+                if (window.Logger) {
+                    window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'portfolio-state-page', timeout: maxRetries * 50 });
+                }
                 return;
             }
             
             if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
-                console.error('❌ LightweightCharts library not available');
+                if (window.Logger) {
+                    window.Logger.error('❌ LightweightCharts library not available', { page: 'portfolio-state-page' });
+                }
                 return;
             }
             
@@ -2135,7 +2219,9 @@
                 try {
                     window.TradingViewChartAdapter.destroyChart(plTrendChart);
                 } catch (e) {
-                    console.warn('Error destroying P/L trend chart:', e);
+                    if (window.Logger) {
+                        window.Logger.warn('Error destroying P/L trend chart', { page: 'portfolio-state-page', error: e });
+                    }
                 }
                 plTrendChart = null;
             }
@@ -2150,7 +2236,9 @@
                 const containerHeight = container.clientHeight || container.offsetHeight || 200;
                 
                 if (containerWidth === 0 || containerHeight === 0) {
-                    console.warn('P/L trend chart container has zero dimensions, waiting...');
+                    if (window.Logger) {
+                        window.Logger.warn('P/L trend chart container has zero dimensions, waiting...', { page: 'portfolio-state-page' });
+                    }
                     setTimeout(() => initPLTrendChart(), 100);
                     return;
                 }
@@ -2333,7 +2421,9 @@
                                 markersPrimitive.setMarkers(markers);
                             }
                         } catch (error) {
-                            console.warn('⚠️ Failed to create markers primitive for P/L chart:', error);
+                            if (window.Logger) {
+                                window.Logger.warn('⚠️ Failed to create markers primitive for P/L chart', { page: 'portfolio-state-page', error });
+                            }
                         }
                     } else if (typeof totalPLSeries.setMarkers === 'function') {
                         // Fallback to direct setMarkers if available
@@ -2348,7 +2438,9 @@
                 setupChartSynchronization();
                 
             } catch (error) {
-                console.error('Error creating P/L trend chart:', error);
+                if (window.Logger) {
+                    window.Logger.error('Error creating P/L trend chart', { page: 'portfolio-state-page', error });
+                }
                 plTrendChart = null;
             }
         }
@@ -2360,7 +2452,9 @@
             if (!portfolioPerformanceChart || !portfolioValueChart || !plTrendChart) {
                 syncSetupAttempts++;
                 if (syncSetupAttempts >= MAX_SYNC_SETUP_ATTEMPTS) {
-                    console.error('Max sync setup attempts reached');
+                    if (window.Logger) {
+                        window.Logger.error('Max sync setup attempts reached', { page: 'portfolio-state-page' });
+                    }
                     return;
                 }
                 setTimeout(setupChartSynchronization, 100);
@@ -2402,7 +2496,9 @@
                             to: sourceRange.to
                         });
                     } catch (error) {
-                        console.error(`Sync error (${direction}):`, error);
+                        if (window.Logger) {
+                            window.Logger.error(`Sync error (${direction})`, { page: 'portfolio-state-page', error });
+                        }
                     } finally {
                         setTimeout(() => { isSyncingCharts = false; }, 50);
                     }
@@ -2464,7 +2560,9 @@
                     try {
                         fn(timeScale);
                     } catch (error) {
-                        console.warn('Error applying to chart:', error);
+                        if (window.Logger) {
+                            window.Logger.warn('Error applying to chart', { page: 'portfolio-state-page', error });
+                        }
                     }
                 });
             }
@@ -3016,7 +3114,9 @@
                 // Initialize preferences if available
                 if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
                     await window.PreferencesCore.initializeWithLazyLoading();
-                    console.log('✅ PreferencesCore initialized');
+                    if (window.Logger) {
+                        window.Logger.info('✅ PreferencesCore initialized', { page: 'portfolio-state-page' });
+                    }
                 }
                 
                 // Wait for preferences to be available in global scope
@@ -3027,20 +3127,30 @@
                 }
                 
                 if (window.currentPreferences || window.__latestPrefs) {
-                    console.log('✅ User preferences available in global scope');
+                    if (window.Logger) {
+                        window.Logger.info('✅ User preferences available in global scope', { page: 'portfolio-state-page' });
+                    }
                 } else {
-                    console.warn('⚠️ User preferences not found in global scope after timeout');
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ User preferences not found in global scope after timeout', { page: 'portfolio-state-page' });
+                    }
                 }
                 
                 // Reload TradingView theme preferences if available
                 if (window.TradingViewTheme && typeof window.TradingViewTheme.loadPreferences === 'function') {
                     await window.TradingViewTheme.loadPreferences();
-                    console.log('✅ TradingView theme preferences reloaded');
+                    if (window.Logger) {
+                        window.Logger.info('✅ TradingView theme preferences reloaded', { page: 'portfolio-state-page' });
+                    }
                 }
                 
-                console.log('✅ User preferences loaded successfully');
+                if (window.Logger) {
+                    window.Logger.info('✅ User preferences loaded successfully', { page: 'portfolio-state-page' });
+                }
             } catch (error) {
-                console.warn('⚠️ Could not load user preferences (non-critical):', error);
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Could not load user preferences (non-critical)', { page: 'portfolio-state-page', error });
+                }
             }
         }
         
@@ -3054,9 +3164,13 @@
             }
             
             if (typeof window.TradingViewChartAdapter === 'undefined') {
-                console.warn('⚠️ Script TradingViewChartAdapter not loaded after timeout');
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Script TradingViewChartAdapter not loaded after timeout', { page: 'portfolio-state-page' });
+                }
             } else {
-                console.log('✅ Script TradingViewChartAdapter loaded');
+                if (window.Logger) {
+                    window.Logger.info('✅ Script TradingViewChartAdapter loaded', { page: 'portfolio-state-page' });
+                }
             }
             
             // LightweightCharts library - check both possible names
@@ -3069,11 +3183,17 @@
             }
             
             if (typeof window.LightweightCharts !== 'undefined') {
-                console.log('✅ Script LightweightCharts loaded');
+                if (window.Logger) {
+                    window.Logger.info('✅ Script LightweightCharts loaded', { page: 'portfolio-state-page' });
+                }
             } else if (typeof window.lightweightCharts !== 'undefined') {
-                console.log('✅ Script lightweightCharts loaded');
+                if (window.Logger) {
+                    window.Logger.info('✅ Script lightweightCharts loaded', { page: 'portfolio-state-page' });
+                }
             } else {
-                console.warn('⚠️ Script LightweightCharts/lightweightCharts not loaded after timeout');
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Script LightweightCharts/lightweightCharts not loaded after timeout', { page: 'portfolio-state-page' });
+                }
             }
         }
         

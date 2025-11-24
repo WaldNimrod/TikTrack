@@ -705,6 +705,12 @@
                         </div>
                     </div>
                     <div class="section-body">
+                        <div id="comparison-chart-series-controls" class="mb-3" style="padding: 12px; background: #f8f9fa; border-radius: 4px; border: 1px solid #dee2e6;">
+                            <div style="margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: #495057;">בחר סדרות להצגה:</div>
+                            <div style="display: flex; gap: 20px; flex-wrap: wrap;" id="series-checkboxes-container">
+                                <!-- Will be populated dynamically -->
+                            </div>
+                        </div>
                         <div id="comparison-chart-legend" class="chart-legend mb-2" style="display: flex; gap: 15px; flex-wrap: wrap; padding: 8px; background: #f8f9fa; border-radius: 4px;">
                             <!-- Legend will be populated dynamically -->
                         </div>
@@ -954,10 +960,121 @@
             }
         }
         
+        // Get entity color dynamically from system
+        function getEntityColor(entityType) {
+            // Try to use color-scheme-system if available
+            if (window.getEntityColor && typeof window.getEntityColor === 'function') {
+                const color = window.getEntityColor(entityType);
+                if (color) return color;
+            }
+            
+            // Try CSS variable
+            const cssVar = getCSSVariableValue(`--entity-${entityType.replace('_', '-')}-color`, '');
+            if (cssVar) return cssVar;
+            
+            // Fallback to default entity colors from color-scheme-system
+            const defaultColors = {
+                'trade': '#26baac',
+                'trade_plan': '#28a745',
+                'execution': '#17a2b8',
+                'account': '#6f42c1',
+                'trading_account': '#28a745',
+                'cash_flow': '#fd7e14',
+                'ticker': '#20c997',
+                'alert': '#dc3545',
+                'note': '#6c757d',
+                'constraint': '#e83e8c',
+                'design': '#6f42c1',
+                'research': '#17a2b8',
+                'preference': '#adb5bd',
+                'development': '#fc5a06',
+                'position': '#0d6efd'
+            };
+            
+            return defaultColors[entityType] || getCSSVariableValue('--primary-color', '#26baac');
+        }
+        
+        // Initialize series checkboxes UI
+        function initializeSeriesControls() {
+            const container = document.getElementById('series-checkboxes-container');
+            if (!container) return;
+            
+            container.innerHTML = AVAILABLE_SERIES.map(series => {
+                const color = getEntityColor(series.entityType);
+                const isChecked = seriesVisibility[series.key] !== false; // Default true
+                return `
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <input type="checkbox" 
+                               id="series-${series.key}" 
+                               class="form-check-input" 
+                               ${isChecked ? 'checked' : ''}
+                               onchange="toggleSeries('${series.key}', this.checked)"
+                               style="cursor: pointer;">
+                        <label for="series-${series.key}" style="cursor: pointer; margin: 0; display: flex; align-items: center; gap: 6px;">
+                            <div style="width: 14px; height: 14px; background-color: ${color}; border-radius: 2px; border: 1px solid rgba(0,0,0,0.1);"></div>
+                            <span style="font-size: 0.85rem;">${series.label}</span>
+                        </label>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Toggle series visibility
+        function toggleSeries(seriesKey, visible) {
+            seriesVisibility[seriesKey] = visible;
+            saveSeriesVisibilityState();
+            updateComparisonChart(getFilterValues());
+        }
+        
+        // Save series visibility state
+        function saveSeriesVisibilityState() {
+            try {
+                localStorage.setItem('comparative-analysis-series-visibility', JSON.stringify(seriesVisibility));
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Failed to save series visibility state', { page: 'comparative-analysis-page', error });
+                }
+            }
+        }
+        
+        // Load series visibility state
+        function loadSeriesVisibilityState() {
+            try {
+                const saved = localStorage.getItem('comparative-analysis-series-visibility');
+                if (saved) {
+                    const savedState = JSON.parse(saved);
+                    Object.keys(savedState).forEach(key => {
+                        if (seriesVisibility.hasOwnProperty(key)) {
+                            seriesVisibility[key] = savedState[key];
+                        }
+                    });
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Failed to load series visibility state', { page: 'comparative-analysis-page', error });
+                }
+            }
+        }
+        
         // Chart variables
         let comparisonChart = null;
-        let plSeries = null;
-        let successRateSeries = null;
+        let chartSeries = {}; // Object to store all series by column key
+        
+        // Available columns/series configuration
+        const AVAILABLE_SERIES = [
+            { key: 'trades', label: 'טריידים', entityType: 'trade', priceScaleId: 'left', format: 'number' },
+            { key: 'avgPL', label: 'P/L ממוצע', entityType: 'execution', priceScaleId: 'right', format: 'currency' },
+            { key: 'totalPL', label: 'P/L כולל', entityType: 'trade', priceScaleId: 'right', format: 'currency' },
+            { key: 'successRate', label: 'אחוז הצלחה', entityType: 'trade_plan', priceScaleId: 'left', format: 'percentage' },
+            { key: 'maxInvestmentAtPoint', label: 'מקס בנקודה', entityType: 'position', priceScaleId: 'right', format: 'currency' },
+            { key: 'totalPurchases', label: 'סה"כ קניות', entityType: 'cash_flow', priceScaleId: 'right', format: 'currency' }
+        ];
+        
+        // Series visibility state (default: all visible)
+        let seriesVisibility = {};
+        AVAILABLE_SERIES.forEach(series => {
+            seriesVisibility[series.key] = true;
+        });
         
         // Filter state - separated into record filters and comparison parameters
         const RECORD_FILTER_STORAGE_KEY = 'comparative-analysis-record-filters';
@@ -976,16 +1093,22 @@
             }
             
             if (typeof window.TradingViewChartAdapter === 'undefined') {
-                console.error('❌ TradingViewChartAdapter not available after', maxRetries * 50, 'ms');
+                if (window.Logger) {
+                    window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'comparative-analysis-page', timeout: maxRetries * 50 });
+                }
                 throw new Error('TradingViewChartAdapter not loaded');
             }
             
             if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
-                console.error('❌ LightweightCharts not available after', maxRetries * 50, 'ms');
+                if (window.Logger) {
+                    window.Logger.error('❌ LightweightCharts not available', { page: 'comparative-analysis-page', timeout: maxRetries * 50 });
+                }
                 throw new Error('LightweightCharts not loaded');
             }
             
-            console.log('✅ TradingView libraries loaded');
+            if (window.Logger) {
+                window.Logger.info('✅ TradingView libraries loaded', { page: 'comparative-analysis-page' });
+            }
         }
         
         // Get current record filter values (for filtering which trades to include)
@@ -1350,7 +1473,9 @@
                 const filters = getFilterValues();
                 localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
             } catch (error) {
-                console.warn('Failed to save filter state:', error);
+                if (window.Logger) {
+                    window.Logger.warn('Failed to save filter state', { page: 'comparative-analysis-page', error });
+                }
             }
         }
         
@@ -1436,7 +1561,9 @@
                     }
                 }
             } catch (error) {
-                console.warn('Failed to load filter state:', error);
+                if (window.Logger) {
+                    window.Logger.warn('Failed to load filter state', { page: 'comparative-analysis-page', error });
+                }
             }
         }
         
@@ -1692,45 +1819,48 @@
             };
         }
         
-        // Generate mock P/L by category data for Bar Chart (with positive/negative colors)
-        function generateMockPLByCategoryData(filters) {
+        // Generate mock data for all series by column
+        function generateMockSeriesData(filters, seriesKey) {
             const tableResult = generateMockComparisonTableData(filters);
             const tableData = tableResult.data;
             const data = [];
             
-            // Create grouped bars: for each category, create two time points (one for P/L, one for Success Rate)
-            // P/L bars will be at time: index * 2, Success Rate bars at time: index * 2 + 0.5
-            tableData.forEach((cat, index) => {
+            // Find series config
+            const seriesConfig = AVAILABLE_SERIES.find(s => s.key === seriesKey);
+            if (!seriesConfig) return { data: [], categories: [] };
+            
+            // Calculate time offset for grouped bars
+            // Each category gets a time slot, and each series within a category gets an offset
+            const seriesIndex = AVAILABLE_SERIES.findIndex(s => s.key === seriesKey);
+            const visibleSeries = AVAILABLE_SERIES.filter(s => seriesVisibility[s.key] !== false);
+            const visibleIndex = visibleSeries.findIndex(s => s.key === seriesKey);
+            const totalVisible = visibleSeries.length;
+            
+            tableData.forEach((cat, catIndex) => {
+                // Base time for category - each category gets a time slot
+                // Space between categories: totalVisible + 1 (to allow spacing)
+                const baseTime = catIndex * (totalVisible + 1);
+                // Offset within category (spread bars evenly within the category slot)
+                // Each visible series gets an offset: 0, 1, 2, ... (totalVisible - 1)
+                const timeOffset = visibleIndex;
+                const time = (baseTime + timeOffset).toString();
+                
+                let value = cat[seriesKey];
+                if (value === undefined || value === null) {
+                    // Handle missing values
+                    value = 0;
+                }
+                
                 data.push({
-                    time: (index * 2).toString(), // P/L bar position
-                    value: cat.totalPL
-                    // No color - will use series color
+                    time: time,
+                    value: value
                 });
             });
             
             return {
                 data,
-                categories: tableData.map(cat => cat.name)
-            };
-        }
-        
-        // Generate mock success rate data for Bar Chart
-        function generateMockSuccessRateData(filters) {
-            const tableResult = generateMockComparisonTableData(filters);
-            const tableData = tableResult.data;
-            
-            const data = [];
-            // Success Rate bars will be at time: index * 2 + 0.5 (next to P/L bars)
-            tableData.forEach((cat, index) => {
-                data.push({
-                    time: (index * 2 + 0.5).toString(), // Success Rate bar position (next to P/L)
-                    value: cat.successRate
-                });
-            });
-            
-            return {
-                data,
-                categories: tableData.map(cat => cat.name)
+                categories: tableData.map(cat => cat.name),
+                seriesConfig: seriesConfig
             };
         }
         
@@ -2349,7 +2479,9 @@
         // Filter by category
         function filterByCategory(category) {
             // This is a placeholder - in a real implementation, this would filter the data
-            console.log('Filtering by category:', category);
+            if (window.Logger) {
+                window.Logger.info('Filtering by category', { page: 'comparative-analysis-page', category });
+            }
             // For now, just show a notification
             if (window.showNotification) {
                 window.showNotification(`מסנן לפי קטגוריה: ${category}`, 'info');
@@ -2363,7 +2495,9 @@
                 
                 const container = document.getElementById('comparison-chart-container');
                 if (!container) {
-                    console.error('Comparison chart container not found');
+                    if (window.Logger) {
+                        window.Logger.error('Comparison chart container not found', { page: 'comparative-analysis-page' });
+                    }
                     return;
                 }
                 
@@ -2380,13 +2514,13 @@
                             comparisonChart.remove();
                         }
                     } catch (e) {
-                        console.warn('Error removing existing comparison chart:', e);
+                        if (window.Logger) {
+                            window.Logger.warn('Error removing existing comparison chart', { page: 'comparative-analysis-page', error: e });
+                        }
                     }
                 }
                 
                 const filters = getFilterValues();
-                const plData = generateMockPLByCategoryData(filters);
-                const successRateData = generateMockSuccessRateData(filters);
                 
                 // Create chart with dual price scales
                 comparisonChart = window.TradingViewChartAdapter.createChart(container, {
@@ -2424,102 +2558,109 @@
                     }
                 });
                 
-                // Add bar series - one series for P/L, one for Success Rate
-                // Use grouped bars: P/L at time index*2, Success Rate at time index*2+0.5
+                // Clear existing series - remove all series we've stored
+                Object.values(chartSeries).forEach(series => {
+                    if (series) {
+                        try {
+                            comparisonChart.removeSeries(series);
+                        } catch (e) {
+                            if (window.Logger) {
+                                window.Logger.warn('Error removing series', { page: 'comparative-analysis-page', error: e });
+                            }
+                        }
+                    }
+                });
+                chartSeries = {};
+                
+                // Add series for each visible column
                 const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
+                const visibleSeries = AVAILABLE_SERIES.filter(s => seriesVisibility[s.key] !== false);
+                let categories = [];
+                
                 if (lightweightCharts && lightweightCharts.HistogramSeries) {
-                    // Single P/L series (all values, one color) - right scale
-                    if (plData.data.length > 0) {
-                        plSeries = comparisonChart.addSeries(lightweightCharts.HistogramSeries, {
-                            color: getCSSVariableValue('--primary-color', '#26baac'), // Single color for all P/L values
-                            priceFormat: {
-                                type: 'price',
-                                precision: 0,
-                                minMove: 1
-                            },
-                            title: 'P/L כולל',
-                            priceScaleId: 'right',
-                            baseLineVisible: false
-                        });
-                        plSeries.setData(plData.data);
-                    }
-                    
-                    // Success Rate series (blue) - left scale
-                    // Success Rate bars are at time: index * 2 + 0.5 (next to P/L bars)
-                    if (successRateData.data.length > 0) {
-                        successRateSeries = comparisonChart.addSeries(lightweightCharts.HistogramSeries, {
-                            color: '#28a745', // Green for success rate
-                            priceFormat: {
-                                type: 'price',
-                                precision: 0,
-                                minMove: 1
-                            },
-                            title: 'אחוז הצלחה',
-                            priceScaleId: 'left',
-                            baseLineVisible: false
-                        });
-                        successRateSeries.setData(successRateData.data);
-                    }
+                    visibleSeries.forEach(seriesConfig => {
+                        const seriesData = generateMockSeriesData(filters, seriesConfig.key);
+                        if (seriesData.data.length > 0) {
+                            if (categories.length === 0) {
+                                categories = seriesData.categories;
+                            }
+                            
+                            const color = getEntityColor(seriesConfig.entityType);
+                            const series = comparisonChart.addSeries(lightweightCharts.HistogramSeries, {
+                                color: color,
+                                priceFormat: {
+                                    type: 'price',
+                                    precision: seriesConfig.format === 'percentage' ? 1 : 0,
+                                    minMove: seriesConfig.format === 'percentage' ? 0.1 : 1
+                                },
+                                title: seriesConfig.label,
+                                priceScaleId: seriesConfig.priceScaleId,
+                                baseLineVisible: false
+                            });
+                            series.setData(seriesData.data);
+                            chartSeries[seriesConfig.key] = series;
+                        }
+                    });
                 } else {
                     // Fallback: use area series
-                    if (plData.data.length > 0) {
-                        plSeries = window.TradingViewChartAdapter.addAreaSeries(comparisonChart, {
-                            lineColor: getCSSVariableValue('--primary-color', '#26baac'),
-                            topColor: getCSSVariableValue('--primary-color', '#26baac'),
-                            bottomColor: getCSSVariableValue('--primary-color', '#26baac') + '28',
-                            priceFormat: {
-                                type: 'price',
-                                precision: 0,
-                                minMove: 1
-                            },
-                            title: 'P/L כולל',
-                            priceScaleId: 'right'
-                        });
-                        plSeries.setData(plData.data);
-                    }
-                    
-                    if (successRateData.data.length > 0) {
-                        successRateSeries = window.TradingViewChartAdapter.addAreaSeries(comparisonChart, {
-                            lineColor: '#28a745',
-                            topColor: '#28a745',
-                            bottomColor: '#28a745' + '28',
-                            priceFormat: {
-                                type: 'price',
-                                precision: 0,
-                                minMove: 1
-                            },
-                            title: 'אחוז הצלחה',
-                            priceScaleId: 'left'
-                        });
-                        successRateSeries.setData(successRateData.data);
-                    }
+                    visibleSeries.forEach(seriesConfig => {
+                        const seriesData = generateMockSeriesData(filters, seriesConfig.key);
+                        if (seriesData.data.length > 0) {
+                            if (categories.length === 0) {
+                                categories = seriesData.categories;
+                            }
+                            
+                            const color = getEntityColor(seriesConfig.entityType);
+                            const series = window.TradingViewChartAdapter.addAreaSeries(comparisonChart, {
+                                lineColor: color,
+                                topColor: color,
+                                bottomColor: color + '28',
+                                priceFormat: {
+                                    type: 'price',
+                                    precision: seriesConfig.format === 'percentage' ? 1 : 0,
+                                    minMove: seriesConfig.format === 'percentage' ? 0.1 : 1
+                                },
+                                title: seriesConfig.label,
+                                priceScaleId: seriesConfig.priceScaleId
+                            });
+                            series.setData(seriesData.data);
+                            chartSeries[seriesConfig.key] = series;
+                        }
+                    });
                 }
                 
                 // Update legend
-                updateChartLegend(plData, successRateData);
+                updateChartLegend();
                 
                 // Set custom time formatter to show category names (centered for each category group)
-                const categories = plData.categories || [];
-                comparisonChart.timeScale().applyOptions({
-                    timeVisible: true,
-                    tickMarkFormatter: (time, tickMarkType, locale) => {
-                        const timeNum = parseFloat(time);
-                        const categoryIndex = Math.floor(timeNum / 2);
-                        // Only show label at the center of each category group (at time index*2 + 1)
-                        if (Math.abs(timeNum - (categoryIndex * 2 + 1)) < 0.1) {
-                            if (categoryIndex >= 0 && categoryIndex < categories.length) {
-                                return categories[categoryIndex];
+                if (categories.length > 0) {
+                    const visibleCount = visibleSeries.length;
+                    comparisonChart.timeScale().applyOptions({
+                        timeVisible: true,
+                        tickMarkFormatter: (time, tickMarkType, locale) => {
+                            const timeNum = parseFloat(time);
+                            const categoryIndex = Math.floor(timeNum / (visibleCount + 1));
+                            // Only show label at the center of each category group
+                            const centerTime = categoryIndex * (visibleCount + 1) + (visibleCount / 2);
+                            if (Math.abs(timeNum - centerTime) < 0.1) {
+                                if (categoryIndex >= 0 && categoryIndex < categories.length) {
+                                    return categories[categoryIndex];
+                                }
                             }
+                            return '';
                         }
-                        return '';
-                    }
-                });
+                    });
+                }
                 
                 comparisonChart.timeScale().fitContent();
-                console.log('✅ Comparison chart initialized');
+                if (window.Logger) {
+                    window.Logger.info('✅ Comparison chart initialized', { page: 'comparative-analysis-page' });
+                }
                 
             } catch (error) {
-                console.error('Error initializing comparison chart:', error);
+                if (window.Logger) {
+                    window.Logger.error('Error initializing comparison chart', { page: 'comparative-analysis-page', error });
+                }
                 const container = document.getElementById('comparison-chart-container');
                 if (container) {
                     const loading = container.querySelector('.chart-loading');
@@ -2532,32 +2673,24 @@
         }
         
         // Update chart legend
-        function updateChartLegend(plData, successRateData) {
+        function updateChartLegend() {
             const legend = document.getElementById('comparison-chart-legend');
             if (!legend) return;
             
             const legendItems = [];
             
-            // P/L Series (single color)
-            if (plData.data.length > 0) {
-                const primaryColor = getCSSVariableValue('--primary-color', '#26baac');
-                legendItems.push(`
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <div style="width: 16px; height: 16px; background-color: ${primaryColor}; border-radius: 2px;"></div>
-                        <span style="font-size: 0.9rem;"><strong>P/L כולל</strong></span>
-                    </div>
-                `);
-            }
-            
-            // Success Rate
-            if (successRateData.data.length > 0) {
-                legendItems.push(`
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <div style="width: 16px; height: 16px; background-color: #28a745; border-radius: 2px;"></div>
-                        <span style="font-size: 0.9rem;"><strong>אחוז הצלחה</strong></span>
-                    </div>
-                `);
-            }
+            // Add legend item for each visible series
+            AVAILABLE_SERIES.forEach(seriesConfig => {
+                if (seriesVisibility[seriesConfig.key] !== false && chartSeries[seriesConfig.key]) {
+                    const color = getEntityColor(seriesConfig.entityType);
+                    legendItems.push(`
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <div style="width: 16px; height: 16px; background-color: ${color}; border-radius: 2px;"></div>
+                            <span style="font-size: 0.9rem;"><strong>${seriesConfig.label}</strong></span>
+                        </div>
+                    `);
+                }
+            });
             
             legend.innerHTML = legendItems.join('');
         }
@@ -2587,52 +2720,49 @@
             }
             
             try {
-                const plData = generateMockPLByCategoryData(filters);
-                const successRateData = generateMockSuccessRateData(filters);
+                // Clear existing series - remove all series we've stored
+                Object.values(chartSeries).forEach(series => {
+                    if (series) {
+                        try {
+                            comparisonChart.removeSeries(series);
+                        } catch (e) {
+                            if (window.Logger) {
+                                window.Logger.warn('Error removing series', { page: 'comparative-analysis-page', error: e });
+                            }
+                        }
+                    }
+                });
+                chartSeries = {};
                 
-                // Remove all existing series
+                // Add series for each visible column
                 const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
+                const visibleSeries = AVAILABLE_SERIES.filter(s => seriesVisibility[s.key] !== false);
+                let categories = [];
+                
                 if (lightweightCharts && lightweightCharts.HistogramSeries) {
-                    // Remove all series
-                    const allSeries = comparisonChart.series();
-                    allSeries.forEach(series => comparisonChart.removeSeries(series));
-                    
-                    // Reset series references
-                    plSeries = null;
-                    successRateSeries = null;
-                    
-                    // Single P/L series (all values, one color) - right scale
-                    if (plData.data.length > 0) {
-                        plSeries = comparisonChart.addSeries(lightweightCharts.HistogramSeries, {
-                            color: getCSSVariableValue('--primary-color', '#26baac'),
-                            priceFormat: {
-                                type: 'price',
-                                precision: 0,
-                                minMove: 1
-                            },
-                            title: 'P/L כולל',
-                            priceScaleId: 'right',
-                            baseLineVisible: false
-                        });
-                        plSeries.setData(plData.data);
-                    }
-                    
-                    // Success Rate series (green) - left scale
-                    // Success Rate bars are at time: index * 2 + 0.5 (next to P/L bars)
-                    if (successRateData.data.length > 0) {
-                        successRateSeries = comparisonChart.addSeries(lightweightCharts.HistogramSeries, {
-                            color: '#28a745',
-                            priceFormat: {
-                                type: 'price',
-                                precision: 0,
-                                minMove: 1
-                            },
-                            title: 'אחוז הצלחה',
-                            priceScaleId: 'left',
-                            baseLineVisible: false
-                        });
-                        successRateSeries.setData(successRateData.data);
-                    }
+                    visibleSeries.forEach(seriesConfig => {
+                        const seriesData = generateMockSeriesData(filters, seriesConfig.key);
+                        if (seriesData.data.length > 0) {
+                            if (categories.length === 0) {
+                                categories = seriesData.categories;
+                            }
+                            
+                            const color = getEntityColor(seriesConfig.entityType);
+                            const series = comparisonChart.addSeries(lightweightCharts.HistogramSeries, {
+                                color: color,
+                                priceFormat: {
+                                    type: 'price',
+                                    precision: seriesConfig.format === 'percentage' ? 1 : 0,
+                                    minMove: seriesConfig.format === 'percentage' ? 0.1 : 1
+                                },
+                                title: seriesConfig.label,
+                                priceScaleId: seriesConfig.priceScaleId,
+                                baseLineVisible: false
+                            });
+                            series.setData(seriesData.data);
+                            chartSeries[seriesConfig.key] = series;
+                        }
+                    });
                 } else {
                     // Fallback: reinitialize chart
                     initComparisonChart();
@@ -2640,28 +2770,33 @@
                 }
                 
                 // Update legend
-                updateChartLegend(plData, successRateData);
+                updateChartLegend();
                 
                 // Set custom time formatter to show category names (centered for each category group)
-                const categories = plData.categories || [];
-                comparisonChart.timeScale().applyOptions({
-                    timeVisible: true,
-                    tickMarkFormatter: (time, tickMarkType, locale) => {
-                        const timeNum = parseFloat(time);
-                        const categoryIndex = Math.floor(timeNum / 2);
-                        // Only show label at the center of each category group (at time index*2 + 1)
-                        if (Math.abs(timeNum - (categoryIndex * 2 + 1)) < 0.1) {
-                            if (categoryIndex >= 0 && categoryIndex < categories.length) {
-                                return categories[categoryIndex];
+                if (categories.length > 0) {
+                    const visibleCount = visibleSeries.length;
+                    comparisonChart.timeScale().applyOptions({
+                        timeVisible: true,
+                        tickMarkFormatter: (time, tickMarkType, locale) => {
+                            const timeNum = parseFloat(time);
+                            const categoryIndex = Math.floor(timeNum / (visibleCount + 1));
+                            // Only show label at the center of each category group
+                            const centerTime = categoryIndex * (visibleCount + 1) + (visibleCount / 2);
+                            if (Math.abs(timeNum - centerTime) < 0.1) {
+                                if (categoryIndex >= 0 && categoryIndex < categories.length) {
+                                    return categories[categoryIndex];
+                                }
                             }
+                            return '';
                         }
-                        return '';
-                    }
-                });
+                    });
+                }
                 
                 comparisonChart.timeScale().fitContent();
             } catch (error) {
-                console.error('Error updating comparison chart:', error);
+                if (window.Logger) {
+                    window.Logger.error('Error updating comparison chart', { page: 'comparative-analysis-page', error });
+                }
                 // Fallback: reinitialize
                 initComparisonChart();
             }
@@ -2721,6 +2856,7 @@
         // Make functions globally available
         window.selectAllOptions = selectAllOptions;
         window.clearAllOptions = clearAllOptions;
+        window.toggleSeries = toggleSeries;
         
         // ===== Side Filter Functions =====
         function toggleSideFilterMenu() {
@@ -3249,9 +3385,13 @@
                     }
                 }
                 
-                console.log('✅ Trading accounts loaded');
+                if (window.Logger) {
+                    window.Logger.info('✅ Trading accounts loaded', { page: 'comparative-analysis-page' });
+                }
             } catch (error) {
-                console.error('❌ Error loading trading accounts:', error);
+                if (window.Logger) {
+                    window.Logger.error('❌ Error loading trading accounts', { page: 'comparative-analysis-page', error });
+                }
                 // Mock data fallback
                 const select = document.getElementById('recordFilterTradingAccounts');
                 if (select) {
@@ -3285,7 +3425,9 @@
                             select.innerHTML = methods.map(method => 
                                 `<option value="${method.id}">${method.name_he || method.name || `Method #${method.id}`}</option>`
                             ).join('');
-                            console.log('✅ Trading methods loaded via ConditionsCRUDManager');
+                            if (window.Logger) {
+                                window.Logger.info('✅ Trading methods loaded via ConditionsCRUDManager', { page: 'comparative-analysis-page' });
+                            }
                             return;
                         }
                     } catch (crudError) {
@@ -3305,7 +3447,9 @@
                     <option value="5">דפוסים טכניים</option>
                     <option value="6">פיבונאצ'י</option>
                 `;
-                console.log('✅ Trading methods loaded (mock data)');
+                if (window.Logger) {
+                    window.Logger.info('✅ Trading methods loaded (mock data)', { page: 'comparative-analysis-page' });
+                }
             } catch (error) {
                 // Silent fallback to mock data
                 const select = document.getElementById('comparisonTradingMethods');
@@ -3354,9 +3498,13 @@
                     }
                 }
                 
-                console.log('✅ Tickers loaded');
+                if (window.Logger) {
+                    window.Logger.info('✅ Tickers loaded', { page: 'comparative-analysis-page' });
+                }
             } catch (error) {
-                console.error('❌ Error loading tickers:', error);
+                if (window.Logger) {
+                    window.Logger.error('❌ Error loading tickers', { page: 'comparative-analysis-page', error });
+                }
                 // Mock data fallback
                 const select = document.getElementById('comparisonTickers');
                 if (select) {
@@ -3377,7 +3525,9 @@
                 const filters = getRecordFilterValues();
                 localStorage.setItem(RECORD_FILTER_STORAGE_KEY, JSON.stringify(filters));
             } catch (error) {
-                console.warn('Failed to save record filter state:', error);
+                if (window.Logger) {
+                    window.Logger.warn('Failed to save record filter state', { page: 'comparative-analysis-page', error });
+                }
             }
         }
         
@@ -3390,7 +3540,9 @@
                 // Restore filters (implementation similar to loadFilterState)
                 // ... (to be implemented if needed)
             } catch (error) {
-                console.warn('Failed to load record filter state:', error);
+                if (window.Logger) {
+                    window.Logger.warn('Failed to load record filter state', { page: 'comparative-analysis-page', error });
+                }
             }
         }
         
@@ -3399,7 +3551,9 @@
                 const params = getComparisonParameterValues();
                 localStorage.setItem(COMPARISON_PARAMS_STORAGE_KEY, JSON.stringify(params));
             } catch (error) {
-                console.warn('Failed to save comparison parameter state:', error);
+                if (window.Logger) {
+                    window.Logger.warn('Failed to save comparison parameter state', { page: 'comparative-analysis-page', error });
+                }
             }
         }
         
@@ -3412,7 +3566,9 @@
                 // Restore parameters (implementation similar to loadFilterState)
                 // ... (to be implemented if needed)
             } catch (error) {
-                console.warn('Failed to load comparison parameter state:', error);
+                if (window.Logger) {
+                    window.Logger.warn('Failed to load comparison parameter state', { page: 'comparative-analysis-page', error });
+                }
             }
         }
         
@@ -3636,7 +3792,9 @@
         async function initializeTagsFilter() {
             const tagsSelect = document.getElementById('filterTags');
             if (!tagsSelect) {
-                console.warn('⚠️ Tags filter select not found');
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Tags filter select not found', { page: 'comparative-analysis-page' });
+                }
                 return;
             }
             
@@ -3649,7 +3807,9 @@
             }
             
             if (!window.TagUIManager) {
-                console.warn('⚠️ TagUIManager not available after waiting');
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ TagUIManager not available after waiting', { page: 'comparative-analysis-page' });
+                }
                 return;
             }
             
@@ -3657,12 +3817,18 @@
                 // Initialize the tag select
                 if (typeof window.TagUIManager.refreshSelectOptions === 'function') {
                     await window.TagUIManager.refreshSelectOptions(tagsSelect);
-                    console.log('✅ Tags filter initialized');
+                    if (window.Logger) {
+                        window.Logger.info('✅ Tags filter initialized', { page: 'comparative-analysis-page' });
+                    }
                 } else {
-                    console.warn('⚠️ TagUIManager.refreshSelectOptions not available');
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ TagUIManager.refreshSelectOptions not available', { page: 'comparative-analysis-page' });
+                    }
                 }
             } catch (error) {
-                console.error('❌ Error initializing tags filter:', error);
+                if (window.Logger) {
+                    window.Logger.error('❌ Error initializing tags filter', { page: 'comparative-analysis-page', error });
+                }
             }
         }
         
@@ -3670,7 +3836,9 @@
         async function initializeRecordFilterTags() {
             const tagsSelect = document.getElementById('recordFilterTags');
             if (!tagsSelect) {
-                console.warn('⚠️ Record filter tags select not found');
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Record filter tags select not found', { page: 'comparative-analysis-page' });
+                }
                 return;
             }
             
@@ -3683,7 +3851,9 @@
             }
             
             if (!window.TagUIManager) {
-                console.warn('⚠️ TagUIManager not available after waiting');
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ TagUIManager not available after waiting', { page: 'comparative-analysis-page' });
+                }
                 return;
             }
             
@@ -3691,12 +3861,18 @@
                 // Initialize the tag select
                 if (typeof window.TagUIManager.refreshSelectOptions === 'function') {
                     await window.TagUIManager.refreshSelectOptions(tagsSelect);
-                    console.log('✅ Record filter tags initialized');
+                    if (window.Logger) {
+                        window.Logger.info('✅ Record filter tags initialized', { page: 'comparative-analysis-page' });
+                    }
                 } else {
-                    console.warn('⚠️ TagUIManager.refreshSelectOptions not available');
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ TagUIManager.refreshSelectOptions not available', { page: 'comparative-analysis-page' });
+                    }
                 }
             } catch (error) {
-                console.error('❌ Error initializing record filter tags:', error);
+                if (window.Logger) {
+                    window.Logger.error('❌ Error initializing record filter tags', { page: 'comparative-analysis-page', error });
+                }
             }
         }
         
@@ -3704,7 +3880,9 @@
         async function initializeComparisonTags() {
             const tagsSelect = document.getElementById('comparisonTags');
             if (!tagsSelect) {
-                console.warn('⚠️ Comparison tags select not found');
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Comparison tags select not found', { page: 'comparative-analysis-page' });
+                }
                 return;
             }
             
@@ -3717,7 +3895,9 @@
             }
             
             if (!window.TagUIManager) {
-                console.warn('⚠️ TagUIManager not available after waiting');
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ TagUIManager not available after waiting', { page: 'comparative-analysis-page' });
+                }
                 return;
             }
             
@@ -3725,12 +3905,18 @@
                 // Initialize the tag select
                 if (typeof window.TagUIManager.refreshSelectOptions === 'function') {
                     await window.TagUIManager.refreshSelectOptions(tagsSelect);
-                    console.log('✅ Comparison tags initialized');
+                    if (window.Logger) {
+                        window.Logger.info('✅ Comparison tags initialized', { page: 'comparative-analysis-page' });
+                    }
                 } else {
-                    console.warn('⚠️ TagUIManager.refreshSelectOptions not available');
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ TagUIManager.refreshSelectOptions not available', { page: 'comparative-analysis-page' });
+                    }
                 }
             } catch (error) {
-                console.error('❌ Error initializing comparison tags:', error);
+                if (window.Logger) {
+                    window.Logger.error('❌ Error initializing comparison tags', { page: 'comparative-analysis-page', error });
+                }
             }
         }
         
@@ -3799,6 +3985,12 @@
                     loadComparisonParameterState();
                 }
                 
+                // Load series visibility state
+                loadSeriesVisibilityState();
+                
+                // Initialize series controls UI
+                initializeSeriesControls();
+                
                 // Initialize chart
                 await initComparisonChart();
                 
@@ -3811,10 +4003,14 @@
                     exportBtn.addEventListener('click', exportComparativeAnalysis);
                 }
                 
-                console.log('✅ Comparative analysis page initialized');
+                if (window.Logger) {
+                    window.Logger.info('✅ Comparative analysis page initialized', { page: 'comparative-analysis-page' });
+                }
                 
             } catch (error) {
-                console.error('Error initializing page:', error);
+                if (window.Logger) {
+                    window.Logger.error('Error initializing page', { page: 'comparative-analysis-page', error });
+                }
             }
         });
     </script>

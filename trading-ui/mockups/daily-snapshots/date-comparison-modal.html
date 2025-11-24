@@ -31,6 +31,9 @@
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
     
+    <!-- Logger Service -->
+    <script src="../../scripts/logger-service.js" defer></script>
+    
     <!-- Preferences System -->
     <script src="../../scripts/services/preferences-data.js" defer></script>
     <script src="../../scripts/preferences-core-new.js" defer></script>
@@ -330,7 +333,9 @@
                     await window.PreferencesCore.initializeWithLazyLoading();
                 }
             } catch (error) {
-                console.warn('Preferences initialization failed (non-critical):', error);
+                if (window.Logger) {
+                    window.Logger.warn('Preferences initialization failed (non-critical)', { page: 'date-comparison-modal', error });
+                }
             }
         });
     </script>

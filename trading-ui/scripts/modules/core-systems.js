@@ -5127,6 +5127,19 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
         },
       ],
     },
+
+    'tradingview-widgets-showcase': {
+      name: 'TradingView Widgets Showcase',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          console.log('🎯 Initializing TradingView Widgets Showcase...');
+          console.log('✅ TradingView Widgets Showcase initialized');
+        },
+      ],
+    },
   };
 
   // ===== CONFIGURATION HELPER FUNCTIONS =====

@@ -67,7 +67,7 @@ class ColorManager {
   constructor() {
     this.colorCache = new Map();
     this.colorGroups = {
-      'chart': ['chartBackgroundColor', 'chartBorderColor', 'chartGridColor', 'chartPointColor', 'chartPrimaryColor', 'chartTextColor'],
+      'chart': ['chartBackgroundColor', 'chartBorderColor', 'chartGridColor', 'chartPointColor', 'chartPrimaryColor', 'chartSecondaryColor', 'chartTextColor'],
       'entity': ['entityAlertColor', 'entityAlertColorDark', 'entityAlertColorLight', 'entityInfoColor', 'entityInfoColorDark', 'entityInfoColorLight', 'entityNoteColor', 'entityNoteColorDark', 'entityNoteColorLight', 'entityTradeColor', 'entityTradeColorDark', 'entityTradeColorLight', 'entityTickerColor', 'entityTickerColorDark', 'entityTickerColorLight', 'entityExecutionColor', 'entityExecutionColorDark', 'entityExecutionColorLight', 'entityTradingAccountColor', 'entityTradingAccountColorDark', 'entityTradingAccountColorLight', 'entityTradePlanColor', 'entityTradePlanColorDark', 'entityTradePlanColorLight', 'entityCashFlowColor', 'entityCashFlowColorDark', 'entityCashFlowColorLight', 'entityPreferencesColor', 'entityPreferencesColorDark', 'entityPreferencesColorLight', 'entityResearchColor', 'entityResearchColorDark', 'entityResearchColorLight'],
       'status': ['statusOpenColor', 'statusClosedColor', 'statusCancelledColor'],
       'value': ['valuePositiveColor', 'valueNegativeColor', 'valueNeutralColor', 'valuePositiveColorLight', 'valuePositiveColorDark', 'valueNegativeColorLight', 'valueNegativeColorDark', 'valueNeutralColorLight', 'valueNeutralColorDark'],
@@ -83,6 +83,7 @@ class ColorManager {
       'chartGridColor': '#f0f0f0',
       'chartPointColor': '#26baac',
       'chartPrimaryColor': '#1a8f83',
+      'chartSecondaryColor': '#fc5a06',
       'chartTextColor': '#333333',
 
       // Entity colors

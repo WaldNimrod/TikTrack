@@ -1723,6 +1723,49 @@ const PACKAGE_MANIFEST = {
     ],
     estimatedSize: '~20KB',
     initTime: '~10ms'
+  },
+
+  // 21. TRADINGVIEW WIDGETS PACKAGE - ווידג'טים של TradingView
+  'tradingview-widgets': {
+    id: 'tradingview-widgets',
+    name: 'TradingView Widgets Package',
+    description: 'מערכת מרכזית לניהול ווידג'טים של TradingView',
+    version: '1.0.0',
+    critical: false,
+    loadOrder: 21,
+    dependencies: ['base', 'preferences'],
+    scripts: [
+      {
+        file: 'tradingview-widgets/tradingview-widgets-config.js',
+        globalCheck: 'window.TradingViewWidgetsConfig',
+        description: 'הגדרות ווידג'טים',
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'tradingview-widgets/tradingview-widgets-colors.js',
+        globalCheck: 'window.TradingViewWidgetsColors',
+        description: 'אינטגרציה עם מערכת הצבעים',
+        required: true,
+        loadOrder: 2
+      },
+      {
+        file: 'tradingview-widgets/tradingview-widgets-factory.js',
+        globalCheck: 'window.TradingViewWidgetsFactory',
+        description: 'Factory ליצירת ווידג'טים',
+        required: true,
+        loadOrder: 3
+      },
+      {
+        file: 'tradingview-widgets/tradingview-widgets-core.js',
+        globalCheck: 'window.TradingViewWidgetsManager',
+        description: 'מערכת ניהול מרכזית לווידג'טים',
+        required: true,
+        loadOrder: 4
+      }
+    ],
+    estimatedSize: '~45KB',
+    initTime: '~30ms'
   }
 };
 

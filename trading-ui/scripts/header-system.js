@@ -857,6 +857,8 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/chart-management">📊 ניהול גרפים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/dynamic-colors-display">🌈 תצוגת צבעים דינמית</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/designs">🎭 עיצובים</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/tradingview-widgets-showcase">🎯 ווידג'טים TradingView</a></li>
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item">

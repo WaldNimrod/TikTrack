@@ -724,11 +724,11 @@
                 const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
                 
                 // Get time range from header buttons (default: all)
-                const activeRangeBtn = document.querySelector('.chart-control-btn.active[data-range]');
+                const activeRangeBtn = document.querySelector('.chart-time-range-btn.active[data-range]');
                 const timeRange = activeRangeBtn?.dataset.range || 'all';
                 
                 // Get unit size from header buttons (use default if none active)
-                const activeUnitBtn = document.querySelector('.unit-size-btn.active[data-unit]');
+                const activeUnitBtn = document.querySelector('.chart-unit-size-btn.active[data-unit]');
                 let unitSize = activeUnitBtn?.dataset.unit;
                 
                 // If no active unit button, set default based on time range (without triggering events)
@@ -746,7 +746,7 @@
                     }
                     
                     // Set the button as active (without triggering events - do it silently)
-                    const targetUnitBtn = document.querySelector(`.unit-size-btn[data-unit="${unitSize}"]`);
+                    const targetUnitBtn = document.querySelector(`.chart-unit-size-btn[data-unit="${unitSize}"]`);
                     if (targetUnitBtn && !targetUnitBtn.classList.contains('active')) {
                         // Set as active silently (before event listeners are set up)
                         targetUnitBtn.classList.add('active');
@@ -964,7 +964,7 @@
             }
             
             // Find and activate the target unit button
-            const targetUnitBtn = document.querySelector(`.unit-size-btn[data-unit="${targetUnit}"]`);
+            const targetUnitBtn = document.querySelector(`.chart-unit-size-btn[data-unit="${targetUnit}"]`);
             if (targetUnitBtn) {
                 // Check if already active to prevent triggering events
                 if (targetUnitBtn.classList.contains('active')) {
@@ -972,7 +972,7 @@
                 }
                 
                 // Remove active class from all unit buttons (without triggering events)
-                document.querySelectorAll('.unit-size-btn').forEach(btn => {
+                document.querySelectorAll('.chart-unit-size-btn').forEach(btn => {
                     btn.classList.remove('active');
                     btn.style.border = '1px solid #ddd';
                     btn.style.background = 'white';
@@ -1142,7 +1142,7 @@
             const tickersCompareSelect = document.getElementById('tickersCompare');
             
             // Setup unit size buttons in header
-            const unitSizeButtons = document.querySelectorAll('.unit-size-btn[data-unit]');
+            const unitSizeButtons = document.querySelectorAll('.chart-unit-size-btn[data-unit]');
             unitSizeButtons.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -1168,7 +1168,7 @@
             });
             
             // Setup time range buttons in header
-            const timeRangeButtons = document.querySelectorAll('.chart-control-btn[data-range]');
+            const timeRangeButtons = document.querySelectorAll('.chart-time-range-btn[data-range]');
             timeRangeButtons.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -1852,9 +1852,9 @@
             }
             
             const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
-            const activeUnitBtn = document.querySelector('.unit-size-btn.active[data-unit]');
+            const activeUnitBtn = document.querySelector('.chart-unit-size-btn.active[data-unit]');
             const unitSize = activeUnitBtn?.dataset.unit || 'day';
-            const activeRangeBtn = document.querySelector('.chart-control-btn.active[data-range]');
+            const activeRangeBtn = document.querySelector('.chart-time-range-btn.active[data-range]');
             const timeRange = activeRangeBtn?.dataset.range || 'all';
             
             const mockData = generateMockPriceData(selectedTicker, unitSize, timeRange);
@@ -1879,7 +1879,7 @@
                     horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
                 },
                 width: volumeContainer.clientWidth,
-                height: volumeContainer.clientHeight,
+                height: volumeContainer.clientHeight || 150, // Use wrapper height (150px) if container height is 0
                 timeScale: {
                     timeVisible: true,
                     secondsVisible: false,
@@ -3288,9 +3288,9 @@
             comparisonSection.style.display = 'block';
             
             // Get time range and unit size from active buttons
-            const activeRangeBtn = document.querySelector('.chart-control-btn.active[data-range]');
+            const activeRangeBtn = document.querySelector('.chart-time-range-btn.active[data-range]');
             const timeRange = activeRangeBtn?.dataset.range || 'all';
-            const activeUnitBtn = document.querySelector('.unit-size-btn.active[data-unit]');
+            const activeUnitBtn = document.querySelector('.chart-unit-size-btn.active[data-unit]');
             const unitSize = activeUnitBtn?.dataset.unit || 'day';
             
             // Wait for adapter and create comparison chart

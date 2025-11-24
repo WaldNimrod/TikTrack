@@ -349,21 +349,21 @@
                         <!-- Chart Controls Wrapper (LTR, in section-body, above chart) -->
                         <div class="chart-controls-wrapper">
                             <div class="chart-controls mb-2">
-                                <button class="btn btn-sm btn-outline-secondary" id="chartZoomIn" title="זום פנימה">
-                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary" id="chartZoomOut" title="זום החוצה">
-                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary" id="chartReset" title="איפוס זום">
-                                    <img src="../../images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon">
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary" id="chartPanLeft" title="תזוזה שמאלה">
-                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary" id="chartPanRight" title="תזוזה ימינה">
-                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="chartZoomIn" title="זום פנימה">
+                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="chartZoomOut" title="זום החוצה">
+                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="chartReset" title="איפוס זום">
+                                <img src="../../images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon">
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="chartPanLeft" title="תזוזה שמאלה">
+                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="chartPanRight" title="תזוזה ימינה">
+                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
+                            </button>
                             </div>
                         </div>
                         
@@ -1551,15 +1551,15 @@
                 }
             } else {
                 // Fallback
-                document.getElementById('total-cash-balance').textContent = formatCurrency(data.total_cash_balance);
-                document.getElementById('cash-balance-total').textContent = formatCurrency(data.total_cash_balance);
+            document.getElementById('total-cash-balance').textContent = formatCurrency(data.total_cash_balance);
+            document.getElementById('cash-balance-total').textContent = formatCurrency(data.total_cash_balance);
             }
             
             // Cash balance by account
             const cashByAccount = document.getElementById('cash-balance-by-account');
             if (cashByAccount && data.cash_balance_by_account) {
                 if (window.FieldRendererService) {
-                    cashByAccount.innerHTML = data.cash_balance_by_account.map(acc => `
+                cashByAccount.innerHTML = data.cash_balance_by_account.map(acc => `
                         <div class="d-flex justify-content-between mb-1 text-small">
                             <span>${acc.account_name}:</span>
                             <span>${window.FieldRendererService.renderAmount(acc.balance, '$', 0, false)}</span>
@@ -1569,11 +1569,11 @@
                     // Fallback
                     cashByAccount.innerHTML = data.cash_balance_by_account.map(acc => `
                         <div class="d-flex justify-content-between mb-1 text-small">
-                            <span>${acc.account_name}:</span>
-                            <span>${formatCurrency(acc.balance)}</span>
-                        </div>
-                    `).join('');
-                }
+                        <span>${acc.account_name}:</span>
+                        <span>${formatCurrency(acc.balance)}</span>
+                    </div>
+                `).join('');
+            }
             }
             
             // Portfolio value - using FieldRendererService
@@ -1608,10 +1608,10 @@
                 }
             } else {
                 // Fallback
-                document.getElementById('total-pl').textContent = formatCurrency(data.total_pl);
-                document.getElementById('total-pl-detail').textContent = formatCurrency(data.total_pl);
-                document.getElementById('realized-pl').textContent = formatCurrency(data.total_realized_pl);
-                document.getElementById('unrealized-pl').textContent = formatCurrency(data.total_unrealized_pl);
+            document.getElementById('total-pl').textContent = formatCurrency(data.total_pl);
+            document.getElementById('total-pl-detail').textContent = formatCurrency(data.total_pl);
+            document.getElementById('realized-pl').textContent = formatCurrency(data.total_realized_pl);
+            document.getElementById('unrealized-pl').textContent = formatCurrency(data.total_unrealized_pl);
             }
             
             // Calculate P/L percentage with zero-division check
@@ -1627,10 +1627,10 @@
             // Display P/L percentage using FieldRendererService
             const plPercentEl = document.getElementById('pl-percentage');
             if (plPercentEl) {
-                if (plPercent === '-') {
+            if (plPercent === '-') {
                     plPercentEl.innerHTML = '<span class="numeric-value-zero">(-)</span>';
-                } else {
-                    const plPercentNum = parseFloat(plPercent);
+            } else {
+                const plPercentNum = parseFloat(plPercent);
                     if (window.FieldRendererService) {
                         plPercentEl.innerHTML = `(${window.FieldRendererService.renderNumericValue(plPercentNum, '%', true)})`;
                     } else {
@@ -3027,9 +3027,9 @@
                     changeDisplay = `${changeAmount} (${changePercentHtml})`;
                 } else {
                     // Fallback
-                    const isPositive = change >= 0;
-                    const changeClass = isPositive ? 'text-success' : 'text-danger';
-                    const changeSign = isPositive ? '+' : '';
+                const isPositive = change >= 0;
+                const changeClass = isPositive ? 'text-success' : 'text-danger';
+                const changeSign = isPositive ? '+' : '';
                     value1Display = formatCurrency(item.value1);
                     value2Display = formatCurrency(item.value2);
                     changeDisplay = `<span class="${changeClass}">${changeSign}${formatCurrency(change)} (${changeSign}${changePercent}%)</span>`;

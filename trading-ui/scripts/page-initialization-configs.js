@@ -2365,6 +2365,84 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         },
       ],
     },
+
+    'tradingview-widgets-showcase': {
+      name: 'TradingView Widgets Showcase',
+      packages: ['base', 'preferences', 'tradingview-widgets', 'init-system'],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'TradingViewWidgetsManager',
+        'TradingViewWidgetsColors',
+      ],
+      description: 'תצוגת כל הווידג\'טים הרשמיים של TradingView (iFrame Widgets) עם תיאור הפרמטרים',
+      lastModified: '2025-11-24',
+      pageType: 'development',
+      preloadAssets: [],
+      cacheStrategy: 'none',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger.info('🎯 Initializing TradingView Widgets Showcase...', {
+            page: 'page-initialization-configs',
+          });
+        },
+      ],
+    },
+
+    // Price History Page (Mockup)
+    'price-history-page': {
+      name: 'Price History Page',
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'crud',
+        'preferences',
+        'entity-services',
+        'tradingview-charts',
+        'tradingview-widgets',
+        'init-system',
+      ],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'TradingViewChartAdapter',
+        'TradingViewTheme',
+        'window.LightweightCharts',
+        'TradingViewWidgetsManager',
+        'TradingViewWidgetsColors',
+      ],
+      description: 'עמוד היסטוריית מחירים - מוקאפ עם גרפים TradingView Lightweight Charts ו-TradingView Widgets',
+      lastModified: '2025-11-24',
+      pageType: 'mockup',
+      preloadAssets: ['trades-data', 'executions-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: true,
+      requiresValidation: false,
+      requiresTables: true,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger.info('📊 Initializing Price History Page...', {
+            page: 'page-initialization-configs',
+          });
+
+          // Wait for TradingView to be available
+          if (typeof window.lightweightCharts === 'undefined') {
+            window.Logger.warn('⚠️ TradingView Lightweight Charts not loaded yet', {
+              page: 'page-initialization-configs',
+            });
+          }
+
+          // Wait for TradingView Widgets Manager
+          if (window.TradingViewWidgetsManager) {
+            await window.TradingViewWidgetsManager.init();
+          }
+        },
+      ],
+    },
   };
 
   // ===== GLOBAL EXPORT =====

@@ -1458,6 +1458,7 @@ function getColorPreferences() {
     chartGridColor: '#e9ecef',       // אפור בהיר - רשת גרפים
     chartBorderColor: '#dee2e6',     // אפור - גבול גרפים
     chartPointColor: '#26baac',      // טורקיז - נקודות גרפים
+    chartSecondaryColor: '#fc5a06',  // כתום-אדום - צבע משני לגרפים
     
     // צבעי רקע וטקסט
     cardBackground: '#ffffff',
@@ -1624,6 +1625,9 @@ function updateCSSVariablesFromPreferences(preferences) {
       // עדכון צבעי גרפים
       if (preferences.chartPrimaryColor) {
         document.documentElement.style.setProperty('--chart-primary-color', preferences.chartPrimaryColor);
+      }
+      if (preferences.chartSecondaryColor) {
+        document.documentElement.style.setProperty('--chart-secondary-color', preferences.chartSecondaryColor);
       }
       if (preferences.chartBackgroundColor) {
         document.documentElement.style.setProperty('--chart-background-color', preferences.chartBackgroundColor);

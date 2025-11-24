@@ -593,7 +593,7 @@ class UnifiedLogDisplay {
             // Check for CSS conflicts
             const testBtn = document.createElement('button');
             testBtn.className = 'btn btn-action';
-            testBtn.innerHTML = '<i class="fas fa-info"></i>';
+            testBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info" class="icon">';
             testBtn.style.position = 'absolute';
             testBtn.style.top = '-1000px';
             testBtn.style.left = '-1000px';

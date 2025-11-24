@@ -1020,13 +1020,13 @@ class CodeQualityDashboard {
         sections.forEach(sectionId => {
             const element = document.getElementById(sectionId);
             if (element) {
-                element.innerHTML = '<div class="text-center text-muted"><i class="fas fa-spinner fa-spin"></i> טוען...</div>';
+                element.innerHTML = '<div class="text-center text-muted"><img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> טוען...</div>';
             }
         });
 
         const duplicateDetails = document.getElementById('duplicateDetailsPanel');
         if (duplicateDetails) {
-            duplicateDetails.innerHTML = '<div class="text-center text-muted"><i class="fas fa-spinner fa-spin"></i> טוען כפילויות...</div>';
+            duplicateDetails.innerHTML = '<div class="text-center text-muted"><img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> טוען כפילויות...</div>';
         }
     }
 

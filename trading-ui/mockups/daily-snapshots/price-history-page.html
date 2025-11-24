@@ -865,17 +865,36 @@
                 // Update comparison chart if needed
                 updateComparisonChart();
                 
-                // Fit content (both charts will sync automatically via listeners)
-                priceChart.timeScale().fitContent();
-                
-                // Ensure volume chart also fits content and syncs
-                if (volumeChart) {
-                    setTimeout(() => {
-                        const priceRange = priceChart.timeScale().getVisibleRange();
-                        if (priceRange) {
-                            volumeChart.timeScale().setVisibleRange(priceRange);
-                        }
-                    }, 50);
+                // Fit content to show all data (both charts will sync automatically via listeners)
+                // This ensures zoom and pan are correctly set after data loads
+                try {
+                    priceChart.timeScale().fitContent();
+                    
+                    // Ensure volume chart also fits content and syncs
+                    if (volumeChart) {
+                        setTimeout(() => {
+                            try {
+                                const priceRange = priceChart.timeScale().getVisibleRange();
+                                if (priceRange && priceRange.from && priceRange.to) {
+                                    volumeChart.timeScale().setVisibleRange(priceRange);
+                                } else {
+                                    // Fallback: fit content on volume chart too
+                                    volumeChart.timeScale().fitContent();
+                                }
+                            } catch (e) {
+                                if (window.Logger) {
+                                    window.Logger.warn('Error syncing volume chart after fitContent', { 
+                                        page: 'price-history-page', 
+                                        error: e 
+                                    });
+                                }
+                            }
+                        }, 100);
+                    }
+                } catch (e) {
+                    if (window.Logger) {
+                        window.Logger.warn('Error fitting content', { page: 'price-history-page', error: e });
+                    }
                 }
                 
                 // Setup event listeners for filters and header buttons (only once)
@@ -987,6 +1006,49 @@
             }
             
             // Chart type is NOT changed automatically - only by user click
+        }
+        
+        // Auto-set time range based on unit size (reverse logic)
+        function autoSetTimeRangeByUnitSize(unitSize) {
+            let targetRange;
+            
+            // Automatic time range logic based on unit size
+            if (unitSize === '5min') {
+                targetRange = 'day'; // 5 דקות -> טווח של יום אחד
+            } else if (unitSize === 'hour') {
+                targetRange = 'week'; // שעה -> טווח של שבוע
+            } else if (unitSize === 'day') {
+                targetRange = 'month'; // יום -> טווח של חודש
+            } else if (unitSize === 'week') {
+                targetRange = 'all'; // שבוע -> טווח מלא
+            } else if (unitSize === 'month' || unitSize === 'year') {
+                targetRange = 'all'; // חודש/שנה -> טווח מלא
+            } else {
+                targetRange = 'month'; // default
+            }
+            
+            // Find and activate the target range button
+            const targetRangeBtn = document.querySelector(`.chart-time-range-btn[data-range="${targetRange}"]`);
+            if (targetRangeBtn) {
+                // Check if already active to prevent triggering events
+                if (targetRangeBtn.classList.contains('active')) {
+                    return; // Already active, no need to change
+                }
+                
+                // Remove active class from all range buttons (without triggering events)
+                document.querySelectorAll('.chart-time-range-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.style.border = '1px solid #ddd';
+                    btn.style.background = 'white';
+                    btn.style.color = '';
+                });
+                
+                // Activate target range button (without triggering events)
+                targetRangeBtn.classList.add('active');
+                targetRangeBtn.style.border = '1px solid #007bff';
+                targetRangeBtn.style.background = '#007bff';
+                targetRangeBtn.style.color = 'white';
+            }
         }
         
         // Cache for mock data to prevent regeneration on every call
@@ -1167,7 +1229,11 @@
                         btn.style.background = '#007bff';
                         btn.style.color = 'white';
                         
-                        // Reload chart
+                        // Auto-set time range based on unit size (reverse logic)
+                        const unitSize = btn.dataset.unit;
+                        autoSetTimeRangeByUnitSize(unitSize);
+                        
+                        // Reload chart (will update zoom/pan after data loads)
                         reloadChart();
                     });
                 });

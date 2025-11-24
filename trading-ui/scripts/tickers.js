@@ -2388,7 +2388,7 @@ async function checkTickerExternalData() {
     try {
         // Disable button and show loading
         checkBtn.disabled = true;
-        checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> בודק...';
+        checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> בודק...';
         resultDiv.style.display = 'none';
         warningDiv.style.display = 'none';
         
@@ -2508,7 +2508,7 @@ async function checkTickerExternalData() {
     } finally {
         // Re-enable button
         checkBtn.disabled = false;
-        checkBtn.innerHTML = '<i class="fas fa-sync-alt"></i> בדוק נתונים חיצוניים';
+        checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1"> בדוק נתונים חיצוניים';
     }
 }
 

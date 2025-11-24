@@ -297,15 +297,14 @@ class AccountActivityService:
                         'balance': 0.0
                     }
                 
-                # Calculate execution amount (negative for buy, positive for sell/sale)
-                # Support both 'sell' and 'sale' for backward compatibility
+                # Calculate execution amount (negative for buy, positive for sell)
                 # Ensure action is not None - use 'buy' as default if missing
                 execution_action = ex.action if ex.action else 'buy'
                 logger.debug(f"    Execution {ex.id}: action={repr(ex.action)}, using={repr(execution_action)}")
                 
                 if execution_action == 'buy':
                     execution_amount = -float(ex.price * ex.quantity + (ex.fee or 0))
-                else:  # 'sell' or 'sale'
+                else:  # 'sell', 'short', or 'cover'
                     execution_amount = float(ex.price * ex.quantity - (ex.fee or 0))
                 
                 # Add execution as movement
@@ -517,10 +516,10 @@ class AccountActivityService:
             currency_id = ex.ticker.currency_id if ex.ticker and ex.ticker.currency_id else (ex.trading_account.currency_id if ex.trading_account else 1)
             currency_symbol = ex.ticker.currency.symbol if ex.ticker and ex.ticker.currency else (ex.trading_account.currency.symbol if ex.trading_account and ex.trading_account.currency else 'USD')
             
-            # Calculate execution amount (negative for buy, positive for sell/sale)
+            # Calculate execution amount (negative for buy, positive for sell/short/cover)
             if ex.action == 'buy':
                 execution_amount = -float(ex.price * ex.quantity + (ex.fee or 0))
-            else:  # 'sell' or 'sale'
+            else:  # 'sell', 'short', or 'cover'
                 execution_amount = float(ex.price * ex.quantity - (ex.fee or 0))
             
             movements.append({

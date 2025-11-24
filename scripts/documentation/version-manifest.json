@@ -1,12 +1,12 @@
 {
   "production": {
-    "version": "1.2.6.0",
+    "version": "1.2.7.0",
     "major": 1,
     "minor": 2,
-    "patch": 6,
+    "patch": 7,
     "build": 0,
-    "commit": "02125d51015c87adee94a489792922d2ff650ae2",
-    "updated_at": "2025-11-24T01:30:31+00:00",
+    "commit": "b8b71e2bcb0df4e7f7c6955ee2a21de58c898535",
+    "updated_at": "2025-11-24T16:41:00+00:00",
     "notes": "Production update - 2025-11-24"
   }
 }

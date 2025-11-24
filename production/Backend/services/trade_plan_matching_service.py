@@ -255,7 +255,7 @@ class TradePlanMatchingService:
                 buy_quantity += quantity
                 buy_value += quantity * price
                 buy_fees += fee
-            elif action in {"sell", "sale"}:
+            elif action == "sell":
                 sell_quantity += quantity
 
         net_quantity = buy_quantity - sell_quantity

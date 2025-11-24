@@ -36,7 +36,7 @@
         neutral: 'minus',          // - for neutral
         sad: 'x',                  // ✗ for negative
         angry: 'alert-triangle',   // ⚠ for warning
-        confused: 'info-circle',   // ℹ for info
+        confused: 'note',           // ℹ for info (note is fallback for info-circle)
         stressed: 'bolt'           // ⚡ for stress
     };
 
@@ -247,8 +247,15 @@
         }
 
         try {
-            // Generate mock data
-            const entries = generateMockEmotionalEntries();
+            // Use existing mock entries if available, otherwise generate new ones
+            let entries = mockEmotionalEntries;
+            if (entries.length === 0) {
+                entries = generateMockEmotionalEntries();
+                mockEmotionalEntries = entries;
+            }
+
+            // Limit to 10 most recent entries
+            entries = entries.slice(0, 10);
 
             // Clear container
             container.innerHTML = '';
@@ -320,18 +327,9 @@
         const emotion = EMOTION_TYPES[entry.emotion_type];
         let iconHtml = '';
         
-        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
-            try {
-                // Use fallback icon
-                const fallbackIcon = EMOTION_ICON_FALLBACKS[entry.emotion_type] || 'info-circle';
-                iconHtml = window.IconSystem.renderIcon('tabler', fallbackIcon, { width: 16, height: 16 });
-            } catch (e) {
-                // Fallback to default icon
-                iconHtml = `<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">`;
-            }
-        } else {
-            iconHtml = `<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">`;
-        }
+        // Use relative path for mockup pages
+        const fallbackIcon = EMOTION_ICON_FALLBACKS[entry.emotion_type] || 'note';
+        iconHtml = `<img src="../../images/icons/tabler/${fallbackIcon}.svg" width="16" height="16" alt="icon" class="icon">`;
 
         // Format date
         let dateDisplay = '-';
@@ -416,7 +414,7 @@
                 severity: 'info',
                 title: 'תובנה',
                 message: 'אתה נוטה להיות מרוצה יותר בטריידים עם תוכנית (70% מהמקרים).',
-                icon: 'info-circle'
+                icon: 'note'
             },
             {
                 type: 'pattern',
@@ -437,17 +435,8 @@
         const alert = document.createElement('div');
         alert.className = `alert alert-${insight.severity}`;
 
-        // Get icon
-        let iconHtml = '';
-        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
-            try {
-                iconHtml = window.IconSystem.renderIcon('tabler', insight.icon, { width: 16, height: 16 });
-            } catch (e) {
-                iconHtml = `<img src="../../images/icons/tabler/${insight.icon}.svg" width="16" height="16" alt="${insight.icon}" class="icon">`;
-            }
-        } else {
-            iconHtml = `<img src="../../images/icons/tabler/${insight.icon}.svg" width="16" height="16" alt="${insight.icon}" class="icon">`;
-        }
+        // Get icon - use relative path for mockup pages
+        const iconHtml = `<img src="../../images/icons/tabler/${insight.icon}.svg" width="16" height="16" alt="${insight.icon}" class="icon">`;
 
         alert.innerHTML = `
             ${iconHtml}
@@ -469,26 +458,11 @@
             const emotion = EMOTION_TYPES[emotionKey];
             
             if (emotion) {
-                // Add icon to button
+                // Add icon to button - use relative path for mockup pages
                 const iconSpan = button.querySelector('.emotion-icon');
                 if (iconSpan) {
-                    let iconHtml = '';
-                    
-                    if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
-                        try {
-                            // Try to use IconSystem with fallback icon
-                            const fallbackIcon = EMOTION_ICON_FALLBACKS[emotionKey] || 'info-circle';
-                            iconHtml = window.IconSystem.renderIcon('tabler', fallbackIcon, { width: 16, height: 16 });
-                        } catch (e) {
-                            // Fallback to default icon
-                            iconHtml = `<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">`;
-                        }
-                    } else {
-                        // Fallback to default icon
-                        iconHtml = `<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">`;
-                    }
-                    
-                    iconSpan.innerHTML = iconHtml;
+                    const fallbackIcon = EMOTION_ICON_FALLBACKS[emotionKey] || 'note';
+                    iconSpan.innerHTML = `<img src="../../images/icons/tabler/${fallbackIcon}.svg" width="16" height="16" alt="icon" class="icon">`;
                 }
             }
 
@@ -623,10 +597,24 @@
     }
 
     /**
+     * Setup mockup notice icon
+     */
+    function setupMockupNotice() {
+        const noticeIcon = document.querySelector('.mockup-notice-icon');
+        if (noticeIcon) {
+            // Use relative path for mockup pages - note is fallback for info-circle
+            noticeIcon.innerHTML = `<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">`;
+        }
+    }
+
+    /**
      * Initialize all widgets
      */
     async function initializeWidgets() {
         try {
+            // Setup mockup notice icon
+            setupMockupNotice();
+
             // Initialize chart
             await initEmotionalPatternsChart();
 

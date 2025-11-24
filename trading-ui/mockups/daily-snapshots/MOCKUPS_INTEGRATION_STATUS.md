@@ -1,7 +1,18 @@
 # מטריצת סטטוס אינטגרציה - עמודי מוקאפ
 ## Mockups Integration Status Matrix
 
-**תאריך עדכון אחרון:** 27 בינואר 2025  
+7. **Emotional Tracking Widget - מימוש מלא (29 בינואר 2025):**
+   - ✅ גרף דפוסים רגשיים עם TradingView Lightweight Charts (Bar Chart)
+   - ✅ רשימת תיעודים אחרונים עם FieldRendererService ו-IconSystem
+   - ✅ תובנות דינמיות
+   - ✅ טופס תיעוד מהיר פונקציונלי
+   - ✅ אינטגרציה מלאה עם כל המערכות
+   - ✅ מדריך מפתח: `documentation/frontend/EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md`
+   - ✅ מפרט מימוש: `documentation/frontend/EMOTIONAL_TRACKING_IMPLEMENTATION_SPEC.md`
+
+---
+
+**תאריך עדכון אחרון:** 29 בינואר 2025  
 **סטטוס כללי:** בשלב 2 - אינטגרציות חשובות (הושלם history-widget)
 
 ---
@@ -18,7 +29,7 @@
 | **strategy-analysis** | ✅ | ✅ | ⏳ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
 | **economic-calendar** | ✅ | ✅ | ⏳ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
 | **history-widget** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
-| **emotional-tracking** | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
+| **emotional-tracking** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
 | **date-comparison-modal** | ✅ | ✅ | ⏳ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
 | **tradingview-test** | ✅ | ✅ | ⏳ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
 

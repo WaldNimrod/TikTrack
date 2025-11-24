@@ -637,6 +637,23 @@ class HeaderSystem {
   }
 
   static getHeaderHTML() {
+    // Detect if we're in a mockup page and adjust image paths accordingly
+    // Check both pathname and href to handle different server configurations
+    const pathname = window.location.pathname || '';
+    const href = window.location.href || '';
+    const isMockupPage = pathname.includes('/mockups/') || href.includes('/mockups/');
+    const imagePathPrefix = isMockupPage ? '../../' : '';
+    
+    // Debug log for troubleshooting
+    if (isMockupPage && window.Logger) {
+      window.Logger.debug('🔍 Mockup page detected, using image path prefix', {
+        page: 'header-system',
+        pathname: pathname,
+        href: href,
+        imagePathPrefix: imagePathPrefix
+      });
+    }
+    
     return `
         <div class="header-content">
           <!-- אזור לוגו ותפריט -->
@@ -648,7 +665,7 @@ class HeaderSystem {
                   <ul class="tiktrack-nav-list">
                     <li class="tiktrack-nav-item">
                       <a href="/" class="tiktrack-nav-link" data-page="home">
-                        <img src="images/icons/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only">
+                        <img src="${imagePathPrefix}images/icons/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only">
                       </a>
                     </li>
 
@@ -729,6 +746,7 @@ class HeaderSystem {
                         <li class="separator"></li>
 
                         <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/chart-management">📊 ניהול גרפים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/dynamic-colors-display">🌈 תצוגת צבעים דינמית</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/designs">🎭 עיצובים</a></li>
@@ -780,7 +798,7 @@ class HeaderSystem {
 
               <div class="logo-section">
                 <div class="logo">
-                  <img src="images/logo.svg" alt="TikTrack Logo" class="logo-image">
+                  <img src="${imagePathPrefix}images/logo.svg" alt="TikTrack Logo" class="logo-image">
                   <span class="logo-text">פשוט לנהל תיק</span>
                 </div>
               </div>

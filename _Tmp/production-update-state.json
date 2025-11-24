@@ -1,74 +1,173 @@
 {
-  "snapshot_id": "pre-update_20251122_213214",
+  "snapshot_id": "pre-update_20251124_032851",
   "step_1": {
     "completed": true,
-    "timestamp": "2025-11-22T21:32:16.199016",
+    "timestamp": "2025-11-24T03:28:15.846990",
     "result": {
       "success": true,
       "commits_count": 15,
-      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251122_213214.log",
+      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251124_032814.log",
       "commits": [
-        "10e29a76b Fix TradingView preferences integration and sequential group saving",
-        "d1d8d0d15 fix: Delete related market data before deleting ticker",
-        "9d11244ce chore: Align development version with production - 1.3.0.0",
-        "95d171f86 feat: Pre-production release updates",
-        "efc4f514a Header System: Complete refactoring to prevent duplicates and improve initialization"
+        "f992b37a9 Complete comprehensive testing of mockup pages and fix NotificationSystem",
+        "e513f4d71 Integrate Logger Service and FieldRendererService across all 12 mockup pages",
+        "37e762a2b Add Logger Service and improve mockup pages integration",
+        "126bd5c5c Fix duplicate keys in FA_TO_TABLER dictionary",
+        "ad1e68a94 Complete Icon System implementation across all pages and mockups"
       ]
     }
   },
   "step_2": {
     "completed": true,
-    "timestamp": "2025-11-22T21:32:19.599778",
+    "timestamp": "2025-11-24T03:28:15.895790",
     "result": {
       "success": true,
-      "conflicts_resolved": 1,
-      "conflicts_unresolved": 0
+      "running": false,
+      "port": 5001,
+      "pid": null,
+      "health": "not_running"
     }
   },
   "step_3": {
     "completed": true,
-    "timestamp": "2025-11-22T21:32:19.619381",
+    "timestamp": "2025-11-24T03:28:16.103912",
     "result": {
       "success": true,
-      "removed_count": 0
+      "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/backups/postgresql_backup_pre-update_20251124_032815.sql",
+      "backup_path": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/backups/postgresql_backup_pre-update_20251124_032815.sql"
     }
   },
   "step_4": {
     "completed": true,
-    "timestamp": "2025-11-22T21:32:19.653267",
+    "timestamp": "2025-11-24T03:28:17.678119",
     "result": {
       "success": true,
-      "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/db/backups/tiktrack_pre-update_20251122_193219.db"
+      "commits_count": 15,
+      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251124_032816.log",
+      "commits": [
+        "f992b37a9 Complete comprehensive testing of mockup pages and fix NotificationSystem",
+        "e513f4d71 Integrate Logger Service and FieldRendererService across all 12 mockup pages",
+        "37e762a2b Add Logger Service and improve mockup pages integration",
+        "126bd5c5c Fix duplicate keys in FA_TO_TABLER dictionary",
+        "ad1e68a94 Complete Icon System implementation across all pages and mockups"
+      ]
     }
   },
   "step_5": {
     "completed": true,
-    "timestamp": "2025-11-22T21:32:20.143465",
+    "timestamp": "2025-11-24T03:28:21.049328",
+    "result": {
+      "success": true,
+      "conflicts_resolved": 0,
+      "conflicts_unresolved": 0
+    }
+  },
+  "step_6": {
+    "completed": true,
+    "timestamp": "2025-11-24T03:28:21.424678",
     "result": {
       "success": true
     }
   },
-  "last_failed_step": null,
-  "step_6": {
-    "completed": true,
-    "timestamp": "2025-11-22T21:32:20.149732",
-    "result": {
-      "success": true,
-      "warning": "Cleanup had warnings"
-    }
-  },
   "step_7": {
     "completed": true,
-    "timestamp": "2025-11-22T21:32:20.153676",
+    "timestamp": "2025-11-24T03:28:21.425136",
+    "result": {
+      "success": true,
+      "stopped": false,
+      "reason": "not_running"
+    }
+  },
+  "step_8": {
+    "completed": true,
+    "timestamp": "2025-11-24T03:28:52.539570",
+    "result": {
+      "success": true,
+      "migrations_run": 0,
+      "migrations": []
+    }
+  },
+  "last_failed_step": 8,
+  "step_9": {
+    "completed": true,
+    "timestamp": "2025-11-24T03:28:52.540264",
     "result": {
       "success": true,
       "verified": false,
       "warning": "Settings mismatch"
     }
   },
-  "step_8": {
+  "step_10": {
     "completed": true,
-    "timestamp": "2025-11-22T21:32:20.317680",
+    "timestamp": "2025-11-24T03:28:56.690100",
+    "result": {
+      "success": true,
+      "needs_update": true,
+      "report": {
+        "dependencies": {
+          "needs_update": true,
+          "missing_file": false,
+          "packages": [
+            "Flask",
+            "Flask-CORS",
+            "Werkzeug",
+            "SQLAlchemy",
+            "psycopg2-binary",
+            "Flask-SocketIO",
+            "python-socketio",
+            "python-engineio",
+            "gunicorn",
+            "waitress",
+            "requests",
+            "urllib3",
+            "pytest",
+            "pytest-cov",
+            "pytest-html",
+            "pytest-xdist",
+            "psutil",
+            "schedule",
+            "pytz",
+            "yfinance",
+            "bleach"
+          ],
+          "missing_packages": [
+            "bleach"
+          ],
+          "outdated_packages": []
+        },
+        "critical_files": {
+          "app.py": true,
+          "settings.py": true,
+          "requirements.txt": true
+        },
+        "database_structure": {
+          "ready": true,
+          "missing_tables": [],
+          "total_tables": 37
+        },
+        "ui_files": {
+          "ready": true,
+          "missing_files": []
+        },
+        "warnings": [
+          "Missing packages: bleach"
+        ],
+        "needs_update": true
+      }
+    }
+  },
+  "step_11": {
+    "completed": true,
+    "timestamp": "2025-11-24T03:29:04.864182",
+    "result": {
+      "success": true,
+      "updated": true,
+      "missing_packages": [],
+      "syntax_errors": []
+    }
+  },
+  "step_12": {
+    "completed": true,
+    "timestamp": "2025-11-24T03:29:06.669235",
     "result": {
       "success": true,
       "results": {
@@ -79,53 +178,83 @@
       }
     }
   },
-  "step_9": {
-    "completed": true,
-    "timestamp": "2025-11-22T21:32:20.349816",
-    "result": {
-      "success": true,
-      "new_version": "1.2.5.0"
-    }
-  },
-  "step_10": {
-    "completed": true,
-    "timestamp": "2025-11-22T21:32:22.323189",
-    "result": {
-      "success": true,
-      "commit_message": "chore: production update from main - 2025-11-22"
-    }
-  },
-  "step_11": {
-    "completed": true,
-    "timestamp": "2025-11-22T21:32:22.358098",
-    "result": {
-      "success": true,
-      "pid": 88810,
-      "background": true
-    }
-  },
-  "step_12": {
-    "completed": true,
-    "timestamp": "2025-11-21T14:30:46.904285",
-    "result": {
-      "success": true,
-      "dry_run": true
-    }
-  },
   "step_13": {
     "completed": true,
-    "timestamp": "2025-11-21T14:30:46.904555",
+    "timestamp": "2025-11-24T03:29:36.839745",
     "result": {
       "success": true,
-      "dry_run": true
+      "pid": 36493,
+      "port": 5001,
+      "background": true,
+      "health_check": "failed",
+      "health_error": "Health check did not pass within 30 seconds (elapsed: 30.1s)"
     }
   },
-  "step_5.5": {
+  "step_14": {
     "completed": true,
-    "timestamp": "2025-11-21T22:20:00.242529",
+    "timestamp": "2025-11-24T03:30:31.870814",
     "result": {
       "success": true,
-      "dry_run": true
+      "stable": false,
+      "report": {
+        "stable": false,
+        "summary": [],
+        "warnings": [
+          "6 health check(s) failed"
+        ],
+        "errors": [
+          "Process not alive: Process not found",
+          "\u001b[0;31m[03:29:09] ERROR:\u001b[0m Server process exited unexpectedly during startup (PID 36523)"
+        ]
+      },
+      "stability_result": {
+        "stable": false,
+        "health_checks": {
+          "passed": 0,
+          "failed": 6,
+          "total": 6,
+          "results": [
+            [
+              false,
+              "<urlopen error [Errno 61] Connection refused>"
+            ],
+            [
+              false,
+              "<urlopen error [Errno 61] Connection refused>"
+            ],
+            [
+              false,
+              "<urlopen error [Errno 61] Connection refused>"
+            ],
+            [
+              false,
+              "<urlopen error [Errno 61] Connection refused>"
+            ],
+            [
+              false,
+              "<urlopen error [Errno 61] Connection refused>"
+            ],
+            [
+              false,
+              "<urlopen error [Errno 61] Connection refused>"
+            ]
+          ]
+        },
+        "process_alive": false,
+        "process_error": "Process not found",
+        "log_errors": [
+          "\u001b[0;31m[03:29:09] ERROR:\u001b[0m Server process exited unexpectedly during startup (PID 36523)"
+        ],
+        "log_errors_count": 1
+      }
+    }
+  },
+  "step_15": {
+    "completed": true,
+    "timestamp": "2025-11-24T03:30:31.922034",
+    "result": {
+      "success": true,
+      "new_version": "1.2.6.0"
     }
   }
 }

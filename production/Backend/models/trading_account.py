@@ -42,7 +42,6 @@ class TradingAccount(BaseModel):
     total_value = Column(Float, default=0)
     total_pl = Column(Float, default=0)  # Not updated - shows "בפיתוח" in UI
     notes = Column(String(5000))
-    external_account_number = Column(String(64), nullable=True, unique=True)  # External broker account number for IBKR import matching
     
     # Relationships with other entities
     # Currency relationship
@@ -89,7 +88,6 @@ class TradingAccount(BaseModel):
             'total_value': self.total_value,
             'total_pl': self.total_pl,  # Not updated - shows "בפיתוח" in UI
             'notes': self.notes,
-            'external_account_number': self.external_account_number,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
     

@@ -1,0 +1,40 @@
+/**
+ * CSS Reset - איפוס סגנונות ברירת מחדל
+ * 
+ * קובץ זה מאפס את סגנונות ברירת המחדל של הדפדפן
+ * ומוודא התנהגות עקבית בכל הדפדפנים
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* Box-sizing reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Remove default margin and padding */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* Remove list styles on ul, ol elements with a list role */
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+}
+
+/* Set core root defaults */
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
+/* Set core body defaults */
+body {
+  min-height: 100vh;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+}

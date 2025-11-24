@@ -29,7 +29,7 @@ def run_step(dry_run: bool = False) -> dict:
     logger = get_logger()
     reporter = get_reporter()
     
-    logger.step_start("Fix Production Config", 7)
+    logger.step_start("Fix Production Config", 9)
     
     project_root = Path(__file__).parent.parent.parent.parent
     production_config = project_root / "production" / "Backend" / "config"

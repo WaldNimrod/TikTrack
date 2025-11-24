@@ -169,6 +169,18 @@ function toDateObject(value) {
       }
     }
 
+    // Support DD.MM.YYYY HH:MM format (e.g., "31.12.2024 18:06")
+    const dotDateTimeMatch = trimmed.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2})$/);
+    if (dotDateTimeMatch) {
+      const [, day, month, year, hour, minute] = dotDateTimeMatch;
+      parsed = Date.parse(
+        `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:00Z`
+      );
+      if (!Number.isNaN(parsed)) {
+        return new Date(parsed);
+      }
+    }
+
     const hebrewDateTimePipeMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s*\|\s*(\d{1,2}):(\d{2})$/);
     if (hebrewDateTimePipeMatch) {
       const [, day, month, year, hour, minute] = hebrewDateTimePipeMatch;

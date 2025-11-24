@@ -250,6 +250,237 @@ async function invalidateTradesCache() {
   }
 }
 
+// ========================================================================
+// Business Logic API Wrappers
+// ========================================================================
+
+/**
+ * Calculate stop price using backend business logic service.
+ * @param {number} currentPrice - Current price
+ * @param {number} stopPercentage - Stop percentage
+ * @param {string} side - Trade side ('Long', 'Short', 'buy', 'sell')
+ * @returns {Promise<number>} Calculated stop price
+ */
+async function calculateStopPrice(currentPrice, stopPercentage, side = 'Long') {
+  try {
+    const response = await fetch('/api/business/trade/calculate-stop-price', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        current_price: currentPrice,
+        stop_percentage: stopPercentage,
+        side: side
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    if (result.status === 'success' && result.data?.stop_price !== undefined) {
+      return result.data.stop_price;
+    } else {
+      throw new Error(result.error?.message || 'Invalid calculation result');
+    }
+  } catch (error) {
+    window.Logger?.error?.('❌ Error calculating stop price', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+    throw error;
+  }
+}
+
+/**
+ * Calculate target price using backend business logic service.
+ * @param {number} currentPrice - Current price
+ * @param {number} targetPercentage - Target percentage
+ * @param {string} side - Trade side ('Long', 'Short', 'buy', 'sell')
+ * @returns {Promise<number>} Calculated target price
+ */
+async function calculateTargetPrice(currentPrice, targetPercentage, side = 'Long') {
+  try {
+    const response = await fetch('/api/business/trade/calculate-target-price', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        current_price: currentPrice,
+        target_percentage: targetPercentage,
+        side: side
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    if (result.status === 'success' && result.data?.target_price !== undefined) {
+      return result.data.target_price;
+    } else {
+      throw new Error(result.error?.message || 'Invalid calculation result');
+    }
+  } catch (error) {
+    window.Logger?.error?.('❌ Error calculating target price', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+    throw error;
+  }
+}
+
+/**
+ * Calculate percentage from price using backend business logic service.
+ * @param {number} currentPrice - Current price
+ * @param {number} targetPrice - Target price
+ * @param {string} side - Trade side ('Long', 'Short', 'buy', 'sell')
+ * @returns {Promise<number>} Calculated percentage
+ */
+async function calculatePercentageFromPrice(currentPrice, targetPrice, side = 'Long') {
+  try {
+    const response = await fetch('/api/business/trade/calculate-percentage-from-price', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        current_price: currentPrice,
+        target_price: targetPrice,
+        side: side
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    if (result.status === 'success' && result.data?.percentage !== undefined) {
+      return result.data.percentage;
+    } else {
+      throw new Error(result.error?.message || 'Invalid calculation result');
+    }
+  } catch (error) {
+    window.Logger?.error?.('❌ Error calculating percentage', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+    throw error;
+  }
+}
+
+/**
+ * Calculate investment values using backend business logic service.
+ * @param {Object} params - Parameters: {price?, quantity?, amount?}
+ * @returns {Promise<Object>} Calculated values: {price, quantity, amount}
+ */
+async function calculateInvestment(params = {}) {
+  try {
+    const response = await fetch('/api/business/trade/calculate-investment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    if (result.status === 'success' && result.data) {
+      return result.data;
+    } else {
+      throw new Error(result.error?.message || 'Invalid calculation result');
+    }
+  } catch (error) {
+    window.Logger?.error?.('❌ Error calculating investment', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+    throw error;
+  }
+}
+
+/**
+ * Calculate P/L using backend business logic service.
+ * @param {Object} params - Parameters: {entry_price, exit_price, quantity, side}
+ * @returns {Promise<Object>} Calculated P/L: {pl, pl_percent}
+ */
+async function calculatePL(params = {}) {
+  try {
+    const response = await fetch('/api/business/trade/calculate-pl', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    if (result.status === 'success' && result.data) {
+      return result.data;
+    } else {
+      throw new Error(result.error?.message || 'Invalid calculation result');
+    }
+  } catch (error) {
+    window.Logger?.error?.('❌ Error calculating P/L', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+    throw error;
+  }
+}
+
+/**
+ * Calculate risk/reward ratio using backend business logic service.
+ * @param {Object} params - Parameters: {entry_price, stop_price, target_price, quantity, side}
+ * @returns {Promise<Object>} Calculated risk/reward: {risk, reward, ratio}
+ */
+async function calculateRiskReward(params = {}) {
+  try {
+    const response = await fetch('/api/business/trade/calculate-risk-reward', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    if (result.status === 'success' && result.data) {
+      return result.data;
+    } else {
+      throw new Error(result.error?.message || 'Invalid calculation result');
+    }
+  } catch (error) {
+    window.Logger?.error?.('❌ Error calculating risk/reward', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+    throw error;
+  }
+}
+
+/**
+ * Validate trade data using backend business logic service.
+ * @param {Object} tradeData - Trade data to validate
+ * @returns {Promise<Object>} Validation result: {is_valid, errors}
+ */
+async function validateTrade(tradeData) {
+  try {
+    const response = await fetch('/api/business/trade/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(tradeData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        is_valid: false,
+        errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+      };
+    }
+
+    const result = await response.json();
+    return {
+      is_valid: result.status === 'success',
+      errors: []
+    };
+  } catch (error) {
+    window.Logger?.error?.('❌ Error validating trade', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+    return {
+      is_valid: false,
+      errors: [error.message || 'Validation error']
+    };
+  }
+}
+
 window.TradesData = {
   KEY: TRADES_DATA_KEY,
   TTL: TRADES_TTL,
@@ -263,6 +494,14 @@ window.TradesData = {
   getCachedTrades,
   setCachedTrades,
   invalidateTradesCache,
+  // Business logic API wrappers
+  calculateStopPrice,
+  calculateTargetPrice,
+  calculatePercentageFromPrice,
+  calculateInvestment,
+  calculatePL,
+  calculateRiskReward,
+  validateTrade,
 };
 
 window.Logger?.info?.('✅ Trades Data Service initialized', PAGE_LOG_CONTEXT);

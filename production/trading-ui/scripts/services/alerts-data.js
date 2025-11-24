@@ -333,6 +333,84 @@
     return response.json();
   }
 
+  // ========================================================================
+  // Business Logic API Wrappers
+  // ========================================================================
+
+  /**
+   * Validate alert data using backend business logic service.
+   * @param {Object} alertData - Alert data to validate
+   * @returns {Promise<Object>} Validation result: {is_valid, errors}
+   */
+  async function validateAlert(alertData) {
+    try {
+      const response = await fetch('/api/business/alert/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(alertData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return {
+          is_valid: false,
+          errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+        };
+      }
+
+      const result = await response.json();
+      return {
+        is_valid: result.status === 'success',
+        errors: []
+      };
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating alert', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      return {
+        is_valid: false,
+        errors: [error.message || 'Validation error']
+      };
+    }
+  }
+
+  /**
+   * Validate condition value using backend business logic service.
+   * @param {string} conditionAttribute - Condition attribute type ('price', 'change', 'volume')
+   * @param {number} conditionNumber - Condition numeric value
+   * @returns {Promise<Object>} Validation result: {is_valid, error}
+   */
+  async function validateConditionValue(conditionAttribute, conditionNumber) {
+    try {
+      const response = await fetch('/api/business/alert/validate-condition-value', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          condition_attribute: conditionAttribute,
+          condition_number: conditionNumber
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return {
+          is_valid: false,
+          error: errorData.error?.message || 'Validation failed'
+        };
+      }
+
+      const result = await response.json();
+      return {
+        is_valid: result.status === 'success',
+        error: null
+      };
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating condition value', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      return {
+        is_valid: false,
+        error: error.message || 'Validation error'
+      };
+    }
+  }
+
   window.AlertsData = {
     KEY: ALERTS_DATA_KEY,
     TTL: ALERTS_TTL,
@@ -345,6 +423,9 @@
     updateAlert,
     deleteAlert,
     fetchAlertDetails,
+    // Business logic API wrappers
+    validateAlert,
+    validateConditionValue,
   };
 
   window.Logger?.info?.('✅ Alerts Data Service initialized', PAGE_LOG_CONTEXT);

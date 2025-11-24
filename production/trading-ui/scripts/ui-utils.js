@@ -14,7 +14,8 @@
  */
 
 // ===== PRICE CALCULATION FUNCTIONS =====
-// These functions are used across multiple pages (trade plans, trades, tickers)
+// These functions now use backend business logic API
+// Legacy functions maintained for backward compatibility, but delegate to TradesData service
 
 /**
  * Calculate stop price based on percentage
@@ -22,29 +23,36 @@
  * @param {number} currentPrice - Current price of the ticker
  * @param {number} stopPercentage - Stop percentage (e.g., 0.1 for 10%)
  * @param {string} side - Trade side ('Long' or 'Short')
- * @returns {number} Calculated stop price
+ * @returns {Promise<number>|number} Calculated stop price (async if TradesData available)
+ * 
+ * @deprecated Use window.TradesData.calculateStopPrice() directly for async operations
  */
-function calculateStopPrice(currentPrice, stopPercentage, side = 'Long') {
+async function calculateStopPrice(currentPrice, stopPercentage, side = 'Long') {
+  // Use backend business logic API if available
+  if (window.TradesData?.calculateStopPrice) {
+    try {
+      return await window.TradesData.calculateStopPrice(currentPrice, stopPercentage, side);
+    } catch (error) {
+      window.Logger?.warn?.('Failed to calculate stop price via API, using fallback', { error: error?.message });
+      // Fall back to local calculation for backward compatibility
+    }
+  }
+  
+  // Fallback to local calculation (for backward compatibility)
   if (!currentPrice || currentPrice <= 0) {
-    // Invalid current price for stop calculation
     return 0;
   }
 
   if (!stopPercentage || stopPercentage <= 0) {
-    // Invalid stop percentage
     return 0;
   }
 
-  const percentage = stopPercentage / 100; // Convert to decimal
-
+  const percentage = stopPercentage / 100;
   if (side === 'Long') {
-    // For Long: Stop below current price
     return currentPrice * (1 - percentage);
   } else if (side === 'Short') {
-    // For Short: Stop above current price
     return currentPrice * (1 + percentage);
   } else {
-    // Invalid side for stop calculation
     return 0;
   }
 }
@@ -54,29 +62,36 @@ function calculateStopPrice(currentPrice, stopPercentage, side = 'Long') {
  * @param {number} currentPrice - Current price of the ticker
  * @param {number} targetPercentage - Target percentage (e.g., 2000 for 2000%)
  * @param {string} side - Trade side ('Long' or 'Short')
- * @returns {number} Calculated target price
+ * @returns {Promise<number>|number} Calculated target price (async if TradesData available)
+ * 
+ * @deprecated Use window.TradesData.calculateTargetPrice() directly for async operations
  */
-function calculateTargetPrice(currentPrice, targetPercentage, side = 'Long') {
+async function calculateTargetPrice(currentPrice, targetPercentage, side = 'Long') {
+  // Use backend business logic API if available
+  if (window.TradesData?.calculateTargetPrice) {
+    try {
+      return await window.TradesData.calculateTargetPrice(currentPrice, targetPercentage, side);
+    } catch (error) {
+      window.Logger?.warn?.('Failed to calculate target price via API, using fallback', { error: error?.message });
+      // Fall back to local calculation for backward compatibility
+    }
+  }
+  
+  // Fallback to local calculation (for backward compatibility)
   if (!currentPrice || currentPrice <= 0) {
-    // Invalid current price for target calculation
     return 0;
   }
 
   if (!targetPercentage || targetPercentage <= 0) {
-    // Invalid target percentage
     return 0;
   }
 
-  const percentage = targetPercentage / 100; // Convert to decimal
-
+  const percentage = targetPercentage / 100;
   if (side === 'Long') {
-    // For Long: Target above current price
     return currentPrice * (1 + percentage);
   } else if (side === 'Short') {
-    // For Short: Target below current price
     return currentPrice * (1 - percentage);
   } else {
-    // Invalid side for target calculation
     return 0;
   }
 }
@@ -86,16 +101,27 @@ function calculateTargetPrice(currentPrice, targetPercentage, side = 'Long') {
  * @param {number} currentPrice - Current price
  * @param {number} targetPrice - Target price
  * @param {string} side - Trade side ('Long' or 'Short')
- * @returns {number} Percentage difference
+ * @returns {Promise<number>|number} Percentage difference (async if TradesData available)
+ * 
+ * @deprecated Use window.TradesData.calculatePercentageFromPrice() directly for async operations
  */
-function calculatePercentageFromPrice(currentPrice, targetPrice, side = 'Long') {
+async function calculatePercentageFromPrice(currentPrice, targetPrice, side = 'Long') {
+  // Use backend business logic API if available
+  if (window.TradesData?.calculatePercentageFromPrice) {
+    try {
+      return await window.TradesData.calculatePercentageFromPrice(currentPrice, targetPrice, side);
+    } catch (error) {
+      window.Logger?.warn?.('Failed to calculate percentage via API, using fallback', { error: error?.message });
+      // Fall back to local calculation for backward compatibility
+    }
+  }
+  
+  // Fallback to local calculation (for backward compatibility)
   if (!currentPrice || currentPrice <= 0) {
-    // Invalid current price for percentage calculation
     return 0;
   }
 
   if (!targetPrice || targetPrice <= 0) {
-    // Invalid target price for percentage calculation
     return 0;
   }
 
@@ -104,7 +130,6 @@ function calculatePercentageFromPrice(currentPrice, targetPrice, side = 'Long') 
   } else if (side === 'Short') {
     return (currentPrice - targetPrice) / currentPrice * 100;
   } else {
-    // Invalid side for percentage calculation
     return 0;
   }
 }
@@ -114,7 +139,7 @@ function calculatePercentageFromPrice(currentPrice, targetPrice, side = 'Long') 
  * @param {string} formId - ID of the form
  * @param {number} currentPrice - Current price of the ticker
  */
-function updatePricesFromPercentages(formId, currentPrice) {
+async function updatePricesFromPercentages(formId, currentPrice) {
   const form = document.getElementById(formId);
   if (!form) {
     handleElementNotFound('updatePricesFromPercentages', `Form not found: ${formId}`);
@@ -137,9 +162,9 @@ function updatePricesFromPercentages(formId, currentPrice) {
   const stopPercentage = parseFloat(stopPercentageElement.value) || 0.1;
   const targetPercentage = parseFloat(targetPercentageElement.value) || 2000;
 
-  // Calculate new prices
-  const newStopPrice = calculateStopPrice(currentPrice, stopPercentage, side);
-  const newTargetPrice = calculateTargetPrice(currentPrice, targetPercentage, side);
+  // Calculate new prices using backend API (with fallback)
+  const newStopPrice = await calculateStopPrice(currentPrice, stopPercentage, side);
+  const newTargetPrice = await calculateTargetPrice(currentPrice, targetPercentage, side);
 
   // Update form fields
   stopPriceElement.value = newStopPrice.toFixed(2);
@@ -161,7 +186,7 @@ function updatePricesFromPercentages(formId, currentPrice) {
  * @param {string} formId - ID of the form
  * @param {number} currentPrice - Current price of the ticker
  */
-function updatePercentagesFromPrices(formId, currentPrice) {
+async function updatePercentagesFromPrices(formId, currentPrice) {
   const form = document.getElementById(formId);
   if (!form) {
     handleElementNotFound('updatePercentagesFromPrices', `Form not found: ${formId}`);
@@ -184,9 +209,9 @@ function updatePercentagesFromPrices(formId, currentPrice) {
   const stopPrice = parseFloat(stopPriceElement.value) || 0;
   const targetPrice = parseFloat(targetPriceElement.value) || 0;
 
-  // Calculate new percentages
-  const newStopPercentage = calculatePercentageFromPrice(currentPrice, stopPrice, side);
-  const newTargetPercentage = calculatePercentageFromPrice(currentPrice, targetPrice, side);
+  // Calculate new percentages using backend API (with fallback)
+  const newStopPercentage = await calculatePercentageFromPrice(currentPrice, stopPrice, side);
+  const newTargetPercentage = await calculatePercentageFromPrice(currentPrice, targetPrice, side);
 
   // Update form fields
   stopPercentageElement.value = newStopPercentage.toFixed(2);

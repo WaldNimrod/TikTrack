@@ -72,6 +72,24 @@ python3 Backend/scripts/create_production_db.py
 
 ### שלב 2: הפעלת שרת פרודקשן
 
+**זיהוי סביבה אוטומטי:**
+הסקריפט `start_server.sh` מזהה אוטומטית את הסביבה לפי שם תיקיית העבודה:
+- `TikTrackApp-Production` → Production (פורט 5001)
+- `TikTrackApp` → Development (פורט 8080)
+
+**הפעלה:**
+```bash
+./start_server.sh
+```
+
+> **✅ הסקריפט מזהה אוטומטית את הסביבה לפי שם התיקיה!**
+
+**אלטרנטיבה (עם override מפורש):**
+```bash
+./start_server.sh --env production
+```
+
+או:
 ```bash
 ./start_production.sh
 ```
@@ -96,8 +114,11 @@ python3 Backend/scripts/create_production_db.py
 ### סקריפטים
 
 #### סקריפטי הפעלה:
-- `start_server.sh` - הפעלת פיתוח (פורט 8080)
-- `start_production.sh` - הפעלת פרודקשן (פורט 5001)
+- `start_server.sh` - הפעלה אוטומטית לפי שם תיקיה:
+  - `TikTrackApp` → Development (פורט 8080)
+  - `TikTrackApp-Production` → Production (פורט 5001)
+  - ניתן override עם: `--env development` או `--env production`
+- `start_production.sh` - הפעלת פרודקשן (פורט 5001) - wrapper ל-`start_server.sh --env production`
 
 #### סקריפטי פרודקשן:
 - `production/Backend/scripts/create_production_db.py` - יצירת DB פרודקשן (כולל מיגרציות אוטומטיות)

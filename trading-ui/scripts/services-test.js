@@ -128,7 +128,7 @@ function testFieldRenderer() {
         // בדיקת action badges
         const actionBadges = [
             window.FieldRendererService.renderAction('buy'),
-            window.FieldRendererService.renderAction('sale')
+            window.FieldRendererService.renderAction('sell')
         ];
         document.getElementById('actionBadges').innerHTML = actionBadges.join(' ');
         

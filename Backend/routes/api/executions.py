@@ -5,6 +5,7 @@ from models.execution import Execution
 from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 from services.execution_trade_matching_service import ExecutionTradeMatchingService
+from services.execution_clustering_service import ExecutionClusteringService, map_execution_action_to_trade_side
 from services.date_normalization_service import DateNormalizationService
 from services.preferences_service import PreferencesService
 from services.tag_service import TagService
@@ -243,7 +244,7 @@ def get_pending_assignment_executions():
         db: Session = g.db
         preferences_service = PreferencesService()
         normalizer = BaseEntityUtils.get_request_normalizer(request, preferences_service=preferences_service)
-        executions = ExecutionTradeMatchingService.get_pending_executions(db)
+        executions = ExecutionClusteringService.get_pending_executions(db)
         
         # Convert to dict format
         executions_data = [execution.to_dict() for execution in executions]
@@ -305,10 +306,12 @@ def get_pending_assignment_trade_creation_clusters():
         normalizer = _get_date_normalizer()
 
         items_limit = request.args.get('limit', default=None, type=int)
+        executions_limit = request.args.get('executions_limit', default=None, type=int)
 
-        clusters = ExecutionTradeMatchingService.get_execution_trade_creation_clusters(
+        clusters = ExecutionClusteringService.get_execution_trade_creation_clusters(
             db,
-            max_items=items_limit
+            max_items=items_limit,
+            limit_executions=executions_limit
         )
 
         payload = BaseEntityUtils.create_success_payload(
@@ -357,13 +360,14 @@ def suggest_trades_for_execution(execution_id: int):
         return jsonify(error_payload), 500
 
 @executions_bp.route('/batch-assign', methods=['POST'])
-@handle_database_session(auto_commit=True, auto_close=True)
+@handle_database_session(auto_commit=False, auto_close=False)
 @invalidate_cache(['executions', 'trades', 'dashboard', 'account-activity-*', 'positions', 'portfolio'])
 def batch_assign_executions():
-    """Batch assign executions to trades"""
+    """Batch assign executions to trades with validation and rollback support"""
+    db: Session = g.db
     try:
-        data = request.get_json()
-        db: Session = g.db
+        # Get JSON data - handle None case when content-type is not application/json
+        data = request.get_json() or {}
         
         # Expected format: {"assignments": [{"execution_id": 1, "trade_id": 5}, ...]}
         assignments = data.get('assignments', [])
@@ -375,89 +379,187 @@ def batch_assign_executions():
                 "version": "1.0"
             }), 400
         
-        results = {
-            "success": [],
-            "failed": []
-        }
+        # Pre-validate all assignments before processing
+        validated_assignments = []
+        validation_errors = []
         
         for assignment in assignments:
             execution_id = assignment.get('execution_id')
             trade_id = assignment.get('trade_id')
             
             if not execution_id or not trade_id:
-                results["failed"].append({
+                validation_errors.append({
                     "execution_id": execution_id,
                     "trade_id": trade_id,
                     "error": "Missing execution_id or trade_id"
                 })
                 continue
             
-            try:
-                execution = db.query(Execution).filter(Execution.id == execution_id).first()
-                if not execution:
-                    results["failed"].append({
-                        "execution_id": execution_id,
-                        "trade_id": trade_id,
-                        "error": "Execution not found"
-                    })
-                    continue
-                
-                # Verify trade exists and matches ticker
-                from models.trade import Trade
-                trade = db.query(Trade).filter(Trade.id == trade_id).first()
-                if not trade:
-                    results["failed"].append({
-                        "execution_id": execution_id,
-                        "trade_id": trade_id,
-                        "error": "Trade not found"
-                    })
-                    continue
-                
-                # Verify ticker match
-                if execution.ticker_id != trade.ticker_id:
-                    results["failed"].append({
-                        "execution_id": execution_id,
-                        "trade_id": trade_id,
-                        "error": "Ticker mismatch"
-                    })
-                    continue
-                
-                # Assign trade
-                execution.trade_id = trade_id
-                # Set trading_account_id from trade if not set
-                if not execution.trading_account_id:
-                    execution.trading_account_id = trade.trading_account_id
-                
-                results["success"].append({
-                    "execution_id": execution_id,
-                    "trade_id": trade_id
-                })
-                
-            except Exception as e:
-                logger.error(f"Error assigning execution {execution_id} to trade {trade_id}: {str(e)}")
-                results["failed"].append({
+            execution = db.query(Execution).filter(Execution.id == execution_id).first()
+            if not execution:
+                validation_errors.append({
                     "execution_id": execution_id,
                     "trade_id": trade_id,
-                    "error": str(e)
+                    "error": "Execution not found"
                 })
+                continue
+            
+            # Verify trade exists
+            from models.trade import Trade
+            trade = db.query(Trade).filter(Trade.id == trade_id).first()
+            if not trade:
+                validation_errors.append({
+                    "execution_id": execution_id,
+                    "trade_id": trade_id,
+                    "error": "Trade not found"
+                })
+                continue
+            
+            # Verify trade is active (not cancelled/deleted)
+            if trade.status and trade.status.lower() in ['cancelled', 'deleted']:
+                validation_errors.append({
+                    "execution_id": execution_id,
+                    "trade_id": trade_id,
+                    "error": f"Trade is not active (status: {trade.status})"
+                })
+                continue
+            
+            # Verify ticker match
+            if execution.ticker_id != trade.ticker_id:
+                validation_errors.append({
+                    "execution_id": execution_id,
+                    "trade_id": trade_id,
+                    "error": "Ticker mismatch"
+                })
+                continue
+            
+            # Verify side match - execution action must match trade side
+            execution_side = map_execution_action_to_trade_side(execution.action)
+            trade_side = trade.side.lower() if trade.side else 'long'
+            
+            if execution_side != trade_side:
+                validation_errors.append({
+                    "execution_id": execution_id,
+                    "trade_id": trade_id,
+                    "error": f"Side mismatch: execution is {execution_side} (action: {execution.action}), trade is {trade_side}. A trade cannot mix long and short executions."
+                })
+                continue
+            
+            # Verify execution is not already assigned
+            if execution.trade_id is not None:
+                validation_errors.append({
+                    "execution_id": execution_id,
+                    "trade_id": trade_id,
+                    "error": f"Execution is already assigned to trade {execution.trade_id}"
+                })
+                continue
+            
+            validated_assignments.append({
+                "execution": execution,
+                "trade": trade,
+                "execution_id": execution_id,
+                "trade_id": trade_id
+            })
         
-        db.commit()
+        # If all assignments failed validation, return early
+        if not validated_assignments:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "All assignments failed validation"},
+                "data": {
+                    "success": [],
+                    "failed": validation_errors
+                },
+                "summary": {
+                    "total": len(assignments),
+                    "success": 0,
+                    "failed": len(validation_errors)
+                },
+                "version": "1.0"
+            }), 400
         
-        return jsonify({
-            "status": "success",
-            "data": results,
-            "summary": {
-                "total": len(assignments),
-                "success": len(results["success"]),
-                "failed": len(results["failed"])
-            },
-            "version": "1.0"
-        }), 200
+        # Process validated assignments in a transaction
+        results = {
+            "success": [],
+            "failed": validation_errors.copy()
+        }
+        
+        try:
+            for assignment in validated_assignments:
+                execution = assignment["execution"]
+                trade = assignment["trade"]
+                execution_id = assignment["execution_id"]
+                trade_id = assignment["trade_id"]
+                
+                try:
+                    # Assign trade
+                    execution.trade_id = trade_id
+                    # Set trading_account_id from trade if not set
+                    if not execution.trading_account_id:
+                        execution.trading_account_id = trade.trading_account_id
+                    
+                    results["success"].append({
+                        "execution_id": execution_id,
+                        "trade_id": trade_id
+                    })
+                    
+                except Exception as e:
+                    logger.error(f"Error assigning execution {execution_id} to trade {trade_id}: {str(e)}")
+                    results["failed"].append({
+                        "execution_id": execution_id,
+                        "trade_id": trade_id,
+                        "error": str(e)
+                    })
+                    # Rollback on individual error if configured
+                    raise
+            
+            # Commit all successful assignments
+            db.commit()
+            
+            return jsonify({
+                "status": "success",
+                "data": results,
+                "summary": {
+                    "total": len(assignments),
+                    "success": len(results["success"]),
+                    "failed": len(results["failed"])
+                },
+                "version": "1.0"
+            }), 200
+            
+        except Exception as e:
+            # Rollback on any error
+            db.rollback()
+            logger.error(f"Error in batch assign transaction: {str(e)}")
+            
+            # CRITICAL: After rollback, all "successful" assignments were actually rolled back
+            # Move all previously "successful" assignments to failed with rollback message
+            for success_item in results["success"]:
+                results["failed"].append({
+                    "execution_id": success_item["execution_id"],
+                    "trade_id": success_item["trade_id"],
+                    "error": f"Transaction rolled back due to error: {str(e)}"
+                })
+            
+            # Clear success list since all were rolled back
+            results["success"] = []
+            
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Transaction failed: {str(e)}. All assignments were rolled back."},
+                "data": results,
+                "version": "1.0"
+            }), 500
         
     except Exception as e:
+        db.rollback()
         logger.error(f"Error in batch assign: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
             "version": "1.0"
         }), 500
+    finally:
+        # Explicitly close the session since auto_close=False
+        if db:
+            db.close()

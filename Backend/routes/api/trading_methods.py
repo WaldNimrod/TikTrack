@@ -9,7 +9,7 @@ from typing import Dict, Any, List
 from sqlalchemy.orm import Session
 
 from models.trading_method import TradingMethod, MethodParameter
-from config.database import get_db
+from .base_entity_decorators import handle_database_session
 from .base_entity_utils import BaseEntityUtils
 from services.preferences_service import PreferencesService
 
@@ -26,10 +26,12 @@ trading_methods_bp = Blueprint('trading_methods', __name__, url_prefix='/api/tra
 
 
 @trading_methods_bp.route('/', methods=['GET'])
+@handle_database_session()
 def get_trading_methods():
     """Get all trading methods with optional parameters"""
+    from flask import g
     try:
-        db: Session = get_db()
+        db: Session = g.db
         
         # Check if parameters should be included
         include_parameters = request.args.get('include_parameters', 'false').lower() == 'true'
@@ -69,10 +71,12 @@ def get_trading_methods():
 
 
 @trading_methods_bp.route('/<int:method_id>', methods=['GET'])
+@handle_database_session()
 def get_trading_method(method_id: int):
     """Get a specific trading method by ID"""
+    from flask import g
     try:
-        db: Session = get_db()
+        db: Session = g.db
         
         method = db.query(TradingMethod).filter(
             TradingMethod.id == method_id,

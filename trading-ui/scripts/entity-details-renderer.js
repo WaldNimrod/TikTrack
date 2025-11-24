@@ -1238,7 +1238,7 @@ class EntityDetailsRenderer {
                 let soldAmount = 0;
                 executions.forEach(exec => {
                     const action = exec.action || '';
-                    if (action === 'sell' || action === 'sale') {
+                    if (action === 'sell') {
                         const quantity = parseFloat(exec.quantity || 0);
                         const price = parseFloat(exec.price || 0);
                         const fee = parseFloat(exec.fee || 0);
@@ -1271,7 +1271,7 @@ class EntityDetailsRenderer {
                         totalBoughtQuantity += quantity;
                         totalBoughtAmount += (quantity * price) + fee;
                         totalCost += (quantity * price) + fee;
-                    } else if (action === 'sell' || action === 'sale') {
+                    } else if (action === 'sell') {
                         totalSoldQuantity += quantity;
                         totalSoldAmount += (quantity * price) - fee;
                     }
@@ -1339,7 +1339,7 @@ class EntityDetailsRenderer {
             const action = exec.action || '';
             
             // Realized P/L - רק מ-sell executions (רק אם יש נתון מפורש)
-            if ((action === 'sell' || action === 'sale') && exec.realized_pl !== null && exec.realized_pl !== undefined) {
+            if (action === 'sell' && exec.realized_pl !== null && exec.realized_pl !== undefined) {
                 realizedPL += parseFloat(exec.realized_pl || 0);
                 hasRealizedPLData = true;
             }
@@ -3016,7 +3016,7 @@ class EntityDetailsRenderer {
         // סוג ביצוע
         const action = executionData.action || executionData.type || '-';
         const actionDisplay = action === 'buy' ? 'קנייה' : 
-                             action === 'sell' || action === 'sale' ? 'מכירה' :
+                             action === 'sell' ? 'מכירה' :
                              action === 'short' ? 'מכירה בחסר' :
                              action === 'cover' ? 'כיסוי' : action;
         
@@ -5678,7 +5678,7 @@ class EntityDetailsRenderer {
             // סוג ביצוע
             const action = entityData.action || entityData.type || '-';
             const actionDisplay = action === 'buy' ? 'קנייה' : 
-                                 action === 'sell' || action === 'sale' ? 'מכירה' :
+                                 action === 'sell' ? 'מכירה' :
                                  action === 'short' ? 'מכירה בחסר' :
                                  action === 'cover' ? 'כיסוי' : action;
             

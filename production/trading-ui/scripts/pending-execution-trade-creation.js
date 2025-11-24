@@ -92,8 +92,17 @@
     async refreshClusters({ source = 'executions', force = false } = {}) {
       try {
         if (this.state.isLoading && !force) {
+          window.Logger?.warn('⚠️ [PendingExecutionTradeCreation] Already loading, skipping');
           return;
         }
+
+        window.Logger?.info('🔄 [PendingExecutionTradeCreation] refreshClusters called', {
+          source,
+          force,
+          hasRenderAction: typeof window.renderAction === 'function',
+          renderActionType: typeof window.renderAction,
+          windowRenderAction: window.renderAction ? window.renderAction.toString().substring(0, 100) : 'not found'
+        });
 
         this.state.isLoading = true;
         this.state.error = null;
@@ -115,6 +124,22 @@
         }
 
         const clusters = Array.isArray(payload.data) ? payload.data : [];
+        
+        // LOG: Debug API response
+        window.Logger?.info('📡 [PendingExecutionTradeCreation] API response received', {
+          clusterCount: clusters.length,
+          firstCluster: clusters[0] ? {
+            clusterId: clusters[0].cluster_id,
+            side: clusters[0].side,
+            executionCount: (clusters[0].executions || []).length,
+            firstExecution: clusters[0].executions?.[0] ? {
+              id: clusters[0].executions[0].id,
+              action: clusters[0].executions[0].action,
+              normalized_action: clusters[0].executions[0].normalized_action
+            } : null
+          } : null
+        });
+        
         this.state.clusters = clusters;
         this.state.clusterMap = new Map(clusters.map(cluster => [cluster.cluster_id, cluster]));
         this.state.selection = new Map(
@@ -125,6 +150,7 @@
         );
         this.state.lastFetchedAt = Date.now();
 
+        window.Logger?.info('✅ [PendingExecutionTradeCreation] State updated, calling render functions');
         this.renderExecutionsSection();
         this.renderDashboardWidget();
       } catch (error) {
@@ -455,6 +481,14 @@
     renderExecutionsTable(cluster, selectedIds) {
       const FieldRenderer = window.FieldRendererService;
 
+      // LOG: Debug rendering
+      window.Logger?.info('🔍 [PendingExecutionTradeCreation] renderExecutionsTable called', {
+        clusterId: cluster.cluster_id,
+        executionCount: (cluster.executions || []).length,
+        hasRenderAction: typeof window.renderAction === 'function',
+        hasFieldRenderer: !!FieldRenderer
+      });
+
       const rows = (cluster.executions || []).map(execution => {
         const executionId = execution.id;
         const isChecked = selectedIds.has(executionId);
@@ -477,6 +511,31 @@
         const valueDisplay = execution.value ? `$${execution.value.toFixed(2)}` : '-';
         const feeDisplay = execution.fee ? `$${Number(execution.fee).toFixed(2)}` : '$0.00';
 
+        // LOG: Debug action rendering
+        const actionValue = execution.normalized_action || execution.action;
+        const actionDisplay = window.renderAction 
+          ? window.renderAction(actionValue)
+          : (() => {
+              const action = ((actionValue || '').trim()).toLowerCase();
+              if (!action) return '<span class="badge badge-secondary">-</span>';
+              const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
+              const actionHebrew = actionTranslations[action] || action;
+              const positiveActions = new Set(['buy', 'short']);
+              const colorClass = positiveActions.has(action) ? ' text-success' : ' text-danger';
+              return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>`;
+            })();
+
+        // LOG: Debug first execution
+        if (executionId === (cluster.executions || [])[0]?.id) {
+          window.Logger?.info('🔍 [PendingExecutionTradeCreation] First execution action rendering', {
+            executionId,
+            action: actionValue,
+            actionDisplay: actionDisplay.substring(0, 100),
+            hasRenderAction: typeof window.renderAction === 'function',
+            renderActionResult: typeof window.renderAction === 'function' ? window.renderAction(actionValue) : 'N/A'
+          });
+        }
+
         return `
           <tr data-execution-id=\"${executionId}\">
             <td class=\"text-center\">
@@ -489,7 +548,7 @@
                 ${isChecked ? 'checked' : ''}>
             </td>
             <td>${executionDate}</td>
-            <td>${execution.action === 'sale' ? 'מכירה' : 'קניה'}</td>
+            <td class=\"type-cell\" data-type=\"${(actionValue || 'buy').toLowerCase()}\">${actionDisplay}</td>
             <td>${quantity ?? '-'}</td>
             <td>${price ?? '-'}</td>
             <td>${valueDisplay}</td>
@@ -535,9 +594,19 @@
           || execution.date
           || '-';
         const value = execution.value ? `$${execution.value.toFixed(2)}` : '-';
+        
+        // Use window.renderAction() for consistent action display (same as main executions table)
+        const actionText = window.renderAction 
+          ? window.renderAction(execution.normalized_action || execution.action).replace(/<[^>]*>/g, '')
+          : (() => {
+              const action = ((execution.normalized_action || execution.action || '').trim()).toLowerCase();
+              const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
+              return actionTranslations[action] || action;
+            })();
+        
         return `
           <div class=\"trade-create-widget-execution d-flex justify-content-between\">
-            <span class=\"text-muted\">${date} • ${execution.action === 'sale' ? 'מכירה' : 'קניה'} • ${execution.quantity}</span>
+            <span class=\"text-muted\">${date} • ${actionText} • ${execution.quantity}</span>
             <span class=\"text-muted\">${value}</span>
           </div>
         `;

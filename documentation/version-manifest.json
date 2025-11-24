@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.3.7.0",
+    "version": "1.3.8.0",
     "major": 1,
     "minor": 3,
-    "patch": 7,
+    "patch": 8,
     "build": 0,
-    "commit": "c3ff970200899a9198c499bd05188f5c54cb3e1d",
-    "updated_at": "2025-11-24T02:24:58+00:00",
-    "notes": "Add E2E testing and improve production update process v1.3.7.0"
+    "commit": "c52e595f120b222d20fcb05b126fb0b54d73f898",
+    "updated_at": "2025-11-24T14:13:24+00:00",
+    "notes": "Add comprehensive bug documentation for execution clustering issue"
   },
   "development": {
     "version": "1.3.18.0",

@@ -4295,7 +4295,9 @@ async function saveTrade() {
                 requiresHardReload: false
             });
 
-            if (crudResult && window.PendingExecutionTradeCreation?.handleTradeCreated) {
+            // רק אם הטרייד נוצר מאשקול ביצועים - קישור אוטומטי של ביצועים לטרייד
+            const isFromExecutionCluster = form.dataset.tradeCreationSource === 'execution-cluster';
+            if (isFromExecutionCluster && crudResult && window.PendingExecutionTradeCreation?.handleTradeCreated) {
                 await window.PendingExecutionTradeCreation.handleTradeCreated(crudResult);
             }
         }

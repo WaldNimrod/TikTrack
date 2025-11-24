@@ -202,152 +202,161 @@
                 <div class="content-section" id="price-chart-section">
                     <div class="section-header">
                         <h2><img src="../../images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon"> גרף מחירים לאורך זמן</h2>
-                        <div class="header-actions d-flex flex-column gap-2 align-items-start">
-                            <!-- Row 1: Time Range & Chart Type -->
-                            <div class="d-flex align-items-center gap-2 flex-wrap">
-                                <!-- Unit Size Buttons -->
-                                <div class="chart-unit-size-group">
-                                    <div class="chart-unit-size-label">יחידת זמן</div>
-                                    <div class="chart-unit-size-buttons">
-                                        <button class="chart-unit-size-btn" data-unit="5min">5m</button>
-                                        <button class="chart-unit-size-btn" data-unit="hour">1h</button>
-                                        <button class="chart-unit-size-btn active" data-unit="day">1D</button>
-                                        <button class="chart-unit-size-btn" data-unit="week">1W</button>
-                                        <button class="chart-unit-size-btn" data-unit="month">1M</button>
-                                        <button class="chart-unit-size-btn" data-unit="year">1Y</button>
-                                    </div>
-                                </div>
-                                <!-- Time Range Buttons -->
-                                <div class="chart-time-range-group">
-                                    <div class="chart-time-range-label">טווח זמן</div>
-                                    <div class="chart-time-range-buttons">
-                                        <button class="chart-time-range-btn" data-range="day">יום</button>
-                                        <button class="chart-time-range-btn" data-range="week">שבוע</button>
-                                        <button class="chart-time-range-btn" data-range="month">חודש</button>
-                                        <button class="chart-time-range-btn" data-range="year">שנה</button>
-                                        <button class="chart-time-range-btn active" data-range="all">הכול</button>
-                                    </div>
-                                </div>
-                                <!-- Chart Type Buttons -->
-                                <div class="chart-type-group">
-                                    <div class="chart-type-label">סוג גרף</div>
-                                    <div class="chart-type-buttons">
-                                        <button class="chart-type-btn" data-type="line" title="קו">
-                                            <img src="../../images/icons/chart-type-line.svg" width="18" height="18" alt="קו">
-                                        </button>
-                                        <button class="chart-type-btn" data-type="bar" title="בארים">
-                                            <img src="../../images/icons/chart-type-bar.svg" width="18" height="18" alt="בארים">
-                                        </button>
-                                        <button class="chart-type-btn active" data-type="candlestick" title="נרות">
-                                            <img src="../../images/icons/chart-type-candlestick.svg" width="18" height="18" alt="נרות">
-                                        </button>
-                                    </div>
-                                </div>
-                            <!-- Row 2: Other Controls (all in one flex row, no wrap) -->
-                            <div class="d-flex align-items-center gap-2 flex-nowrap">
-                                <!-- View Mode Buttons (Price/Percentage) -->
-                                <div class="chart-view-mode-group">
-                                    <div class="chart-view-mode-label">מצב תצוגה</div>
-                                    <div class="chart-view-mode-buttons">
-                                        <button class="view-mode-btn active" data-mode="price" title="תצוגת מחיר">$</button>
-                                        <button class="view-mode-btn" data-mode="percent" title="תצוגת אחוזים">%</button>
-                                    </div>
-                                </div>
-                                <!-- Y-Axis Scale Buttons (Linear/Logarithmic) -->
-                                <div class="chart-y-scale-group">
-                                    <div class="chart-y-scale-label">סולם Y</div>
-                                    <div class="chart-y-scale-buttons">
-                                        <button class="y-scale-btn active" data-scale="linear" title="ליניארי">
-                                            <img src="../../images/icons/chart-scale-linear.svg" alt="ליניארי">
-                                        </button>
-                                        <button class="y-scale-btn" data-scale="log" title="לוגריתמי">
-                                            <img src="../../images/icons/chart-scale-log.svg" alt="לוגריתמי">
-                                        </button>
-                                    </div>
-                                </div>
-                                <!-- Volume Toggle Button (always visible, default ON) -->
-                                <div class="chart-control-group">
-                                    <div class="chart-control-label">נפח</div>
-                                    <div class="chart-control-buttons">
-                                        <button class="volume-toggle-btn active" id="volumeToggle" title="הצג/הסתר נפח">
-                                            <img src="../../images/icons/chart-volume-toggle.svg" alt="Volume">
-                                            <span>Volume</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <!-- Auto Scale Button -->
-                                <div class="chart-control-group">
-                                    <div class="chart-control-label">התאמה</div>
-                                    <div class="chart-control-buttons">
-                                        <button class="auto-scale-btn" id="autoScaleBtn" title="התאמה אוטומטית">
-                                            <img src="../../images/icons/chart-auto-scale.svg" alt="Auto Scale">
-                                        </button>
-                                    </div>
-                                </div>
-                                <!-- Zoom Controls -->
-                                <div class="chart-control-group">
-                                    <div class="chart-control-label">זום</div>
-                                    <div class="chart-control-buttons">
-                                        <button class="zoom-btn" data-action="zoom-in" title="זום פנימה">
-                                            <img src="../../images/icons/chart-zoom-in.svg" alt="Zoom In">
-                                        </button>
-                                        <button class="zoom-btn" data-action="zoom-out" title="זום החוצה">
-                                            <img src="../../images/icons/chart-zoom-out.svg" alt="Zoom Out">
-                                        </button>
-                                        <button class="zoom-btn" data-action="reset" title="איפוס זום">
-                                            <img src="../../images/icons/chart-zoom-reset.svg" alt="Reset Zoom">
-                                        </button>
-                                    </div>
-                                </div>
-                                <!-- Indicators Toggle -->
-                                <div class="chart-control-group">
-                                    <div class="chart-control-label">מחוונים</div>
-                                    <div class="chart-control-buttons">
-                                        <button class="indicators-toggle-btn" id="indicatorsToggle" title="מחוונים">
-                                            <img src="../../images/icons/chart-indicators.svg" alt="Indicators">
-                                            <span>Indicators</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <!-- Series Visibility Toggle -->
-                                <div class="chart-control-group">
-                                    <div class="chart-control-label">סדרות</div>
-                                    <div class="chart-control-buttons">
-                                        <button class="series-visibility-toggle-btn" id="seriesVisibilityToggle" title="הצג/הסתר סדרות">
-                                            <img src="../../images/icons/chart-series-toggle.svg" alt="Series">
-                                        </button>
-                                    </div>
-                                </div>
-                                <!-- Export/Screenshot -->
-                                <div class="chart-control-group">
-                                    <div class="chart-control-label">ייצוא</div>
-                                    <div class="chart-control-buttons">
-                                        <button class="export-btn" data-action="screenshot" title="צילום מסך">
-                                            <img src="../../images/icons/chart-screenshot.svg" alt="Screenshot">
-                                        </button>
-                                        <button class="export-btn" data-action="export-image" title="ייצא תמונה">
-                                            <img src="../../images/icons/chart-export-image.svg" alt="Export">
-                                        </button>
-                                    </div>
-                                </div>
-                                <!-- Drawing Tools Button -->
-                                <div class="chart-control-group">
-                                    <div class="chart-control-label">כלי ציור</div>
-                                    <div class="chart-control-buttons">
-                                        <button class="drawing-tools-toggle-btn" id="drawingToolsToggle" title="כלי ציור ומדידה">
-                                            <img src="../../images/icons/chart-drawing-tools.svg" alt="Drawing Tools">
-                                        </button>
-                                    </div>
-                                </div>
+                        <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('price-chart-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
-                            </div>
                         </div>
                     </div>
+                    <!-- Section Body (קונטיינר ראשי אחיד) -->
                     <div class="section-body">
+                        <!-- Chart Controls (LTR, above chart - בתוך section-body) -->
+                        <div class="chart-controls-wrapper" style="direction: ltr; text-align: left;">
+                            <div class="chart-controls-container">
+                                <!-- Row 1: Time Range & Chart Type -->
+                                <div class="chart-controls-row">
+                                    <!-- Unit Size Buttons -->
+                                    <div class="chart-unit-size-group">
+                                        <div class="chart-unit-size-label">יחידת זמן</div>
+                                        <div class="chart-unit-size-buttons">
+                                            <button class="chart-unit-size-btn" data-unit="5min">5m</button>
+                                            <button class="chart-unit-size-btn" data-unit="hour">1h</button>
+                                            <button class="chart-unit-size-btn active" data-unit="day">1D</button>
+                                            <button class="chart-unit-size-btn" data-unit="week">1W</button>
+                                            <button class="chart-unit-size-btn" data-unit="month">1M</button>
+                                            <button class="chart-unit-size-btn" data-unit="year">1Y</button>
+                                        </div>
+                                    </div>
+                                    <!-- Time Range Buttons -->
+                                    <div class="chart-time-range-group">
+                                        <div class="chart-time-range-label">טווח זמן</div>
+                                        <div class="chart-time-range-buttons">
+                                            <button class="chart-time-range-btn" data-range="day">יום</button>
+                                            <button class="chart-time-range-btn" data-range="week">שבוע</button>
+                                            <button class="chart-time-range-btn" data-range="month">חודש</button>
+                                            <button class="chart-time-range-btn" data-range="year">שנה</button>
+                                            <button class="chart-time-range-btn active" data-range="all">הכול</button>
+                                        </div>
+                                    </div>
+                                    <!-- Chart Type Buttons -->
+                                    <div class="chart-type-group">
+                                        <div class="chart-type-label">סוג גרף</div>
+                                        <div class="chart-type-buttons">
+                                            <button class="chart-type-btn" data-type="line" title="קו">
+                                                <img src="../../images/icons/chart-type-line.svg" width="18" height="18" alt="קו">
+                                            </button>
+                                            <button class="chart-type-btn" data-type="bar" title="בארים">
+                                                <img src="../../images/icons/chart-type-bar.svg" width="18" height="18" alt="בארים">
+                                            </button>
+                                            <button class="chart-type-btn active" data-type="candlestick" title="נרות">
+                                                <img src="../../images/icons/chart-type-candlestick.svg" width="18" height="18" alt="נרות">
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Row 2: Other Controls -->
+                                <div class="chart-controls-row">
+                                    <!-- View Mode Buttons (Price/Percentage) -->
+                                    <div class="chart-view-mode-group">
+                                        <div class="chart-view-mode-label">מצב תצוגה</div>
+                                        <div class="chart-view-mode-buttons">
+                                            <button class="view-mode-btn active" data-mode="price" title="תצוגת מחיר">$</button>
+                                            <button class="view-mode-btn" data-mode="percent" title="תצוגת אחוזים">%</button>
+                                        </div>
+                                    </div>
+                                    <!-- Y-Axis Scale Buttons (Linear/Logarithmic) -->
+                                    <div class="chart-y-scale-group">
+                                        <div class="chart-y-scale-label">סולם Y</div>
+                                        <div class="chart-y-scale-buttons">
+                                            <button class="y-scale-btn active" data-scale="linear" title="ליניארי">
+                                                <img src="../../images/icons/chart-scale-linear.svg" alt="ליניארי">
+                                            </button>
+                                            <button class="y-scale-btn" data-scale="log" title="לוגריתמי">
+                                                <img src="../../images/icons/chart-scale-log.svg" alt="לוגריתמי">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- Volume Toggle Button -->
+                                    <div class="chart-control-group">
+                                        <div class="chart-control-label">נפח</div>
+                                        <div class="chart-control-buttons">
+                                            <button class="volume-toggle-btn active" id="volumeToggle" title="הצג/הסתר נפח">
+                                                <img src="../../images/icons/chart-volume-toggle.svg" alt="Volume">
+                                                <span>Volume</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- Auto Scale Button -->
+                                    <div class="chart-control-group">
+                                        <div class="chart-control-label">התאמה</div>
+                                        <div class="chart-control-buttons">
+                                            <button class="auto-scale-btn" id="autoScaleBtn" title="התאמה אוטומטית">
+                                                <img src="../../images/icons/chart-auto-scale.svg" alt="Auto Scale">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- Zoom Controls -->
+                                    <div class="chart-control-group">
+                                        <div class="chart-control-label">זום</div>
+                                        <div class="chart-control-buttons">
+                                            <button class="zoom-btn" data-action="zoom-in" title="זום פנימה">
+                                                <img src="../../images/icons/chart-zoom-in.svg" alt="Zoom In">
+                                            </button>
+                                            <button class="zoom-btn" data-action="zoom-out" title="זום החוצה">
+                                                <img src="../../images/icons/chart-zoom-out.svg" alt="Zoom Out">
+                                            </button>
+                                            <button class="zoom-btn" data-action="reset" title="איפוס זום">
+                                                <img src="../../images/icons/chart-zoom-reset.svg" alt="Reset Zoom">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- Indicators Toggle -->
+                                    <div class="chart-control-group">
+                                        <div class="chart-control-label">מחוונים</div>
+                                        <div class="chart-control-buttons">
+                                            <button class="indicators-toggle-btn" id="indicatorsToggle" title="מחוונים">
+                                                <img src="../../images/icons/chart-indicators.svg" alt="Indicators">
+                                                <span>Indicators</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- Series Visibility Toggle -->
+                                    <div class="chart-control-group">
+                                        <div class="chart-control-label">סדרות</div>
+                                        <div class="chart-control-buttons">
+                                            <button class="series-visibility-toggle-btn" id="seriesVisibilityToggle" title="הצג/הסתר סדרות">
+                                                <img src="../../images/icons/chart-series-toggle.svg" alt="Series">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- Export/Screenshot -->
+                                    <div class="chart-control-group">
+                                        <div class="chart-control-label">ייצוא</div>
+                                        <div class="chart-control-buttons">
+                                            <button class="export-btn" data-action="screenshot" title="צילום מסך">
+                                                <img src="../../images/icons/chart-screenshot.svg" alt="Screenshot">
+                                            </button>
+                                            <button class="export-btn" data-action="export-image" title="ייצא תמונה">
+                                                <img src="../../images/icons/chart-export-image.svg" alt="Export">
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- Drawing Tools Button -->
+                                    <div class="chart-control-group">
+                                        <div class="chart-control-label">כלי ציור</div>
+                                        <div class="chart-control-buttons">
+                                            <button class="drawing-tools-toggle-btn" id="drawingToolsToggle" title="כלי ציור ומדידה">
+                                                <img src="../../images/icons/chart-drawing-tools.svg" alt="Drawing Tools">
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Chart Container Wrapper (קונטיינר ייעודי לגרף) -->
+                        <div class="chart-container-wrapper">
                                 <!-- Price Chart Container (Top Panel) -->
-                                <div id="price-chart-wrapper">
+                                <div class="tradingview-chart-wrapper" id="price-chart-wrapper">
                                     <!-- Indicators Toolbar (Right Side) -->
                                     <div id="indicators-toolbar" class="chart-toolbar chart-toolbar-right">
                                         <div class="chart-toolbar-header">
@@ -423,12 +432,14 @@
                                     </div>
                                     <!-- Drawing Canvas Overlay -->
                                     <canvas id="drawing-canvas"></canvas>
-                                    <div id="price-chart-container"></div>
+                                    <div class="tradingview-chart-container tradingview-price-chart-container" id="price-chart-container"></div>
                                 </div>
                                 <!-- Volume Chart Container (Bottom Panel - Separate) -->
-                                <div id="volume-chart-wrapper">
-                                    <div id="volume-chart-container"></div>
+                                <div class="tradingview-chart-wrapper" id="volume-chart-wrapper">
+                                    <div class="tradingview-chart-container tradingview-volume-chart-container" id="volume-chart-container"></div>
                                 </div>
+                        </div>
+                        <!-- אפשר להוסיף אלמנטים נוספים כאן (מעל או מתחת לגרף) -->
                     </div>
                 </div>
                 
@@ -443,8 +454,8 @@
                         </div>
                     </div>
                     <div class="section-body">
-                        <div id="comparison-chart-container">
-                            <div id="comparison-chart-wrapper"></div>
+                        <div class="tradingview-chart-wrapper comparison-chart-wrapper" id="comparison-chart-wrapper">
+                            <div class="tradingview-chart-container tradingview-comparison-chart-container" id="comparison-chart-container"></div>
                             <div id="comparison-legend" class="mt-3">
                                 <!-- Legend will be dynamically generated here -->
                             </div>

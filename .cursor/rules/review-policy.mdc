@@ -1,0 +1,60 @@
+---
+description: Agent Review usage guidelines to optimize quota consumption
+alwaysApply: true
+---
+
+# Agent Review Usage Policy
+
+## When to Use Agent Review ✅
+
+Use Agent Review ONLY for:
+
+- Major refactors affecting 5+ files
+
+- Security-sensitive changes:
+
+  - Authentication/Authorization
+
+  - Payment processing
+
+  - Data encryption/privacy
+
+  - API security
+
+- Database schema migrations
+
+- Breaking API changes
+
+- Major architectural changes
+
+## When NOT to Use Agent Review ❌
+
+Do NOT use Agent Review for:
+
+- Small bug fixes (1-2 files)
+
+- UI/styling tweaks
+
+- Single file changes
+
+- Documentation updates
+
+- Minor refactors
+
+- Adding comments or logs
+
+- Configuration changes
+
+## Alternative Approach
+
+For small changes:
+
+1. Manually review the diff in VS Code
+
+2. Use Git diff tools
+
+3. Rely on your own code review practices
+
+4. Save Agent Review for critical changes
+
+**Remember:** Each Agent Review = 1 full agent request = quota usage

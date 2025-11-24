@@ -127,3 +127,133 @@ export POSTGRES_PASSWORD="BigMeZoo1974!?"
 - **If multiple processes**: Kill existing with `kill [PID]`
 - **Always use**: `./start_server.sh` (automatically configures PostgreSQL)
 - Check logs in `Backend/logs/` for detailed information
+
+## Cursor Usage Optimization Rules - CRITICAL
+
+**These rules optimize quota usage and should be followed in ALL interactions.**
+
+### 1. Model Selection Policy
+
+- **ALWAYS use Gemini 2.5 Flash** as the primary model (most cost-effective)
+- It provides the best cost-to-performance ratio
+- **NEVER use Auto model selection**
+- Only suggest alternative models if:
+  - The user explicitly requests a different model
+  - The task has specific requirements that Gemini cannot handle
+
+### 2. Agent Review Policy
+
+**Use Agent Review ONLY for:**
+
+- Major refactors affecting 5+ files
+- Security-sensitive changes:
+  - Authentication/Authorization
+  - Payment processing
+  - Data encryption/privacy
+  - API security
+- Database schema migrations
+- Breaking API changes
+- Major architectural changes
+
+**Do NOT use Agent Review for:**
+
+- Small bug fixes (1-2 files)
+- UI/styling tweaks
+- Single file changes
+- Documentation updates
+- Minor refactors
+- Adding comments or logs
+- Configuration changes
+
+**Alternative for small changes:**
+- Manually review the diff in VS Code
+- Use Git diff tools
+- Rely on your own code review practices
+- Save Agent Review for critical changes
+
+**Remember:** Each Agent Review = 1 full agent request = quota usage
+
+### 3. Tab Completions First - CRITICAL
+
+**Tab completions are unlimited and don't consume quota. Use them extensively!**
+
+**When to suggest Tab instead of Agent:**
+
+- Function implementations following common patterns
+- Standard CRUD operations
+- Basic data transformations
+- Common loops and iterations
+- Standard error handling
+- Typical React components
+- Standard API calls
+
+**When to use Agent (Chat):**
+
+- Complex algorithms
+- Unfamiliar patterns
+- Multi-file changes
+- Architecture decisions
+- Debugging complex issues
+- Refactoring large sections
+
+**Recommendation Strategy:**
+
+When user asks for simple code:
+1. First suggest: "You can start typing and use Tab to autocomplete this"
+2. Offer: "Would you like me to explain the pattern so you can Tab-complete, or shall I write it out?"
+3. For power users: Provide the pattern/structure and let them Tab-complete
+
+**Remember:** Every Tab completion = $0. Every Agent response = quota usage.
+
+### 4. Context Management
+
+**Standard Context (Default):**
+- Use standard 200k token context for 99% of tasks
+- This is sufficient for most coding scenarios
+- Covers ~15,000 lines of code
+
+**Max Mode Restrictions:**
+
+Do NOT use Max Mode unless ALL of the following apply:
+- Individual files exceed 10,000 lines
+- Need to analyze multiple large dependencies simultaneously
+- Standard context has proven insufficient
+- User explicitly requests Max Mode
+
+**Context Best Practices:**
+
+- Include only directly relevant files in responses
+- Reference specific functions with @symbols instead of full files
+- Avoid attaching full files when only a section is relevant
+- Don't include entire directories
+- Remove unnecessary context between prompts
+
+**Efficient File References:**
+
+✅ Good: `@myFunction` in `utils.ts`
+✅ Good: Show me lines 45-60 of `@component.tsx`
+❌ Bad: Include all files in the `src/` directory
+❌ Bad: Attach the entire `@largefile.ts` for one function
+
+**Remember:** More context = more tokens = more quota usage
+
+### 5. Response Style
+
+- Be concise and focused
+- Get straight to the solution
+- Avoid unnecessary explanations unless asked
+- Don't repeat information already provided
+- Remember: shorter responses = less quota usage
+
+### 6. Workflow Preferences
+
+When providing coding assistance:
+- Suggest using Tab completions for simple code patterns
+- Remind that Tab is unlimited and doesn't consume quota
+- For straightforward functions, encourage starting typing and let Tab complete
+- Only write full implementations for:
+  - Complex algorithms
+  - Multi-step workflows
+  - When explicitly requested
+
+**These optimization rules are fundamental and should be applied in ALL future interactions.**

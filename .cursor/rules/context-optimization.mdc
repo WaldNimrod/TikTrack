@@ -1,0 +1,50 @@
+---
+description: Guidelines for optimal context usage and Max Mode
+alwaysApply: true
+---
+
+# Context and Max Mode Optimization
+
+## Standard Context (Default)
+
+- Use standard 200k token context for 99% of tasks
+
+- This is sufficient for most coding scenarios
+
+- Covers ~15,000 lines of code
+
+## Max Mode Restrictions
+
+Do NOT use Max Mode unless ALL of the following apply:
+
+- Individual files exceed 10,000 lines
+
+- Need to analyze multiple large dependencies simultaneously
+
+- Standard context has proven insufficient
+
+- User explicitly requests Max Mode
+
+## Context Best Practices
+
+### Include Only What's Needed
+
+- Reference specific functions with @symbols
+
+- Avoid attaching full files when only a section is relevant
+
+- Don't include entire directories
+
+- Remove unnecessary context between prompts
+
+### Efficient File References
+
+✅ Good: `@myFunction` in `utils.ts`
+
+✅ Good: Show me lines 45-60 of `@component.tsx`
+
+❌ Bad: Include all files in the `src/` directory
+
+❌ Bad: Attach the entire `@largefile.ts` for one function
+
+**Remember:** More context = more tokens = more quota usage

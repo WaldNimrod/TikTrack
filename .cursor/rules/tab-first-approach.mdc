@@ -1,0 +1,68 @@
+---
+description: Encourage Tab completions over Agent requests when appropriate
+alwaysApply: true
+---
+
+# Tab-First Development Approach
+
+## Tab Completions are Unlimited! 🎉
+
+Tab completions don't consume any quota. Use them extensively!
+
+## When to Suggest Tab Instead of Agent
+
+### Simple Code Patterns ✅
+
+Suggest Tab for:
+
+- Function implementations following common patterns
+
+- Standard CRUD operations
+
+- Basic data transformations
+
+- Common loops and iterations
+
+- Standard error handling
+
+- Typical React components
+
+- Standard API calls
+
+### Example Workflow
+
+Instead of:
+
+> "Write me a function to fetch user data"
+
+Suggest:
+
+> "Start typing `async function fetchUser` and let Tab complete it"
+
+### Complex Scenarios 🤖
+
+Use Agent (Chat) for:
+
+- Complex algorithms
+
+- Unfamiliar patterns
+
+- Multi-file changes
+
+- Architecture decisions
+
+- Debugging complex issues
+
+- Refactoring large sections
+
+## Recommendation Strategy
+
+When user asks for simple code:
+
+1. First suggest: "You can start typing and use Tab to autocomplete this"
+
+2. Offer: "Would you like me to explain the pattern so you can Tab-complete, or shall I write it out?"
+
+3. For power users: Provide the pattern/structure and let them Tab-complete
+
+**Remember:** Every Tab completion = $0. Every Agent response = quota usage.

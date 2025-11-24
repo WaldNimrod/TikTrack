@@ -10,13 +10,13 @@
     "notes": "Add comprehensive bug documentation for execution clustering issue"
   },
   "development": {
-    "version": "1.3.21.0",
+    "version": "1.3.22.0",
     "major": 1,
     "minor": 3,
-    "patch": 21,
+    "patch": 22,
     "build": 0,
-    "commit": "8045ea03bcfd222129a6cba3af8357af56c1386a",
-    "updated_at": "2025-11-24T15:10:50+00:00",
-    "notes": "Fix: הוספת סינון לפי side במערכת שיוך ביצועים - רק trades עם side תואם יוצעו"
+    "commit": "cdb459489028b38653238068d25594d9502b0dfc",
+    "updated_at": "2025-11-24T15:24:00+00:00",
+    "notes": "Fix TradingView Widgets System: Remove init-system.js 404 errors, fix syntax, add 2 missing widgets, register all mockup pages"
   }
 }

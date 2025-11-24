@@ -46,27 +46,17 @@
             }
 
             try {
-                // Load mappings
+                // Load mappings - retry if not available
                 if (typeof window.IconMappings !== 'undefined') {
                     this.mappings = window.IconMappings;
-                    
-                    // Debug: Log available button mappings
-                    if (typeof window.Logger !== 'undefined' && this.mappings.buttons) {
-                        window.Logger.debug('IconMappings loaded', {
-                            page: 'icon-system',
-                            buttonCount: Object.keys(this.mappings.buttons).length,
-                            hasInfoCircle: 'info-circle' in this.mappings.buttons,
-                            hasBookmark: 'bookmark' in this.mappings.buttons,
-                            hasAlertCircle: 'alert-circle' in this.mappings.buttons
-                        });
-                    }
                 } else {
-                    if (typeof window.Logger !== 'undefined') {
-                        window.Logger.warn('⚠️ IconMappings not found, using fallback', { page: 'icon-system' });
+                    // Retry after a short delay
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    if (typeof window.IconMappings !== 'undefined') {
+                        this.mappings = window.IconMappings;
                     } else {
-                        console.warn('⚠️ IconMappings not found, using fallback');
+                        this.mappings = {};
                     }
-                    this.mappings = {};
                 }
 
                 // Check cache availability
@@ -76,19 +66,8 @@
 
                 this.initialized = true;
 
-                if (typeof window.Logger !== 'undefined') {
-                    window.Logger.info('✅ Icon System initialized successfully', { page: 'icon-system' });
-                } else {
-                    console.log('✅ Icon System initialized successfully');
-                }
-
                 return true;
             } catch (error) {
-                if (typeof window.Logger !== 'undefined') {
-                    window.Logger.error('❌ Failed to initialize Icon System:', error, { page: 'icon-system' });
-                } else {
-                    console.error('❌ Failed to initialize Icon System:', error);
-                }
                 return false;
             }
         }
@@ -153,19 +132,8 @@
                         iconPath = `${this.tablerPath}${mapping}.svg`;
                     }
                 } else {
-                    // Try direct Tabler name (will fail if icon doesn't exist)
+                    // Try direct Tabler name
                     iconPath = `${this.tablerPath}${name}.svg`;
-                    
-                    // Log missing mapping for debugging (only for known missing icons)
-                    if (typeof window.Logger !== 'undefined' && ['info-circle', 'bookmark', 'alert-circle'].includes(name)) {
-                        window.Logger.warn('Icon mapping not found, trying direct path (will fail)', {
-                            page: 'icon-system',
-                            type: type,
-                            name: name,
-                            hasMappings: !!this.mappings?.[type],
-                            availableMappings: this.mappings?.[type] ? Object.keys(this.mappings[type]).slice(0, 10) : []
-                        });
-                    }
                 }
             }
 
@@ -222,7 +190,6 @@
                 } catch (error) {
                     // If loading fails, fallback to img tag
                     if (typeof window.Logger !== 'undefined') {
-                        window.Logger.debug(`⚠️ Failed to load SVG inline for ${path}, using img tag:`, error, { page: 'icon-system' });
                     }
                 }
             }
@@ -431,11 +398,5 @@
         iconSystem.initialize().catch(console.error);
     }
 
-    // Log initialization
-    if (typeof window.Logger !== 'undefined') {
-        window.Logger.info('✅ Icon System loaded successfully', { page: 'icon-system' });
-    } else {
-        console.log('✅ Icon System loaded successfully');
-    }
 })();
 

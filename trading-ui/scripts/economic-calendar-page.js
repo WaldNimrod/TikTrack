@@ -153,12 +153,7 @@
                 if (parsed.eventTypes) state.filters.eventTypes = parsed.eventTypes;
             }
         } catch (error) {
-            if (window.Logger) {
-                window.Logger.warn('Failed to load filters from localStorage', {
-                    page: 'economic-calendar-page',
-                    error: error.message
-                });
-            }
+            // Ignore localStorage errors
         }
     }
 
@@ -175,12 +170,7 @@
             };
             localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(data));
         } catch (error) {
-            if (window.Logger) {
-                window.Logger.warn('Failed to save filters to localStorage', {
-                    page: 'economic-calendar-page',
-                    error: error.message
-                });
-            }
+            // Ignore localStorage errors
         }
     }
 
@@ -290,20 +280,10 @@
         try {
             const cached = await window.UnifiedCacheManager.get(WIDGET_CONFIG_CACHE_KEY);
             if (cached && cached.config) {
-                if (window.Logger) {
-                    window.Logger.info('Loaded widget config from cache', {
-                        page: 'economic-calendar-page'
-                    });
-                }
                 return cached.config;
             }
         } catch (error) {
-            if (window.Logger) {
-                window.Logger.warn('Failed to load widget config from cache', {
-                    page: 'economic-calendar-page',
-                    error: error.message
-                });
-            }
+            // Ignore cache errors
         }
 
         return null;
@@ -324,18 +304,7 @@
                 timestamp: Date.now()
             }, { ttl: WIDGET_CONFIG_CACHE_TTL });
 
-            if (window.Logger) {
-                window.Logger.info('Saved widget config to cache', {
-                    page: 'economic-calendar-page'
-                });
-            }
         } catch (error) {
-            if (window.Logger) {
-                window.Logger.warn('Failed to save widget config to cache', {
-                    page: 'economic-calendar-page',
-                    error: error.message
-                });
-            }
         }
     }
 
@@ -504,13 +473,6 @@
         if (window.NotificationSystem) {
             window.NotificationSystem.showSuccess('האירוע נשמר בהצלחה');
         }
-
-        if (window.Logger) {
-            window.Logger.info('Event saved from widget', {
-                page: 'economic-calendar-page',
-                event: newEvent.title
-            });
-        }
     }
 
     /**
@@ -628,11 +590,6 @@
      */
     async function initializeEconomicCalendarWidget() {
         if (state.initialized) {
-            if (window.Logger) {
-                window.Logger.warn('Economic Calendar Widget already initialized', {
-                    page: 'economic-calendar-page'
-                });
-            }
             return;
         }
 
@@ -640,61 +597,52 @@
         hideError();
 
         try {
-            // Wait for TradingViewWidgetsManager to be available
+            // Wait for TradingViewWidgetsManager to be available (reduced timeout)
             const managerAvailable = await waitFor(() => {
                 return typeof window.TradingViewWidgetsManager !== 'undefined';
-            }, 5000);
+            }, 2000).catch(() => false);
 
             if (!managerAvailable) {
                 throw new Error('TradingViewWidgetsManager not available after timeout');
             }
 
-            // Wait for cache system (optional, non-blocking)
-            if (window.cacheSystemReady !== undefined) {
-                // Use Promise.race to timeout quickly
-                await Promise.race([
-                    waitFor(() => window.cacheSystemReady === true, 2000), // Reduced from 5000
-                    new Promise(resolve => setTimeout(resolve, 2000)) // Max 2 seconds
-                ]).catch(() => {
-                    // Ignore timeout - cache is optional
-                });
-            }
-
-            // Wait for preferences (optional, non-blocking)
-            await Promise.race([
-                waitFor(() => {
-                    return window.currentPreferences || window.userPreferences;
-                }, 2000), // Reduced from 5000
-                new Promise(resolve => setTimeout(resolve, 2000)) // Max 2 seconds
-            ]).catch(() => {
-                // Ignore timeout - preferences are optional
-            });
-
             // Initialize TradingViewWidgetsManager if needed (blocking for widget creation)
             if (window.TradingViewWidgetsManager && !window.TradingViewWidgetsManager._initialized) {
                 await window.TradingViewWidgetsManager.init();
                 
-                // Wait for initialization to complete
+                // Wait for initialization to complete (reduced timeout)
                 await waitFor(() => {
                     return window.TradingViewWidgetsManager._initialized === true;
-                }, 5000);
-            } else if (window.TradingViewWidgetsManager && window.TradingViewWidgetsManager._initialized) {
-                // Already initialized, continue
-            } else {
-                throw new Error('TradingViewWidgetsManager not available');
-            }
-
-            // Get widget configuration
-            const config = await getWidgetConfig(true);
-
-            // Create widget
-            if (window.Logger) {
-                window.Logger.info('Creating Economic Calendar Widget', {
-                    page: 'economic-calendar-page',
-                    config: config
+                }, 2000).catch(() => {
+                    // Continue anyway - widget might still work
                 });
             }
 
+            // Load cache and preferences in parallel (non-blocking, very short timeout)
+            const loadOptionalData = Promise.allSettled([
+                // Cache system (500ms max)
+                window.cacheSystemReady !== undefined 
+                    ? Promise.race([
+                        waitFor(() => window.cacheSystemReady === true, 500),
+                        new Promise(resolve => setTimeout(resolve, 500))
+                    ])
+                    : Promise.resolve(),
+                // Preferences (500ms max)
+                Promise.race([
+                    waitFor(() => window.currentPreferences || window.userPreferences, 500),
+                    new Promise(resolve => setTimeout(resolve, 500))
+                ])
+            ]);
+            
+            // Don't wait for optional data - continue immediately
+            loadOptionalData.catch(() => {
+                // Ignore - these are optional
+            });
+
+            // Get widget configuration (non-blocking, use defaults if cache/preferences not ready)
+            const config = await getWidgetConfig(false);
+
+            // Create widget immediately
             const widget = window.TradingViewWidgetsManager.createWidget({
                 type: 'economic-calendar',
                 containerId: state.widgetContainerId,
@@ -709,6 +657,17 @@
 
             // Setup event listeners after widget is loaded
             setupWidgetEventListeners();
+            
+            // Update widget config in background if cache/preferences become available
+            loadOptionalData.then(() => {
+                getWidgetConfig(true).then(updatedConfig => {
+                    if (state.widget && updatedConfig) {
+                        window.TradingViewWidgetsManager.updateWidget(state.widget.id, updatedConfig);
+                    }
+                }).catch(() => {
+                    // Ignore - widget already loaded with defaults
+                });
+            });
 
             if (window.NotificationSystem) {
                 window.NotificationSystem.showSuccess('לוח השנה הכלכלי נטען בהצלחה');
@@ -727,17 +686,6 @@
             if (window.NotificationSystem) {
                 window.NotificationSystem.showError('שגיאה', errorMessage);
             }
-
-            if (window.NotificationSystem) {
-                window.NotificationSystem.showError('שגיאה', 'שגיאה באתחול לוח כלכלי');
-            }
-            if (window.Logger) {
-                window.Logger.error('Failed to initialize Economic Calendar Widget', {
-                    page: 'economic-calendar-page',
-                    error: error.message,
-                    stack: error.stack
-                });
-            }
         }
     }
 
@@ -755,21 +703,9 @@
             if (window.TradingViewWidgetsManager) {
                 // Update widget (this will recreate it with new config)
                 window.TradingViewWidgetsManager.updateWidget(state.widgetContainerId, config);
-                
-                if (window.Logger) {
-                    window.Logger.info('Economic Calendar Widget updated', {
-                        page: 'economic-calendar-page',
-                        config: config
-                    });
-                }
             }
         } catch (error) {
-            if (window.Logger) {
-                window.Logger.error('Failed to update Economic Calendar Widget', {
-                    page: 'economic-calendar-page',
-                    error: error.message
-                });
-            }
+            // Ignore update errors
         }
     }
 
@@ -782,19 +718,8 @@
                 window.TradingViewWidgetsManager.destroyWidget(state.widgetContainerId);
                 state.widget = null;
                 state.initialized = false;
-                
-                if (window.Logger) {
-                    window.Logger.info('Economic Calendar Widget destroyed', {
-                        page: 'economic-calendar-page'
-                    });
-                }
             } catch (error) {
-                if (window.Logger) {
-                    window.Logger.error('Failed to destroy Economic Calendar Widget', {
-                        page: 'economic-calendar-page',
-                        error: error.message
-                    });
-                }
+                // Ignore destroy errors
             }
         }
     }
@@ -805,11 +730,6 @@
      * Handle preferences loaded event
      */
     function handlePreferencesLoaded() {
-        if (window.Logger) {
-            window.Logger.info('Preferences loaded, updating widget', {
-                page: 'economic-calendar-page'
-            });
-        }
 
         // Update widget with new preferences
         if (state.initialized) {
@@ -827,13 +747,6 @@
         // Watch color changes
         if (window.TradingViewWidgetsColors) {
             window.TradingViewWidgetsColors.watchColorChanges((colors) => {
-                if (window.Logger) {
-                    window.Logger.info('Colors changed, updating widget', {
-                        page: 'economic-calendar-page',
-                        colors: colors
-                    });
-                }
-
                 if (state.initialized) {
                     updateWidgetConfig();
                 }
@@ -925,14 +838,20 @@
      * Initialize icons using IconSystem
      */
     async function initializeIcons() {
-        // Wait for IconSystem to be ready
+        // Wait for IconMappings to be loaded first (short timeout)
+        if (typeof window.IconMappings === 'undefined') {
+            await waitFor(() => {
+                return typeof window.IconMappings !== 'undefined';
+            }, 1000).catch(() => {
+                // Continue anyway
+            });
+        }
+
+        // Wait for IconSystem to be ready (short timeout)
         if (!window.IconSystem) {
             await waitFor(() => {
                 return typeof window.IconSystem !== 'undefined';
-            }, 5000).catch(() => {
-                if (window.Logger) {
-                    window.Logger.warn('IconSystem not available', { page: 'economic-calendar-page' });
-                }
+            }, 1000).catch(() => {
                 return;
             });
         }
@@ -940,19 +859,28 @@
         // Initialize IconSystem if needed
         if (window.IconSystem && !window.IconSystem.initialized) {
             await window.IconSystem.initialize().catch(() => {
-                if (window.Logger) {
-                    window.Logger.warn('Failed to initialize IconSystem', { page: 'economic-calendar-page' });
-                }
+                // Continue anyway
             });
         }
 
         if (!window.IconSystem || !window.IconSystem.initialized) {
-            if (window.Logger) {
-                window.Logger.warn('IconSystem not initialized, skipping icon rendering', { 
-                    page: 'economic-calendar-page' 
-                });
-            }
             return;
+        }
+
+        // Verify mappings are loaded - retry if needed
+        if (!window.IconSystem.mappings || !window.IconSystem.mappings.buttons) {
+            // Retry loading mappings
+            if (window.IconMappings) {
+                window.IconSystem.mappings = window.IconMappings;
+            } else {
+                // Wait a bit and retry
+                await new Promise(resolve => setTimeout(resolve, 100));
+                if (window.IconMappings) {
+                    window.IconSystem.mappings = window.IconMappings;
+                } else {
+                    return;
+                }
+            }
         }
 
         // Replace all icon placeholders (only if they have a parent node)
@@ -979,13 +907,6 @@
                         placeholder.outerHTML = iconHTML;
                     }
                 } catch (error) {
-                    if (window.Logger) {
-                        window.Logger.warn('Failed to render icon', {
-                            page: 'economic-calendar-page',
-                            icon: iconName,
-                            error: error.message
-                        });
-                    }
                     // Fallback - try to use img tag with path
                     if (placeholder.parentNode && document.contains(placeholder)) {
                         const fallbackPath = `/trading-ui/images/icons/tabler/${iconName}.svg`;
@@ -1034,11 +955,6 @@
      * Initialize page
      */
     async function initializePage() {
-        if (window.Logger) {
-            window.Logger.info('Initializing Economic Calendar Page', {
-                page: 'economic-calendar-page'
-            });
-        }
 
         // Initialize Header System first
         initializeHeader();
@@ -1063,34 +979,17 @@
         ]);
 
         if (!systemsReady) {
-            if (window.Logger) {
-                window.Logger.warn('Some TradingView systems not available, continuing anyway', {
-                    page: 'economic-calendar-page'
-                });
-            }
         }
 
         // Initialize widget in background (don't block on this - load data immediately)
         // Load data first, then initialize widget
         initializeEconomicCalendarWidget().catch(error => {
-            if (window.Logger) {
-                window.Logger.error('Widget initialization failed, but continuing with data load', {
-                    page: 'economic-calendar-page',
-                    error: error.message
-                });
-            }
         });
 
         // Load mock data (always do this, even if widget failed)
         if (window.EconomicEventsMockData) {
             state.savedEvents = window.EconomicEventsMockData;
             
-            if (window.Logger) {
-                window.Logger.info('Loaded mock data', {
-                    page: 'economic-calendar-page',
-                    count: state.savedEvents.length
-                });
-            }
         }
 
         // Render saved events
@@ -1105,12 +1004,6 @@
             if (config && state.savedEvents && state.savedEvents.length > 0) {
                 window.InfoSummarySystem.calculateAndRender(state.savedEvents, config);
                 
-                if (window.Logger) {
-                    window.Logger.info('Updated summary statistics', {
-                        page: 'economic-calendar-page',
-                        eventsCount: state.savedEvents.length
-                    });
-                }
             }
         }
     }

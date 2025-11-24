@@ -2342,10 +2342,12 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'TradingViewTheme',
         'window.LightweightCharts',
         'window.tradeHistoryPage',
+        'window.UnifiedCacheManager',
+        'window.UnifiedAppInitializer',
       ],
       pageSpecificScripts: ['scripts/trade-history-page.js'],
       description: 'עמוד היסטוריית טרייד - מוקאפ עם גרפים TradingView',
-      lastModified: '2025-01-27',
+      lastModified: '2025-01-29',
       pageType: 'mockup',
       preloadAssets: ['trades-data', 'executions-data'],
       cacheStrategy: 'standard',
@@ -2354,15 +2356,42 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: true,
       customInitializers: [
         async pageConfig => {
-          window.Logger.info('📊 Initializing Trade History Page...', {
+          window.Logger.info('📊 Initializing Trade History Page via UnifiedAppInitializer...', {
             page: 'page-initialization-configs',
           });
 
-          // Wait for TradingView to be available
-          if (typeof window.lightweightCharts === 'undefined') {
-            window.Logger.warn('⚠️ TradingView Lightweight Charts not loaded yet', {
+          // Wait for tradeHistoryPage to be available
+          if (!window.tradeHistoryPage || typeof window.tradeHistoryPage.initializePage !== 'function') {
+            window.Logger.warn('⚠️ tradeHistoryPage.initializePage not available yet, waiting...', {
               page: 'page-initialization-configs',
             });
+            
+            // Wait up to 5 seconds for the script to load
+            let retries = 0;
+            while (!window.tradeHistoryPage || typeof window.tradeHistoryPage.initializePage !== 'function') {
+              if (retries >= 50) {
+                window.Logger.error('❌ tradeHistoryPage.initializePage not available after wait', {
+                  page: 'page-initialization-configs',
+                });
+                return;
+              }
+              await new Promise(resolve => setTimeout(resolve, 100));
+              retries++;
+            }
+          }
+
+          // Call initializePage from trade-history-page.js
+          try {
+            await window.tradeHistoryPage.initializePage();
+            window.Logger.info('✅ Trade History Page initialized via UnifiedAppInitializer', {
+              page: 'page-initialization-configs',
+            });
+          } catch (error) {
+            window.Logger.error('❌ Error initializing Trade History Page', {
+              page: 'page-initialization-configs',
+              error,
+            });
+            throw error;
           }
         },
       ],

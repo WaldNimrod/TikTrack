@@ -24,6 +24,9 @@
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
     
+    <!-- Date Comparison Modal Fixes -->
+    <link rel="stylesheet" href="date-comparison-modal-fixes.css">
+    
     <!-- Header System -->
     <script src="../../scripts/header-system.js" defer></script>
     
@@ -109,36 +112,99 @@
                     <div class="section-header">
                         <h2><img src="../../images/icons/tabler/calendar.svg" width="16" height="16" alt="calendar" class="icon"> בחירת תאריכים להשוואה</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('date-selection-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('date-selection-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="row g-3">
-                            <div class="col-md-5">
-                                <label for="date1" class="form-label">תאריך 1:</label>
-                                <input type="date" id="date1" class="form-control" onchange="handleDate1Change()">
+                        <!-- Date Range Filter (Preset) -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-3">
+                                <label for="dateComparisonRangeFilterToggle" class="form-label form-label-small">טווח מוגדר</label>
+                                <div class="filter-group date-range-filter">
+                                    <div class="filter-dropdown">
+                                        <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="dateComparisonRangeFilterToggle" data-onclick="toggleDateComparisonRangeFilterMenu()">
+                                            <span class="selected-value selected-date-text" id="selectedDateComparisonRange">השנה</span>
+                                            <span class="dropdown-arrow">▼</span>
+                                        </button>
+                                        <div class="filter-menu" id="dateComparisonRangeFilterMenu">
+                                            <div class="date-range-filter-item" data-value="אתמול" data-onclick="selectDateComparisonRangeOption('אתמול')">
+                                                <span class="option-text">אתמול</span>
+                                            </div>
+                                            <div class="date-range-filter-item" data-value="השבוע" data-onclick="selectDateComparisonRangeOption('השבוע')">
+                                                <span class="option-text">השבוע</span>
+                                            </div>
+                                            <div class="date-range-filter-item" data-value="שבוע" data-onclick="selectDateComparisonRangeOption('שבוע')">
+                                                <span class="option-text">שבוע (7 ימים)</span>
+                                            </div>
+                                            <div class="date-range-filter-item" data-value="שבוע קודם" data-onclick="selectDateComparisonRangeOption('שבוע קודם')">
+                                                <span class="option-text">שבוע שעבר</span>
+                                            </div>
+                                            <div class="date-range-filter-item" data-value="החודש" data-onclick="selectDateComparisonRangeOption('החודש')">
+                                                <span class="option-text">החודש</span>
+                                            </div>
+                                            <div class="date-range-filter-item" data-value="חודש" data-onclick="selectDateComparisonRangeOption('חודש')">
+                                                <span class="option-text">חודש (30 יום)</span>
+                                            </div>
+                                            <div class="date-range-filter-item" data-value="חודש קודם" data-onclick="selectDateComparisonRangeOption('חודש קודם')">
+                                                <span class="option-text">חודש קודם</span>
+                                            </div>
+                                            <div class="date-range-filter-item selected" data-value="השנה" data-onclick="selectDateComparisonRangeOption('השנה')">
+                                                <span class="option-text">השנה</span>
+                                            </div>
+                                            <div class="date-range-filter-item" data-value="שנה" data-onclick="selectDateComparisonRangeOption('שנה')">
+                                                <span class="option-text">שנה (365 ימים)</span>
+                                            </div>
+                                            <div class="date-range-filter-item" data-value="שנה קודמת" data-onclick="selectDateComparisonRangeOption('שנה קודמת')">
+                                                <span class="option-text">שנה שעברה</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-5">
-                                <label for="date2" class="form-label">תאריך 2:</label>
-                                <input type="date" id="date2" class="form-control" onchange="handleDate2Change()">
-                            </div>
+                            
+                            <!-- Compare Button -->
                             <div class="col-md-2">
-                                <label class="form-label">&nbsp;</label>
+                                <label class="form-label form-label-small">&nbsp;</label>
                                 <button data-button-type="COMPARE" data-variant="primary" data-text="השווה" data-onclick="compareDates()" class="w-100"></button>
                             </div>
                         </div>
                         <div id="date-validation-message" class="mt-2"></div>
+                        
+                        <!-- Date Management Section -->
+                        <div class="date-management-section mt-3">
+                            <label class="form-label form-label-small mb-2">ניהול תאריכים להשוואה (עד 10 תאריכים, מינימום 2)</label>
+                            
+                            <!-- Add Date Section -->
+                            <div class="add-date-section mb-3">
+                                <div class="col-md-8">
+                                    <label for="new-date-input" class="form-label form-label-small">הוסף תאריך חדש:</label>
+                                    <input type="date" id="new-date-input" class="form-control form-control-sm" data-onchange="handleNewDateInput()">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label form-label-small">&nbsp;</label>
+                                    <button data-button-type="ADD" data-variant="secondary" data-text="הוסף" data-onclick="addDateFromInput()" class="w-100" id="add-date-btn"></button>
+                                </div>
+                            </div>
+                            
+                            <!-- Selected Dates List -->
+                            <div class="selected-dates-section">
+                                <label class="form-label form-label-small mb-2">תאריכים נבחרים (מסודרים לפי סדר כרונולוגי):</label>
+                                <div id="dates-list" class="date-list">
+                                    <!-- Selected dates will be dynamically added here -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
                 <!-- Comparison Table Section -->
                 <div class="content-section" id="date_comparison_modal-טבלת-השוואות">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> טבלת השוואות</h2>
+                        <h2><img src="../../images/icons/tabler/clipboard-list.svg" width="16" height="16" alt="icon" class="icon"> טבלת השוואות</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('date_comparison_modal-טבלת-השוואות')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-טבלת-השוואות')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -170,7 +236,7 @@
                     <div class="section-header">
                         <h2><img src="../../images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon"> גרף Bar Chart - השוואה בין התאריכים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('date_comparison_modal-גרף-bar-chart---השוואה-בין-ה')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-גרף-bar-chart---השוואה-בין-ה')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -198,7 +264,7 @@
                     <div class="section-header">
                         <h2><img src="../../images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon"> גרף Line Chart - מגמה בין התאריכים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('date_comparison_modal-גרף-line-chart---מגמה-בין-הת')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-גרף-line-chart---מגמה-בין-הת')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -234,7 +300,7 @@
             <!-- Modal Footer -->
             <div class="modal-footer">
                 <button class="btn btn-outline-primary">ייצא ל-Excel/PDF</button>
-                <button class="btn btn-secondary" onclick="window.close()">סגור</button>
+                <button class="btn btn-secondary" data-onclick="window.close()">סגור</button>
             </div>
         </div>
     </div>

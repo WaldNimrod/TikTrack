@@ -49,6 +49,14 @@
     <!-- Field Renderer Service -->
     <script src="../../scripts/services/field-renderer-service.js" defer></script>
     
+    <!-- Info Summary System -->
+    <script src="../../scripts/info-summary-configs.js" defer></script>
+    <script src="../../scripts/info-summary-system.js" defer></script>
+    
+    <!-- Icon System -->
+    <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
+    <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    
     <!-- Action Buttons System -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
     <script src="../../scripts/button-system-init.js" defer></script>
@@ -552,6 +560,19 @@
                 return;
             }
             
+            // Additional protection: prevent rapid re-initializations
+            const now = Date.now();
+            if (window._lastChartInit && (now - window._lastChartInit) < 1000) {
+                if (window.Logger) {
+                    window.Logger.warn('⏸️ Chart initialization too soon after last init, skipping...', { 
+                        page: 'price-history-page',
+                        timeSinceLastInit: now - window._lastChartInit
+                    });
+                }
+                return;
+            }
+            window._lastChartInit = now;
+            
             isChartInitializing = true;
             
             try {
@@ -584,6 +605,15 @@
                     window.Logger.info('📊 Chart type selected', { page: 'price-history-page', chartType, activeButton: activeChartTypeBtn });
                 }
                 
+                // Ensure container has width before creating chart
+                if (container.clientWidth === 0) {
+                    // Force layout calculation
+                    container.style.width = '100%';
+                    container.style.minWidth = '100px';
+                    // Wait for next frame to ensure width is calculated
+                    await new Promise(resolve => requestAnimationFrame(resolve));
+                }
+                
                 // Create chart
                 priceChart = window.TradingViewChartAdapter.createChart(container, {
                     layout: {
@@ -594,7 +624,7 @@
                         vertLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') },
                         horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
                     },
-                    width: container.clientWidth,
+                    width: container.clientWidth || container.offsetWidth || 800, // Fallback to 800 if width is 0
                     height: 450, // Price chart height - volume is in separate panel below
                     timeScale: {
                         timeVisible: true,
@@ -610,6 +640,9 @@
                     }
                 });
                 
+                // Make chart available globally
+                window.priceChart = priceChart;
+                
                 // Get selected ticker
                 const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
                 
@@ -617,12 +650,34 @@
                 const activeRangeBtn = document.querySelector('.chart-control-btn.active[data-range]');
                 const timeRange = activeRangeBtn?.dataset.range || 'all';
                 
-                // Auto-set unit size based on time range
-                autoSetUnitSizeByTimeRange(timeRange);
-                
-                // Get unit size from header buttons
+                // Get unit size from header buttons (use default if none active)
                 const activeUnitBtn = document.querySelector('.unit-size-btn.active[data-unit]');
-                const unitSize = activeUnitBtn?.dataset.unit || 'day';
+                let unitSize = activeUnitBtn?.dataset.unit;
+                
+                // If no active unit button, set default based on time range (without triggering events)
+                if (!unitSize) {
+                    if (timeRange === 'day') {
+                        unitSize = '5min';
+                    } else if (timeRange === 'week') {
+                        unitSize = 'hour';
+                    } else if (timeRange === 'month' || timeRange === 'year') {
+                        unitSize = 'day';
+                    } else if (timeRange === 'all') {
+                        unitSize = 'week';
+                    } else {
+                        unitSize = 'day';
+                    }
+                    
+                    // Set the button as active (without triggering events - do it silently)
+                    const targetUnitBtn = document.querySelector(`.unit-size-btn[data-unit="${unitSize}"]`);
+                    if (targetUnitBtn && !targetUnitBtn.classList.contains('active')) {
+                        // Set as active silently (before event listeners are set up)
+                        targetUnitBtn.classList.add('active');
+                        targetUnitBtn.style.border = '1px solid #007bff';
+                        targetUnitBtn.style.background = '#007bff';
+                        targetUnitBtn.style.color = 'white';
+                    }
+                }
                 
                 // Get view mode (price/percent)
                 const activeViewModeBtn = document.querySelector('.view-mode-btn.active');
@@ -736,14 +791,14 @@
                 // Fit content
                 priceChart.timeScale().fitContent();
                 
-                // Setup event listeners for filters and header buttons
+                // Setup event listeners for filters and header buttons (only once)
                 setupChartFilters();
                 
                 // Setup drawing tools
                 setupDrawingTools();
                 
-                // Initialize new features
-                initializeNewFeatures();
+                // Initialize new features (but don't apply preferences yet - wait for chart to be ready)
+                initializeNewFeatures(false); // Pass false to skip preferences application
                 
                 // Initialize performance features
                 initializePerformanceFeatures();
@@ -756,6 +811,14 @@
                 if (window.Logger) {
                     window.Logger.info('✅ Price chart initialized', { page: 'price-history-page' });
                 }
+                
+                // Apply preferences AFTER chart is fully initialized (with delay to prevent loops)
+                setTimeout(() => {
+                    if (!window._preferencesApplied && priceChart) {
+                        window._preferencesApplied = true;
+                        applyChartPreferences();
+                    }
+                }, 800);
                 
             } catch (error) {
                 if (window.Logger) {
@@ -802,7 +865,12 @@
             // Find and activate the target unit button
             const targetUnitBtn = document.querySelector(`.unit-size-btn[data-unit="${targetUnit}"]`);
             if (targetUnitBtn) {
-                // Remove active class from all unit buttons
+                // Check if already active to prevent triggering events
+                if (targetUnitBtn.classList.contains('active')) {
+                    return; // Already active, no need to change
+                }
+                
+                // Remove active class from all unit buttons (without triggering events)
                 document.querySelectorAll('.unit-size-btn').forEach(btn => {
                     btn.classList.remove('active');
                     btn.style.border = '1px solid #ddd';
@@ -810,7 +878,7 @@
                     btn.style.color = '';
                 });
                 
-                // Activate target unit button
+                // Activate target unit button (without triggering events)
                 targetUnitBtn.classList.add('active');
                 targetUnitBtn.style.border = '1px solid #007bff';
                 targetUnitBtn.style.background = '#007bff';
@@ -820,8 +888,19 @@
             // Chart type is NOT changed automatically - only by user click
         }
         
-        // Generate mock price data
+        // Cache for mock data to prevent regeneration on every call
+        const _mockDataCache = new Map();
+        
+        // Generate mock price data (with caching to prevent constant regeneration)
         function generateMockPriceData(ticker, unitSize, timeRange) {
+            // Create cache key
+            const cacheKey = `${ticker}_${unitSize}_${timeRange}`;
+            
+            // Return cached data if exists
+            if (_mockDataCache.has(cacheKey)) {
+                return _mockDataCache.get(cacheKey);
+            }
+            
             const data = {
                 line: [],
                 candles: []
@@ -861,6 +940,13 @@
             };
             const basePrice = basePrices[ticker] || 100;
             
+            // Use seeded random for consistent data (based on ticker)
+            let seed = ticker.charCodeAt(0) + ticker.charCodeAt(1) + ticker.charCodeAt(2) || 0;
+            function seededRandom() {
+                seed = (seed * 9301 + 49297) % 233280;
+                return seed / 233280;
+            }
+            
             // Generate data
             let currentPrice = basePrice;
             const startDate = new Date();
@@ -896,8 +982,8 @@
                     date.setFullYear(date.getFullYear() + i);
                 }
                 
-                // Simulate price movement
-                const change = (Math.random() - 0.5) * 4; // -2 to +2
+                // Simulate price movement using seeded random for consistency
+                const change = (seededRandom() - 0.5) * 4; // -2 to +2
                 currentPrice = Math.max(10, currentPrice + change);
                 
                 // Format time based on unit size (support minutes)
@@ -918,9 +1004,9 @@
                 
                 // Candlestick data
                 const open = currentPrice;
-                const close = currentPrice + (Math.random() - 0.5) * 2;
-                const high = Math.max(open, close) + Math.random() * 1;
-                const low = Math.min(open, close) - Math.random() * 1;
+                const close = currentPrice + (seededRandom() - 0.5) * 2;
+                const high = Math.max(open, close) + seededRandom() * 1;
+                const low = Math.min(open, close) - seededRandom() * 1;
                 
                 data.candles.push({
                     time: timeStr,
@@ -933,11 +1019,23 @@
                 currentPrice = close;
             }
             
+            // Cache the data
+            _mockDataCache.set(cacheKey, data);
+            
             return data;
         }
         
+        // Flag to prevent multiple setup of chart filters
+        let _chartFiltersSetup = false;
+        
         // Setup chart filters and header buttons
         function setupChartFilters() {
+            // Prevent multiple setups
+            if (_chartFiltersSetup) {
+                return;
+            }
+            _chartFiltersSetup = true;
+            
             const tickerSelect = document.getElementById('tickerSelect');
             const unitSizeSelect = document.getElementById('unitSize');
             const tickersCompareSelect = document.getElementById('tickersCompare');
@@ -1495,6 +1593,19 @@
         
         // Reload chart
         function reloadChart() {
+            // Prevent rapid reloads
+            const now = Date.now();
+            if (window._lastChartReload && (now - window._lastChartReload) < 500) {
+                if (window.Logger) {
+                    window.Logger.warn('⏸️ Chart reload too soon after last reload, skipping...', { 
+                        page: 'price-history-page',
+                        timeSinceLastReload: now - window._lastChartReload
+                    });
+                }
+                return;
+            }
+            window._lastChartReload = now;
+            
             // Store volume visibility state
             const wasVolumeVisible = volumeVisible;
             
@@ -1516,12 +1627,12 @@
             // Reinitialize chart
             initPriceChart();
             
-            // Update linked items when ticker changes
-            if (typeof loadLinkedItemsForTicker === 'function') {
-                setTimeout(() => {
-                    loadLinkedItemsForTicker();
-                }, 500);
-            }
+            // Update linked items when ticker changes - DISABLED FOR TESTING
+            // if (typeof loadLinkedItemsForTicker === 'function') {
+            //     setTimeout(() => {
+            //         loadLinkedItemsForTicker();
+            //     }, 500);
+            // }
             
             // Restore volume visibility after chart initialization
             if (wasVolumeVisible) {
@@ -1684,17 +1795,36 @@
                 }
             });
             
-            // Sync time scale with price chart
-            if (priceChart) {
+            // Sync time scale with price chart (with protection against infinite loops)
+            if (priceChart && !window._volumeSyncSetup) {
+                window._volumeSyncSetup = true;
+                let _isSyncing = false;
+                
                 priceChart.timeScale().subscribeVisibleTimeRangeChange((timeRange) => {
-                    if (volumeChart && timeRange) {
+                    if (_isSyncing || !volumeChart || !timeRange) return;
+                    _isSyncing = true;
+                    try {
                         volumeChart.timeScale().setVisibleRange(timeRange);
+                    } catch (e) {
+                        if (window.Logger) {
+                            window.Logger.warn('Error syncing volume chart time range', { page: 'price-history-page', error: e });
+                        }
+                    } finally {
+                        setTimeout(() => { _isSyncing = false; }, 100);
                     }
                 });
                 
                 volumeChart.timeScale().subscribeVisibleTimeRangeChange((timeRange) => {
-                    if (priceChart && timeRange) {
+                    if (_isSyncing || !priceChart || !timeRange) return;
+                    _isSyncing = true;
+                    try {
                         priceChart.timeScale().setVisibleRange(timeRange);
+                    } catch (e) {
+                        if (window.Logger) {
+                            window.Logger.warn('Error syncing price chart time range', { page: 'price-history-page', error: e });
+                        }
+                    } finally {
+                        setTimeout(() => { _isSyncing = false; }, 100);
                     }
                 });
             }
@@ -2040,16 +2170,16 @@
             if (!container) return;
             
             if (activeIndicators.length === 0) {
-                container.innerHTML = '<div class="no-indicators-message" style="font-size: 0.7rem; color: #6c757d; font-style: italic; padding: 4px;">אין מחוונים פעילים</div>';
+                container.innerHTML = '<div class="no-indicators-message">אין מחוונים פעילים</div>';
                 return;
             }
             
             let html = '';
             activeIndicators.forEach(indicator => {
                 html += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 6px; background: #f8f9fa; border-radius: 4px; border: 1px solid #dee2e6;">
-                        <span style="font-size: 0.75rem; color: #495057;">${indicator.label}</span>
-                        <button class="remove-indicator-btn" data-indicator-id="${indicator.id}" style="background: #dc3545; color: white; border: none; border-radius: 3px; padding: 2px 6px; cursor: pointer; font-size: 0.7rem;" title="הסר">×</button>
+                    <div class="indicator-item">
+                        <span class="indicator-item-label">${indicator.label}</span>
+                        <button class="remove-indicator-btn" data-indicator-id="${indicator.id}" title="הסר">×</button>
                     </div>
                 `;
             });
@@ -2210,33 +2340,108 @@
         }
         
         function applyChartPreferences() {
-            if (!chartPreferences) return;
+            if (!chartPreferences || !priceChart) return; // Don't apply if chart not ready
             
-            // Apply view mode
-            if (chartPreferences.viewMode) {
+            // Apply view mode (without triggering reload)
+            if (chartPreferences.viewMode && chartPreferences.viewMode !== viewMode) {
                 const btn = document.querySelector(`.view-mode-btn[data-mode="${chartPreferences.viewMode}"]`);
-                if (btn) btn.click();
+                if (btn && !btn.classList.contains('active')) {
+                    // Update state without triggering event
+                    viewMode = chartPreferences.viewMode;
+                    document.querySelectorAll('.view-mode-btn').forEach(b => {
+                        b.classList.remove('active');
+                        b.style.border = '1px solid #ddd';
+                        b.style.background = 'white';
+                        b.style.color = '';
+                    });
+                    btn.classList.add('active');
+                    btn.style.border = '1px solid #007bff';
+                    btn.style.background = '#007bff';
+                    btn.style.color = 'white';
+                    // Reload chart to apply view mode
+                    reloadChart();
+                    return; // Exit early to prevent other changes
+                }
             }
             
-            // Apply Y scale
-            if (chartPreferences.yScaleMode) {
+            // Apply Y scale (without triggering reload if already set)
+            if (chartPreferences.yScaleMode && chartPreferences.yScaleMode !== yScaleMode) {
                 const btn = document.querySelector(`.y-scale-btn[data-scale="${chartPreferences.yScaleMode}"]`);
-                if (btn) btn.click();
+                if (btn && !btn.classList.contains('active')) {
+                    yScaleMode = chartPreferences.yScaleMode;
+                    const scaleMode = yScaleMode === 'log' ? 1 : 0;
+                    priceChart.applyOptions({
+                        rightPriceScale: {
+                            mode: scaleMode
+                        }
+                    });
+                    // Update button state
+                    document.querySelectorAll('.y-scale-btn').forEach(b => {
+                        b.classList.remove('active');
+                        b.style.border = '1px solid #ddd';
+                        b.style.background = 'white';
+                        b.style.color = '';
+                        const img = b.querySelector('img');
+                        if (img) img.style.filter = '';
+                    });
+                    btn.classList.add('active');
+                    btn.style.border = '1px solid #007bff';
+                    btn.style.background = '#007bff';
+                    btn.style.color = 'white';
+                    const img = btn.querySelector('img');
+                    if (img) img.style.filter = 'brightness(0) invert(1)';
+                }
             }
             
-            // Apply volume visibility
-            if (chartPreferences.volumeVisible) {
-                toggleVolume();
+            // Apply volume visibility (without triggering reload)
+            if (chartPreferences.volumeVisible !== undefined && chartPreferences.volumeVisible !== volumeVisible) {
+                volumeVisible = chartPreferences.volumeVisible;
+                const btn = document.getElementById('volumeToggle');
+                const volumeWrapper = document.getElementById('volume-chart-wrapper');
+                if (btn) {
+                    if (volumeVisible) {
+                        btn.style.border = '1px solid #007bff';
+                        btn.style.background = '#007bff';
+                        btn.style.color = 'white';
+                        btn.classList.add('active');
+                        if (volumeWrapper) {
+                            volumeWrapper.style.display = 'block';
+                        }
+                        addVolumeSeries();
+                    } else {
+                        btn.style.border = '1px solid #ddd';
+                        btn.style.background = 'white';
+                        btn.style.color = '';
+                        btn.classList.remove('active');
+                        if (volumeWrapper) {
+                            volumeWrapper.style.display = 'none';
+                        }
+                        removeVolumeSeries();
+                    }
+                }
             }
             
-            // Apply auto scale
-            if (chartPreferences.autoScaleEnabled) {
-                toggleAutoScale();
+            // Apply auto scale (without triggering reload)
+            if (chartPreferences.autoScaleEnabled !== undefined && chartPreferences.autoScaleEnabled !== autoScaleEnabled) {
+                autoScaleEnabled = chartPreferences.autoScaleEnabled;
+                const btn = document.getElementById('autoScaleBtn');
+                if (btn) {
+                    if (autoScaleEnabled) {
+                        btn.style.border = '1px solid #007bff';
+                        btn.style.background = '#007bff';
+                        btn.style.color = 'white';
+                        applyAutoScale();
+                    } else {
+                        btn.style.border = '1px solid #ddd';
+                        btn.style.background = 'white';
+                        btn.style.color = '';
+                    }
+                }
             }
         }
         
         // Initialize new features
-        function initializeNewFeatures() {
+        function initializeNewFeatures(applyPreferences = true) {
             // Setup volume toggle
             const volumeToggle = document.getElementById('volumeToggle');
             if (volumeToggle) {
@@ -2258,8 +2463,27 @@
             // Setup keyboard navigation
             setupKeyboardNavigation();
             
-            // Load preferences
-            loadChartPreferences();
+            // Load preferences (but don't apply them yet if chart is not ready)
+            if (applyPreferences) {
+                loadChartPreferences();
+            } else {
+                // Just load preferences without applying
+                if (window.PreferencesCore) {
+                    window.PreferencesCore.getAllPreferences().then(preferences => {
+                        chartPreferences = {
+                            viewMode: preferences['chart_view_mode'] || 'price',
+                            yScaleMode: preferences['chart_y_scale'] || 'linear',
+                            volumeVisible: preferences['chart_volume_visible'] !== undefined ? preferences['chart_volume_visible'] : true,
+                            autoScaleEnabled: preferences['chart_auto_scale'] || false,
+                            indicatorsVisible: preferences['chart_indicators_visible'] || false
+                        };
+                    }).catch(e => {
+                        if (window.Logger) {
+                            window.Logger.warn('Error loading chart preferences', { page: 'price-history-page', error: e });
+                        }
+                    });
+                }
+            }
             
             // Setup indicators toggle - opens indicators toolbar
             const indicatorsToggle = document.getElementById('indicatorsToggle');
@@ -2300,8 +2524,8 @@
             // Setup series legend
             setupSeriesLegend();
             
-            // Setup linked items - load when ticker changes
-            setupLinkedItems();
+            // Setup linked items - DISABLED FOR TESTING
+            // setupLinkedItems();
         }
         
         // ========================================================================
@@ -2644,7 +2868,6 @@
             if (!legendContainer) {
                 legendContainer = document.createElement('div');
                 legendContainer.id = 'chart-legend';
-                legendContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 10; font-size: 0.75rem;';
                 
                 const wrapper = document.getElementById('price-chart-wrapper');
                 if (wrapper) {
@@ -2661,11 +2884,11 @@
             if (!legendContainer) return;
             
             const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
-            let html = '<div style="font-weight: 600; margin-bottom: 4px;">סדרות:</div>';
+            let html = '<div class="series-legend-title">סדרות:</div>';
             
             // Main series
-            html += `<div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
-                <span style="width: 12px; height: 2px; background: ${getCSSVariableValue('--primary-color', '#007bff')};"></span>
+            html += `<div class="series-legend-item">
+                <span class="series-legend-color" style="background: ${getCSSVariableValue('--brand-primary-color', '#007bff')};"></span>
                 <span>${selectedTicker}</span>
             </div>`;
             
@@ -2674,16 +2897,16 @@
                 .map(opt => opt.value);
             const colors = ['#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1'];
             comparisonTickers.forEach((ticker, idx) => {
-                html += `<div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
-                    <span style="width: 12px; height: 2px; background: ${colors[idx % colors.length]};"></span>
+                html += `<div class="series-legend-item">
+                    <span class="series-legend-color" style="background: ${colors[idx % colors.length]};"></span>
                     <span>${ticker}</span>
                 </div>`;
             });
             
             // Volume
             if (volumeVisible && volumeSeries) {
-                html += `<div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
-                    <span style="width: 12px; height: 12px; background: #26baac; border-radius: 2px;"></span>
+                html += `<div class="series-legend-item">
+                    <span class="series-legend-color-square"></span>
                     <span>Volume</span>
                 </div>`;
             }
@@ -2691,8 +2914,8 @@
             // MA indicators
             if (indicatorsVisible && maSeries.length > 0) {
                 maSeries.forEach((series, idx) => {
-                    html += `<div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
-                        <span style="width: 12px; height: 1px; background: #ff9800;"></span>
+                    html += `<div class="series-legend-item">
+                        <span class="series-legend-color-line" style="background: var(--brand-secondary-color, #ff9800);"></span>
                         <span>MA(${20 + idx * 10})</span>
                     </div>`;
                 });
@@ -2929,21 +3152,32 @@
                     let html = '';
                     
                     // Main ticker
-                    html += `<span class="badge" style="background: ${getCSSVariableValue('--primary-color', '#007bff')}; margin-right: 8px;">● ${selectedTicker}</span>`;
+                    html += `<span class="comparison-legend-badge" style="background: ${getCSSVariableValue('--brand-primary-color', '#007bff')};"><span>●</span> ${selectedTicker}</span>`;
                     
                     // Comparison tickers
                     comparisonTickers.forEach((ticker, idx) => {
-                        html += `<span class="badge" style="background: ${colors[idx % colors.length]}; margin-right: 8px;">● ${ticker}</span>`;
+                        html += `<span class="comparison-legend-badge" style="background: ${colors[idx % colors.length]};"><span>●</span> ${ticker}</span>`;
                     });
                     
                     legendContainer.innerHTML = html;
                 }
                 
-                // Sync time scale with main chart
-                if (priceChart) {
+                // Sync time scale with main chart (with protection against infinite loops)
+                if (priceChart && !window._comparisonSyncSetup) {
+                    window._comparisonSyncSetup = true;
+                    let _isSyncing = false;
+                    
                     priceChart.timeScale().subscribeVisibleTimeRangeChange((timeRange) => {
-                        if (comparisonChart && timeRange) {
+                        if (_isSyncing || !comparisonChart || !timeRange) return;
+                        _isSyncing = true;
+                        try {
                             comparisonChart.timeScale().setVisibleRange(timeRange);
+                        } catch (e) {
+                            if (window.Logger) {
+                                window.Logger.warn('Error syncing comparison chart time range', { page: 'price-history-page', error: e });
+                            }
+                        } finally {
+                            setTimeout(() => { _isSyncing = false; }, 100);
                         }
                     });
                 }

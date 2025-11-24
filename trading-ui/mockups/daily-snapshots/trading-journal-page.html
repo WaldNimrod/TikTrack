@@ -50,6 +50,10 @@
     <!-- Field Renderer Service -->
     <script src="../../scripts/services/field-renderer-service.js" defer></script>
     
+    <!-- Info Summary System -->
+    <script src="../../scripts/info-summary-configs.js" defer></script>
+    <script src="../../scripts/info-summary-system.js" defer></script>
+    
     <!-- UI Utils (includes toggleSection) -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
     
@@ -61,28 +65,31 @@
     <div id="unified-header"></div>
     
     <!-- Mockups Navigation -->
-    <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 0; margin-bottom: 20px;">
+        <!-- Mockups Navigation -->
+    <div class="mockups-navigation">
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                        <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
+                    <div class="mockups-navigation-content">
+                        <span class="mockups-navigation-label">
                             <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
-                        </span>                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
-                <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
-                <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
-                <a href="comparative-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח השוואתי</a>
-                <a href="trading-journal-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">יומן מסחר</a>
-                <a href="strategy-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח אסטרטגיות</a>
-                <a href="economic-calendar-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">לוח כלכלי</a>
-                <a href="history-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ווידג'ט היסטוריה</a>
-                <a href="emotional-tracking-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">תיעוד רגשי</a>
-                <a href="date-comparison-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">השוואת תאריכים</a>
-                <a href="journal-entry-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">רשומת יומן</a>
-</div>
+                        </span>
+                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
+                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
+                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
+                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
+                        <a href="trading-journal-page.html" class="mockups-navigation-link active">יומן מסחר</a>
+                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
+                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
+                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
+                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
+                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
+                        <a href="journal-entry-modal.html" class="mockups-navigation-link">רשומת יומן</a>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
     
     <!-- Page Content -->
@@ -125,26 +132,26 @@
                                         חודש הבא <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                     </button>
                                 </div>
-                                <div class="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;">
+                                <div class="calendar-grid">
                                     <!-- Calendar Headers -->
-                                    <div class="text-center fw-bold" style="padding: 10px;">א'</div>
-                                    <div class="text-center fw-bold" style="padding: 10px;">ב'</div>
-                                    <div class="text-center fw-bold" style="padding: 10px;">ג'</div>
-                                    <div class="text-center fw-bold" style="padding: 10px;">ד'</div>
-                                    <div class="text-center fw-bold" style="padding: 10px;">ה'</div>
-                                    <div class="text-center fw-bold" style="padding: 10px;">ו'</div>
-                                    <div class="text-center fw-bold" style="padding: 10px;">ש'</div>
+                                    <div class="text-center fw-bold calendar-day-header">א'</div>
+                                    <div class="text-center fw-bold calendar-day-header">ב'</div>
+                                    <div class="text-center fw-bold calendar-day-header">ג'</div>
+                                    <div class="text-center fw-bold calendar-day-header">ד'</div>
+                                    <div class="text-center fw-bold calendar-day-header">ה'</div>
+                                    <div class="text-center fw-bold calendar-day-header">ו'</div>
+                                    <div class="text-center fw-bold calendar-day-header">ש'</div>
                                     
                                     <!-- Calendar Days (placeholder) -->
-                                    <div style="padding: 10px; border: 1px solid #e9ecef; border-radius: 4px; min-height: 80px; background: #f8f9fa;">
+                                    <div class="calendar-day-cell">
                                         <div class="fw-bold">1</div>
                                         <div class="small text-success">3 טריידים</div>
                                     </div>
-                                    <div style="padding: 10px; border: 1px solid #e9ecef; border-radius: 4px; min-height: 80px; background: #fff;">
+                                    <div class="calendar-day-cell-today">
                                         <div class="fw-bold">2</div>
                                     </div>
                                     <!-- More days... -->
-                                    <div style="padding: 10px; border: 1px solid #26baac; border-radius: 4px; min-height: 80px; background: #e6f7f5;">
+                                    <div class="calendar-day-cell-active">
                                         <div class="fw-bold">15</div>
                                         <div class="small text-primary">רשומת יומן</div>
                                         <div class="small text-success">2 טריידים</div>
@@ -160,8 +167,8 @@
                         <h2><img src="../../images/icons/tabler/list.svg" width="16" height="16" alt="list" class="icon"> רשומות יומן</h2>
                         <div class="header-actions d-flex align-items-center gap-2">
                             <div>
-                                <input type="text" class="form-control form-control-sm d-inline-block" placeholder="חיפוש..." style="width: 200px;">
-                                <select class="form-select form-select-sm d-inline-block" style="width: 150px;">
+                                <input type="text" class="form-control form-control-sm d-inline-block form-control-inline-search" placeholder="חיפוש...">
+                                <select class="form-select form-select-sm d-inline-block form-select-inline">
                                     <option>כל התאריכים</option>
                                     <option>השבוע</option>
                                     <option>החודש</option>
@@ -173,11 +180,11 @@
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-3 hidden">
                             <h5 class="card-title mb-0">רשומות יומן</h5>
                                     <div>
-                                        <input type="text" class="form-control form-control-sm d-inline-block" placeholder="חיפוש..." style="width: 200px;">
-                                        <select class="form-select form-select-sm d-inline-block" style="width: 150px;">
+                                        <input type="text" class="form-control form-control-sm d-inline-block form-control-inline-search" placeholder="חיפוש...">
+                                        <select class="form-select form-select-sm d-inline-block form-select-inline">
                                             <option>כל התאריכים</option>
                                             <option>השבוע</option>
                                             <option>החודש</option>

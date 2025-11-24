@@ -37,6 +37,10 @@
     <!-- Field Renderer Service -->
     <script src="../../scripts/services/field-renderer-service.js" defer></script>
     
+    <!-- Info Summary System -->
+    <script src="../../scripts/info-summary-configs.js" defer></script>
+    <script src="../../scripts/info-summary-system.js" defer></script>
+    
     <!-- Preferences System -->
     <script src="../../scripts/services/preferences-data.js" defer></script>
     <script src="../../scripts/preferences-core-new.js" defer></script>
@@ -56,28 +60,31 @@
     <div id="unified-header"></div>
     
     <!-- Mockups Navigation -->
-    <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 0; margin-bottom: 20px;">
+        <!-- Mockups Navigation -->
+    <div class="mockups-navigation">
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                        <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
+                    <div class="mockups-navigation-content">
+                        <span class="mockups-navigation-label">
                             <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
-                        </span>                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
-                <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
-                <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
-                <a href="comparative-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח השוואתי</a>
-                <a href="trading-journal-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">יומן מסחר</a>
-                <a href="strategy-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח אסטרטגיות</a>
-                <a href="economic-calendar-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">לוח כלכלי</a>
-                <a href="history-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ווידג'ט היסטוריה</a>
-                <a href="emotional-tracking-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">תיעוד רגשי</a>
-                <a href="date-comparison-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">השוואת תאריכים</a>
-                <a href="journal-entry-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">רשומת יומן</a>
-</div>
+                        </span>
+                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
+                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
+                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
+                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
+                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
+                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
+                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
+                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
+                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link active">תיעוד רגשי</a>
+                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
+                        <a href="journal-entry-modal.html" class="mockups-navigation-link">רשומת יומן</a>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
     
     <!-- Page Content -->
@@ -147,7 +154,7 @@
                         <div class="card mb-4">
                             <div class="card-body">
                                 <h6 class="card-title">ניתוח דפוסים רגשיים</h6>
-                                <div class="chart-container" style="height: 250px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                <div class="chart-container chart-container-placeholder-small">
                                     [גרף דפוסים רגשיים - Bar Chart או Pie Chart]
                                 </div>
                                 <div class="mt-3">

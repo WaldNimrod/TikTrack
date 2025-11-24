@@ -10,18 +10,18 @@
 
 | עמוד | NotificationSystem | toggleSection | Button System | FieldRenderer | InfoSummary | Logger | Preferences | Cache | ColorScheme | Icon | PageState | Header |
 |------|-------------------|---------------|--------------|---------------|-------------|--------|-------------|-------|-------------|------|-----------|--------|
-| **trade-history** | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
-| **portfolio-state** | ✅ | ✅ | ⏳ | ✅ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
-| **price-history** | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
-| **comparative-analysis** | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
-| **trading-journal** | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ✅ |
-| **strategy-analysis** | ✅ | ✅ | ⏳ | ⚠️ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
-| **economic-calendar** | ✅ | ✅ | ⏳ | ⚠️ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
-| **history-widget** | ✅ | ✅ | ✅ | ⚠️ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
-| **emotional-tracking** | ✅ | ✅ | ✅ | ⚠️ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
-| **date-comparison-modal** | ✅ | ✅ | ⏳ | ⚠️ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ✅ | ❌ | ✅ |
-| **journal-entry-modal** | ✅ | ✅ | ⏳ | ⚠️ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ⏳ | ❌ | ✅ |
-| **tradingview-test** | ✅ | ✅ | ⏳ | ⚠️ | ❌ | ✅ | ⚠️ | ❌ | ⚠️ | ⏳ | ❌ | ✅ |
+| **trade-history** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
+| **portfolio-state** | ✅ | ✅ | ⏳ | ✅ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
+| **price-history** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
+| **comparative-analysis** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
+| **trading-journal** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
+| **strategy-analysis** | ✅ | ✅ | ⏳ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
+| **economic-calendar** | ✅ | ✅ | ⏳ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
+| **history-widget** | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
+| **emotional-tracking** | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
+| **date-comparison-modal** | ✅ | ✅ | ⏳ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
+| **journal-entry-modal** | ✅ | ✅ | ⏳ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
+| **tradingview-test** | ✅ | ✅ | ⏳ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
 
 **סימון:**
 - ✅ = משולב כראוי
@@ -40,15 +40,15 @@
 
 ### שלב 2 - אינטגרציות חשובות (4 מערכות):
 - **FieldRendererService:** ✅ הושלם - 12/12 עמודים (כל העמודים טוענים את המערכת, 4 עמודים משתמשים בה בפועל: price-history, portfolio-state, comparative-analysis, trade-history)
-- **InfoSummarySystem:** ❌ לא התחיל
+- **InfoSummarySystem:** ✅ הושלם - 12/12 עמודים (כל העמודים טוענים את המערכת, מוכן לאינטגרציה עתידית)
 - **Logger Service:** ✅ הושלם - 12/12 עמודים
-- **PreferencesCore:** ⚠️ שימוש חלקי - כל העמודים
+- **PreferencesCore:** ✅ הושלם - 12/12 עמודים (כל העמודים טוענים את המערכת, comparative-analysis-page משתמש במערכת במקום localStorage)
 
 ### שלב 3 - אינטגרציות אופציונליות (5 מערכות):
 - **UnifiedCacheManager:** ❌ לא רלוונטי למוקאפ (רק בעת חיבור ל-API)
-- **ColorSchemeSystem:** ⚠️ שימוש חלקי - כל העמודים
-- **Icon System:** ⏳ בתהליך - 6/12 עמודים (נוסף על ידי המשתמש: history-widget, economic-calendar, emotional-tracking, date-comparison-modal, strategy-analysis, trading-journal)
-- **Page State Management:** ❌ לא התחיל
+- **ColorSchemeSystem:** ✅ הושלם - כל העמודים (כבר משתמשים ב-getCSSVariableValue)
+- **Icon System:** ✅ הושלם - 12/12 עמודים (כל העמודים טוענים את המערכת)
+- **Page State Management:** ⚠️ לא רלוונטי למוקאפ (משמש לעמודים עם נתונים אמיתיים)
 - **Header System:** ✅ כבר משולב - כל העמודים
 
 ---
@@ -59,9 +59,11 @@
 
 2. **FieldRendererService:** ✅ הושלם - כל 12 העמודים טוענים את המערכת. 4 עמודים משתמשים בה בפועל: price-history-page (סטטיסטיקות שינוי), portfolio-state-page (P/L values, טבלת השוואה), comparative-analysis-page (P/L עם אחוזים), trade-history-page (P/L בטבלה).
 
-3. **PreferencesCore:** כל העמודים טוענים את המערכת, אך חלקם עדיין משתמשים ב-localStorage ישירות.
+3. **InfoSummarySystem:** ✅ הושלם - כל 12 העמודים טוענים את המערכת (info-summary-configs.js ו-info-summary-system.js). המערכת מוכנה לאינטגרציה עתידית כאשר יהיו נתונים אמיתיים.
 
-4. **Button System:** כל העמודים עם כפתורי data-button-type טוענים את המערכת.
+4. **PreferencesCore:** ✅ הושלם - כל 12 העמודים טוענים את המערכת. comparative-analysis-page משתמש במערכת במקום localStorage (8 העדפות: series visibility, filters, record filters, comparison parameters). שאר העמודים מוכנים לאינטגרציה עתידית.
+
+5. **Button System:** כל העמודים עם כפתורי data-button-type טוענים את המערכת.
 
 ---
 

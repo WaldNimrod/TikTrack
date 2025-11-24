@@ -37,6 +37,10 @@
     <!-- Field Renderer Service -->
     <script src="../../scripts/services/field-renderer-service.js" defer></script>
     
+    <!-- Info Summary System -->
+    <script src="../../scripts/info-summary-configs.js" defer></script>
+    <script src="../../scripts/info-summary-system.js" defer></script>
+    
     <!-- Preferences System -->
     <script src="../../scripts/services/preferences-data.js" defer></script>
     <script src="../../scripts/preferences-core-new.js" defer></script>
@@ -53,142 +57,31 @@
     <div id="unified-header"></div>
     
     <!-- Mockups Navigation -->
-    <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box;">
-        <div style="max-width: 1400px; margin: 0 auto;">
-            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                <span style="font-weight: bold; color: #495057; font-size: 0.9rem; white-space: nowrap;">
-                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
-                </span>                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
-                <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
-                <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
-                <a href="comparative-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח השוואתי</a>
-                <a href="trading-journal-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">יומן מסחר</a>
-                <a href="strategy-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח אסטרטגיות</a>
-                <a href="economic-calendar-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">לוח כלכלי</a>
-                <a href="history-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ווידג'ט היסטוריה</a>
-                <a href="emotional-tracking-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">תיעוד רגשי</a>
-                <a href="date-comparison-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">השוואת תאריכים</a>
-                <a href="journal-entry-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">רשומת יומן</a>
-</div>
+        <!-- Mockups Navigation -->
+    <div class="mockups-navigation">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div class="mockups-navigation-content">
+                        <span class="mockups-navigation-label">
+                            <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                        </span>
+                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
+                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
+                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
+                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
+                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
+                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
+                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
+                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
+                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
+                        <a href="date-comparison-modal.html" class="mockups-navigation-link active">השוואת תאריכים</a>
+                        <a href="journal-entry-modal.html" class="mockups-navigation-link">רשומת יומן</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <style>
-        /* Modal Overlay */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1050;
-        }
-        
-        /* Modal Container */
-        .modal-container {
-            background: white;
-            border-radius: 12px;
-            max-width: 900px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
-        
-        /* Modal Header */
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #6c757d;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-        
-        .modal-close:hover {
-            background: #f8f9fa;
-            color: #000;
-        }
-        
-        /* Modal Body */
-        .modal-body {
-            padding: 1.5rem;
-        }
-        
-        /* Modal Footer */
-        .modal-footer {
-            padding: 1.5rem;
-            border-top: 1px solid #e9ecef;
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-        }
-    </style>
-</head>
-<body class="modal-page">
-    <!-- Modal Overlay -->
-    <div class="modal-overlay">
-        <div class="modal-container">
-            <!-- Modal Header -->
-            <div class="modal-header">
-                <h2 class="modal-title">השוואת תאריכים</h2>
-                <button class="modal-close" onclick="window.close()">×</button>
-            </div>
-            
-            <!-- Modal Body -->
-            <div class="modal-body">
-                <!-- Date Selection Section -->
-                <div class="content-section" id="date_comparison_modal-בחירת-תאריכים">
-                    <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> בחירת תאריכים</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('date_comparison_modal-בחירת-תאריכים')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="datePicker1" class="form-label">תאריך ראשון:</label>
-                                <input type="date" id="datePicker1" class="form-control" value="2025-01-10">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="datePicker2" class="form-label">תאריך שני:</label>
-                                <input type="date" id="datePicker2" class="form-control" value="2025-01-15">
-                            </div>
-                            <div class="col-md-12">
-                                <button class="btn btn-primary">השווה</button>
-                            
-                    </div>
-                </div>
-                    </div>
-                </div>
                 
                 <!-- Comparison Table Section -->
                 <div class="content-section" id="date_comparison_modal-טבלת-השוואות">
@@ -267,12 +160,12 @@
                     </div>
                     <div class="section-body">
 
-                        <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                        <div class="chart-container chart-container-placeholder">
                             [גרף Bar Chart - השוואה בין התאריכים]
                         </div>
                         <div class="mt-3">
-                            <span class="badge" style="background: #007bff;">█ תאריך 1</span>
-                            <span class="badge" style="background: #28a745;">█ תאריך 2</span>
+                            <span class="badge badge-legend badge-legend-info">█ תאריך 1</span>
+                            <span class="badge badge-legend badge-legend-success">█ תאריך 2</span>
                         
                     </div>
                 </div>
@@ -289,13 +182,13 @@
                     </div>
                     <div class="section-body">
 
-                        <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                        <div class="chart-container chart-container-placeholder">
                             [גרף Line Chart - מגמה בין התאריכים]
                         </div>
                         <div class="mt-3">
-                            <span class="badge" style="background: #007bff;">● יתרות</span>
-                            <span class="badge" style="background: #28a745;">● שווי תיק</span>
-                            <span class="badge" style="background: #dc3545;">● P/L כולל</span>
+                            <span class="badge badge-legend badge-legend-info">● יתרות</span>
+                            <span class="badge badge-legend badge-legend-success">● שווי תיק</span>
+                            <span class="badge badge-legend badge-legend-red">● P/L כולל</span>
                         
                     </div>
                 </div>

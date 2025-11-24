@@ -38,6 +38,10 @@
     <!-- Field Renderer Service -->
     <script src="../../scripts/services/field-renderer-service.js" defer></script>
     
+    <!-- Info Summary System -->
+    <script src="../../scripts/info-summary-configs.js" defer></script>
+    <script src="../../scripts/info-summary-system.js" defer></script>
+    
     <!-- Preferences System -->
     <script src="../../scripts/services/preferences-data.js" defer></script>
     <script src="../../scripts/preferences-core-new.js" defer></script>
@@ -51,193 +55,31 @@
     <div id="unified-header"></div>
     
     <!-- Mockups Navigation -->
-    <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box;">
-        <div style="max-width: 1400px; margin: 0 auto;">
-            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                <span style="font-weight: bold; color: #495057; font-size: 0.9rem; white-space: nowrap;">
-                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
-                </span>                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
-                <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
-                <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
-                <a href="comparative-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח השוואתי</a>
-                <a href="trading-journal-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">יומן מסחר</a>
-                <a href="strategy-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח אסטרטגיות</a>
-                <a href="economic-calendar-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">לוח כלכלי</a>
-                <a href="history-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ווידג'ט היסטוריה</a>
-                <a href="emotional-tracking-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">תיעוד רגשי</a>
-                <a href="date-comparison-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">השוואת תאריכים</a>
-                <a href="journal-entry-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">רשומת יומן</a>
-</div>
+        <!-- Mockups Navigation -->
+    <div class="mockups-navigation">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div class="mockups-navigation-content">
+                        <span class="mockups-navigation-label">
+                            <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                        </span>
+                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
+                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
+                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
+                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
+                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
+                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
+                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
+                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
+                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
+                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
+                        <a href="journal-entry-modal.html" class="mockups-navigation-link active">רשומת יומן</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <style>
-        /* Modal Overlay */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1050;
-        }
-        
-        /* Modal Container */
-        .modal-container {
-            background: white;
-            border-radius: 12px;
-            max-width: 800px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
-        
-        /* Modal Header */
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #6c757d;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-        
-        .modal-close:hover {
-            background: #f8f9fa;
-            color: #000;
-        }
-        
-        /* Modal Body */
-        .modal-body {
-            padding: 1.5rem;
-        }
-        
-        /* Modal Footer */
-        .modal-footer {
-            padding: 1.5rem;
-            border-top: 1px solid #e9ecef;
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-        }
-    </style>
-</head>
-<body class="modal-page">
-    <!-- Modal Overlay -->
-    <div class="modal-overlay">
-        <div class="modal-container">
-            <!-- Modal Header -->
-            <div class="modal-header">
-                <h2 class="modal-title">רשומת יומן חדשה</h2>
-                <button class="modal-close" onclick="window.close()">×</button>
-            </div>
-            
-            <!-- Modal Body -->
-            <div class="modal-body">
-                <!-- Date and Time -->
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="entryDate" class="form-label">תאריך:</label>
-                        <input type="date" id="entryDate" class="form-control" value="2025-01-15">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="entryTime" class="form-label">שעה:</label>
-                        <input type="time" id="entryTime" class="form-control" value="14:30">
-                    </div>
-                </div>
-                
-                <!-- Link to Trade/Plan -->
-                <div class="mb-3">
-                    <label for="linkedTrade" class="form-label">קישור לטרייד/תוכנית:</label>
-                    <select id="linkedTrade" class="form-select">
-                        <option value="">אין קישור</option>
-                        <option value="123">Trade #123 - AAPL</option>
-                        <option value="124">Trade #124 - TSLA</option>
-                        <option value="plan-1">Plan #1 - MSFT</option>
-                    </select>
-                </div>
-                
-                <!-- Emotional Tracking -->
-                <div class="mb-3">
-                    <label class="form-label">תיעוד רגשי:</label>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <button class="btn btn-outline-secondary btn-sm">
-                            <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> שמח
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm">
-                            <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> מרוצה
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm">
-                            <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> ניטרלי
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm">
-                            <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> עצוב
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm">
-                            <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> כועס
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Notes and Analysis -->
-                <div class="mb-3">
-                    <label for="entryNotes" class="form-label">הערות וניתוח:</label>
-                    <div id="entryNotes" style="min-height: 200px; border: 1px solid #ced4da; border-radius: 4px;">
-                        <!-- Rich Text Editor would go here (Quill) -->
-                        <p>ניתוח טרייד AAPL - כניסה טובה, יציאה מוקדמת מדי. צריך לשפר את ניהול הסיכון.</p>
-                    </div>
-                </div>
-                
-                <!-- Tags -->
-                <div class="mb-3">
-                    <label for="entryTags" class="form-label">תגיות:</label>
-                    <input type="text" id="entryTags" class="form-control" placeholder="הזן תגיות מופרדות בפסיקים (למשל: ניתוח, למידה, שיפור)">
-                    <small class="text-muted">תגיות קיימות: ניתוח, למידה, שיפור, הצלחה, כישלון</small>
-                </div>
-                
-                <!-- Images/Charts -->
-                <div class="mb-3">
-                    <label class="form-label">תמונות/גרפים:</label>
-                    <div class="border rounded p-3" style="background: #f8f9fa;">
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-sm btn-outline-primary">
-                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> העלה תמונה
-                            </button>
-                            <button class="btn btn-sm btn-outline-primary">
-                                <img src="../../images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon"> הוסף גרף
-                            </button>
-                        </div>
-                        <div class="mt-2">
-                            <small class="text-muted">ניתן להעלות תמונות או להוסיף גרפים מהטרייד</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
             
             <!-- Modal Footer -->
             <div class="modal-footer">

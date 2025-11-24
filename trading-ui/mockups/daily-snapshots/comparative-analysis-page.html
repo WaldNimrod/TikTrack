@@ -25,171 +25,6 @@
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
     
     <!-- Filter Styles (same as header system) -->
-    <style>
-        .filter-group {
-            position: relative;
-        }
-        
-        .filter-dropdown {
-            position: relative;
-        }
-        
-        .filter-toggle {
-            display: flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.25rem 0.9rem;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 400;
-            color: #333;
-            width: 100%;
-            text-align: right;
-            direction: rtl;
-            transition: all 0.2s ease;
-        }
-        
-        .filter-toggle:hover {
-            border-color: #ff9500;
-            color: #ff9500;
-            background: white;
-            box-shadow: none;
-        }
-        
-        .filter-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            min-width: 200px;
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.2s ease;
-            display: none;
-            direction: rtl;
-        }
-        
-        .filter-group:hover .filter-menu,
-        .filter-menu.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-            display: block;
-        }
-        
-        .account-filter-item {
-            padding: 6px 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .account-filter-item:hover {
-            background: #f8f9ff;
-            color: #667eea;
-        }
-        
-        .account-filter-item:last-child {
-            border-bottom: none;
-        }
-        
-        .account-filter-item.selected {
-            background-color: #f0f8ff;
-            color: #26baac;
-            font-weight: 500;
-        }
-        
-        .account-filter-item.selected::before {
-            content: "✓";
-            margin-left: 8px;
-            color: #26baac;
-            font-weight: bold;
-        }
-        
-        .date-range-filter-item {
-            padding: 6px 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .date-range-filter-item:hover {
-            background: #f8f9ff;
-            color: #667eea;
-        }
-        
-        .date-range-filter-item:last-child {
-            border-bottom: none;
-        }
-        
-        .date-range-filter-item.selected {
-            background-color: #f0f8ff;
-            color: #26baac;
-            font-weight: 500;
-        }
-        
-        .date-range-filter-item.selected::before {
-            content: "✓";
-            margin-left: 8px;
-            color: #26baac;
-            font-weight: bold;
-        }
-        
-        .option-text {
-            font-weight: 500;
-        }
-        
-        .selected-value {
-            flex: 1;
-            text-align: right;
-        }
-        
-        .dropdown-arrow {
-            font-size: 0.7rem;
-            transition: transform 0.2s ease;
-        }
-        
-        .filter-toggle:hover .dropdown-arrow {
-            transform: translateY(2px);
-        }
-        
-        /* Multi-select quick action buttons */
-        .multi-select-actions {
-            display: flex;
-            gap: 0.25rem;
-            margin-top: 0.25rem;
-            font-size: 0.75rem;
-        }
-        
-        .multi-select-actions button {
-            color: #26baac;
-            text-decoration: none;
-            padding: 0;
-            border: none;
-            background: none;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        
-        .multi-select-actions button:hover {
-            color: #fc5a06;
-            text-decoration: underline;
-        }
-        
-        .multi-select-actions span {
-            color: #dee2e6;
-        }
-    </style>
     
     <!-- Bootstrap JS for Modal and Tooltip -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -204,6 +39,9 @@
     <!-- Core Systems (Must load first) -->
     <script src="../../scripts/logger-service.js?v=1.0.0"></script>
     <script src="../../scripts/button-icons.js?v=1.0.0"></script>
+    
+    <!-- Notification System -->
+    <script src="../../scripts/notification-system.js" defer></script>
     
     <!-- Preferences System -->
     <script src="../../scripts/services/preferences-data.js" defer></script>
@@ -220,6 +58,10 @@
     
     <!-- Field Renderer Service -->
     <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    
+    <!-- Info Summary System -->
+    <script src="../../scripts/info-summary-configs.js" defer></script>
+    <script src="../../scripts/info-summary-system.js" defer></script>
     
     <!-- Tag System -->
     <script src="../../scripts/services/tag-service.js" defer></script>
@@ -242,25 +84,26 @@
     <div id="unified-header"></div>
     
     <!-- Mockups Navigation -->
-    <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 0; margin-bottom: 20px;">
+    <div class="mockups-navigation">
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                        <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
+                    <div class="mockups-navigation-content">
+                        <span class="mockups-navigation-label">
                             <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
-                        </span>                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
-                <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
-                <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
-                <a href="comparative-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח השוואתי</a>
-                <a href="trading-journal-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">יומן מסחר</a>
-                <a href="strategy-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח אסטרטגיות</a>
-                <a href="economic-calendar-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">לוח כלכלי</a>
-                <a href="history-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ווידג'ט היסטוריה</a>
-                <a href="emotional-tracking-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">תיעוד רגשי</a>
-                <a href="date-comparison-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">השוואת תאריכים</a>
-                <a href="journal-entry-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">רשומת יומן</a>
-</div>
+                        </span>
+                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
+                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
+                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
+                        <a href="comparative-analysis-page.html" class="mockups-navigation-link active">ניתוח השוואתי</a>
+                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
+                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
+                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
+                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
+                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
+                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
+                        <a href="journal-entry-modal.html" class="mockups-navigation-link">רשומת יומן</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -314,10 +157,10 @@
                                 <div class="row g-2 mb-3">
                                     <!-- Date Range Filter (Preset) -->
                                     <div class="col-md-2">
-                                        <label class="form-label" style="font-size: 0.85rem;">טווח מוגדר</label>
+                                        <label class="form-label form-label-small">טווח מוגדר</label>
                                         <div class="filter-group date-range-filter">
                                             <div class="filter-dropdown">
-                                                <button class="filter-toggle date-range-filter-toggle" id="dateRangeFilterToggle" onclick="toggleDateRangeFilterMenu()" style="max-width: 100%;">
+                                                <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="dateRangeFilterToggle" onclick="toggleDateRangeFilterMenu()">
                                                     <span class="selected-value selected-date-text" id="selectedDateRange">השנה</span>
                                                     <span class="dropdown-arrow">▼</span>
                                                 </button>
@@ -368,13 +211,13 @@
                                         <div class="row g-2">
                                             <!-- Custom Date From -->
                                             <div class="col-md-6">
-                                                <label for="customDateFrom" class="form-label" style="font-size: 0.85rem;">מתאריך</label>
+                                                <label for="customDateFrom" class="form-label form-label-small">מתאריך</label>
                                                 <input type="date" id="customDateFrom" class="form-control form-control-sm" onchange="handleCustomDateFromChange()">
                                             </div>
                                             
                                             <!-- Custom Date To -->
                                             <div class="col-md-6">
-                                                <label for="customDateTo" class="form-label" style="font-size: 0.85rem;">עד תאריך</label>
+                                                <label for="customDateTo" class="form-label form-label-small">עד תאריך</label>
                                                 <input type="date" id="customDateTo" class="form-control form-control-sm" onchange="handleCustomDateToChange()">
                                             </div>
                                         </div>
@@ -387,11 +230,11 @@
                                     <!-- Trading Account Filter -->
                                     <div class="col-md-2">
                                         <div class="d-flex align-items-center gap-1 mb-1">
-                                            <label class="form-label mb-0" style="font-size: 0.85rem;">חשבון מסחר</label>
-                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="selectAllOptions('recordFilterTradingAccounts')" title="בחר הכל">
+                                            <label class="form-label mb-0 form-label-small">חשבון מסחר</label>
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" onclick="selectAllOptions('recordFilterTradingAccounts')" title="בחר הכל">
                                                 <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
                                             </button>
-                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="clearAllOptions('recordFilterTradingAccounts')" title="נקה הכל">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" onclick="clearAllOptions('recordFilterTradingAccounts')" title="נקה הכל">
                                                 <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
                                             </button>
                                         </div>
@@ -403,11 +246,11 @@
                                     <!-- Tags Filter -->
                                     <div class="col-md-2">
                                         <div class="d-flex align-items-center gap-1 mb-1">
-                                            <label for="recordFilterTags" class="form-label mb-0" style="font-size: 0.85rem;">תגיות</label>
-                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="selectAllOptions('recordFilterTags')" title="בחר הכל">
+                                            <label for="recordFilterTags" class="form-label mb-0 form-label-small">תגיות</label>
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" onclick="selectAllOptions('recordFilterTags')" title="בחר הכל">
                                                 <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
                                             </button>
-                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="clearAllOptions('recordFilterTags')" title="נקה הכל">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" onclick="clearAllOptions('recordFilterTags')" title="נקה הכל">
                                                 <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
                                             </button>
                                         </div>
@@ -418,10 +261,10 @@
                                     
                                     <!-- Side Filter -->
                                     <div class="col-md-2">
-                                        <label class="form-label" style="font-size: 0.85rem;">צד</label>
+                                        <label class="form-label form-label-small">צד</label>
                                         <div class="filter-group side-filter">
                                             <div class="filter-dropdown">
-                                                <button class="filter-toggle side-filter-toggle" id="sideFilterToggle" onclick="toggleSideFilterMenu()" style="max-width: 100%;">
+                                                <button class="filter-toggle filter-toggle-full-width side-filter-toggle" id="sideFilterToggle" onclick="toggleSideFilterMenu()">
                                                     <span class="selected-value selected-side-text" id="selectedSide">כל הצדדים</span>
                                                     <span class="dropdown-arrow">▼</span>
                                                 </button>
@@ -442,10 +285,10 @@
                                     
                                     <!-- Status Filter -->
                                     <div class="col-md-2">
-                                        <label class="form-label" style="font-size: 0.85rem;">סטטוס</label>
+                                        <label class="form-label form-label-small">סטטוס</label>
                                         <div class="filter-group status-filter">
                                             <div class="filter-dropdown">
-                                                <button class="filter-toggle status-filter-toggle" id="statusFilterToggle" onclick="toggleStatusFilterMenu()" style="max-width: 100%;">
+                                                <button class="filter-toggle filter-toggle-full-width status-filter-toggle" id="statusFilterToggle" onclick="toggleStatusFilterMenu()">
                                                     <span class="selected-value selected-status-text" id="selectedStatus">כל הסטטוסים</span>
                                                     <span class="dropdown-arrow">▼</span>
                                                 </button>
@@ -469,14 +312,14 @@
                                     
                                     <!-- With/Without Plan Filter (last in row) -->
                                     <div class="col-md-2">
-                                        <label class="form-label" style="font-size: 0.85rem;">תוכנית מסחר</label>
+                                        <label class="form-label form-label-small">תוכנית מסחר</label>
                                         <div class="form-check">
                                             <input type="checkbox" id="recordFilterWithPlan" class="form-check-input" checked onchange="applyRecordFilters()">
-                                            <label for="recordFilterWithPlan" class="form-check-label" style="font-size: 0.85rem;">עם תוכנית</label>
+                                            <label for="recordFilterWithPlan" class="form-check-label form-label-small">עם תוכנית</label>
                                         </div>
                                         <div class="form-check">
                                             <input type="checkbox" id="recordFilterWithoutPlan" class="form-check-input" checked onchange="applyRecordFilters()">
-                                            <label for="recordFilterWithoutPlan" class="form-check-label" style="font-size: 0.85rem;">בלי תוכנית</label>
+                                            <label for="recordFilterWithoutPlan" class="form-check-label form-label-small">בלי תוכנית</label>
                                         </div>
                                     </div>
                                 </div>
@@ -513,10 +356,10 @@
                                         <div class="form-check mb-2 d-flex align-items-center gap-1">
                                             <input type="checkbox" id="compareByInvestmentType" class="form-check-input" onchange="toggleComparisonParameter('investmentType')">
                                             <label for="compareByInvestmentType" class="form-check-label fw-bold mb-0">סוג השקעה</label>
-                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="selectAllOptions('comparisonInvestmentTypes')" title="בחר הכל" disabled id="btn-select-all-investment-types">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" onclick="selectAllOptions('comparisonInvestmentTypes')" title="בחר הכל" disabled id="btn-select-all-investment-types">
                                                 <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
                                             </button>
-                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="clearAllOptions('comparisonInvestmentTypes')" title="נקה הכל" disabled id="btn-clear-all-investment-types">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" onclick="clearAllOptions('comparisonInvestmentTypes')" title="נקה הכל" disabled id="btn-clear-all-investment-types">
                                                 <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
                                             </button>
                                         </div>
@@ -532,10 +375,10 @@
                                         <div class="form-check mb-2 d-flex align-items-center gap-1">
                                             <input type="checkbox" id="compareByTradingMethods" class="form-check-input" onchange="toggleComparisonParameter('tradingMethods')">
                                             <label for="compareByTradingMethods" class="form-check-label fw-bold mb-0">שיטות מסחר</label>
-                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="selectAllOptions('comparisonTradingMethods')" title="בחר הכל" disabled id="btn-select-all-trading-methods">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" onclick="selectAllOptions('comparisonTradingMethods')" title="בחר הכל" disabled id="btn-select-all-trading-methods">
                                                 <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
                                             </button>
-                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="clearAllOptions('comparisonTradingMethods')" title="נקה הכל" disabled id="btn-clear-all-trading-methods">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" onclick="clearAllOptions('comparisonTradingMethods')" title="נקה הכל" disabled id="btn-clear-all-trading-methods">
                                                 <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
                                             </button>
                                         </div>
@@ -549,10 +392,10 @@
                                         <div class="form-check mb-2 d-flex align-items-center gap-1">
                                             <input type="checkbox" id="compareByTicker" class="form-check-input" onchange="toggleComparisonParameter('ticker')">
                                             <label for="compareByTicker" class="form-check-label fw-bold mb-0">טיקר</label>
-                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="selectAllOptions('comparisonTickers')" title="בחר הכל" disabled id="btn-select-all-tickers">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" onclick="selectAllOptions('comparisonTickers')" title="בחר הכל" disabled id="btn-select-all-tickers">
                                                 <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
                                             </button>
-                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="clearAllOptions('comparisonTickers')" title="נקה הכל" disabled id="btn-clear-all-tickers">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" onclick="clearAllOptions('comparisonTickers')" title="נקה הכל" disabled id="btn-clear-all-tickers">
                                                 <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
                                             </button>
                                         </div>
@@ -566,10 +409,10 @@
                                         <div class="form-check mb-2 d-flex align-items-center gap-1">
                                             <input type="checkbox" id="compareByTags" class="form-check-input" onchange="toggleComparisonParameter('tags')">
                                             <label for="compareByTags" class="form-check-label fw-bold mb-0">תגיות</label>
-                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="selectAllOptions('comparisonTags')" title="בחר הכל" disabled id="btn-select-all-comparison-tags">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" onclick="selectAllOptions('comparisonTags')" title="בחר הכל" disabled id="btn-select-all-comparison-tags">
                                                 <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
                                             </button>
-                                            <button class="btn btn-link p-0 text-decoration-none" style="font-size: 0.7rem; padding: 1px 3px !important; line-height: 1;" onclick="clearAllOptions('comparisonTags')" title="נקה הכל" disabled id="btn-clear-all-comparison-tags">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" onclick="clearAllOptions('comparisonTags')" title="נקה הכל" disabled id="btn-clear-all-comparison-tags">
                                                 <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
                                             </button>
                                         </div>
@@ -586,11 +429,11 @@
                                         </div>
                                         <div class="form-check">
                                             <input type="checkbox" id="comparisonWithPlan" class="form-check-input" onchange="applyComparisonParameters()" disabled>
-                                            <label for="comparisonWithPlan" class="form-check-label" style="font-size: 0.85rem;">עם תוכנית</label>
+                                            <label for="comparisonWithPlan" class="form-check-label form-label-small">עם תוכנית</label>
                                         </div>
                                         <div class="form-check">
                                             <input type="checkbox" id="comparisonWithoutPlan" class="form-check-input" onchange="applyComparisonParameters()" disabled>
-                                            <label for="comparisonWithoutPlan" class="form-check-label" style="font-size: 0.85rem;">בלי תוכנית</label>
+                                            <label for="comparisonWithoutPlan" class="form-check-label form-label-small">בלי תוכנית</label>
                                         </div>
                                     </div>
                                 </div>
@@ -626,12 +469,12 @@
                                                     <strong>סיכום:</strong> טוען נתונים...
                                                 </td>
                                             </tr>
-                                            <tr class="table-secondary" style="font-size: 0.85rem;">
+                                            <tr class="table-secondary form-label-small">
                                                 <td colspan="5" id="comparison-table-filter-info">
                                                     <strong>פרמטרי סינון:</strong> טוען נתונים...
                                                 </td>
                                             </tr>
-                                            <tr class="table-secondary" style="font-size: 0.85rem;">
+                                            <tr class="table-secondary form-label-small">
                                                 <td colspan="5" id="comparison-table-comparison-info">
                                                     <strong>פרמטרי השוואה:</strong> טוען נתונים...
                                                 </td>
@@ -672,21 +515,21 @@
                                     </table>
                                 </div>
                                 <div class="mt-3">
-                                    <div style="margin-bottom: 8px;">
+                                    <div class="mb-2">
                                         <strong>ערכים חיוביים (ירוק):</strong>
-                                        <span class="badge" style="background-color: rgba(40, 167, 69, 0.7); margin-right: 4px;">מצוין</span>
-                                        <span class="badge" style="background-color: rgba(40, 167, 69, 0.55); margin-right: 4px;">טוב מאוד</span>
-                                        <span class="badge" style="background-color: rgba(40, 167, 69, 0.4); margin-right: 4px;">טוב</span>
-                                        <span class="badge" style="background-color: rgba(40, 167, 69, 0.3); margin-right: 4px;">בינוני</span>
-                                        <span class="badge" style="background-color: rgba(40, 167, 69, 0.2);">חלש</span>
+                                        <span class="badge heatmap-excellent me-1">מצוין</span>
+                                        <span class="badge heatmap-very-good me-1">טוב מאוד</span>
+                                        <span class="badge heatmap-good me-1">טוב</span>
+                                        <span class="badge heatmap-average me-1">בינוני</span>
+                                        <span class="badge heatmap-below-avg">חלש</span>
                                     </div>
                                     <div>
                                         <strong>ערכים שליליים (אדום):</strong>
-                                        <span class="badge" style="background-color: rgba(220, 53, 69, 0.7); margin-right: 4px;">גרוע מאוד</span>
-                                        <span class="badge" style="background-color: rgba(220, 53, 69, 0.55); margin-right: 4px;">גרוע</span>
-                                        <span class="badge" style="background-color: rgba(220, 53, 69, 0.4); margin-right: 4px;">בינוני</span>
-                                        <span class="badge" style="background-color: rgba(220, 53, 69, 0.3); margin-right: 4px;">פחות גרוע</span>
-                                        <span class="badge" style="background-color: rgba(220, 53, 69, 0.2);">הכי פחות גרוע</span>
+                                        <span class="badge heatmap-very-poor me-1">גרוע מאוד</span>
+                                        <span class="badge heatmap-poor me-1">גרוע</span>
+                                        <span class="badge heatmap-average me-1">בינוני</span>
+                                        <span class="badge heatmap-below-avg me-1">פחות גרוע</span>
+                                        <span class="badge heatmap-good">הכי פחות גרוע</span>
                                     </div>
                                 </div>
                             </div>
@@ -705,24 +548,24 @@
                         </div>
                     </div>
                     <div class="section-body">
-                        <div id="comparison-chart-series-controls" class="mb-3" style="padding: 12px; background: #f8f9fa; border-radius: 4px; border: 1px solid #dee2e6;">
-                            <div style="margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: #495057;">בחר סדרות להצגה:</div>
-                            <div style="display: flex; gap: 20px; flex-wrap: wrap;" id="series-checkboxes-container">
+                        <div id="comparison-chart-series-controls" class="comparison-chart-series-controls mb-3">
+                            <div class="comparison-chart-series-controls-title">בחר סדרות להצגה:</div>
+                            <div class="comparison-chart-series-checkboxes" id="series-checkboxes-container">
                                 <!-- Will be populated dynamically -->
                             </div>
                         </div>
-                        <div id="comparison-chart-legend" class="chart-legend mb-2" style="display: flex; gap: 15px; flex-wrap: wrap; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                        <div id="comparison-chart-legend" class="comparison-chart-legend mb-2">
                             <!-- Legend will be populated dynamically -->
                         </div>
-                        <div id="comparison-chart-container" class="chart-container" style="height: 300px; position: relative; background: #fff; border-radius: 8px; border: 1px solid #dee2e6;">
-                            <div class="chart-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6c757d;">
+                        <div id="comparison-chart-container" class="comparison-chart-container">
+                            <div class="chart-loading">
                                 <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
                             </div>
-                            <div id="chart-scale-labels" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 10;">
-                                <div id="left-scale-label" style="position: absolute; left: 8px; top: 8px; font-size: 0.75rem; color: #6c757d; font-weight: 500; background: rgba(255, 255, 255, 0.8); padding: 2px 6px; border-radius: 3px;">
+                            <div id="chart-scale-labels" class="chart-scale-labels">
+                                <div id="left-scale-label" class="left-scale-label">
                                     אחוז הצלחה (%)
                                 </div>
-                                <div id="right-scale-label" style="position: absolute; right: 8px; top: 8px; font-size: 0.75rem; color: #6c757d; font-weight: 500; background: rgba(255, 255, 255, 0.8); padding: 2px 6px; border-radius: 3px;">
+                                <div id="right-scale-label" class="right-scale-label">
                                     P/L כולל ($)
                                 </div>
                             </div>
@@ -736,217 +579,6 @@
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
     
-    <!-- CSS Animations and Panel Styling -->
-    <style>
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .chart-container {
-            transition: opacity 0.3s ease;
-        }
-        
-        .heatmap-row {
-            transition: background-color 0.2s, transform 0.1s;
-        }
-        
-        .heatmap-row:hover {
-            transform: scale(1.01);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-        
-        .table-hover tbody tr {
-            transition: background-color 0.2s;
-        }
-        
-        /* Panel Styling - Record Filter Panel (Blue) */
-        .filter-panel-card {
-            background-color: #E3F2FD;
-            border: 2px solid #2196F3;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .filter-panel-card .section-header {
-            background-color: #BBDEFB;
-            padding: 12px 16px;
-            border-bottom: 2px solid #2196F3;
-        }
-        
-        .filter-panel-card .section-header h3 {
-            color: #1976D2;
-            margin: 0;
-            font-size: 1.1rem;
-        }
-        
-        .filter-panel-card .section-header .text-muted {
-            color: #1565C0;
-            font-size: 0.85rem;
-        }
-        
-        /* Panel Styling - Comparison Parameters Panel (Green) */
-        .comparison-panel-card {
-            background-color: #E8F5E9;
-            border: 2px solid #4CAF50;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .comparison-panel-card .section-header {
-            background-color: #C8E6C9;
-            padding: 12px 16px;
-            border-bottom: 2px solid #4CAF50;
-        }
-        
-        .comparison-panel-card .section-header h3 {
-            color: #2E7D32;
-            margin: 0;
-            font-size: 1.1rem;
-        }
-        
-        .comparison-panel-card .section-header .text-muted {
-            color: #1B5E20;
-            font-size: 0.85rem;
-        }
-        
-        /* Side and Status Filter Styling (matching date range filter) */
-        .side-filter-item,
-        .status-filter-item {
-            padding: 6px 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .side-filter-item:hover,
-        .status-filter-item:hover {
-            background: #f8f9ff;
-            color: #667eea;
-        }
-        
-        .side-filter-item.selected,
-        .status-filter-item.selected {
-            background: #e3f2fd;
-            color: #1976d2;
-            font-weight: 500;
-        }
-        
-        /* Disabled state for comparison parameters */
-        .form-select:disabled,
-        .form-check-input:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        /* Header actions styling - ensure buttons are on the left (end of line in RTL) */
-        .filter-panel-card .section-header,
-        .comparison-panel-card .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 15px;
-        }
-        
-        .filter-panel-card .section-header .header-title-section,
-        .comparison-panel-card .section-header .header-title-section {
-            flex: 1;
-        }
-        
-        .filter-panel-card .section-header .header-actions,
-        .comparison-panel-card .section-header .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex-shrink: 0;
-        }
-        
-        /* Small icon buttons in header */
-        .filter-panel-card .section-header .header-actions .btn-link,
-        .comparison-panel-card .section-header .header-actions .btn-link {
-            font-size: 0.8rem !important;
-            padding: 4px 6px !important;
-            line-height: 1.2 !important;
-            min-width: auto !important;
-            width: auto !important;
-            height: auto !important;
-            color: #495057 !important;
-            background-color: rgba(255, 255, 255, 0.7) !important;
-            border: 1px solid rgba(0, 0, 0, 0.1) !important;
-            border-radius: 4px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            transition: all 0.2s ease !important;
-        }
-        
-        .filter-panel-card .section-header .header-actions .btn-link:hover,
-        .comparison-panel-card .section-header .header-actions .btn-link:hover {
-            background-color: rgba(255, 255, 255, 0.9) !important;
-            border-color: rgba(0, 0, 0, 0.2) !important;
-            opacity: 1 !important;
-            transform: scale(1.05);
-        }
-        
-        .filter-panel-card .section-header .header-actions .btn-link img,
-        .comparison-panel-card .section-header .header-actions .btn-link img {
-            width: 16px !important;
-            height: 16px !important;
-            display: block !important;
-            margin-left: 2px !important;
-        }
-        
-        .filter-panel-card .section-header .header-actions .btn-link:hover,
-        .comparison-panel-card .section-header .header-actions .btn-link:hover {
-            opacity: 0.7;
-        }
-        
-        .filter-panel-card .section-header .header-actions .btn-link i,
-        .comparison-panel-card .section-header .header-actions .btn-link i {
-            font-size: 0.85rem;
-        }
-        
-        /* Heatmap gradient colors */
-        .heatmap-excellent {
-            background-color: rgba(40, 167, 69, 0.7) !important;
-        }
-        
-        .heatmap-very-good {
-            background-color: rgba(40, 167, 69, 0.55) !important;
-        }
-        
-        .heatmap-good {
-            background-color: rgba(40, 167, 69, 0.4) !important;
-        }
-        
-        .heatmap-average {
-            background-color: rgba(255, 193, 7, 0.4) !important;
-        }
-        
-        .heatmap-below-avg {
-            background-color: rgba(255, 193, 7, 0.55) !important;
-        }
-        
-        .heatmap-poor {
-            background-color: rgba(220, 53, 69, 0.55) !important;
-        }
-        
-        .heatmap-very-poor {
-            background-color: rgba(220, 53, 69, 0.7) !important;
-        }
-    </style>
     
     <!-- Initialize Preferences System and Dynamic Colors -->
     <script>
@@ -1003,16 +635,15 @@
                 const color = getEntityColor(series.entityType);
                 const isChecked = seriesVisibility[series.key] !== false; // Default true
                 return `
-                    <div style="display: flex; align-items: center; gap: 6px;">
+                    <div class="series-checkbox-container">
                         <input type="checkbox" 
                                id="series-${series.key}" 
                                class="form-check-input" 
                                ${isChecked ? 'checked' : ''}
-                               onchange="toggleSeries('${series.key}', this.checked)"
-                               style="cursor: pointer;">
-                        <label for="series-${series.key}" style="cursor: pointer; margin: 0; display: flex; align-items: center; gap: 6px;">
-                            <div style="width: 14px; height: 14px; background-color: ${color}; border-radius: 2px; border: 1px solid rgba(0,0,0,0.1);"></div>
-                            <span style="font-size: 0.85rem;">${series.label}</span>
+                               onchange="toggleSeries('${series.key}', this.checked)">
+                        <label for="series-${series.key}" class="series-checkbox-label">
+                            <div class="series-color-indicator" style="background-color: ${color};"></div>
+                            <span class="form-label-small">${series.label}</span>
                         </label>
                     </div>
                 `;
@@ -1026,10 +657,15 @@
             updateComparisonChart(getFilterValues());
         }
         
-        // Save series visibility state
-        function saveSeriesVisibilityState() {
+        // Save series visibility state using PreferencesCore
+        async function saveSeriesVisibilityState() {
             try {
-                localStorage.setItem('comparative-analysis-series-visibility', JSON.stringify(seriesVisibility));
+                if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
+                    await window.PreferencesCore.savePreference(PREF_SERIES_VISIBILITY, seriesVisibility);
+                } else {
+                    // Fallback to localStorage
+                    localStorage.setItem(PREF_SERIES_VISIBILITY, JSON.stringify(seriesVisibility));
+                }
             } catch (error) {
                 if (window.Logger) {
                     window.Logger.warn('Failed to save series visibility state', { page: 'comparative-analysis-page', error });
@@ -1037,12 +673,21 @@
             }
         }
         
-        // Load series visibility state
-        function loadSeriesVisibilityState() {
+        // Load series visibility state using PreferencesCore
+        async function loadSeriesVisibilityState() {
             try {
-                const saved = localStorage.getItem('comparative-analysis-series-visibility');
-                if (saved) {
-                    const savedState = JSON.parse(saved);
+                let savedState = null;
+                if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                    savedState = await window.PreferencesCore.getPreference(PREF_SERIES_VISIBILITY);
+                } else {
+                    // Fallback to localStorage
+                    const saved = localStorage.getItem(PREF_SERIES_VISIBILITY);
+                    if (saved) {
+                        savedState = JSON.parse(saved);
+                    }
+                }
+                
+                if (savedState) {
                     Object.keys(savedState).forEach(key => {
                         if (seriesVisibility.hasOwnProperty(key)) {
                             seriesVisibility[key] = savedState[key];
@@ -1077,8 +722,11 @@
         });
         
         // Filter state - separated into record filters and comparison parameters
-        const RECORD_FILTER_STORAGE_KEY = 'comparative-analysis-record-filters';
-        const COMPARISON_PARAMS_STORAGE_KEY = 'comparative-analysis-comparison-params';
+        // Using PreferencesCore preference names
+        const PREF_SERIES_VISIBILITY = 'comparative-analysis-series-visibility';
+        const PREF_FILTERS = 'comparative-analysis-filters';
+        const PREF_RECORD_FILTERS = 'comparative-analysis-record-filters';
+        const PREF_COMPARISON_PARAMS = 'comparative-analysis-comparison-params';
         
         // Wait for TradingView adapter
         async function waitForTradingViewAdapter() {
@@ -1467,11 +1115,16 @@
             return { start, end, range };
         }
         
-        // Save filter state to localStorage
-        function saveFilterState() {
+        // Save filter state using PreferencesCore
+        async function saveFilterState() {
             try {
                 const filters = getFilterValues();
-                localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
+                if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
+                    await window.PreferencesCore.savePreference(PREF_FILTERS, filters);
+                } else {
+                    // Fallback to localStorage
+                    localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+                }
             } catch (error) {
                 if (window.Logger) {
                     window.Logger.warn('Failed to save filter state', { page: 'comparative-analysis-page', error });
@@ -1479,13 +1132,21 @@
             }
         }
         
-        // Load filter state from localStorage
-        function loadFilterState() {
+        // Load filter state using PreferencesCore
+        async function loadFilterState() {
             try {
-                const saved = localStorage.getItem(FILTER_STORAGE_KEY);
-                if (!saved) return;
+                let filters = null;
+                if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                    filters = await window.PreferencesCore.getPreference(PREF_FILTERS);
+                } else {
+                    // Fallback to localStorage
+                    const saved = localStorage.getItem(PREF_FILTERS);
+                    if (saved) {
+                        filters = JSON.parse(saved);
+                    }
+                }
                 
-                const filters = JSON.parse(saved);
+                if (!filters) return;
                 
                 // Restore investment types
                 if (filters.investmentTypes) {
@@ -1595,13 +1256,26 @@
                 const displayName = tag.category?.name 
                     ? `${tag.category.name} • ${tag.name}`
                     : tag.name;
-                return `<span class="badge rounded-pill bg-light text-dark border me-1 mb-1" style="border-color: ${color}; font-size: 0.75rem;">${displayName}</span>`;
+                return `<span class="badge rounded-pill bg-light text-dark border me-1 mb-1 compact-stat-label-small" style="border-color: ${color};">${displayName}</span>`;
             }).join('');
         }
         
         // Create comparison categories from enabled parameters (cross-product)
         function createComparisonCategories(comparisonParams) {
             const enabledParams = [];
+            
+            if (window.Logger) {
+                window.Logger.info('🔍 Creating comparison categories', { 
+                    page: 'comparative-analysis-page',
+                    params: {
+                        investmentType: { enabled: comparisonParams.investmentType?.enabled, valuesCount: comparisonParams.investmentType?.values?.length || 0 },
+                        tradingMethods: { enabled: comparisonParams.tradingMethods?.enabled, valuesCount: comparisonParams.tradingMethods?.values?.length || 0 },
+                        ticker: { enabled: comparisonParams.ticker?.enabled, valuesCount: comparisonParams.ticker?.values?.length || 0 },
+                        withWithoutPlan: { enabled: comparisonParams.withWithoutPlan?.enabled, valuesCount: comparisonParams.withWithoutPlan?.values?.length || 0 },
+                        tags: { enabled: comparisonParams.tags?.enabled, valuesCount: comparisonParams.tags?.values?.length || 0 }
+                    }
+                });
+            }
             
             // Collect enabled parameters with their values
             if (comparisonParams.investmentType.enabled && comparisonParams.investmentType.values.length > 0) {
@@ -1686,7 +1360,21 @@
             
             // If no parameters enabled, return empty array
             if (enabledParams.length === 0) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ No comparison parameters enabled - returning empty categories', { 
+                        page: 'comparative-analysis-page',
+                        comparisonParams: comparisonParams
+                    });
+                }
                 return { categories: [], paramHeaders: [] };
+            }
+            
+            if (window.Logger) {
+                window.Logger.info('✅ Creating categories from enabled parameters', { 
+                    page: 'comparative-analysis-page',
+                    enabledParamsCount: enabledParams.length,
+                    enabledParams: enabledParams.map(p => ({ name: p.name, valuesCount: p.values.length }))
+                });
             }
             
             // Create cross-product of all parameter combinations
@@ -1703,6 +1391,13 @@
             }
             
             const combinations = cartesianProduct(enabledParams.map(p => p.values));
+            
+            if (window.Logger) {
+                window.Logger.info('📊 Generated category combinations', { 
+                    page: 'comparative-analysis-page',
+                    combinationsCount: combinations.length
+                });
+            }
             
             // Create category objects with parameter values separated
             const categories = combinations.map(combo => {
@@ -1836,14 +1531,27 @@
             const visibleIndex = visibleSeries.findIndex(s => s.key === seriesKey);
             const totalVisible = visibleSeries.length;
             
+            // Use a base date for the chart (e.g., 2024-01-01)
+            // Each category will be spaced by days, and each series within a category by hours
+            const baseDate = new Date('2024-01-01');
+            
+            // Use Unix timestamp (seconds since epoch) for better precision
+            // Base timestamp: 2024-01-01 00:00:00 UTC
+            const baseTimestamp = Math.floor(new Date('2024-01-01T00:00:00Z').getTime() / 1000);
+            // Each category gets 1 day (86400 seconds) for data + 1 day for spacing = 2 days total
+            // Each series within category gets 1 hour (3600 seconds)
+            const secondsPerDay = 86400;
+            const secondsPerHour = 3600;
+            const daysPerCategory = 2; // 1 day for data + 1 day for spacing
+            
             tableData.forEach((cat, catIndex) => {
-                // Base time for category - each category gets a time slot
-                // Space between categories: totalVisible + 1 (to allow spacing)
-                const baseTime = catIndex * (totalVisible + 1);
-                // Offset within category (spread bars evenly within the category slot)
-                // Each visible series gets an offset: 0, 1, 2, ... (totalVisible - 1)
-                const timeOffset = visibleIndex;
-                const time = (baseTime + timeOffset).toString();
+                // Base time for category - each category gets 2 days (1 day data + 1 day spacing)
+                // Data starts at the beginning of each 2-day block
+                const categoryBaseTime = baseTimestamp + (catIndex * daysPerCategory * secondsPerDay);
+                // Offset within category - each series gets 1 hour offset
+                // This creates grouped bars: series 0 at hour 0, series 1 at hour 1, etc.
+                const timeOffset = visibleIndex * secondsPerHour;
+                const time = categoryBaseTime + timeOffset;
                 
                 let value = cat[seriesKey];
                 if (value === undefined || value === null) {
@@ -2014,7 +1722,7 @@
                     // Fallback
                     const percentFormatted = percent.toFixed(1);
                     const percentClass = percent >= 0 ? 'text-success' : 'text-danger';
-                    percentHtml = `<span class="${percentClass}" style="font-size: 0.85em; opacity: 0.8;">(${percent >= 0 ? '+' : ''}${percentFormatted}%)</span>`;
+                    percentHtml = `<span class="${percentClass} form-label-small percent-opacity">(${percent >= 0 ? '+' : ''}${percentFormatted}%)</span>`;
                 }
                 return `${valueFormatted} ${percentHtml}`;
             }
@@ -2318,7 +2026,7 @@
                         <td class="text-end">${formatInvestmentWithPercent(cat.totalPurchases, totalPurchasesPercent)}</td>
                     `;
                     
-                    return `<tr style="animation: fadeIn 0.3s;">${paramCells}${dataCells}</tr>`;
+                    return `<tr class="fade-in-row">${paramCells}${dataCells}</tr>`;
                 }).join('');
                 
                 // Build summary row (last row, highlighted)
@@ -2330,7 +2038,7 @@
                 
                 // Note: formatPLWithPercent already returns HTML with colors via FieldRendererService
                 const summaryRow = `
-                    <tr class="table-info fw-bold" style="background-color: #d1ecf1; border-top: 2px solid #0c5460;">
+                    <tr class="table-info fw-bold table-summary-row">
                         ${summaryParamCells}
                         <td><strong>${totalTrades}<br>${avgTrades.toFixed(1)}</strong></td>
                         <td><strong>${formatPLWithPercent(totalAvgPL, summaryPLPercent)}<br>${formatPLWithPercent(avgAvgPL, summaryPLPercent)}</strong></td>
@@ -2416,8 +2124,7 @@
                 <tr class="heatmap-row" data-category="${item.category}" data-index="${index}" 
                     onmouseover="showHeatmapTooltip(event, ${JSON.stringify(item).replace(/"/g, '&quot;')})"
                     onmouseout="hideHeatmapTooltip()"
-                    onclick="filterByCategory('${item.category}')"
-                    style="cursor: pointer; transition: background-color 0.2s;">
+                    onclick="filterByCategory('${item.category}')">
                     <td><strong>${item.category}</strong></td>
                     <td style="${getColorStyle(item.tradesPercentile, item.trades)}" data-value="${item.trades}">${item.trades}</td>
                     <td style="${getColorStyle(item.avgPLPercentile, item.avgPL)}" data-value="${item.avgPL}">${formatPLWithPercent(item.avgPL, plPercent)}</td>
@@ -2643,14 +2350,29 @@
                 // Set custom time formatter to show category names (centered for each category group)
                 if (categories.length > 0) {
                     const visibleCount = visibleSeries.length;
+                    // Base timestamp: 2024-01-01 00:00:00 UTC (in seconds)
+                    const baseTimestamp = Math.floor(new Date('2024-01-01T00:00:00Z').getTime() / 1000);
+                    const secondsPerDay = 86400;
+                    const secondsPerHour = 3600;
+                    const daysPerCategory = 2; // 1 day for data + 1 day for spacing
+                    
                     comparisonChart.timeScale().applyOptions({
                         timeVisible: true,
                         tickMarkFormatter: (time, tickMarkType, locale) => {
-                            const timeNum = parseFloat(time);
-                            const categoryIndex = Math.floor(timeNum / (visibleCount + 1));
-                            // Only show label at the center of each category group
-                            const centerTime = categoryIndex * (visibleCount + 1) + (visibleCount / 2);
-                            if (Math.abs(timeNum - centerTime) < 0.1) {
+                            // Time is already a Unix timestamp (in seconds)
+                            const timestamp = typeof time === 'string' ? parseInt(time) : time;
+                            
+                            // Calculate category index based on 2-day blocks from base timestamp
+                            const daysFromBase = Math.floor((timestamp - baseTimestamp) / secondsPerDay);
+                            const categoryIndex = Math.floor(daysFromBase / daysPerCategory);
+                            
+                            // Only show label at the center of each category group (at noon of the first day of each 2-day block)
+                            // Center is at base of category + half of visible series hours
+                            const centerOffset = Math.floor(visibleCount / 2) * secondsPerHour;
+                            const centerTimestamp = baseTimestamp + (categoryIndex * daysPerCategory * secondsPerDay) + centerOffset;
+                            
+                            // Show label if we're within 2 hours of the center
+                            if (Math.abs(timestamp - centerTimestamp) < (2 * secondsPerHour)) {
                                 if (categoryIndex >= 0 && categoryIndex < categories.length) {
                                     return categories[categoryIndex];
                                 }
@@ -2692,9 +2414,9 @@
                 if (seriesVisibility[seriesConfig.key] !== false && chartSeries[seriesConfig.key]) {
                     const color = getEntityColor(seriesConfig.entityType);
                     legendItems.push(`
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <div style="width: 16px; height: 16px; background-color: ${color}; border-radius: 2px;"></div>
-                            <span style="font-size: 0.9rem;"><strong>${seriesConfig.label}</strong></span>
+                        <div class="series-checkbox-container">
+                            <div class="series-legend-color" style="background-color: ${color};"></div>
+                            <span class="form-label-small"><strong>${seriesConfig.label}</strong></span>
                         </div>
                     `);
                 }
@@ -2705,7 +2427,7 @@
         
         
         // Update all visualizations
-        function updateAllVisualizations() {
+        async function updateAllVisualizations() {
             const filters = getFilterValues();
             
             // Update table
@@ -2714,17 +2436,21 @@
             // Update heatmap
             updateHeatmap(filters);
             
-            // Update charts
-            requestAnimationFrame(() => {
-                updateComparisonChart(filters);
-            });
+            // Update charts (async to handle chart initialization if needed)
+            await updateComparisonChart(filters);
         }
         
         // Update Comparison Chart
-        function updateComparisonChart(filters) {
+        async function updateComparisonChart(filters) {
             if (!comparisonChart) {
-                initComparisonChart();
-                return;
+                await initComparisonChart();
+                // After initialization, continue with update
+                if (!comparisonChart) {
+                    if (window.Logger) {
+                        window.Logger.warn('Chart initialization failed, skipping update', { page: 'comparative-analysis-page' });
+                    }
+                    return;
+                }
             }
             
             try {
@@ -2783,14 +2509,29 @@
                 // Set custom time formatter to show category names (centered for each category group)
                 if (categories.length > 0) {
                     const visibleCount = visibleSeries.length;
+                    // Base timestamp: 2024-01-01 00:00:00 UTC (in seconds)
+                    const baseTimestamp = Math.floor(new Date('2024-01-01T00:00:00Z').getTime() / 1000);
+                    const secondsPerDay = 86400;
+                    const secondsPerHour = 3600;
+                    const daysPerCategory = 2; // 1 day for data + 1 day for spacing
+                    
                     comparisonChart.timeScale().applyOptions({
                         timeVisible: true,
                         tickMarkFormatter: (time, tickMarkType, locale) => {
-                            const timeNum = parseFloat(time);
-                            const categoryIndex = Math.floor(timeNum / (visibleCount + 1));
-                            // Only show label at the center of each category group
-                            const centerTime = categoryIndex * (visibleCount + 1) + (visibleCount / 2);
-                            if (Math.abs(timeNum - centerTime) < 0.1) {
+                            // Time is already a Unix timestamp (in seconds)
+                            const timestamp = typeof time === 'string' ? parseInt(time) : time;
+                            
+                            // Calculate category index based on 2-day blocks from base timestamp
+                            const daysFromBase = Math.floor((timestamp - baseTimestamp) / secondsPerDay);
+                            const categoryIndex = Math.floor(daysFromBase / daysPerCategory);
+                            
+                            // Only show label at the center of each category group (at noon of the first day of each 2-day block)
+                            // Center is at base of category + half of visible series hours
+                            const centerOffset = Math.floor(visibleCount / 2) * secondsPerHour;
+                            const centerTimestamp = baseTimestamp + (categoryIndex * daysPerCategory * secondsPerDay) + centerOffset;
+                            
+                            // Show label if we're within 2 hours of the center
+                            if (Math.abs(timestamp - centerTimestamp) < (2 * secondsPerHour)) {
                                 if (categoryIndex >= 0 && categoryIndex < categories.length) {
                                     return categories[categoryIndex];
                                 }
@@ -3528,10 +3269,15 @@
         }
         
         // ===== State Management Functions =====
-        function saveRecordFilterState() {
+        async function saveRecordFilterState() {
             try {
                 const filters = getRecordFilterValues();
-                localStorage.setItem(RECORD_FILTER_STORAGE_KEY, JSON.stringify(filters));
+                if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
+                    await window.PreferencesCore.savePreference(PREF_RECORD_FILTERS, filters);
+                } else {
+                    // Fallback to localStorage
+                    localStorage.setItem(PREF_RECORD_FILTERS, JSON.stringify(filters));
+                }
             } catch (error) {
                 if (window.Logger) {
                     window.Logger.warn('Failed to save record filter state', { page: 'comparative-analysis-page', error });
@@ -3539,12 +3285,20 @@
             }
         }
         
-        function loadRecordFilterState() {
+        async function loadRecordFilterState() {
             try {
-                const saved = localStorage.getItem(RECORD_FILTER_STORAGE_KEY);
-                if (!saved) return;
+                let filters = null;
+                if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                    filters = await window.PreferencesCore.getPreference(PREF_RECORD_FILTERS);
+                } else {
+                    // Fallback to localStorage
+                    const saved = localStorage.getItem(PREF_RECORD_FILTERS);
+                    if (saved) {
+                        filters = JSON.parse(saved);
+                    }
+                }
                 
-                const filters = JSON.parse(saved);
+                if (!filters) return;
                 // Restore filters (implementation similar to loadFilterState)
                 // ... (to be implemented if needed)
             } catch (error) {
@@ -3554,25 +3308,151 @@
             }
         }
         
-        function saveComparisonParameterState() {
+        async function saveComparisonParameterState() {
             try {
                 const params = getComparisonParameterValues();
-                localStorage.setItem(COMPARISON_PARAMS_STORAGE_KEY, JSON.stringify(params));
+                if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
+                    try {
+                        await window.PreferencesCore.savePreference(PREF_COMPARISON_PARAMS, params);
+                    } catch (prefError) {
+                        // If preference doesn't exist in database, fallback to localStorage
+                        if (window.Logger) {
+                            window.Logger.warn('Preference not found in database, using localStorage fallback', { 
+                                page: 'comparative-analysis-page', 
+                                preference: PREF_COMPARISON_PARAMS,
+                                error: prefError 
+                            });
+                        }
+                        localStorage.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
+                    }
+                } else {
+                    // Fallback to localStorage
+                    localStorage.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
+                }
             } catch (error) {
                 if (window.Logger) {
                     window.Logger.warn('Failed to save comparison parameter state', { page: 'comparative-analysis-page', error });
                 }
+                // Final fallback: always try localStorage
+                try {
+                    const params = getComparisonParameterValues();
+                    localStorage.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
+                } catch (e) {
+                    // Ignore localStorage errors
+                }
             }
         }
         
-        function loadComparisonParameterState() {
+        async function loadComparisonParameterState() {
             try {
-                const saved = localStorage.getItem(COMPARISON_PARAMS_STORAGE_KEY);
-                if (!saved) return;
+                let params = null;
+                if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                    params = await window.PreferencesCore.getPreference(PREF_COMPARISON_PARAMS);
+                } else {
+                    // Fallback to localStorage
+                    const saved = localStorage.getItem(PREF_COMPARISON_PARAMS);
+                    if (saved) {
+                        params = JSON.parse(saved);
+                    }
+                }
                 
-                const params = JSON.parse(saved);
-                // Restore parameters (implementation similar to loadFilterState)
-                // ... (to be implemented if needed)
+                if (!params) return;
+                
+                // Restore investment type
+                if (params.investmentType) {
+                    const checkbox = document.getElementById('compareByInvestmentType');
+                    const select = document.getElementById('comparisonInvestmentTypes');
+                    const btnSelectAll = document.getElementById('btn-select-all-investment-types');
+                    const btnClearAll = document.getElementById('btn-clear-all-investment-types');
+                    if (checkbox && select) {
+                        checkbox.checked = params.investmentType.enabled || false;
+                        select.disabled = !checkbox.checked;
+                        if (btnSelectAll) btnSelectAll.disabled = !checkbox.checked;
+                        if (btnClearAll) btnClearAll.disabled = !checkbox.checked;
+                        if (params.investmentType.values && Array.isArray(params.investmentType.values)) {
+                            Array.from(select.options).forEach(opt => {
+                                opt.selected = params.investmentType.values.includes(opt.value);
+                            });
+                        }
+                    }
+                }
+                
+                // Restore trading methods
+                if (params.tradingMethods) {
+                    const checkbox = document.getElementById('compareByTradingMethods');
+                    const select = document.getElementById('comparisonTradingMethods');
+                    const btnSelectAll = document.getElementById('btn-select-all-trading-methods');
+                    const btnClearAll = document.getElementById('btn-clear-all-trading-methods');
+                    if (checkbox && select) {
+                        checkbox.checked = params.tradingMethods.enabled || false;
+                        select.disabled = !checkbox.checked;
+                        if (btnSelectAll) btnSelectAll.disabled = !checkbox.checked;
+                        if (btnClearAll) btnClearAll.disabled = !checkbox.checked;
+                        if (params.tradingMethods.values && Array.isArray(params.tradingMethods.values)) {
+                            Array.from(select.options).forEach(opt => {
+                                opt.selected = params.tradingMethods.values.includes(opt.value);
+                            });
+                        }
+                    }
+                }
+                
+                // Restore ticker
+                if (params.ticker) {
+                    const checkbox = document.getElementById('compareByTicker');
+                    const select = document.getElementById('comparisonTickers');
+                    const btnSelectAll = document.getElementById('btn-select-all-tickers');
+                    const btnClearAll = document.getElementById('btn-clear-all-tickers');
+                    if (checkbox && select) {
+                        checkbox.checked = params.ticker.enabled || false;
+                        select.disabled = !checkbox.checked;
+                        if (btnSelectAll) btnSelectAll.disabled = !checkbox.checked;
+                        if (btnClearAll) btnClearAll.disabled = !checkbox.checked;
+                        if (params.ticker.values && Array.isArray(params.ticker.values)) {
+                            Array.from(select.options).forEach(opt => {
+                                opt.selected = params.ticker.values.includes(opt.value);
+                            });
+                        }
+                    }
+                }
+                
+                // Restore with/without plan
+                if (params.withWithoutPlan) {
+                    const checkbox = document.getElementById('compareByPlan');
+                    const withPlan = document.getElementById('comparisonWithPlan');
+                    const withoutPlan = document.getElementById('comparisonWithoutPlan');
+                    if (checkbox && withPlan && withoutPlan) {
+                        checkbox.checked = params.withWithoutPlan.enabled || false;
+                        withPlan.disabled = !checkbox.checked;
+                        withoutPlan.disabled = !checkbox.checked;
+                        if (params.withWithoutPlan.values && Array.isArray(params.withWithoutPlan.values)) {
+                            withPlan.checked = params.withWithoutPlan.values.includes('with');
+                            withoutPlan.checked = params.withWithoutPlan.values.includes('without');
+                        }
+                    }
+                }
+                
+                // Restore tags
+                if (params.tags) {
+                    const checkbox = document.getElementById('compareByTags');
+                    const select = document.getElementById('comparisonTags');
+                    const btnSelectAll = document.getElementById('btn-select-all-comparison-tags');
+                    const btnClearAll = document.getElementById('btn-clear-all-comparison-tags');
+                    if (checkbox && select) {
+                        checkbox.checked = params.tags.enabled || false;
+                        select.disabled = !checkbox.checked;
+                        if (btnSelectAll) btnSelectAll.disabled = !checkbox.checked;
+                        if (btnClearAll) btnClearAll.disabled = !checkbox.checked;
+                        if (params.tags.values && Array.isArray(params.tags.values)) {
+                            if (window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                                window.TagUIManager.setSelectedValues(select, params.tags.values);
+                            } else {
+                                Array.from(select.options).forEach(opt => {
+                                    opt.selected = params.tags.values.includes(parseInt(opt.value));
+                                });
+                            }
+                        }
+                    }
+                }
             } catch (error) {
                 if (window.Logger) {
                     window.Logger.warn('Failed to load comparison parameter state', { page: 'comparative-analysis-page', error });
@@ -3946,8 +3826,24 @@
                 ]);
                 
                 // Set default values (only if no saved state)
-                const savedRecordFilters = localStorage.getItem(RECORD_FILTER_STORAGE_KEY);
-                const savedComparisonParams = localStorage.getItem(COMPARISON_PARAMS_STORAGE_KEY);
+                // Load saved states using PreferencesCore
+                let savedRecordFilters = null;
+                let savedComparisonParams = null;
+                
+                if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                    savedRecordFilters = await window.PreferencesCore.getPreference(PREF_RECORD_FILTERS);
+                    savedComparisonParams = await window.PreferencesCore.getPreference(PREF_COMPARISON_PARAMS);
+                } else {
+                    // Fallback to localStorage
+                    const savedRecordFiltersStr = localStorage.getItem(PREF_RECORD_FILTERS);
+                    const savedComparisonParamsStr = localStorage.getItem(PREF_COMPARISON_PARAMS);
+                    if (savedRecordFiltersStr) {
+                        savedRecordFilters = JSON.parse(savedRecordFiltersStr);
+                    }
+                    if (savedComparisonParamsStr) {
+                        savedComparisonParams = JSON.parse(savedComparisonParamsStr);
+                    }
+                }
                 
                 if (!savedRecordFilters) {
                     // Set default date range to "השנה" (current year)
@@ -3985,28 +3881,28 @@
                         document.getElementById('recordFilterWithoutPlan').checked = true;
                     }
                 } else {
-                    loadRecordFilterState();
+                    await loadRecordFilterState();
                 }
                 
                 // Set default comparison parameters if no saved state
                 if (!savedComparisonParams) {
-                    // Default: Compare by trading methods (all methods selected)
-                    const compareByTradingMethods = document.getElementById('compareByTradingMethods');
-                    const comparisonTradingMethods = document.getElementById('comparisonTradingMethods');
-                    const btnSelectAllMethods = document.getElementById('btn-select-all-trading-methods');
-                    const btnClearAllMethods = document.getElementById('btn-clear-all-trading-methods');
+                    // Default: Compare by investment types (all types selected: Investment, Swing, Passive)
+                    const compareByInvestmentType = document.getElementById('compareByInvestmentType');
+                    const comparisonInvestmentTypes = document.getElementById('comparisonInvestmentTypes');
+                    const btnSelectAllInvestment = document.getElementById('btn-select-all-investment-types');
+                    const btnClearAllInvestment = document.getElementById('btn-clear-all-investment-types');
                     
-                    if (compareByTradingMethods && comparisonTradingMethods && comparisonTradingMethods.options.length > 0) {
+                    if (compareByInvestmentType && comparisonInvestmentTypes && comparisonInvestmentTypes.options.length > 0) {
                         // Enable the checkbox
-                        compareByTradingMethods.checked = true;
+                        compareByInvestmentType.checked = true;
                         
                         // Enable the select and buttons
-                        comparisonTradingMethods.disabled = false;
-                        if (btnSelectAllMethods) btnSelectAllMethods.disabled = false;
-                        if (btnClearAllMethods) btnClearAllMethods.disabled = false;
+                        comparisonInvestmentTypes.disabled = false;
+                        if (btnSelectAllInvestment) btnSelectAllInvestment.disabled = false;
+                        if (btnClearAllInvestment) btnClearAllInvestment.disabled = false;
                         
-                        // Select all trading methods
-                        Array.from(comparisonTradingMethods.options).forEach(opt => {
+                        // Select all investment types (Investment, Swing, Passive)
+                        Array.from(comparisonInvestmentTypes.options).forEach(opt => {
                             opt.selected = true;
                         });
                         
@@ -4014,33 +3910,55 @@
                         saveComparisonParameterState();
                         
                         if (window.Logger) {
-                            window.Logger.info('✅ Default comparison parameters set (Trading Methods - all)', { page: 'comparative-analysis-page' });
+                            window.Logger.info('✅ Default comparison parameters set (Investment Types - all)', { 
+                                page: 'comparative-analysis-page',
+                                typesCount: comparisonInvestmentTypes.options.length,
+                                selectedCount: Array.from(comparisonInvestmentTypes.selectedOptions).length
+                            });
                         }
                     } else {
                         if (window.Logger) {
                             window.Logger.warn('⚠️ Could not set default comparison parameters - elements not ready', { 
                                 page: 'comparative-analysis-page',
-                                compareByTradingMethods: !!compareByTradingMethods,
-                                comparisonTradingMethods: !!comparisonTradingMethods,
-                                optionsCount: comparisonTradingMethods?.options?.length || 0
+                                compareByInvestmentType: !!compareByInvestmentType,
+                                comparisonInvestmentTypes: !!comparisonInvestmentTypes,
+                                optionsCount: comparisonInvestmentTypes?.options?.length || 0
                             });
                         }
                     }
                 } else {
                     // Load saved comparison parameters
-                    loadComparisonParameterState();
+                    await loadComparisonParameterState();
+                }
+                
+                // Verify that comparison parameters are set (for debugging)
+                const currentParams = getComparisonParameterValues();
+                if (window.Logger) {
+                    window.Logger.info('📊 Current comparison parameters after initialization', { 
+                        page: 'comparative-analysis-page',
+                        tradingMethods: {
+                            enabled: currentParams.tradingMethods.enabled,
+                            valuesCount: currentParams.tradingMethods.values.length
+                        },
+                        investmentType: {
+                            enabled: currentParams.investmentType.enabled,
+                            valuesCount: currentParams.investmentType.values.length
+                        },
+                        ticker: {
+                            enabled: currentParams.ticker.enabled,
+                            valuesCount: currentParams.ticker.values.length
+                        }
+                    });
                 }
                 
                 // Load series visibility state
-                loadSeriesVisibilityState();
+                await loadSeriesVisibilityState();
                 
                 // Initialize series controls UI
                 initializeSeriesControls();
                 
-                // Initialize chart (will use current filter values)
-                await initComparisonChart();
-                
-                // Update all visualizations with initial filters (this will update chart with correct data)
+                // Update all visualizations with initial filters
+                // This will initialize the chart if needed and update all data
                 updateAllVisualizations();
                 
                 // Setup export button

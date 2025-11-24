@@ -361,65 +361,66 @@
 
     /**
      * Update Daily Statistics
-     * Updates the daily stats tab with mock data (showing both amounts and percentages)
+     * Updates the daily stats tab - shows: Instrument | Daily P&L / Change | Last Price
      */
     function updateDailyStats() {
         try {
-            // Mock data
-            const stats = {
-                dailyPL: 500,
-                dailyPLPercent: 2.1,
-                portfolioChange: 2.5,
-                portfolioChangeAmount: 1250,
-                activeTrades: 5
-            };
-
-            // Update P/L Today - show both amount and percentage
-            const dailyPLElement = document.getElementById('dailyPLValue');
-            if (dailyPLElement && typeof window.FieldRendererService !== 'undefined') {
-                const amountHtml = window.FieldRendererService.renderNumericValue(
-                    stats.dailyPL, 
-                    '$', 
-                    true
-                );
-                const percentHtml = window.FieldRendererService.renderNumericValue(
-                    stats.dailyPLPercent, 
-                    '%', 
-                    true
-                );
-                dailyPLElement.innerHTML = `${amountHtml} <small class="text-muted">(${percentHtml})</small>`;
-            } else if (dailyPLElement) {
-                // Fallback
-                dailyPLElement.innerHTML = `+$${stats.dailyPL} <small class="text-muted">(+${stats.dailyPLPercent}%)</small>`;
-                dailyPLElement.className = 'stat-value text-success';
+            const tbody = document.getElementById('dailyStatsTableBody');
+            if (!tbody) {
+                return;
             }
 
-            // Update Portfolio Change - show both percentage and amount
-            const portfolioChangeElement = document.getElementById('portfolioChangeValue');
-            if (portfolioChangeElement && typeof window.FieldRendererService !== 'undefined') {
-                const percentHtml = window.FieldRendererService.renderNumericValue(
-                    stats.portfolioChange, 
-                    '%', 
-                    true
-                );
-                const amountHtml = window.FieldRendererService.renderNumericValue(
-                    stats.portfolioChangeAmount, 
-                    '$', 
-                    true
-                );
-                portfolioChangeElement.innerHTML = `${percentHtml} <small class="text-muted">(${amountHtml})</small>`;
-            } else if (portfolioChangeElement) {
-                // Fallback
-                portfolioChangeElement.innerHTML = `+${stats.portfolioChange}% <small class="text-muted">(+$${stats.portfolioChangeAmount})</small>`;
-                portfolioChangeElement.className = 'stat-value text-success';
-            }
+            // Mock data based on screenshots - Daily P&L tab format
+            const dailyData = [
+                { ticker: 'ANX', fullName: 'AM NASDAQ-100 SP ET...', dailyPL: 1380, change: 6.85, lastPrice: 246.25, priceChangePercent: 2.86 },
+                { ticker: 'TETH', fullName: '21SHARES ETHEREUM...', dailyPL: 1320, change: 1.17, lastPrice: 14.85, priceChangePercent: 8.55 },
+                { ticker: 'IBIT', fullName: 'ISHARES BITCOIN TRU...', dailyPL: 1320, change: 2.61, lastPrice: 50.58, priceChangePercent: 5.44 },
+                { ticker: 'JPM', fullName: 'JPMORGAN CHASE & CO', dailyPL: 0, change: 0.03, lastPrice: 298.05, priceChangePercent: 0.01 },
+                { ticker: 'FLXI', fullName: 'FRK FTSE INDIA UCITS...', dailyPL: 0, change: -0.100, lastPrice: 39.005, priceChangePercent: -0.26 },
+                { ticker: 'ALAB', fullName: 'ASTERA LABS INC', dailyPL: -46.0, change: 6.00, lastPrice: 147.80, priceChangePercent: 4.23 }
+            ];
 
-            // Update Active Trades
-            const activeTradesElement = document.getElementById('activeTradesValue');
-            if (activeTradesElement) {
-                activeTradesElement.textContent = stats.activeTrades;
-                activeTradesElement.className = 'stat-value';
-            }
+            tbody.innerHTML = '';
+            
+            dailyData.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // Instrument (Ticker + Full Name)
+                const instrumentCell = document.createElement('td');
+                instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class="text-muted small">${item.fullName}</div>`;
+                row.appendChild(instrumentCell);
+                
+                // Daily P&L / Change
+                const plChangeCell = document.createElement('td');
+                let plHtml = '';
+                let changeHtml = '';
+                
+                if (typeof window.FieldRendererService !== 'undefined') {
+                    plHtml = window.FieldRendererService.renderNumericValue(item.dailyPL, '$', true);
+                    changeHtml = window.FieldRendererService.renderNumericValue(item.change, '$', true);
+                } else {
+                    if (item.dailyPL > 0) {
+                        plHtml = `<span class="text-success">${formatValue(item.dailyPL)}K</span>`;
+                    } else if (item.dailyPL < 0) {
+                        plHtml = `<span class="text-danger">${formatValue(item.dailyPL)}K</span>`;
+                    } else {
+                        plHtml = `<span class="text-muted">0</span>`;
+                    }
+                    changeHtml = item.change > 0 ? `+${item.change.toFixed(2)}` : `${item.change.toFixed(3)}`;
+                }
+                
+                plChangeCell.innerHTML = `<div>${plHtml}</div><div class="small">${changeHtml}</div>`;
+                row.appendChild(plChangeCell);
+                
+                // Last Price (with percentage change)
+                const lastPriceCell = document.createElement('td');
+                const priceColor = item.priceChangePercent >= 0 ? 'text-success' : 'text-danger';
+                const priceSign = item.priceChangePercent >= 0 ? '+' : '';
+                lastPriceCell.innerHTML = `<div class="${priceColor}"><strong>${item.lastPrice.toFixed(2)}</strong></div><div class="small ${priceColor}">${priceSign}${item.priceChangePercent.toFixed(2)}%</div>`;
+                row.appendChild(lastPriceCell);
+                
+                tbody.appendChild(row);
+            });
 
             if (window.Logger) {
                 window.Logger.info('✅ Daily stats updated', { page: 'history-widget' });
@@ -433,10 +434,21 @@
             }
         }
     }
+    
+    /**
+     * Helper function to format values (e.g., 1380 -> "1.38")
+     */
+    function formatValue(value) {
+        if (value >= 0) {
+            return (value / 1000).toFixed(2);
+        } else {
+            return '-' + (Math.abs(value) / 1000).toFixed(2);
+        }
+    }
 
     /**
      * Update P/L Statistics
-     * Updates the P/L stats tab with top 5 positions (highest and lowest P/L)
+     * Updates the P/L stats tab - shows: Instrument | Urlz P&L / Mkt Val | Last Price
      */
     function updatePLStats() {
         try {
@@ -445,78 +457,44 @@
                 return;
             }
 
-            // Mock data - top 5 positions with highest and lowest P/L
+            // Mock data based on screenshots - Unrealized P&L tab format
             const plData = [
-                { ticker: 'AAPL', pl: 2500, plPercent: 5.2, dailyChange: 120 },
-                { ticker: 'TSLA', pl: 1800, plPercent: 3.8, dailyChange: -50 },
-                { ticker: 'MSFT', pl: -800, plPercent: -1.5, dailyChange: -30 },
-                { ticker: 'GOOGL', pl: 1200, plPercent: 2.4, dailyChange: 80 },
-                { ticker: 'NVDA', pl: -600, plPercent: -1.2, dailyChange: -20 }
+                { ticker: 'QQQ', fullName: 'INVESCO QQQ TRUST', unrealizedPL: 7480, mktVal: 30300, lastPrice: 605.34, priceChangePercent: 2.59 },
+                { ticker: 'ANX', fullName: 'AM NASDAQ-100 SP ET...', unrealizedPL: 5710, mktVal: 46900, lastPrice: 246.25, priceChangePercent: 2.86 },
+                { ticker: 'GRNY', fullName: 'FUNDSTR GRAN SH US...', unrealizedPL: 3980, mktVal: 19400, lastPrice: 24.22, priceChangePercent: 2.58 },
+                { ticker: 'ORCL', fullName: 'ORACLE CORP', unrealizedPL: -484, mktVal: 4010, lastPrice: 200.35, priceChangePercent: 0.80 },
+                { ticker: 'TETH', fullName: '21SHARES ETHEREUM...', unrealizedPL: -913, mktVal: 17800, lastPrice: 14.85, priceChangePercent: 8.55 },
+                { ticker: 'QUBT', fullName: 'QUANTUM COMPUTIN...', unrealizedPL: -1380, mktVal: 5730, lastPrice: 11.49, priceChangePercent: 12.60 }
             ];
-
-            // Sort by P/L (highest first, then lowest)
-            plData.sort((a, b) => Math.abs(b.pl) - Math.abs(a.pl));
 
             tbody.innerHTML = '';
             
             plData.forEach(item => {
                 const row = document.createElement('tr');
                 
-                // Ticker
-                const tickerCell = document.createElement('td');
-                tickerCell.textContent = item.ticker;
-                row.appendChild(tickerCell);
+                // Instrument (Ticker + Full Name)
+                const instrumentCell = document.createElement('td');
+                instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class="text-muted small">${item.fullName}</div>`;
+                row.appendChild(instrumentCell);
                 
-                // P/L
-                const plCell = document.createElement('td');
-                if (typeof window.FieldRendererService !== 'undefined') {
-                    plCell.innerHTML = window.FieldRendererService.renderNumericValue(
-                        item.pl, 
-                        '$', 
-                        true
-                    );
-                } else {
-                    plCell.textContent = item.pl > 0 ? `+$${item.pl}` : `-$${Math.abs(item.pl)}`;
-                    plCell.className = item.pl > 0 ? 'text-success' : 'text-danger';
-                }
-                row.appendChild(plCell);
+                // Unrealized P&L / Market Value
+                const plMktValCell = document.createElement('td');
+                const plColor = item.unrealizedPL >= 0 ? 'text-success' : 'text-danger';
+                const plValue = formatValue(item.unrealizedPL);
+                const mktValValue = formatValue(item.mktVal);
                 
-                // Percentage
-                const percentCell = document.createElement('td');
-                if (typeof window.FieldRendererService !== 'undefined') {
-                    percentCell.innerHTML = window.FieldRendererService.renderNumericValue(
-                        item.plPercent, 
-                        '%', 
-                        true
-                    );
-                } else {
-                    percentCell.textContent = item.plPercent > 0 ? `+${item.plPercent}%` : `${item.plPercent}%`;
-                    percentCell.className = item.plPercent > 0 ? 'text-success' : 'text-danger';
-                }
-                row.appendChild(percentCell);
+                plMktValCell.innerHTML = `
+                    <div class="${plColor}"><strong>${plValue}K</strong></div>
+                    <div class="small text-muted">${mktValValue}K</div>
+                `;
+                row.appendChild(plMktValCell);
                 
-                // Daily Change - show both amount and percentage
-                const dailyChangeCell = document.createElement('td');
-                const dailyChangePercent = item.pl !== 0 ? ((item.dailyChange / Math.abs(item.pl)) * 100) : 0;
-                if (typeof window.FieldRendererService !== 'undefined') {
-                    const amountHtml = window.FieldRendererService.renderNumericValue(
-                        item.dailyChange, 
-                        '$', 
-                        true
-                    );
-                    const percentHtml = window.FieldRendererService.renderNumericValue(
-                        dailyChangePercent, 
-                        '%', 
-                        true
-                    );
-                    dailyChangeCell.innerHTML = `${amountHtml} <small class="text-muted">(${percentHtml})</small>`;
-                } else {
-                    const amountText = item.dailyChange > 0 ? `+$${item.dailyChange}` : `-$${Math.abs(item.dailyChange)}`;
-                    const percentText = dailyChangePercent > 0 ? `+${dailyChangePercent.toFixed(2)}%` : `${dailyChangePercent.toFixed(2)}%`;
-                    dailyChangeCell.innerHTML = `${amountText} <small class="text-muted">(${percentText})</small>`;
-                    dailyChangeCell.className = item.dailyChange > 0 ? 'text-success' : 'text-danger';
-                }
-                row.appendChild(dailyChangeCell);
+                // Last Price (with percentage change)
+                const lastPriceCell = document.createElement('td');
+                const priceColor = item.priceChangePercent >= 0 ? 'text-success' : 'text-danger';
+                const priceSign = item.priceChangePercent >= 0 ? '+' : '';
+                lastPriceCell.innerHTML = `<div class="${priceColor}"><strong>${item.lastPrice.toFixed(2)}</strong></div><div class="small ${priceColor}">${priceSign}${item.priceChangePercent.toFixed(2)}%</div>`;
+                row.appendChild(lastPriceCell);
                 
                 tbody.appendChild(row);
             });
@@ -536,7 +514,7 @@
 
     /**
      * Update Market Value Statistics
-     * Updates the market value stats tab with top 10 positions by market value
+     * Updates the market value stats tab - shows: Instrument | Mkt Val / Position | Last Price
      */
     function updateMarketValueStats() {
         try {
@@ -545,18 +523,14 @@
                 return;
             }
 
-            // Mock data - top 10 positions by market value
+            // Mock data based on screenshots - MKT VALUE tab format
             const marketValueData = [
-                { ticker: 'AAPL', value: 50000, percentOfAssets: 25.5, dailyChange: 1250 },
-                { ticker: 'MSFT', value: 45000, percentOfAssets: 23.0, dailyChange: 900 },
-                { ticker: 'GOOGL', value: 35000, percentOfAssets: 17.9, dailyChange: 700 },
-                { ticker: 'TSLA', value: 28000, percentOfAssets: 14.3, dailyChange: -500 },
-                { ticker: 'NVDA', value: 20000, percentOfAssets: 10.2, dailyChange: 400 },
-                { ticker: 'AMZN', value: 12000, percentOfAssets: 6.1, dailyChange: 300 },
-                { ticker: 'META', value: 8000, percentOfAssets: 4.1, dailyChange: 200 },
-                { ticker: 'NFLX', value: 5000, percentOfAssets: 2.6, dailyChange: 100 },
-                { ticker: 'AMD', value: 3000, percentOfAssets: 1.5, dailyChange: 50 },
-                { ticker: 'INTC', value: 2000, percentOfAssets: 1.0, dailyChange: -30 }
+                { ticker: 'ANX', fullName: 'AM NASDAQ-100 SP ET...', mktVal: 46900, position: 190, lastPrice: 246.25, priceChangePercent: 2.86 },
+                { ticker: 'SPPY', fullName: 'SPDR S&P 500 LDRS U...', mktVal: 33500, position: 800, lastPrice: 41.910, priceChangePercent: 1.66 },
+                { ticker: 'SP5C', fullName: 'AM CORE S&P 500 SW...', mktVal: 31500, position: 75, lastPrice: 419.80, priceChangePercent: 0.24 },
+                { ticker: 'QQQ', fullName: 'INVESCO QQQ TRUST...', mktVal: 30300, position: 50, lastPrice: 605.34, priceChangePercent: 2.59 },
+                { ticker: 'SPYL', fullName: 'SPDR S&P 500 UCITS E...', mktVal: 28600, position: 2000, lastPrice: 14.3090, priceChangePercent: 1.83 },
+                { ticker: 'IBIT', fullName: 'ISHARES BITCOIN TRU...', mktVal: 25300, position: 500, lastPrice: 50.62, priceChangePercent: 5.52 }
             ];
 
             tbody.innerHTML = '';
@@ -564,59 +538,28 @@
             marketValueData.forEach(item => {
                 const row = document.createElement('tr');
                 
-                // Ticker
-                const tickerCell = document.createElement('td');
-                tickerCell.textContent = item.ticker;
-                row.appendChild(tickerCell);
+                // Instrument (Ticker + Full Name)
+                const instrumentCell = document.createElement('td');
+                instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class="text-muted small">${item.fullName}</div>`;
+                row.appendChild(instrumentCell);
                 
-                // Market Value
-                const valueCell = document.createElement('td');
-                if (typeof window.FieldRendererService !== 'undefined') {
-                    valueCell.innerHTML = window.FieldRendererService.renderNumericValue(
-                        item.value, 
-                        '$', 
-                        false
-                    );
-                } else {
-                    valueCell.textContent = `$${item.value.toLocaleString()}`;
-                }
-                row.appendChild(valueCell);
+                // Market Value / Position
+                const mktValPositionCell = document.createElement('td');
+                const mktValValue = formatValue(item.mktVal);
+                const positionValue = item.position >= 1000 ? `${(item.position / 1000).toFixed(2)}K` : item.position.toString();
                 
-                // Percentage of Assets
-                const percentCell = document.createElement('td');
-                if (typeof window.FieldRendererService !== 'undefined') {
-                    percentCell.innerHTML = window.FieldRendererService.renderNumericValue(
-                        item.percentOfAssets, 
-                        '%', 
-                        false
-                    );
-                } else {
-                    percentCell.textContent = `${item.percentOfAssets}%`;
-                }
-                row.appendChild(percentCell);
+                mktValPositionCell.innerHTML = `
+                    <div><strong>${mktValValue}K</strong></div>
+                    <div class="small text-muted">${positionValue}</div>
+                `;
+                row.appendChild(mktValPositionCell);
                 
-                // Daily Change - show both amount and percentage
-                const dailyChangeCell = document.createElement('td');
-                const dailyChangePercent = item.value !== 0 ? ((item.dailyChange / item.value) * 100) : 0;
-                if (typeof window.FieldRendererService !== 'undefined') {
-                    const amountHtml = window.FieldRendererService.renderNumericValue(
-                        item.dailyChange, 
-                        '$', 
-                        true
-                    );
-                    const percentHtml = window.FieldRendererService.renderNumericValue(
-                        dailyChangePercent, 
-                        '%', 
-                        true
-                    );
-                    dailyChangeCell.innerHTML = `${amountHtml} <small class="text-muted">(${percentHtml})</small>`;
-                } else {
-                    const amountText = item.dailyChange > 0 ? `+$${item.dailyChange}` : `-$${Math.abs(item.dailyChange)}`;
-                    const percentText = dailyChangePercent > 0 ? `+${dailyChangePercent.toFixed(2)}%` : `${dailyChangePercent.toFixed(2)}%`;
-                    dailyChangeCell.innerHTML = `${amountText} <small class="text-muted">(${percentText})</small>`;
-                    dailyChangeCell.className = item.dailyChange > 0 ? 'text-success' : 'text-danger';
-                }
-                row.appendChild(dailyChangeCell);
+                // Last Price (with percentage change)
+                const lastPriceCell = document.createElement('td');
+                const priceColor = item.priceChangePercent >= 0 ? 'text-success' : 'text-danger';
+                const priceSign = item.priceChangePercent >= 0 ? '+' : '';
+                lastPriceCell.innerHTML = `<div class="${priceColor}"><strong>${item.lastPrice.toFixed(2)}</strong></div><div class="small ${priceColor}">${priceSign}${item.priceChangePercent.toFixed(2)}%</div>`;
+                row.appendChild(lastPriceCell);
                 
                 tbody.appendChild(row);
             });
@@ -675,7 +618,9 @@
                     }
                     
                     // Load data for the selected tab if needed
-                    if (targetId === '#pl-stats') {
+                    if (targetId === '#daily-stats') {
+                        updateDailyStats();
+                    } else if (targetId === '#pl-stats') {
                         updatePLStats();
                     } else if (targetId === '#market-value-stats') {
                         updateMarketValueStats();
@@ -705,7 +650,7 @@
         }
         
         const menuButtons = buttons.map((button) => {
-            const icon = button.icon || '/trading-ui/images/icons/tabler/eye.svg';
+            const icon = button.icon || '../../images/icons/tabler/eye.svg';
             const text = button.text || '';
             const title = button.title || '';
             const onclick = button.onclick || '';
@@ -715,8 +660,8 @@
             </button>`;
         }).join('');
         
-        // Get menu trigger icon
-        const menuIcon = '<img src="/trading-ui/images/icons/tabler/menu-2.svg" width="16" height="16" alt="קישורים מהירים" class="icon">';
+        // Get menu trigger icon - using ⋮ (three dots) if icon not available
+        const menuIcon = '<span style="font-size: 18px; line-height: 1;">⋮</span>';
         
         return `
             <div class="actions-menu-wrapper" id="quickLinksActionsMenuWrapper">
@@ -806,28 +751,28 @@
                     onclick: `window.location.href='portfolio-state-page.html'`, 
                     title: 'מצב תיק אתמול',
                     text: 'מצב תיק',
-                    icon: '/trading-ui/images/icons/tabler/chart-line.svg'
+                    icon: '../../images/icons/tabler/chart-line.svg'
                 },
                 { 
                     type: 'VIEW', 
                     onclick: `window.location.href='trade-history-page.html'`, 
                     title: 'טריידים פעילים',
                     text: 'טריידים',
-                    icon: '/trading-ui/images/icons/tabler/trending-up.svg'
+                    icon: '../../images/icons/tabler/trending-up.svg'
                 },
                 { 
                     type: 'VIEW', 
                     onclick: `window.location.href='price-history-page.html'`, 
                     title: 'שינויי מחיר היום',
                     text: 'שינויי מחיר',
-                    icon: '/trading-ui/images/icons/tabler/trending-up.svg'
+                    icon: '../../images/icons/tabler/trending-up.svg'
                 },
                 { 
                     type: 'VIEW', 
                     onclick: `window.location.href='comparative-analysis-page.html'`, 
                     title: 'ניתוח השוואתי',
                     text: 'ניתוח',
-                    icon: '/trading-ui/images/icons/tabler/chart-bar.svg'
+                    icon: '../../images/icons/tabler/chart-bar.svg'
                 }
             ];
             
@@ -837,11 +782,6 @@
             
             // Setup positioning that checks available space
             setupQuickLinksPositioning();
-            
-            if (window.Logger) {
-                window.Logger.info('✅ Quick links actions menu setup completed', { page: 'history-widget' });
-            }
-
 
             // Close chart date range menu when clicking outside
             document.addEventListener('click', (e) => {
@@ -937,12 +877,6 @@
             await waitForSystem(
                 () => typeof window.FieldRendererService !== 'undefined',
                 'FieldRendererService'
-            );
-
-            // Wait for createActionsMenu
-            await waitForSystem(
-                () => typeof window.createActionsMenu !== 'undefined',
-                'createActionsMenu'
             );
 
             // Initialize chart

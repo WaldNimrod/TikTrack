@@ -217,19 +217,19 @@
                                 <div class="tab-content" id="statsTabContent">
                                     <!-- Daily Stats Tab -->
                                     <div class="tab-pane fade show active" id="daily-stats" role="tabpanel" aria-labelledby="daily-tab">
-                                        <div class="statistics-summary" id="dailyStatsContainer">
-                                            <div class="stat-item">
-                                                <span class="stat-label">P/L היום:</span>
-                                                <span class="stat-value" id="dailyPLValue">-</span>
-                                            </div>
-                                            <div class="stat-item">
-                                                <span class="stat-label">שינוי שווי תיק:</span>
-                                                <span class="stat-value" id="portfolioChangeValue">-</span>
-                                            </div>
-                                            <div class="stat-item">
-                                                <span class="stat-label">טריידים פעילים:</span>
-                                                <span class="stat-value" id="activeTradesValue">-</span>
-                                            </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-hover" id="dailyStatsTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Instrument</th>
+                                                        <th>Daily P&L / Change</th>
+                                                        <th>Last Price</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="dailyStatsTableBody">
+                                                    <!-- Will be populated dynamically -->
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                     
@@ -239,10 +239,9 @@
                                             <table class="table table-sm table-hover" id="plStatsTable">
                                                 <thead>
                                                     <tr>
-                                                        <th>טיקר</th>
-                                                        <th>P/L</th>
-                                                        <th>אחוז</th>
-                                                        <th>שינוי יומי</th>
+                                                        <th>Instrument</th>
+                                                        <th>Urlz P&L / Mkt Val</th>
+                                                        <th>Last Price</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="plStatsTableBody">
@@ -258,10 +257,9 @@
                                             <table class="table table-sm table-hover" id="marketValueStatsTable">
                                                 <thead>
                                                     <tr>
-                                                        <th>טיקר</th>
-                                                        <th>שווי</th>
-                                                        <th>אחוז מהנכסים</th>
-                                                        <th>שינוי יומי</th>
+                                                        <th>Instrument</th>
+                                                        <th>Mkt Val / Position</th>
+                                                        <th>Last Price</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="marketValueStatsTableBody">

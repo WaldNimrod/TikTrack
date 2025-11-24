@@ -448,6 +448,22 @@
     display: flex;
 }
 
+/* ===== RTL Support for Toolbars ===== */
+/* RTL positioning rules for toolbars - critical for Hebrew/Arabic users */
+[dir="rtl"] #indicators-toolbar {
+    right: auto;
+    left: 10px;
+    inset-inline-end: auto;
+    inset-inline-start: 10px;
+}
+
+[dir="rtl"] #drawing-tools-toolbar {
+    left: auto;
+    right: 10px;
+    inset-inline-start: auto;
+    inset-inline-end: 10px;
+}
+
 /* ===== Responsive Chart Containers ===== */
 
 /* Chart Container Sizes */

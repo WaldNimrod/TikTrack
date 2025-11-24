@@ -366,10 +366,19 @@
                         </div>
                         
                         <!-- Combined Chart Container -->
-                        <div class="chart-container-large">
-                            <div id="portfolio-performance-chart-container" class="chart-container-third"></div>
-                            <div id="portfolio-value-chart-container" class="chart-container-third-border"></div>
-                            <div id="pl-trend-chart-container" class="chart-container-third-border"></div>
+                        <!-- Chart Container Wrapper (קונטיינר ייעודי לגרף) -->
+                        <div class="chart-container-wrapper">
+                            <div class="chart-container-large">
+                                <div class="tradingview-chart-wrapper chart-container-third">
+                                    <div class="tradingview-chart-container tradingview-portfolio-chart-container" id="portfolio-performance-chart-container"></div>
+                                </div>
+                                <div class="tradingview-chart-wrapper chart-container-third-border">
+                                    <div class="tradingview-chart-container tradingview-portfolio-chart-container" id="portfolio-value-chart-container"></div>
+                                </div>
+                                <div class="tradingview-chart-wrapper chart-container-third-border">
+                                    <div class="tradingview-chart-container tradingview-portfolio-chart-container" id="pl-trend-chart-container"></div>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Chart Legend -->

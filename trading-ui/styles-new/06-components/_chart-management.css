@@ -1529,103 +1529,7 @@
 }
 
 /* ===== Chart Wrapper and Toolbars ===== */
-#price-chart-wrapper {
-    position: relative;
-    height: 450px;
-    width: 100%;
-    min-width: 0;
-    background: var(--apple-bg-primary);
-    border-radius: var(--apple-radius-small) var(--apple-radius-small) 0 0;
-    overflow: hidden;
-    border-bottom: 2px solid var(--apple-border-light);
-    display: block;
-    clear: both;
-    box-sizing: border-box;
-}
-
-/* Ensure section-header and section-body stack vertically */
-#price-chart-section {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-}
-
-#price-chart-section .section-header {
-    flex: 0 0 auto;
-    width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-}
-
-#price-chart-section .section-header .header-actions {
-    flex: 1 1 auto;
-    min-width: 0;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-#price-chart-section .section-body {
-    flex: 1 1 auto;
-    display: block;
-    width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-    overflow: hidden;
-}
-
-#volume-chart-wrapper {
-    position: relative;
-    height: 150px;
-    width: 100%;
-    min-width: 0;
-    background: var(--apple-bg-primary);
-    border-radius: 0 0 var(--apple-radius-small) var(--apple-radius-small);
-    overflow: hidden;
-    border-top: 2px solid var(--apple-border-light);
-    display: block;
-    box-sizing: border-box;
-}
-
-#price-chart-container,
-#volume-chart-container {
-    height: 100%;
-    width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-    position: relative;
-    display: block;
-}
-
-#drawing-canvas {
-    position: absolute;
-    top: 0;
-    inset-inline-start: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 15;
-    pointer-events: none;
-}
-
-/* Indicators Toolbar */
-#indicators-toolbar {
-    position: absolute;
-    top: 10px;
-    inset-inline-end: 10px;
-    z-index: 20;
-    background: var(--apple-bg-primary);
-    opacity: 0.95;
-    padding: var(--spacing-sm);
-    border-radius: var(--apple-radius-small);
-    box-shadow: var(--apple-shadow-medium);
-    display: none;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-    min-width: 250px;
-    max-width: 300px;
-}
+/* Note: TradingView-specific styles moved to _tradingview-charts.css */
 
 #indicators-toolbar .chart-toolbar-header {
     font-size: 0.7rem;
@@ -1711,20 +1615,7 @@
 }
 
 /* Drawing Tools Toolbar */
-#drawing-tools-toolbar {
-    position: absolute;
-    top: 10px;
-    inset-inline-start: 10px;
-    z-index: 20;
-    background: var(--apple-bg-primary);
-    opacity: 0.95;
-    padding: var(--spacing-sm);
-    border-radius: var(--apple-radius-small);
-    box-shadow: var(--apple-shadow-medium);
-    display: none;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-}
+/* Note: TradingView-specific toolbar styles moved to _tradingview-charts.css */
 
 #drawing-tools-toolbar .chart-toolbar-header {
     font-size: 0.7rem;
@@ -1773,28 +1664,8 @@
     height: 16px;
 }
 
-/* RTL Support for Toolbars */
-[dir="rtl"] #indicators-toolbar {
-    right: auto;
-    left: 10px;
-}
-
-[dir="rtl"] #drawing-tools-toolbar {
-    left: auto;
-    right: 10px;
-}
-
 /* ===== Comparison Chart Styles ===== */
-#comparison-chart-container {
-    height: 350px;
-    width: 100%;
-    position: relative;
-}
-
-#comparison-chart-wrapper {
-    height: 100%;
-    width: 100%;
-}
+/* Note: TradingView-specific container styles moved to _tradingview-charts.css */
 
 #comparison-legend {
     display: flex;

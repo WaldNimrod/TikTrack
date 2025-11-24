@@ -154,13 +154,26 @@
                 throw new Error('TradingView Lightweight Charts LineSeries not available');
             }
 
-            // Get colors from theme
+            // Get colors from theme (Priority 1: user preferences, Priority 2: entity colors)
             const colors = window.TradingViewTheme 
                 ? window.TradingViewTheme.getChartColors() 
                 : { primary: '#26baac' };
+            
+            // If entityType is provided, use entity color (Priority 2)
+            let seriesColor = options.color;
+            if (!seriesColor && options.entityType && window.TradingViewTheme) {
+                seriesColor = window.TradingViewTheme.getEntityColorForSeries(
+                    options.entityType, 
+                    options.variant || 'base'
+                );
+            }
+            // Fallback to primary color (Priority 1: user preferences)
+            if (!seriesColor) {
+                seriesColor = colors.primary || colors.point || '#26baac';
+            }
 
             const seriesOptions = {
-                color: options.color || colors.primary,
+                color: seriesColor,
                 lineWidth: options.lineWidth || 2,
                 lineType: options.lineType || 0, // 0: Normal, 1: Stepped, 2: With Gaps
                 ...options,
@@ -201,11 +214,24 @@
             const colors = window.TradingViewTheme 
                 ? window.TradingViewTheme.getChartColors() 
                 : { primary: '#26baac' };
+            
+            // If entityType is provided, use entity color (Priority 2)
+            let seriesColor = options.lineColor || options.color;
+            if (!seriesColor && options.entityType && window.TradingViewTheme) {
+                seriesColor = window.TradingViewTheme.getEntityColorForSeries(
+                    options.entityType, 
+                    options.variant || 'base'
+                );
+            }
+            // Fallback to primary color (Priority 1: user preferences)
+            if (!seriesColor) {
+                seriesColor = colors.primary || colors.point || '#26baac';
+            }
 
             const seriesOptions = {
-                lineColor: options.lineColor || colors.primary,
-                topColor: options.topColor || colors.primary,
-                bottomColor: options.bottomColor || `${colors.primary}28`, // 28 = alpha
+                lineColor: seriesColor,
+                topColor: options.topColor || seriesColor,
+                bottomColor: options.bottomColor || `${seriesColor}28`, // 28 = alpha
                 ...options,
             };
 

@@ -73,6 +73,7 @@
 @import '06-components/_pagination-system.css?v=1.0.0';
 @import '06-components/_background-tasks.css?v=1.0.0';
 /* @import '06-components/_cache-test.css?v=1.0.0'; - File not found, commented out */
+@import '06-components/_tradingview-charts.css?v=1.0.0';
 @import '06-components/_chart-management.css?v=1.0.0';
 @import '06-components/_constraints.css?v=1.0.0';
 @import '06-components/_crud-testing-dashboard.css?v=1.0.0';

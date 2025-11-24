@@ -5,6 +5,12 @@
 
 ---
 
+## 📋 תיעוד CSS
+
+**קובץ חדש:** [TRADINGVIEW_CSS_REQUIREMENTS.md](./TRADINGVIEW_CSS_REQUIREMENTS.md) - תיעוד מקיף של דרישות CSS, מבנה HTML, classes זמינים, מערכת צבעים, ודוגמאות שימוש.
+
+---
+
 ## 📚 מקורות רשמיים
 
 ### 1. GitHub Repository הרשמי

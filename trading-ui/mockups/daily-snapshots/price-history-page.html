@@ -799,8 +799,18 @@
                 // Update comparison chart if needed
                 updateComparisonChart();
                 
-                // Fit content
+                // Fit content (both charts will sync automatically via listeners)
                 priceChart.timeScale().fitContent();
+                
+                // Ensure volume chart also fits content and syncs
+                if (volumeChart) {
+                    setTimeout(() => {
+                        const priceRange = priceChart.timeScale().getVisibleRange();
+                        if (priceRange) {
+                            volumeChart.timeScale().setVisibleRange(priceRange);
+                        }
+                    }, 50);
+                }
                 
                 // Setup event listeners for filters and header buttons (only once)
                 setupChartFilters();
@@ -1806,38 +1816,121 @@
                 }
             });
             
-            // Sync time scale with price chart (with protection against infinite loops)
-            if (priceChart && !window._volumeSyncSetup) {
-                window._volumeSyncSetup = true;
+            // ========================================================================
+            // PERFECT SYNCHRONIZATION: Price Chart ↔ Volume Chart (100% Sync)
+            // ========================================================================
+            // Based on TradingView Lightweight Charts official documentation
+            // Ensures 100% synchronization of time scale, scroll position, and zoom
+            // IMPORTANT: Setup sync every time volume chart is created (not just once)
+            if (priceChart && volumeChart) {
+                // Remove old listeners if they exist (prevent duplicates)
+                if (window._priceChartSyncUnsubscribe) {
+                    try {
+                        window._priceChartSyncUnsubscribe();
+                    } catch (e) {
+                        // Ignore errors when unsubscribing
+                    }
+                }
+                if (window._volumeChartSyncUnsubscribe) {
+                    try {
+                        window._volumeChartSyncUnsubscribe();
+                    } catch (e) {
+                        // Ignore errors when unsubscribing
+                    }
+                }
+                
+                // Sync state management
                 let _isSyncing = false;
+                let _syncTimeout = null;
+                let _lastSyncedRange = null;
                 
+                // Debounce function to prevent rapid updates
+                const debounceSync = (callback, delay = 16) => {
+                    if (_syncTimeout) {
+                        clearTimeout(_syncTimeout);
+                    }
+                    _syncTimeout = setTimeout(callback, delay);
+                };
+                
+                // Check if ranges are equal (to prevent unnecessary updates)
+                const rangesEqual = (range1, range2) => {
+                    if (!range1 || !range2) return false;
+                    return range1.from === range2.from && range1.to === range2.to;
+                };
+                
+                // Perfect sync function - syncs time scale with 100% accuracy
+                const syncTimeScale = (sourceChart, targetChart, sourceRange) => {
+                    if (_isSyncing || !sourceRange || !targetChart) return;
+                    
+                    // Check if range actually changed
+                    if (_lastSyncedRange && rangesEqual(_lastSyncedRange, sourceRange)) {
+                        return; // No change, skip sync
+                    }
+                    
+                    _isSyncing = true;
+                    _lastSyncedRange = sourceRange;
+                    
+                    try {
+                        // Get current target range to check if update is needed
+                        const currentTargetRange = targetChart.timeScale().getVisibleRange();
+                        
+                        // Only update if ranges are different
+                        if (!rangesEqual(currentTargetRange, sourceRange)) {
+                            // Set visible range with exact same values
+                            targetChart.timeScale().setVisibleRange({
+                                from: sourceRange.from,
+                                to: sourceRange.to
+                            });
+                        }
+                    } catch (e) {
+                        if (window.Logger) {
+                            window.Logger.warn('Error syncing chart time range', { 
+                                page: 'price-history-page', 
+                                error: e,
+                                sourceRange 
+                            });
+                        }
+                    } finally {
+                        // Use requestAnimationFrame for smooth sync
+                        requestAnimationFrame(() => {
+                            _isSyncing = false;
+                        });
+                    }
+                };
+                
+                // Sync Price Chart → Volume Chart
                 priceChart.timeScale().subscribeVisibleTimeRangeChange((timeRange) => {
-                    if (_isSyncing || !volumeChart || !timeRange) return;
-                    _isSyncing = true;
-                    try {
-                        volumeChart.timeScale().setVisibleRange(timeRange);
-                    } catch (e) {
-                        if (window.Logger) {
-                            window.Logger.warn('Error syncing volume chart time range', { page: 'price-history-page', error: e });
-                        }
-                    } finally {
-                        setTimeout(() => { _isSyncing = false; }, 100);
-                    }
+                    if (!timeRange || !timeRange.from || !timeRange.to) return;
+                    
+                    debounceSync(() => {
+                        syncTimeScale(priceChart, volumeChart, timeRange);
+                    }, 10); // 10ms debounce for smooth performance
                 });
                 
+                // Sync Volume Chart → Price Chart (bidirectional sync)
                 volumeChart.timeScale().subscribeVisibleTimeRangeChange((timeRange) => {
-                    if (_isSyncing || !priceChart || !timeRange) return;
-                    _isSyncing = true;
-                    try {
-                        priceChart.timeScale().setVisibleRange(timeRange);
-                    } catch (e) {
-                        if (window.Logger) {
-                            window.Logger.warn('Error syncing price chart time range', { page: 'price-history-page', error: e });
-                        }
-                    } finally {
-                        setTimeout(() => { _isSyncing = false; }, 100);
-                    }
+                    if (!timeRange || !timeRange.from || !timeRange.to) return;
+                    
+                    debounceSync(() => {
+                        syncTimeScale(volumeChart, priceChart, timeRange);
+                    }, 10); // 10ms debounce for smooth performance
                 });
+                
+                // Initial sync - ensure both charts start with same range
+                setTimeout(() => {
+                    if (priceChart && volumeChart) {
+                        const initialRange = priceChart.timeScale().getVisibleRange();
+                        if (initialRange) {
+                            syncTimeScale(priceChart, volumeChart, initialRange);
+                        }
+                    }
+                }, 100);
+                
+                if (window.Logger) {
+                    window.Logger.info('✅ Chart synchronization setup complete (100% sync)', { 
+                        page: 'price-history-page' 
+                    });
+                }
             }
             
             // Create green volume series (up bars)
@@ -1872,14 +1965,21 @@
             volumeSeries = volumeSeriesGreen || volumeSeriesRed;
             
             // Fit content
+            // Fit content - volume chart will sync with price chart automatically
+            // But we ensure initial sync here
             volumeChart.timeScale().fitContent();
             
-            // Sync visible range with price chart
+            // Sync visible range with price chart (ensure 100% sync)
             if (priceChart) {
-                const priceRange = priceChart.timeScale().getVisibleRange();
-                if (priceRange) {
-                    volumeChart.timeScale().setVisibleRange(priceRange);
-                }
+                setTimeout(() => {
+                    const priceRange = priceChart.timeScale().getVisibleRange();
+                    if (priceRange && priceRange.from && priceRange.to) {
+                        volumeChart.timeScale().setVisibleRange({
+                            from: priceRange.from,
+                            to: priceRange.to
+                        });
+                    }
+                }, 50);
             }
             
             updateSeriesLegend();
@@ -1961,9 +2061,19 @@
         function applyAutoScale() {
             if (!priceChart || !autoScaleEnabled) return;
             
-            // Auto scale by fitting content
+            // Auto scale by fitting content (volume chart will sync automatically)
             try {
                 priceChart.timeScale().fitContent();
+                
+                // Ensure volume chart syncs after fitContent
+                setTimeout(() => {
+                    if (volumeChart) {
+                        const priceRange = priceChart.timeScale().getVisibleRange();
+                        if (priceRange && priceRange.from && priceRange.to) {
+                            volumeChart.timeScale().setVisibleRange(priceRange);
+                        }
+                    }
+                }, 50);
             } catch (e) {
                 if (window.Logger) {
                     window.Logger.warn('Error applying auto scale', { page: 'price-history-page', error: e });
@@ -2057,6 +2167,21 @@
             
             try {
                 window.TradingViewChartAdapter.resetTimeScale(priceChart);
+                
+                // Ensure volume chart syncs after reset (100% sync)
+                setTimeout(() => {
+                    if (volumeChart) {
+                        window.TradingViewChartAdapter.resetTimeScale(volumeChart);
+                        
+                        // Double-check sync after reset
+                        setTimeout(() => {
+                            const priceRange = priceChart.timeScale().getVisibleRange();
+                            if (priceRange && priceRange.from && priceRange.to) {
+                                volumeChart.timeScale().setVisibleRange(priceRange);
+                            }
+                        }, 50);
+                    }
+                }, 50);
             } catch (e) {
                 if (window.Logger) {
                     window.Logger.warn('Error resetting zoom', { page: 'price-history-page', error: e });

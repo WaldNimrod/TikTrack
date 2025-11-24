@@ -1597,9 +1597,11 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
   unifiedInitDebugLog('🔧 UnifiedAppInitializer created');
 }
 
-window.Logger.info('🔧 UnifiedAppInitializer created:', window.unifiedAppInit, {
-  page: 'unified-app-initializer',
-});
+if (window.Logger && typeof window.Logger.info === 'function') {
+  window.Logger.info('🔧 UnifiedAppInitializer created:', window.unifiedAppInit, {
+    page: 'unified-app-initializer',
+  });
+}
 
 // ===== GLOBAL EXPORT =====
 

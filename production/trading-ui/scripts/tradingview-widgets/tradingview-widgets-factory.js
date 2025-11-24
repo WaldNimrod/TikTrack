@@ -303,6 +303,12 @@
       // Create wrapper div
       const wrapper = document.createElement('div');
       wrapper.className = 'tradingview-widget-container';
+      
+      // Store original container's parent and next sibling for proper insertion
+      const containerParent = container.parentElement;
+      const containerNextSibling = container.nextSibling;
+      
+      // Move container into wrapper
       wrapper.appendChild(container);
 
       // Create script element
@@ -318,9 +324,14 @@
       // Append script to wrapper
       wrapper.appendChild(script);
 
-      // Insert wrapper into container's parent or body
-      if (container.parentElement) {
-        container.parentElement.appendChild(wrapper);
+      // Insert wrapper into container's original parent or body
+      if (containerParent) {
+        // Insert wrapper where container was (before nextSibling if exists)
+        if (containerNextSibling) {
+          containerParent.insertBefore(wrapper, containerNextSibling);
+        } else {
+          containerParent.appendChild(wrapper);
+        }
       } else {
         document.body.appendChild(wrapper);
       }

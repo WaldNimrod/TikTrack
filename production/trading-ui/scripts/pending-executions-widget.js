@@ -342,7 +342,7 @@
             const executionDetails = `
                 <div class="col-12 col-md-6">
                     <div class="bg-body-tertiary rounded-3 p-3 d-flex flex-column gap-2 h-100 cursor-pointer" role="button" tabindex="0"
-                        onclick="PendingExecutionsHighlights.openExecutionDetails(${execution.id})"
+                        data-onclick="PendingExecutionsHighlights.openExecutionDetails(${execution.id})"
                         onkeypress="if(event.key==='Enter'){PendingExecutionsHighlights.openExecutionDetails(${execution.id});}">
                         <div class="fw-semibold text-muted">פרטי ביצוע</div>
                         <div class="d-flex flex-wrap gap-2 align-items-center">
@@ -368,7 +368,7 @@
                 ? `
                     <div class="col-12 col-md-6">
                         <div class="bg-body-tertiary rounded-3 p-3 d-flex flex-column gap-2 h-100 cursor-pointer" role="button" tabindex="0"
-                            onclick="PendingExecutionsHighlights.openTradeDetails(${primarySuggestion.trade_id})"
+                            data-onclick="PendingExecutionsHighlights.openTradeDetails(${primarySuggestion.trade_id})"
                             onkeypress="if(event.key==='Enter'){PendingExecutionsHighlights.openTradeDetails(${primarySuggestion.trade_id});}">
                             <div class="fw-semibold text-muted">פרטי טרייד</div>
                             <div class="d-flex flex-wrap gap-2 align-items-center">

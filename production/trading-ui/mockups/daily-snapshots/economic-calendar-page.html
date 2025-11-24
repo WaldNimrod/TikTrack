@@ -30,6 +30,7 @@
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Logger Service -->
     <script src="../../scripts/logger-service.js" defer></script>
@@ -54,6 +55,15 @@
     
     <!-- UI Utils (includes toggleSection) -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
+    
+    <!-- TradingView Widgets System -->
+    <script src="../../scripts/tradingview-widgets/tradingview-widgets-config.js" defer></script>
+    <script src="../../scripts/tradingview-widgets/tradingview-widgets-colors.js" defer></script>
+    <script src="../../scripts/tradingview-widgets/tradingview-widgets-factory.js" defer></script>
+    <script src="../../scripts/tradingview-widgets/tradingview-widgets-core.js" defer></script>
+    
+    <!-- Mock Data -->
+    <script src="../../scripts/mock-data/economic-events-mock-data.js" defer></script>
 </head>
 <body class="economic-calendar-page">
     <!-- Header System -->
@@ -66,7 +76,7 @@
                 <div class="col-md-12">
                     <div class="mockups-navigation-content">
                         <span class="mockups-navigation-label">
-                            <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                            <span class="icon-placeholder" data-icon="link" data-size="16"></span> ניווט מוקאפים:
                         </span>
                         <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
                         <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
@@ -78,7 +88,6 @@
                         <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
                         <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
                         <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                        <a href="journal-entry-modal.html" class="mockups-navigation-link">רשומת יומן</a>
                     </div>
                 </div>
             </div>
@@ -90,11 +99,11 @@
         <div class="page-body">
             <div class="main-content">
                 <!-- Header Section -->
-                <div class="content-section" id="economic_calendar_page-פילטרים">
+                <div class="content-section"  data-section="economic_calendar_page-פילטרים">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> פילטרים</h2>
+                        <h2><span class="icon-placeholder" data-icon="info-circle" data-size="16"></span> פילטרים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('economic_calendar_page-פילטרים')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-פילטרים')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -133,68 +142,84 @@
                         </div>
                         
                         <!-- Calendar View Section -->
-                <div class="content-section" id="economic_calendar_page-אירועים-כלכליים">
+                <div class="content-section"  data-section="economic_calendar_page-אירועים-כלכליים">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> אירועים כלכליים</h2>
+                        <h2><span class="icon-placeholder" data-icon="info-circle" data-size="16"></span> אירועים כלכליים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('economic_calendar_page-אירועים-כלכליים')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-אירועים-כלכליים')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
-
-                                <div class="list-group">
-                                    <div class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <div class="d-flex align-items-center gap-2 mb-2">
-                                                    <span class="badge bg-danger">גבוהה</span>
-                                                    <span class="badge bg-primary">ריבית</span>
-                                                    <span class="badge bg-secondary">ארה"ב</span>
-                                                </div>
-                                                <h6 class="mb-1">החלטת ריבית FED</h6>
-                                                <p class="mb-1">15 בינואר 2025, 20:00</p>
-                                                <p class="mb-1 text-muted">החלטת ריבית של הבנק המרכזי של ארה"ב. השפעה צפויה על השוק.</p>
-                                                <small class="text-muted">
-                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> קשור לטריידים: #123, #124
-                                                </small>
-                                            
-                    </div>
-                </div>
-                                    <div class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <div class="d-flex align-items-center gap-2 mb-2">
-                                                    <span class="badge bg-warning">בינונית</span>
-                                                    <span class="badge bg-primary">תוצר</span>
-                                                    <span class="badge bg-secondary">ארה"ב</span>
-                                                </div>
-                                                <h6 class="mb-1">דוח תוצר ארה"ב</h6>
-                                                <p class="mb-1">20 בינואר 2025, 15:30</p>
-                                                <p class="mb-1 text-muted">דוח רבעוני על התוצר המקומי הגולמי של ארה"ב.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <div class="d-flex align-items-center gap-2 mb-2">
-                                                    <span class="badge bg-warning">בינונית</span>
-                                                    <span class="badge bg-primary">תעסוקה</span>
-                                                    <span class="badge bg-secondary">ארה"ב</span>
-                                                </div>
-                                                <h6 class="mb-1">דוח תעסוקה NFP</h6>
-                                                <p class="mb-1">25 בינואר 2025, 15:30</p>
-                                                <p class="mb-1 text-muted">דוח תעסוקה חודשי - Non-Farm Payrolls.</p>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <!-- Save Event Button (shown after widget loads) -->
+                        <div id="save-event-controls" class="mb-3" style="display: none;">
+                            <button id="save-event-from-widget-btn" class="btn btn-primary btn-sm">
+                                <span class="icon-placeholder" data-icon="bookmark" data-size="16"></span>
+                                שמור אירוע נבחר
+                            </button>
+                            <small class="text-muted ms-2">לחץ על אירוע בווידג'ט ואז לחץ על הכפתור לשמירה</small>
+                        </div>
+                        
+                        <!-- TradingView Economic Calendar Widget Container -->
+                        <div id="economic-calendar-widget-container" class="economic-calendar-widget-wrapper">
+                            <!-- Loading State -->
+                            <div id="economic-calendar-loading" class="economic-calendar-loading text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">טוען...</span>
                                 </div>
+                                <p class="mt-3 text-muted">טוען לוח שנה כלכלי...</p>
+                            </div>
+                            
+                            <!-- Error State (hidden by default) -->
+                            <div id="economic-calendar-error" class="economic-calendar-error alert alert-danger hidden" role="alert">
+                                <span class="icon-placeholder" data-icon="alert-circle" data-size="16"></span>
+                                <strong>שגיאה בטעינת לוח השנה הכלכלי:</strong>
+                                <span id="economic-calendar-error-message"></span>
                             </div>
                         </div>
                     </div>
                 </div>
+                
+                <!-- Saved Events Section -->
+                <div class="content-section"  data-section="economic_calendar_page-אירועים-שמורים">
+                    <div class="section-header">
+                        <h2><span class="icon-placeholder" data-icon="bookmark" data-size="16"></span> אירועים שמורים</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-אירועים-שמורים')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div id="saved-events-container">
+                            <!-- Saved events will be rendered here -->
+                            <div class="text-muted text-center py-3">
+                                אין אירועים שמורים
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Summary Statistics Section -->
+                <div class="content-section"  data-section="economic_calendar_page-סטטיסטיקות">
+                    <div class="section-header">
+                        <h2><span class="icon-placeholder" data-icon="chart-bar" data-size="16"></span> סטטיסטיקות</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-סטטיסטיקות')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div id="economic-calendar-summary">
+                            <!-- Summary statistics will be rendered here by InfoSummarySystem -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
             </div>
         </div>
     </div>
@@ -203,5 +228,9 @@
     <div class="page-bottom-spacing"></div>
     <!-- Page-specific script -->
     <script src="../../scripts/economic-calendar-page.js" defer></script>
+    
+    <!-- Notification System Containers -->
+    <div class="notification-container" id="notification-container"></div>
+    <div id="toast-container"></div>
 </body>
 </html>

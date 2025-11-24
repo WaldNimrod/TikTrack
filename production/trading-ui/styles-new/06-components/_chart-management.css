@@ -1065,6 +1065,7 @@
 }
 
 /* Heatmap gradient colors */
+/* Heatmap color classes - Positive values (GREEN only) */
 .heatmap-excellent {
     background-color: rgba(40, 167, 69, 0.7);
 }
@@ -1078,19 +1079,48 @@
 }
 
 .heatmap-average {
-    background-color: rgba(255, 193, 7, 0.4);
+    background-color: rgba(40, 167, 69, 0.3);
 }
 
 .heatmap-below-avg {
-    background-color: rgba(255, 193, 7, 0.55);
+    background-color: rgba(40, 167, 69, 0.25);
 }
 
 .heatmap-poor {
-    background-color: rgba(220, 53, 69, 0.55);
+    background-color: rgba(40, 167, 69, 0.2);
 }
 
 .heatmap-very-poor {
+    background-color: rgba(40, 167, 69, 0.15);
+}
+
+/* Heatmap color classes - Negative values (RED only) */
+.heatmap-negative-excellent {
     background-color: rgba(220, 53, 69, 0.7);
+}
+
+.heatmap-negative-very-poor {
+    background-color: rgba(220, 53, 69, 0.55);
+}
+
+.heatmap-negative-poor {
+    background-color: rgba(220, 53, 69, 0.4);
+}
+
+.heatmap-negative-average {
+    background-color: rgba(220, 53, 69, 0.3);
+}
+
+.heatmap-negative-below-avg {
+    background-color: rgba(220, 53, 69, 0.25);
+}
+
+.heatmap-negative-good {
+    background-color: rgba(220, 53, 69, 0.2);
+}
+
+.heatmap-negative-very-good {
+    background-color: rgba(220, 53, 69, 0.15);
 }
 
 /* Chart animations */
@@ -2549,14 +2579,34 @@
     display: inline-block;
 }
 
-.calendar-day-indicator.trades {
+.calendar-day-indicator.execution {
+    background: var(--apple-blue-light, #cce5ff);
+    color: var(--apple-blue-dark, #004085);
+}
+
+.calendar-day-indicator.cash_flow {
     background: var(--apple-green-light, #d4edda);
     color: var(--apple-green-dark, #155724);
 }
 
-.calendar-day-indicator.journal {
-    background: var(--apple-blue-light, #cce5ff);
-    color: var(--apple-blue-dark, #004085);
+.calendar-day-indicator.trade {
+    background: var(--apple-purple-light, #e8d5ff);
+    color: var(--apple-purple-dark, #6b2c91);
+}
+
+.calendar-day-indicator.trade_plan {
+    background: var(--apple-orange-light, #ffe5d4);
+    color: var(--apple-orange-dark, #cc7700);
+}
+
+.calendar-day-indicator.note {
+    background: var(--apple-yellow-light, #fff9e6);
+    color: var(--apple-yellow-dark, #cc9900);
+}
+
+.calendar-day-indicator.alert {
+    background: var(--apple-red-light, #ffe5e5);
+    color: var(--apple-red-dark, #cc0000);
 }
 
 .calendar-day-cell-empty {
@@ -2616,5 +2666,113 @@
 .journal-entry-actions {
     display: flex;
     gap: var(--spacing-sm);
+}
+
+.journal-entry-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 4px 8px;
+    background: var(--apple-bg-secondary);
+    border: 1px solid var(--apple-border-light);
+    border-radius: var(--apple-radius-small);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Dynamic entity colors for journal entry badges - using CSS variables */
+.journal-entry-item[data-entry-type="execution"] .journal-entry-type-badge {
+    background: var(--entity-execution-bg, rgba(23, 162, 184, 0.1));
+    color: var(--entity-execution-color, #17a2b8);
+    border-color: var(--entity-execution-color, #17a2b8);
+}
+
+.journal-entry-item[data-entry-type="cash_flow"] .journal-entry-type-badge {
+    background: var(--entity-cash-flow-bg, rgba(32, 201, 151, 0.1));
+    color: var(--entity-cash-flow-color, #20c997);
+    border-color: var(--entity-cash-flow-color, #20c997);
+}
+
+.journal-entry-item[data-entry-type="trade"] .journal-entry-type-badge {
+    background: var(--entity-trade-bg, rgba(0, 123, 255, 0.1));
+    color: var(--entity-trade-color, #007bff);
+    border-color: var(--entity-trade-color, #007bff);
+}
+
+.journal-entry-item[data-entry-type="trade_plan"] .journal-entry-type-badge {
+    background: var(--entity-trade-plan-bg, rgba(0, 86, 179, 0.1));
+    color: var(--entity-trade-plan-color, #0056b3);
+    border-color: var(--entity-trade-plan-color, #0056b3);
+}
+
+.journal-entry-item[data-entry-type="note"] .journal-entry-type-badge {
+    background: var(--entity-note-bg, rgba(111, 66, 193, 0.1));
+    color: var(--entity-note-color, #6f42c1);
+    border-color: var(--entity-note-color, #6f42c1);
+}
+
+.journal-entry-item[data-entry-type="alert"] .journal-entry-type-badge {
+    background: var(--entity-alert-bg, rgba(255, 156, 5, 0.1));
+    color: var(--entity-alert-color, #ff9c05);
+    border-color: var(--entity-alert-color, #ff9c05);
+}
+
+/* Dynamic colors for journal entry items - left border accent */
+.journal-entry-item[data-entry-type="execution"] {
+    border-left: 3px solid var(--entity-execution-color, #17a2b8);
+}
+
+.journal-entry-item[data-entry-type="cash_flow"] {
+    border-left: 3px solid var(--entity-cash-flow-color, #20c997);
+}
+
+.journal-entry-item[data-entry-type="trade"] {
+    border-left: 3px solid var(--entity-trade-color, #007bff);
+}
+
+.journal-entry-item[data-entry-type="trade_plan"] {
+    border-left: 3px solid var(--entity-trade-plan-color, #0056b3);
+}
+
+.journal-entry-item[data-entry-type="note"] {
+    border-left: 3px solid var(--entity-note-color, #6f42c1);
+}
+
+.journal-entry-item[data-entry-type="alert"] {
+    border-left: 3px solid var(--entity-alert-color, #ff9c05);
+}
+
+/* ===== Journal Entries List - Two Columns ===== */
+.journal-entries-list-two-columns {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+    .journal-entries-list-two-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== Filter Buttons Container ===== */
+.filter-buttons-container {
+    display: flex;
+    gap: var(--spacing-xs);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-buttons-container button.active {
+    background-color: var(--apple-blue);
+    color: white;
+    border-color: var(--apple-blue);
+}
+
+.filter-buttons-container button.filter-icon-btn:hover {
+    background-color: var(--apple-bg-secondary);
+    border-color: var(--apple-blue);
 }
 

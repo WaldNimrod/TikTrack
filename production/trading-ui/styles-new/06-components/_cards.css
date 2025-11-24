@@ -823,8 +823,39 @@
 
 /* Pending Execution Trade Creation */
 .trade-create-cluster-card {
+  position: relative;
   border: 1px solid rgba(0, 0, 0, 0.05);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, z-index 0s;
+}
+
+.trade-create-cluster-card.is-hovered {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  z-index: 10;
+}
+
+.trade-create-cluster-details {
+  position: absolute;
+  inset-inline-start: 0;
+  top: calc(100% + 0.5rem);
+  inline-size: 100%;
+  min-inline-size: 300px;
+  background: var(--bs-body-bg, #fff);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.16);
+  padding: 1rem 1.25rem;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.2s ease, transform 0.24s ease;
+  pointer-events: none;
+  z-index: 12;
+}
+
+.trade-create-cluster-card.is-hovered .trade-create-cluster-details {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .trade-create-summary {

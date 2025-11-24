@@ -54,6 +54,7 @@
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Action Buttons System -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
@@ -77,7 +78,7 @@
                 <div class="col-md-12">
                     <div class="mockups-navigation-content">
                         <span class="mockups-navigation-label">
-                            <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
                         </span>
                         <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
                         <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
@@ -89,7 +90,6 @@
                         <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
                         <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
                         <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                        <a href="journal-entry-modal.html" class="mockups-navigation-link">רשומת יומן</a>
 </div>
                 </div>
             </div>
@@ -101,16 +101,16 @@
         <div class="page-body">
             <div class="main-content">
                 <!-- Header Section -->
-                <div class="top-section" id="price_history_page_top_section">
+                <div class="top-section"  data-section="price_history_page_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <img src="../../images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon">
+                            <span class="icon-placeholder icon" data-icon="chart-line" data-size="16" data-alt="chart-line" aria-label="chart-line"></span>
                             היסטוריית מחירים
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
                             <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
                             <button data-button-type="SETTINGS" data-variant="small" data-icon="settings" title="הגדרות תצוגה"></button>
-                        </div><button class="filter-toggle-btn" onclick="toggleSection('price_history_page_top_section')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                        </div><button class="filter-toggle-btn" data-onclick="toggleSection('price_history_page_top_section')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
@@ -152,11 +152,11 @@
                 </div>
                 
                 <!-- Change Statistics Section (Above Chart) -->
-                <div class="content-section" id="change-statistics-section">
+                <div class="content-section"  data-section="change-statistics-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> סטטיסטיקות שינוי</h2>
+                        <h2><span class="icon-placeholder icon" data-icon="chart-bar" data-size="16" data-alt="chart-bar" aria-label="chart-bar"></span> סטטיסטיקות שינוי</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('change-statistics-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('change-statistics-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -197,11 +197,11 @@
                 </div>
                 
                 <!-- TradingView Widget Section (Charting Library - Original) -->
-                <div class="content-section" id="tradingview-widget-section">
+                <div class="content-section"  data-section="tradingview-widget-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart" class="icon"> גרף מחירים - TradingView (Original)</h2>
+                        <h2><span class="icon-placeholder icon" data-icon="chart-line" data-size="16" data-alt="chart" aria-label="chart"></span> גרף מחירים - TradingView (Original)</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('tradingview-widget-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('tradingview-widget-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -225,11 +225,11 @@
                 
                 
                 <!-- Linked Items Section -->
-                <div class="content-section" id="linked-items-section">
+                <div class="content-section"  data-section="linked-items-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> פריטים מקושרים לטיקר</h2>
+                        <h2><span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> פריטים מקושרים לטיקר</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('linked-items-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('linked-items-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
             </div>
@@ -301,5 +301,9 @@
     <script src="../../scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
     <script src="../../scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
     <script src="../../scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    
+    <!-- Notification System Containers -->
+    <div class="notification-container" id="notification-container"></div>
+    <div id="toast-container"></div>
 </body>
 </html>

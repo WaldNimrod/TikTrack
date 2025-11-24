@@ -39,10 +39,10 @@ const IconMappings = {
         note: '/trading-ui/images/icons/entities/notes.svg',
         preference: '/trading-ui/images/icons/entities/preferences.svg',
         research: '/trading-ui/images/icons/entities/research.svg',
-        design: '/trading-ui/images/icons/tabler/palette.svg', // Using Tabler - design icon not found
-        constraint: '/trading-ui/images/icons/tabler/lock.svg', // Using Tabler - constraint icon not found
+        design: '/trading-ui/images/icons/tabler/palette.svg',
+        constraint: '/trading-ui/images/icons/tabler/lock.svg',
         development: '/trading-ui/images/icons/entities/development.svg',
-        info: '/trading-ui/images/icons/tabler/info-circle.svg', // Using Tabler - info icon not found
+        info: '/trading-ui/images/icons/tabler/info-circle.svg',
         position: '/trading-ui/images/icons/entities/trades.svg',
         home: '/trading-ui/images/icons/entities/home.svg'
     },
@@ -81,7 +81,10 @@ const IconMappings = {
         sort: 'arrows-sort',
         copy: 'copy',
         menu: 'settings',
-        back: 'arrow-right' // RTL - חץ ימינה
+        back: 'arrow-right', // RTL - חץ ימינה
+        'info-circle': 'info-circle',
+        'bookmark': 'bookmark',
+        'alert-circle': 'alert-circle'
     },
 
     /**
@@ -109,7 +112,7 @@ const IconMappings = {
     charts: {
         'type-line': 'chart-line',
         'type-bar': 'chart-bar',
-            'type-candlestick': 'chart-candle',
+        'type-candlestick': 'chart-candle',
         'scale-linear': 'line',
         'scale-log': 'chart-line',
         'volume-toggle': 'volume',

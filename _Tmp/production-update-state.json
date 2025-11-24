@@ -1,5 +1,5 @@
 {
-  "snapshot_id": "pre-update_20251125_014256",
+  "snapshot_id": "pre-update_20251125_014303",
   "step_1": {
     "completed": true,
     "timestamp": "2025-11-25T01:41:50.247755",
@@ -54,92 +54,198 @@
     }
   },
   "step_5": {
-    "completed": false,
-    "timestamp": "2025-11-25T01:42:56.087233",
+    "completed": true,
+    "timestamp": "2025-11-25T01:43:06.908151",
     "result": {
-      "success": false,
-      "error": "Command '['git', 'pull', 'origin', 'production']' returned non-zero exit status 128."
+      "success": true,
+      "conflicts_resolved": 0,
+      "conflicts_unresolved": 0
     }
   },
   "step_6": {
     "completed": true,
-    "timestamp": "2025-11-25T01:41:03.942445",
+    "timestamp": "2025-11-25T01:43:07.521987",
     "result": {
-      "success": true,
-      "dry_run": true
+      "success": true
     }
   },
   "step_7": {
     "completed": true,
-    "timestamp": "2025-11-25T01:41:03.942789",
+    "timestamp": "2025-11-25T01:43:07.522545",
     "result": {
       "success": true,
-      "dry_run": true
+      "stopped": false,
+      "reason": "not_running"
     }
   },
   "step_8": {
     "completed": true,
-    "timestamp": "2025-11-25T01:41:03.943115",
+    "timestamp": "2025-11-25T01:43:07.591966",
     "result": {
       "success": true,
-      "dry_run": true
+      "migrations_run": 0,
+      "migrations": []
     }
   },
   "last_failed_step": 5,
   "step_9": {
     "completed": true,
-    "timestamp": "2025-11-25T01:41:03.943446",
+    "timestamp": "2025-11-25T01:43:07.592673",
     "result": {
       "success": true,
-      "dry_run": true
+      "verified": false,
+      "warning": "Settings mismatch"
     }
   },
   "step_10": {
     "completed": true,
-    "timestamp": "2025-11-25T01:41:03.943805",
+    "timestamp": "2025-11-25T01:43:11.834812",
     "result": {
       "success": true,
-      "dry_run": true
+      "needs_update": false,
+      "report": {
+        "dependencies": {
+          "needs_update": false,
+          "missing_file": false,
+          "packages": [
+            "Flask",
+            "Flask-CORS",
+            "Werkzeug",
+            "SQLAlchemy",
+            "psycopg2-binary",
+            "Flask-SocketIO",
+            "python-socketio",
+            "python-engineio",
+            "gunicorn",
+            "waitress",
+            "requests",
+            "urllib3",
+            "pytest",
+            "pytest-cov",
+            "pytest-html",
+            "pytest-xdist",
+            "psutil",
+            "schedule",
+            "pytz",
+            "yfinance",
+            "bleach"
+          ],
+          "missing_packages": [],
+          "outdated_packages": []
+        },
+        "critical_files": {
+          "app.py": true,
+          "settings.py": true,
+          "requirements.txt": true
+        },
+        "database_structure": {
+          "ready": true,
+          "missing_tables": [],
+          "total_tables": 37
+        },
+        "ui_files": {
+          "ready": true,
+          "missing_files": []
+        },
+        "warnings": [],
+        "needs_update": false
+      }
     }
   },
   "step_11": {
     "completed": true,
-    "timestamp": "2025-11-25T01:41:03.944149",
+    "timestamp": "2025-11-25T01:43:11.835314",
     "result": {
       "success": true,
-      "dry_run": true
+      "updated": false,
+      "reason": "no_updates_needed"
     }
   },
   "step_12": {
     "completed": true,
-    "timestamp": "2025-11-25T01:41:03.944458",
+    "timestamp": "2025-11-25T01:43:13.657588",
     "result": {
       "success": true,
-      "dry_run": true
+      "results": {
+        "isolation": false,
+        "structure": false,
+        "post_validation": false,
+        "ui_tests": true
+      }
     }
   },
   "step_13": {
     "completed": true,
-    "timestamp": "2025-11-25T01:41:03.944749",
+    "timestamp": "2025-11-25T01:43:15.759976",
     "result": {
       "success": true,
-      "dry_run": true
+      "pid": 23346,
+      "port": 5001,
+      "background": true,
+      "health_check": "passed"
     }
   },
   "step_14": {
     "completed": true,
-    "timestamp": "2025-11-25T01:41:03.945140",
+    "timestamp": "2025-11-25T01:44:10.912328",
     "result": {
       "success": true,
-      "dry_run": true
+      "stable": true,
+      "report": {
+        "stable": true,
+        "summary": [
+          "All 6 health checks passed",
+          "Process is running"
+        ],
+        "warnings": [],
+        "errors": []
+      },
+      "stability_result": {
+        "stable": true,
+        "health_checks": {
+          "passed": 6,
+          "failed": 0,
+          "total": 6,
+          "results": [
+            [
+              true,
+              null
+            ],
+            [
+              true,
+              null
+            ],
+            [
+              true,
+              null
+            ],
+            [
+              true,
+              null
+            ],
+            [
+              true,
+              null
+            ],
+            [
+              true,
+              null
+            ]
+          ]
+        },
+        "process_alive": true,
+        "process_error": null,
+        "log_errors": [],
+        "log_errors_count": 0
+      }
     }
   },
   "step_15": {
     "completed": true,
-    "timestamp": "2025-11-25T01:41:03.945494",
+    "timestamp": "2025-11-25T01:44:10.959338",
     "result": {
       "success": true,
-      "dry_run": true
+      "new_version": "1.2.9.0"
     }
   },
   "step_16": {

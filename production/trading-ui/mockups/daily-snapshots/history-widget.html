@@ -24,12 +24,18 @@
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
     
+    <!-- TradingView Lightweight Charts -->
+    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js" defer></script>
+    <script src="../../scripts/charts/tradingview-theme.js" defer></script>
+    <script src="../../scripts/charts/tradingview-adapter.js" defer></script>
+    
     <!-- Header System -->
     <script src="../../scripts/header-system.js" defer></script>
     
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Logger Service -->
     <script src="../../scripts/logger-service.js" defer></script>
@@ -57,6 +63,9 @@
     
     <!-- Button System -->
     <script src="../../scripts/button-system-init.js" defer></script>
+    
+    <!-- Actions Menu System (for quick links) -->
+    <script src="../../scripts/modules/actions-menu-system.js" defer></script>
 </head>
 <body class="dashboard-page">
     <!-- Header System -->
@@ -70,7 +79,7 @@
                 <div class="col-md-12">
                     <div class="mockups-navigation-content">
                         <span class="mockups-navigation-label">
-                            <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
                         </span>
                         <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
                         <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
@@ -82,7 +91,6 @@
                         <a href="history-widget.html" class="mockups-navigation-link active">ווידג'ט היסטוריה</a>
                         <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
                         <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                        <a href="journal-entry-modal.html" class="mockups-navigation-link">רשומת יומן</a>
                     </div>
                 </div>
             </div>
@@ -95,15 +103,15 @@
         <div class="page-body">
             <div class="main-content">
                 <!-- History Widget Section -->
-                <div class="top-section" id="history_widget_top_section">
+                <div class="top-section" id="history_widget_top_section" data-section="history_widget_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="clock" class="icon">
+                            <span class="icon-placeholder icon" data-icon="clock" data-size="16" data-alt="clock" aria-label="clock"></span>
                             היסטוריה מהירה
                         </div>
-                        <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
-                            <button data-button-type="REFRESH" data-variant="small" data-icon="🔄" data-text="רענון" title="רענון נתונים"></button>
-                        </div><button class="filter-toggle-btn" onclick="toggleSection(\'history_widget_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                        <div class="header-actions d-flex align-items-center gap-2">                            <div class="table-actions">
+                            <button data-button-type="REFRESH" data-variant="small" data-icon="🔄" data-text="רענון" data-onclick="window.historyWidget.refreshWidget()" title="רענון נתונים"></button>
+                        </div><button class="filter-toggle-btn" data-onclick="toggleSection(\'history_widget_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
@@ -111,16 +119,8 @@
                         <div class="card mb-4">
                             <div class="card-body">
                                 <h6 class="card-title">קישורים מהירים:</h6>
-                                <div class="list-group">
-                                    <a href="#" class="list-group-item list-group-item-action">
-                                        <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> מצב תיק אתמול
-                                    </a>
-                                    <a href="#" class="list-group-item list-group-item-action">
-                                        <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> טריידים פעילים
-                                    </a>
-                                    <a href="#" class="list-group-item list-group-item-action">
-                                        <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> שינויי מחיר היום
-                                    </a>
+                                <div id="quickLinksActionsMenuContainer">
+                                    <!-- Will be populated dynamically by JavaScript -->
                                 </div>
                             </div>
                         </div>
@@ -128,12 +128,64 @@
                         <!-- Mini Chart Section -->
                         <div class="card mb-4">
                             <div class="card-body">
-                                <h6 class="card-title">P/L שבועי</h6>
-                                <div class="chart-container chart-container-placeholder-extra-small">
-                                    [מיני-גרף P/L שבועי - Line Chart קטן]
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="card-title mb-0">רווח והפסד</h6>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <!-- Chart Labels - positioned next to dropdown -->
+                                        <div class="chart-labels d-flex align-items-center gap-3" id="chartLabelsContainer">
+                                            <div class="chart-label-item">
+                                                <span class="chart-label-text text-muted small">סכום כולל:</span>
+                                                <span class="chart-label-value fw-bold" id="chartTotalValue">-</span>
+                                            </div>
+                                            <div class="chart-label-item">
+                                                <span class="chart-label-text text-muted small">שינוי:</span>
+                                                <span class="chart-label-value fw-bold" id="chartChangePercent">-</span>
+                                            </div>
+                                        </div>
+                                        <div class="filter-group date-range-filter" style="min-width: 150px;">
+                                            <div class="filter-dropdown">
+                                                <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="chartDateRangeToggle" data-onclick="window.historyWidget.toggleChartDateRangeMenu()">
+                                                    <span class="selected-value selected-date-text" id="selectedChartDateRange">השבוע</span>
+                                                    <span class="dropdown-arrow">▼</span>
+                                                </button>
+                                                <div class="filter-menu" id="chartDateRangeMenu">
+                                                    <div class="date-range-filter-item" data-value="היום" data-onclick="window.historyWidget.selectChartDateRange('היום')">
+                                                        <span class="option-text">היום</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="אתמול" data-onclick="window.historyWidget.selectChartDateRange('אתמול')">
+                                                        <span class="option-text">אתמול</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item selected" data-value="השבוע" data-onclick="window.historyWidget.selectChartDateRange('השבוע')">
+                                                        <span class="option-text">השבוע</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="שבוע" data-onclick="window.historyWidget.selectChartDateRange('שבוע')">
+                                                        <span class="option-text">שבוע (7 ימים)</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="שבוע קודם" data-onclick="window.historyWidget.selectChartDateRange('שבוע קודם')">
+                                                        <span class="option-text">שבוע שעבר</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="החודש" data-onclick="window.historyWidget.selectChartDateRange('החודש')">
+                                                        <span class="option-text">החודש</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="חודש" data-onclick="window.historyWidget.selectChartDateRange('חודש')">
+                                                        <span class="option-text">חודש (30 יום)</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="חודש קודם" data-onclick="window.historyWidget.selectChartDateRange('חודש קודם')">
+                                                        <span class="option-text">חודש קודם</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="השנה" data-onclick="window.historyWidget.selectChartDateRange('השנה')">
+                                                        <span class="option-text">השנה</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="שנה" data-onclick="window.historyWidget.selectChartDateRange('שנה')">
+                                                        <span class="option-text">שנה (365 ימים)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="mt-2 text-small-center">
-                                    Mon  Tue  Wed  Thu  Fri  Sat  Sun
+                                <div class="chart-container chart-container-placeholder-extra-small" id="weeklyPLChartContainer">
+                                    <div class="chart-loading">טוען גרף...</div>
                                 </div>
                             </div>
                         </div>
@@ -142,18 +194,80 @@
                         <div class="card mb-4">
                             <div class="card-body">
                                 <h6 class="card-title">סטטיסטיקות מהירות:</h6>
-                                <div class="statistics-summary">
-                                    <div class="stat-item">
-                                        <span class="stat-label">P/L היום:</span>
-                                        <span class="stat-value text-success">+$500</span>
+                                
+                                <!-- Tabs -->
+                                <ul class="nav nav-tabs mb-3" id="statsTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="daily-tab" data-bs-toggle="tab" data-bs-target="#daily-stats" type="button" role="tab" aria-controls="daily-stats" aria-selected="true">
+                                            <span class="icon-placeholder icon" data-icon="calendar" data-size="16" data-alt="icon" aria-label="icon"></span> יומי
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="pl-tab" data-bs-toggle="tab" data-bs-target="#pl-stats" type="button" role="tab" aria-controls="pl-stats" aria-selected="false">
+                                            <span class="icon-placeholder icon" data-icon="chart-line" data-size="16" data-alt="icon" aria-label="icon"></span> רווח והפסד כולל
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="market-value-tab" data-bs-toggle="tab" data-bs-target="#market-value-stats" type="button" role="tab" aria-controls="market-value-stats" aria-selected="false">
+                                            <span class="icon-placeholder icon" data-icon="currency-dollar" data-size="16" data-alt="icon" aria-label="icon"></span> שווי שוק
+                                        </button>
+                                    </li>
+                                </ul>
+                                
+                                <!-- Tab Content -->
+                                <div class="tab-content" id="statsTabContent">
+                                    <!-- Daily Stats Tab -->
+                                    <div class="tab-pane fade show active" id="daily-stats" role="tabpanel" aria-labelledby="daily-tab">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-hover" id="dailyStatsTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Instrument</th>
+                                                        <th>Daily P&L / Change</th>
+                                                        <th>Last Price</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="dailyStatsTableBody">
+                                                    <!-- Will be populated dynamically -->
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
-                                    <div class="stat-item">
-                                        <span class="stat-label">שינוי שווי תיק:</span>
-                                        <span class="stat-value text-success">+2.5%</span>
+                                    
+                                    <!-- P/L Stats Tab -->
+                                    <div class="tab-pane fade" id="pl-stats" role="tabpanel" aria-labelledby="pl-tab">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-hover" id="plStatsTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Instrument</th>
+                                                        <th>Urlz P&L / Mkt Val</th>
+                                                        <th>Last Price</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="plStatsTableBody">
+                                                    <!-- Will be populated dynamically -->
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
-                                    <div class="stat-item">
-                                        <span class="stat-label">טריידים פעילים:</span>
-                                        <span class="stat-value">5</span>
+                                    
+                                    <!-- Market Value Stats Tab -->
+                                    <div class="tab-pane fade" id="market-value-stats" role="tabpanel" aria-labelledby="market-value-tab">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-hover" id="marketValueStatsTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Instrument</th>
+                                                        <th>Mkt Val / Position</th>
+                                                        <th>Last Price</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="marketValueStatsTableBody">
+                                                    <!-- Will be populated dynamically -->
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -161,24 +275,26 @@
                         
                         <!-- Full History Link -->
                         <div class="text-center">
-                            <a href="#" class="btn btn-primary">פתח היסטוריה מלאה →</a>
+                            <a href="trade-history-page.html" class="btn btn-primary">פתח היסטוריה מלאה →</a>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Other Dashboard Widgets Placeholder -->
-                <div class="content-section">
-                    <div class="section-header">
-                        <div class="table-title">שאר ווידג'טים של הדשבורד...</div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
     
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
+    
+    <!-- Bootstrap JS for Tabs -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
     <!-- Page-specific script -->
     <script src="../../scripts/history-widget.js" defer></script>
+    
+    <!-- Notification System Containers -->
+    <div class="notification-container" id="notification-container"></div>
+    <div id="toast-container"></div>
 </body>
 </html>

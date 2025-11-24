@@ -2579,14 +2579,34 @@
     display: inline-block;
 }
 
-.calendar-day-indicator.trades {
+.calendar-day-indicator.execution {
+    background: var(--apple-blue-light, #cce5ff);
+    color: var(--apple-blue-dark, #004085);
+}
+
+.calendar-day-indicator.cash_flow {
     background: var(--apple-green-light, #d4edda);
     color: var(--apple-green-dark, #155724);
 }
 
-.calendar-day-indicator.journal {
-    background: var(--apple-blue-light, #cce5ff);
-    color: var(--apple-blue-dark, #004085);
+.calendar-day-indicator.trade {
+    background: var(--apple-purple-light, #e8d5ff);
+    color: var(--apple-purple-dark, #6b2c91);
+}
+
+.calendar-day-indicator.trade_plan {
+    background: var(--apple-orange-light, #ffe5d4);
+    color: var(--apple-orange-dark, #cc7700);
+}
+
+.calendar-day-indicator.note {
+    background: var(--apple-yellow-light, #fff9e6);
+    color: var(--apple-yellow-dark, #cc9900);
+}
+
+.calendar-day-indicator.alert {
+    background: var(--apple-red-light, #ffe5e5);
+    color: var(--apple-red-dark, #cc0000);
 }
 
 .calendar-day-cell-empty {
@@ -2646,5 +2666,94 @@
 .journal-entry-actions {
     display: flex;
     gap: var(--spacing-sm);
+}
+
+.journal-entry-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 4px 8px;
+    background: var(--apple-bg-secondary);
+    border: 1px solid var(--apple-border-light);
+    border-radius: var(--apple-radius-small);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.journal-entry-item[data-entry-type="execution"] .journal-entry-type-badge {
+    background: var(--apple-blue-light, #cce5ff);
+    color: var(--apple-blue-dark, #004085);
+    border-color: var(--apple-blue);
+}
+
+.journal-entry-item[data-entry-type="cash_flow"] .journal-entry-type-badge {
+    background: var(--apple-green-light, #d4edda);
+    color: var(--apple-green-dark, #155724);
+    border-color: var(--apple-green);
+}
+
+.journal-entry-item[data-entry-type="trade_created"] .journal-entry-type-badge,
+.journal-entry-item[data-entry-type="trade_plan_created"] .journal-entry-type-badge {
+    background: var(--brand-primary-light, #6ed8ca);
+    color: var(--brand-primary-dark, #1a8f83);
+    border-color: var(--brand-primary-color);
+}
+
+.journal-entry-item[data-entry-type="trade_closed"] .journal-entry-type-badge {
+    background: var(--apple-green-light, #d4edda);
+    color: var(--apple-green-dark, #155724);
+    border-color: var(--apple-green);
+}
+
+.journal-entry-item[data-entry-type="trade_plan_cancelled"] .journal-entry-type-badge {
+    background: color-mix(in srgb, var(--apple-orange) 15%, transparent);
+    color: var(--apple-orange-dark, #cc7700);
+    border-color: var(--apple-orange);
+}
+
+.journal-entry-item[data-entry-type="note"] .journal-entry-type-badge {
+    background: color-mix(in srgb, var(--apple-purple) 15%, transparent);
+    color: var(--apple-purple);
+    border-color: var(--apple-purple);
+}
+
+.journal-entry-item[data-entry-type="alert"] .journal-entry-type-badge {
+    background: color-mix(in srgb, var(--apple-yellow) 15%, transparent);
+    color: var(--apple-orange-dark, #cc7700);
+    border-color: var(--apple-yellow);
+}
+
+/* ===== Journal Entries List - Two Columns ===== */
+.journal-entries-list-two-columns {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+    .journal-entries-list-two-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== Filter Buttons Container ===== */
+.filter-buttons-container {
+    display: flex;
+    gap: var(--spacing-xs);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-buttons-container button.active {
+    background-color: var(--apple-blue);
+    color: white;
+    border-color: var(--apple-blue);
+}
+
+.filter-buttons-container button.filter-icon-btn:hover {
+    background-color: var(--apple-bg-secondary);
+    border-color: var(--apple-blue);
 }
 

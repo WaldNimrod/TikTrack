@@ -294,6 +294,75 @@ const INFO_SUMMARY_CONFIGS = {
         formatter: 'currencyWithColor'
       }
     ]
+  },
+
+  // Economic Calendar page configuration
+  'economic-calendar-page': {
+    containerId: 'economic-calendar-summary',
+    stats: [
+      {
+        id: 'totalEvents',
+        label: 'סה"כ אירועים שמורים',
+        calculator: 'count'
+      },
+      {
+        id: 'highImportance',
+        label: 'חשיבות גבוהה',
+        calculator: 'countByField',
+        params: { field: 'importance', value: 'high' }
+      },
+      {
+        id: 'mediumImportance',
+        label: 'חשיבות בינונית',
+        calculator: 'countByField',
+        params: { field: 'importance', value: 'medium' }
+      },
+      {
+        id: 'lowImportance',
+        label: 'חשיבות נמוכה',
+        calculator: 'countByField',
+        params: { field: 'importance', value: 'low' }
+      },
+      {
+        id: 'eventsByUS',
+        label: 'אירועים ארה"ב',
+        calculator: 'countByField',
+        params: { field: 'country', value: 'US' }
+      },
+      {
+        id: 'eventsByEU',
+        label: 'אירועים אירופה',
+        calculator: 'countByField',
+        params: { field: 'country', value: 'EU' }
+      }
+    ]
+  },
+
+  // Date Comparison Modal configuration
+  'date-comparison-modal': {
+    containerId: 'comparison-summary',
+    stats: [
+      {
+        id: 'total_change',
+        label: 'שינוי כולל',
+        calculator: 'custom',
+        customCalculator: (data) => data.total_change || 0,
+        formatter: 'currencyWithColor'
+      },
+      {
+        id: 'avg_change_percent',
+        label: 'שינוי ממוצע',
+        calculator: 'custom',
+        customCalculator: (data) => data.avg_change_percent || 0,
+        formatter: 'percentageWithColor'
+      },
+      {
+        id: 'significant_changes',
+        label: 'שינויים משמעותיים',
+        calculator: 'custom',
+        customCalculator: (data) => data.significant_changes || 0
+      }
+    ]
   }
 };
 

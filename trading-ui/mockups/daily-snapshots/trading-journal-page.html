@@ -87,7 +87,6 @@
                         <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
                         <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
                         <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                        <a href="journal-entry-modal.html" class="mockups-navigation-link">רשומת יומן</a>
                     </div>
                 </div>
             </div>
@@ -168,7 +167,8 @@
                                     <!-- Calendar Days - January 2025 -->
                                     <div class="calendar-day-cell">
                                         <div class="calendar-day-number">1</div>
-                                        <div class="calendar-day-indicator trades">3 טריידים</div>
+                                        <div class="calendar-day-indicator execution">2 ביצועים</div>
+                                        <div class="calendar-day-indicator trade">1 טרייד</div>
                                     </div>
                                     <div class="calendar-day-cell calendar-day-cell-today">
                                         <div class="calendar-day-number">2</div>
@@ -181,7 +181,7 @@
                                     </div>
                                     <div class="calendar-day-cell">
                                         <div class="calendar-day-number">5</div>
-                                        <div class="calendar-day-indicator journal">רשומת יומן</div>
+                                        <div class="calendar-day-indicator note">1 הערה</div>
                                     </div>
                                     <div class="calendar-day-cell">
                                         <div class="calendar-day-number">6</div>
@@ -197,8 +197,7 @@
                                     </div>
                                     <div class="calendar-day-cell">
                                         <div class="calendar-day-number">10</div>
-                                        <div class="calendar-day-indicator journal">רשומת יומן</div>
-                                        <div class="calendar-day-indicator trades">1 טרייד</div>
+                                        <div class="calendar-day-indicator trade">1 טרייד</div>
                                     </div>
                                     <div class="calendar-day-cell">
                                         <div class="calendar-day-number">11</div>
@@ -214,8 +213,7 @@
                                     </div>
                                     <div class="calendar-day-cell calendar-day-cell-active">
                                         <div class="calendar-day-number">15</div>
-                                        <div class="calendar-day-indicator journal">רשומת יומן</div>
-                                        <div class="calendar-day-indicator trades">2 טריידים</div>
+                                        <div class="calendar-day-indicator execution">1 ביצוע</div>
                                     </div>
                                     <div class="calendar-day-cell">
                                         <div class="calendar-day-number">16</div>
@@ -275,12 +273,98 @@
                             <h2><img src="../../images/icons/tabler/list.svg" width="16" height="16" alt="list" class="icon"> רשומות יומן</h2>
                             <div class="header-actions d-flex align-items-center gap-2">
                                 <div>
-                                    <input type="text" class="form-control form-control-sm d-inline-block form-control-inline-search" placeholder="חיפוש...">
-                                    <select class="form-select form-select-sm d-inline-block form-select-inline">
-                                        <option>כל התאריכים</option>
-                                        <option>השבוע</option>
-                                        <option>החודש</option>
+                                    <input type="text" class="form-control form-control-sm d-inline-block form-control-inline-search" placeholder="חיפוש..." id="journal-search-input">
+                                    <select class="form-select form-select-sm d-inline-block form-select-inline" id="journal-date-filter">
+                                        <option value="all">כל התאריכים</option>
+                                        <option value="week">השבוע</option>
+                                        <option value="month">החודש</option>
                                     </select>
+                                </div>
+                                <div class="filter-buttons-container button-row">
+                                    <button
+                                        data-button-type="FILTER"
+                                        data-variant="small"
+                                        data-icon="⚙️"
+                                        data-classes="btn-sm active"
+                                        data-onclick="filterJournalByEntityType('all')"
+                                        data-type="all"
+                                        title="הצג הכל"
+                                        data-tooltip="הצג הכל - כל סוגי הישויות"
+                                        data-tooltip-placement="top"
+                                        data-tooltip-trigger="hover">
+                                    </button>
+                                    <button
+                                        data-button-type="FILTER"
+                                        data-variant="small"
+                                        data-icon="⚡"
+                                        data-classes="btn-sm filter-icon-btn"
+                                        data-onclick="filterJournalByEntityType('execution')"
+                                        data-type="execution"
+                                        title="ביצועים"
+                                        data-tooltip="סינון לפי: ביצועים"
+                                        data-tooltip-placement="top"
+                                        data-tooltip-trigger="hover">
+                                    </button>
+                                    <button
+                                        data-button-type="FILTER"
+                                        data-variant="small"
+                                        data-icon="💰"
+                                        data-classes="btn-sm filter-icon-btn"
+                                        data-onclick="filterJournalByEntityType('cash_flow')"
+                                        data-type="cash_flow"
+                                        title="תזרימי מזומן"
+                                        data-tooltip="סינון לפי: תזרימי מזומן"
+                                        data-tooltip-placement="top"
+                                        data-tooltip-trigger="hover">
+                                    </button>
+                                    <button
+                                        data-button-type="FILTER"
+                                        data-variant="small"
+                                        data-icon="💼"
+                                        data-classes="btn-sm filter-icon-btn"
+                                        data-onclick="filterJournalByEntityType('trade')"
+                                        data-type="trade"
+                                        title="טריידים"
+                                        data-tooltip="סינון לפי: טריידים"
+                                        data-tooltip-placement="top"
+                                        data-tooltip-trigger="hover">
+                                    </button>
+                                    <button
+                                        data-button-type="FILTER"
+                                        data-variant="small"
+                                        data-icon="📝"
+                                        data-classes="btn-sm filter-icon-btn"
+                                        data-onclick="filterJournalByEntityType('trade_plan')"
+                                        data-type="trade_plan"
+                                        title="תוכניות"
+                                        data-tooltip="סינון לפי: תוכניות"
+                                        data-tooltip-placement="top"
+                                        data-tooltip-trigger="hover">
+                                    </button>
+                                    <button
+                                        data-button-type="FILTER"
+                                        data-variant="small"
+                                        data-icon="📄"
+                                        data-classes="btn-sm filter-icon-btn"
+                                        data-onclick="filterJournalByEntityType('note')"
+                                        data-type="note"
+                                        title="הערות"
+                                        data-tooltip="סינון לפי: הערות"
+                                        data-tooltip-placement="top"
+                                        data-tooltip-trigger="hover">
+                                    </button>
+                                    <button
+                                        data-button-type="FILTER"
+                                        data-variant="small"
+                                        data-icon="🔔"
+                                        data-classes="btn-sm filter-icon-btn"
+                                        data-onclick="filterJournalByEntityType('alert')"
+                                        data-type="alert"
+                                        title="התראות"
+                                        data-tooltip="סינון לפי: התראות"
+                                        data-tooltip-placement="top"
+                                        data-tooltip-trigger="hover">
+                                    </button>
                                 </div>
                                 <button class="filter-toggle-btn" onclick="toggleSection('journal-entries-list-section')" title="הצג/הסתר סקשן">
                                     <span class="section-toggle-icon">▼</span>
@@ -288,64 +372,254 @@
                             </div>
                         </div>
                         <div class="section-body">
-                            <div class="journal-entries-list">
-                            <div class="journal-entry-item">
-                                <div class="journal-entry-header">
-                                    <div>
-                                        <div class="journal-entry-date">15 בינואר 2025</div>
-                                        <div class="journal-entry-content">ניתוח טרייד AAPL - כניסה טובה, יציאה מוקדמת מדי. צריך לשפר את ניהול הסיכון.</div>
-                                        <div class="journal-entry-meta">
-                                            <div class="journal-entry-meta-item">
-                                                <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> קשור לטרייד #123
+                            <div class="journal-entries-list journal-entries-list-two-columns">
+                                <!-- Execution Entry -->
+                                <div class="journal-entry-item" data-entry-type="execution">
+                                    <div class="journal-entry-header">
+                                        <div>
+                                            <div class="journal-entry-date">15 בינואר 2025, 14:30</div>
+                                            <div class="journal-entry-type-badge">
+                                                <img src="../../images/icons/tabler/activity.svg" width="16" height="16" alt="execution" class="icon"> ביצוע
                                             </div>
-                                            <div class="journal-entry-meta-item">
-                                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רגש: מרוצה
+                                            <div class="journal-entry-content">
+                                                <strong>AAPL</strong> | <strong>קנייה</strong> | כמות: <strong>10</strong> | מחיר: <strong>$150.25</strong> | עמלה: <strong>$1.00</strong> | Realized P/L: <strong>-$</strong> | MTM P/L: <strong>-$</strong>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="journal-entry-actions">
-                                        <button data-button-type="EDIT" data-variant="small" data-text="ערוך" title="ערוך רשומה"></button>
-                                        <button data-button-type="DELETE" data-variant="small" data-text="מחק" title="מחק רשומה"></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="journal-entry-item">
-                                <div class="journal-entry-header">
-                                    <div>
-                                        <div class="journal-entry-date">10 בינואר 2025</div>
-                                        <div class="journal-entry-content">טרייד TSLA - הצלחה גדולה! אסטרטגיית RSI עבדה מצוין.</div>
-                                        <div class="journal-entry-meta">
-                                            <div class="journal-entry-meta-item">
-                                                <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> קשור לטרייד #124
-                                            </div>
-                                            <div class="journal-entry-meta-item">
-                                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רגש: שמח
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> טרייד #123
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/wallet.svg" width="16" height="16" alt="account" class="icon"> IBKR Main
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/database.svg" width="16" height="16" alt="source" class="icon"> manual
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="journal-entry-actions">
-                                        <button data-button-type="EDIT" data-variant="small" data-text="ערוך" title="ערוך רשומה"></button>
-                                        <button data-button-type="DELETE" data-variant="small" data-text="מחק" title="מחק רשומה"></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="journal-entry-item">
-                                <div class="journal-entry-header">
-                                    <div>
-                                        <div class="journal-entry-date">5 בינואר 2025</div>
-                                        <div class="journal-entry-content">תחילת חודש - סקירה כללית. מטרות: שיפור אחוז הצלחה, ניהול סיכון טוב יותר.</div>
-                                        <div class="journal-entry-meta">
-                                            <div class="journal-entry-meta-item">
-                                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רגש: ניטרלי
-                                            </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-icon="eye" title="צפה בביצוע"></button>
                                         </div>
                                     </div>
-                                    <div class="journal-entry-actions">
-                                        <button data-button-type="EDIT" data-variant="small" data-text="ערוך" title="ערוך רשומה"></button>
-                                        <button data-button-type="DELETE" data-variant="small" data-text="מחק" title="מחק רשומה"></button>
+                                </div>
+
+                                <!-- Cash Flow Entry -->
+                                <div class="journal-entry-item" data-entry-type="cash_flow">
+                                    <div class="journal-entry-header">
+                                        <div>
+                                            <div class="journal-entry-date">14 בינואר 2025</div>
+                                            <div class="journal-entry-type-badge">
+                                                <img src="../../images/icons/tabler/cash.svg" width="16" height="16" alt="cash_flow" class="icon"> תזרים מזומן
+                                            </div>
+                                            <div class="journal-entry-content">
+                                                <strong>הפקדה</strong> | סכום: <strong>$5,000.00</strong> | עמלה: <strong>$0.00</strong> | תיאור: הפקדה ראשונית לחשבון
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/wallet.svg" width="16" height="16" alt="account" class="icon"> IBKR Main
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/currency-dollar.svg" width="16" height="16" alt="currency" class="icon"> USD
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/database.svg" width="16" height="16" alt="source" class="icon"> manual
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בתזרים מזומן"></button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+
+                                <!-- Trade Created Entry -->
+                                <div class="journal-entry-item" data-entry-type="trade" data-entry-subtype="trade_created">
+                                    <div class="journal-entry-header">
+                                        <div>
+                                            <div class="journal-entry-date">13 בינואר 2025, 09:15</div>
+                                            <div class="journal-entry-type-badge">
+                                                <img src="../../images/icons/tabler/plus-circle.svg" width="16" height="16" alt="trade_created" class="icon"> טרייד נוצר
+                                            </div>
+                                            <div class="journal-entry-content">
+                                                <strong>AAPL</strong> | מחיר: <strong>$150.25</strong> | שינוי: <strong>+1.2%</strong> | פוזיציה: <strong>10</strong> | P/L%: <strong>+2.5%</strong> | P/L: <strong>$150.00</strong>
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> טרייד #123
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/wallet.svg" width="16" height="16" alt="account" class="icon"> IBKR Main
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="status" class="icon"> פתוח
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/tag.svg" width="16" height="16" alt="type" class="icon"> סווינג
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/arrow-left-right.svg" width="16" height="16" alt="side" class="icon"> Long
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בטרייד"></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Trade Plan Created Entry -->
+                                <div class="journal-entry-item" data-entry-type="trade_plan" data-entry-subtype="trade_plan_created">
+                                    <div class="journal-entry-header">
+                                        <div>
+                                            <div class="journal-entry-date">12 בינואר 2025, 16:45</div>
+                                            <div class="journal-entry-type-badge">
+                                                <img src="../../images/icons/tabler/plus-circle.svg" width="16" height="16" alt="trade_plan_created" class="icon"> תוכנית נוצרה
+                                            </div>
+                                            <div class="journal-entry-content">
+                                                <strong>TSLA</strong> | כמות: <strong>10</strong> | מחיר יעד: <strong>$200.00</strong> | השקעה: <strong>$2,000</strong> | סיכוי: <strong>$500</strong> | סיכון: <strong>$200</strong> | יחס: <strong>2.5</strong>
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> תוכנית #45
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/wallet.svg" width="16" height="16" alt="account" class="icon"> IBKR Main
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="status" class="icon"> פתוח
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/tag.svg" width="16" height="16" alt="type" class="icon"> סווינג
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/arrow-left-right.svg" width="16" height="16" alt="side" class="icon"> Long
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בתוכנית"></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Trade Closed Entry -->
+                                <div class="journal-entry-item" data-entry-type="trade" data-entry-subtype="trade_closed">
+                                    <div class="journal-entry-header">
+                                        <div>
+                                            <div class="journal-entry-date">10 בינואר 2025, 15:20</div>
+                                            <div class="journal-entry-type-badge">
+                                                <img src="../../images/icons/tabler/check-circle.svg" width="16" height="16" alt="trade_closed" class="icon"> טרייד נסגר
+                                            </div>
+                                            <div class="journal-entry-content">
+                                                <strong>MSFT</strong> | מחיר: <strong>$350.00</strong> | שינוי: <strong>+0.5%</strong> | פוזיציה: <strong>0</strong> | P/L%: <strong>+4.5%</strong> | P/L: <strong>$450.00</strong>
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> טרייד #120
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/wallet.svg" width="16" height="16" alt="account" class="icon"> IBKR Main
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="status" class="icon"> סגור
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/tag.svg" width="16" height="16" alt="type" class="icon"> סווינג
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/arrow-left-right.svg" width="16" height="16" alt="side" class="icon"> Long
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בטרייד"></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Trade Plan Cancelled Entry -->
+                                <div class="journal-entry-item" data-entry-type="trade_plan" data-entry-subtype="trade_plan_cancelled">
+                                    <div class="journal-entry-header">
+                                        <div>
+                                            <div class="journal-entry-date">8 בינואר 2025, 11:30</div>
+                                            <div class="journal-entry-type-badge">
+                                                <img src="../../images/icons/tabler/x-circle.svg" width="16" height="16" alt="trade_plan_cancelled" class="icon"> תוכנית בוטלה
+                                            </div>
+                                            <div class="journal-entry-content">
+                                                <strong>NVDA</strong> | תוכנית <strong>#42</strong> בוטלה | סיבה: תנאי כניסה לא התקיימו
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> תוכנית #42
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/wallet.svg" width="16" height="16" alt="account" class="icon"> IBKR Main
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="status" class="icon"> בוטל
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בתוכנית"></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Note Entry -->
+                                <div class="journal-entry-item" data-entry-type="note">
+                                    <div class="journal-entry-header">
+                                        <div>
+                                            <div class="journal-entry-date">5 בינואר 2025, 08:00</div>
+                                            <div class="journal-entry-type-badge">
+                                                <img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="note" class="icon"> הערה
+                                            </div>
+                                            <div class="journal-entry-content">
+                                                תחילת חודש - סקירה כללית. מטרות: שיפור אחוז הצלחה, ניהול סיכון טוב יותר. התמקדות באסטרטגיות RSI ו-MACD.
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> IBKR Main
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/paperclip.svg" width="16" height="16" alt="attachment" class="icon"> אין קובץ
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בהערה"></button>
+                                            <button data-button-type="EDIT" data-variant="small" data-icon="pencil" title="ערוך הערה"></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Alert Triggered Entry -->
+                                <div class="journal-entry-item" data-entry-type="alert">
+                                    <div class="journal-entry-header">
+                                        <div>
+                                            <div class="journal-entry-date">3 בינואר 2025, 10:15</div>
+                                            <div class="journal-entry-type-badge">
+                                                <img src="../../images/icons/tabler/bell.svg" width="16" height="16" alt="alert" class="icon"> התראה הופעלה
+                                            </div>
+                                            <div class="journal-entry-content">
+                                                <strong>AAPL</strong> | מחיר עלה מעל <strong>$150.00</strong> | תנאי: price | more_than | 150.00
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> התראה #78
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="status" class="icon"> open
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <img src="../../images/icons/tabler/check.svg" width="16" height="16" alt="triggered" class="icon"> הופעל
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בהתראה"></button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -360,6 +634,60 @@
     
     <!-- Page-specific script -->
     <script src="../../scripts/trading-journal-page.js" defer></script>
+    
+    <!-- Journal Filter Script -->
+    <script>
+        /**
+         * Filter journal entries by entity type
+         * @param {string} entityType - Entity type to filter by ('all', 'execution', 'cash_flow', 'trade', 'trade_plan', 'note', 'alert')
+         */
+        function filterJournalByEntityType(entityType) {
+            const normalizedType = entityType || 'all';
+            const entries = document.querySelectorAll('.journal-entry-item');
+            const calendarDays = document.querySelectorAll('.calendar-day-cell');
+            
+            // Update filter buttons
+            const filterButtons = document.querySelectorAll('.filter-buttons-container button[data-type]');
+            filterButtons.forEach(btn => {
+                if (btn.getAttribute('data-type') === normalizedType) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Filter journal entries
+            entries.forEach(entry => {
+                const entryType = entry.getAttribute('data-entry-type');
+                if (normalizedType === 'all') {
+                    entry.style.display = '';
+                } else if (normalizedType === 'trade' && entryType === 'trade') {
+                    entry.style.display = '';
+                } else if (normalizedType === 'trade_plan' && entryType === 'trade_plan') {
+                    entry.style.display = '';
+                } else if (entryType === normalizedType) {
+                    entry.style.display = '';
+                } else {
+                    entry.style.display = 'none';
+                }
+            });
+            
+            // Update calendar indicators (placeholder - will be implemented with real data)
+            // For now, just log the filter change
+            if (window.Logger) {
+                window.Logger.info('Journal filtered by entity type', { entityType: normalizedType });
+            }
+        }
+        
+        // Make function available globally
+        window.filterJournalByEntityType = filterJournalByEntityType;
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set default filter to 'all'
+            filterJournalByEntityType('all');
+        });
+    </script>
 </body>
 </html>
 

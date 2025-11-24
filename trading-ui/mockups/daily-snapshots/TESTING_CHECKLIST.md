@@ -18,8 +18,7 @@
 8. ✅ `history-widget.html` - ווידג'ט היסטוריה
 9. ✅ `emotional-tracking-widget.html` - תיעוד רגשי
 10. ✅ `date-comparison-modal.html` - השוואת תאריכים
-11. ✅ `journal-entry-modal.html` - רשומת יומן
-12. ✅ `tradingview-test-page.html` - בדיקת TradingView
+11. ✅ `tradingview-test-page.html` - בדיקת TradingView
 
 ---
 

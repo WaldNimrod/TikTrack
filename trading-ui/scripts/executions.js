@@ -1824,41 +1824,123 @@ window.initializeExecutionsPage = async function() {
     let tradeCreationDebounceTimer = null;
     const setupTradeCreationSection = () => {
       // Check if section is actually visible to user (not just restored state)
-      const sectionBody = tradeCreationSection.querySelector('.section-body');
-      const isActuallyOpen = sectionBody && sectionBody.style.display !== 'none' && !sectionBody.classList.contains('hidden');
-      
-      // If section is already open, initialize immediately
-      if (isActuallyOpen && !tradeCreationInitialized) {
-        // Small delay to ensure DOM is ready
-        setTimeout(() => {
-          initializeTradeCreationSection();
-        }, 100);
-      } else if (!isActuallyOpen) {
-        // If section is closed, set up observer to initialize when it opens
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting && !tradeCreationInitialized) {
-              // Debounce to avoid multiple rapid calls
-              if (tradeCreationDebounceTimer) {
-                clearTimeout(tradeCreationDebounceTimer);
-              }
-              tradeCreationDebounceTimer = setTimeout(() => {
-                initializeTradeCreationSection();
-                observer.disconnect();
-              }, 500); // 500ms debounce
-            }
-          });
-        }, { threshold: 0.1 });
+      // Use the same logic as toggleSection to determine if section is open
+      // Add a small delay to ensure DOM is fully updated after restoreAllSectionStates
+      setTimeout(() => {
+        const sectionBody = tradeCreationSection.querySelector('.section-body');
+        const computedStyle = sectionBody ? window.getComputedStyle(sectionBody) : null;
+        const displayStyle = sectionBody?.style.display;
+        const computedDisplay = computedStyle?.display;
+        const isActuallyOpen = sectionBody && 
+          displayStyle !== 'none' && 
+          computedDisplay !== 'none' &&
+          !sectionBody.classList.contains('hidden') &&
+          !tradeCreationSection.classList.contains('collapsed');
         
-        observer.observe(tradeCreationSection);
+        window.Logger?.info('🔍 Checking trade-creation section state', {
+          displayStyle,
+          computedDisplay,
+          hasHiddenClass: sectionBody?.classList.contains('hidden'),
+          hasCollapsedClass: tradeCreationSection.classList.contains('collapsed'),
+          isActuallyOpen,
+          tradeCreationInitialized,
+          page: "executions"
+        });
+        
+        // If section is already open, initialize immediately
+        if (isActuallyOpen && !tradeCreationInitialized) {
+          window.Logger?.info('✅ Trade-creation section is open, initializing...', { page: "executions" });
+          initializeTradeCreationSection();
+        } else if (!isActuallyOpen) {
+          window.Logger?.info('⏳ Trade-creation section is closed, setting up observer...', { page: "executions" });
+          // If section is closed, set up observer to initialize when it opens
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting && !tradeCreationInitialized) {
+                // Debounce to avoid multiple rapid calls
+                if (tradeCreationDebounceTimer) {
+                  clearTimeout(tradeCreationDebounceTimer);
+                }
+                tradeCreationDebounceTimer = setTimeout(() => {
+                  initializeTradeCreationSection();
+                  observer.disconnect();
+                }, 500); // 500ms debounce
+              }
+            });
+          }, { threshold: 0.1 });
+          
+          observer.observe(tradeCreationSection);
+        }
+      }, 200); // Delay to ensure DOM is fully updated after restoreAllSectionStates
+    };
+    
+    // Also listen to section toggle events to initialize when section opens
+    const handleSectionToggle = (event) => {
+      const sectionId = event.detail?.sectionId || event.target?.getAttribute('data-section');
+      if (sectionId === 'trade-creation' && !tradeCreationInitialized) {
+        setTimeout(() => {
+          const sectionBody = tradeCreationSection.querySelector('.section-body');
+          const isOpen = sectionBody && 
+            sectionBody.style.display !== 'none' && 
+            !sectionBody.classList.contains('hidden') &&
+            !tradeCreationSection.classList.contains('collapsed');
+          if (isOpen) {
+            initializeTradeCreationSection();
+          }
+        }, 150);
       }
     };
     
     // Wait for sections:restored event or check if already restored
-    if (window.sectionsRestored) {
-      setupTradeCreationSection();
-    } else {
-      document.addEventListener('sections:restored', setupTradeCreationSection, { once: true });
+    // Use a more robust check - the event might have fired before we registered the listener
+    const checkAndSetup = () => {
+      if (window.sectionsRestored) {
+        window.Logger?.info('🔍 sectionsRestored flag is true, calling setupTradeCreationSection immediately', { page: "executions" });
+        setupTradeCreationSection();
+        return true;
+      }
+      return false;
+    };
+    
+    // Check immediately
+    if (!checkAndSetup()) {
+      window.Logger?.info('🔍 Waiting for sections:restored event...', { page: "executions" });
+      // Event is dispatched on window, not document!
+      window.addEventListener('sections:restored', () => {
+        window.Logger?.info('🔍 sections:restored event received!', { page: "executions" });
+        setupTradeCreationSection();
+      }, { once: true });
+      
+      // Also check periodically in case event already fired
+      let checkCount = 0;
+      const checkInterval = setInterval(() => {
+        checkCount++;
+        if (checkAndSetup() || checkCount > 20) {
+          clearInterval(checkInterval);
+        }
+      }, 100);
+    }
+    
+    // Also listen to section toggle events
+    document.addEventListener('section:toggled', handleSectionToggle);
+    // Fallback: listen to click events on toggle buttons
+    const toggleBtn = tradeCreationSection?.querySelector('button[data-onclick*="toggleSection"]');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        setTimeout(() => {
+          if (!tradeCreationInitialized) {
+            const sectionBody = tradeCreationSection.querySelector('.section-body');
+            const isOpen = sectionBody && 
+              sectionBody.style.display !== 'none' && 
+              !sectionBody.classList.contains('hidden') &&
+              !tradeCreationSection.classList.contains('collapsed');
+            if (isOpen) {
+              window.Logger?.info('🔄 Initializing trade creation section (lazy loading - toggle button clicked)', { page: "executions" });
+              initializeTradeCreationSection();
+            }
+          }
+        }, 200);
+      });
     }
   }
 
@@ -1934,98 +2016,125 @@ window.initializeExecutionsPage = async function() {
     let suggestionsDebounceTimer = null;
     const setupSuggestionsObserver = () => {
       // Check if section is actually visible to user (not just restored state)
-      const sectionBody = suggestionsSection.querySelector('.section-body');
-      const isActuallyOpen = sectionBody && sectionBody.style.display !== 'none' && !sectionBody.classList.contains('hidden');
-      
-      // Only initialize if section is actually open (user-initiated, not just restored state)
-      if (!isActuallyOpen) {
-        // Observer לבדיקת visibility של הסקשן - רק אחרי ש-sections שוחזרו
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            // אם הסקשן גלוי ולא טענו עדיין את הנתונים
-            if (entry.isIntersecting && !suggestionsLoaded) {
-              // Debounce to avoid multiple rapid calls
-              if (suggestionsDebounceTimer) {
-                clearTimeout(suggestionsDebounceTimer);
-              }
-              suggestionsDebounceTimer = setTimeout(() => {
-                suggestionsLoaded = true;
-                window.Logger?.info('🔄 Loading trade suggestions (lazy loading - section visible)', { page: "executions" });
-                loadTradeSuggestionsForAll().catch(error => {
-                  window.Logger?.warn('⚠️ Failed to load trade suggestions on section open:', error, { page: "executions" });
-                  suggestionsLoaded = false; // Allow retry
-                });
-                observer.disconnect(); // Stop observing after first load
-              }, 500); // 500ms debounce
-            }
-          });
-        }, { threshold: 0.1 }); // Trigger when 10% of section is visible
+      // Use the same logic as toggleSection to determine if section is open
+      // Add a small delay to ensure DOM is fully updated after restoreAllSectionStates
+      setTimeout(() => {
+        const sectionBody = suggestionsSection.querySelector('.section-body');
+        const computedStyle = sectionBody ? window.getComputedStyle(sectionBody) : null;
+        const displayStyle = sectionBody?.style.display;
+        const computedDisplay = computedStyle?.display;
+        const isActuallyOpen = sectionBody && 
+          displayStyle !== 'none' && 
+          computedDisplay !== 'none' &&
+          !sectionBody.classList.contains('hidden') &&
+          !suggestionsSection.classList.contains('collapsed');
         
-        observer.observe(suggestionsSection);
+        window.Logger?.info('🔍 Checking suggestions section state', {
+          displayStyle,
+          computedDisplay,
+          hasHiddenClass: sectionBody?.classList.contains('hidden'),
+          hasCollapsedClass: suggestionsSection.classList.contains('collapsed'),
+          isActuallyOpen,
+          suggestionsLoaded,
+          page: "executions"
+        });
+        
+        // If section is already open, initialize immediately
+        if (isActuallyOpen && !suggestionsLoaded) {
+          window.Logger?.info('✅ Suggestions section is open, loading...', { page: "executions" });
+          suggestionsLoaded = true;
+          loadTradeSuggestionsForAll().catch(error => {
+            window.Logger?.warn('⚠️ Failed to load trade suggestions:', error, { page: "executions" });
+            suggestionsLoaded = false; // Allow retry
+          });
+        } else if (!isActuallyOpen) {
+          window.Logger?.info('⏳ Suggestions section is closed, setting up observer...', { page: "executions" });
+          // Observer לבדיקת visibility של הסקשן - רק אחרי ש-sections שוחזרו
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              // אם הסקשן גלוי ולא טענו עדיין את הנתונים
+              if (entry.isIntersecting && !suggestionsLoaded) {
+                // Debounce to avoid multiple rapid calls
+                if (suggestionsDebounceTimer) {
+                  clearTimeout(suggestionsDebounceTimer);
+                }
+                suggestionsDebounceTimer = setTimeout(() => {
+                  suggestionsLoaded = true;
+                  window.Logger?.info('🔄 Loading trade suggestions (lazy loading - section visible)', { page: "executions" });
+                  loadTradeSuggestionsForAll().catch(error => {
+                    window.Logger?.warn('⚠️ Failed to load trade suggestions on section open:', error, { page: "executions" });
+                    suggestionsLoaded = false; // Allow retry
+                  });
+                  observer.disconnect(); // Stop observing after first load
+                }, 500); // 500ms debounce
+              }
+            });
+          }, { threshold: 0.1 }); // Trigger when 10% of section is visible
+          
+          observer.observe(suggestionsSection);
+        }
+      }, 200); // Delay to ensure DOM is fully updated after restoreAllSectionStates
+    };
+    
+    // Also listen to section toggle events to initialize when section opens
+    const handleSuggestionsSectionToggle = (event) => {
+      const sectionId = event.detail?.sectionId || event.target?.getAttribute('data-section');
+      if (sectionId === 'suggestions' && !suggestionsLoaded) {
+        const sectionBody = suggestionsSection.querySelector('.section-body');
+        const isOpen = sectionBody && 
+          sectionBody.style.display !== 'none' && 
+          !sectionBody.classList.contains('hidden') &&
+          !suggestionsSection.classList.contains('collapsed');
+        if (isOpen) {
+          setTimeout(() => {
+            suggestionsLoaded = true;
+            window.Logger?.info('🔄 Loading trade suggestions (lazy loading - section toggled open)', { page: "executions" });
+            loadTradeSuggestionsForAll().catch(error => {
+              window.Logger?.warn('⚠️ Failed to load trade suggestions:', error, { page: "executions" });
+              suggestionsLoaded = false; // Allow retry
+            });
+          }, 100);
+        }
       }
     };
     
     // Wait for sections:restored event or check if already restored
     if (window.sectionsRestored) {
+      window.Logger?.info('🔍 sectionsRestored flag is true, calling setupSuggestionsObserver immediately', { page: "executions" });
       setupSuggestionsObserver();
     } else {
-      document.addEventListener('sections:restored', setupSuggestionsObserver, { once: true });
+      window.Logger?.info('🔍 Waiting for sections:restored event...', { page: "executions" });
+      // Event is dispatched on window, not document!
+      window.addEventListener('sections:restored', setupSuggestionsObserver, { once: true });
     }
-  }
-  
-  // Wrapper ל-toggleSection עם lazy loading לסקשנים
-  if (typeof window.toggleSection === 'function') {
-    const originalToggleSection = window.toggleSection;
-    window.toggleSection = function(sectionId) {
-      const result = originalToggleSection.call(this, sectionId);
-      
-      // LAZY LOADING: טעינת נתונים כשהמשתמש פותח סקשן
-      setTimeout(() => {
-        const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
-        if (!section) return;
-        
-        const sectionBody = section.querySelector('.section-body');
-        const isOpen = sectionBody && sectionBody.style.display !== 'none' && !sectionBody.classList.contains('hidden');
-        
-        // Trade creation section - lazy loading
-        if (sectionId === 'trade-creation' && isOpen && window.PendingExecutionTradeCreation) {
-          const containerId = 'executionTradeCreationClustersContainer';
-          const container = document.getElementById(containerId);
-          
-          // אם הסקשן פתוח והקונטיינר לא מכיל נתונים, אתחל
-          if (container && (!container.children.length || container.textContent.trim() === '' || container.textContent.includes('טוען'))) {
-            if (window.PendingExecutionTradeCreation.initializeExecutionsSection) {
-              window.Logger?.info('🔄 Initializing trade creation section (lazy loading - user toggled section)', { page: "executions" });
-              window.PendingExecutionTradeCreation.initializeExecutionsSection({
-                containerId: containerId,
-                countElementId: 'executionTradeCreationClustersCount',
-                loadingElementId: 'executionTradeCreationClustersLoading',
-                emptyStateId: 'executionTradeCreationClustersEmpty',
-                errorElementId: 'executionTradeCreationClustersError'
+    
+    // Also listen to section toggle events
+    document.addEventListener('section:toggled', handleSuggestionsSectionToggle);
+    // Fallback: listen to click events on toggle buttons
+    const suggestionsToggleBtn = suggestionsSection?.querySelector('button[data-onclick*="toggleSection"]');
+    if (suggestionsToggleBtn) {
+      suggestionsToggleBtn.addEventListener('click', () => {
+        setTimeout(() => {
+          if (!suggestionsLoaded) {
+            const sectionBody = suggestionsSection.querySelector('.section-body');
+            const isOpen = sectionBody && 
+              sectionBody.style.display !== 'none' && 
+              !sectionBody.classList.contains('hidden') &&
+              !suggestionsSection.classList.contains('collapsed');
+            if (isOpen) {
+              suggestionsLoaded = true;
+              window.Logger?.info('🔄 Loading trade suggestions (lazy loading - toggle button clicked)', { page: "executions" });
+              loadTradeSuggestionsForAll().catch(error => {
+                window.Logger?.warn('⚠️ Failed to load trade suggestions:', error, { page: "executions" });
+                suggestionsLoaded = false; // Allow retry
               });
             }
           }
-        }
-        
-        // Suggestions section - lazy loading
-        if (sectionId === 'suggestions' && isOpen && typeof loadTradeSuggestionsForAll === 'function') {
-          // Check if suggestions are already loaded
-          const suggestionsTable = section.querySelector('table');
-          const hasSuggestions = suggestionsTable && suggestionsTable.querySelector('tbody') && 
-                                 suggestionsTable.querySelector('tbody').children.length > 0;
-          
-          if (!hasSuggestions) {
-            window.Logger?.info('🔄 Loading trade suggestions (lazy loading - user toggled section)', { page: "executions" });
-            loadTradeSuggestionsForAll().catch(error => {
-              window.Logger?.warn('⚠️ Failed to load trade suggestions on toggle:', error, { page: "executions" });
-            });
-          }
-        }
-      }, 100); // Small delay to ensure section is fully opened
-      
-      return result;
-    };
+        }, 200);
+      });
+    }
   }
+  
 
   // עדכון אוטומטי כל 30 שניות - הושבת זמנית למניעת לופים
   // setInterval(() => {

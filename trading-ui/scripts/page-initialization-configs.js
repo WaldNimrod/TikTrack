@@ -2630,8 +2630,33 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           window.Logger?.info('📊 Initializing Economic Calendar Page...', {
             page: 'page-initialization-configs',
           });
+          
+          // Wait for TradingViewWidgetsManager
           if (window.TradingViewWidgetsManager) {
-            await window.TradingViewWidgetsManager.init();
+            if (!window.TradingViewWidgetsManager._initialized) {
+              await window.TradingViewWidgetsManager.init();
+            }
+          }
+          
+          // Wait for cache system
+          if (window.cacheSystemReady !== undefined) {
+            let waitCount = 0;
+            while (!window.cacheSystemReady && waitCount < 50) {
+              await new Promise(resolve => setTimeout(resolve, 100));
+              waitCount++;
+            }
+          }
+          
+          // Wait for preferences
+          let prefWaitCount = 0;
+          while (!window.currentPreferences && !window.userPreferences && prefWaitCount < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            prefWaitCount++;
+          }
+          
+          // Initialize widget if economicCalendarPage is available
+          if (window.economicCalendarPage && typeof window.economicCalendarPage.initializeEconomicCalendarWidget === 'function') {
+            await window.economicCalendarPage.initializeEconomicCalendarWidget();
           }
         },
       ],
@@ -2645,16 +2670,20 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'services',
         'ui-advanced',
         'preferences',
+        'tradingview-charts',
         'init-system',
       ],
       requiredGlobals: [
         'NotificationSystem',
         'window.IconSystem',
         'window.historyWidget',
+        'window.TradingViewChartAdapter',
+        'window.TradingViewTheme',
+        'window.FieldRendererService',
       ],
       pageSpecificScripts: ['scripts/history-widget.js'],
       description: 'ווידג\'ט היסטוריה - מוקאפ',
-      lastModified: '2025-11-24',
+      lastModified: '2025-01-27',
       pageType: 'mockup',
       preloadAssets: [],
       cacheStrategy: 'standard',
@@ -2666,6 +2695,18 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           window.Logger?.info('📊 Initializing History Widget...', {
             page: 'page-initialization-configs',
           });
+          
+          // Initialize widgets after systems are ready
+          if (typeof window.historyWidget !== 'undefined' && typeof window.historyWidget.initializeWidgets === 'function') {
+            try {
+              await window.historyWidget.initializeWidgets();
+            } catch (error) {
+              window.Logger?.warn('Error initializing history widget widgets', {
+                page: 'page-initialization-configs',
+                error
+              });
+            }
+          }
         },
       ],
     },
@@ -2678,16 +2719,21 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'services',
         'ui-advanced',
         'preferences',
+        'tradingview-charts',
         'init-system',
       ],
       requiredGlobals: [
         'NotificationSystem',
         'window.IconSystem',
         'window.emotionalTrackingWidget',
+        'TradingViewChartAdapter',
+        'TradingViewTheme',
+        'window.LightweightCharts',
+        'FieldRendererService',
       ],
       pageSpecificScripts: ['scripts/emotional-tracking-widget.js'],
       description: 'ווידג\'ט תיעוד רגשי - מוקאפ',
-      lastModified: '2025-11-24',
+      lastModified: '2025-01-29',
       pageType: 'mockup',
       preloadAssets: [],
       cacheStrategy: 'standard',
@@ -2699,6 +2745,20 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           window.Logger?.info('📊 Initializing Emotional Tracking Widget...', {
             page: 'page-initialization-configs',
           });
+
+          // Wait for TradingView to be available
+          if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
+            window.Logger?.warn('⚠️ TradingView Lightweight Charts not loaded yet', {
+              page: 'page-initialization-configs',
+            });
+          }
+
+          // Initialize widgets after a short delay to ensure all systems are loaded
+          if (window.emotionalTrackingWidget && typeof window.emotionalTrackingWidget.initializeWidgets === 'function') {
+            setTimeout(() => {
+              window.emotionalTrackingWidget.initializeWidgets();
+            }, 500);
+          }
         },
       ],
     },
@@ -2712,59 +2772,40 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'ui-advanced',
         'preferences',
         'init-system',
+        'charts',
       ],
       requiredGlobals: [
         'NotificationSystem',
         'window.IconSystem',
         'window.dateComparisonModal',
+        'TradingViewChartAdapter',
+        'UnifiedCacheManager',
+        'FieldRendererService',
+        'InfoSummarySystem',
+        'PreferencesCore',
       ],
       pageSpecificScripts: ['scripts/date-comparison-modal.js'],
       description: 'מודל השוואת תאריכים - מוקאפ',
-      lastModified: '2025-11-24',
+      lastModified: '2025-01-29',
       pageType: 'mockup',
       preloadAssets: [],
       cacheStrategy: 'standard',
       requiresFilters: false,
       requiresValidation: false,
-      requiresTables: false,
+      requiresTables: true,
       customInitializers: [
         async pageConfig => {
           window.Logger?.info('📊 Initializing Date Comparison Modal...', {
             page: 'page-initialization-configs',
           });
-        },
-      ],
-    },
-
-    // Journal Entry Modal (Mockup)
-    'journal-entry-modal': {
-      name: 'Journal Entry Modal',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'preferences',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'window.journalEntryModal',
-      ],
-      pageSpecificScripts: ['scripts/journal-entry-modal.js'],
-      description: 'מודל רשומת יומן - מוקאפ',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: [],
-      cacheStrategy: 'standard',
-      requiresFilters: false,
-      requiresValidation: false,
-      requiresTables: false,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Journal Entry Modal...', {
-            page: 'page-initialization-configs',
-          });
+          
+          // Wait for all required systems
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Initialize date comparison modal if available
+          if (window.dateComparisonModal && typeof window.dateComparisonModal.initializePage === 'function') {
+            await window.dateComparisonModal.initializePage();
+          }
         },
       ],
     },

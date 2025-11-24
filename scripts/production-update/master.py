@@ -45,33 +45,99 @@ from reporter import UpdateReporter, get_reporter, set_reporter
 from rollback import RollbackManager
 
 # Import step modules
-collect_changes = load_step_module("01_collect_changes")
-merge_main = load_step_module("02_merge_main")
-cleanup_documentation = load_step_module("03_cleanup_documentation")
+# Note: Some steps may not exist - we'll handle that gracefully
+def safe_load_step(step_name):
+    """Safely load a step module, return None if not found"""
+    try:
+        return load_step_module(step_name)
+    except Exception:
+        return None
+
+# Load all step modules
+save_production_changes = safe_load_step("00_save_production_changes")
+collect_changes = safe_load_step("01_collect_changes")
+check_server = load_step_module("02_check_server")
+merge_main = safe_load_step("02_merge_main")
+merge_to_production = safe_load_step("03_merge_to_production")
 backup_database = load_step_module("04_backup_database")
 sync_code = load_step_module("05_sync_code")
-cleanup_backups = load_step_module("06_cleanup_backups")
-fix_config = load_step_module("07_fix_config")
+stop_server = load_step_module("07_stop_server")
+run_migrations = load_step_module("08_run_migrations")
+fix_config = safe_load_step("07_fix_config") or safe_load_step("09_fix_config")
+check_server_updates = load_step_module("10_check_server_updates")
+update_server = load_step_module("11_update_server")
 validate = load_step_module("08_validate")
+start_server = load_step_module("13_start_server")
+verify_stability = load_step_module("14_verify_server_stability")
 bump_version = load_step_module("09_bump_version")
 commit_push = load_step_module("10_commit_push")
-start_server = load_step_module("11_start_server")
+e2e_tests = load_step_module("17_e2e_tests")
 
 
-# Step mapping
-STEP_MODULES = {
-    1: ('collect_changes', collect_changes),
-    2: ('merge_main', merge_main),
-    3: ('cleanup_documentation', cleanup_documentation),
-    4: ('backup_database', backup_database),
-    5: ('sync_code', sync_code),
-    6: ('cleanup_backups', cleanup_backups),
-    7: ('fix_config', fix_config),
-    8: ('validate', validate),
-    9: ('bump_version', bump_version),
-    10: ('commit_push', commit_push),
-    11: ('start_server', start_server),
-}
+# Step mapping - Updated to match new plan
+STEP_MODULES = {}
+
+# Step 1: Save production changes (optional - use collect_changes if available)
+if save_production_changes:
+    STEP_MODULES[1] = ('save_production_changes', save_production_changes)
+elif collect_changes:
+    STEP_MODULES[1] = ('collect_changes', collect_changes)
+
+# Step 2: Check server
+STEP_MODULES[2] = ('check_server', check_server)
+
+# Step 3: Backup database
+STEP_MODULES[3] = ('backup_database', backup_database)
+
+# Step 4: Update main (use collect_changes or merge_main)
+if collect_changes:
+    STEP_MODULES[4] = ('update_main', collect_changes)
+elif merge_main:
+    STEP_MODULES[4] = ('merge_main', merge_main)
+
+# Step 5: Merge to production
+if merge_to_production:
+    STEP_MODULES[5] = ('merge_to_production', merge_to_production)
+elif merge_main:
+    STEP_MODULES[5] = ('merge_main', merge_main)
+
+# Step 6: Sync code
+STEP_MODULES[6] = ('sync_code', sync_code)
+
+# Step 7: Stop server
+STEP_MODULES[7] = ('stop_server', stop_server)
+
+# Step 8: Run migrations
+STEP_MODULES[8] = ('run_migrations', run_migrations)
+
+# Step 9: Fix config
+if fix_config:
+    STEP_MODULES[9] = ('fix_config', fix_config)
+
+# Step 10: Check server updates
+STEP_MODULES[10] = ('check_server_updates', check_server_updates)
+
+# Step 11: Update server
+STEP_MODULES[11] = ('update_server', update_server)
+
+# Step 12: Validate
+STEP_MODULES[12] = ('validate', validate)
+
+# Step 13: Start server
+STEP_MODULES[13] = ('start_server', start_server)
+
+# Step 14: Verify stability
+STEP_MODULES[14] = ('verify_stability', verify_stability)
+
+# Step 15: Bump version
+STEP_MODULES[15] = ('bump_version', bump_version)
+
+# Step 16: Commit and push
+STEP_MODULES[16] = ('commit_push', commit_push)
+
+# Step 17: E2E browser tests
+if e2e_tests:
+    STEP_MODULES[17] = ('e2e_tests', e2e_tests)
 
 
 class UpdateMaster:
@@ -114,24 +180,46 @@ class UpdateMaster:
     def _save_state(self):
         """Save current state"""
         self.state_file.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Convert Path objects to strings for JSON serialization
+        def convert_paths(obj):
+            if isinstance(obj, Path):
+                return str(obj)
+            elif isinstance(obj, dict):
+                return {k: convert_paths(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_paths(item) for item in obj]
+            elif isinstance(obj, tuple):
+                return tuple(convert_paths(item) for item in obj)
+            else:
+                return obj
+        
+        serializable_state = convert_paths(self.state)
         with open(self.state_file, 'w', encoding='utf-8') as f:
-            json.dump(self.state, f, indent=2)
+            json.dump(serializable_state, f, indent=2)
     
     def _get_steps_to_run(self, requested_steps: Optional[List[int]] = None,
                          skip_steps: Optional[List[int]] = None) -> List[int]:
         """Determine which steps to run"""
+        max_step = max(STEP_MODULES.keys()) if STEP_MODULES else 16
         if requested_steps:
-            steps = [s for s in requested_steps if 1 <= s <= 11]
+            steps = [s for s in requested_steps if 1 <= s <= max_step and s in STEP_MODULES]
         else:
-            steps = list(range(1, 12))
+            steps = list(STEP_MODULES.keys())
         
         if skip_steps:
             steps = [s for s in steps if s not in skip_steps]
         
         return sorted(steps)
     
-    def run_step(self, step_number: int, dry_run: bool = False) -> Dict:
-        """Run a single step"""
+    def run_step(self, step_number: int, dry_run: bool = False, previous_result: Optional[Dict] = None) -> Dict:
+        """Run a single step
+        
+        Args:
+            step_number: Step number to run
+            dry_run: If True, don't make changes
+            previous_result: Result from previous step (for passing data between steps)
+        """
         if step_number not in STEP_MODULES:
             return {'success': False, 'error': f'Invalid step number: {step_number}'}
         
@@ -143,8 +231,25 @@ class UpdateMaster:
         start_time = time.time()
         
         try:
-            # Run step
-            result = step_module.run_step(dry_run=dry_run)
+            # Run step - pass previous result if available
+            if previous_result and hasattr(step_module, 'run_step'):
+                # Try to pass previous result if step accepts it
+                import inspect
+                sig = inspect.signature(step_module.run_step)
+                if 'server_status' in sig.parameters or 'update_report' in sig.parameters or 'server_pid' in sig.parameters:
+                    # Step accepts previous result
+                    if 'server_status' in sig.parameters:
+                        result = step_module.run_step(dry_run=dry_run, server_status=previous_result)
+                    elif 'update_report' in sig.parameters:
+                        result = step_module.run_step(dry_run=dry_run, update_report=previous_result)
+                    elif 'server_pid' in sig.parameters:
+                        result = step_module.run_step(dry_run=dry_run, server_pid=previous_result.get('pid'))
+                    else:
+                        result = step_module.run_step(dry_run=dry_run)
+                else:
+                    result = step_module.run_step(dry_run=dry_run)
+            else:
+                result = step_module.run_step(dry_run=dry_run)
             
             duration = time.time() - start_time
             success = result.get('success', False)
@@ -174,6 +279,8 @@ class UpdateMaster:
             duration = time.time() - start_time
             self.logger.error(f"  ❌ Step {step_number} failed with exception: {e}")
             self.reporter.add_step(step_name, step_number, False, duration, {'error': str(e)})
+            import traceback
+            traceback.print_exc()
             return {'success': False, 'error': str(e)}
     
     def run(self, steps: Optional[List[int]] = None, skip: Optional[List[int]] = None,
@@ -219,8 +326,12 @@ class UpdateMaster:
         
         # Run steps
         all_success = True
+        previous_result = None
         for step_num in steps_to_run:
-            result = self.run_step(step_num, dry_run)
+            result = self.run_step(step_num, dry_run, previous_result=previous_result)
+            
+            # Pass result to next step if needed
+            previous_result = result
             
             if not result.get('success'):
                 all_success = False

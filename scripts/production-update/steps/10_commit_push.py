@@ -36,7 +36,7 @@ def run_step(dry_run: bool = False, commit_message: str = None) -> dict:
     logger = get_logger()
     reporter = get_reporter()
     
-    logger.step_start("Commit and Push", 10)
+    logger.step_start("Commit and Push", 16)
     
     project_root = Path(__file__).parent.parent.parent.parent
     

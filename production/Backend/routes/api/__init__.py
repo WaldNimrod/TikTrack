@@ -32,6 +32,7 @@ from .quality_lint import bp as quality_lint_bp
 from .account_activity import account_activity_bp
 from .positions import positions_bp, portfolio_bp
 from .tags import tags_bp
+from .business_logic import business_logic_bp
 
 # Base classes for unified API
 from .base_entity import BaseEntityAPI
@@ -79,6 +80,7 @@ __all__ = [
     'positions_bp',
     'portfolio_bp',
     'tags_bp',
+    'business_logic_bp',
     
     # Base classes
     'BaseEntityAPI',

@@ -8,6 +8,9 @@
     <meta http-equiv="Expires" content="0">
     <title>בדיקת TradingView Lightweight Charts - TikTrack</title>
     
+    <!-- Preconnect to CDN for faster loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
@@ -75,6 +78,9 @@
     </style>
 </head>
 <body>
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
     <div class="container-fluid mt-4">
         <div class="row">
             <div class="col-12">
@@ -84,6 +90,23 @@
                         <i class="bi bi-clipboard"></i>
                         העתק לוג מפורט
                     </button>
+                </div>
+                
+                <!-- Documentation Links -->
+                <div class="alert alert-info mb-4" role="alert">
+                    <h5 class="alert-heading">📚 תיעוד מערכת TradingView</h5>
+                    <p class="mb-2">
+                        <strong>תיעוד מלא:</strong> 
+                        <a href="../../documentation/02-ARCHITECTURE/FRONTEND/TRADINGVIEW_LIGHTWEIGHT_CHARTS/INDEX.md" target="_blank" class="alert-link">
+                            אינדקס מסמכי TradingView Lightweight Charts
+                        </a>
+                    </p>
+                    <p class="mb-0">
+                        <strong>תוכנית מימוש:</strong> 
+                        <a href="../../documentation/02-ARCHITECTURE/FRONTEND/TRADINGVIEW_LIGHTWEIGHT_CHARTS_IMPLEMENTATION_PLAN.md" target="_blank" class="alert-link">
+                            תוכנית מימוש TradingView Lightweight Charts
+                        </a>
+                    </p>
                 </div>
                 
                 <!-- Test 1: Library Loading -->
@@ -159,22 +182,25 @@
         </div>
     </div>
     
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts with defer/async for non-blocking loading -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
     
-    <!-- Preferences System (MUST BE LOADED FIRST for preferences) -->
-    <script src="../../scripts/services/preferences-data.js"></script>
-    <script src="../../scripts/preferences-core-new.js"></script>
-    <script src="../../scripts/preferences-lazy-loader.js"></script>
+    <!-- Header System (defer) -->
+    <script src="../../scripts/header-system.js" defer></script>
     
-    <!-- TradingView Lightweight Charts -->
-    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js"></script>
+    <!-- Preferences System (defer - not blocking) -->
+    <script src="../../scripts/services/preferences-data.js" defer></script>
+    <script src="../../scripts/preferences-core-new.js" defer></script>
+    <script src="../../scripts/preferences-lazy-loader.js" defer></script>
     
-    <!-- Theme System -->
-    <script src="../../scripts/charts/tradingview-theme.js"></script>
+    <!-- TradingView Lightweight Charts (defer) -->
+    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js" defer></script>
     
-    <!-- Adapter System -->
-    <script src="../../scripts/charts/tradingview-adapter.js"></script>
+    <!-- Theme System (defer) -->
+    <script src="../../scripts/charts/tradingview-theme.js" defer></script>
+    
+    <!-- Adapter System (defer) -->
+    <script src="../../scripts/charts/tradingview-adapter.js" defer></script>
     
     <!-- Test Script -->
     <script>
@@ -307,94 +333,90 @@
                         const status = document.getElementById('basic-chart-status');
                         const container = document.getElementById('basic-chart-container');
                         
-                        try {
-                            // Clear container first
-                            container.innerHTML = '';
-                            
-                            // Quick check - don't run full tests again
-                            if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
-                                status.className = 'test-status error';
-                                status.textContent = '❌ הספרייה לא נטענה - לא ניתן ליצור גרף';
-                                return false;
-                            }
-                            
-                            if (typeof window.TradingViewChartAdapter === 'undefined') {
-                                status.className = 'test-status error';
-                                status.textContent = '❌ מערכת Adapter לא עובדת - לא ניתן ליצור גרף';
-                                return false;
-                            }
-                            
-                            // Wait a bit for container to be ready
-                            setTimeout(() => {
+                        return new Promise((resolve) => {
+                            // Use requestAnimationFrame instead of setTimeout
+                            requestAnimationFrame(() => {
                                 try {
-                                    // Ensure container has dimensions
+                                    // Clear container first
+                                    container.innerHTML = '';
+                                    
+                                    // Quick checks
+                                    if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
+                                        status.className = 'test-status error';
+                                        status.textContent = '❌ הספרייה לא נטענה - לא ניתן ליצור גרף';
+                                        resolve(false);
+                                        return;
+                                    }
+                                    
+                                    if (typeof window.TradingViewChartAdapter === 'undefined') {
+                                        status.className = 'test-status error';
+                                        status.textContent = '❌ מערכת Adapter לא עובדת - לא ניתן ליצור גרף';
+                                        resolve(false);
+                                        return;
+                                    }
+                                    
+                                    // Check dimensions with ResizeObserver or immediate check
                                     if (container.clientWidth === 0 || container.clientHeight === 0) {
-                                        status.className = 'test-status error';
-                                        status.textContent = '❌ הקונטיינר לא מוכן (אין מימדים)';
-                                        return;
-                                    }
-                                    
-                                    const chart = window.TradingViewChartAdapter.createChart(container, {
-                                        width: container.clientWidth || 600,
-                                        height: container.clientHeight || 400,
-                                    });
-                                    
-                                    // Verify chart has required methods (correct API: addSeries, not addLineSeries)
-                                    if (!chart || typeof chart.addSeries !== 'function') {
-                                        status.className = 'test-status error';
-                                        status.textContent = `❌ הגרף לא נוצר נכון - חסר addSeries`;
-                                        console.error('Chart object:', chart);
-                                        console.error('Chart methods:', chart ? Object.getOwnPropertyNames(chart) : 'null');
-                                        // Try to find addSeries in prototype
-                                        if (chart && Object.getPrototypeOf(chart)) {
-                                            console.error('Chart prototype methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(chart)));
-                                        }
-                                        return;
-                                    }
-                                    
-                                    // Add a basic line series to make the chart visible
-                                    try {
-                                        const lineSeries = window.TradingViewChartAdapter.addLineSeries(chart, {
-                                            color: '#26baac',
-                                            lineWidth: 2,
+                                        // Wait for next frame if dimensions not ready
+                                        requestAnimationFrame(() => {
+                                            createChart();
                                         });
-                                        
-                                        // Add sample data
-                                        const sampleData = [
-                                            { time: '2025-01-01', value: 100 },
-                                            { time: '2025-01-02', value: 105 },
-                                            { time: '2025-01-03', value: 110 },
-                                            { time: '2025-01-04', value: 108 },
-                                            { time: '2025-01-05', value: 115 },
-                                            { time: '2025-01-06', value: 120 },
-                                            { time: '2025-01-07', value: 118 },
-                                        ];
-                                        
-                                        lineSeries.setData(sampleData);
-                                        
-                                        status.className = 'test-status success';
-                                        status.textContent = '✅ גרף בסיסי נוצר בהצלחה עם נתונים';
-                                    } catch (seriesError) {
-                                        status.className = 'test-status warning';
-                                        status.textContent = `⚠️ גרף נוצר אבל לא ניתן להוסיף series: ${seriesError.message}`;
-                                        console.error('Series Error:', seriesError);
+                                    } else {
+                                        createChart();
+                                    }
+                                    
+                                    function createChart() {
+                                        try {
+                                            const chart = window.TradingViewChartAdapter.createChart(container, {
+                                                width: container.clientWidth || 600,
+                                                height: container.clientHeight || 400,
+                                            });
+                                            
+                                            if (!chart || typeof chart.addSeries !== 'function') {
+                                                status.className = 'test-status error';
+                                                status.textContent = `❌ הגרף לא נוצר נכון - חסר addSeries`;
+                                                console.error('Chart object:', chart);
+                                                console.error('Chart methods:', chart ? Object.getOwnPropertyNames(chart) : 'null');
+                                                resolve(false);
+                                                return;
+                                            }
+                                            
+                                            // Add series and data
+                                            const lineSeries = window.TradingViewChartAdapter.addLineSeries(chart, {
+                                                color: '#26baac',
+                                                lineWidth: 2,
+                                            });
+                                            
+                                            const sampleData = [
+                                                { time: '2025-01-01', value: 100 },
+                                                { time: '2025-01-02', value: 105 },
+                                                { time: '2025-01-03', value: 110 },
+                                                { time: '2025-01-04', value: 108 },
+                                                { time: '2025-01-05', value: 115 },
+                                                { time: '2025-01-06', value: 120 },
+                                                { time: '2025-01-07', value: 118 },
+                                            ];
+                                            
+                                            lineSeries.setData(sampleData);
+                                            
+                                            status.className = 'test-status success';
+                                            status.textContent = '✅ גרף בסיסי נוצר בהצלחה עם נתונים';
+                                            resolve(true);
+                                        } catch (error) {
+                                            status.className = 'test-status error';
+                                            status.textContent = `❌ שגיאה: ${error.message}`;
+                                            console.error('Basic Chart Error:', error);
+                                            resolve(false);
+                                        }
                                     }
                                 } catch (error) {
                                     status.className = 'test-status error';
                                     status.textContent = `❌ שגיאה: ${error.message}`;
                                     console.error('Basic Chart Error:', error);
-                                    console.error('Error stack:', error.stack);
+                                    resolve(false);
                                 }
-                            }, 200);
-                            
-                            return true;
-                        } catch (error) {
-                            status.className = 'test-status error';
-                            status.textContent = `❌ שגיאה: ${error.message}`;
-                            console.error('Basic Chart Error:', error);
-                            console.error('Error stack:', error.stack);
-                            return false;
-                        }
+                            });
+                        });
                     }
                 },
                 
@@ -404,54 +426,55 @@
                         const status = document.getElementById('line-series-status');
                         const container = document.getElementById('line-series-container');
                         
-                        try {
-                            // Clear container first
-                            container.innerHTML = '';
-                            
-                            // Wait a bit for container to be ready
-                            setTimeout(() => {
+                        return new Promise((resolve) => {
+                            requestAnimationFrame(() => {
                                 try {
-                                    // Ensure container has dimensions
+                                    container.innerHTML = '';
+                                    
                                     if (container.clientWidth === 0 || container.clientHeight === 0) {
-                                        status.className = 'test-status error';
-                                        status.textContent = '❌ הקונטיינר לא מוכן (אין מימדים)';
-                                        return;
+                                        requestAnimationFrame(() => {
+                                            createChart();
+                                        });
+                                    } else {
+                                        createChart();
                                     }
                                     
-                                    const chart = window.TradingViewChartAdapter.createChart(container, {
-                                        width: container.clientWidth || 600,
-                                        height: container.clientHeight || 400,
-                                    });
-                                    const lineSeries = window.TradingViewChartAdapter.addLineSeries(chart);
-                                    
-                                    // Sample data - TradingView accepts 'YYYY-MM-DD' format
-                                    const data = [
-                                        { time: '2025-01-01', value: 100 },
-                                        { time: '2025-01-02', value: 105 },
-                                        { time: '2025-01-03', value: 110 },
-                                        { time: '2025-01-04', value: 108 },
-                                        { time: '2025-01-05', value: 115 },
-                                    ];
-                                    
-                                    lineSeries.setData(data);
-                                    
-                                    status.className = 'test-status success';
-                                    status.textContent = '✅ Line Series נוצר בהצלחה';
+                                    function createChart() {
+                                        try {
+                                            const chart = window.TradingViewChartAdapter.createChart(container, {
+                                                width: container.clientWidth || 600,
+                                                height: container.clientHeight || 400,
+                                            });
+                                            const lineSeries = window.TradingViewChartAdapter.addLineSeries(chart);
+                                            
+                                            const data = [
+                                                { time: '2025-01-01', value: 100 },
+                                                { time: '2025-01-02', value: 105 },
+                                                { time: '2025-01-03', value: 110 },
+                                                { time: '2025-01-04', value: 108 },
+                                                { time: '2025-01-05', value: 115 },
+                                            ];
+                                            
+                                            lineSeries.setData(data);
+                                            
+                                            status.className = 'test-status success';
+                                            status.textContent = '✅ Line Series נוצר בהצלחה';
+                                            resolve(true);
+                                        } catch (error) {
+                                            status.className = 'test-status error';
+                                            status.textContent = `❌ שגיאה: ${error.message}`;
+                                            console.error('Line Series Error:', error);
+                                            resolve(false);
+                                        }
+                                    }
                                 } catch (error) {
                                     status.className = 'test-status error';
                                     status.textContent = `❌ שגיאה: ${error.message}`;
                                     console.error('Line Series Error:', error);
-                                    console.error('Error stack:', error.stack);
+                                    resolve(false);
                                 }
-                            }, 200);
-                            
-                            return true;
-                        } catch (error) {
-                            status.className = 'test-status error';
-                            status.textContent = `❌ שגיאה: ${error.message}`;
-                            console.error('Line Series Error:', error);
-                            return false;
-                        }
+                            });
+                        });
                     }
                 },
                 
@@ -461,57 +484,58 @@
                         const status = document.getElementById('stepped-line-status');
                         const container = document.getElementById('stepped-line-container');
                         
-                        try {
-                            // Clear container first
-                            container.innerHTML = '';
-                            
-                            // Wait a bit for container to be ready
-                            setTimeout(() => {
+                        return new Promise((resolve) => {
+                            requestAnimationFrame(() => {
                                 try {
-                                    // Ensure container has dimensions
+                                    container.innerHTML = '';
+                                    
                                     if (container.clientWidth === 0 || container.clientHeight === 0) {
-                                        status.className = 'test-status error';
-                                        status.textContent = '❌ הקונטיינר לא מוכן (אין מימדים)';
-                                        return;
+                                        requestAnimationFrame(() => {
+                                            createChart();
+                                        });
+                                    } else {
+                                        createChart();
                                     }
                                     
-                                    const chart = window.TradingViewChartAdapter.createChart(container, {
-                                        width: container.clientWidth || 600,
-                                        height: container.clientHeight || 400,
-                                    });
-                                    const lineSeries = window.TradingViewChartAdapter.addLineSeries(chart, {
-                                        lineType: 1, // Stepped
-                                        color: '#26baac',
-                                    });
-                                    
-                                    // Sample data
-                                    const data = [
-                                        { time: '2025-01-01', value: 100 },
-                                        { time: '2025-01-02', value: 150 },
-                                        { time: '2025-01-03', value: 120 },
-                                        { time: '2025-01-04', value: 180 },
-                                        { time: '2025-01-05', value: 160 },
-                                    ];
-                                    
-                                    lineSeries.setData(data);
-                                    
-                                    status.className = 'test-status success';
-                                    status.textContent = '✅ Stepped Line נוצר בהצלחה';
+                                    function createChart() {
+                                        try {
+                                            const chart = window.TradingViewChartAdapter.createChart(container, {
+                                                width: container.clientWidth || 600,
+                                                height: container.clientHeight || 400,
+                                            });
+                                            const lineSeries = window.TradingViewChartAdapter.addLineSeries(chart, {
+                                                lineType: 1, // Stepped
+                                                color: '#26baac',
+                                            });
+                                            
+                                            const data = [
+                                                { time: '2025-01-01', value: 100 },
+                                                { time: '2025-01-02', value: 150 },
+                                                { time: '2025-01-03', value: 120 },
+                                                { time: '2025-01-04', value: 180 },
+                                                { time: '2025-01-05', value: 160 },
+                                            ];
+                                            
+                                            lineSeries.setData(data);
+                                            
+                                            status.className = 'test-status success';
+                                            status.textContent = '✅ Stepped Line נוצר בהצלחה';
+                                            resolve(true);
+                                        } catch (error) {
+                                            status.className = 'test-status error';
+                                            status.textContent = `❌ שגיאה: ${error.message}`;
+                                            console.error('Stepped Line Error:', error);
+                                            resolve(false);
+                                        }
+                                    }
                                 } catch (error) {
                                     status.className = 'test-status error';
                                     status.textContent = `❌ שגיאה: ${error.message}`;
                                     console.error('Stepped Line Error:', error);
-                                    console.error('Error stack:', error.stack);
+                                    resolve(false);
                                 }
-                            }, 200);
-                            
-                            return true;
-                        } catch (error) {
-                            status.className = 'test-status error';
-                            status.textContent = `❌ שגיאה: ${error.message}`;
-                            console.error('Stepped Line Error:', error);
-                            return false;
-                        }
+                            });
+                        });
                     }
                 },
                 
@@ -521,69 +545,71 @@
                         const status = document.getElementById('dual-axes-status');
                         const container = document.getElementById('dual-axes-container');
                         
-                        try {
-                            // Clear container first
-                            container.innerHTML = '';
-                            
-                            // Wait a bit for container to be ready
-                            setTimeout(() => {
+                        return new Promise((resolve) => {
+                            requestAnimationFrame(() => {
                                 try {
-                                    // Ensure container has dimensions
+                                    container.innerHTML = '';
+                                    
                                     if (container.clientWidth === 0 || container.clientHeight === 0) {
-                                        status.className = 'test-status error';
-                                        status.textContent = '❌ הקונטיינר לא מוכן (אין מימדים)';
-                                        return;
+                                        requestAnimationFrame(() => {
+                                            createChart();
+                                        });
+                                    } else {
+                                        createChart();
                                     }
                                     
-                                    const chart = window.TradingViewChartAdapter.createChart(container, {
-                                        width: container.clientWidth || 600,
-                                        height: container.clientHeight || 400,
-                                    });
-                                    
-                                    // Position Size - Left Scale
-                                    const positionSizeSeries = window.TradingViewChartAdapter.addLineSeries(chart, {
-                                        priceScaleId: 'left',
-                                        color: '#6c757d',
-                                        lineType: 1, // Stepped
-                                    });
-                                    
-                                    // P/L - Right Scale
-                                    const plSeries = window.TradingViewChartAdapter.addLineSeries(chart, {
-                                        priceScaleId: 'right',
-                                        color: '#26baac',
-                                        lineType: 0, // Normal
-                                    });
-                                    
-                                    // Sample data
-                                    positionSizeSeries.setData([
-                                        { time: '2025-01-01', value: 100 },
-                                        { time: '2025-01-02', value: 150 },
-                                        { time: '2025-01-03', value: 120 },
-                                    ]);
-                                    
-                                    plSeries.setData([
-                                        { time: '2025-01-01', value: 0 },
-                                        { time: '2025-01-02', value: 500 },
-                                        { time: '2025-01-03', value: 300 },
-                                    ]);
-                                    
-                                    status.className = 'test-status success';
-                                    status.textContent = '✅ Dual Y-Axes נוצר בהצלחה';
+                                    function createChart() {
+                                        try {
+                                            const chart = window.TradingViewChartAdapter.createChart(container, {
+                                                width: container.clientWidth || 600,
+                                                height: container.clientHeight || 400,
+                                            });
+                                            
+                                            // Position Size - Left Scale
+                                            const positionSizeSeries = window.TradingViewChartAdapter.addLineSeries(chart, {
+                                                priceScaleId: 'left',
+                                                color: '#6c757d',
+                                                lineType: 1, // Stepped
+                                            });
+                                            
+                                            // P/L - Right Scale
+                                            const plSeries = window.TradingViewChartAdapter.addLineSeries(chart, {
+                                                priceScaleId: 'right',
+                                                color: '#26baac',
+                                                lineType: 0, // Normal
+                                            });
+                                            
+                                            // Sample data
+                                            positionSizeSeries.setData([
+                                                { time: '2025-01-01', value: 100 },
+                                                { time: '2025-01-02', value: 150 },
+                                                { time: '2025-01-03', value: 120 },
+                                            ]);
+                                            
+                                            plSeries.setData([
+                                                { time: '2025-01-01', value: 0 },
+                                                { time: '2025-01-02', value: 500 },
+                                                { time: '2025-01-03', value: 300 },
+                                            ]);
+                                            
+                                            status.className = 'test-status success';
+                                            status.textContent = '✅ Dual Y-Axes נוצר בהצלחה';
+                                            resolve(true);
+                                        } catch (error) {
+                                            status.className = 'test-status error';
+                                            status.textContent = `❌ שגיאה: ${error.message}`;
+                                            console.error('Dual Y-Axes Error:', error);
+                                            resolve(false);
+                                        }
+                                    }
                                 } catch (error) {
                                     status.className = 'test-status error';
                                     status.textContent = `❌ שגיאה: ${error.message}`;
                                     console.error('Dual Y-Axes Error:', error);
-                                    console.error('Error stack:', error.stack);
+                                    resolve(false);
                                 }
-                            }, 200);
-                            
-                            return true;
-                        } catch (error) {
-                            status.className = 'test-status error';
-                            status.textContent = `❌ שגיאה: ${error.message}`;
-                            console.error('Dual Y-Axes Error:', error);
-                            return false;
-                        }
+                            });
+                        });
                     }
                 },
                 
@@ -744,8 +770,85 @@
                 'rtl': 'rtl'
             };
             
+            // Run single test helper
+            async function runSingleTest(testKey, test) {
+                const statusEl = document.getElementById(`${elementIdMap[testKey] || testKey}-status`);
+                const infoEl = document.getElementById(`${elementIdMap[testKey] || testKey}-info`);
+                
+                let testResult = {
+                    name: test.name,
+                    status: 'pending',
+                    message: '',
+                    info: '',
+                    error: null
+                };
+                
+                try {
+                    console.log(`Running test: ${test.name}`);
+                    let result = test.run();
+                    
+                    // Wait only for async operations (if test returns Promise)
+                    // Capture the resolved value from the Promise
+                    if (result instanceof Promise) {
+                        result = await result;
+                    }
+                    
+                    // Small delay for DOM updates (only if needed)
+                    await new Promise(r => requestAnimationFrame(r));
+                    
+                    // Use the actual result value (not the Promise object) to determine test outcome
+                    const testPassed = result ? true : false;
+                    
+                    if (testPassed) {
+                        testResults.passed++;
+                    } else {
+                        testResults.failed++;
+                    }
+                    
+                    // Update from DOM (if available, otherwise use result)
+                    if (statusEl) {
+                        testResult.status = statusEl.className.includes('success') ? 'passed' : 
+                                           statusEl.className.includes('error') ? 'failed' : 
+                                           testPassed ? 'passed' : 'failed';
+                        testResult.message = statusEl.textContent || '';
+                    } else {
+                        // No DOM status element, use result value
+                        testResult.status = testPassed ? 'passed' : 'failed';
+                    }
+                    
+                    if (infoEl && infoEl.style.display !== 'none') {
+                        testResult.info = infoEl.innerHTML || '';
+                    }
+                } catch (error) {
+                    console.error(`Test ${test.name} failed:`, error);
+                    testResults.failed++;
+                    testResult.status = 'failed';
+                    testResult.error = error.message;
+                    testResult.message = `❌ שגיאה: ${error.message}`;
+                }
+                
+                testResults.tests[testKey] = testResult;
+            }
+            
+            // Update test summary
+            function updateTestSummary() {
+                console.log(`\n📊 Test Summary:`);
+                console.log(`✅ Passed: ${testResults.passed}`);
+                console.log(`❌ Failed: ${testResults.failed}`);
+                console.log(`📈 Total: ${testResults.total}`);
+                
+                // Update summary display
+                const summaryPassed = document.getElementById('summary-passed');
+                const summaryFailed = document.getElementById('summary-failed');
+                const summaryTotal = document.getElementById('summary-total');
+                
+                if (summaryPassed) summaryPassed.textContent = `✅ עברו: ${testResults.passed}`;
+                if (summaryFailed) summaryFailed.textContent = `❌ נכשלו: ${testResults.failed}`;
+                if (summaryTotal) summaryTotal.textContent = `📈 סך הכל: ${testResults.total}`;
+            }
+            
             // Run all tests
-            async function runAllTests() {
+            async function runAllTests(preferencesPromise = null) {
                 console.log('🧪 Starting TradingView Lightweight Charts tests...');
                 
                 testResults.startTime = new Date();
@@ -753,119 +856,84 @@
                 testResults.failed = 0;
                 testResults.total = Object.keys(tests).length;
                 
-                const testKeys = Object.keys(tests);
+                // Group tests by type
+                const basicTests = ['library', 'theme', 'adapter'];
+                const chartTests = ['basicChart', 'lineSeries', 'steppedLine', 'dualAxes'];
+                const integrationTests = ['colors', 'preferences', 'rtl'];
                 
-                for (let index = 0; index < testKeys.length; index++) {
-                    const testKey = testKeys[index];
-                    const test = tests[testKey];
-                    
-                    await new Promise(resolve => {
-                        setTimeout(async () => {
-                            console.log(`Running test ${index + 1}: ${test.name}`);
-                            
-                            const statusEl = document.getElementById(`${elementIdMap[testKey] || testKey}-status`);
-                            const infoEl = document.getElementById(`${elementIdMap[testKey] || testKey}-info`);
-                            
-                            let testResult = {
-                                name: test.name,
-                                status: 'pending',
-                                message: '',
-                                info: '',
-                                error: null
-                            };
-                            
-                            try {
-                                const result = test.run();
-                                
-                                // Wait a bit for async operations
-                                await new Promise(r => setTimeout(r, 100));
-                                
-                                // Update from DOM if available
-                                if (statusEl) {
-                                    testResult.status = statusEl.className.includes('success') ? 'passed' : 
-                                                       statusEl.className.includes('error') ? 'failed' : 'pending';
-                                    testResult.message = statusEl.textContent || '';
-                                }
-                                
-                                if (infoEl && infoEl.style.display !== 'none') {
-                                    testResult.info = infoEl.innerHTML || '';
-                                }
-                                
-                                if (result) {
-                                    testResults.passed++;
-                                } else {
-                                    testResults.failed++;
-                                }
-                                
-                                testResult.status = result ? 'passed' : 'failed';
-                            } catch (error) {
-                                console.error(`Test ${test.name} failed:`, error);
-                                testResults.failed++;
-                                testResult.status = 'failed';
-                                testResult.error = error.message;
-                                testResult.message = `❌ שגיאה: ${error.message}`;
-                            }
-                            
-                            testResults.tests[testKey] = testResult;
-                            resolve();
-                        }, index * 300);
-                    });
+                // Run basic tests in parallel (immediate)
+                await Promise.all(basicTests.map(testKey => runSingleTest(testKey, tests[testKey])));
+                
+                // Wait for preferences if needed (for preferences test)
+                if (preferencesPromise && integrationTests.includes('preferences')) {
+                    await preferencesPromise;
                 }
+                
+                // Run chart tests in parallel (after DOM is ready)
+                await new Promise(resolve => requestAnimationFrame(() => {
+                    Promise.all(chartTests.map(testKey => runSingleTest(testKey, tests[testKey])))
+                        .then(() => resolve());
+                }));
+                
+                // Run integration tests in parallel
+                await Promise.all(integrationTests.map(testKey => runSingleTest(testKey, tests[testKey])));
                 
                 testResults.endTime = new Date();
                 
-                setTimeout(() => {
-                    console.log(`\n📊 Test Summary:`);
-                    console.log(`✅ Passed: ${testResults.passed}`);
-                    console.log(`❌ Failed: ${testResults.failed}`);
-                    console.log(`📈 Total: ${testResults.total}`);
-                    
-                    // Update summary display
-                    const summaryPassed = document.getElementById('summary-passed');
-                    const summaryFailed = document.getElementById('summary-failed');
-                    const summaryTotal = document.getElementById('summary-total');
-                    
-                    if (summaryPassed) summaryPassed.textContent = `✅ עברו: ${testResults.passed}`;
-                    if (summaryFailed) summaryFailed.textContent = `❌ נכשלו: ${testResults.failed}`;
-                    if (summaryTotal) summaryTotal.textContent = `📈 סך הכל: ${testResults.total}`;
-                }, 500);
+                // Update summary immediately
+                updateTestSummary();
             }
             
             // Wait for DOM, scripts, and preferences to load
             async function initializeAndRunTests() {
-                try {
-                    // Initialize preferences with lazy loading (as per documentation)
-                    if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
-                        console.log('📄 Initializing preferences with lazy loading...');
-                        await window.PreferencesCore.initializeWithLazyLoading();
-                        console.log('✅ Preferences initialized successfully');
-                        
-                        // Wait a bit for preferences to fully load
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        
-                        // Reload TradingView theme preferences after preferences are loaded
-                        if (window.TradingViewTheme && typeof window.TradingViewTheme.loadPreferences === 'function') {
-                            await window.TradingViewTheme.loadPreferences();
-                            console.log('✅ TradingView theme preferences reloaded');
+                // Start preferences loading in parallel (non-blocking)
+                const preferencesPromise = (async () => {
+                    try {
+                        if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+                            console.log('📄 Initializing preferences with lazy loading...');
+                            await window.PreferencesCore.initializeWithLazyLoading();
+                            console.log('✅ Preferences initialized successfully');
+                            
+                            // Reload TradingView theme preferences after preferences are loaded
+                            if (window.TradingViewTheme && typeof window.TradingViewTheme.loadPreferences === 'function') {
+                                await window.TradingViewTheme.loadPreferences();
+                                console.log('✅ TradingView theme preferences reloaded');
+                            }
+                            return true;
                         }
-                    } else {
-                        console.warn('⚠️ PreferencesCore.initializeWithLazyLoading not available');
+                    } catch (error) {
+                        console.warn('⚠️ Preferences initialization failed:', error);
+                        return false;
                     }
-                    
-                    // Run tests
-                    runAllTests();
-                } catch (error) {
-                    console.error('⚠️ Error during initialization, running tests anyway:', error);
-                    runAllTests();
-                }
+                    return false;
+                })();
+                
+                // Run basic tests immediately (don't wait for preferences)
+                runAllTests(preferencesPromise);
             }
             
+            // Wait for DOM and scripts to load
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => {
-                    setTimeout(initializeAndRunTests, 500);
-                });
+                document.addEventListener('DOMContentLoaded', initializeAndRunTests);
             } else {
-                setTimeout(initializeAndRunTests, 500);
+                // DOM already ready, but wait for scripts to load
+                if (window.LightweightCharts || window.lightweightCharts) {
+                    initializeAndRunTests();
+                } else {
+                    // Wait for scripts with a small timeout (max 1 second)
+                    const scriptCheckInterval = setInterval(() => {
+                        if (window.LightweightCharts || window.lightweightCharts) {
+                            clearInterval(scriptCheckInterval);
+                            initializeAndRunTests();
+                        }
+                    }, 100);
+                    
+                    // Timeout after 1 second
+                    setTimeout(() => {
+                        clearInterval(scriptCheckInterval);
+                        initializeAndRunTests();
+                    }, 1000);
+                }
             }
             
             // Override console methods to capture logs

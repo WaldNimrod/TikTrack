@@ -458,6 +458,10 @@ app.register_blueprint(users_bp)
 app.register_blueprint(background_tasks_bp)
 app.register_blueprint(entity_details_bp)
 
+# Business Logic API
+from routes.api.business_logic import business_logic_bp
+app.register_blueprint(business_logic_bp)
+
 # Register Cache Sync blueprint
 from routes.api.cache_sync import cache_sync_bp
 app.register_blueprint(cache_sync_bp)
@@ -498,11 +502,11 @@ app.register_blueprint(status_bp)
 app.register_blueprint(pages_bp)
 
 # Register Conditions System blueprints
-# Note: trading_methods_bp removed - file deleted
+from routes.api.trading_methods import trading_methods_bp
 from routes.api.plan_conditions import plan_conditions_bp
 from routes.api.trade_conditions import trade_conditions_bp
 
-# Note: trading_methods_bp removed - file deleted
+app.register_blueprint(trading_methods_bp)
 app.register_blueprint(plan_conditions_bp)
 app.register_blueprint(trade_conditions_bp)
 

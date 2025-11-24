@@ -17,7 +17,7 @@
  * - רנדור numeric badges (positive/negative/neutral)
  * - רנדור currency display (1 → US Dollar)
  * - רנדור type badges (swing, investment, passive)
- * - רנדור action badges (buy, sale)
+ * - רנדור action badges (buy, sell, short, cover)
  * - רנדור priority badges (high, medium, low)
  * - רנדור shares/quantity (תמיד עם # prefix)
  * - רנדור boolean (כן/לא עם איקונים ✓/✗)
@@ -356,7 +356,6 @@ class FieldRendererService {
             // Execution actions (buy/sell)
             'buy': 'קנייה',
             'sell': 'מכירה',
-            'sale': 'מכירה'
         };
         
         const typeLower = type.toLowerCase();
@@ -558,7 +557,7 @@ class FieldRendererService {
     /**
      * רנדור action badge (פעולה: קנייה/מכירה)
      * 
-     * @param {string} action - פעולה (buy, sale, sell)
+     * @param {string} action - פעולה (buy, sell, short, cover)
      * @param {number|null} amountForColor - סכום לקביעת צבע (חיובי/שלילי), אופציונלי
      * @returns {string} - HTML של ה-badge (עיצוב זהה ל-renderType)
      * 

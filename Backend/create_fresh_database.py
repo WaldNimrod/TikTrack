@@ -389,7 +389,7 @@ class DatabaseRecreator:
             (1, 'buy', datetime.now() - timedelta(days=5), 10, 150.00, 1.50, 'manual', 'exec_001'),
             (2, 'buy', datetime.now() - timedelta(days=10), 5, 300.00, 2.00, 'manual', 'exec_002'),
             (3, 'buy', datetime.now() - timedelta(days=15), 2, 120.00, 1.00, 'manual', 'exec_003'),
-            (3, 'sale', datetime.now() - timedelta(days=1), 2, 132.50, 1.00, 'manual', 'exec_004')
+            (3, 'sell', datetime.now() - timedelta(days=1), 2, 132.50, 1.00, 'manual', 'exec_004')
         ]
         cursor.executemany(
             "INSERT INTO executions (trade_id, action, date, quantity, price, fee, source, external_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",

@@ -9,8 +9,10 @@
 # Purpose: Start TikTrack server safely with conflict detection
 # Location: start_server.sh (project root)
 # Integration: Uses Backend/utils/server_lock_manager.py
-# NOTE: Development runs on port 8080. Use `--env production` (or run
-#       start_production.sh) for the isolated production stack on port 5001.
+# NOTE: Environment detection by directory name:
+#       - TikTrackApp-Production → Production (port 5001)
+#       - TikTrackApp → Development (port 8080)
+#       You can override with --env flag: --env production or --env development
 #
 # Database: PostgreSQL (default for development since November 2025)
 # - Automatically sets PostgreSQL environment variables if not already set
@@ -89,6 +91,12 @@ show_help() {
     echo "  --env <env>       Environment (development | production)"
     echo "                    Shorthand: --prod, --production"
     echo "  --attach          Follow live logs and keep script open (Ctrl+C exits tail)"
+    echo ""
+    echo "Environment Detection:"
+    echo "  The script automatically detects environment from workspace directory name:"
+    echo "  - TikTrackApp-Production → Production (port 5001)"
+    echo "  - TikTrackApp → Development (port 8080)"
+    echo "  You can override with --env flag if needed."
     echo ""
     echo "Description:"
     echo "  Starts TikTrack server with automatic conflict detection."
@@ -282,7 +290,10 @@ start_server() {
         export POSTGRES_PORT
     fi
 
-    nohup env POSTGRES_HOST="$POSTGRES_HOST" POSTGRES_DB="$POSTGRES_DB" POSTGRES_USER="$POSTGRES_USER" POSTGRES_PASSWORD="$POSTGRES_PASSWORD" POSTGRES_PORT="${POSTGRES_PORT:-5432}" python3 app.py >> "$OUTPUT_LOG" 2>&1 &
+    # Export TIKTRACK_ENV for Python app to detect environment
+    export TIKTRACK_ENV="$ENVIRONMENT"
+    
+    nohup env TIKTRACK_ENV="$ENVIRONMENT" POSTGRES_HOST="$POSTGRES_HOST" POSTGRES_DB="$POSTGRES_DB" POSTGRES_USER="$POSTGRES_USER" POSTGRES_PASSWORD="$POSTGRES_PASSWORD" POSTGRES_PORT="${POSTGRES_PORT:-5432}" python3 app.py >> "$OUTPUT_LOG" 2>&1 &
     SERVER_PID=$!
     popd >/dev/null
 
@@ -320,7 +331,54 @@ handle_shutdown() {
     exit 0
 }
 
+detect_environment_from_directory() {
+    # Detect environment based on workspace directory name
+    # TikTrackApp-Production → production (port 5001)
+    # TikTrackApp → development (port 8080)
+    
+    local workspace_path="$(pwd)"
+    local workspace_name="$(basename "$workspace_path")"
+    
+    # Check for Production in directory name (case-insensitive)
+    if [[ "$workspace_name" == *"Production"* ]] || [[ "$workspace_name" == *"production"* ]]; then
+        echo "production"
+        return 0
+    elif [[ "$workspace_name" == "TikTrackApp" ]]; then
+        echo "development"
+        return 0
+    else
+        # Default to development if uncertain (safer default)
+        log_warning "Could not determine environment from directory name: $workspace_name"
+        log_warning "Defaulting to development. Use --env flag to override."
+        echo "development"
+        return 0
+    fi
+}
+
 main() {
+    # Auto-detect environment from directory name if not explicitly set
+    local detected_env=""
+    local env_explicitly_set=false
+    
+    # First pass: check if --env or --production flags are provided
+    for arg in "$@"; do
+        case $arg in
+            --env|--env=*|--production|--prod)
+                env_explicitly_set=true
+                break
+                ;;
+        esac
+    done
+    
+    # If environment not explicitly set, detect from directory name
+    if [ "$env_explicitly_set" = false ]; then
+        detected_env=$(detect_environment_from_directory)
+        if [ -n "$detected_env" ]; then
+            ENVIRONMENT="$detected_env"
+            log_info "Auto-detected environment: $ENVIRONMENT (from workspace directory: $(basename "$(pwd)"))"
+        fi
+    fi
+    
     while [[ $# -gt 0 ]]; do
         case $1 in
             -h|--help)
@@ -372,6 +430,7 @@ main() {
             LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
             SERVER_PORT=5001
             DB_PATH="$SERVER_DIR/db/tiktrack.db"
+            log_info "Environment: PRODUCTION → Port: 5001"
             ;;
         development|dev|DEVELOPMENT|Dev|"")
             ENVIRONMENT="development"
@@ -380,6 +439,7 @@ main() {
             LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
             SERVER_PORT=8080
             DB_PATH="$SERVER_DIR/db/tiktrack.db"
+            log_info "Environment: DEVELOPMENT → Port: 8080"
             ;;
         *)
             log_error "Unknown environment: $ENVIRONMENT"

@@ -29,6 +29,9 @@
 > **✅ מעודכן (נובמבר 2025):** `start_server.sh` מגדיר אוטומטית PostgreSQL בסביבת פיתוח!
 
 - **שימוש**: בדיקות מקומיות, עבודה עם PostgreSQL (Docker container)
+- **זיהוי סביבה אוטומטי**: הסקריפט מזהה את הסביבה לפי שם תיקיית העבודה:
+  - `TikTrackApp` → Development (פורט 8080)
+  - `TikTrackApp-Production` → Production (פורט 5001)
 - **דרישות מוקדמות**: 
   - PostgreSQL Docker container חייב לרוץ: `docker ps | grep postgres`
   - אם לא רץ: `docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev`
@@ -36,12 +39,13 @@
   ```bash
   ./start_server.sh
   ```
-  > **✅ הסקריפט מגדיר אוטומטית משתני סביבה של PostgreSQL בסביבת פיתוח!**
+  > **✅ הסקריפט מזהה אוטומטית את הסביבה לפי שם התיקיה ומגדיר משתני סביבה של PostgreSQL!**
 - **מה הסקריפט עושה:**
-  1. בודק אם PostgreSQL container רץ (בסביבת פיתוח)
-  2. מגדיר אוטומטית משתני סביבה של PostgreSQL (אם לא מוגדרים)
-  3. בודק את בריאות ה-container
-  4. מפעיל את השרת עם ההגדרות הנכונות
+  1. מזהה את הסביבה לפי שם תיקיית העבודה (או לפי `--env`)
+  2. בודק אם PostgreSQL container רץ (בסביבת פיתוח)
+  3. מגדיר אוטומטית משתני סביבה של PostgreSQL (אם לא מוגדרים)
+  4. בודק את בריאות ה-container
+  5. מפעיל את השרת עם ההגדרות הנכונות (פורט 8080 לפיתוח, 5001 לפרודקשן)
 - **פקודות נוספות:**  
   ```bash
   ./start_server.sh --check-only   # בדיקת קונפליקטים
@@ -62,8 +66,21 @@
   > **הערה**: אם המשתנים כבר מוגדרים, הסקריפט משתמש בערכים הקיימים.
 
 ### 🏭 **שרת פרודקשן מקומי (פורט ‎5001)**
-- שימוש: סימולציה של סביבת הייצור מול `production/Backend` ו־`production/trading-ui`
-- סקריפט מומלץ (מחזיר שליטה כברירת מחדל):  
+- **שימוש**: סימולציה של סביבת הייצור מול `production/Backend` ו־`production/trading-ui`
+- **זיהוי סביבה אוטומטי**: הסקריפט מזהה את הסביבה לפי שם תיקיית העבודה:
+  - `TikTrackApp-Production` → Production (פורט 5001)
+  - `TikTrackApp` → Development (פורט 8080)
+- **סקריפט מומלץ (מחזיר שליטה כברירת מחדל):**  
+  ```bash
+  ./start_server.sh
+  ```
+  > **✅ הסקריפט מזהה אוטומטית את הסביבה לפי שם התיקיה!**
+  > 
+  > לחילופין, ניתן להשתמש ב:
+  ```bash
+  ./start_server.sh --env production
+  ```
+  או:
   ```bash
   production/start_production.sh
   ```

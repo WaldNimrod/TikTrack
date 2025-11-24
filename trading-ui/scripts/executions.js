@@ -1238,7 +1238,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
 
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = (execution.action || execution.type) === 'buy' ? 'קנייה' :
-      (execution.action || execution.type) === 'sale' ? 'מכירה' :
+      (execution.action || execution.type) === 'sell' ? 'מכירה' :
         execution.action || execution.type;
 
     // תמיד להשתמש בחשבון ישירות מהרשומה, או מהטרייד אם אין ישיר
@@ -1819,17 +1819,22 @@ window.initializeExecutionsPage = async function() {
       }
     };
     
-    // Wait for sections to be restored before initializing observers
+    // Wait for sections to be restored before initializing
     // This prevents loading data during initial page load when restoreAllSectionStates opens sections
     let tradeCreationDebounceTimer = null;
-    const setupTradeCreationObserver = () => {
+    const setupTradeCreationSection = () => {
       // Check if section is actually visible to user (not just restored state)
       const sectionBody = tradeCreationSection.querySelector('.section-body');
       const isActuallyOpen = sectionBody && sectionBody.style.display !== 'none' && !sectionBody.classList.contains('hidden');
       
-      // Only initialize if section is actually open (user-initiated, not just restored state)
-      if (!isActuallyOpen) {
-        // Observer לבדיקת visibility של הסקשן - רק אחרי ש-sections שוחזרו
+      // If section is already open, initialize immediately
+      if (isActuallyOpen && !tradeCreationInitialized) {
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          initializeTradeCreationSection();
+        }, 100);
+      } else if (!isActuallyOpen) {
+        // If section is closed, set up observer to initialize when it opens
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting && !tradeCreationInitialized) {
@@ -1851,9 +1856,9 @@ window.initializeExecutionsPage = async function() {
     
     // Wait for sections:restored event or check if already restored
     if (window.sectionsRestored) {
-      setupTradeCreationObserver();
+      setupTradeCreationSection();
     } else {
-      document.addEventListener('sections:restored', setupTradeCreationObserver, { once: true });
+      document.addEventListener('sections:restored', setupTradeCreationSection, { once: true });
     }
   }
 

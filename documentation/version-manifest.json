@@ -5,18 +5,18 @@
     "minor": 3,
     "patch": 8,
     "build": 0,
-    "commit": "61c9d24e877c8bd32c7deb0a523f3ca34f28616b",
-    "updated_at": "2025-11-23T22:27:07+00:00",
-    "notes": "Update Business Logic Phase 5 Plan: Add comprehensive validation architecture integration details"
+    "commit": "c52e595f120b222d20fcb05b126fb0b54d73f898",
+    "updated_at": "2025-11-24T14:13:24+00:00",
+    "notes": "Add comprehensive bug documentation for execution clustering issue"
   },
   "development": {
-    "version": "1.3.40.0",
+    "version": "1.3.18.0",
     "major": 1,
     "minor": 3,
-    "patch": 40,
+    "patch": 18,
     "build": 0,
-    "commit": "5499b850aae7e7abb3e452997f928c7ae2189a8b",
-    "updated_at": "2025-11-23T23:31:49+00:00",
-    "notes": "Remove deleted test result and system files from repository"
+    "commit": "e40732b7d75c83815b9a10b3e12760f180010ca9",
+    "updated_at": "2025-11-22T22:50:43+00:00",
+    "notes": "Fix account linking modal - always show interface for user confirmation"
   }
 }

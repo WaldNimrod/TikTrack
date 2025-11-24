@@ -29,7 +29,7 @@ def run_step(dry_run: bool = False) -> dict:
     logger = get_logger()
     reporter = get_reporter()
     
-    logger.step_start("Fix Production Config", 7)
+    logger.step_start("Fix Production Config", 9)
     
     project_root = Path(__file__).parent.parent.parent.parent
     production_config = project_root / "production" / "Backend" / "config"
@@ -56,7 +56,7 @@ def run_step(dry_run: bool = False) -> dict:
             checks = {
                 'IS_PRODUCTION = True': 'IS_PRODUCTION' in content and 'True' in content,
                 'PORT = 5001': 'PORT = 5001' in content,
-                'tiktrack.db': 'tiktrack.db' in content,
+                'DATABASE_URL (PostgreSQL)': 'postgresql' in content.lower() or 'DATABASE_URL' in content,
             }
             
             all_ok = True
@@ -74,11 +74,12 @@ def run_step(dry_run: bool = False) -> dict:
             # Try to import and verify
             try:
                 sys.path.insert(0, str(production_config.parent))
-                from config.settings import IS_PRODUCTION, PORT, DB_PATH, UI_DIR
+                from config.settings import IS_PRODUCTION, PORT, DATABASE_URL, UI_DIR, USING_SQLITE
                 
                 logger.info(f"    📍 IS_PRODUCTION: {IS_PRODUCTION}")
                 logger.info(f"    📍 PORT: {PORT}")
-                logger.info(f"    📍 DB_PATH: {DB_PATH}")
+                logger.info(f"    📍 DATABASE_URL: {DATABASE_URL[:50]}...")
+                logger.info(f"    📍 USING_SQLITE: {USING_SQLITE}")
                 logger.info(f"    📍 UI_DIR: {UI_DIR}")
                 
                 if IS_PRODUCTION and PORT == 5001:

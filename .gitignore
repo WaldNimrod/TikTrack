@@ -41,6 +41,10 @@ Thumbs.db
 *.swo
 *~
 
+# Server runtime artifacts (generated on server start/stop)
+**/.tiktrack_server_pid
+.tiktrack_server_pid
+
 # Additional log patterns
 *.log.*
 logs/*.log.*

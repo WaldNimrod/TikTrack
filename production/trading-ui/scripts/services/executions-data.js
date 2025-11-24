@@ -298,6 +298,103 @@
     return response.json();
   }
 
+  // ========================================================================
+  // Business Logic API Wrappers
+  // ========================================================================
+
+  /**
+   * Calculate execution values using backend business logic service.
+   * @param {Object} params - Parameters: {quantity, price, commission, action, is_edit}
+   * @returns {Promise<Object>} Calculated values: {total, label}
+   */
+  async function calculateExecutionValues(params = {}) {
+    try {
+      const response = await fetch('/api/business/execution/calculate-values', {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify(params)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result.status === 'success' && result.data) {
+        return result.data;
+      } else {
+        throw new Error(result.error?.message || 'Invalid calculation result');
+      }
+    } catch (error) {
+      window.Logger?.error?.('❌ Error calculating execution values', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      throw error;
+    }
+  }
+
+  /**
+   * Calculate average price from multiple executions using backend business logic service.
+   * @param {Array} executions - Array of execution objects with quantity and price
+   * @returns {Promise<Object>} Calculated values: {average_price, total_quantity, total_amount}
+   */
+  async function calculateAveragePrice(executions = []) {
+    try {
+      const response = await fetch('/api/business/execution/calculate-average-price', {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify({ executions })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result.status === 'success' && result.data) {
+        return result.data;
+      } else {
+        throw new Error(result.error?.message || 'Invalid calculation result');
+      }
+    } catch (error) {
+      window.Logger?.error?.('❌ Error calculating average price', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      throw error;
+    }
+  }
+
+  /**
+   * Validate execution data using backend business logic service.
+   * @param {Object} executionData - Execution data to validate
+   * @returns {Promise<Object>} Validation result: {is_valid, errors}
+   */
+  async function validateExecution(executionData) {
+    try {
+      const response = await fetch('/api/business/execution/validate', {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify(executionData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return {
+          is_valid: false,
+          errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+        };
+      }
+
+      const result = await response.json();
+      return {
+        is_valid: result.status === 'success',
+        errors: []
+      };
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating execution', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      return {
+        is_valid: false,
+        errors: [error.message || 'Validation error']
+      };
+    }
+  }
+
   window.ExecutionsData = {
     KEY: EXECUTIONS_DATA_KEY,
     TTL: EXECUTIONS_TTL,
@@ -310,6 +407,10 @@
     updateExecution,
     deleteExecution,
     fetchExecutionDetails,
+    // Business logic API wrappers
+    calculateExecutionValues,
+    calculateAveragePrice,
+    validateExecution,
   };
 
   window.Logger?.info?.('✅ Executions Data Service initialized', PAGE_LOG_CONTEXT);

@@ -18,6 +18,158 @@
     
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
+    
+    <!-- Filter Styles (same as header system) -->
+    <style>
+        .filter-group {
+            position: relative;
+        }
+        
+        .filter-dropdown {
+            position: relative;
+        }
+        
+        .filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.25rem 0.9rem;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #333;
+            width: 100%;
+            text-align: right;
+            direction: rtl;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-toggle:hover {
+            border-color: #ff9500;
+            color: #ff9500;
+            background: white;
+            box-shadow: none;
+        }
+        
+        .filter-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            display: none;
+            direction: rtl;
+        }
+        
+        .filter-group:hover .filter-menu,
+        .filter-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            display: block;
+        }
+        
+        .account-filter-item {
+            padding: 6px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .account-filter-item:hover {
+            background: #f8f9ff;
+            color: #667eea;
+        }
+        
+        .account-filter-item:last-child {
+            border-bottom: none;
+        }
+        
+        .account-filter-item.selected {
+            background-color: #f0f8ff;
+            color: #26baac;
+            font-weight: 500;
+        }
+        
+        .account-filter-item.selected::before {
+            content: "✓";
+            margin-left: 8px;
+            color: #26baac;
+            font-weight: bold;
+        }
+        
+        .date-range-filter-item {
+            padding: 6px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .date-range-filter-item:hover {
+            background: #f8f9ff;
+            color: #667eea;
+        }
+        
+        .date-range-filter-item:last-child {
+            border-bottom: none;
+        }
+        
+        .date-range-filter-item.selected {
+            background-color: #f0f8ff;
+            color: #26baac;
+            font-weight: 500;
+        }
+        
+        .date-range-filter-item.selected::before {
+            content: "✓";
+            margin-left: 8px;
+            color: #26baac;
+            font-weight: bold;
+        }
+        
+        .option-text {
+            font-weight: 500;
+        }
+        
+        .selected-value {
+            flex: 1;
+            text-align: right;
+        }
+        
+        .dropdown-arrow {
+            font-size: 0.7rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .filter-toggle:hover .dropdown-arrow {
+            transform: translateY(2px);
+        }
+    </style>
+    
+    <!-- Core Systems (Must load first) -->
+    <script src="../../scripts/logger-service.js?v=1.0.0"></script>
+    <script src="../../scripts/button-icons.js?v=1.0.0"></script>
+    
+    <!-- TradingView Lightweight Charts -->
+    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js" defer></script>
+    <script src="../../scripts/charts/tradingview-theme.js" defer></script>
+    <script src="../../scripts/charts/tradingview-adapter.js" defer></script>
+    
+    <!-- Action Buttons System -->
+    <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
 </head>
 <body class="portfolio-state-page">
     <!-- Header System -->
@@ -31,18 +183,19 @@
                     <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                         <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
                             <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
-                        </span>                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
-                <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
-                <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
-                <a href="comparative-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח השוואתי</a>
-                <a href="trading-journal-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">יומן מסחר</a>
-                <a href="strategy-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח אסטרטגיות</a>
-                <a href="economic-calendar-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">לוח כלכלי</a>
-                <a href="history-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ווידג'ט היסטוריה</a>
-                <a href="emotional-tracking-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">תיעוד רגשי</a>
-                <a href="date-comparison-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">השוואת תאריכים</a>
-                <a href="journal-entry-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">רשומת יומן</a>
-</div>
+                        </span>
+                        <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
+                        <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
+                        <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
+                        <a href="comparative-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח השוואתי</a>
+                        <a href="trading-journal-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">יומן מסחר</a>
+                        <a href="strategy-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח אסטרטגיות</a>
+                        <a href="economic-calendar-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">לוח כלכלי</a>
+                        <a href="history-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ווידג'ט היסטוריה</a>
+                        <a href="emotional-tracking-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">תיעוד רגשי</a>
+                        <a href="date-comparison-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">השוואת תאריכים</a>
+                        <a href="journal-entry-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">רשומת יומן</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -62,8 +215,7 @@
                         <div class="header-actions d-flex align-items-center gap-2">
                             <div class="table-actions">
                                 <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
-                                <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה"></button>
-                                <button data-button-type="COMPARE" data-variant="small" data-text="השווה" title="השוואת תאריכים"></button>
+                                <button data-button-type="COMPARE" data-variant="small" data-text="השווה" data-onclick="compareDates()" title="השוואת תאריכים"></button>
                                 <button data-button-type="BACK" data-variant="small" data-text="← חזור" title="חזור לדשבורד"></button>
                             </div>
                             <button class="filter-toggle-btn" onclick="toggleSection('portfolio-state-top-section')" title="הצג/הסתר סקשן">
@@ -73,163 +225,298 @@
                     </div>
                     
                     <div class="section-body">
-                        <!-- Date Selection -->
-                        <div class="mb-4">
-                            <label for="datePicker" class="form-label">בחירת תאריך:</label>
-                            <input type="date" id="datePicker" class="form-control" value="2025-01-15" style="max-width: 200px;">
+                        <!-- Filters Section -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="bi bi-funnel"></i> מסננים</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <!-- Date Range Filter -->
+                                    <div class="col-md-3">
+                                        <label class="form-label" style="font-size: 0.85rem;">טווח תאריכים</label>
+                                        <div class="filter-group date-range-filter">
+                                            <div class="filter-dropdown">
+                                                <button class="filter-toggle date-range-filter-toggle" id="dateRangeFilterToggle" onclick="toggleDateRangeFilterMenu()">
+                                                    <span class="selected-value selected-date-text" id="selectedDateRange">היום</span>
+                                                    <span class="dropdown-arrow">▼</span>
+                                                </button>
+                                                <div class="filter-menu" id="dateRangeFilterMenu">
+                                                    <div class="date-range-filter-item" data-value="כל זמן" onclick="selectDateRangeOption('כל זמן')">
+                                                        <span class="option-text">כל זמן</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="היום" onclick="selectDateRangeOption('היום')">
+                                                        <span class="option-text">היום</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="אתמול" onclick="selectDateRangeOption('אתמול')">
+                                                        <span class="option-text">אתמול</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="השבוע" onclick="selectDateRangeOption('השבוע')">
+                                                        <span class="option-text">השבוע</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="שבוע" onclick="selectDateRangeOption('שבוע')">
+                                                        <span class="option-text">שבוע (7 ימים)</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="שבוע קודם" onclick="selectDateRangeOption('שבוע קודם')">
+                                                        <span class="option-text">שבוע שעבר</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="החודש" onclick="selectDateRangeOption('החודש')">
+                                                        <span class="option-text">החודש</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="חודש" onclick="selectDateRangeOption('חודש')">
+                                                        <span class="option-text">חודש (30 יום)</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="חודש קודם" onclick="selectDateRangeOption('חודש קודם')">
+                                                        <span class="option-text">חודש קודם</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="השנה" onclick="selectDateRangeOption('השנה')">
+                                                        <span class="option-text">השנה</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="שנה" onclick="selectDateRangeOption('שנה')">
+                                                        <span class="option-text">שנה (365 ימים)</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="שנה קודמת" onclick="selectDateRangeOption('שנה קודמת')">
+                                                        <span class="option-text">שנה שעברה</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Trading Account Filter -->
+                                    <div class="col-md-3">
+                                        <label class="form-label" style="font-size: 0.85rem;">חשבון מסחר</label>
+                                        <div class="filter-group account-filter">
+                                            <div class="filter-dropdown">
+                                                <button class="filter-toggle account-filter-toggle" id="accountFilterToggle" onclick="toggleAccountFilterMenu()">
+                                                    <span class="selected-value selected-account-text" id="selectedAccount">כל חשבון מסחר</span>
+                                                    <span class="dropdown-arrow">▼</span>
+                                                </button>
+                                                <div class="filter-menu" id="accountFilterMenu">
+                                                    <div class="account-filter-item" data-value="הכול" onclick="selectAccountOption('הכול')">
+                                                        <span class="option-text">הכול</span>
+                                                    </div>
+                                                    <!-- Will be populated dynamically -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Investment Type Filter -->
+                                    <div class="col-md-3">
+                                        <label for="filterInvestmentType" class="form-label" style="font-size: 0.85rem;">סוג השקעה</label>
+                                        <select id="filterInvestmentType" class="form-select form-select-sm" onchange="applyFilters()">
+                                            <option value="">הכל</option>
+                                            <!-- Will be populated dynamically -->
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Clear Filters Button -->
+                                    <div class="col-md-3 d-flex align-items-end">
+                                        <button data-button-type="CLEAR" data-variant="small" data-text="נקה מסננים" data-onclick="clearFilters()" class="w-100"></button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Summary Cards Section -->
                         <div class="row mb-4">
+                            <!-- Cash Balance Card (Expandable) -->
                             <div class="col-md-3">
                                 <div class="compact-stat-card">
-                                    <div class="compact-stat-label">יתרות</div>
-                                    <div class="compact-stat-number">$50,000</div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="compact-stat-label">יתרות מזומן</div>
+                                            <div class="compact-stat-number" id="total-cash-balance">$50,000</div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="toggleCardDetails('cash-balance-details')" title="הצג/הסתר פרטים">
+                                            <i class="bi bi-chevron-down" id="cash-balance-chevron"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Expanded Details -->
+                                <div id="cash-balance-details" class="card mt-2" style="display: none;">
+                                    <div class="card-body" style="padding: 0.75rem;">
+                                        <h6 class="card-title" style="font-size: 0.9rem; margin-bottom: 0.5rem;">יתרות לפי חשבון:</h6>
+                                        <div id="cash-balance-by-account">
+                                            <!-- Will be populated dynamically -->
+                                        </div>
+                                        <div class="mt-2 pt-2" style="border-top: 1px solid #dee2e6;">
+                                            <strong>סה"כ:</strong> <span id="cash-balance-total">$50,000</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            
+                            <!-- Portfolio Value Card -->
                             <div class="col-md-3">
                                 <div class="compact-stat-card">
                                     <div class="compact-stat-label">שווי תיק</div>
-                                    <div class="compact-stat-number">$75,000</div>
+                                    <div class="compact-stat-number" id="total-portfolio-value">$75,000</div>
                                 </div>
                             </div>
+                            
+                            <!-- P/L Card (Expandable) -->
                             <div class="col-md-3">
                                 <div class="compact-stat-card">
-                                    <div class="compact-stat-label">P/L כולל</div>
-                                    <div class="compact-stat-number positive">$25,000</div>
-                                    <div class="compact-stat-label" style="font-size: 0.8rem; color: #28a745;">(+50%)</div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="compact-stat-label">P/L כולל</div>
+                                            <div class="compact-stat-number positive" id="total-pl">$25,000</div>
+                                            <div class="compact-stat-label" style="font-size: 0.8rem; color: #28a745;" id="pl-percentage">(+50%)</div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="toggleCardDetails('pl-details')" title="הצג/הסתר פרטים">
+                                            <i class="bi bi-chevron-down" id="pl-chevron"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- Expanded Details -->
+                                <div id="pl-details" class="card mt-2" style="display: none;">
+                                    <div class="card-body" style="padding: 0.75rem;">
+                                        <div class="mb-2">
+                                            <strong>P/L ממומש:</strong> 
+                                            <span class="text-success" id="realized-pl">$10,000</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>P/L לא ממומש:</strong> 
+                                            <span class="text-warning" id="unrealized-pl">$15,000</span>
+                                        </div>
+                                        <div class="pt-2" style="border-top: 1px solid #dee2e6;">
+                                            <strong>P/L כולל:</strong> 
+                                            <span class="text-success" id="total-pl-detail">$25,000</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            
+                            <!-- Positions Count Card (Expandable) -->
                             <div class="col-md-3">
-                                <div class="compact-stat-card">
+                                <div class="compact-stat-card" style="cursor: pointer;" onclick="toggleCardDetails('positions-details')">
                                     <div class="compact-stat-label">פוזיציות</div>
-                                    <div class="compact-stat-number">5</div>
+                                    <div class="compact-stat-number" id="total-positions-count">5</div>
+                                    <div class="compact-stat-label" style="font-size: 0.75rem; color: #6c757d; margin-top: 5px;">
+                                        <i class="bi bi-chevron-down" id="positions-chevron"></i> לחץ לפרטים
+                                    </div>
+                                </div>
+                                <!-- Expanded Details -->
+                                <div id="positions-details" class="card mt-2" style="display: none;">
+                                    <div class="card-body" style="padding: 0.75rem;">
+                                        <h6 class="card-title" style="font-size: 0.9rem; margin-bottom: 0.5rem;">פוזיציות לפי חשבון:</h6>
+                                        <div id="positions-by-account">
+                                            <!-- Will be populated dynamically -->
+                                        </div>
+                                        <div class="mt-2 pt-2" style="border-top: 1px solid #dee2e6;">
+                                            <strong>סה"כ:</strong> <span id="positions-total">5</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Positions Table Section -->
-                <div class="content-section" id="positions-table-section">
+                <!-- Charts Section (Combined) -->
+                <div class="content-section" id="charts-section">
                     <div class="section-header">
-                        <h2><i class="bi bi-table"></i> טבלת פוזיציות</h2>
+                        <h2><i class="bi bi-graph-up"></i> גרפים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('positions-table-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" onclick="toggleSection('charts-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>חשבון</th>
-                                                <th>טיקר</th>
-                                                <th>כמות</th>
-                                                <th>כיוון</th>
-                                                <th>מחיר ממוצע</th>
-                                                <th>שווי שוק</th>
-                                                <th>P/L כולל</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Acc1</td>
-                                                <td>AAPL</td>
-                                                <td>100</td>
-                                                <td><span class="badge bg-success">Long</span></td>
-                                                <td>$150</td>
-                                                <td>$15,000</td>
-                                                <td class="text-success">$1,000</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Acc1</td>
-                                                <td>TSLA</td>
-                                                <td>50</td>
-                                                <td><span class="badge bg-success">Long</span></td>
-                                                <td>$250</td>
-                                                <td>$12,500</td>
-                                                <td class="text-success">$500</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Acc2</td>
-                                                <td>MSFT</td>
-                                                <td>200</td>
-                                                <td><span class="badge bg-danger">Short</span></td>
-                                                <td>$300</td>
-                                                <td>$60,000</td>
-                                                <td class="text-danger">-$2,000</td>
-                                            </tr>
-                                        </tbody>
-                                        <tfoot>
-                                            <tr class="table-info">
-                                                <td colspan="2"><strong>סיכום:</strong></td>
-                                                <td><strong>סה"כ פוזיציות: 3</strong></td>
-                                                <td colspan="2"><strong>סה"כ שווי: $87,500</strong></td>
-                                                <td colspan="2"><strong>סה"כ P/L: -$500</strong></td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                    </div>
-                </div>
-                
-                <!-- Portfolio Value Chart Section -->
-                <div class="content-section" id="portfolio-value-chart-section">
-                    <div class="section-header">
-                        <h2><i class="bi bi-graph-up"></i> שווי תיק לאורך זמן</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('portfolio-value-chart-section')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
+                        <!-- Period Selection -->
                         <div class="mb-3">
-                            <button class="btn btn-sm btn-outline-primary">שבוע</button>
-                            <button class="btn btn-sm btn-primary">חודש</button>
-                            <button class="btn btn-sm btn-outline-primary">3 חודשים</button>
-                            <button class="btn btn-sm btn-outline-primary">שנה</button>
-                            <button class="btn btn-sm btn-outline-primary">כל הזמן</button>
+                            <button data-button-type="PERIOD" data-variant="small" data-text="שבוע" data-onclick="setChartPeriod('week', 'both', event)" class="me-2"></button>
+                            <button data-button-type="PERIOD" data-variant="small" data-text="חודש" data-onclick="setChartPeriod('month', 'both', event)" class="me-2 active"></button>
+                            <button data-button-type="PERIOD" data-variant="small" data-text="3 חודשים" data-onclick="setChartPeriod('3months', 'both', event)" class="me-2"></button>
+                            <button data-button-type="PERIOD" data-variant="small" data-text="שנה" data-onclick="setChartPeriod('year', 'both', event)" class="me-2"></button>
+                            <button data-button-type="PERIOD" data-variant="small" data-text="כל הזמן" data-onclick="setChartPeriod('all', 'both', event)" class="me-2"></button>
                         </div>
-                        <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                            [גרף שווי תיק - Line Chart]
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- P/L Trend Chart Section -->
-                <div class="content-section" id="pl-trend-chart-section">
-                    <div class="section-header">
-                        <h2><i class="bi bi-graph-up-arrow"></i> P/L לאורך זמן</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('pl-trend-chart-section')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
+                        
+                        <!-- Chart Controls -->
+                        <div class="chart-controls mb-2" style="display: flex; gap: 5px; justify-content: flex-end; align-items: center;">
+                            <button class="btn btn-sm btn-outline-secondary" id="chartZoomIn" title="זום פנימה">
+                                <i class="bi bi-zoom-in"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="chartZoomOut" title="זום החוצה">
+                                <i class="bi bi-zoom-out"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="chartReset" title="איפוס זום">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="chartPanLeft" title="תזוזה שמאלה">
+                                <i class="bi bi-arrow-left"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="chartPanRight" title="תזוזה ימינה">
+                                <i class="bi bi-arrow-right"></i>
                             </button>
                         </div>
-                    </div>
-                    <div class="section-body">
-                        <div class="mb-3">
-                            <button class="btn btn-sm btn-outline-primary">שבוע</button>
-                            <button class="btn btn-sm btn-primary">חודש</button>
-                            <button class="btn btn-sm btn-outline-primary">3 חודשים</button>
-                            <button class="btn btn-sm btn-outline-primary">שנה</button>
-                            <button class="btn btn-sm btn-outline-primary">כל הזמן</button>
+                        
+                        <!-- Combined Chart Container -->
+                        <div class="chart-container" style="height: 520px; border: 1px solid #dee2e6; border-radius: 8px; position: relative;">
+                            <div id="portfolio-value-chart-container" style="width: 100%; height: 50%; position: relative;"></div>
+                            <div id="pl-trend-chart-container" style="width: 100%; height: 50%; position: relative; border-top: 1px solid #dee2e6;"></div>
                         </div>
-                        <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                            [גרף P/L - Line Chart עם 3 קווים]
-                        </div>
+                        
+                        <!-- Chart Legend -->
                         <div class="mt-3">
-                            <span class="badge" style="background: #28a745;">● P/L ממומש</span>
-                            <span class="badge" style="background: #ffc107;">● P/L לא ממומש</span>
-                            <span class="badge" style="background: #007bff;">● P/L כולל</span>
+                            <span class="badge" style="background: #26baac; margin-left: 10px;">● שווי תיק</span>
+                            <span class="badge" style="background: #28a745; margin-left: 10px;">● P/L ממומש</span>
+                            <span class="badge" style="background: #ffc107; margin-left: 10px;">● P/L לא ממומש</span>
+                            <span class="badge" style="background: #007bff; margin-left: 10px;">● P/L כולל</span>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Comparison Section (Optional) -->
+                <!-- Trades Table Section -->
+                <div class="content-section" id="trades-table-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-table"></i> רשימת טריידים</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('trades-table-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="tradesTable">
+                                <thead>
+                                    <tr>
+                                        <th>טיקר</th>
+                                        <th>מחיר</th>
+                                        <th>שינוי</th>
+                                        <th>פוזיציה</th>
+                                        <th>P/L%</th>
+                                        <th>P/L</th>
+                                        <th>סטטוס</th>
+                                        <th>סוג</th>
+                                        <th>צד</th>
+                                        <th>חשבון</th>
+                                        <th>נוצר ב</th>
+                                        <th>נסגר ב</th>
+                                        <th class="col-actions actions-cell">
+                                            <span class="actions-header-icon">⋮</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="trades-table-body">
+                                    <!-- Will be populated dynamically -->
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-info">
+                                        <td colspan="3"><strong>סיכום:</strong></td>
+                                        <td colspan="9" id="trades-summary">-</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Comparison Section -->
                 <div class="content-section" id="comparison-section">
                     <div class="section-header">
                         <h2><i class="bi bi-arrow-left-right"></i> השוואה בין תאריכים</h2>
@@ -240,58 +527,1931 @@
                         </div>
                     </div>
                     <div class="section-body">
-                                <div class="mb-3">
-                                    <label for="datePicker2" class="form-label">תאריך שני:</label>
-                                    <input type="date" id="datePicker2" class="form-control d-inline-block" value="2025-01-10" style="max-width: 200px;">
-                                    <button class="btn btn-primary ms-2">השווה</button>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>מדד</th>
-                                                <th>תאריך 1</th>
-                                                <th>תאריך 2</th>
-                                                <th>שינוי</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>יתרות</td>
-                                                <td>$50,000</td>
-                                                <td>$48,000</td>
-                                                <td class="text-success">+$2,000 (+4.2%)</td>
-                                            </tr>
-                                            <tr>
-                                                <td>שווי תיק</td>
-                                                <td>$75,000</td>
-                                                <td>$70,000</td>
-                                                <td class="text-success">+$5,000 (+7.1%)</td>
-                                            </tr>
-                                            <tr>
-                                                <td>P/L כולל</td>
-                                                <td>$25,000</td>
-                                                <td>$22,000</td>
-                                                <td class="text-success">+$3,000 (+13.6%)</td>
-                                            </tr>
-                                            <tr>
-                                                <td>פוזיציות</td>
-                                                <td>5</td>
-                                                <td>4</td>
-                                                <td class="text-success">+1 (+25%)</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                        <div class="mb-3">
+                            <label for="datePicker2" class="form-label">תאריך להשוואה:</label>
+                            <div class="d-flex gap-2 align-items-center">
+                                <input type="date" id="datePicker2" class="form-control d-inline-block" style="max-width: 200px;">
+                                <button data-button-type="COMPARE" data-variant="small" data-text="השווה" data-onclick="compareDates()"></button>
+                                <button class="btn btn-sm btn-outline-danger" id="removeComparisonDate" onclick="removeComparisonDate()" style="display: none;">
+                                    <i class="bi bi-x-circle"></i> הסר השוואה
+                                </button>
                             </div>
+                        </div>
+                        <div class="table-responsive" id="comparison-table-wrapper" style="display: none;">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>מדד</th>
+                                        <th id="comparison-date1-header">-</th>
+                                        <th id="comparison-date2-header">-</th>
+                                        <th>שינוי</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comparison-table-body">
+                                    <!-- Will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="comparison-placeholder" class="text-muted text-center py-4">
+                            בחר תאריך להשוואה
                         </div>
                     </div>
                 </div>
+                
             </div>
         </div>
     </div>
     
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
+    
+    <!-- Bootstrap JS for Modal -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Header System -->
+    <script src="../../scripts/header-system.js" defer></script>
+    
+    <!-- Button System -->
+    <script src="../../scripts/button-system-init.js?v=1.0.0" defer></script>
+    
+    <script>
+        // Investment types from system constraints (same as database)
+        const INVESTMENT_TYPES = [
+            { value: 'swing', label: 'סווינג' },
+            { value: 'investment', label: 'השקעה' },
+            { value: 'passive', label: 'פאסיבי' }
+        ];
+        
+        let allTradingAccounts = [];
+        let portfolioValueChart = null;
+        let plTrendChart = null;
+        let currentPeriod = {
+            'both': 'month'
+        };
+        
+        // Chart synchronization
+        let isSyncingCharts = false;
+        let chartsSynchronized = false;
+        let syncSetupAttempts = 0;
+        const MAX_SYNC_SETUP_ATTEMPTS = 50;
+        
+        // Trades data
+        let allTrades = [];
+        let filteredTrades = [];
+        
+        // Helper function to get CSS variable value
+        function getCSSVariableValue(variableName, fallback) {
+            try {
+                if (typeof window !== 'undefined' && window.getComputedStyle) {
+                    const value = getComputedStyle(document.documentElement).getPropertyValue(variableName);
+                    if (value) {
+                        const trimmed = value.trim();
+                        if (trimmed) {
+                            return trimmed;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to read CSS variable', variableName, error);
+            }
+            return fallback;
+        }
+        
+        // Toggle card details
+        function toggleCardDetails(cardId) {
+            const details = document.getElementById(cardId);
+            const chevron = document.getElementById(cardId.replace('-details', '-chevron'));
+            if (details) {
+                const isVisible = details.style.display !== 'none';
+                details.style.display = isVisible ? 'none' : 'block';
+                if (chevron) {
+                    chevron.className = isVisible ? 'bi bi-chevron-down' : 'bi bi-chevron-up';
+                }
+            }
+        }
+        
+        // Load trading accounts
+        async function loadTradingAccounts() {
+            try {
+                console.log('🔧 Loading trading accounts...');
+                const response = await fetch('/api/trading-accounts/');
+                if (response.ok) {
+                    const data = await response.json();
+                    const accounts = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+                    console.log(`📊 Found ${accounts.length} accounts from API`);
+                    
+                    allTradingAccounts = accounts.map(acc => ({
+                        id: acc.id,
+                        name: acc.name || acc.account_name || `Account #${acc.id}`
+                    })).sort((a, b) => a.name.localeCompare(b.name));
+                    
+                    console.log(`✅ Processed ${allTradingAccounts.length} trading accounts:`, allTradingAccounts.map(a => a.name));
+                    
+                    // Populate account filter menu (same as header system)
+                    const accountMenu = document.getElementById('accountFilterMenu');
+                    if (accountMenu) {
+                        // Remove all items except "הכול"
+                        const existingItems = accountMenu.querySelectorAll('.account-filter-item:not([data-value="הכול"])');
+                        console.log(`🧹 Removing ${existingItems.length} existing account items`);
+                        existingItems.forEach(item => item.remove());
+                        
+                        // Add all accounts (same as header system)
+                        allTradingAccounts.forEach(account => {
+                            const accountItem = document.createElement('div');
+                            accountItem.className = 'account-filter-item';
+                            // Use account ID as data-value (same as header system)
+                            accountItem.setAttribute('data-value', account.id.toString());
+                            accountItem.onclick = () => selectAccountOption(account.id.toString());
+                            accountItem.innerHTML = `<span class="option-text">${account.name}</span>`;
+                            accountMenu.appendChild(accountItem);
+                            console.log(`✅ Added account to menu: ${account.name} (ID: ${account.id})`);
+                        });
+                        
+                        // Verify items were added
+                        const allItems = accountMenu.querySelectorAll('.account-filter-item');
+                        console.log(`📋 Total items in menu: ${allItems.length} (should be ${allTradingAccounts.length + 1} including "הכול")`);
+                        
+                        // Select all accounts by default (select "הכול")
+                        const allItem = accountMenu.querySelector('.account-filter-item[data-value="הכול"]');
+                        if (allItem) {
+                            allItem.classList.add('selected');
+                        }
+                        
+                        // Update filter text
+                        updateAccountFilterText();
+                        
+                        console.log(`✅ Loaded ${allTradingAccounts.length} trading accounts for filter`);
+                    } else {
+                        console.error('❌ accountFilterMenu not found!');
+                    }
+                } else {
+                    console.error('❌ Failed to load trading accounts:', response.status, response.statusText);
+                }
+            } catch (error) {
+                console.error('❌ Error loading trading accounts:', error);
+            }
+        }
+        
+        // Load investment types dropdown
+        function loadInvestmentTypes() {
+            const investmentSelect = document.getElementById('filterInvestmentType');
+            if (investmentSelect) {
+                investmentSelect.innerHTML = '<option value="">הכל</option>';
+                INVESTMENT_TYPES.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type.value;
+                    option.textContent = type.label;
+                    investmentSelect.appendChild(option);
+                });
+            }
+        }
+        
+        // Toggle account filter menu (same as header system)
+        function toggleAccountFilterMenu() {
+            const menu = document.getElementById('accountFilterMenu');
+            if (menu) {
+                const isCurrentlyOpen = menu.classList.contains('show');
+                if (isCurrentlyOpen) {
+                    menu.classList.remove('show');
+                } else {
+                    // Close date range menu if open
+                    const dateMenu = document.getElementById('dateRangeFilterMenu');
+                    if (dateMenu) {
+                        dateMenu.classList.remove('show');
+                    }
+                    menu.classList.add('show');
+                }
+            }
+        }
+        
+        // Toggle date range filter menu (same as header system)
+        function toggleDateRangeFilterMenu() {
+            const menu = document.getElementById('dateRangeFilterMenu');
+            if (menu) {
+                const isCurrentlyOpen = menu.classList.contains('show');
+                if (isCurrentlyOpen) {
+                    menu.classList.remove('show');
+                } else {
+                    // Close account menu if open
+                    const accountMenu = document.getElementById('accountFilterMenu');
+                    if (accountMenu) {
+                        accountMenu.classList.remove('show');
+                    }
+                    menu.classList.add('show');
+                }
+            }
+        }
+        
+        // Select date range option (same as header system)
+        function selectDateRangeOption(dateRange) {
+            const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+            dateRangeItems.forEach(item => item.classList.remove('selected'));
+            
+            const clickedItem = Array.from(dateRangeItems).find(
+                item => item.getAttribute('data-value') === dateRange
+            );
+            if (clickedItem) {
+                clickedItem.classList.add('selected');
+            }
+            
+            updateDateRangeFilterText();
+            
+            // Close menu
+            const dateMenu = document.getElementById('dateRangeFilterMenu');
+            if (dateMenu) {
+                dateMenu.classList.remove('show');
+            }
+            
+            // Apply filters
+            applyFilters();
+        }
+        
+        // Update date range filter text (same as header system)
+        function updateDateRangeFilterText() {
+            const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
+            const dateElement = document.getElementById('selectedDateRange');
+            
+            if (dateElement && selectedItem) {
+                const optionText = selectedItem.querySelector('.option-text');
+                const displayText = optionText ? optionText.textContent.trim() : selectedItem.getAttribute('data-value');
+                dateElement.textContent = displayText;
+            } else if (dateElement) {
+                dateElement.textContent = 'היום'; // Default
+            }
+        }
+        
+        // Get date range (returns start and end dates based on selected range)
+        function getDateRange() {
+            const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
+            if (!selectedItem) {
+                return { start: null, end: null, range: 'היום' }; // Default to today
+            }
+            
+            const range = selectedItem.getAttribute('data-value');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            let start = null;
+            let end = today;
+            
+            switch (range) {
+                case 'כל זמן':
+                    return { start: null, end: null, range };
+                    
+                case 'היום':
+                    start = new Date(today);
+                    break;
+                    
+                case 'אתמול':
+                    start = new Date(today);
+                    start.setDate(today.getDate() - 1);
+                    end = new Date(start);
+                    break;
+                    
+                case 'השבוע': {
+                    const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+                    start = new Date(today);
+                    start.setDate(today.getDate() - dayOfWeek);
+                    break;
+                }
+                
+                case 'שבוע':
+                    start = new Date(today);
+                    start.setDate(today.getDate() - 7);
+                    break;
+                    
+                case 'שבוע קודם': {
+                    const dayOfWeek = today.getDay();
+                    const lastWeekEnd = new Date(today);
+                    lastWeekEnd.setDate(today.getDate() - dayOfWeek - 1);
+                    end = new Date(lastWeekEnd);
+                    end.setHours(23, 59, 59, 999);
+                    start = new Date(lastWeekEnd);
+                    start.setDate(lastWeekEnd.getDate() - 6);
+                    start.setHours(0, 0, 0, 0);
+                    break;
+                }
+                
+                case 'החודש': {
+                    start = new Date(today.getFullYear(), today.getMonth(), 1);
+                    break;
+                }
+                
+                case 'חודש':
+                    start = new Date(today);
+                    start.setDate(today.getDate() - 30);
+                    break;
+                    
+                case 'חודש קודם': {
+                    const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                    const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+                    start = lastMonthStart;
+                    end = lastMonthEnd;
+                    end.setHours(23, 59, 59, 999);
+                    break;
+                }
+                
+                case 'השנה': {
+                    start = new Date(today.getFullYear(), 0, 1);
+                    break;
+                }
+                
+                case 'שנה':
+                    start = new Date(today);
+                    start.setDate(today.getDate() - 365);
+                    break;
+                    
+                case 'שנה קודמת': {
+                    const lastYearStart = new Date(today.getFullYear() - 1, 0, 1);
+                    const lastYearEnd = new Date(today.getFullYear() - 1, 11, 31);
+                    start = lastYearStart;
+                    end = lastYearEnd;
+                    end.setHours(23, 59, 59, 999);
+                    break;
+                }
+            }
+            
+            if (start) {
+                start.setHours(0, 0, 0, 0);
+            }
+            if (end) {
+                end.setHours(23, 59, 59, 999);
+            }
+            
+            return { start, end, range };
+        }
+        
+        // Check if date is in range
+        function isDateInRange(dateString, dateRange) {
+            if (!dateString || !dateRange || dateRange === 'כל זמן') {
+                return true;
+            }
+            
+            const date = new Date(dateString);
+            const { start, end } = getDateRange();
+            
+            if (!start && !end) {
+                return true; // כל זמן
+            }
+            
+            date.setHours(0, 0, 0, 0);
+            
+            if (start && end) {
+                return date >= start && date <= end;
+            } else if (start) {
+                return date >= start;
+            } else if (end) {
+                return date <= end;
+            }
+            
+            return true;
+        }
+        
+        // Select account option (same as header system)
+        function selectAccountOption(account) {
+            const accountStr = account.toString();
+            const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
+            const clickedItem = Array.from(accountItems).find(
+                item => item.getAttribute('data-value') === accountStr
+            );
+            
+            if (clickedItem) {
+                if (accountStr === 'הכול') {
+                    accountItems.forEach(item => item.classList.remove('selected'));
+                    clickedItem.classList.add('selected');
+                } else {
+                    const allItem = Array.from(accountItems).find(
+                        item => item.getAttribute('data-value') === 'הכול'
+                    );
+                    if (allItem) {
+                        allItem.classList.remove('selected');
+                    }
+                    clickedItem.classList.toggle('selected');
+                    
+                    const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
+                    if (selectedItems.length === 0 && allItem) {
+                        allItem.classList.add('selected');
+                    }
+                }
+            } else {
+                console.warn('⚠️ Account item not found for:', accountStr);
+            }
+            
+            updateAccountFilterText();
+            
+            // Close menu
+            const accountMenu = document.getElementById('accountFilterMenu');
+            if (accountMenu) {
+                accountMenu.classList.remove('show');
+            }
+            
+            // Apply filters
+            applyFilters();
+        }
+        
+        // Update account filter text (same as header system)
+        function updateAccountFilterText() {
+            const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
+            const accountElement = document.getElementById('selectedAccount');
+            
+            if (accountElement) {
+                if (selectedItems.length === 0 || 
+                    (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
+                    accountElement.textContent = 'כל חשבון מסחר';
+                } else if (selectedItems.length === 1) {
+                    const optionText = selectedItems[0].querySelector('.option-text');
+                    const displayText = optionText ? optionText.textContent.trim() : selectedItems[0].getAttribute('data-value');
+                    accountElement.textContent = displayText;
+                } else {
+                    accountElement.textContent = `${selectedItems.length} חשבונות`;
+                }
+            }
+        }
+        
+        // Get selected accounts from filter (same as header system)
+        function getSelectedAccounts() {
+            const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
+            const selectedIds = Array.from(selectedItems)
+                .map(item => item.getAttribute('data-value'))
+                .filter(value => value !== 'הכול');
+            
+            // If no accounts selected or "הכול" is selected, return all account IDs
+            if (selectedIds.length === 0 || 
+                Array.from(selectedItems).some(item => item.getAttribute('data-value') === 'הכול')) {
+                return allTradingAccounts.map(acc => acc.id.toString());
+            }
+            
+            return selectedIds;
+        }
+        
+        function applyFilters() {
+            // Update account filter text
+            updateAccountFilterText();
+            
+            // Reload portfolio state with filters (this will filter trades, update charts and summary)
+            loadPortfolioState();
+        }
+        
+        // Filter trades based on filters
+        function filterTrades(dateRange, selectedAccounts, investmentType) {
+            const { start, end, range } = getDateRange();
+            
+            filteredTrades = allTrades.filter(trade => {
+                // Date range filter - check if trade was active during the selected range
+                if (range && range !== 'כל זמן') {
+                    const createdDate = trade.created_at ? new Date(trade.created_at) : null;
+                    const closedDate = trade.closed_at ? new Date(trade.closed_at) : null;
+                    
+                    // Trade must be created before or on the end date
+                    if (end && createdDate && createdDate > end) {
+                        return false;
+                    }
+                    
+                    // If trade is closed, it must be closed after or on the start date
+                    if (start && closedDate && closedDate < start) {
+                        return false;
+                    }
+                    
+                    // Trade must be active during the range
+                    // If trade is still open, it's active if created before/on end
+                    // If trade is closed, it must overlap with the range
+                    if (closedDate && start && closedDate < start) {
+                        return false;
+                    }
+                    if (createdDate && end && createdDate > end) {
+                        return false;
+                    }
+                }
+                
+                // Account filter - if accounts selected, trade must be in one of them
+                if (selectedAccounts && selectedAccounts.length > 0) {
+                    const accountId = trade.trading_account_id?.toString();
+                    if (!selectedAccounts.includes(accountId)) {
+                        return false;
+                    }
+                }
+                
+                // Investment type filter
+                if (investmentType && trade.investment_type !== investmentType) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            // Update trades table
+            updateTradesTable();
+        }
+        
+        // Clear filters
+        function clearFilters() {
+            // Reset date range to "היום" (today) - same as header system
+            const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+            dateRangeItems.forEach(item => item.classList.remove('selected'));
+            const todayItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item[data-value="היום"]');
+            if (todayItem) {
+                todayItem.classList.add('selected');
+            }
+            updateDateRangeFilterText();
+            
+            // Select "הכול" (all accounts) - same as header system
+            const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
+            accountItems.forEach(item => item.classList.remove('selected'));
+            const allItem = document.querySelector('#accountFilterMenu .account-filter-item[data-value="הכול"]');
+            if (allItem) {
+                allItem.classList.add('selected');
+            }
+            
+            // Reset investment type
+            document.getElementById('filterInvestmentType').value = '';
+            
+            // Update filter texts
+            updateAccountFilterText();
+            
+            // Apply filters to reload data
+            applyFilters();
+        }
+        
+        // Helper function to render numeric value (fallback)
+        function renderNumericValue(value, suffix = '%', showSign = true) {
+            if (window.FieldRendererService?.renderNumericValue) {
+                return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
+            }
+            const sign = showSign && value >= 0 ? '+' : '';
+            const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
+            return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
+        }
+        
+        // Load chart default period from preferences
+        async function loadChartDefaultPeriod() {
+            try {
+                let chartPrefs = null;
+                
+                // Try multiple methods to load preferences
+                if (typeof window.getGroupPreferences === 'function') {
+                    try {
+                        chartPrefs = await window.getGroupPreferences('ui').catch(() => null);
+                    } catch (e) {
+                        console.warn('Error loading preferences via getGroupPreferences:', e);
+                    }
+                }
+                
+                // Fallback: Try PreferencesCore
+                if (!chartPrefs && window.PreferencesCore) {
+                    try {
+                        chartPrefs = await window.PreferencesCore.loadGroupPreferences('ui').catch(() => null);
+                    } catch (e) {
+                        console.warn('Error loading preferences via PreferencesCore:', e);
+                    }
+                }
+                
+                // Fallback: Try PreferencesData
+                if (!chartPrefs && window.PreferencesData) {
+                    try {
+                        chartPrefs = await window.PreferencesData.loadPreferenceGroup({ groupName: 'ui' }).catch(() => null);
+                    } catch (e) {
+                        console.warn('Error loading preferences via PreferencesData:', e);
+                    }
+                }
+                
+                // Get default period from preferences
+                const uiPrefsData = chartPrefs?.data?.preferences || chartPrefs?.preferences || {};
+                const chartPrefsData = uiPrefsData.charts || {};
+                const defaultPeriod = chartPrefsData.defaultPeriod || '1M';
+                
+                // Map period to button
+                const periodMap = {
+                    '1W': 'week',
+                    '1M': 'month',
+                    '3M': '3months',
+                    '1Y': 'year',
+                    'ALL': 'all'
+                };
+                
+                const periodButton = periodMap[defaultPeriod] || 'month';
+                
+                // Set active button
+                document.querySelectorAll('[data-onclick*="setChartPeriod"]').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.getAttribute('data-onclick').includes(`'${periodButton}'`)) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                // Load chart with default period
+                if (periodButton) {
+                    await setChartPeriod(periodButton, 'both', null);
+                }
+            } catch (error) {
+                console.warn('Could not load chart default period from preferences:', error);
+                // Default to month if preferences fail
+                document.querySelectorAll('[data-onclick*="setChartPeriod(\'month\'"]').forEach(btn => {
+                    btn.classList.add('active');
+                });
+            }
+        }
+        
+        // Load portfolio state
+        async function loadPortfolioState() {
+            const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
+            const dateRange = selectedItem ? selectedItem.getAttribute('data-value') : 'היום';
+            const selectedAccounts = getSelectedAccounts();
+            const investmentType = document.getElementById('filterInvestmentType').value;
+            
+            // Load trades from API (only if not already loaded or date range changed)
+            await loadTrades(dateRange, selectedAccounts, investmentType);
+            
+            // Filter trades based on current filters
+            filterTrades(dateRange, selectedAccounts, investmentType);
+            
+            // Calculate summary from filtered trades
+            const summary = calculateSummaryFromTrades(filteredTrades);
+            updateSummaryCards(summary);
+            
+            // Reload charts with filtered data (both together)
+            await Promise.all([
+                initPortfolioValueChart(),
+                initPLTrendChart()
+            ]);
+            
+            // Setup chart controls after charts are ready
+            setTimeout(() => {
+                setupChartControls();
+            }, 500);
+        }
+        
+        // Load trades from API
+        async function loadTrades(dateRange, selectedAccounts, investmentType) {
+            try {
+                // TODO: Load from API endpoint /api/daily-snapshots/{date}/trades
+                // For now, using mock data
+                // In production, this should fetch from: /api/daily-snapshots/{date}/trades?account_id={accountId}&investment_type={investmentType}
+                allTrades = [
+                    {
+                        id: 1,
+                        ticker_symbol: 'AAPL',
+                        ticker_id: 1,
+                        trading_account_id: 1,
+                        account_name: 'Account #1',
+                        current_price: 150.50,
+                        daily_change: 2.5,
+                        position_quantity: 100,
+                        position_pl_percent: 6.67,
+                        position_pl_value: 1000,
+                        status: 'open',
+                        investment_type: 'swing',
+                        side: 'Long',
+                        created_at: '2025-01-10',
+                        closed_at: null
+                    },
+                    {
+                        id: 2,
+                        ticker_symbol: 'TSLA',
+                        ticker_id: 2,
+                        trading_account_id: 1,
+                        account_name: 'Account #1',
+                        current_price: 250.00,
+                        daily_change: -1.2,
+                        position_quantity: 50,
+                        position_pl_percent: 4.00,
+                        position_pl_value: 500,
+                        status: 'open',
+                        investment_type: 'day',
+                        side: 'Long',
+                        created_at: '2025-01-12',
+                        closed_at: null
+                    },
+                    {
+                        id: 3,
+                        ticker_symbol: 'MSFT',
+                        ticker_id: 3,
+                        trading_account_id: 2,
+                        account_name: 'Account #2',
+                        current_price: 300.00,
+                        daily_change: 0.5,
+                        position_quantity: 200,
+                        position_pl_percent: -3.33,
+                        position_pl_value: -2000,
+                        status: 'open',
+                        investment_type: 'investment',
+                        side: 'Short',
+                        created_at: '2025-01-08',
+                        closed_at: null
+                    },
+                    {
+                        id: 4,
+                        ticker_symbol: 'GOOGL',
+                        ticker_id: 4,
+                        trading_account_id: 2,
+                        account_name: 'Account #2',
+                        current_price: 140.00,
+                        daily_change: 1.5,
+                        position_quantity: 75,
+                        position_pl_percent: 5.00,
+                        position_pl_value: 525,
+                        status: 'open',
+                        investment_type: 'swing',
+                        side: 'Long',
+                        created_at: '2025-01-05',
+                        closed_at: null
+                    }
+                ];
+            } catch (error) {
+                console.error('Error loading trades:', error);
+                allTrades = [];
+            }
+        }
+        
+        // Calculate summary from trades
+        function calculateSummaryFromTrades(trades) {
+            const cashBalanceByAccount = {};
+            let totalCashBalance = 0;
+            let totalPortfolioValue = 0;
+            let totalRealizedPL = 0;
+            let totalUnrealizedPL = 0;
+            const positionsCountByAccount = {};
+            
+            trades.forEach(trade => {
+                const accountId = trade.trading_account_id;
+                const accountName = trade.account_name || `Account #${accountId}`;
+                
+                // Cash balance (mock - should come from snapshot)
+                if (!cashBalanceByAccount[accountId]) {
+                    cashBalanceByAccount[accountId] = {
+                        account_id: accountId,
+                        account_name: accountName,
+                        balance: 20000 // Mock
+                    };
+                    totalCashBalance += 20000;
+                }
+                
+                // Portfolio value (from position)
+                if (trade.position_pl_value) {
+                    totalUnrealizedPL += trade.position_pl_value;
+                }
+                
+                // Positions count
+                if (!positionsCountByAccount[accountId]) {
+                    positionsCountByAccount[accountId] = {
+                        account_id: accountId,
+                        count: 0
+                    };
+                }
+                positionsCountByAccount[accountId].count++;
+            });
+            
+            totalPortfolioValue = totalCashBalance + totalUnrealizedPL;
+            totalRealizedPL = 0; // Should come from closed trades
+            const totalPL = totalRealizedPL + totalUnrealizedPL;
+            
+            return {
+                total_cash_balance: totalCashBalance,
+                cash_balance_by_account: Object.values(cashBalanceByAccount),
+                total_portfolio_value: totalPortfolioValue,
+                total_realized_pl: totalRealizedPL,
+                total_unrealized_pl: totalUnrealizedPL,
+                total_pl: totalPL,
+                open_positions_count: trades.length,
+                positions_count_by_account: Object.values(positionsCountByAccount)
+            };
+        }
+        
+        // Update trades table
+        function updateTradesTable() {
+            const tbody = document.getElementById('trades-table-body');
+            if (!tbody) return;
+            
+            if (filteredTrades.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="13" class="text-center text-muted">אין טריידים להצגה</td></tr>';
+                document.getElementById('trades-summary').textContent = 'אין טריידים';
+                return;
+            }
+            
+            tbody.innerHTML = filteredTrades.map(trade => {
+                // Use FieldRendererService if available
+                const renderStatus = window.FieldRendererService?.renderStatus 
+                    ? window.FieldRendererService.renderStatus(trade.status, 'trade')
+                    : `<span class="badge bg-${trade.status === 'open' ? 'success' : trade.status === 'closed' ? 'secondary' : 'danger'}">${trade.status === 'open' ? 'פתוח' : trade.status === 'closed' ? 'סגור' : 'מבוטל'}</span>`;
+                
+                const renderType = window.FieldRendererService?.renderType
+                    ? window.FieldRendererService.renderType(trade.investment_type)
+                    : `<span class="badge">${INVESTMENT_TYPES.find(t => t.value === trade.investment_type)?.label || trade.investment_type}</span>`;
+                
+                const renderSide = window.FieldRendererService?.renderSide
+                    ? window.FieldRendererService.renderSide(trade.side)
+                    : `<span class="badge bg-${trade.side === 'Long' ? 'success' : 'danger'}">${trade.side}</span>`;
+                
+                const renderAmount = (value, currency = '$') => {
+                    if (window.FieldRendererService?.renderAmount) {
+                        return window.FieldRendererService.renderAmount(value, currency, 2);
+                    }
+                    return `${currency}${value.toFixed(2)}`;
+                };
+                
+                const renderNumericValue = (value, suffix = '%', showSign = true) => {
+                    if (window.FieldRendererService?.renderNumericValue) {
+                        return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
+                    }
+                    const sign = showSign && value >= 0 ? '+' : '';
+                    const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
+                    return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
+                };
+                
+                const formatDate = (dateStr) => {
+                    if (!dateStr) return '-';
+                    if (window.FieldRendererService?.renderDate) {
+                        return window.FieldRendererService.renderDate(dateStr, false);
+                    }
+                    if (window.dateUtils?.formatDate) {
+                        return window.dateUtils.formatDate(dateStr, { includeTime: false });
+                    }
+                    try {
+                        const date = new Date(dateStr);
+                        return date.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    } catch {
+                        return dateStr;
+                    }
+                };
+                
+                return `
+                    <tr>
+                        <td><strong>${trade.ticker_symbol || 'טיקר לא ידוע'}</strong></td>
+                        <td>${renderAmount(trade.current_price || 0)}</td>
+                        <td>${renderNumericValue(trade.daily_change || 0, '%')}</td>
+                        <td>${trade.position_quantity || 0}</td>
+                        <td>${renderNumericValue(trade.position_pl_percent || 0, '%')}</td>
+                        <td>${renderNumericValue(trade.position_pl_value || 0, '$')}</td>
+                        <td>${renderStatus}</td>
+                        <td>${renderType}</td>
+                        <td>${renderSide}</td>
+                        <td>${trade.account_name || `Account #${trade.trading_account_id}`}</td>
+                        <td>${formatDate(trade.created_at)}</td>
+                        <td>${formatDate(trade.closed_at)}</td>
+                        <td class="col-actions actions-cell" data-entity-id="${trade.id}" data-entity-type="trade" data-status="${trade.status || 'open'}"></td>
+                    </tr>
+                `;
+            }).join('');
+            
+            // Update summary
+            const totalPL = filteredTrades.reduce((sum, t) => sum + (t.position_pl_value || 0), 0);
+            const summaryElement = document.getElementById('trades-summary');
+            if (summaryElement) {
+                summaryElement.innerHTML = `
+                    <strong>סה"כ טריידים: ${filteredTrades.length}</strong> | 
+                    <strong>סה"כ P/L: ${renderNumericValue(totalPL, '$')}</strong>
+                `;
+            }
+            
+            // Load action buttons
+            if (window.loadTableActionButtons) {
+                window.loadTableActionButtons('tradesTable', 'trade', {
+                    showDetails: true,
+                    showLinked: true,
+                    showEdit: true,
+                    showDelete: false // Trades shouldn't be deleted from this page
+                });
+            }
+        }
+        
+        // Update summary cards
+        function updateSummaryCards(data) {
+            // Cash balance
+            document.getElementById('total-cash-balance').textContent = formatCurrency(data.total_cash_balance);
+            document.getElementById('cash-balance-total').textContent = formatCurrency(data.total_cash_balance);
+            
+            // Cash balance by account
+            const cashByAccount = document.getElementById('cash-balance-by-account');
+            if (cashByAccount && data.cash_balance_by_account) {
+                cashByAccount.innerHTML = data.cash_balance_by_account.map(acc => `
+                    <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
+                        <span>${acc.account_name}:</span>
+                        <span>${formatCurrency(acc.balance)}</span>
+                    </div>
+                `).join('');
+            }
+            
+            // Portfolio value
+            document.getElementById('total-portfolio-value').textContent = formatCurrency(data.total_portfolio_value);
+            
+            // P/L
+            document.getElementById('total-pl').textContent = formatCurrency(data.total_pl);
+            document.getElementById('total-pl-detail').textContent = formatCurrency(data.total_pl);
+            document.getElementById('realized-pl').textContent = formatCurrency(data.total_realized_pl);
+            document.getElementById('unrealized-pl').textContent = formatCurrency(data.total_unrealized_pl);
+            
+            // Calculate P/L percentage with zero-division check
+            const denominator = data.total_portfolio_value - data.total_pl;
+            let plPercent;
+            if (denominator === 0 || !denominator || isNaN(denominator)) {
+                // Fallback: if denominator is zero, show 0% or '-' if total_pl is also zero
+                plPercent = data.total_pl === 0 || !data.total_pl ? '-' : '0.0';
+            } else {
+                plPercent = ((data.total_pl / denominator) * 100).toFixed(1);
+            }
+            
+            // Display P/L percentage
+            if (plPercent === '-') {
+                document.getElementById('pl-percentage').textContent = '(-)';
+                document.getElementById('pl-percentage').style.color = '#6c757d';
+            } else {
+                const plPercentNum = parseFloat(plPercent);
+                document.getElementById('pl-percentage').textContent = `(${plPercentNum >= 0 ? '+' : ''}${plPercent}%)`;
+                document.getElementById('pl-percentage').style.color = plPercentNum >= 0 ? '#28a745' : '#dc3545';
+            }
+            
+            // Positions count
+            document.getElementById('total-positions-count').textContent = data.open_positions_count;
+            document.getElementById('positions-total').textContent = data.open_positions_count;
+            
+            // Positions by account
+            const positionsByAccount = document.getElementById('positions-by-account');
+            if (positionsByAccount && data.positions_count_by_account) {
+                positionsByAccount.innerHTML = data.positions_count_by_account.map(acc => {
+                    const accountName = allTradingAccounts.find(a => a.id === acc.account_id)?.name || `Account #${acc.account_id}`;
+                    return `
+                        <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
+                            <span>${accountName}:</span>
+                            <span>${acc.count}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+        
+        // Format currency
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+        
+        // Get lighter color for percentage series
+        function getLighterColor(color, amount = 0.3) {
+            if (!color) return 'rgba(128, 128, 128, 0.5)';
+            const hex = color.replace('#', '');
+            if (hex.length !== 6) return color;
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            return `rgba(${r}, ${g}, ${b}, ${amount})`;
+        }
+        
+        // Set chart period
+        function setChartPeriod(period, chartType, event = null) {
+            currentPeriod[chartType] = period;
+            
+            // Update button states - find the button that was clicked
+            let activeButton = null;
+            
+            // Try to get button from event if provided
+            if (event && event.target) {
+                activeButton = event.target.closest('button');
+            }
+            
+            // If no button from event, find it by the period value in data-onclick
+            if (!activeButton) {
+                const buttons = document.querySelectorAll(`[data-onclick*="setChartPeriod('${period}'"]`);
+                activeButton = buttons.length > 0 ? buttons[0] : null;
+            }
+            
+            // Remove active class from all period buttons
+            document.querySelectorAll(`[data-onclick*="setChartPeriod"]`).forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to the clicked button
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
+            
+            // Reload charts
+            if (chartType === 'both') {
+                initPortfolioValueChart();
+                initPLTrendChart();
+            } else if (chartType === 'portfolio-value') {
+                initPortfolioValueChart();
+            } else if (chartType === 'pl-trend') {
+                initPLTrendChart();
+            }
+        }
+        
+        // Initialize Portfolio Value Chart
+        async function initPortfolioValueChart() {
+            const container = document.getElementById('portfolio-value-chart-container');
+            if (!container) {
+                console.warn('Portfolio value chart container not found');
+                return;
+            }
+            
+            // Wait for TradingView to be available with better error handling
+            let retries = 0;
+            const maxRetries = 100; // Increased timeout for defer scripts
+            while ((typeof window.TradingViewChartAdapter === 'undefined' || 
+                    (typeof window.LightweightCharts === 'undefined' && 
+                     typeof window.lightweightCharts === 'undefined')) && 
+                   retries < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+                retries++;
+            }
+            
+            if (typeof window.TradingViewChartAdapter === 'undefined') {
+                console.error('❌ TradingViewChartAdapter not available after', maxRetries * 50, 'ms');
+                console.error('Available window objects:', Object.keys(window).filter(k => k.toLowerCase().includes('chart') || k.toLowerCase().includes('trading')));
+                return;
+            }
+            
+            if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
+                console.error('❌ LightweightCharts library not available');
+                return;
+            }
+            
+            // Destroy existing chart
+            if (portfolioValueChart && typeof window.TradingViewChartAdapter.destroyChart === 'function') {
+                try {
+                    window.TradingViewChartAdapter.destroyChart(portfolioValueChart);
+                } catch (e) {
+                    console.warn('Error destroying portfolio value chart:', e);
+                }
+                portfolioValueChart = null;
+            }
+            
+            try {
+                const primaryColor = getCSSVariableValue('--primary-color', '#26baac');
+                
+                // Ensure container has proper dimensions
+                const containerWidth = container.clientWidth || container.offsetWidth || 800;
+                const containerHeight = container.clientHeight || container.offsetHeight || 200;
+                
+                if (containerWidth === 0 || containerHeight === 0) {
+                    console.warn('Portfolio value chart container has zero dimensions, waiting...');
+                    setTimeout(() => initPortfolioValueChart(), 100);
+                    return;
+                }
+                
+                portfolioValueChart = window.TradingViewChartAdapter.createChart(container, {
+                    width: containerWidth,
+                    height: containerHeight,
+                    layout: {
+                        textColor: getCSSVariableValue('--text-color', '#212529'),
+                        background: { type: 'solid', color: getCSSVariableValue('--card-background', '#ffffff') }
+                    },
+                    grid: {
+                        vertLines: { color: '#f0f0f0' },
+                        horzLines: { color: '#f0f0f0' }
+                    },
+                    timeScale: {
+                        timeVisible: true,
+                        secondsVisible: false
+                    },
+                    rightPriceScale: {
+                        visible: true,
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    },
+                    leftPriceScale: {
+                        visible: true,
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    },
+                    crosshair: {
+                        mode: 1, // Normal mode - shows crosshair with tooltip
+                        vertLine: {
+                            color: '#6A5ACD',
+                            width: 1,
+                            style: 0,
+                            labelBackgroundColor: '#6A5ACD'
+                        },
+                        horzLine: {
+                            color: '#6A5ACD',
+                            width: 1,
+                            style: 0,
+                            labelBackgroundColor: '#6A5ACD'
+                        }
+                    }
+                });
+                
+                // Get lighter shade for percentage series
+                const primaryColorLighter = getLighterColor(primaryColor, 0.5);
+                
+                // Value series (left Y axis - amounts)
+                const portfolioValueSeries = window.TradingViewChartAdapter.addLineSeries(portfolioValueChart, {
+                    color: primaryColor,
+                    lineWidth: 2,
+                    title: 'שווי תיק ($)',
+                    priceScaleId: 'left',
+                    priceFormat: {
+                        type: 'price',
+                        precision: 0,
+                        minMove: 1
+                    }
+                });
+                
+                // Percentage series (right Y axis - percentages)
+                const portfolioValuePercentSeries = window.TradingViewChartAdapter.addLineSeries(portfolioValueChart, {
+                    color: primaryColorLighter,
+                    lineWidth: 2,
+                    lineType: 0, // Normal line (using lighter color to differentiate)
+                    title: 'שווי תיק (%)',
+                    priceScaleId: 'right',
+                    priceFormat: {
+                        type: 'percent',
+                        precision: 2,
+                        minMove: 0.01
+                    }
+                });
+                
+                // Generate data based on filtered trades - TODO: Load from API
+                const mockData = generateMockPortfolioValueData(currentPeriod['both'] || 'month');
+                portfolioValueSeries.setData(mockData.values);
+                portfolioValuePercentSeries.setData(mockData.percentages);
+                
+                // Add markers for min/max points
+                const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
+                if (mockData.minIndex >= 0 && mockData.maxIndex >= 0 && lightweightCharts) {
+                    const markers = [];
+                    if (mockData.minIndex >= 0) {
+                        markers.push({
+                            time: mockData.values[mockData.minIndex].time,
+                            position: 'belowBar',
+                            color: '#dc3545',
+                            shape: 'arrowUp',
+                            text: `מינימום: $${mockData.values[mockData.minIndex].value.toLocaleString()}`,
+                            size: 1
+                        });
+                    }
+                    if (mockData.maxIndex >= 0) {
+                        markers.push({
+                            time: mockData.values[mockData.maxIndex].time,
+                            position: 'aboveBar',
+                            color: '#28a745',
+                            shape: 'arrowDown',
+                            text: `מקסימום: $${mockData.values[mockData.maxIndex].value.toLocaleString()}`,
+                            size: 1
+                        });
+                    }
+                    
+                    // Try to use createSeriesMarkers if available
+                    if (typeof lightweightCharts.createSeriesMarkers === 'function') {
+                        try {
+                            const markersPrimitive = lightweightCharts.createSeriesMarkers(portfolioValueSeries);
+                            if (markersPrimitive && typeof markersPrimitive.setMarkers === 'function') {
+                                markersPrimitive.setMarkers(markers);
+                            }
+                        } catch (error) {
+                            console.warn('⚠️ Failed to create markers primitive:', error);
+                        }
+                    } else if (typeof portfolioValueSeries.setMarkers === 'function') {
+                        // Fallback to direct setMarkers if available
+                        portfolioValueSeries.setMarkers(markers);
+                    }
+                }
+                
+                // Always fit content on load
+                portfolioValueChart.timeScale().fitContent();
+                
+                // Setup synchronization after both charts are ready
+                setupChartSynchronization();
+                
+            } catch (error) {
+                console.error('Error creating portfolio value chart:', error);
+                portfolioValueChart = null;
+            }
+        }
+        
+        // Initialize P/L Trend Chart
+        async function initPLTrendChart() {
+            const container = document.getElementById('pl-trend-chart-container');
+            if (!container) {
+                console.warn('P/L trend chart container not found');
+                return;
+            }
+            
+            // Wait for TradingView to be available with better error handling
+            let retries = 0;
+            const maxRetries = 100; // Increased timeout for defer scripts
+            while ((typeof window.TradingViewChartAdapter === 'undefined' || 
+                    (typeof window.LightweightCharts === 'undefined' && 
+                     typeof window.lightweightCharts === 'undefined')) && 
+                   retries < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+                retries++;
+            }
+            
+            if (typeof window.TradingViewChartAdapter === 'undefined') {
+                console.error('❌ TradingViewChartAdapter not available after', maxRetries * 50, 'ms');
+                return;
+            }
+            
+            if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
+                console.error('❌ LightweightCharts library not available');
+                return;
+            }
+            
+            // Destroy existing chart
+            if (plTrendChart && typeof window.TradingViewChartAdapter.destroyChart === 'function') {
+                try {
+                    window.TradingViewChartAdapter.destroyChart(plTrendChart);
+                } catch (e) {
+                    console.warn('Error destroying P/L trend chart:', e);
+                }
+                plTrendChart = null;
+            }
+            
+            try {
+                const successColor = getCSSVariableValue('--success-color', '#28a745');
+                const warningColor = getCSSVariableValue('--warning-color', '#ffc107');
+                const primaryColor = getCSSVariableValue('--primary-color', '#007bff');
+                
+                // Ensure container has proper dimensions
+                const containerWidth = container.clientWidth || container.offsetWidth || 800;
+                const containerHeight = container.clientHeight || container.offsetHeight || 200;
+                
+                if (containerWidth === 0 || containerHeight === 0) {
+                    console.warn('P/L trend chart container has zero dimensions, waiting...');
+                    setTimeout(() => initPLTrendChart(), 100);
+                    return;
+                }
+                
+                plTrendChart = window.TradingViewChartAdapter.createChart(container, {
+                    width: containerWidth,
+                    height: containerHeight,
+                    layout: {
+                        textColor: getCSSVariableValue('--text-color', '#212529'),
+                        background: { type: 'solid', color: getCSSVariableValue('--card-background', '#ffffff') }
+                    },
+                    grid: {
+                        vertLines: { color: '#f0f0f0' },
+                        horzLines: { color: '#f0f0f0' }
+                    },
+                    timeScale: {
+                        timeVisible: true,
+                        secondsVisible: false
+                    },
+                    rightPriceScale: {
+                        visible: true,
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    },
+                    leftPriceScale: {
+                        visible: true,
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    },
+                    crosshair: {
+                        mode: 1, // Normal mode - shows crosshair with tooltip
+                        vertLine: {
+                            color: '#6A5ACD',
+                            width: 1,
+                            style: 0,
+                            labelBackgroundColor: '#6A5ACD'
+                        },
+                        horzLine: {
+                            color: '#6A5ACD',
+                            width: 1,
+                            style: 0,
+                            labelBackgroundColor: '#6A5ACD'
+                        }
+                    }
+                });
+                
+                // Get lighter shades for percentage series
+                const successColorLighter = getLighterColor(successColor, 0.5);
+                const warningColorLighter = getLighterColor(warningColor, 0.5);
+                const primaryColorLighter = getLighterColor(primaryColor, 0.5);
+                
+                // Value series (left Y axis - amounts)
+                const realizedPLSeries = window.TradingViewChartAdapter.addLineSeries(plTrendChart, {
+                    color: successColor,
+                    lineWidth: 2,
+                    title: 'P/L ממומש ($)',
+                    priceScaleId: 'left',
+                    priceFormat: {
+                        type: 'price',
+                        precision: 0,
+                        minMove: 1
+                    }
+                });
+                
+                const unrealizedPLSeries = window.TradingViewChartAdapter.addLineSeries(plTrendChart, {
+                    color: warningColor,
+                    lineWidth: 2,
+                    title: 'P/L לא ממומש ($)',
+                    priceScaleId: 'left',
+                    priceFormat: {
+                        type: 'price',
+                        precision: 0,
+                        minMove: 1
+                    }
+                });
+                
+                const totalPLSeries = window.TradingViewChartAdapter.addLineSeries(plTrendChart, {
+                    color: primaryColor,
+                    lineWidth: 3,
+                    title: 'P/L כולל ($)',
+                    priceScaleId: 'left',
+                    priceFormat: {
+                        type: 'price',
+                        precision: 0,
+                        minMove: 1
+                    }
+                });
+                
+                // Percentage series (right Y axis - percentages)
+                const realizedPLPercentSeries = window.TradingViewChartAdapter.addLineSeries(plTrendChart, {
+                    color: successColorLighter,
+                    lineWidth: 2,
+                    lineType: 0, // Normal line (using lighter color to differentiate)
+                    title: 'P/L ממומש (%)',
+                    priceScaleId: 'right',
+                    priceFormat: {
+                        type: 'percent',
+                        precision: 2,
+                        minMove: 0.01
+                    }
+                });
+                
+                const unrealizedPLPercentSeries = window.TradingViewChartAdapter.addLineSeries(plTrendChart, {
+                    color: warningColorLighter,
+                    lineWidth: 2,
+                    lineType: 0, // Normal line (using lighter color to differentiate)
+                    title: 'P/L לא ממומש (%)',
+                    priceScaleId: 'right',
+                    priceFormat: {
+                        type: 'percent',
+                        precision: 2,
+                        minMove: 0.01
+                    }
+                });
+                
+                const totalPLPercentSeries = window.TradingViewChartAdapter.addLineSeries(plTrendChart, {
+                    color: primaryColorLighter,
+                    lineWidth: 3,
+                    lineType: 0, // Normal line (using lighter color to differentiate)
+                    title: 'P/L כולל (%)',
+                    priceScaleId: 'right',
+                    priceFormat: {
+                        type: 'percent',
+                        precision: 2,
+                        minMove: 0.01
+                    }
+                });
+                
+                // Generate data based on filtered trades - TODO: Load from API
+                const mockData = generateMockPLData(currentPeriod['both'] || 'month');
+                realizedPLSeries.setData(mockData.realized);
+                unrealizedPLSeries.setData(mockData.unrealized);
+                totalPLSeries.setData(mockData.total);
+                realizedPLPercentSeries.setData(mockData.realizedPercent);
+                unrealizedPLPercentSeries.setData(mockData.unrealizedPercent);
+                totalPLPercentSeries.setData(mockData.totalPercent);
+                
+                // Add markers for min/max points on total PL
+                const lightweightChartsPL = window.LightweightCharts || window.lightweightCharts;
+                if (mockData.minIndex >= 0 && mockData.maxIndex >= 0 && lightweightChartsPL) {
+                    const markers = [];
+                    if (mockData.minIndex >= 0) {
+                        markers.push({
+                            time: mockData.total[mockData.minIndex].time,
+                            position: 'belowBar',
+                            color: '#dc3545',
+                            shape: 'arrowUp',
+                            text: `מינימום: $${mockData.total[mockData.minIndex].value.toLocaleString()}`,
+                            size: 1
+                        });
+                    }
+                    if (mockData.maxIndex >= 0) {
+                        markers.push({
+                            time: mockData.total[mockData.maxIndex].time,
+                            position: 'aboveBar',
+                            color: '#28a745',
+                            shape: 'arrowDown',
+                            text: `מקסימום: $${mockData.total[mockData.maxIndex].value.toLocaleString()}`,
+                            size: 1
+                        });
+                    }
+                    
+                    // Try to use createSeriesMarkers if available
+                    if (typeof lightweightChartsPL.createSeriesMarkers === 'function') {
+                        try {
+                            const markersPrimitive = lightweightChartsPL.createSeriesMarkers(totalPLSeries);
+                            if (markersPrimitive && typeof markersPrimitive.setMarkers === 'function') {
+                                markersPrimitive.setMarkers(markers);
+                            }
+                        } catch (error) {
+                            console.warn('⚠️ Failed to create markers primitive for P/L chart:', error);
+                        }
+                    } else if (typeof totalPLSeries.setMarkers === 'function') {
+                        // Fallback to direct setMarkers if available
+                        totalPLSeries.setMarkers(markers);
+                    }
+                }
+                
+                // Always fit content on load
+                plTrendChart.timeScale().fitContent();
+                
+                // Setup synchronization after both charts are ready
+                setupChartSynchronization();
+                
+            } catch (error) {
+                console.error('Error creating P/L trend chart:', error);
+                plTrendChart = null;
+            }
+        }
+        
+        // Setup chart synchronization
+        function setupChartSynchronization() {
+            if (chartsSynchronized) return;
+            
+            if (!portfolioValueChart || !plTrendChart) {
+                syncSetupAttempts++;
+                if (syncSetupAttempts >= MAX_SYNC_SETUP_ATTEMPTS) {
+                    console.error('Max sync setup attempts reached');
+                    return;
+                }
+                setTimeout(setupChartSynchronization, 100);
+                return;
+            }
+            
+            syncSetupAttempts = 0;
+            chartsSynchronized = true;
+            
+            const portfolioTimeScale = portfolioValueChart.timeScale();
+            const plTimeScale = plTrendChart.timeScale();
+            
+            function timeRangesEqual(range1, range2) {
+                if (!range1 || !range2) return false;
+                if (!range1.from || !range1.to || !range2.from || !range2.to) return false;
+                const from1 = typeof range1.from === 'string' ? range1.from : String(range1.from);
+                const to1 = typeof range1.to === 'string' ? range1.to : String(range1.to);
+                const from2 = typeof range2.from === 'string' ? range2.from : String(range2.from);
+                const to2 = typeof range2.to === 'string' ? range2.to : String(range2.to);
+                return from1 === from2 && to1 === to2;
+            }
+            
+            function syncRangeToOtherChart(sourceRange, sourceTimeScale, targetTimeScale, direction) {
+                if (isSyncingCharts) return;
+                if (!sourceRange || !sourceRange.from || !sourceRange.to) return;
+                
+                const currentTargetRange = targetTimeScale.getVisibleRange();
+                if (timeRangesEqual(sourceRange, currentTargetRange)) return;
+                
+                isSyncingCharts = true;
+                try {
+                    targetTimeScale.setVisibleRange({
+                        from: sourceRange.from,
+                        to: sourceRange.to
+                    });
+                } catch (error) {
+                    console.error(`Sync error (${direction}):`, error);
+                } finally {
+                    setTimeout(() => { isSyncingCharts = false; }, 50);
+                }
+            }
+            
+            // Sync portfolio chart to P/L chart
+            if (typeof portfolioTimeScale.subscribeVisibleTimeRangeChange === 'function') {
+                portfolioTimeScale.subscribeVisibleTimeRangeChange((newRange) => {
+                    syncRangeToOtherChart(newRange, portfolioTimeScale, plTimeScale, 'Portfolio → P/L');
+                });
+            }
+            
+            // Sync P/L chart to portfolio chart
+            if (typeof plTimeScale.subscribeVisibleTimeRangeChange === 'function') {
+                plTimeScale.subscribeVisibleTimeRangeChange((newRange) => {
+                    syncRangeToOtherChart(newRange, plTimeScale, portfolioTimeScale, 'P/L → Portfolio');
+                });
+            }
+        }
+        
+        // Setup zoom/pan/reset buttons
+        function setupChartControls() {
+            if (!portfolioValueChart || !plTrendChart) {
+                setTimeout(setupChartControls, 100);
+                return;
+            }
+            
+            const portfolioTimeScale = portfolioValueChart.timeScale();
+            const plTimeScale = plTrendChart.timeScale();
+            
+            // Helper functions
+            function getTimeDiff(from, to) {
+                if (typeof from === 'string' && typeof to === 'string') {
+                    return new Date(to).getTime() - new Date(from).getTime();
+                }
+                return to - from;
+            }
+            
+            function addTime(time, ms) {
+                if (typeof time === 'string') {
+                    const date = new Date(time);
+                    date.setTime(date.getTime() + ms);
+                    return date.toISOString().split('T')[0];
+                }
+                return time + ms;
+            }
+            
+            function applyToBothCharts(fn) {
+                [portfolioTimeScale, plTimeScale].forEach(timeScale => {
+                    try {
+                        fn(timeScale);
+                    } catch (error) {
+                        console.warn('Error applying to chart:', error);
+                    }
+                });
+            }
+            
+            // Zoom In
+            const zoomInBtn = document.getElementById('chartZoomIn');
+            if (zoomInBtn) {
+                zoomInBtn.addEventListener('click', () => {
+                    const visibleRange = portfolioTimeScale.getVisibleRange();
+                    if (visibleRange && visibleRange.from && visibleRange.to) {
+                        const range = getTimeDiff(visibleRange.from, visibleRange.to);
+                        const newRange = range * 0.8;
+                        const newFrom = addTime(visibleRange.from, (range - newRange) / 2);
+                        const newTo = addTime(visibleRange.from, range - (range - newRange) / 2);
+                        applyToBothCharts(ts => ts.setVisibleRange({ from: newFrom, to: newTo }));
+                    }
+                });
+            }
+            
+            // Zoom Out
+            const zoomOutBtn = document.getElementById('chartZoomOut');
+            if (zoomOutBtn) {
+                zoomOutBtn.addEventListener('click', () => {
+                    const visibleRange = portfolioTimeScale.getVisibleRange();
+                    if (visibleRange && visibleRange.from && visibleRange.to) {
+                        const range = getTimeDiff(visibleRange.from, visibleRange.to);
+                        const newRange = range * 1.25;
+                        const shift = (newRange - range) / 2;
+                        const newFrom = addTime(visibleRange.from, -shift);
+                        const newTo = addTime(visibleRange.to, shift);
+                        applyToBothCharts(ts => ts.setVisibleRange({ from: newFrom, to: newTo }));
+                    }
+                });
+            }
+            
+            // Reset (Fit Content)
+            const resetBtn = document.getElementById('chartReset');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    applyToBothCharts(ts => ts.fitContent());
+                });
+            }
+            
+            // Pan Left
+            const panLeftBtn = document.getElementById('chartPanLeft');
+            if (panLeftBtn) {
+                panLeftBtn.addEventListener('click', () => {
+                    const visibleRange = portfolioTimeScale.getVisibleRange();
+                    if (visibleRange && visibleRange.from && visibleRange.to) {
+                        const range = getTimeDiff(visibleRange.from, visibleRange.to);
+                        const shift = range * 0.2;
+                        const newFrom = addTime(visibleRange.from, -shift);
+                        const newTo = addTime(visibleRange.to, -shift);
+                        applyToBothCharts(ts => ts.setVisibleRange({ from: newFrom, to: newTo }));
+                    }
+                });
+            }
+            
+            // Pan Right
+            const panRightBtn = document.getElementById('chartPanRight');
+            if (panRightBtn) {
+                panRightBtn.addEventListener('click', () => {
+                    const visibleRange = portfolioTimeScale.getVisibleRange();
+                    if (visibleRange && visibleRange.from && visibleRange.to) {
+                        const range = getTimeDiff(visibleRange.from, visibleRange.to);
+                        const shift = range * 0.2;
+                        const newFrom = addTime(visibleRange.from, shift);
+                        const newTo = addTime(visibleRange.to, shift);
+                        applyToBothCharts(ts => ts.setVisibleRange({ from: newFrom, to: newTo }));
+                    }
+                });
+            }
+        }
+        
+        // Generate mock portfolio value data (filtered by date/account/investment type)
+        function generateMockPortfolioValueData(period) {
+            const data = [];
+            const dataPercent = [];
+            const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 365;
+            
+            // Calculate base value from filtered trades
+            const baseValue = filteredTrades.reduce((sum, trade) => {
+                // Mock calculation - should use actual position values
+                return sum + (trade.position_pl_value || 0);
+            }, 50000);
+            
+            const startValue = baseValue;
+            let minValue = Infinity;
+            let maxValue = -Infinity;
+            let minIndex = -1;
+            let maxIndex = -1;
+            
+            for (let i = days; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const value = startValue + (days - i) * 50 + Math.random() * 1000;
+                const roundedValue = Math.round(value);
+                
+                // Track min/max for markers
+                if (roundedValue < minValue) {
+                    minValue = roundedValue;
+                    minIndex = data.length;
+                }
+                if (roundedValue > maxValue) {
+                    maxValue = roundedValue;
+                    maxIndex = data.length;
+                }
+                
+                // Calculate percentage change from start
+                const percentChange = ((roundedValue - startValue) / startValue) * 100;
+                
+                data.push({
+                    time: date.toISOString().split('T')[0],
+                    value: roundedValue
+                });
+                
+                dataPercent.push({
+                    time: date.toISOString().split('T')[0],
+                    value: percentChange
+                });
+            }
+            
+            return {
+                values: data,
+                percentages: dataPercent,
+                minIndex: minIndex,
+                maxIndex: maxIndex,
+                startValue: startValue
+            };
+        }
+        
+        // Generate mock P/L data (filtered by date/account/investment type)
+        function generateMockPLData(period) {
+            const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 365;
+            const realized = [];
+            const unrealized = [];
+            const total = [];
+            const realizedPercent = [];
+            const unrealizedPercent = [];
+            const totalPercent = [];
+            
+            // Calculate base values from filtered trades
+            const baseUnrealizedPL = filteredTrades.reduce((sum, trade) => sum + (trade.position_pl_value || 0), 0);
+            const baseRealizedPL = 10000; // Mock - should come from closed trades
+            const baseTotalPL = baseRealizedPL + baseUnrealizedPL;
+            
+            // Track min/max for markers
+            let minTotal = Infinity, maxTotal = -Infinity;
+            let minIndex = -1, maxIndex = -1;
+            
+            for (let i = days; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const realizedValue = baseRealizedPL + (days - i) * 20 + Math.random() * 500;
+                const unrealizedValue = baseUnrealizedPL + (days - i) * 30 + Math.random() * 800;
+                const totalValue = realizedValue + unrealizedValue;
+                
+                const roundedRealized = Math.round(realizedValue);
+                const roundedUnrealized = Math.round(unrealizedValue);
+                const roundedTotal = Math.round(totalValue);
+                
+                // Track min/max for total PL
+                if (roundedTotal < minTotal) {
+                    minTotal = roundedTotal;
+                    minIndex = total.length;
+                }
+                if (roundedTotal > maxTotal) {
+                    maxTotal = roundedTotal;
+                    maxIndex = total.length;
+                }
+                
+                // Calculate percentages
+                const realizedPercentValue = baseRealizedPL > 0 ? ((roundedRealized - baseRealizedPL) / baseRealizedPL) * 100 : 0;
+                const unrealizedPercentValue = baseUnrealizedPL > 0 ? ((roundedUnrealized - baseUnrealizedPL) / baseUnrealizedPL) * 100 : 0;
+                const totalPercentValue = baseTotalPL > 0 ? ((roundedTotal - baseTotalPL) / baseTotalPL) * 100 : 0;
+                
+                const timeStr = date.toISOString().split('T')[0];
+                
+                realized.push({ time: timeStr, value: roundedRealized });
+                unrealized.push({ time: timeStr, value: roundedUnrealized });
+                total.push({ time: timeStr, value: roundedTotal });
+                
+                realizedPercent.push({ time: timeStr, value: realizedPercentValue });
+                unrealizedPercent.push({ time: timeStr, value: unrealizedPercentValue });
+                totalPercent.push({ time: timeStr, value: totalPercentValue });
+            }
+            
+            return { 
+                realized, unrealized, total,
+                realizedPercent, unrealizedPercent, totalPercent,
+                minIndex, maxIndex,
+                baseRealizedPL, baseUnrealizedPL, baseTotalPL
+            };
+        }
+        
+        // Compare dates
+        function compareDates() {
+            // Get selected date range
+            const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
+            const dateRange1 = selectedItem ? selectedItem.getAttribute('data-value') : 'היום';
+            const { start: start1, end: end1 } = getDateRange();
+            
+            // For comparison, use the end date (or today if no end)
+            const date1 = end1 ? end1.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+            const date2 = document.getElementById('datePicker2').value;
+            
+            if (!date1 || !date2) {
+                alert('נא לבחור שני תאריכים להשוואה');
+                return;
+            }
+            
+            // Format dates for display
+            const formatDate = (dateStr) => {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            };
+            
+            // Update headers
+            document.getElementById('comparison-date1-header').textContent = formatDate(date1);
+            document.getElementById('comparison-date2-header').textContent = formatDate(date2);
+            
+            // Show comparison table and hide placeholder
+            document.getElementById('comparison-table-wrapper').style.display = 'block';
+            document.getElementById('comparison-placeholder').style.display = 'none';
+            document.getElementById('removeComparisonDate').style.display = 'inline-block';
+            
+            // TODO: Load comparison data from API
+            // For now, using mock data
+            const comparisonData = [
+                { metric: 'יתרות', value1: 50000, value2: 48000 },
+                { metric: 'שווי תיק', value1: 75000, value2: 70000 },
+                { metric: 'P/L כולל', value1: 25000, value2: 22000 },
+                { metric: 'פוזיציות', value1: 5, value2: 4 }
+            ];
+            
+            const tbody = document.getElementById('comparison-table-body');
+            tbody.innerHTML = comparisonData.map(item => {
+                const change = item.value1 - item.value2;
+                const changePercent = ((change / item.value2) * 100).toFixed(1);
+                const isPositive = change >= 0;
+                const changeClass = isPositive ? 'text-success' : 'text-danger';
+                const changeSign = isPositive ? '+' : '';
+                
+                return `
+                    <tr>
+                        <td>${item.metric}</td>
+                        <td>${formatCurrency(item.value1)}</td>
+                        <td>${formatCurrency(item.value2)}</td>
+                        <td class="${changeClass}">${changeSign}${formatCurrency(change)} (${changeSign}${changePercent}%)</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // Remove comparison date
+        function removeComparisonDate() {
+            document.getElementById('datePicker2').value = '';
+            document.getElementById('comparison-table-wrapper').style.display = 'none';
+            document.getElementById('comparison-placeholder').style.display = 'block';
+            document.getElementById('removeComparisonDate').style.display = 'none';
+            document.getElementById('comparison-date1-header').textContent = '-';
+            document.getElementById('comparison-date2-header').textContent = '-';
+        }
+        
+        // Toggle section
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const body = section.querySelector('.section-body');
+                if (body) {
+                    body.style.display = body.style.display === 'none' ? 'block' : 'none';
+                    const icon = section.querySelector('.section-toggle-icon');
+                    if (icon) {
+                        icon.textContent = body.style.display === 'none' ? '▶' : '▼';
+                    }
+                }
+            }
+        }
+        
+        // Load user preferences
+        async function loadUserPreferences() {
+            try {
+                // Initialize preferences if available
+                if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+                    await window.PreferencesCore.initializeWithLazyLoading();
+                    console.log('✅ PreferencesCore initialized');
+                }
+                
+                // Wait for preferences to be available in global scope
+                let retries = 0;
+                while ((!window.currentPreferences && !window.__latestPrefs) && retries < 20) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    retries++;
+                }
+                
+                if (window.currentPreferences || window.__latestPrefs) {
+                    console.log('✅ User preferences available in global scope');
+                } else {
+                    console.warn('⚠️ User preferences not found in global scope after timeout');
+                }
+                
+                // Reload TradingView theme preferences if available
+                if (window.TradingViewTheme && typeof window.TradingViewTheme.loadPreferences === 'function') {
+                    await window.TradingViewTheme.loadPreferences();
+                    console.log('✅ TradingView theme preferences reloaded');
+                }
+                
+                console.log('✅ User preferences loaded successfully');
+            } catch (error) {
+                console.warn('⚠️ Could not load user preferences (non-critical):', error);
+            }
+        }
+        
+        // Wait for all required scripts to load
+        async function waitForScripts() {
+            // TradingViewChartAdapter is required
+            let retries = 0;
+            while (typeof window.TradingViewChartAdapter === 'undefined' && retries < 100) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+                retries++;
+            }
+            
+            if (typeof window.TradingViewChartAdapter === 'undefined') {
+                console.warn('⚠️ Script TradingViewChartAdapter not loaded after timeout');
+            } else {
+                console.log('✅ Script TradingViewChartAdapter loaded');
+            }
+            
+            // LightweightCharts library - check both possible names
+            retries = 0;
+            while ((typeof window.LightweightCharts === 'undefined' && 
+                    typeof window.lightweightCharts === 'undefined') && 
+                   retries < 100) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+                retries++;
+            }
+            
+            if (typeof window.LightweightCharts !== 'undefined') {
+                console.log('✅ Script LightweightCharts loaded');
+            } else if (typeof window.lightweightCharts !== 'undefined') {
+                console.log('✅ Script lightweightCharts loaded');
+            } else {
+                console.warn('⚠️ Script LightweightCharts/lightweightCharts not loaded after timeout');
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Wait for all scripts to load first
+            await waitForScripts();
+            
+            // Load user preferences first
+            await loadUserPreferences();
+            
+            // Set default date range to "היום" (today)
+            const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+            dateRangeItems.forEach(item => item.classList.remove('selected'));
+            const todayItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item[data-value="היום"]');
+            if (todayItem) {
+                todayItem.classList.add('selected');
+            }
+            updateDateRangeFilterText();
+            
+            await loadTradingAccounts();
+            loadInvestmentTypes();
+            await loadPortfolioState();
+            
+            // Load chart default period from preferences
+            await loadChartDefaultPeriod();
+            
+            // Setup chart controls after charts are initialized
+            setTimeout(() => {
+                setupChartControls();
+            }, 1000);
+        });
+        
+        // Handle window resize for charts
+        window.addEventListener('resize', () => {
+            if (portfolioValueChart) {
+                portfolioValueChart.applyOptions({ width: document.getElementById('portfolio-value-chart-container').clientWidth });
+            }
+            if (plTrendChart) {
+                plTrendChart.applyOptions({ width: document.getElementById('pl-trend-chart-container').clientWidth });
+            }
+        });
+    </script>
 </body>
 </html>

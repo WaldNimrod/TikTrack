@@ -33,7 +33,7 @@ def run_step(dry_run: bool = False, skip_ui_tests: bool = False) -> dict:
     logger = get_logger()
     reporter = get_reporter()
     
-    logger.step_start("Validate Production", 8)
+    logger.step_start("Validate Production", 12)
     
     project_root = Path(__file__).parent.parent.parent.parent
     

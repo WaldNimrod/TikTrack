@@ -1622,7 +1622,7 @@ const PACKAGE_MANIFEST = {
   'dashboard-widgets': {
     id: 'dashboard-widgets',
     name: 'Dashboard Widgets',
-    description: 'ווידג׳טים וממשקי דף הבית (Pending Executions, Trade Creation)',
+    description: 'ווידג'טים וממשקי דף הבית (Pending Executions, Trade Creation)',
     version: '1.0.0',
     critical: false,
     loadOrder: 19.5,

@@ -84,24 +84,16 @@ check "No Cross-Links" "[ ! -L \"$PRODUCTION_BACKEND/Backend\" ]" "No symlinks t
 # ========================================
 info ""
 info "2. Checking database isolation..."
-check "Production DB" "[ -f \"$PRODUCTION_BACKEND/db/tiktrack.db\" ]" "tiktrack.db exists"
+# Note: System uses PostgreSQL - database isolation is via DATABASE_URL in config
+check "Production DB Config" "[ -f \"$PRODUCTION_BACKEND/config/settings.py\" ]" "settings.py exists"
 if [ "$DEV_EXISTS" = true ]; then
-    if [ -f "$DEV_BACKEND/db/tiktrack.db" ]; then
-        check "Dev DB Separate" "[ -f \"$DEV_BACKEND/db/tiktrack.db\" ]" "tiktrack.db (dev) exists separately"
+    if [ -f "$DEV_BACKEND/config/settings.py" ]; then
+        check "Dev DB Config Separate" "[ -f \"$DEV_BACKEND/config/settings.py\" ]" "settings.py (dev) exists separately"
     else
-        warn "Dev DB Separate" "tiktrack.db not found in development repository"
+        warn "Dev DB Config Separate" "settings.py not found in development repository"
     fi
 else
-    warn "Dev DB Separate" "Skipped dev database check (no development repository detected)"
-fi
-
-# Check for cross-references
-if [ -f "$PRODUCTION_BACKEND/db/simpleTrade_new.db" ]; then
-    warn "Legacy DB in Prod" "simpleTrade_new.db found in production (should be removed)"
-fi
-
-if [ "$DEV_EXISTS" = true ] && [ -f "$DEV_BACKEND/db/simpleTrade_new.db" ]; then
-    warn "Legacy Dev DB" "simpleTrade_new.db found in development (should be renamed to tiktrack.db)"
+    warn "Dev DB Config Separate" "Skipped dev database config check (no development repository detected)"
 fi
 
 # ========================================
@@ -111,9 +103,10 @@ info ""
 info "3. Checking code isolation (no hardcoded dev paths)..."
 
 # Check for hardcoded dev database paths
-if grep -r "simpleTrade_new.db" "$PRODUCTION_BACKEND" --include="*.py" | grep -v "create_production_db.py" | grep -v "scripts/backup_database.py" | grep -v "Development Team" | grep -v "#" > /dev/null; then
-    warn "Hardcoded DB Path" "Found references to simpleTrade_new.db (should use config.settings)"
-    grep -r "simpleTrade_new.db" "$PRODUCTION_BACKEND" --include="*.py" | grep -v "create_production_db.py" | grep -v "scripts/backup_database.py" | grep -v "Development Team" | grep -v "#" | head -5
+# Check for hardcoded SQLite references (deprecated - system uses PostgreSQL)
+if grep -r "sqlite://\|\.db\|tiktrack\.db\|simpleTrade" "$PRODUCTION_BACKEND" --include="*.py" | grep -v "create_production_db.py" | grep -v "scripts/backup_database.py" | grep -v "Development Team" | grep -v "#" | grep -v "deprecated" | grep -v "legacy" > /dev/null; then
+    warn "Hardcoded DB Path" "Found references to SQLite/legacy DB paths (should use config.settings.DATABASE_URL)"
+    grep -r "sqlite://\|\.db\|tiktrack\.db\|simpleTrade" "$PRODUCTION_BACKEND" --include="*.py" | grep -v "create_production_db.py" | grep -v "scripts/backup_database.py" | grep -v "Development Team" | grep -v "#" | grep -v "deprecated" | grep -v "legacy" | head -5
 fi
 
 # Check for hardcoded dev port
@@ -147,10 +140,11 @@ else
 fi
 
 # Check DB path
-if grep -q "tiktrack.db" "$PRODUCTION_BACKEND/config/settings.py"; then
-    check "DB Path Config" "true" "DB path points to tiktrack.db"
+# Check for PostgreSQL DATABASE_URL (system uses PostgreSQL)
+if grep -q "postgresql" "$PRODUCTION_BACKEND/config/settings.py" || grep -q "DATABASE_URL" "$PRODUCTION_BACKEND/config/settings.py"; then
+    check "DB Config" "true" "Database URL configured (PostgreSQL)"
 else
-    warn "DB Path Config" "DB path not pointing to tiktrack.db"
+    warn "DB Config" "DATABASE_URL not found or not using PostgreSQL"
 fi
 
 # ========================================

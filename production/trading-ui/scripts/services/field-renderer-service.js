@@ -569,20 +569,36 @@ class FieldRendererService {
     static renderAction(action, amountForColor = null) {
         if (!action) return '<span class="badge badge-secondary">-</span>';
         
-        const actionLower = action.toLowerCase();
-        const isBuy = actionLower === 'buy' || actionLower === 'קנייה';
-        const actionHebrew = isBuy ? 'קנייה' : 'מכירה';
+        // תרגום לעברית - בדיוק כמו renderType
+        const actionTranslations = {
+            'buy': 'קנייה',
+            'sell': 'מכירה',
+            'short': 'קנייה בחסר',
+            'cover': 'כיסוי'
+        };
         
-        // קביעת צבע לפי amount אם סופק, אחרת לפי סוג פעולה (buy = שלילי בדרך כלל, sell = חיובי)
+        // חובה לחתוך רווחים לפני המרה ל-lowercase
+        const actionStr = String(action).trim();
+        const actionLower = actionStr.toLowerCase();
+        const actionHebrew = actionTranslations[actionLower] || actionStr;
+        
+        // קביעת צבע לפי amount אם סופק - בדיוק כמו renderType
+        // שימוש ב-text-success/text-danger שמתעדכנים דינמית מהעדפות
         let colorClass = '';
         if (amountForColor !== null && amountForColor !== undefined) {
             colorClass = amountForColor >= 0 ? ' text-success' : ' text-danger';
         } else {
-            // ברירת מחדל: buy = שלילי (יוצא כסף), sell = חיובי (נכנס כסף)
-            colorClass = isBuy ? ' text-danger' : ' text-success';
+            // ברירת מחדל: buy/short = ירוק (חיובי), sell/cover = אדום (שלילי)
+            // cover הוא כמו sell - כיסוי פוזיציה בחסר = יוצא כסף = אדום
+            const positiveActions = new Set(['buy', 'short']);
+            if (positiveActions.has(actionLower)) {
+                colorClass = ' text-success';
+            } else {
+                colorClass = ' text-danger';
+            }
         }
         
-        // שימוש באותו עיצוב כמו renderType - badge-type badge-capsule
+        // שימוש באותו עיצוב בדיוק כמו renderType
         return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${actionLower}">${actionHebrew}</span>`;
     }
 
@@ -1426,18 +1442,56 @@ class FieldRendererService {
 
     /**
      * רנדור shares/quantity עם # prefix
+     * תומך במניות חלקיות (fractional shares) - מציג עד ספרה אחת אחרי הנקודה
      * 
-     * @param {number} shares - כמות מניות
+     * @param {number} shares - כמות מניות (יכול להיות גם מספר חלקי כמו 0.5 או 1.234)
      * @param {string} cssClass - class נוסף (אופציונלי)
      * @returns {string} - HTML עם # prefix
      * 
      * @example
      * const html = FieldRendererService.renderShares(150);
      * // Output: '<span class="numeric-ltr">#150</span>'
+     * 
+     * @example
+     * const html = FieldRendererService.renderShares(1000000);
+     * // Output: '<span class="numeric-ltr">#1,000,000</span>'
+     * 
+     * @example
+     * const html = FieldRendererService.renderShares(0.5);
+     * // Output: '<span class="numeric-ltr">#0.5</span>'
+     * 
+     * @example
+     * const html = FieldRendererService.renderShares(1.234);
+     * // Output: '<span class="numeric-ltr">#1.2</span>'
      */
     static renderShares(shares, cssClass = 'numeric-ltr') {
         if (!shares || shares === 0) return '-';
-        return `<span class="${cssClass}">#${shares}</span>`;
+        
+        const sharesNum = Number(shares);
+        
+        // בדיקה אם המספר הוא שלם
+        const isWholeNumber = sharesNum % 1 === 0;
+        
+        let formattedShares;
+        if (isWholeNumber) {
+            // מספר שלם - מציג ללא נקודה עשרונית, עם מפרידי אלפים
+            formattedShares = sharesNum.toLocaleString('en-US', { 
+                maximumFractionDigits: 0 
+            });
+        } else {
+            // מספר חלקי - מציג עד ספרה אחת אחרי הנקודה עם מפרידי אלפים
+            // פיצול לחלק שלם וחלק עשרוני, הוספת מפרידי אלפים לחלק השלם בלבד
+            const parts = sharesNum.toString().split('.');
+            // שימוש ב-Math.trunc כדי לקבל את החלק השלם (עובד נכון גם עם מספרים שליליים)
+            const integerPartNum = Math.trunc(sharesNum);
+            const integerPart = integerPartNum.toLocaleString('en-US');
+            const decimalPart = parts[1] || '';
+            // הגבלה לספרה אחת אחרי הנקודה כפי שמתועד (1.234 → 1.2)
+            const trimmedDecimal = decimalPart.length > 1 ? decimalPart.substring(0, 1) : decimalPart;
+            formattedShares = trimmedDecimal ? `${integerPart}.${trimmedDecimal}` : integerPart;
+        }
+        
+        return `<span class="${cssClass}">#${formattedShares}</span>`;
     }
 
     /**

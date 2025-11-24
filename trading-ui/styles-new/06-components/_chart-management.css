@@ -2487,3 +2487,134 @@
     gap: var(--spacing-md);
 }
 
+/* ===== Calendar Grid ===== */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-md);
+}
+
+.calendar-day-header {
+    padding: var(--spacing-sm);
+    background: var(--apple-bg-secondary);
+    border: 1px solid var(--apple-border-light);
+    border-radius: var(--apple-radius-small);
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+    font-weight: bold;
+}
+
+.calendar-day-cell {
+    min-height: 80px;
+    padding: var(--spacing-xs);
+    background: var(--apple-bg-primary);
+    border: 1px solid var(--apple-border-light);
+    border-radius: var(--apple-radius-small);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.calendar-day-cell:hover {
+    background: var(--apple-bg-secondary);
+    border-color: var(--apple-blue);
+    box-shadow: var(--apple-shadow-light);
+}
+
+.calendar-day-cell-today {
+    background: var(--apple-bg-secondary);
+    border: 2px solid var(--apple-blue);
+    font-weight: 600;
+}
+
+.calendar-day-cell-active {
+    background: var(--apple-bg-secondary);
+    border: 2px solid var(--logo-orange);
+}
+
+.calendar-day-number {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-text-primary);
+}
+
+.calendar-day-indicator {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.calendar-day-indicator.trades {
+    background: var(--apple-green-light, #d4edda);
+    color: var(--apple-green-dark, #155724);
+}
+
+.calendar-day-indicator.journal {
+    background: var(--apple-blue-light, #cce5ff);
+    color: var(--apple-blue-dark, #004085);
+}
+
+.calendar-day-cell-empty {
+    visibility: hidden;
+}
+
+/* ===== Journal Entries ===== */
+.journal-entry-item {
+    padding: var(--spacing-md);
+    border: 1px solid var(--apple-border-light);
+    border-radius: var(--apple-radius-small);
+    margin-bottom: var(--spacing-sm);
+    background: var(--apple-bg-primary);
+    transition: all 0.2s;
+}
+
+.journal-entry-item:hover {
+    background: var(--apple-bg-secondary);
+    border-color: var(--apple-blue);
+    box-shadow: var(--apple-shadow-light);
+}
+
+.journal-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-sm);
+}
+
+.journal-entry-date {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.journal-entry-content {
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-sm);
+}
+
+.journal-entry-meta {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+}
+
+.journal-entry-meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.journal-entry-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+

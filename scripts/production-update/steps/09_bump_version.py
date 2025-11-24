@@ -35,7 +35,7 @@ def run_step(dry_run: bool = False, bump_type: str = "patch", note: str = None) 
     logger = get_logger()
     reporter = get_reporter()
     
-    logger.step_start("Bump Version", 9)
+    logger.step_start("Bump Version", 15)
     
     project_root = Path(__file__).parent.parent.parent.parent
     bump_script = project_root / "scripts" / "production-update" / "lib" / "bump_version.py"

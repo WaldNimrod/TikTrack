@@ -1238,10 +1238,15 @@ async function updateExecutionsTableMain(executions, options = {}) {
                     </div>
                 </td>
                 <td class="type-cell" data-type="${typeForFilter}">
-                    ${window.renderAction ? window.renderAction(execution.action || execution.type) : 
-                      `<span class="${(execution.action || execution.type) === 'buy' ? 'profit-positive' : 'profit-negative'}">
-                        ${(execution.action || execution.type) === 'buy' ? 'קניה' : 'מכירה'}
-                      </span>`}
+                    ${window.renderAction ? window.renderAction(execution.action || execution.type) : (() => {
+                        const action = ((execution.action || execution.type || '').trim()).toLowerCase();
+                        if (!action) return '<span class="badge badge-secondary">-</span>';
+                        const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
+                        const actionHebrew = actionTranslations[action] || action;
+                        const positiveActions = new Set(['buy', 'short']);
+                        const colorClass = positiveActions.has(action) ? ' text-success' : ' text-danger';
+                        return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>`;
+                    })()}
                 </td>
                 <td class="table-cell-clickable" data-account="${accountName}" 
                   data-onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
@@ -2649,17 +2654,47 @@ function hideExecutionTickerInfo() {
 
 /**
  * Calculate execution values (total, etc.) for form
+ * Uses backend Business Logic API via ExecutionsData service
  * @param {string} formType - Form type ('add' or 'edit')
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function calculateExecutionValues(formType) {
+async function calculateExecutionValues(formType) {
   const isEdit = formType === 'edit';
   const prefix = isEdit ? 'editExecution' : 'execution';
   
   const quantity = parseFloat(document.getElementById(`${prefix}Quantity`).value) || 0;
   const price = parseFloat(document.getElementById(`${prefix}Price`).value) || 0;
   const commission = parseFloat(document.getElementById(`${prefix}Commission`).value) || 0;
+  const action = document.getElementById(`${prefix}Type`)?.value || 'buy';
 
+  // Use backend Business Logic API if available
+  if (window.ExecutionsData && typeof window.ExecutionsData.calculateExecutionValues === 'function') {
+    try {
+      const result = await window.ExecutionsData.calculateExecutionValues({
+        quantity,
+        price,
+        commission,
+        action
+      });
+      
+      if (result && result.total !== undefined) {
+        const totalElement = document.getElementById(`${prefix}Total`);
+        if (totalElement) {
+          const sign = result.total >= 0 ? '' : '-';
+          totalElement.innerHTML = `<strong>${result.label || 'סה"כ:'}</strong> ${sign}$${Math.abs(result.total).toFixed(2)}`;
+        }
+        return;
+      }
+    } catch (error) {
+      window.Logger?.warn?.('⚠️ Error calling ExecutionsData.calculateExecutionValues, using fallback', {
+        page: 'executions',
+        error: error?.message || error
+      });
+      // Fall through to local calculation
+    }
+  }
+
+  // Fallback: Local calculation (backward compatibility)
   let total = 0;
   let label = '';
   
@@ -2674,27 +2709,25 @@ function calculateExecutionValues(formType) {
     }
   } else {
     // בטופס הוספה - לוגיקה מתקדמת עם buy/sell
-    const type = document.getElementById(`${prefix}Type`).value;
+    if (action === 'buy') {
+      // בקנייה: סה"כ עלות = -(כמות * מחיר + עמלה) - שלילי כי זה כסף שיוצא
+      total = -(quantity * price + commission);
+      label = 'סה"כ עלות:';
+    } else if (action === 'sell') {
+      // במכירה: סה"כ מזומן = כמות * מחיר - עמלה - חיובי כי זה כסף שנכנס
+      total = quantity * price - commission;
+      label = 'סה"כ מזומן:';
+    } else {
+      // אם לא נבחר סוג, הצג סכום בסיסי
+      total = quantity * price;
+      label = 'סה"כ:';
+    }
 
-  if (type === 'buy') {
-    // בקנייה: סה"כ עלות = -(כמות * מחיר + עמלה) - שלילי כי זה כסף שיוצא
-    total = -(quantity * price + commission);
-    label = 'סה"כ עלות:';
-  } else if (type === 'sell') {
-    // במכירה: סה"כ מזומן = כמות * מחיר - עמלה - חיובי כי זה כסף שנכנס
-    total = quantity * price - commission;
-    label = 'סה"כ מזומן:';
-  } else {
-    // אם לא נבחר סוג, הצג סכום בסיסי
-    total = quantity * price;
-    label = 'סה"כ:';
-  }
-
-  // עדכון התצוגה
+    // עדכון התצוגה
     const totalElement = document.getElementById(`${prefix}Total`);
-  if (totalElement) {
-    const sign = total >= 0 ? '' : '-';
-    totalElement.innerHTML = `<strong>${label}</strong> ${sign}$${Math.abs(total).toFixed(2)}`;
+    if (totalElement) {
+      const sign = total >= 0 ? '' : '-';
+      totalElement.innerHTML = `<strong>${label}</strong> ${sign}$${Math.abs(total).toFixed(2)}`;
     }
   }
 }
@@ -2702,19 +2735,19 @@ function calculateExecutionValues(formType) {
 /**
  * Calculate execution values for add form
  * @deprecated Use calculateExecutionValues('add') instead
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function calculateAddExecutionValues() {
-  calculateExecutionValues('add');
+async function calculateAddExecutionValues() {
+  await calculateExecutionValues('add');
 }
 
 /**
  * Calculate execution values for edit form
  * @deprecated Use calculateExecutionValues('edit') instead
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function calculateEditExecutionValues() {
-  calculateExecutionValues('edit');
+async function calculateEditExecutionValues() {
+  await calculateExecutionValues('edit');
 }
 
 // הגדרת הפונקציות כגלובליות
@@ -2797,8 +2830,15 @@ function updateExecutionsTableForTradeModal(executions) {
     executions.forEach(execution => {
       const row = document.createElement('tr');
 
-      const typeBadge = window.renderAction ? window.renderAction(execution.type) : 
-        (execution.type === 'buy' ? '<span class="badge bg-success">קניה</span>' : '<span class="badge bg-danger">מכירה</span>');
+      const typeBadge = window.renderAction ? window.renderAction(execution.type) : (() => {
+        const action = ((execution.type || '').trim()).toLowerCase();
+        if (!action) return '<span class="badge badge-secondary">-</span>';
+        const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
+        const actionHebrew = actionTranslations[action] || action;
+        const positiveActions = new Set(['buy', 'short']);
+        const colorClass = positiveActions.has(action) ? ' text-success' : ' text-danger';
+        return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>`;
+      })();
 
       const statusBadge = execution.status === 'completed'
         ? '<span class="badge bg-success">הושלם</span>'
@@ -3755,7 +3795,11 @@ async function deleteExecution(executionId) {
             const ticker = execution.ticker_symbol || execution.symbol || 'לא מוגדר';
             const actionText = window.renderAction ? 
                                window.renderAction(execution.action || execution.type).replace(/<[^>]*>/g, '') : 
-                               ((execution.action || execution.type) === 'buy' ? 'קנייה' : 'מכירה');
+                               (() => {
+                                   const action = (((execution.action || execution.type) || '').trim()).toLowerCase();
+                                   const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
+                                   return actionTranslations[action] || action;
+                               })();
             const quantity = execution.quantity || '0';
             const price = execution.price ? (window.formatPrice ? window.formatPrice(execution.price) : `$${parseFloat(execution.price).toFixed(2)}`) : '$0';
             // Use FieldRendererService or dateUtils for consistent date formatting
@@ -4180,7 +4224,15 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
             : (executionDateValue ? (window.formatDate ? window.formatDate(executionDateValue) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(executionDateValue) : (window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(executionDateValue).toLocaleDateString('he-IL') : new Date(executionDateValue).toLocaleDateString('he-IL')))) : '-'));
     const executionPrice = FieldRenderer?.renderAmount ? FieldRenderer.renderAmount(execution?.price, '$', 2, false) : (execution?.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-');
     const executionQuantity = FieldRenderer?.renderShares ? FieldRenderer.renderShares(execution?.quantity) : (execution?.quantity || '-');
-    const executionAction = FieldRenderer?.renderAction ? FieldRenderer.renderAction(execution?.action) : (execution?.action === 'buy' ? 'קניה' : 'מכירה');
+    const executionAction = FieldRenderer?.renderAction ? FieldRenderer.renderAction(execution?.action) : (() => {
+        const action = ((execution?.action || '').trim()).toLowerCase();
+        if (!action) return '<span class="badge badge-secondary">-</span>';
+        const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
+        const actionHebrew = actionTranslations[action] || action;
+        const positiveActions = new Set(['buy', 'short']);
+        const colorClass = positiveActions.has(action) ? ' text-success' : ' text-danger';
+        return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>`;
+    })();
     
     const scoreCategory = suggestion.score >= 100 ? 'open' : 
                           suggestion.score >= 70 ? 'warning' : 'info';

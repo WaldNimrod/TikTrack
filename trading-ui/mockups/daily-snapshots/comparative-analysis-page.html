@@ -496,42 +496,40 @@
                         </div>
                     </div>
                     <div class="section-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th></th>
-                                                <th>טריידים</th>
-                                                <th>P/L ממוצע</th>
-                                                <th>P/L כולל</th>
-                                                <th>אחוז הצלחה</th>
-                                                <th class="text-end">מקס בנקודה</th>
-                                                <th class="text-end">סה"כ קניות</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="heatmap-table-body">
-                                            <!-- Will be populated dynamically -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="mt-3">
-                                    <div class="mb-2">
-                                        <strong>ערכים חיוביים (ירוק):</strong>
-                                        <span class="badge heatmap-excellent me-1">מצוין</span>
-                                        <span class="badge heatmap-very-good me-1">טוב מאוד</span>
-                                        <span class="badge heatmap-good me-1">טוב</span>
-                                        <span class="badge heatmap-average me-1">בינוני</span>
-                                        <span class="badge heatmap-below-avg">חלש</span>
-                                    </div>
-                                    <div>
-                                        <strong>ערכים שליליים (אדום):</strong>
-                                        <span class="badge heatmap-very-poor me-1">גרוע מאוד</span>
-                                        <span class="badge heatmap-poor me-1">גרוע</span>
-                                        <span class="badge heatmap-average me-1">בינוני</span>
-                                        <span class="badge heatmap-below-avg me-1">פחות גרוע</span>
-                                        <span class="badge heatmap-good">הכי פחות גרוע</span>
-                                    </div>
-                                </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>טריידים</th>
+                                        <th>P/L ממוצע</th>
+                                        <th>P/L כולל</th>
+                                        <th>אחוז הצלחה</th>
+                                        <th class="text-end">מקס בנקודה</th>
+                                        <th class="text-end">סה"כ קניות</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="heatmap-table-body">
+                                    <!-- Will be populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-3">
+                            <div class="mb-2">
+                                <strong>ערכים חיוביים (ירוק):</strong>
+                                <span class="badge heatmap-excellent me-1">מצוין</span>
+                                <span class="badge heatmap-very-good me-1">טוב מאוד</span>
+                                <span class="badge heatmap-good me-1">טוב</span>
+                                <span class="badge heatmap-average me-1">בינוני</span>
+                                <span class="badge heatmap-below-avg">חלש</span>
+                            </div>
+                            <div>
+                                <strong>ערכים שליליים (אדום):</strong>
+                                <span class="badge heatmap-very-poor me-1">גרוע מאוד</span>
+                                <span class="badge heatmap-poor me-1">גרוע</span>
+                                <span class="badge heatmap-average me-1">בינוני</span>
+                                <span class="badge heatmap-below-avg me-1">פחות גרוע</span>
+                                <span class="badge heatmap-good">הכי פחות גרוע</span>
                             </div>
                         </div>
                     </div>
@@ -562,14 +560,15 @@
                             <div class="tradingview-chart-wrapper comparison-chart-wrapper">
                                 <div class="tradingview-chart-container tradingview-comparison-chart-container" id="comparison-chart-container">
                                     <div class="chart-loading">
-                                    <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
-                                </div>
-                                <div id="chart-scale-labels" class="chart-scale-labels">
-                                    <div id="left-scale-label" class="left-scale-label">
-                                        אחוז הצלחה (%)
+                                        <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
                                     </div>
-                                    <div id="right-scale-label" class="right-scale-label">
-                                        P/L כולל ($)
+                                    <div id="chart-scale-labels" class="chart-scale-labels">
+                                        <div id="left-scale-label" class="left-scale-label">
+                                            אחוז הצלחה (%)
+                                        </div>
+                                        <div id="right-scale-label" class="right-scale-label">
+                                            P/L כולל ($)
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2220,6 +2219,10 @@
                     return;
                 }
                 
+                // Get wrapper for width calculation (if exists)
+                const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                const containerWidth = wrapper ? wrapper.clientWidth : container.clientWidth;
+                
                 // Remove loading indicator
                 const loading = container.querySelector('.chart-loading');
                 if (loading) loading.remove();
@@ -2251,7 +2254,7 @@
                         vertLines: { visible: false },
                         horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
                     },
-                    width: container.clientWidth,
+                    width: containerWidth,
                     height: 300,
                     timeScale: {
                         visible: true,
@@ -3675,7 +3678,10 @@
             if (comparisonChart) {
                 const container = document.getElementById('comparison-chart-container');
                 if (container) {
-                    comparisonChart.applyOptions({ width: container.clientWidth });
+                    // Get wrapper for width calculation (if exists)
+                    const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                    const containerWidth = wrapper ? wrapper.clientWidth : container.clientWidth;
+                    comparisonChart.applyOptions({ width: containerWidth });
                 }
             }
         });

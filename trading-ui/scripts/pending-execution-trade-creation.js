@@ -92,8 +92,10 @@
     async refreshClusters({ source = 'executions', force = false } = {}) {
       try {
         if (this.state.isLoading && !force) {
+          window.Logger?.warn('⚠️ [PendingExecutionTradeCreation] Already loading, skipping');
           return;
         }
+
 
         this.state.isLoading = true;
         this.state.error = null;
@@ -115,6 +117,7 @@
         }
 
         const clusters = Array.isArray(payload.data) ? payload.data : [];
+        
         this.state.clusters = clusters;
         this.state.clusterMap = new Map(clusters.map(cluster => [cluster.cluster_id, cluster]));
         this.state.selection = new Map(
@@ -455,6 +458,7 @@
     renderExecutionsTable(cluster, selectedIds) {
       const FieldRenderer = window.FieldRendererService;
 
+
       const rows = (cluster.executions || []).map(execution => {
         const executionId = execution.id;
         const isChecked = selectedIds.has(executionId);
@@ -477,6 +481,9 @@
         const valueDisplay = execution.value ? `$${execution.value.toFixed(2)}` : '-';
         const feeDisplay = execution.fee ? `$${Number(execution.fee).toFixed(2)}` : '$0.00';
 
+        // Use exact same code as main executions table (executions.js line 1241)
+        const typeForFilter = ((execution.action || execution.type || '').trim()).toLowerCase();
+
         return `
           <tr data-execution-id=\"${executionId}\">
             <td class=\"text-center\">
@@ -489,7 +496,17 @@
                 ${isChecked ? 'checked' : ''}>
             </td>
             <td>${executionDate}</td>
-            <td>${execution.action === 'sale' ? 'מכירה' : 'קניה'}</td>
+            <td class=\"type-cell\" data-type=\"${typeForFilter}\">
+                    ${window.renderAction ? window.renderAction(execution.action || execution.type) : (() => {
+                        const action = ((execution.action || execution.type || '').trim()).toLowerCase();
+                        if (!action) return '<span class="badge badge-secondary">-</span>';
+                        const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
+                        const actionHebrew = actionTranslations[action] || action;
+                        const positiveActions = new Set(['buy', 'short']);
+                        const colorClass = positiveActions.has(action) ? ' text-success' : ' text-danger';
+                        return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>`;
+                    })()}
+            </td>
             <td>${quantity ?? '-'}</td>
             <td>${price ?? '-'}</td>
             <td>${valueDisplay}</td>
@@ -535,9 +552,15 @@
           || execution.date
           || '-';
         const value = execution.value ? `$${execution.value.toFixed(2)}` : '-';
+        
+        // Use exact same code as main executions table (executions.js line 3802)
+        const actionText = window.renderAction ? 
+                               window.renderAction(execution.action || execution.type).replace(/<[^>]*>/g, '') : 
+                               (execution.action || execution.type || 'buy');
+        
         return `
           <div class=\"trade-create-widget-execution d-flex justify-content-between\">
-            <span class=\"text-muted\">${date} • ${execution.action === 'sale' ? 'מכירה' : 'קניה'} • ${execution.quantity}</span>
+            <span class=\"text-muted\">${date} • ${actionText} • ${execution.quantity}</span>
             <span class=\"text-muted\">${value}</span>
           </div>
         `;

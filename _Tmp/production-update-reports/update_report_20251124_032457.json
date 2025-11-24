@@ -1,0 +1,44 @@
+{
+  "start_time": "2025-11-24T03:24:57.603808",
+  "steps": [
+    {
+      "number": 3,
+      "name": "backup_database",
+      "success": false,
+      "duration_seconds": 0.0026979446411132812,
+      "timestamp": "2025-11-24T03:24:57.616511",
+      "details": {
+        "success": false,
+        "error": "pg_dump not found - please install PostgreSQL client tools"
+      }
+    }
+  ],
+  "files_updated": [],
+  "files_new": [],
+  "files_deleted": [],
+  "warnings": [],
+  "errors": [
+    {
+      "message": "Database backup failed: pg_dump not found - please install PostgreSQL client tools",
+      "step": "backup_database",
+      "timestamp": "2025-11-24T03:24:57.616485"
+    },
+    {
+      "message": "Step 3 (backup_database) failed",
+      "step": "backup_database",
+      "timestamp": "2025-11-24T03:24:57.616514"
+    }
+  ],
+  "summary": {
+    "total_duration_seconds": 0.013147,
+    "steps_completed": 0,
+    "steps_failed": 1,
+    "files_updated_count": 0,
+    "files_new_count": 0,
+    "files_deleted_count": 0,
+    "warnings_count": 0,
+    "errors_count": 2
+  },
+  "end_time": "2025-11-24T03:24:57.616955",
+  "success": false
+}

@@ -3,6 +3,8 @@
 TikTrack Schema Guard
 =====================
 
+⚠️ DEPRECATED: This script is for SQLite databases only. The system now uses PostgreSQL.
+
 Validates that a target SQLite database matches the canonical schema stored in
 `_Tmp/simpleTrade_new.db`. The script compares table definitions (including
 column order, types, nullability, default values, and primary keys), indexes,

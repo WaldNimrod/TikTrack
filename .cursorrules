@@ -62,17 +62,29 @@ This is a fundamental rule that ALL future chats must follow. Any documentation 
 ## Server Management Rules - CRITICAL
 **השתמש רק ב-`./start_server.sh` להפעלת השרת - הסקריפט מגדיר אוטומטית PostgreSQL בסביבת פיתוח**
 
+### Environment Detection by Directory Name:
+**CRITICAL**: The server automatically detects environment based on workspace directory name:
+- **`TikTrackApp-Production`** → Production environment → Port **5001**
+- **`TikTrackApp`** → Development environment → Port **8080**
+
+**Always verify environment before starting server** by checking the workspace directory name.
+
+### Server Ports:
+- **Development**: Port **8080** (workspace: `TikTrackApp`)
+- **Production**: Port **5001** (workspace: `TikTrackApp-Production`)
+
 ### Database Migration Status:
 - **✅ COMPLETED**: Migration from SQLite to PostgreSQL (November 2025)
 - **✅ ACTIVE**: PostgreSQL is now the primary database
 - **❌ DEPRECATED**: SQLite is no longer in use (moved to archive)
 
 ### Server Startup Rules (PostgreSQL):
-- **ONLY USE**: `./start_server.sh` to start the server (automatically configures PostgreSQL in development)
+- **ONLY USE**: `./start_server.sh` to start the server (automatically detects environment and configures PostgreSQL)
 - **ALTERNATIVE**: `./start_pg_server.sh` (convenience wrapper, same as start_server.sh)
 - **NEVER RUN**: `python3 Backend/app.py` directly (will fail - no database connection)
 - **ALWAYS CHECK**: PostgreSQL Docker container is running: `docker ps | grep postgres`
 - **ALWAYS CHECK**: for running processes before starting
+- **ALWAYS VERIFY**: Environment detection by checking workspace directory name before starting
 
 ### PostgreSQL Environment Variables (Automatic):
 The `start_server.sh` script automatically sets these in development mode:

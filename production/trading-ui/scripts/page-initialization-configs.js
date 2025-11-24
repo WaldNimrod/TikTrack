@@ -1773,6 +1773,82 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         },
       ],
     },
+
+    // TradingView Lightweight Charts Test Page
+    tradingview_test_page: {
+      name: 'TradingView Lightweight Charts Test Page',
+      packages: [
+        'base',
+        'system-management',
+        'preferences',
+        'charts',
+        'tradingview-charts',
+        'init-system',
+      ],
+      requiredGlobals: [
+        'window.Logger',
+        'window.TradingViewTheme',
+        'window.TradingViewChartAdapter',
+        'window.LightweightCharts',
+        'window.PreferencesData',
+        'window.PreferencesCore',
+      ],
+      description: 'דף בדיקה עבור אינטגרציית TradingView Lightweight Charts',
+      lastModified: '2025-11-22',
+      pageType: 'test',
+      cacheStrategy: 'no-cache',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger.info('📊 Initializing TradingView Test Page...', {
+            page: 'page-initialization-configs',
+          });
+
+          // Initialize preferences with lazy loading (as per documentation)
+          if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+            window.Logger.info('📄 Initializing preferences with lazy loading...', {
+              page: 'page-initialization-configs',
+            });
+            
+            try {
+              await window.PreferencesCore.initializeWithLazyLoading();
+              window.Logger.info('✅ Preferences initialized successfully', {
+                page: 'page-initialization-configs',
+              });
+            } catch (error) {
+              window.Logger.warn('⚠️ Preferences initialization failed (non-critical)', {
+                page: 'page-initialization-configs',
+                error: error?.message || error,
+              });
+            }
+          } else {
+            window.Logger.warn('⚠️ PreferencesCore.initializeWithLazyLoading not available', {
+              page: 'page-initialization-configs',
+            });
+          }
+
+          // Wait a bit for preferences to load
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          // Reload TradingView theme preferences after preferences are loaded
+          if (window.TradingViewTheme && typeof window.TradingViewTheme.loadPreferences === 'function') {
+            try {
+              await window.TradingViewTheme.loadPreferences();
+              window.Logger.info('✅ TradingView theme preferences reloaded', {
+                page: 'page-initialization-configs',
+              });
+            } catch (error) {
+              window.Logger.warn('⚠️ Failed to reload TradingView theme preferences', {
+                page: 'page-initialization-configs',
+                error: error?.message || error,
+              });
+            }
+          }
+        },
+      ],
+    },
   };
 
   // ===== CONFIGURATION HELPER FUNCTIONS =====

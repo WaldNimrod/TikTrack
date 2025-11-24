@@ -117,23 +117,30 @@ GET /api/system/health/detailed   # Detailed health status
 - **Retry logic with up to 10 attempts**
 - **Port: 8080**
 
-#### Development Mode
-```bash
-./start_dev.sh
-```
-- Uses Flask development server
-- Hot reload enabled
-- Debug mode active
-- Port: 8080
-
-#### Production Mode
+#### Development Mode (Port 8080)
 ```bash
 ./start_server.sh
 ```
+- **Environment Detection**: Automatically detects from workspace directory name
+  - `TikTrackApp` → Development (port 8080)
+  - `TikTrackApp-Production` → Production (port 5001)
+- Uses Flask development server
+- Hot reload enabled
+- Debug mode active
+- Port: **8080**
+
+#### Production Mode (Port 5001)
+```bash
+./start_server.sh
+```
+- **Environment Detection**: Automatically detects from workspace directory name
+  - `TikTrackApp-Production` → Production (port 5001)
+  - `TikTrackApp` → Development (port 8080)
 - Uses Flask development server
 - Optimized for production
 - Better stability and performance
-- Port: 8080
+- Port: **5001**
+- Can override with: `./start_server.sh --env production`
 
 ### Server Health Check
 ```bash
@@ -149,7 +156,10 @@ python3 Backend/server_health_check.py
 
 ### Server Settings
 - **Host**: 127.0.0.1 (localhost)
-- **Port**: 8080
+- **Port**: 
+  - **Development**: 8080 (workspace: `TikTrackApp`)
+  - **Production**: 5001 (workspace: `TikTrackApp-Production`)
+- **Environment Detection**: Automatic by workspace directory name
 - **Threads**: 4 (production)
 - **Timeout**: 30 seconds
 

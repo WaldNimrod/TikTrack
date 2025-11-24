@@ -3,6 +3,8 @@
 TikTrack DB Backup Helper
 =========================
 
+⚠️ DEPRECATED: This script is for SQLite databases only. The system now uses PostgreSQL.
+
 Creates a timestamped backup of the active SQLite database, validates its
 integrity, and writes companion metadata to assist disaster recovery.
 

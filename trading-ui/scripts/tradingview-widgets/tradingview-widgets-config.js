@@ -2,7 +2,7 @@
  * TradingView Widgets Configuration
  * ==================================
  * 
- * Configuration for all 11 official TradingView widgets
+ * Configuration for all 13 official TradingView widgets
  * 
  * Documentation: documentation/02-ARCHITECTURE/FRONTEND/TRADINGVIEW_WIDGETS_IMPLEMENTATION_PLAN.md
  * 
@@ -14,7 +14,7 @@
 
   /**
    * TradingView Widgets Configuration
-   * Contains default configurations for all 11 official TradingView widgets
+   * Contains default configurations for all 13 official TradingView widgets
    */
   window.TradingViewWidgetsConfig = {
     /**
@@ -242,6 +242,42 @@
           locale: 'he',
           width: '100%',
           height: 600,
+          isTransparent: false
+        },
+        requiredParams: ['symbol'],
+        supportsRTL: false,
+        responsive: true
+      },
+
+      'symbol-search': {
+        script: 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-search.js',
+        defaultConfig: {
+          width: '100%',
+          height: 400,
+          symbolsTypes: [
+            { name: 'מניות', originalName: 'Stock' },
+            { name: 'מטבעות', originalName: 'Forex' },
+            { name: 'קריפטו', originalName: 'Crypto' }
+          ],
+          showSymbolLogo: true,
+          colorTheme: 'light',
+          locale: 'he',
+          isTransparent: false
+        },
+        requiredParams: [],
+        supportsRTL: false,
+        responsive: true
+      },
+
+      'technical-analysis': {
+        script: 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js',
+        defaultConfig: {
+          symbol: 'NASDAQ:AAPL',
+          interval: 'D',
+          width: '100%',
+          height: 500,
+          locale: 'he',
+          colorTheme: 'light',
           isTransparent: false
         },
         requiredParams: ['symbol'],

@@ -1,28 +1,45 @@
 # TikTrack Production Update Process - מדריך עדכון פרודקשן
 
-**תאריך:** 2025-11-21  
-**גרסה:** 1.3.0  
+**תאריך:** 2025-11-24  
+**גרסה:** 1.3.7.0  
 **מטרה:** תהליך מלא ומסודר לעדכון קוד הפרודקשן המקומי מול Git
 
 **⚠️ עדכון חשוב:** גרסה זו כוללת תיקונים קריטיים לבדיקת הגדרות production אחרי sync
 
-**🆕 עדכון 1.2.0:** כל ה-hardcoded URLs הוחלפו ב-relative URLs - הקוד עובד אוטומטית בפיתוח ובפרודקשן
+**🆕 עדכון 1.3.7.0:** מערכת עדכון מלאה עם ניהול שרת, זיהוי מיגרציות אוטומטי, תמיכה מלאה ב-PostgreSQL, ובדיקות E2E בדפדפן
+
+**🆕 עדכון 1.4.0:** הסרת אזכורים ל-SQLite מהתיעוד - המערכת עברה ל-PostgreSQL. הוספת סעיף על בדיקת צורך במיגרציות (ידני).
+
+**🆕 עדכון 1.3.7.0:** הוספת בדיקות E2E בדפדפן, שיפור ניהול שרת, ותמיכה מלאה ב-PostgreSQL.
 
 **🆕 עדכון 1.3.0:** שינוי מ-whitelist ל-blacklist - כל הקבצים מתעדכנים אוטומטית למעט חריגים ספציפיים (tests, archive, backups, documentation, legacy). הוספת verification מקיף אחרי sync.
+
+**🆕 עדכון 1.2.0:** כל ה-hardcoded URLs הוחלפו ב-relative URLs - הקוד עובד אוטומטית בפיתוח ובפרודקשן
 
 ---
 
 ## 📋 תהליך עדכון פרודקשן - סקירה מהירה
 
-### תהליך מלא (7 שלבים):
+### תהליך מלא (17 שלבים אוטומטיים):
 
 0. **הכנה בסביבת הפיתוח** - שמירת שינויים ויצירת changelog
-1. **עדכון main branch** - משיכת שינויים אחרונים
-2. **מיזוג main → production** - העברת שינויים לפרודקשן
-3. **סינכרון קוד** - העתקת קבצים פעילים לפרודקשן
-4. **בדיקות** - אימות שהכל עובד
-5. **עדכון גרסה** - קידום `Patch/Build` במערכת הגרסאות
-6. **Commit & Push** - שמירת שינויים ב-Git
+1. **שמירת שינויים בפרודקשן** - שמירת שינויים מקומיים לפני עדכון
+2. **בדיקת מצב השרת** - בדיקה אם השרת רץ על פורט 5001
+3. **גיבוי PostgreSQL** - יצירת גיבוי לפני עדכון
+4. **עדכון main branch** - משיכת שינויים אחרונים
+5. **מיזוג main → production** - העברת שינויים לפרודקשן
+6. **סינכרון קוד** - העתקת קבצים פעילים לפרודקשן
+7. **עצירת השרת** - עצירה בטוחה של השרת (אם רץ)
+8. **הרצת מיגרציות** - זיהוי והרצת מיגרציות נדרשות (אוטומטי!)
+9. **תיקון הגדרות production** - וידוא הגדרות נכונות
+10. **בדיקת עדכונים דרושים** - בדיקת dependencies וקבצים קריטיים
+11. **עדכון השרת** - התקנת dependencies חדשים
+12. **בדיקות אימות** - אימות שהכל עובד
+13. **הפעלת השרת** - הפעלה על פורט 5001 עם health check
+14. **בדיקת יציבות** - וידוא שהשרת רץ יציב
+15. **עדכון גרסה** - קידום `Patch/Build` במערכת הגרסאות
+16. **Commit & Push** - שמירת שינויים ב-Git
+17. **בדיקות E2E בדפדפן** - בדיקות end-to-end מקיפות (חדש!)
 
 ---
 
@@ -145,7 +162,7 @@ git log --oneline -10
 
 **התהליך מבוסס על `scripts/production-update/master.py` הקיים ב-production branch**
 
-#### אופציה 1: שימוש ב-Master Script (מומלץ)
+#### אופציה 1: שימוש ב-Master Script (מומלץ מאוד!)
 
 ```bash
 # עבור לענף פרודקשן
@@ -154,26 +171,48 @@ git checkout production
 # משוך עדכונים אחרונים של פרודקשן
 git pull origin production
 
-# מיזוג שינויים מ-main
-git merge main
-
-# הרצת Master Script (11 שלבים אוטומטיים)
+# הרצת Master Script (16 שלבים אוטומטיים מלאים)
 python3 scripts/production-update/master.py
 ```
 
-**Master Script מבצע:**
-- Step 1: Collect Changes - איסוף שינויים מ-main
-- Step 2: Merge Main - מיזוג main → production (עם conflict resolver אוטומטי)
-- Step 3: Cleanup Documentation - ניקוי דוקומנטציה
-- Step 4: Backup Database - גיבוי DB
-- Step 5: Sync Code - סנכרון קוד (Backend + UI) + post-sync transformations + verification
-- Step 5b: Verify Sync - בדיקת שלמות העדכון (file count, checksums, directory structure) - **חובה**
-- Step 6: Cleanup Backups - ניקוי קבצי גיבוי
-- Step 7: Fix Config - תיקון הגדרות production
-- Step 8: Validate - בדיקות ואימות
-- Step 9: Bump Version - עדכון גרסה
-- Step 10: Commit & Push - Git commit & push
-- Step 11: Start Server - הפעלת שרת (אופציונלי)
+**Master Script מבצע (17 שלבים):**
+
+**שלבים מקדימים:**
+- Step 1: Save Production Changes / Collect Changes - שמירת שינויים מקומיים או איסוף שינויים מ-main
+
+**ניהול שרת:**
+- Step 2: Check Server - בדיקת מצב השרת (רץ/לא רץ, PID, health check)
+- Step 7: Stop Server - עצירה בטוחה של השרת (graceful shutdown)
+- Step 13: Start Server - הפעלת השרת על פורט 5001 עם health check
+- Step 14: Verify Server Stability - בדיקת יציבות (6 בדיקות health check במרווחים)
+
+**גיבוי ומיזוג:**
+- Step 3: Backup Database - גיבוי PostgreSQL (pg_dump)
+- Step 4: Update Main - עדכון main branch
+- Step 5: Merge to Production - מיזוג main → production (עם conflict resolver אוטומטי)
+
+**סינכרון ועדכון:**
+- Step 6: Sync Code - סנכרון קוד (Backend + UI) + post-sync transformations + verification
+- Step 8: Run Migrations - **זיהוי והרצת מיגרציות נדרשות אוטומטית!** (חדש!)
+- Step 9: Fix Config - תיקון הגדרות production (PORT=5001, IS_PRODUCTION=True, PostgreSQL)
+- Step 10: Check Server Updates - בדיקת dependencies וקבצים קריטיים (חדש!)
+- Step 11: Update Server - התקנת dependencies חדשים (חדש!)
+
+**בדיקות ואימות:**
+- Step 12: Validate - בדיקות ואימות מקיפות
+
+**סיום:**
+- Step 15: Bump Version - עדכון גרסה
+- Step 16: Commit & Push - Git commit & push
+- Step 17: E2E Browser Tests - בדיקות end-to-end בדפדפן (חדש!)
+
+**יתרונות Master Script:**
+- ✅ **אוטומטי לחלוטין** - כל התהליך מתבצע אוטומטית
+- ✅ **זיהוי מיגרציות אוטומטי** - מזהה ומריץ מיגרציות נדרשות
+- ✅ **ניהול שרת מלא** - בדיקה, עצירה, עדכון, הפעלה, יציבות
+- ✅ **תמיכה ב-PostgreSQL** - גיבוי והרצת מיגרציות עם PostgreSQL
+- ✅ **בדיקות מקיפות** - כל הבדיקות מתבצעות אוטומטית
+- ✅ **Rollback** - תמיכה ב-rollback במקרה של כשלון
 
 #### אופציה 2: תהליך ידני
 
@@ -201,7 +240,7 @@ git commit -m "Merge main into production: [תאריך/תיאור]"
 
 ---
 
-### שלב 3: סינכרון קוד לפרודקשן
+### שלב 6: סינכרון קוד לפרודקשן
 
 **אם השתמשת ב-Master Script, שלב זה כבר בוצע אוטומטית!**
 
@@ -213,6 +252,7 @@ git checkout production
 
 # הרץ סקריפט סינכרון (מעתיק Backend + UI)
 ./scripts/sync_to_production.py
+./scripts/sync_ui_to_production.py
 ```
 
 **מה הסקריפט עושה:**
@@ -274,9 +314,10 @@ git checkout production
 ```bash
 # בדוק את ההגדרות
 cd production/Backend
-python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
+python3 -c "from config.settings import UI_DIR, DATABASE_URL, PORT, IS_PRODUCTION, USING_SQLITE; \
     print(f'UI: {UI_DIR}'); \
-    print(f'DB: {DB_PATH}'); \
+    print(f'DB: {DATABASE_URL[:50]}...'); \
+    print(f'Using SQLite: {USING_SQLITE}'); \
     print(f'Port: {PORT}'); \
     print(f'Production: {IS_PRODUCTION}')"
 ```
@@ -284,7 +325,7 @@ python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
 **תוצאה צפויה:**
 ```
 UI: /path/to/production/trading-ui
-DB: /path/to/production/Backend/db/TikTrack_DB.db
+DB: PostgreSQL connection string (postgresql+psycopg2://...)
 Port: 5001
 Production: True
 ```
@@ -294,7 +335,7 @@ Production: True
 1. **תקן `production/Backend/config/settings.py`:**
    - ודא ש-`IS_PRODUCTION = True` (hardcoded)
    - ודא ש-`PORT = 5001` (hardcoded)
-   - ודא ש-`DB_PATH` מצביע על `TikTrack_DB.db`
+   - ודא ש-`DATABASE_URL` מצביע על PostgreSQL (לא SQLite)
    - ודא ש-`UI_DIR` מצביע על `production/trading-ui`
 
 2. **תקן `production/Backend/config/logging.py`:**
@@ -309,9 +350,28 @@ Production: True
 
 ---
 
-### שלב 4: בדיקות ואימות
+### שלב 8: הרצת מיגרציות (אוטומטי!)
 
-**אם השתמשת ב-Master Script, חלק מהבדיקות כבר בוצעו אוטומטית!**
+**🆕 עדכון 1.3.7.0:** המערכת מזהה ומריצה מיגרציות אוטומטית!
+
+**אם השתמשת ב-Master Script, שלב זה כבר בוצע אוטומטית!**
+
+המערכת:
+1. מזהה מיגרציות נדרשות (טבלאות/עמודות חסרות)
+2. מסדרת אותן לפי dependencies
+3. מריצה אותן בסדר הנכון
+4. מאמתת שהן הצליחו
+
+**אם צריך להריץ ידנית:**
+```bash
+python3 scripts/production-update/steps/08_run_migrations.py
+```
+
+---
+
+### שלב 12: בדיקות ואימות
+
+**אם השתמשת ב-Master Script, כל הבדיקות כבר בוצעו אוטומטית!**
 
 #### בדיקה 1: Sync Verification
 
@@ -363,9 +423,10 @@ python3 scripts/sync_verifier.py
 
 ```bash
 cd production/Backend
-python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
+python3 -c "from config.settings import UI_DIR, DATABASE_URL, PORT, IS_PRODUCTION, USING_SQLITE; \
     print(f'UI: {UI_DIR}'); \
-    print(f'DB: {DB_PATH}'); \
+    print(f'DB: {DATABASE_URL[:50]}...'); \
+    print(f'Using SQLite: {USING_SQLITE}'); \
     print(f'Port: {PORT}'); \
     print(f'Production: {IS_PRODUCTION}')"
 ```
@@ -373,7 +434,7 @@ python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
 **תוצאה צפויה:**
 ```
 UI: /path/to/production/trading-ui
-DB: /path/to/production/Backend/db/TikTrack_DB.db
+DB: PostgreSQL connection string (postgresql+psycopg2://...)
 Port: 5001
 Production: True
 ```
@@ -387,21 +448,194 @@ python3 -c "from services.preferences_service import PreferencesService; print('
 
 **תוצאה צפויה:** `✅ OK` (ללא שגיאות)
 
-#### בדיקה 5: בדיקת הפעלת שרת (אופציונלי)
+#### בדיקה 4.5: בדיקת צורך במיגרציות (אוטומטי!)
+
+**🆕 עדכון 1.3.7.0:** המערכת מזהה אוטומטית מיגרציות נדרשות!
+
+**אם השתמשת ב-Master Script, שלב זה כבר בוצע אוטומטית!**
+
+אם לא, ניתן להריץ ידנית:
 
 ```bash
-cd production
-./start_production.sh --check-only
+# זיהוי מיגרציות נדרשות
+python3 scripts/production-update/utils/migration_detector.py
+
+# הרצת מיגרציות (דרך Master Script או ישירות)
+python3 scripts/production-update/steps/08_run_migrations.py
+```
+
+**מה המערכת עושה:**
+1. **משווה מבנה DB** - בין dev ל-production (טבלאות, עמודות, indexes)
+2. **סורקת מיגרציות** - בודקת כל מיגרציה ב-`Backend/migrations/`
+3. **מזהה מיגרציות נדרשות** - לפי טבלאות/עמודות חסרות
+4. **מריצה אוטומטית** - בסדר הנכון (dependencies)
+5. **מאמתת** - בודקת שהמיגרציה הצליחה
+
+**תמיכה במיגרציות:**
+- מיגרציות עם `run_migration(DATABASE_URL)` - תמיכה מלאה
+- מיגרציות עם `upgrade()` - תמיכה מלאה
+- מיגרציות עם `migrate()` - תמיכה מלאה
+
+**דוגמה לפלט:**
+```json
+{
+  "count": 2,
+  "migrations": [
+    {
+      "name": "create_ticker_provider_symbols_table",
+      "tables_created": ["ticker_provider_symbols"],
+      "columns_added": {},
+      "dependencies": []
+    }
+  ]
+}
+```
+
+**הערה:** אם יש מיגרציות מותאמות אישית, ניתן להריץ אותן ידנית:
+```bash
+python3 scripts/run_production_migration.py Backend/migrations/your_migration.py
+```
+
+#### בדיקה 5: בדיקת הפעלת שרת (אופציונלי)
+
+**🆕 עדכון 1.3.7.0:** יש מערכת אוטומטית לניהול שרת!
+
+```bash
+# בדיקת מצב השרת (אוטומטי)
+python3 scripts/production-update/steps/02_check_server.py
+
+# עצירת השרת (אם רץ)
+python3 scripts/production-update/steps/07_stop_server.py
+
+# בדיקת עדכונים דרושים
+python3 scripts/production-update/steps/10_check_server_updates.py
+
+# עדכון השרת (dependencies)
+python3 scripts/production-update/steps/11_update_server.py
+
+# הפעלת השרת
+python3 scripts/production-update/steps/13_start_server.py
+
+# בדיקת יציבות
+python3 scripts/production-update/steps/14_verify_server_stability.py
+```
+
+**או דרך Master Script (מומלץ):**
+```bash
+python3 scripts/production-update/master.py
+# כולל את כל שלבי ניהול השרת אוטומטית
 ```
 
 **תוצאה צפויה:**
 ```
-✅ No conflicts found - server can start safely
+✅ Server is running (PID: 12345)
+✅ Health check passed
+✅ Server stability verified
 ```
 
 ---
 
-### שלב 5: עדכון גרסה
+## 🔧 ניהול שרת - מדריך מפורט
+
+**🆕 עדכון 1.3.7.0:** מערכת ניהול שרת מלאה!
+
+### בדיקת מצב השרת
+
+```bash
+python3 scripts/production-update/steps/02_check_server.py
+```
+
+**מה הסקריפט בודק:**
+- האם השרת רץ על פורט 5001
+- PID של השרת (אם רץ)
+- Health check (`/api/health`)
+- זמן פעולה (uptime)
+
+**פלט:**
+```json
+{
+  "success": true,
+  "running": true,
+  "port": 5001,
+  "pid": 12345,
+  "health": "healthy",
+  "uptime": 3600
+}
+```
+
+### עצירת השרת
+
+```bash
+python3 scripts/production-update/steps/07_stop_server.py
+```
+
+**מה הסקריפט עושה:**
+1. בודק אם השרת רץ
+2. שולח SIGTERM (graceful shutdown)
+3. מחכה עד 30 שניות
+4. אם לא נסגר - שולח SIGKILL
+5. מאמת שהשרת נעצר
+
+### עדכון השרת
+
+```bash
+# בדיקת עדכונים דרושים
+python3 scripts/production-update/steps/10_check_server_updates.py
+
+# עדכון dependencies
+python3 scripts/production-update/steps/11_update_server.py
+```
+
+**מה הסקריפטים בודקים:**
+- Dependencies חסרים או מיושנים
+- קבצים קריטיים קיימים
+- מבנה DB תקין
+- קבצי UI קיימים
+
+### הפעלת השרת
+
+```bash
+python3 scripts/production-update/steps/13_start_server.py
+```
+
+**מה הסקריפט עושה:**
+1. בודק שפורט 5001 פנוי
+2. מפעיל את השרת
+3. מחכה ל-health check (עד 30 שניות)
+4. מדווח על PID וזמן הפעלה
+
+**⚠️ חשוב:** השרת רץ על פורט 5001 (לא 8080)!
+
+### בדיקת יציבות
+
+```bash
+python3 scripts/production-update/steps/14_verify_server_stability.py
+```
+
+**מה הסקריפט עושה:**
+1. מחכה 30 שניות
+2. מבצע 6 בדיקות health check (כל 5 שניות)
+3. בודק שהתהליך עדיין רץ
+4. בודק לוגים לשגיאות קריטיות
+5. מדווח על יציבות
+
+**תוצאה צפויה:**
+```json
+{
+  "stable": true,
+  "health_checks": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6
+  },
+  "process_alive": true,
+  "log_errors_count": 0
+}
+```
+
+---
+
+### שלב 15: עדכון גרסה
 
 ```bash
 # קידום גרסת הפרודקשן אחרי סנכרון קוד
@@ -423,7 +657,7 @@ python3 scripts/versioning/bump-version.py \
 
 ---
 
-### שלב 6: Commit & Push
+### שלב 16: Commit & Push
 
 ```bash
 # ודא שאתה ב-production branch
@@ -454,6 +688,57 @@ git push origin production
 
 ---
 
+### שלב 17: בדיקות E2E בדפדפן (חדש!)
+
+**🆕 עדכון 1.3.7.0:** הוספת בדיקות E2E מקיפות בסוף התהליך!
+
+**אם השתמשת ב-Master Script, שלב זה כבר בוצע אוטומטית!**
+
+המערכת מבצעת בדיקות end-to-end מקיפות:
+
+1. **Health Check** - בדיקת `/api/health` וכל הרכיבים (API, Database, Cache, System)
+2. **דפים קריטיים** - בדיקת טעינת דפים ראשיים:
+   - דף הבית (`/`)
+   - דף טריידים (`/trades`)
+   - דף ביצועים (`/executions`)
+   - דף התראות (`/alerts`)
+3. **API Endpoints** - בדיקת endpoints קריטיים:
+   - `/api/currencies`
+   - `/api/tickers`
+   - `/api/trades`
+   - `/api/alerts`
+4. **Static Assets** - בדיקת טעינת קבצי CSS ו-JS
+
+**אם צריך להריץ ידנית:**
+```bash
+python3 scripts/production-update/steps/17_e2e_tests.py
+```
+
+**תוצאה צפויה:**
+```
+✅ Server is healthy
+✅ Health endpoint OK - all systems healthy
+✅ Main page loads OK with all required elements
+✅ trades page loads OK
+✅ executions page loads OK
+✅ alerts page loads OK
+✅ currencies API OK - valid JSON response
+✅ tickers API OK - valid JSON response
+✅ trades API OK - valid JSON response
+✅ alerts API OK - valid JSON response
+✅ All basic browser checks passed (10/10)
+```
+
+**אם יש שגיאות:**
+- המערכת מדווחת על כל שגיאה
+- בדיקות נכשלות לא מונעות את סיום התהליך (אזהרה בלבד)
+- כל השגיאות מתועדות בדוח הסופי
+
+**תמיכה ב-Playwright:**
+אם Playwright מותקן, המערכת תשתמש בו לבדיקות מתקדמות יותר בנוסף לבדיקות הבסיסיות. אחרת, היא תבצע בדיקות מקיפות באמצעות HTTP requests.
+
+---
+
 ## 📝 תהליך מהיר (Quick Update)
 
 אם אתה בטוח שהכל תקין ורוצה תהליך מהיר:
@@ -470,7 +755,7 @@ cd /path/to/TikTrackApp-Production
 git checkout production && git pull origin production
 git merge main
 
-# 2. הרצת Master Script (כולל sync, בדיקות, commit)
+# 2. הרצת Master Script (כולל sync, מיגרציות, ניהול שרת, בדיקות, commit)
 python3 scripts/production-update/master.py
 
 # 3. תיעוד עדכוני שרת (אם צריך)
@@ -515,8 +800,9 @@ git commit -m "Resolve merge conflicts"
 ```bash
 # בדוק את ההגדרות
 cd production/Backend
-python3 -c "from config.settings import DB_PATH, UI_DIR, PORT, IS_PRODUCTION; \
-    print(f'DB: {DB_PATH}'); \
+python3 -c "from config.settings import DATABASE_URL, UI_DIR, PORT, IS_PRODUCTION, USING_SQLITE; \
+    print(f'DB: {DATABASE_URL[:50]}...'); \
+    print(f'Using SQLite: {USING_SQLITE}'); \
     print(f'UI: {UI_DIR}'); \
     print(f'Port: {PORT}'); \
     print(f'Production: {IS_PRODUCTION}')"
@@ -525,7 +811,7 @@ python3 -c "from config.settings import DB_PATH, UI_DIR, PORT, IS_PRODUCTION; \
 # ודא ש-IS_PRODUCTION = True (hardcoded)
 # ודא ש-PORT = 5001 (hardcoded)
 # ודא ש-UI_DIR מצביע על production/trading-ui
-# ודא ש-DB_PATH מצביע על production/Backend/db/TikTrack_DB.db
+# ודא ש-DATABASE_URL מצביע על PostgreSQL (לא SQLite)
 ```
 
 ### בעיה: הגדרות production לא נכונות אחרי sync
@@ -538,7 +824,7 @@ python3 -c "from config.settings import DB_PATH, UI_DIR, PORT, IS_PRODUCTION; \
    ```python
    IS_PRODUCTION = True  # Hardcoded!
    PORT = 5001  # Hardcoded!
-   DB_PATH = BASE_DIR / "db" / "TikTrack_DB.db"
+   DATABASE_URL = "postgresql+psycopg2://..."  # PostgreSQL connection string
    UI_DIR = BASE_DIR.parent / "trading-ui"
    ```
 3. פתח `production/Backend/config/logging.py`
@@ -551,15 +837,47 @@ python3 -c "from config.settings import DB_PATH, UI_DIR, PORT, IS_PRODUCTION; \
 # בדוק קונפליקטים על הפורט
 lsof -i :5001
 
+# בדוק את מצב השרת (אוטומטי)
+python3 scripts/production-update/steps/02_check_server.py
+
 # בדוק את הלוגים
-tail -f production/Backend/logs/app.log
+tail -f production/Backend/server_output.log
 
 # בדוק את ההגדרות
 cd production/Backend
-python3 -c "from config.settings import PORT, DB_PATH, UI_DIR; \
+python3 -c "from config.settings import PORT, DATABASE_URL, UI_DIR, IS_PRODUCTION; \
     print(f'Port: {PORT}'); \
-    print(f'DB exists: {DB_PATH.exists()}'); \
-    print(f'UI exists: {UI_DIR.exists()}')"
+    print(f'DB: {DATABASE_URL[:50]}...'); \
+    print(f'UI exists: {UI_DIR.exists()}'); \
+    print(f'Production: {IS_PRODUCTION}')"
+```
+
+### בעיה: מיגרציות לא רצות
+
+**פתרון:**
+```bash
+# בדוק מיגרציות נדרשות
+python3 scripts/production-update/utils/migration_detector.py
+
+# הרץ מיגרציות ידנית
+python3 scripts/production-update/steps/08_run_migrations.py
+
+# או מיגרציה בודדת
+python3 scripts/run_production_migration.py Backend/migrations/your_migration.py
+```
+
+### בעיה: השרת נופל אחרי הפעלה
+
+**פתרון:**
+```bash
+# בדוק יציבות השרת
+python3 scripts/production-update/steps/14_verify_server_stability.py
+
+# בדוק עדכונים דרושים
+python3 scripts/production-update/steps/10_check_server_updates.py
+
+# עדכן dependencies
+python3 scripts/production-update/steps/11_update_server.py
 ```
 
 ---
@@ -573,11 +891,13 @@ python3 -c "from config.settings import PORT, DB_PATH, UI_DIR; \
 - [ ] **ההגדרות ב-`production/Backend/config/settings.py` נכונות (hardcoded production)**
 - [ ] **ההגדרות ב-`production/Backend/config/logging.py` נכונות (logs directory)**
 - [ ] UI_DIR מצביע על `production/trading-ui`
-- [ ] DB_PATH מצביע על `production/Backend/db/TikTrack_DB.db`
+- [ ] DATABASE_URL מצביע על PostgreSQL (לא SQLite)
 - [ ] PORT = 5001 (hardcoded)
 - [ ] IS_PRODUCTION = True (hardcoded)
+- [ ] **כל המיגרציות רצו בהצלחה** (אם היו)
+- [ ] **השרת רץ יציב** (אם הופעל)
+- [ ] **Health check עובר** (HTTP 200)
 - [ ] ה-commit message ברור ומתאר את השינויים
-- [ ] אם יש מיגרציות חדשות, הן נוספו ל-`create_production_db.py`
 
 ---
 
@@ -631,11 +951,33 @@ echo "🎉 Production update completed successfully!"
 ## 🔗 קבצים רלוונטיים
 
 ### סקריפטים מרכזיים:
-- `scripts/production-update/master.py` - Master Script (11 שלבים אוטומטיים)
+
+**Master Script:**
+- `scripts/production-update/master.py` - Master Script (16 שלבים אוטומטיים מלאים)
+
+**סינכרון:**
 - `scripts/sync_to_production.py` - סקריפט סינכרון קוד (עם DB protection)
 - `scripts/sync_ui_to_production.py` - סקריפט סינכרון UI (עם verification)
 - `scripts/sync_verifier.py` - בדיקת sync עם checksums
 - `scripts/pre_sync_validation.py` - בדיקת מוכנות לפני sync
+
+**מיגרציות (חדש!):**
+- `scripts/production-update/utils/migration_detector.py` - זיהוי מיגרציות נדרשות
+- `scripts/production-update/steps/08_run_migrations.py` - הרצת מיגרציות אוטומטית
+- `scripts/run_production_migration.py` - הרצת מיגרציה בודדת (PostgreSQL)
+
+**ניהול שרת (חדש!):**
+- `scripts/production-update/steps/02_check_server.py` - בדיקת מצב השרת
+- `scripts/production-update/steps/07_stop_server.py` - עצירת השרת
+- `scripts/production-update/steps/10_check_server_updates.py` - בדיקת עדכונים דרושים
+- `scripts/production-update/steps/11_update_server.py` - עדכון השרת
+- `scripts/production-update/steps/13_start_server.py` - הפעלת השרת (פורט 5001)
+- `scripts/production-update/steps/14_verify_server_stability.py` - בדיקת יציבות
+
+**זיהוי קבצים (חדש!):**
+- `scripts/production-update/utils/new_files_detector.py` - זיהוי קבצים חדשים
+
+**תמיכה:**
 - `scripts/production-update/prepare_changelog.py` - יצירת changelog
 - `scripts/production-update/document_server_changes.py` - תיעוד עדכוני שרת
 
@@ -662,9 +1004,26 @@ echo "🎉 Production update completed successfully!"
 
 ---
 
-**עודכן:** 2025-11-09  
-**גרסה:** 1.3.0  
-**מטרה:** תהליך עדכון מסודר ומובנה
+**עודכן:** 2025-11-24  
+**גרסה:** 1.3.7.0  
+**מטרה:** תהליך עדכון מסודר ומובנה עם ניהול שרת מלא
+
+## 📝 שינויים בגרסה 1.3.7.0
+
+- ✅ **ניהול שרת מלא:** בדיקה, עצירה, עדכון, הפעלה, ויציבות (5 שלבים חדשים)
+- ✅ **זיהוי מיגרציות אוטומטי:** מערכת אוטומטית לזיהוי והרצת מיגרציות נדרשות
+- ✅ **תמיכה מלאה ב-PostgreSQL:** כל הסקריפטים עודכנו ל-PostgreSQL (גיבוי, מיגרציות)
+- ✅ **בדיקת עדכונים דרושים:** בדיקה אוטומטית של dependencies וקבצים קריטיים
+- ✅ **17 שלבים אוטומטיים:** תהליך מלא ומקיף במקום 11 שלבים בסיסיים
+- ✅ **זיהוי קבצים חדשים:** מערכת לזיהוי קבצים חדשים ושינויים
+- ✅ **בריאות שרת:** health checks ויציבות אוטומטית
+- ✅ **בדיקות E2E בדפדפן:** בדיקות end-to-end מקיפות בסוף התהליך (חדש!)
+
+## 📝 שינויים בגרסה 1.4.0
+
+- ✅ **הסרת אזכורים ל-SQLite:** עדכון התיעוד - המערכת עברה ל-PostgreSQL
+- ✅ **בדיקת מיגרציות:** הוספת סעיף על בדיקת צורך במיגרציות (ידני - עכשיו אוטומטי!)
+- ✅ **עדכון בדיקות הגדרות:** שינוי מ-`DB_PATH` ל-`DATABASE_URL` ו-`USING_SQLITE`
 
 ## 📝 שינויים בגרסה 1.3.0
 

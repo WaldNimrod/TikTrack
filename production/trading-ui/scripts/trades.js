@@ -4209,7 +4209,14 @@ async function saveTrade() {
             notes: tradeData.notes || null
         };
         
-        if (tradeData.entry_date) {
+        // Determine if this is add or edit (must be before validation)
+        const isEdit = form.dataset.mode === 'edit';
+        
+        // Only set created_at if entry_date is provided (for manual entry date)
+        // If not provided, created_at will be set automatically by the server
+        // Note: opened_at (entry_date) should be the date of the first execution, not the record creation date
+        if (tradeData.entry_date && isEdit) {
+            // Only set created_at on edit if entry_date is provided
             try {
                 const entryDate = new Date(tradeData.entry_date);
                 payload.created_at = entryDate.toISOString();
@@ -4217,6 +4224,8 @@ async function saveTrade() {
                 window.Logger.warn('Invalid entry date provided', { entryDate: tradeData.entry_date, error: dateError });
             }
         }
+        // On creation, don't send created_at - let server set it automatically
+        // opened_at will be set automatically from the first execution date
         
         // Validate data
         if (!window.validateEntityForm) {
@@ -4234,7 +4243,8 @@ async function saveTrade() {
             { id: 'tradeTakeProfit', name: 'Take Profit', rules: { required: false, min: 0.01 } },
             { id: 'tradeStopLossPercent', name: 'Stop Loss (%)', rules: { required: false, min: 0.01 } },
             { id: 'tradeTakeProfitPercent', name: 'Take Profit (%)', rules: { required: false, min: 0.01 } },
-            { id: 'tradeEntryDate', name: 'תאריך כניסה', rules: { required: true } },
+            // opened_at (entry_date) is not required on creation - will be set automatically from first execution
+            { id: 'tradeEntryDate', name: 'תאריך כניסה', rules: { required: isEdit } },
             { id: 'tradeStatus', name: 'סטטוס', rules: { required: true } }
         ];
         
@@ -4248,8 +4258,6 @@ async function saveTrade() {
             return;
         }
         
-        // Determine if this is add or edit
-        const isEdit = form.dataset.mode === 'edit';
         const tradeId = form.dataset.tradeId;
         
         // Prepare API call

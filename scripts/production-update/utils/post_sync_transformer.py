@@ -270,6 +270,7 @@ class DBProtector:
     
     def __init__(self, project_root: Path):
         self.project_root = project_root
+        # Note: System uses PostgreSQL - these paths are for legacy SQLite support only
         self.production_db = project_root / "production" / "Backend" / "db" / "tiktrack.db"
         self.backup_db = project_root / "production" / "Backend" / "db" / "tiktrack.db.backup"
         self.logger = get_logger()
@@ -306,6 +307,7 @@ class DBProtector:
                 source_db = self.backup_db
                 self.logger.info("  💾 Restoring DB from backup...")
             else:
+                # Legacy SQLite paths (deprecated - system uses PostgreSQL)
                 tmp_db = self.project_root / "_Tmp" / "tiktrack.db"
                 dev_db = self.project_root / "Backend" / "db" / "tiktrack.db"
                 

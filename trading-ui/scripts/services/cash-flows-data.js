@@ -393,6 +393,201 @@
     window.CacheTTLGuard.setConfig(CACHE_KEY, { ttl: DEFAULT_TTL });
   }
 
+  // ========================================================================
+  // Business Logic API Wrappers
+  // ========================================================================
+
+  /**
+   * Validate cash flow data using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (60s TTL).
+   * @param {Object} cashFlowData - Cash flow data to validate
+   * @returns {Promise<Object>} Validation result: {is_valid, errors}
+   */
+  async function validateCashFlow(cashFlowData) {
+    // Use optimized cache key generation
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-cash-flow', cashFlowData)
+      : `business:validate-cash-flow:${JSON.stringify(cashFlowData)}`;
+    
+    try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/cash-flow/validate', {
+            method: 'POST',
+            headers: DEFAULT_HEADERS,
+            body: JSON.stringify(cashFlowData)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            return {
+              is_valid: false,
+              errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+            };
+          }
+
+          const result = await response.json();
+          return {
+            is_valid: result.status === 'success',
+            errors: []
+          };
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
+      const response = await fetch('/api/business/cash-flow/validate', {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify(cashFlowData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return {
+          is_valid: false,
+          errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+        };
+      }
+
+      const result = await response.json();
+      return {
+        is_valid: result.status === 'success',
+        errors: []
+      };
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating cash flow', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      return {
+        is_valid: false,
+        errors: [error?.message || 'Validation failed']
+      };
+    }
+  }
+
+  /**
+   * Calculate cash flow balance using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (30s TTL).
+   * @param {number} accountId - Account ID
+   * @param {Object} params - Additional parameters
+   * @returns {Promise<Object>} Calculated balance
+   */
+  async function calculateCashFlowBalance(accountId, params = {}) {
+    // Use optimized cache key generation
+    const cacheKey = window.CacheKeyHelper?.generateCacheKey 
+      ? window.CacheKeyHelper.generateCacheKey('business:calculate-cash-flow-balance', accountId, params)
+      : `business:calculate-cash-flow-balance:${accountId}:${JSON.stringify(params)}`;
+    
+    try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/cash-flow/calculate-balance', {
+            method: 'POST',
+            headers: DEFAULT_HEADERS,
+            body: JSON.stringify({ account_id: accountId, ...params })
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const result = await response.json();
+          if (result.status === 'success' && result.data) {
+            return result.data;
+          } else {
+            throw new Error(result.error?.message || 'Invalid calculation result');
+          }
+        }, { ttl: 30 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
+      const response = await fetch('/api/business/cash-flow/calculate-balance', {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify({ account_id: accountId, ...params })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result.status === 'success' && result.data) {
+        return result.data;
+      } else {
+        throw new Error(result.error?.message || 'Invalid calculation result');
+      }
+    } catch (error) {
+      window.Logger?.error?.('❌ Error calculating cash flow balance', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      throw error;
+    }
+  }
+
+  /**
+   * Calculate currency conversion using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (30s TTL).
+   * @param {number} amount - Amount to convert
+   * @param {string} fromCurrency - Source currency code
+   * @param {string} toCurrency - Target currency code
+   * @returns {Promise<Object>} Conversion result
+   */
+  async function calculateCurrencyConversion(amount, fromCurrency, toCurrency) {
+    const cacheKey = `business:calculate-currency-conversion:${amount}:${fromCurrency}:${toCurrency}`;
+    
+    try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/cash-flow/calculate-currency-conversion', {
+            method: 'POST',
+            headers: DEFAULT_HEADERS,
+            body: JSON.stringify({
+              amount,
+              from_currency: fromCurrency,
+              to_currency: toCurrency
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const result = await response.json();
+          if (result.status === 'success' && result.data) {
+            return result.data;
+          } else {
+            throw new Error(result.error?.message || 'Invalid calculation result');
+          }
+        }, { ttl: 30 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
+      const response = await fetch('/api/business/cash-flow/calculate-currency-conversion', {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify({
+          amount,
+          from_currency: fromCurrency,
+          to_currency: toCurrency
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result.status === 'success' && result.data) {
+        return result.data;
+      } else {
+        throw new Error(result.error?.message || 'Invalid calculation result');
+      }
+    } catch (error) {
+      window.Logger?.error?.('❌ Error calculating currency conversion', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      throw error;
+    }
+  }
+
   window.CashFlowsData = {
     KEY: CACHE_KEY,
     TTL: DEFAULT_TTL,
@@ -409,6 +604,9 @@
     updateCurrencyExchange,
     deleteCurrencyExchange,
     fetchCurrencyExchange,
+    validateCashFlow,
+    calculateCashFlowBalance,
+    calculateCurrencyConversion,
   };
 
   window.Logger?.info?.('✅ Cash Flows Data Service initialized', PAGE_LOG_CONTEXT);

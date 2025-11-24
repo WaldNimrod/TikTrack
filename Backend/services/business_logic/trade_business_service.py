@@ -14,6 +14,7 @@ from __future__ import annotations
 import logging
 from decimal import Decimal
 from typing import Any, Dict, List, Optional
+from sqlalchemy.orm import Session
 
 from .base_business_service import BaseBusinessService
 from .business_rules_registry import business_rules_registry
@@ -28,9 +29,14 @@ class TradeBusinessService(BaseBusinessService):
     Handles all trade-related calculations, validations, and business rules.
     """
     
-    def __init__(self):
+    @property
+    def table_name(self) -> Optional[str]:
+        """Return the database table name for trades."""
+        return 'trades'
+    
+    def __init__(self, db_session: Optional[Session] = None):
         """Initialize the trade business service."""
-        super().__init__()
+        super().__init__(db_session)
         self.registry = business_rules_registry
     
     # ========================================================================
@@ -467,6 +473,11 @@ class TradeBusinessService(BaseBusinessService):
         """
         Validate trade data according to business rules.
         
+        Validation order (CRITICAL - must follow this order):
+        1. Database Constraints (ValidationService) - checks NOT NULL, UNIQUE, FOREIGN KEY, ENUM, RANGE, CHECK
+        2. Business Rules Registry - checks min/max, allowed_values, required (only if not in Constraints)
+        3. Complex Business Rules - checks business logic (e.g., price*quantity validation)
+        
         Args:
             data: Trade data dictionary
             
@@ -475,22 +486,26 @@ class TradeBusinessService(BaseBusinessService):
         """
         errors = []
         
-        # Validate required fields
-        required_fields = ['price', 'quantity', 'side', 'investment_type', 'status']
-        for field in required_fields:
-            if field not in data or data[field] is None or data[field] == '':
-                errors.append(f"{field} is required")
+        # Step 1: Validate against database constraints (FIRST!)
+        is_valid, constraint_errors = self.validate_with_constraints(data)
+        if not is_valid:
+            errors.extend(constraint_errors)
+            self.logger.debug(f"Constraint validation found {len(constraint_errors)} errors")
         
-        # Validate field values using registry
+        # Step 2: Validate against business rules registry (SECOND!)
+        # Note: BusinessRulesRegistry יכול לבדוק חוקים מורכבים יותר מ-Constraints
+        # (למשל: min/max values שלא מוגדרים ב-CHECK constraints, או חוקים דינמיים)
+        from .utils.edge_cases_utils import is_empty_value
+        
         for field, value in data.items():
-            if value is None or value == '':
+            if is_empty_value(value):
                 continue
             
             rule_result = self.registry.validate_value('trade', field, value)
             if not rule_result['is_valid']:
                 errors.append(rule_result['error'])
         
-        # Business rule validations
+        # Step 3: Complex business rules (THIRD!)
         if 'price' in data and 'quantity' in data:
             price = data.get('price')
             quantity = data.get('quantity')
@@ -673,9 +688,14 @@ class TradeBusinessService(BaseBusinessService):
                             f"תאריך יצירת התוכנית מאוחר מתאריך פתיחת הטרייד. "
                             "לא ניתן לקשר תוכנית שנוצרה אחרי פתיחת הטרייד."
                         )
-                except (ValueError, AttributeError):
-                    # If date parsing fails, skip this validation
-                    self.logger.warning("Failed to parse dates for trade plan validation")
+                except (ValueError, AttributeError) as e:
+                    # Date parsing failed - add error instead of silently skipping
+                    error_msg = f"שגיאה בפענוח תאריכים: תאריך יצירת תוכנית או תאריך פתיחת טרייד לא תקין"
+                    errors.append(error_msg)
+                    self.logger.error(
+                        f"Failed to parse dates for trade plan validation: plan_created_at={plan_created_at}, "
+                        f"trade_opened_at={trade_opened_at}, error={str(e)}"
+                    )
         
         return {
             'is_valid': len(errors) == 0,
@@ -770,9 +790,14 @@ class TradeBusinessService(BaseBusinessService):
                     errors.append(
                         f"תאריך סגירה לא יכול להיות לפני תאריך יצירה"
                     )
-            except (ValueError, AttributeError):
-                # If date parsing fails, skip this validation
-                self.logger.warning("Failed to parse dates for trade validation")
+            except (ValueError, AttributeError) as e:
+                # Date parsing failed - add error instead of silently skipping
+                error_msg = f"שגיאה בפענוח תאריכים: תאריך פתיחה או תאריך סגירה לא תקין"
+                errors.append(error_msg)
+                self.logger.error(
+                    f"Failed to parse dates for trade validation: opened_at={opened_at}, "
+                    f"closed_at={closed_at}, error={str(e)}"
+                )
         
         # Validate updated data
         validation_result = self.validate(updated_trade)

@@ -84,10 +84,11 @@
     
 
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
+    
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+    
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
 </head>
 <body class="conditions-test-page">
     <!-- Unified Header -->
@@ -101,24 +102,24 @@
             <div class="top-section" data-section="top">
                 <div class="section-header">
                     <div class="table-title">
-                        <img src="images/icons/development.svg" alt="בדיקת תנאים" class="section-icon">
+                        <img src="images/icons/entities/development.svg" alt="בדיקת תנאים" class="section-icon">
                         מערכת בדיקת תנאים - Conditions
                     </div>
                     <div class="table-actions">
                         <button class="btn btn-success" id="runAllTestsBtn">
-                            <i class="fas fa-play-circle"></i>
+                            <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon">
                             Run All Tests
                         </button>
                         <button class="btn btn-secondary" id="clearLogsBtn">
-                            <i class="fas fa-trash"></i>
+                            <img src="/trading-ui/images/icons/tabler/trash.svg" width="16" height="16" alt="trash" class="icon">
                             Clear Logs
                         </button>
                         <button class="btn btn-primary" id="copyLogBtn">
-                            <i class="fas fa-copy"></i>
+                            <img src="/trading-ui/images/icons/tabler/copy.svg" width="16" height="16" alt="copy" class="icon">
                             Copy Log
                         </button>
                         <button class="btn btn-warning" id="resetAllBtn">
-                            <i class="fas fa-redo"></i>
+                            <img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon">
                             Reset All
                         </button>
                     </div>
@@ -139,7 +140,7 @@
                 <div class="content-section" id="test-controls">
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/development.svg" alt="שלבי בדיקה" class="section-icon">
+                            <img src="images/icons/entities/development.svg" alt="שלבי בדיקה" class="section-icon">
                             שלבי בדיקה
                         </div>
                         <div class="table-count" id="testCount">7 בדיקות</div>
@@ -155,7 +156,7 @@
                             </div>
                             <div class="test-item-controls">
                                 <button class="btn btn-sm btn-primary run-test-btn" data-test="load-methods">
-                                    <i class="fas fa-play"></i>
+                                    <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon">
                                     Run Test
                                 </button>
                                 <span class="test-duration" id="duration-1"></span>
@@ -171,7 +172,7 @@
                             </div>
                             <div class="test-item-controls">
                                 <button class="btn btn-sm btn-primary run-test-btn" data-test="create-condition">
-                                    <i class="fas fa-play"></i>
+                                    <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon">
                                     Run Test
                                 </button>
                                 <span class="test-duration" id="duration-2"></span>
@@ -187,7 +188,7 @@
                             </div>
                             <div class="test-item-controls">
                                 <button class="btn btn-sm btn-primary run-test-btn" data-test="read-conditions">
-                                    <i class="fas fa-play"></i>
+                                    <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon">
                                     Run Test
                                 </button>
                                 <span class="test-duration" id="duration-3"></span>
@@ -203,7 +204,7 @@
                             </div>
                             <div class="test-item-controls">
                                 <button class="btn btn-sm btn-primary run-test-btn" data-test="edit-condition">
-                                    <i class="fas fa-play"></i>
+                                    <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon">
                                     Run Test
                                 </button>
                                 <span class="test-duration" id="duration-4"></span>
@@ -219,7 +220,7 @@
                             </div>
                             <div class="test-item-controls">
                                 <button class="btn btn-sm btn-primary run-test-btn" data-test="delete-condition">
-                                    <i class="fas fa-play"></i>
+                                    <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon">
                                     Run Test
                                 </button>
                                 <span class="test-duration" id="duration-5"></span>
@@ -235,7 +236,7 @@
                             </div>
                             <div class="test-item-controls">
                                 <button class="btn btn-sm btn-primary run-test-btn" data-test="create-alert">
-                                    <i class="fas fa-play"></i>
+                                    <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon">
                                     Run Test
                                 </button>
                                 <span class="test-duration" id="duration-6"></span>
@@ -251,7 +252,7 @@
                             </div>
                             <div class="test-item-controls">
                                 <button class="btn btn-sm btn-primary run-test-btn" data-test="inheritance-test">
-                                    <i class="fas fa-play"></i>
+                                    <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon">
                                     Run Test
                                 </button>
                                 <span class="test-duration" id="duration-7"></span>
@@ -267,7 +268,7 @@
                             </div>
                             <div class="test-item-controls">
                                 <button class="btn btn-sm btn-primary run-test-btn" data-test="evaluate-single">
-                                    <i class="fas fa-play"></i>
+                                    <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon">
                                     Run Test
                                 </button>
                                 <span class="test-duration" id="duration-8"></span>
@@ -283,7 +284,7 @@
                             </div>
                             <div class="test-item-controls">
                                 <button class="btn btn-sm btn-primary run-test-btn" data-test="evaluate-all">
-                                    <i class="fas fa-play"></i>
+                                    <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon">
                                     Run Test
                                 </button>
                                 <span class="test-duration" id="duration-9"></span>
@@ -299,7 +300,7 @@
                             </div>
                             <div class="test-item-controls">
                                 <button class="btn btn-sm btn-primary run-test-btn" data-test="alert-auto-generation">
-                                    <i class="fas fa-play"></i>
+                                    <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon">
                                     Run Test
                                 </button>
                                 <span class="test-duration" id="duration-10"></span>
@@ -314,12 +315,12 @@
                 <div class="content-section" id="quick-stats">
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/development.svg" alt="סטטיסטיקות מהירות" class="section-icon">
+                            <img src="images/icons/entities/development.svg" alt="סטטיסטיקות מהירות" class="section-icon">
                             סטטיסטיקות מהירות וקישורים
                         </div>
                         <div class="table-actions">
                             <button class="btn btn-sm btn-info" id="refreshStatsBtn">
-                                <i class="fas fa-sync-alt"></i>
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                 רענן
                             </button>
                         </div>
@@ -351,19 +352,19 @@
                                 <h5>קישורים מהירים:</h5>
                                 <div class="links-grid">
                                     <a href="trade_plans.html" class="quick-link">
-                                        <i class="fas fa-chart-line"></i>
+                                        <img src="/trading-ui/images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon">
                                         תכניות מסחר
                                     </a>
                                     <a href="trades.html" class="quick-link">
-                                        <i class="fas fa-exchange-alt"></i>
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                         טריידים
                                     </a>
                                     <a href="alerts.html" class="quick-link">
-                                        <i class="fas fa-bell"></i>
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                         התראות
                                     </a>
                                     <a href="index.html" class="quick-link">
-                                        <i class="fas fa-home"></i>
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                         דף הבית
                                     </a>
                                 </div>
@@ -376,16 +377,16 @@
                 <div class="content-section" id="log-display">
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/development.svg" alt="Log Output" class="section-icon">
+                            <img src="images/icons/entities/development.svg" alt="Log Output" class="section-icon">
                             Log Output
                         </div>
                         <div class="table-actions">
                             <button class="btn btn-sm btn-secondary" id="copyFormattedBtn">
-                                <i class="fas fa-code"></i>
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                 Copy Formatted
                             </button>
                             <button class="btn btn-sm btn-secondary" id="copyRawBtn">
-                                <i class="fas fa-file-text"></i>
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                 Copy Raw
                             </button>
                         </div>
@@ -405,16 +406,16 @@
                 <div class="content-section" id="conditions-ui-demo">
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/development.svg" alt="ממשק תנאים לדוגמה" class="section-icon">
+                            <img src="images/icons/entities/development.svg" alt="ממשק תנאים לדוגמה" class="section-icon">
                             ממשק תנאים לדוגמה - Conditions UI Demo
                         </div>
                         <div class="table-actions">
                             <button class="btn btn-sm btn-success" id="addConditionBtn">
-                                <i class="fas fa-plus"></i>
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                 תנאי חדש
                             </button>
                             <button class="btn btn-sm btn-primary" id="refreshConditionsBtn">
-                                <i class="fas fa-sync"></i>
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                 רענון
                             </button>
                         </div>
@@ -427,18 +428,18 @@
                                     <h4>רשימת תנאים</h4>
                                     <div class="evaluation-controls">
                                         <button class="btn btn-sm btn-info" id="evaluateAllBtn">
-                                            <i class="fas fa-calculator"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                             הערך הכל
                                         </button>
                                         <button class="btn btn-sm btn-warning" id="refreshEvaluationsBtn">
-                                            <i class="fas fa-sync"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                             רענן הערכות
                                         </button>
                                     </div>
                                 </div>
                                 <div class="conditions-list-body" id="conditionsListBody">
                                     <div class="text-center p-3 text-muted">
-                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                         טוען תנאים...
                                     </div>
                                 </div>
@@ -449,7 +450,7 @@
                                 <div class="condition-form-header">
                                     <h4 id="formTitle">תנאי חדש</h4>
                                     <button class="btn btn-sm btn-secondary" id="closeFormBtn">
-                                        <i class="fas fa-times"></i>
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                     </button>
                                 </div>
                                 <div class="condition-form-body">
@@ -480,11 +481,11 @@
                                     </div>
                                     <div class="d-flex gap-2">
                                         <button class="btn btn-primary" id="saveConditionBtn">
-                                            <i class="fas fa-save"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                             שמירה
                                         </button>
                                         <button class="btn btn-secondary" id="cancelFormBtn">
-                                            <i class="fas fa-times"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                             ביטול
                                         </button>
                                     </div>

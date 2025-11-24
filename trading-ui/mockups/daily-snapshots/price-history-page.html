@@ -9,39 +9,87 @@
     <meta http-equiv="Expires" content="0">
     <title>היסטוריית מחירים - TikTrack</title>
     
+    <!-- Preconnect to CDN for faster loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../../styles-new/master.css">
     
     <!-- External Libraries -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
+    
+    
     
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
+    
+    <!-- Header System -->
+    <script src="../../scripts/header-system.js" defer></script>
+    
+    <!-- Preferences System -->
+    <script src="../../scripts/services/preferences-data.js" defer></script>
+    <script src="../../scripts/preferences-core-new.js" defer></script>
+    <script src="../../scripts/preferences-lazy-loader.js" defer></script>
+    
+    <!-- Dynamic Colors System -->
+    <script src="../../scripts/color-scheme-system-clean.js" defer></script>
+    
+    <!-- TradingView Widget (Charting Library) -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    
+    <!-- Notification System -->
+    <script src="../../scripts/notification-system.js" defer></script>
+    
+    <!-- Logger Service -->
+    <script src="../../scripts/logger-service.js" defer></script>
+    
+    <!-- Field Renderer Service -->
+    <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    
+    <!-- Info Summary System -->
+    <script src="../../scripts/info-summary-configs.js" defer></script>
+    <script src="../../scripts/info-summary-system.js" defer></script>
+    
+    <!-- Icon System -->
+    <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
+    <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    
+    <!-- Action Buttons System -->
+    <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
+    <script src="../../scripts/button-system-init.js" defer></script>
+    
+    <!-- Linked Items System -->
+    <script src="../../scripts/services/linked-items-service.js" defer></script>
+    <script src="../../scripts/linked-items.js" defer></script>
+    
+    <!-- Entity Details Renderer (for linked items table) -->
+    <script src="../../scripts/entity-details-renderer.js" defer></script>
 </head>
 <body class="price-history-page">
     <!-- Header System -->
     <div id="unified-header"></div>
     
     <!-- Mockups Navigation -->
-    <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 0; margin-bottom: 20px;">
+    <div class="mockups-navigation">
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                        <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
-                            <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
-                        </span>                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
-                <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
-                <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
-                <a href="comparative-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח השוואתי</a>
-                <a href="trading-journal-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">יומן מסחר</a>
-                <a href="strategy-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח אסטרטגיות</a>
-                <a href="economic-calendar-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">לוח כלכלי</a>
-                <a href="history-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ווידג'ט היסטוריה</a>
-                <a href="emotional-tracking-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">תיעוד רגשי</a>
-                <a href="date-comparison-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">השוואת תאריכים</a>
-                <a href="journal-entry-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">רשומת יומן</a>
+                    <div class="mockups-navigation-content">
+                        <span class="mockups-navigation-label">
+                            <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                        </span>
+                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
+                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
+                        <a href="price-history-page.html" class="mockups-navigation-link active">היסטוריית מחירים</a>
+                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
+                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
+                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
+                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
+                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
+                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
+                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
+                        <a href="journal-entry-modal.html" class="mockups-navigation-link">רשומת יומן</a>
 </div>
                 </div>
             </div>
@@ -56,14 +104,13 @@
                 <div class="top-section" id="price_history_page_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <i class="bi bi-graph-up-arrow"></i>
+                            <img src="../../images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon">
                             היסטוריית מחירים
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
                             <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
-                            <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה"></button>
-                            <button data-button-type="BACK" data-variant="small" data-text="← חזור" title="חזור לרשימת טיקרים"></button>
-                        </div><button class="filter-toggle-btn" onclick="toggleSection(\'price_history_page_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                            <button data-button-type="SETTINGS" data-variant="small" data-icon="settings" title="הגדרות תצוגה"></button>
+                        </div><button class="filter-toggle-btn" onclick="toggleSection('price_history_page_top_section')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
@@ -71,7 +118,7 @@
                         <div class="card mb-4">
                             <div class="card-body">
                                 <div class="row mb-3">
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <label for="tickerSelect" class="form-label">בחירת טיקר:</label>
                                         <select id="tickerSelect" class="form-select">
                                             <option value="AAPL" selected>AAPL</option>
@@ -79,13 +126,15 @@
                                             <option value="MSFT">MSFT</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-4">
-                                        <label for="dateRangeStart" class="form-label">תקופה - מתאריך:</label>
-                                        <input type="date" id="dateRangeStart" class="form-control" value="2025-01-01">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="dateRangeEnd" class="form-label">עד תאריך:</label>
-                                        <input type="date" id="dateRangeEnd" class="form-control" value="2025-01-31">
+                                    <div class="col-md-6">
+                                        <label for="unitSize" class="form-label">גודל יחידה:</label>
+                                        <select id="unitSize" class="form-select">
+                                            <option value="hour">שעה</option>
+                                            <option value="day" selected>יום</option>
+                                            <option value="week">שבוע</option>
+                                            <option value="month">חודש</option>
+                                            <option value="year">שנה</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -102,120 +151,10 @@
                     </div>
                 </div>
                 
-                <!-- Price Chart Section -->
-                <div class="content-section" id="price-chart-section">
-                    <div class="section-header">
-                        <h2><i class="bi bi-graph-up"></i> גרף מחירים לאורך זמן</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('price-chart-section')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                                <div class="mb-3">
-                                    <button class="btn btn-sm btn-outline-primary">שבוע</button>
-                                    <button class="btn btn-sm btn-primary">חודש</button>
-                                    <button class="btn btn-sm btn-outline-primary">3 חודשים</button>
-                                    <button class="btn btn-sm btn-outline-primary">שנה</button>
-                                    <button class="btn btn-sm btn-outline-primary">כל הזמן</button>
-                                </div>
-                                <div class="chart-container" style="height: 400px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                                    [גרף מחירים - Line Chart עם אפשרות השוואה בין טיקרים]
-                                </div>
-                                <div class="mt-3">
-                                    <span class="badge" style="background: #007bff;">● AAPL</span>
-                                    <span class="badge" style="background: #28a745;">● TSLA</span>
-                                    <span class="badge" style="background: #dc3545;">● MSFT</span>
-                                </div>
-                    </div>
-                </div>
-                
-                <!-- Daily Prices Table Section -->
-                <div class="content-section" id="daily-prices-table-section">
-                    <div class="section-header">
-                        <h2><i class="bi bi-table"></i> טבלת מחירים יומיים</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('daily-prices-table-section')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>תאריך</th>
-                                                <th>מחיר</th>
-                                                <th>שינוי (%)</th>
-                                                <th>שינוי ($)</th>
-                                                <th>נפח</th>
-                                                <th>High</th>
-                                                <th>Low</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>01/01</td>
-                                                <td>$150</td>
-                                                <td>-</td>
-                                                <td>-</td>
-                                                <td>1.2M</td>
-                                                <td>$152</td>
-                                                <td>$149</td>
-                                            </tr>
-                                            <tr>
-                                                <td>01/02</td>
-                                                <td>$151</td>
-                                                <td class="text-success">+0.67%</td>
-                                                <td class="text-success">+$1.00</td>
-                                                <td>1.5M</td>
-                                                <td>$152</td>
-                                                <td>$150</td>
-                                            </tr>
-                                            <tr>
-                                                <td>01/03</td>
-                                                <td>$152</td>
-                                                <td class="text-success">+0.66%</td>
-                                                <td class="text-success">+$1.00</td>
-                                                <td>1.3M</td>
-                                                <td>$153</td>
-                                                <td>$151</td>
-                                            </tr>
-                                            <tr>
-                                                <td>01/04</td>
-                                                <td>$154</td>
-                                                <td class="text-success">+1.32%</td>
-                                                <td class="text-success">+$2.00</td>
-                                                <td>1.8M</td>
-                                                <td>$155</td>
-                                                <td>$153</td>
-                                            </tr>
-                                            <tr>
-                                                <td>01/05</td>
-                                                <td>$155</td>
-                                                <td class="text-success">+0.65%</td>
-                                                <td class="text-success">+$1.00</td>
-                                                <td>1.4M</td>
-                                                <td>$156</td>
-                                                <td>$154</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="mt-3">
-                                    <button class="btn btn-sm btn-outline-secondary">מיון</button>
-                                    <button class="btn btn-sm btn-outline-secondary">פילטרים</button>
-                                    <button class="btn btn-sm btn-outline-primary">ייצא</button>
-                                </div>
-                    </div>
-                </div>
-                
-                <!-- Change Statistics Section -->
+                <!-- Change Statistics Section (Above Chart) -->
                 <div class="content-section" id="change-statistics-section">
                     <div class="section-header">
-                        <h2><i class="bi bi-bar-chart"></i> סטטיסטיקות שינוי</h2>
+                        <h2><img src="../../images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> סטטיסטיקות שינוי</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('change-statistics-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -223,58 +162,87 @@
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="row mb-4">
+                        <div class="row mb-4" id="statistics-cards-container">
+                            <!-- Statistics will be dynamically updated here -->
                             <div class="col-md-3">
                                 <div class="compact-stat-card">
                                     <div class="compact-stat-label">שינוי יומי</div>
-                                    <div class="compact-stat-number positive">+0.65%</div>
-                                    <div class="compact-stat-label" style="font-size: 0.8rem;">+$1.00</div>
-                                </div>
-                            </div>
+                                    <div class="compact-stat-number" id="stat-daily-change">-</div>
+                                    <div class="compact-stat-absolute" id="stat-daily-change-abs">-</div>
+                                        </div>
+                                        </div>
                             <div class="col-md-3">
                                 <div class="compact-stat-card">
                                     <div class="compact-stat-label">שינוי שבועי</div>
-                                    <div class="compact-stat-number positive">+3.33%</div>
-                                    <div class="compact-stat-label" style="font-size: 0.8rem;">+$5.00</div>
+                                    <div class="compact-stat-number" id="stat-weekly-change">-</div>
+                                    <div class="compact-stat-absolute" id="stat-weekly-change-abs">-</div>
+                                    </div>
                                 </div>
-                            </div>
                             <div class="col-md-3">
                                 <div class="compact-stat-card">
                                     <div class="compact-stat-label">שינוי חודשי</div>
-                                    <div class="compact-stat-number positive">+12.5%</div>
-                                    <div class="compact-stat-label" style="font-size: 0.8rem;">+$18.75</div>
+                                    <div class="compact-stat-number" id="stat-monthly-change">-</div>
+                                    <div class="compact-stat-absolute" id="stat-monthly-change-abs">-</div>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="compact-stat-card">
                                     <div class="compact-stat-label">שינוי שנתי</div>
-                                    <div class="compact-stat-number positive">+25.0%</div>
-                                    <div class="compact-stat-label" style="font-size: 0.8rem;">+$37.50</div>
+                                    <div class="compact-stat-number" id="stat-yearly-change">-</div>
+                                    <div class="compact-stat-absolute" id="stat-yearly-change-abs">-</div>
                                 </div>
                             </div>
-                        </div>
+                                </div>
                     </div>
                 </div>
                 
-                <!-- Comparison Chart Section (if multiple tickers selected) -->
-                <div class="content-section" id="comparison-chart-section">
+                <!-- TradingView Widget Section (Charting Library - Original) -->
+                <div class="content-section" id="tradingview-widget-section">
                     <div class="section-header">
-                        <h2><i class="bi bi-arrow-left-right"></i> השוואה בין טיקרים</h2>
+                        <h2><img src="../../images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart" class="icon"> גרף מחירים - TradingView (Original)</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('comparison-chart-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" onclick="toggleSection('tradingview-widget-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
-                                <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                                    [גרף השוואה - Line Chart עם מספר טיקרים]
+                        <!-- Ticker Selector for Widget -->
+                        <div class="mb-3">
+                            <label for="widgetTickerSelect" class="form-label">בחר טיקר:</label>
+                            <select id="widgetTickerSelect" class="form-select">
+                                <option value="NASDAQ:AAPL">AAPL - Apple Inc.</option>
+                                <option value="NASDAQ:TSLA">TSLA - Tesla Inc.</option>
+                                <option value="NASDAQ:MSFT">MSFT - Microsoft Corporation</option>
+                                <option value="NASDAQ:GOOGL">GOOGL - Alphabet Inc.</option>
+                                <option value="NASDAQ:AMZN">AMZN - Amazon.com Inc.</option>
+                            </select>
+                        </div>
+                        <!-- TradingView Widget Container -->
+                        <div id="tradingview_widget_chart" style="height: 600px; width: 100%;"></div>
+                    </div>
+                </div>
+                
+                
+                <!-- Linked Items Section -->
+                <div class="content-section" id="linked-items-section">
+                    <div class="section-header">
+                        <h2><img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> פריטים מקושרים לטיקר</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('linked-items-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+            </div>
+        </div>
+                    <div class="section-body">
+                        <div id="linkedItemsContainer">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">טוען...</span>
                                 </div>
-                                <div class="mt-3">
-                                    <span class="badge" style="background: #007bff;">● AAPL</span>
-                                    <span class="badge" style="background: #28a745;">● TSLA</span>
-                                    <span class="badge" style="background: #dc3545;">● MSFT</span>
-                                </div>
+                                <p class="mt-2">טוען פריטים מקושרים...</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -286,5 +254,52 @@
     
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
+    <!-- Price History Page Script -->
+    <script src="../../scripts/price-history-page.js" defer></script>
+    
+    <!-- Initialize Preferences System and Dynamic Colors -->
+    <script>
+        // Initialize only once
+        let isPageInitialized = false;
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (isPageInitialized) {
+                if (window.Logger) {
+                    window.Logger.info('⏸️ Page already initialized, skipping...', { page: 'price-history-page' });
+                }
+                return;
+            }
+            
+            isPageInitialized = true;
+            
+            try {
+                if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+                    await window.PreferencesCore.initializeWithLazyLoading();
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Preferences initialization failed (non-critical)', { page: 'price-history-page', error });
+                }
+            }
+        });
+        
+        // Also try immediate execution if DOM is already loaded
+        if (document.readyState === 'loading') {
+            // DOM is still loading, waiting for DOMContentLoaded...
+        } else {
+            // DOM already loaded, trigger manually
+            setTimeout(() => {
+                if (!isPageInitialized) {
+                    document.dispatchEvent(new Event('DOMContentLoaded'));
+                }
+            }, 100);
+        }
+    </script>
+    
+    <!-- System Scripts -->
+    <!-- 📦 Packages: base, preferences, tradingview-charts, tradingview-widgets, init-system -->
+    <script src="../../scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <script src="../../scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <script src="../../scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
 </body>
 </html>

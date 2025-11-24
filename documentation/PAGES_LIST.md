@@ -88,22 +88,26 @@
 ## 📋 עמודים ראשיים (28 עמודים) ✅ **סטנדרטיזציה מלאה הושלמה**
 
 ### עמודים מרכזיים
-| עמוד | תיאור | גישה | API |
-|------|--------|------|-----|
-| **index.html** | דשבורד ראשי | `http://localhost:5000/` | `/api/dashboard/*` |
-| **trades.html** | ניהול טריידים | `http://localhost:5000/trades.html` | `/api/trades/*` |
-| **trade_plans.html** | תכניות מסחר | `http://localhost:5000/trade_plans.html` | `/api/trade-plans/*` |
-| **alerts.html** | מערכת התראות | `http://localhost:5000/alerts.html` | `/api/alerts/*` |
-| **tickers.html** | ניהול טיקרים | `http://localhost:5000/tickers.html` | `/api/tickers/*` |
-| **trading_accounts.html** | חשבונות מסחר | `http://localhost:5000/trading_accounts.html` | `/api/trading-accounts/*` |
-| **executions.html** | ביצועי עסקאות | `http://localhost:5000/executions.html` | `/api/executions/*` |
-| **data_import.html** | ייבוא נתונים | `http://localhost:5000/data_import.html` | `/api/user-data-import/*` |
-| **cash_flows.html** | תזרימי מזומן | `http://localhost:5000/cash_flows.html` | `/api/cash-flows/*` |
-| **notes.html** | מערכת הערות | `http://localhost:5000/notes.html` | `/api/notes/*` |
-| **research.html** | מחקר וניתוח | `http://localhost:5000/research.html` | `/api/research/*` |
-| **preferences.html** | הגדרות מערכת v3.0 | `http://localhost:8080/preferences.html` | `/api/preferences/*` |
+| עמוד | תיאור | גישה | API | Business Logic Service | סטטוס |
+|------|--------|------|-----|----------------------|-------|
+| **index.html** | דשבורד ראשי | `http://localhost:5000/` | `/api/dashboard/*` | ❌ חסר | ⏳ צריך Business Service |
+| **trades.html** | ניהול טריידים | `http://localhost:5000/trades.html` | `/api/trades/*` | ✅ TradeBusinessService | ✅ מוכן |
+| **trade_plans.html** | תכניות מסחר | `http://localhost:5000/trade_plans.html` | `/api/trade-plans/*` | ✅ TradePlanBusinessService | ✅ מוכן |
+| **alerts.html** | מערכת התראות | `http://localhost:5000/alerts.html` | `/api/alerts/*` | ✅ AlertBusinessService | ✅ מוכן |
+| **tickers.html** | ניהול טיקרים | `http://localhost:5000/tickers.html` | `/api/tickers/*` | ✅ TickerBusinessService | ✅ מוכן |
+| **trading_accounts.html** | חשבונות מסחר | `http://localhost:5000/trading_accounts.html` | `/api/trading-accounts/*` | ✅ TradingAccountBusinessService | ✅ מוכן |
+| **executions.html** | ביצועי עסקאות | `http://localhost:5000/executions.html` | `/api/executions/*` | ✅ ExecutionBusinessService | ✅ מוכן |
+| **data_import.html** | ייבוא נתונים | `http://localhost:5000/data_import.html` | `/api/user-data-import/*` | ❌ חסר | ⏳ צריך Business Service |
+| **cash_flows.html** | תזרימי מזומן | `http://localhost:5000/cash_flows.html` | `/api/cash-flows/*` | ✅ CashFlowBusinessService | ✅ מוכן |
+| **notes.html** | מערכת הערות | `http://localhost:5000/notes.html` | `/api/notes/*` | ✅ NoteBusinessService | ✅ מוכן |
+| **research.html** | מחקר וניתוח | `http://localhost:5000/research.html` | `/api/research/*` | ❌ חסר | ⏳ צריך Business Service |
+| **preferences.html** | הגדרות מערכת v3.0 | `http://localhost:8080/preferences.html` | `/api/preferences/*` | ❌ חסר (מורכב) | ⏳ אופציונלי |
+
+**הערה:** כל העמודים עם Business Logic Service משולבים במלואם עם מערכות מטמון ואיתחול. ראה [Business Logic Layer Documentation](../02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md) לפרטים מלאים.
 
 ### עמודים טכניים
+**הערה:** עמודים טכניים לא משתמשים ב-Business Logic Layer - הם עמודים לניהול מערכת, ניטור וכלי פיתוח.
+
 | עמוד | תיאור | גישה | API |
 |------|--------|------|-----|
 | **db_display.html** | תצוגת בסיס נתונים | `http://localhost:5000/db_display.html` | `/api/db/*` |

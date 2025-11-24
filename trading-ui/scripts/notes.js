@@ -1429,6 +1429,51 @@ async function saveNote() {
     return;
   }
 
+  // Business Logic API validation
+  if (window.NotesData?.validateNote) {
+    try {
+      const validationResult = await window.NotesData.validateNote({
+        content: textContent,
+        related_type_id: parseInt(related_type_id),
+        related_id: parseInt(related_id)
+      });
+
+      if (!validationResult.is_valid) {
+        const errorMessage = validationResult.errors?.join(', ') || 'ולידציה נכשלה';
+        window.showErrorNotification?.('שגיאת ולידציה', errorMessage);
+        return;
+      }
+    } catch (validationError) {
+      window.Logger?.warn('⚠️ Note validation error (continuing with save)', {
+        error: validationError,
+        page: 'notes'
+      });
+      // Continue with save even if validation fails (fallback)
+    }
+  }
+
+  // Validate note relation
+  if (window.NotesData?.validateNoteRelation) {
+    try {
+      const relationValidation = await window.NotesData.validateNoteRelation(
+        parseInt(related_type_id),
+        parseInt(related_id)
+      );
+
+      if (!relationValidation.is_valid) {
+        const errorMessage = relationValidation.errors?.join(', ') || 'ולידציה של קישור נכשלה';
+        window.showErrorNotification?.('שגיאת ולידציה', errorMessage);
+        return;
+      }
+    } catch (validationError) {
+      window.Logger?.warn('⚠️ Note relation validation error (continuing with save)', {
+        error: validationError,
+        page: 'notes'
+      });
+      // Continue with save even if validation fails (fallback)
+    }
+  }
+
   const isEditMode = form.dataset.mode === 'edit';
   const formEntityId = form.dataset.entityId || form.dataset.noteId || form.querySelector('input[name="id"]')?.value || null;
   const noteId = isEditMode && formEntityId ? parseInt(formEntityId, 10) : null;

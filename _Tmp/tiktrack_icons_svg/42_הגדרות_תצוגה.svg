@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <title>42. הגדרות תצוגה</title>
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#284b63" stroke-width="10"/>
+  <g stroke="#26b7a9" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <circle cx="100" cy="100" r="18" />
+    <polyline points="100,70 100,55" />
+    <polyline points="100,145 100,130" />
+    <polyline points="70,100 55,100" />
+    <polyline points="145,100 130,100" />
+    <polyline points="80,80 70,70" />
+    <polyline points="130,130 140,140" />
+    <polyline points="80,120 70,130" />
+    <polyline points="130,70 140,60" />
+  </g>
+</svg>

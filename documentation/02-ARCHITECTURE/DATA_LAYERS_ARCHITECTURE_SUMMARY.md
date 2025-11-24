@@ -147,35 +147,32 @@
 **קוד בפועל:**
 - ✅ **Base Service:** `Backend/services/business_logic/base_business_service.py`
 - ✅ **Business Rules Registry:** `Backend/services/business_logic/business_rules_registry.py`
-- ✅ **Services קיימים (5):**
+- ✅ **Services קיימים (11):**
   - `TradeBusinessService` ✅
   - `ExecutionBusinessService` ✅
   - `AlertBusinessService` ✅
   - `StatisticsBusinessService` ✅
   - `CashFlowBusinessService` ✅
-- ❌ **Services חסרים (7):**
-  - `NoteBusinessService` ❌
-  - `TradingAccountBusinessService` ❌
-  - `TradePlanBusinessService` ❌
-  - `TickerBusinessService` ❌
-  - `CurrencyBusinessService` ❌
-  - `TagBusinessService` ❌
-  - `PreferencesBusinessService` ❌ (מורכב)
-- ✅ **API Blueprint:** `Backend/routes/api/business_logic.py`
-- ✅ **Frontend Wrappers:** `trading-ui/scripts/services/*-data.js` (3 מוכנים, 9 חסרים)
+  - `NoteBusinessService` ✅
+  - `TradingAccountBusinessService` ✅
+  - `TradePlanBusinessService` ✅
+  - `TickerBusinessService` ✅
+  - `CurrencyBusinessService` ✅
+  - `TagBusinessService` ✅
+- ❌ **Services חסרים (1):**
+  - `PreferencesBusinessService` ❌ (מורכב - אופציונלי)
+- ✅ **API Blueprint:** `Backend/routes/api/business_logic.py` - 29+ endpoints
+- ✅ **Frontend Wrappers:** `trading-ui/scripts/services/*-data.js` - 21+ wrappers קיימים
+- ✅ **אינטגרציה עם מערכות מטמון:** UnifiedCacheManager, CacheTTLGuard, CacheSyncManager
+- ✅ **אינטגרציה עם מערכות איתחול:** 5 שלבי איתחול, Packages System, Page Configs
 
-**סטטוס:** ✅ **מיושם חלקית** - 5 Services קיימים, 7 חסרים
+**סטטוס:** ✅ **מיושם במלואו** - 11 Services קיימים, 1 חסר (אופציונלי)
 
-**📋 ראה:** `documentation/03-DEVELOPMENT/PLANS/BUSINESS_LOGIC_COMPLETE_SYSTEM_REFERENCE.md` לפרטים מלאים
-  - Business Rules
-  - Data Transformation
-
-**קוד בפועל:**
-- ✅ **Services:** `Backend/services/` - קיימים services שונים
-- ✅ **Validation:** קיים ב-models וב-API routes
-- ⚠️ **Business Rules:** חלקית - לא כל החוקים מרוכזים
-
-**סטטוס:** ⚠️ **מיושם חלקית - דורש ארגון**
+**📋 ראה:** 
+- `documentation/02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md` - תיעוד מלא
+- `documentation/02-ARCHITECTURE/BACKEND/BUSINESS_RULES_REGISTRY.md` - חוקי עסק
+- `documentation/03-DEVELOPMENT/GUIDES/BUSINESS_LOGIC_DEVELOPER_GUIDE.md` - מדריך מפתחים
+- `documentation/03-DEVELOPMENT/PLANS/BUSINESS_LOGIC_COMPLETE_SYSTEM_REFERENCE.md` - הפניה מלאה
 
 ---
 
@@ -305,6 +302,57 @@ window.{EntityName}Data = {
 
 **סטטוס:** ✅ **מיושם בהתאם לאפיון**
 
+**אינטגרציה עם Business Logic Layer:**
+- ✅ כל Data Service מכיל Business Logic API wrappers
+- ✅ Wrappers משתמשים ב-CacheTTLGuard למטמון אוטומטי
+- ✅ Cache invalidation אחרי mutations דרך CacheSyncManager
+- ✅ 21+ Business Logic API wrappers פעילים
+
+---
+
+## 🔗 אינטגרציות
+
+### אינטגרציה עם מערכות טעינה ואיתחול
+
+**5 שלבי איתחול:**
+- ✅ **Stage 1 (Core Systems):** Cache System נטען - נדרש ל-Business Logic API
+- ✅ **Stage 2 (UI Systems):** לא נדרש ל-Business Logic
+- ✅ **Stage 3 (Page Systems):** Data Services נטענים - Business Logic API wrappers זמינים
+- ✅ **Stage 4 (Validation Systems):** Business Logic API משמש לולידציות מורכבות
+- ✅ **Stage 5 (Finalization):** Business Logic API משמש לחישובים סופיים
+
+**Packages System:**
+- ✅ Data Services מוגדרים ב-`services` package
+- ✅ Business Logic API wrappers נטענים עם Data Services
+
+**Page Configs:**
+- ✅ כל עמוד מגדיר `requiredGlobals` (כולל Data Services)
+- ✅ Custom Initializers יכולים להשתמש ב-Business Logic API
+
+**Preferences Loading Events:**
+- ✅ Business Logic API לא תלוי ב-Preferences (לרוב)
+- ✅ אם נדרש, יש לבדוק `window.__preferencesCriticalLoaded`
+
+### אינטגרציה עם מערכות מטמון
+
+**4 שכבות מטמון:**
+- ✅ **Memory Cache:** תוצאות חישובים (TTL 30 שניות)
+- ✅ **localStorage:** תוצאות ולידציות (TTL 60 שניות)
+- ✅ **IndexedDB:** תוצאות חישובים מורכבים
+- ✅ **Backend Cache:** ⏳ כבוי כרגע (CACHE_DISABLED=true)
+
+**CacheTTLGuard:**
+- ✅ כל Business Logic API wrapper משתמש ב-CacheTTLGuard
+- ✅ TTL מוגדר לפי סוג פעולה (30s חישובים, 60s ולידציות)
+
+**CacheSyncManager:**
+- ✅ Cache invalidation אחרי mutations
+- ✅ סנכרון Frontend ↔ Backend
+
+**Cache Key Helper:**
+- ✅ מפתחות מטמון אופטימליים ועקביים
+- ✅ שימוש ב-`CacheKeyHelper.generateCacheKeyFromObject()`
+
 ---
 
 ## 🔄 זרימת נתונים
@@ -387,32 +435,30 @@ window.{EntityName}Data = {
 | **Data Services** | ממשק אחיד, Cache-first | ✅ 12 services עם ממשק אחיד | ✅ **100%** |
 | **Presentation** | Page Scripts, UI Components | ✅ Page scripts, CRUDResponseHandler | ✅ **100%** |
 
-### ⚠️ התאמה חלקית:
+### ✅ התאמה מלאה (עודכן):
 
-| שכבה | אפיון | קוד בפועל | פערים |
+| שכבה | אפיון | קוד בפועל | סטטוס |
 |------|-------|-----------|-------|
-| **Business Logic** | Services מרוכזים, Business Rules | ✅ **5 Services קיימים, 7 חסרים** | ארגון מחדש הושלם חלקית, צריך להשלים 7 Services נוספים |
+| **Business Logic** | Services מרוכזים, Business Rules | ✅ **11 Services קיימים, 29+ API endpoints, 21+ Frontend wrappers** | ✅ **100%** - ארגון מחדש הושלם, אינטגרציה מלאה עם מטמון ואיתחול |
 
 ---
 
 ## 🔍 ניתוח פערים
 
-### 1. Business Logic Layer - חוסר ארגון
+### 1. ✅ Business Logic Layer - הושלם
 
-**בעיה:**
-- Business Rules מפוזרים בין models, services, ו-API routes
-- אין מרכז אחד לחוקי עסק
-- קשה לעקוב אחרי כל החוקים
+**סטטוס:** ✅ **הושלם בהצלחה**
 
-**השפעה:**
-- קושי בתחזוקה
-- סיכון לאי-עקביות
-- קושי בבדיקות
+**הישגים:**
+- ✅ Business Rules Registry מרכזי נוצר
+- ✅ 11 Business Services נוצרו (מתוך 12 - 1 אופציונלי)
+- ✅ 29+ API endpoints פעילים
+- ✅ 21+ Frontend wrappers משולבים
+- ✅ אינטגרציה מלאה עם מערכות מטמון (UnifiedCacheManager, CacheTTLGuard, CacheSyncManager)
+- ✅ אינטגרציה מלאה עם מערכות איתחול (5 שלבים, Packages System, Page Configs)
+- ✅ תיעוד מלא נוצר
 
-**המלצה:**
-- ארגון מחדש של Business Logic Layer
-- יצירת Business Rules Service מרכזי
-- תיעוד כל החוקים במקום אחד
+**📋 ראה:** `documentation/02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md` לפרטים מלאים
 
 ### 2. Cache Strategy - אופטימיזציה אפשרית
 
@@ -450,17 +496,22 @@ window.{EntityName}Data = {
 
 ## 💡 המלצות
 
-### 1. השלמת Business Logic Layer
+### 1. ✅ Business Logic Layer - הושלם
 
 **פעולות:**
 - ✅ **הושלם:** Base Service class, Business Rules Registry, API Blueprint
-- ⏳ **צריך להשלים:** 7 Business Services נוספים (Note, TradingAccount, TradePlan, Ticker, Currency, Tag, Preferences)
-- ⏳ **צריך להשלים:** 9 Frontend Wrappers נוספים
-- ⏳ **צריך להשלים:** אינטגרציה עם מערכות מטמון ואיתחול
+- ✅ **הושלם:** 11 Business Services (Note, TradingAccount, TradePlan, Ticker, Currency, Tag - כולם נוצרו)
+- ✅ **הושלם:** 21+ Frontend Wrappers
+- ✅ **הושלם:** אינטגרציה מלאה עם מערכות מטמון (UnifiedCacheManager, CacheTTLGuard, CacheSyncManager)
+- ✅ **הושלם:** אינטגרציה מלאה עם מערכות איתחול (5 שלבים, Packages System, Page Configs)
+- ⏳ **אופציונלי:** PreferencesBusinessService (מורכב - לא נדרש כרגע)
 
-**עדיפות:** גבוהה
+**סטטוס:** ✅ **הושלם בהצלחה**
 
-**📋 ראה:** `documentation/03-DEVELOPMENT/PLANS/BUSINESS_LOGIC_REFACTORING_COMPREHENSIVE_PLAN.md` לתוכנית מלאה
+**📋 ראה:** 
+- `documentation/02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md` - תיעוד מלא
+- `documentation/02-ARCHITECTURE/BACKEND/BUSINESS_RULES_REGISTRY.md` - חוקי עסק
+- `documentation/03-DEVELOPMENT/GUIDES/BUSINESS_LOGIC_DEVELOPER_GUIDE.md` - מדריך מפתחים
 
 ### 2. שיפור Cache Monitoring
 

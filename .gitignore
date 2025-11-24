@@ -61,3 +61,27 @@ production/Backend/logs/
 production/Backend/logs-production/
 
 Backend/Backend/reports/user_imports/
+
+# Server PID file
+Backend/.tiktrack_server_pid
+
+# Test result files
+test_results_*.json
+*.json.test
+
+# macOS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+
+# Temporary test files
+/tmp/test_*_results.txt

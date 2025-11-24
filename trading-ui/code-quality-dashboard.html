@@ -34,8 +34,7 @@
     <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906" />
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906" />
-    <!-- FontAwesome Icons - Local -->
-    <link rel="stylesheet" href="images/fontawesome/css/all.min.css?v=0da3519a_20251102_104906" />
+    <!-- FontAwesome removed - using Tabler Icons via IconSystem -->
 
     <!-- Bootstrap JavaScript -->
   </head>
@@ -158,7 +157,7 @@
                   <div class="card">
                     <div class="card-header">
                       <h5 class="card-title mb-0">
-                        <i class="fas fa-shield-alt text-success"></i>
+                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                         כיסוי Error Handling
                       </h5>
                     </div>
@@ -173,7 +172,7 @@
                   <div class="card">
                     <div class="card-header">
                       <h6 class="card-title mb-0">
-                        <i class="fas fa-info-circle text-info"></i>
+                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                         מידע על Error Handling
                       </h6>
                     </div>
@@ -224,7 +223,7 @@
                   <div class="card">
                     <div class="card-header">
                       <h5 class="card-title mb-0">
-                        <i class="fas fa-book text-primary"></i>
+                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                         כיסוי JSDoc
                       </h5>
                     </div>
@@ -239,7 +238,7 @@
                   <div class="card">
                     <div class="card-header">
                       <h6 class="card-title mb-0">
-                        <i class="fas fa-info-circle text-info"></i>
+                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                         מידע על JSDoc
                       </h6>
                     </div>
@@ -293,7 +292,7 @@
                   <div class="card">
                     <div class="card-header">
                       <h5 class="card-title mb-0">
-                        <i class="fas fa-tag text-warning"></i>
+                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                         קונבנציות שמות
                       </h5>
                     </div>
@@ -308,7 +307,7 @@
                   <div class="card">
                     <div class="card-header">
                       <h6 class="card-title mb-0">
-                        <i class="fas fa-info-circle text-info"></i>
+                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                         מידע על Naming Conventions
                       </h6>
                     </div>
@@ -483,7 +482,7 @@
                   <div class="card">
                     <div class="card-header">
                       <h5 class="card-title mb-0">
-                        <i class="fas fa-list text-secondary"></i>
+                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                         סטטוס Function Index
                       </h5>
                     </div>
@@ -498,7 +497,7 @@
                   <div class="card">
                     <div class="card-header">
                       <h6 class="card-title mb-0">
-                        <i class="fas fa-info-circle text-info"></i>
+                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                         מידע על Function Index
                       </h6>
                     </div>
@@ -540,21 +539,21 @@
           >
             <div class="section-header">
               <div class="table-title">
-                <img src="images/icons/development.svg" alt="Lint Monitor" class="table-icon" />
+                <img src="images/icons/entities/development.svg" alt="Lint Monitor" class="table-icon" />
                 ניטור איכות קוד
               </div>
               <div class="header-actions d-flex align-items-center gap-2">
                 <button id="lint-copy-log-button" class="btn btn-sm btn-outline-secondary" type="button">
-                  <i class="fas fa-clipboard-list"></i> העתק לוג מפורט
+                  <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> העתק לוג מפורט
                 </button>
                 <button id="lint-copy-report-button" class="btn btn-sm btn-outline-secondary" type="button">
-                  <i class="fas fa-copy"></i> העתק דוח JSON
+                  <img src="/trading-ui/images/icons/tabler/copy.svg" width="16" height="16" alt="copy" class="icon"> העתק דוח JSON
                 </button>
                 <button id="lint-download-header-button" class="btn btn-sm btn-outline-secondary" type="button">
-                  <i class="fas fa-file-download"></i> הורד דוח
+                  <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> הורד דוח
                 </button>
                 <button id="lint-refresh-button" class="btn btn-sm btn-primary" type="button">
-                  <i class="fas fa-sync-alt"></i> רענן נתונים
+                  <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רענן נתונים
                 </button>
                 <button
                   data-button-type="TOGGLE"
@@ -567,7 +566,7 @@
             </div>
             <div class="section-body">
               <div id="lint-loading-indicator" class="lint-loading hidden">
-                <i class="fas fa-circle-notch fa-spin"></i> טוען נתונים מהשרת...
+                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> טוען נתונים מהשרת...
               </div>
 
               <div id="lint-empty-state" class="lint-empty-state hidden">
@@ -700,7 +699,7 @@
                   </p>
                   <div class="lint-action-footer">
                     <button id="lint-run-collect-button" class="btn btn-sm btn-primary" type="button">
-                      <i class="fas fa-play"></i> הרץ דוח מלא
+                      <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon"> הרץ דוח מלא
                     </button>
                     <span id="lint-run-status" class="lint-action-status text-muted">מוכן להרצה</span>
                   </div>
@@ -712,7 +711,7 @@
                   <p class="lint-action-note">מוודא שאין סטיות פורמט או שגיאות נוספות לפני merge.</p>
                   <div class="lint-action-footer">
                     <button id="lint-download-report-button" class="btn btn-sm btn-outline-secondary" type="button">
-                      <i class="fas fa-file-download"></i> הורד דוח JSON
+                      <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> הורד דוח JSON
                     </button>
                   </div>
                 </div>
@@ -789,6 +788,10 @@
     <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
     <!-- [8] Load Order: 8 -->
     <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <!-- [8.5] Load Order: 7.5 -->
+    <script src="scripts/icon-mappings.js?v=1.0.0"></script> <!-- מיפוי איקונים מרכזי -->
+    <!-- [8.6] Load Order: 7.6 -->
+    <script src="scripts/icon-system.js?v=1.0.0"></script> <!-- מערכת איקונים מרכזית -->
     <!-- [9] Load Order: 9 -->
     <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
     <!-- [10] Load Order: 10 -->

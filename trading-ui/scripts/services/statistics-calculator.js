@@ -284,4 +284,150 @@ window.getMinMax = (data, field) => StatisticsCalculator.getMinMax(data, field);
 window.groupByField = (data, field) => StatisticsCalculator.groupBy(data, field);
 window.calculateFullStatistics = (data, config) => StatisticsCalculator.calculateFullStatistics(data, config);
 
+// ========================================================================
+// Business Logic API Wrappers
+// ========================================================================
+
+/**
+ * Calculate statistics using backend business logic service.
+ * @param {string} calculationType - Type of calculation (kpi, summary, average, position, portfolio)
+ * @param {Array} records - Array of data records
+ * @param {Object} params - Additional parameters
+ * @returns {Promise<Object>} Calculated statistics
+ */
+async function calculateStatisticsViaAPI(calculationType, records, params = {}) {
+    try {
+        const response = await fetch('/api/business/statistics/calculate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                calculation_type: calculationType,
+                data: records,
+                params: params
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        if (result.status === 'success' && result.data) {
+            return result.data;
+        } else {
+            throw new Error(result.error?.message || 'Invalid calculation result');
+        }
+    } catch (error) {
+        console.error('❌ Error calculating statistics via API:', error);
+        // Fallback to local calculation
+        return StatisticsCalculator.calculateFullStatistics(records, params);
+    }
+}
+
+/**
+ * Calculate sum using backend business logic service.
+ * @param {Array} records - Array of data records
+ * @param {string} field - Field name to sum
+ * @returns {Promise<number>} Sum value
+ */
+async function calculateSumViaAPI(records, field) {
+    try {
+        const response = await fetch('/api/business/statistics/calculate-sum', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                data: records,
+                field: field
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        if (result.status === 'success' && result.data) {
+            return result.data.sum || 0;
+        } else {
+            throw new Error(result.error?.message || 'Invalid calculation result');
+        }
+    } catch (error) {
+        console.error('❌ Error calculating sum via API:', error);
+        // Fallback to local calculation
+        return StatisticsCalculator.calculateSum(records, field);
+    }
+}
+
+/**
+ * Calculate average using backend business logic service.
+ * @param {Array} records - Array of data records
+ * @param {string} field - Field name to average
+ * @returns {Promise<number>} Average value
+ */
+async function calculateAverageViaAPI(records, field) {
+    try {
+        const response = await fetch('/api/business/statistics/calculate-average', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                data: records,
+                field: field
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        if (result.status === 'success' && result.data) {
+            return result.data.average || 0;
+        } else {
+            throw new Error(result.error?.message || 'Invalid calculation result');
+        }
+    } catch (error) {
+        console.error('❌ Error calculating average via API:', error);
+        // Fallback to local calculation
+        return StatisticsCalculator.calculateAverage(records, field);
+    }
+}
+
+/**
+ * Count records using backend business logic service.
+ * @param {Array} records - Array of data records
+ * @returns {Promise<number>} Count value
+ */
+async function countRecordsViaAPI(records) {
+    try {
+        const response = await fetch('/api/business/statistics/count-records', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                data: records
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        if (result.status === 'success' && result.data) {
+            return result.data.count || 0;
+        } else {
+            throw new Error(result.error?.message || 'Invalid calculation result');
+        }
+    } catch (error) {
+        console.error('❌ Error counting records via API:', error);
+        // Fallback to local calculation
+        return StatisticsCalculator.countRecords(records);
+    }
+}
+
+// Export API wrappers to global scope
+window.calculateStatisticsViaAPI = calculateStatisticsViaAPI;
+window.calculateSumViaAPI = calculateSumViaAPI;
+window.calculateAverageViaAPI = calculateAverageViaAPI;
+window.countRecordsViaAPI = countRecordsViaAPI;
+
 

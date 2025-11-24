@@ -9,40 +9,77 @@
     <meta http-equiv="Expires" content="0">
     <title>יומן כלכלי - TikTrack</title>
     
+    <!-- Preconnect to CDN for faster loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../../styles-new/master.css">
     
     <!-- External Libraries -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
+    
+    
     
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
+    
+    <!-- Header System -->
+    <script src="../../scripts/header-system.js" defer></script>
+    
+    <!-- Icon System -->
+    <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
+    <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    
+    <!-- Logger Service -->
+    <script src="../../scripts/logger-service.js" defer></script>
+    
+    <!-- Notification System -->
+    <script src="../../scripts/notification-system.js" defer></script>
+    
+    <!-- Field Renderer Service -->
+    <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    
+    <!-- Info Summary System -->
+    <script src="../../scripts/info-summary-configs.js" defer></script>
+    <script src="../../scripts/info-summary-system.js" defer></script>
+    
+    <!-- Preferences System -->
+    <script src="../../scripts/services/preferences-data.js" defer></script>
+    <script src="../../scripts/preferences-core-new.js" defer></script>
+    <script src="../../scripts/preferences-lazy-loader.js" defer></script>
+    
+    <!-- Dynamic Colors System -->
+    <script src="../../scripts/color-scheme-system-clean.js" defer></script>
+    
+    <!-- UI Utils (includes toggleSection) -->
+    <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
 </head>
 <body class="economic-calendar-page">
     <!-- Header System -->
     <div id="unified-header"></div>
     
     <!-- Mockups Navigation -->
-    <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 0; margin-bottom: 20px;">
+    <div class="mockups-navigation">
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                        <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
-                            <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
-                        </span>                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
-                <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
-                <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
-                <a href="comparative-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח השוואתי</a>
-                <a href="trading-journal-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">יומן מסחר</a>
-                <a href="strategy-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח אסטרטגיות</a>
-                <a href="economic-calendar-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">לוח כלכלי</a>
-                <a href="history-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ווידג'ט היסטוריה</a>
-                <a href="emotional-tracking-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">תיעוד רגשי</a>
-                <a href="date-comparison-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">השוואת תאריכים</a>
-                <a href="journal-entry-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">רשומת יומן</a>
-</div>
+                    <div class="mockups-navigation-content">
+                        <span class="mockups-navigation-label">
+                            <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                        </span>
+                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
+                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
+                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
+                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
+                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
+                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
+                        <a href="economic-calendar-page.html" class="mockups-navigation-link active">לוח כלכלי</a>
+                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
+                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
+                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
+                        <a href="journal-entry-modal.html" class="mockups-navigation-link">רשומת יומן</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -55,7 +92,7 @@
                 <!-- Header Section -->
                 <div class="content-section" id="economic_calendar_page-פילטרים">
                     <div class="section-header">
-                        <h2><i class="bi bi-file-text"></i> פילטרים</h2>
+                        <h2><img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> פילטרים</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('economic_calendar_page-פילטרים')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -98,7 +135,7 @@
                         <!-- Calendar View Section -->
                 <div class="content-section" id="economic_calendar_page-אירועים-כלכליים">
                     <div class="section-header">
-                        <h2><i class="bi bi-file-text"></i> אירועים כלכליים</h2>
+                        <h2><img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> אירועים כלכליים</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('economic_calendar_page-אירועים-כלכליים')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -120,7 +157,7 @@
                                                 <p class="mb-1">15 בינואר 2025, 20:00</p>
                                                 <p class="mb-1 text-muted">החלטת ריבית של הבנק המרכזי של ארה"ב. השפעה צפויה על השוק.</p>
                                                 <small class="text-muted">
-                                                    <i class="bi bi-link-45deg"></i> קשור לטריידים: #123, #124
+                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> קשור לטריידים: #123, #124
                                                 </small>
                                             
                     </div>
@@ -164,5 +201,7 @@
     
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
+    <!-- Page-specific script -->
+    <script src="../../scripts/economic-calendar-page.js" defer></script>
 </body>
 </html>

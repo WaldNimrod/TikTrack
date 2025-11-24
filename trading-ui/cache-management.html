@@ -84,8 +84,9 @@
     <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=0da3519a_20251102_104906">
     
     <!-- External Libraries -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
+    
+    
 
     <!-- Header Styles -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
@@ -112,10 +113,10 @@
                         <h1>📊 ניטור וסטטיסטיקות</h1>
                         <div class="header-actions">
                             <button class="btn btn-sm btn-outline-primary" onclick="refreshCacheStats()">
-                                <i class="fas fa-sync-alt"></i> רענן סטטוס
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רענן סטטוס
                             </button>
                             <button class="btn btn-sm btn-outline-info" onclick="toggleAutoRefresh()" id="autoRefreshBtn">
-                                <i class="fas fa-play"></i> רענון אוטומטי
+                                <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon"> רענון אוטומטי
                             </button>
                             <button class="filter-toggle-btn" onclick="toggleSection('monitoring')" title="הצג/הסתר סקשן">
                                 <span class="filter-icon">▲</span>
@@ -166,7 +167,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h5 class="mb-0">
-                                    <i class="fas fa-table"></i> סיכום שכבות מטמון
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> סיכום שכבות מטמון
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -255,14 +256,14 @@
                         <!-- A. ניקוי מטמון -->
                         <div class="action-group mb-4">
                             <h3 class="action-group-title">
-                                <i class="fas fa-broom"></i> ניקוי מטמון
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> ניקוי מטמון
                             </h3>
                             <div class="action-controls">
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="form-check me-3">
                                         <input class="form-check-input" type="checkbox" id="enableValidation">
                                         <label class="form-check-label" for="enableValidation">
-                                            <i class="fas fa-check-circle text-success"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                             בצע ולידציה מפורטת אחרי ניקוי
                                         </label>
                                         </div>
@@ -288,18 +289,18 @@
                         <!-- B. אופטימיזציה -->
                         <div class="action-group mb-4">
                             <h3 class="action-group-title">
-                                <i class="fas fa-magic"></i> אופטימיזציה
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> אופטימיזציה
                             </h3>
                             <div class="action-controls">
                                 <div class="btn-group" role="group">
                                     <button class="btn btn-outline-primary" onclick="executeOptimization('ttl-expired')">
-                                        <i class="fas fa-clock"></i> ניקוי TTL פג תוקף
+                                        <img src="/trading-ui/images/icons/tabler/clock.svg" width="16" height="16" alt="clock" class="icon"> ניקוי TTL פג תוקף
                                             </button>
                                     <button class="btn btn-outline-info" onclick="executeOptimization('smart')">
-                                        <i class="fas fa-brain"></i> אופטימיזציה חכמה
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> אופטימיזציה חכמה
                                             </button>
                                     <button class="btn btn-outline-success" onclick="executeOptimization('compression')">
-                                        <i class="fas fa-compress"></i> דחיסת זיכרון
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> דחיסת זיכרון
                                                 </button>
                                             </div>
                                 <div class="action-feedback" id="optimizationFeedback"></div>
@@ -309,18 +310,18 @@
                         <!-- C. סינכרון -->
                         <div class="action-group mb-4">
                             <h3 class="action-group-title">
-                                <i class="fas fa-sync"></i> סינכרון
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> סינכרון
                             </h3>
                             <div class="action-controls">
                                 <div class="btn-group" role="group">
                                     <button class="btn btn-outline-primary" onclick="executeSynchronization('frontend-backend')">
-                                        <i class="fas fa-exchange-alt"></i> Frontend-Backend
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> Frontend-Backend
                                                 </button>
                                     <button class="btn btn-outline-info" onclick="executeSynchronization('cache-keys')">
-                                        <i class="fas fa-key"></i> רענון Cache Keys
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רענון Cache Keys
                                                 </button>
                                     <button class="btn btn-outline-success" onclick="executeSynchronization('dependencies')">
-                                        <i class="fas fa-link"></i> עדכון Dependencies
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> עדכון Dependencies
                                                 </button>
                                             </div>
                                 <div class="action-feedback" id="syncFeedback"></div>
@@ -330,18 +331,18 @@
                         <!-- D. תחזוקה -->
                         <div class="action-group mb-4">
                             <h3 class="action-group-title">
-                                <i class="fas fa-wrench"></i> תחזוקה
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> תחזוקה
                             </h3>
                             <div class="action-controls">
                                 <div class="btn-group" role="group">
                                     <button class="btn btn-outline-warning" onclick="executeMaintenance('size-cleanup')">
-                                        <i class="fas fa-ruler"></i> ניקוי לפי גודל
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> ניקוי לפי גודל
                                             </button>
                                     <button class="btn btn-outline-info" onclick="executeMaintenance('category-cleanup')">
-                                        <i class="fas fa-folder"></i> ניקוי לפי קטגוריה
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> ניקוי לפי קטגוריה
                                     </button>
                                     <button class="btn btn-outline-success" onclick="executeMaintenance('rebuild-structure')">
-                                        <i class="fas fa-cogs"></i> Rebuild Structure
+                                        <img src="/trading-ui/images/icons/tabler/settings.svg" width="16" height="16" alt="settings" class="icon"> Rebuild Structure
                                             </button>
                                 </div>
                                 <div class="action-feedback" id="maintenanceFeedback"></div>
@@ -359,7 +360,7 @@
                         </p>
                         <div class="header-actions">
                             <button class="btn btn-sm btn-primary" onclick="runAllTests()">
-                                <i class="fas fa-play-circle"></i> הרץ כל הבדיקות
+                                <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon"> הרץ כל הבדיקות
                             </button>
                             <button class="filter-toggle-btn" onclick="toggleSection('tests')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -371,11 +372,11 @@
                             <!-- A. בדיקות בריאות -->
                             <div class="test-category mb-4">
                                 <h4 class="test-category-title">
-                                    <i class="fas fa-heartbeat text-success"></i> בדיקות בריאות
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> בדיקות בריאות
                                 </h4>
                                 <div class="test-category-controls">
                                     <button class="btn btn-sm btn-outline-success" onclick="runHealthChecks()">
-                                        <i class="fas fa-stethoscope"></i> בדוק בריאות
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> בדוק בריאות
                                             </button>
                                     <div class="test-feedback" id="healthTestFeedback"></div>
                                     </div>
@@ -384,11 +385,11 @@
                             <!-- B. בדיקות ביצועים -->
                             <div class="test-category mb-4">
                                 <h4 class="test-category-title">
-                                    <i class="fas fa-tachometer-alt text-warning"></i> בדיקות ביצועים
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> בדיקות ביצועים
                                 </h4>
                                 <div class="test-category-controls">
                                     <button class="btn btn-sm btn-outline-warning" onclick="runPerformanceTests()">
-                                        <i class="fas fa-stopwatch"></i> בדוק ביצועים
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> בדוק ביצועים
                                     </button>
                                     <div class="test-feedback" id="performanceTestFeedback"></div>
                             </div>
@@ -397,11 +398,11 @@
                             <!-- C. בדיקות אינטגרציה -->
                             <div class="test-category mb-4">
                                 <h4 class="test-category-title">
-                                    <i class="fas fa-link text-info"></i> בדיקות אינטגרציה
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> בדיקות אינטגרציה
                                 </h4>
                                 <div class="test-category-controls">
                                     <button class="btn btn-sm btn-outline-info" onclick="runIntegrationTests()">
-                                        <i class="fas fa-sitemap"></i> בדוק אינטגרציה
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> בדוק אינטגרציה
                                     </button>
                                     <div class="test-feedback" id="integrationTestFeedback"></div>
                             </div>
@@ -410,11 +411,11 @@
                             <!-- D. בדיקות ולידציה -->
                             <div class="test-category mb-4">
                                 <h4 class="test-category-title">
-                                    <i class="fas fa-check-circle text-primary"></i> בדיקות ולידציה
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> בדיקות ולידציה
                                 </h4>
                                 <div class="test-category-controls">
                                     <button class="btn btn-sm btn-outline-primary" onclick="runValidationTests()">
-                                        <i class="fas fa-clipboard-check"></i> בדוק ולידציה
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> בדוק ולידציה
                                     </button>
                                     <div class="test-feedback" id="validationTestFeedback"></div>
                                 </div>
@@ -447,13 +448,13 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <h5 class="mb-0">
-                                            <i class="fas fa-search"></i> Cache Browser
+                                            <img src="/trading-ui/images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon"> Cache Browser
                                         </h5>
                             </div>
                                     <div class="card-body">
                                         <p>צפייה ועריכה של cache entries ספציפיים</p>
                                         <button class="btn btn-primary" onclick="openCacheBrowser()">
-                                            <i class="fas fa-external-link-alt"></i> פתח Browser
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> פתח Browser
                                         </button>
                                         </div>
                                         </div>
@@ -462,17 +463,17 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <h5 class="mb-0">
-                                            <i class="fas fa-download"></i> Export/Import
+                                            <img src="/trading-ui/images/icons/tabler/download.svg" width="16" height="16" alt="download" class="icon"> Export/Import
                                         </h5>
                                 </div>
                                     <div class="card-body">
                                         <p>ייצוא וייבוא נתוני מטמון</p>
                                         <div class="btn-group" role="group">
                                             <button class="btn btn-outline-primary" onclick="exportCacheData()">
-                                                <i class="fas fa-file-export"></i> ייצא
+                                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> ייצא
                                             </button>
                                             <button class="btn btn-outline-info" onclick="importCacheData()">
-                                                <i class="fas fa-file-import"></i> ייבא
+                                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> ייבא
                                             </button>
                             </div>
                         </div>
@@ -489,16 +490,16 @@
                         <div class="header-actions">
                             <div class="btn-group btn-group-sm" role="group">
                                 <button class="btn btn-outline-primary" onclick="filterLogs('info')">
-                                    <i class="fas fa-info-circle"></i> Info
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> Info
                                 </button>
                                 <button class="btn btn-outline-warning" onclick="filterLogs('warning')">
-                                    <i class="fas fa-exclamation-triangle"></i> Warning
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> Warning
                                 </button>
                                 <button class="btn btn-outline-danger" onclick="filterLogs('error')">
-                                    <i class="fas fa-times-circle"></i> Error
+                                    <img src="/trading-ui/images/icons/tabler/x.svg" width="16" height="16" alt="x" class="icon"> Error
                                 </button>
                                 <button class="btn btn-outline-secondary" onclick="filterLogs('all')">
-                                    <i class="fas fa-list"></i> כל הלוגים
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> כל הלוגים
                                 </button>
                             </div>
                             <button class="filter-toggle-btn" onclick="toggleSection('logs')" title="הצג/הסתר סקשן">

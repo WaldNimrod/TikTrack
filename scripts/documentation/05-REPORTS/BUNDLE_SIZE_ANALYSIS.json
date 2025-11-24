@@ -1,0 +1,9 @@
+{
+  "total_size": 0,
+  "total_files": 0,
+  "packages": {},
+  "large_files": [],
+  "recommendations": {
+    "code_splitting_opportunities": []
+  }
+}

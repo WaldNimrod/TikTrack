@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <title>37. קו מגמה</title>
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#284b63" stroke-width="10"/>
+  <g stroke="#26b7a9" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <line x1="60" y1="130" x2="140" y2="70" />
+  </g>
+</svg>

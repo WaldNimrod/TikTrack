@@ -11,14 +11,24 @@ Documentation:
 
 from flask import Blueprint, jsonify, request, g
 from typing import Dict, Any
+from sqlalchemy.orm import Session
 import logging
+import time
 
+from routes.api.base_entity_decorators import monitor_performance, handle_database_session
 from services.business_logic import (
     TradeBusinessService,
     ExecutionBusinessService,
     AlertBusinessService,
     StatisticsBusinessService,
-    CashFlowBusinessService
+    CashFlowBusinessService,
+    NoteBusinessService,
+    TradingAccountBusinessService,
+    TradePlanBusinessService,
+    TickerBusinessService,
+    CurrencyBusinessService,
+    TagBusinessService,
+    PreferencesBusinessService
 )
 
 logger = logging.getLogger(__name__)
@@ -32,6 +42,12 @@ execution_service = ExecutionBusinessService()
 alert_service = AlertBusinessService()
 statistics_service = StatisticsBusinessService()
 cash_flow_service = CashFlowBusinessService()
+note_service = NoteBusinessService()
+trading_account_service = TradingAccountBusinessService()
+trade_plan_service = TradePlanBusinessService()
+ticker_service = TickerBusinessService()
+currency_service = CurrencyBusinessService()
+tag_service = TagBusinessService()
 
 
 # ============================================================================
@@ -39,6 +55,7 @@ cash_flow_service = CashFlowBusinessService()
 # ============================================================================
 
 @business_logic_bp.route('/trade/calculate-stop-price', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
 def calculate_stop_price():
     """Calculate stop price based on percentage."""
     try:
@@ -76,6 +93,7 @@ def calculate_stop_price():
 
 
 @business_logic_bp.route('/trade/calculate-target-price', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
 def calculate_target_price():
     """Calculate target price based on percentage."""
     try:
@@ -276,16 +294,21 @@ def calculate_risk_reward():
 
 
 @business_logic_bp.route('/trade/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
 def validate_trade():
     """Validate trade data."""
     try:
         data = request.get_json() or {}
+        db: Session = g.db
         
         # Normalize side to lowercase for consistency with other endpoints
         if 'side' in data and data['side']:
             data['side'] = data['side'].lower()
         
-        result = trade_service.validate(data)
+        # Initialize service with DB session
+        service = TradeBusinessService(db_session=db)
+        result = service.validate(data)
         
         if result['is_valid']:
             return jsonify({
@@ -397,10 +420,13 @@ def calculate_average_price():
 
 
 @business_logic_bp.route('/execution/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
 def validate_execution():
     """Validate execution data."""
     try:
         data = request.get_json() or {}
+        db: Session = g.db
         
         # Normalize action to lowercase for consistency with business rules registry
         # The registry expects lowercase values: 'buy', 'sell', 'short', 'cover'
@@ -408,7 +434,9 @@ def validate_execution():
         if 'action' in data and data['action']:
             data['action'] = data['action'].lower()
         
-        result = execution_service.validate(data)
+        # Initialize service with DB session
+        service = ExecutionBusinessService(db_session=db)
+        result = service.validate(data)
         
         if result['is_valid']:
             return jsonify({
@@ -441,12 +469,17 @@ def validate_execution():
 # ============================================================================
 
 @business_logic_bp.route('/alert/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
 def validate_alert():
     """Validate alert data."""
     try:
         data = request.get_json() or {}
+        db: Session = g.db
         
-        result = alert_service.validate(data)
+        # Initialize service with DB session
+        service = AlertBusinessService(db_session=db)
+        result = service.validate(data)
         
         if result['is_valid']:
             return jsonify({
@@ -561,6 +594,129 @@ def calculate_statistics():
         }), 500
 
 
+@business_logic_bp.route('/statistics/calculate-sum', methods=['POST'])
+def calculate_sum():
+    """Calculate sum of a field."""
+    try:
+        data = request.get_json() or {}
+        
+        records = data.get('data', [])
+        field = data.get('field')
+        
+        if not field:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Field is required'
+                }
+            }), 400
+        
+        result = statistics_service.calculate_sum(records, field)
+        
+        if result.get('is_valid', True):
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'sum': result.get('sum', 0.0)
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': result.get('error', 'Invalid calculation')
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error calculating sum: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/statistics/calculate-average', methods=['POST'])
+def calculate_average():
+    """Calculate average of a field."""
+    try:
+        data = request.get_json() or {}
+        
+        records = data.get('data', [])
+        field = data.get('field')
+        
+        if not field:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Field is required'
+                }
+            }), 400
+        
+        result = statistics_service.calculate_average(records, field)
+        
+        if result.get('is_valid', True):
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'average': result.get('average', 0.0)
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': result.get('error', 'Invalid calculation')
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error calculating average: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/statistics/count-records', methods=['POST'])
+def count_records():
+    """Count records."""
+    try:
+        data = request.get_json() or {}
+        
+        records = data.get('data', [])
+        
+        result = statistics_service.count_records(records)
+        
+        if result.get('is_valid', True):
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'count': result.get('count', 0)
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': result.get('error', 'Invalid calculation')
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error counting records: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
 # ============================================================================
 # Cash Flow Business Logic Endpoints
 # ============================================================================
@@ -643,12 +799,17 @@ def calculate_currency_conversion():
 
 
 @business_logic_bp.route('/cash-flow/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
 def validate_cash_flow():
     """Validate cash flow data."""
     try:
         data = request.get_json() or {}
+        db: Session = g.db
         
-        result = cash_flow_service.validate(data)
+        # Initialize service with DB session
+        service = CashFlowBusinessService(db_session=db)
+        result = service.validate(data)
         
         if result['is_valid']:
             return jsonify({
@@ -668,6 +829,774 @@ def validate_cash_flow():
             
     except Exception as e:
         logger.error(f"Error validating cash flow: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# Note Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/note/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
+def validate_note():
+    """Validate note data."""
+    try:
+        data = request.get_json() or {}
+        db: Session = g.db
+        
+        # Initialize service with DB session
+        service = NoteBusinessService(db_session=db)
+        result = service.validate(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating note: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/note/validate-relation', methods=['POST'])
+def validate_note_relation():
+    """Validate note relation (related_type_id and related_id)."""
+    try:
+        data = request.get_json() or {}
+        
+        related_type_id = data.get('related_type_id')
+        related_id = data.get('related_id')
+        
+        # Convert to int if provided
+        if related_type_id is not None:
+            try:
+                related_type_id = int(related_type_id)
+            except (ValueError, TypeError):
+                related_type_id = None
+        
+        if related_id is not None:
+            try:
+                related_id = int(related_id)
+            except (ValueError, TypeError):
+                related_id = None
+        
+        result = note_service.validate_relation(related_type_id, related_id)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating note relation: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# TradingAccount Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/trading-account/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
+def validate_trading_account():
+    """Validate trading account data."""
+    try:
+        data = request.get_json() or {}
+        db: Session = g.db
+        
+        # Initialize service with DB session
+        service = TradingAccountBusinessService(db_session=db)
+        result = service.validate(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating trading account: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# TradePlan Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/trade-plan/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
+def validate_trade_plan():
+    """Validate trade plan data."""
+    try:
+        data = request.get_json() or {}
+        db: Session = g.db
+        
+        # Initialize service with DB session
+        service = TradePlanBusinessService(db_session=db)
+        result = service.validate(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating trade plan: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# Ticker Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/ticker/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
+def validate_ticker():
+    """Validate ticker data."""
+    try:
+        data = request.get_json() or {}
+        db: Session = g.db
+        
+        # Initialize service with DB session
+        service = TickerBusinessService(db_session=db)
+        result = service.validate(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating ticker: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/ticker/validate-symbol', methods=['POST'])
+def validate_ticker_symbol():
+    """Validate ticker symbol format."""
+    try:
+        data = request.get_json() or {}
+        
+        symbol = data.get('symbol')
+        
+        result = ticker_service.validate_symbol(symbol)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating ticker symbol: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# Currency Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/currency/validate-rate', methods=['POST'])
+def validate_currency_rate():
+    """Validate currency exchange rate."""
+    try:
+        data = request.get_json() or {}
+        
+        rate = data.get('exchange_rate')
+        
+        result = currency_service.validate_exchange_rate(rate)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating currency rate: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# Preferences Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/preferences/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
+def validate_preference():
+    """Validate preference value."""
+    try:
+        data = request.get_json() or {}
+        db: Session = g.db
+        
+        preference_name = data.get('preference_name')
+        value = data.get('value')
+        data_type = data.get('data_type', 'string')
+        
+        if not preference_name:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'preference_name is required'
+                }
+            }), 400
+        
+        # Initialize service with DB session
+        service = PreferencesBusinessService(db_session=db)
+        result = service.validate_preference(preference_name, value, data_type)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+    except Exception as e:
+        logger.error(f"Error validating preference: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/preferences/validate-profile', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
+def validate_profile():
+    """Validate profile data."""
+    try:
+        data = request.get_json() or {}
+        db: Session = g.db
+        
+        # Initialize service with DB session
+        service = PreferencesBusinessService(db_session=db)
+        result = service.validate_profile(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+    except Exception as e:
+        logger.error(f"Error validating profile: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/preferences/validate-dependencies', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
+def validate_dependencies():
+    """Validate dependencies between preferences."""
+    try:
+        data = request.get_json() or {}
+        db: Session = g.db
+        
+        preferences = data.get('preferences', {})
+        
+        if not preferences:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'preferences dictionary is required'
+                }
+            }), 400
+        
+        # Initialize service with DB session
+        service = PreferencesBusinessService(db_session=db)
+        result = service.validate_dependencies(preferences)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+    except Exception as e:
+        logger.error(f"Error validating dependencies: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# Tag Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/tag/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
+def validate_tag():
+    """Validate tag data."""
+    try:
+        data = request.get_json() or {}
+        db: Session = g.db
+        
+        # Initialize service with DB session
+        service = TagBusinessService(db_session=db)
+        result = service.validate(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating tag: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/tag/validate-category', methods=['POST'])
+def validate_tag_category():
+    """Validate tag category."""
+    try:
+        data = request.get_json() or {}
+        
+        category = data.get('category')
+        
+        result = tag_service.validate_category(category)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating tag category: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# Batch Operations Endpoint
+# ============================================================================
+
+@business_logic_bp.route('/batch', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=1.0)
+def batch_operations():
+    """
+    Execute multiple business logic operations in a single request.
+    
+    Request format:
+    {
+        "operations": [
+            {
+                "operation": "calculate-stop-price",
+                "service": "trade",
+                "data": {...}
+            },
+            {
+                "operation": "validate-trade",
+                "service": "trade",
+                "data": {...}
+            }
+        ]
+    }
+    
+    Response format:
+    {
+        "status": "success",
+        "results": [
+            {
+                "operation": "calculate-stop-price",
+                "status": "success",
+                "data": {...}
+            },
+            {
+                "operation": "validate-trade",
+                "status": "error",
+                "error": {...}
+            }
+        ],
+        "total": 2,
+        "successful": 1,
+        "failed": 1
+    }
+    """
+    try:
+        data = request.get_json() or {}
+        operations = data.get('operations', [])
+        
+        if not operations or not isinstance(operations, list):
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Operations list is required and must be an array'
+                }
+            }), 400
+        
+        if len(operations) > 50:  # Limit batch size
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Maximum 50 operations per batch request'
+                }
+            }), 400
+        
+        results = []
+        
+        # Service mapping
+        service_map = {
+            'trade': trade_service,
+            'execution': execution_service,
+            'alert': alert_service,
+            'statistics': statistics_service,
+            'cash-flow': cash_flow_service,
+            'note': note_service,
+            'trading-account': trading_account_service,
+            'trade-plan': trade_plan_service,
+            'ticker': ticker_service,
+            'currency': currency_service,
+            'tag': tag_service
+        }
+        
+        # Operation mapping
+        operation_map = {
+            # Trade operations
+            'calculate-stop-price': lambda svc, d: svc.calculate_stop_price(
+                float(d.get('current_price', 0)),
+                float(d.get('stop_percentage', 0)),
+                d.get('side', 'Long')
+            ),
+            'calculate-target-price': lambda svc, d: svc.calculate_target_price(
+                float(d.get('current_price', 0)),
+                float(d.get('target_percentage', 0)),
+                d.get('side', 'Long')
+            ),
+            'calculate-percentage-from-price': lambda svc, d: svc.calculate_percentage_from_price(
+                float(d.get('current_price', 0)),
+                float(d.get('target_price', 0)),
+                d.get('side', 'Long')
+            ),
+            'calculate-investment': lambda svc, d: svc.calculate_investment(
+                float(d.get('price', 0)),
+                float(d.get('quantity', 0))
+            ),
+            'validate-trade': lambda svc, d: svc.validate_trade(d),
+            
+            # Execution operations
+            'calculate-execution-values': lambda svc, d: svc.calculate_execution_values(d),
+            'calculate-average-price': lambda svc, d: svc.calculate_average_price(d.get('executions', [])),
+            'validate-execution': lambda svc, d: svc.validate_execution(d),
+            
+            # Alert operations
+            'validate-alert': lambda svc, d: svc.validate_alert(d),
+            'validate-condition-value': lambda svc, d: svc.validate_condition_value(
+                d.get('condition_attribute'),
+                d.get('condition_operator'),
+                d.get('condition_number')
+            ),
+            
+            # Statistics operations
+            'calculate-statistics': lambda svc, d: svc.calculate_statistics(
+                d.get('entity_type'),
+                d.get('calculation_type'),
+                d.get('field'),
+                d.get('filters', {})
+            ),
+            'calculate-sum': lambda svc, d: svc.calculate_sum(
+                d.get('entity_type'),
+                d.get('field'),
+                d.get('filters', {})
+            ),
+            'calculate-average': lambda svc, d: svc.calculate_average(
+                d.get('entity_type'),
+                d.get('field'),
+                d.get('filters', {})
+            ),
+            'count-records': lambda svc, d: svc.count_records(
+                d.get('entity_type'),
+                d.get('filters', {})
+            ),
+            
+            # Cash Flow operations
+            'calculate-account-balance': lambda svc, d: svc.calculate_account_balance(
+                d.get('account_id'),
+                d.get('as_of_date')
+            ),
+            'validate-cash-flow': lambda svc, d: svc.validate_cash_flow(d),
+            
+            # Note operations
+            'validate-note': lambda svc, d: svc.validate_note(d),
+            
+            # Trading Account operations
+            'validate-trading-account': lambda svc, d: svc.validate_trading_account(d),
+            
+            # Trade Plan operations
+            'validate-trade-plan': lambda svc, d: svc.validate_trade_plan(d),
+            
+            # Ticker operations
+            'validate-ticker': lambda svc, d: svc.validate_ticker(d),
+            
+            # Tag operations
+            'validate-tag': lambda svc, d: svc.validate_tag(d),
+        }
+        
+        # Process each operation
+        for op_data in operations:
+            operation = op_data.get('operation')
+            service_name = op_data.get('service')
+            op_payload = op_data.get('data', {})
+            
+            try:
+                # Get service
+                service = service_map.get(service_name)
+                if not service:
+                    results.append({
+                        'operation': operation,
+                        'status': 'error',
+                        'error': {
+                            'message': f'Unknown service: {service_name}'
+                        }
+                    })
+                    continue
+                
+                # Get operation handler
+                op_handler = operation_map.get(operation)
+                if not op_handler:
+                    results.append({
+                        'operation': operation,
+                        'status': 'error',
+                        'error': {
+                            'message': f'Unknown operation: {operation}'
+                        }
+                    })
+                    continue
+                
+                # Execute operation
+                result = op_handler(service, op_payload)
+                
+                # Format result
+                if isinstance(result, dict) and result.get('is_valid') is not None:
+                    # Validation result
+                    results.append({
+                        'operation': operation,
+                        'status': 'success' if result.get('is_valid') else 'error',
+                        'data': result
+                    })
+                elif isinstance(result, dict) and 'error' in result:
+                    # Error result
+                    results.append({
+                        'operation': operation,
+                        'status': 'error',
+                        'error': result.get('error', {})
+                    })
+                else:
+                    # Success result
+                    results.append({
+                        'operation': operation,
+                        'status': 'success',
+                        'data': result
+                    })
+                    
+            except Exception as e:
+                logger.error(f"Error executing batch operation {operation}: {str(e)}")
+                results.append({
+                    'operation': operation,
+                    'status': 'error',
+                    'error': {
+                        'message': str(e)
+                    }
+                })
+        
+        # Return batch results
+        return jsonify({
+            'status': 'success',
+            'results': results,
+            'total': len(results),
+            'successful': len([r for r in results if r.get('status') == 'success']),
+            'failed': len([r for r in results if r.get('status') == 'error'])
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error processing batch request: {str(e)}")
         return jsonify({
             'status': 'error',
             'error': {

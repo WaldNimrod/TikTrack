@@ -16,21 +16,36 @@ Documentation:
 """
 
 from .base_business_service import BaseBusinessService
-from .business_rules_registry import BUSINESS_RULES, BusinessRulesRegistry
+from .business_rules_registry import BUSINESS_RULES, BusinessRulesRegistry, business_rules_registry
 from .trade_business_service import TradeBusinessService
 from .execution_business_service import ExecutionBusinessService
 from .alert_business_service import AlertBusinessService
 from .statistics_business_service import StatisticsBusinessService
 from .cash_flow_business_service import CashFlowBusinessService
+from .note_business_service import NoteBusinessService
+from .trading_account_business_service import TradingAccountBusinessService
+from .trade_plan_business_service import TradePlanBusinessService
+from .ticker_business_service import TickerBusinessService
+from .currency_business_service import CurrencyBusinessService
+from .tag_business_service import TagBusinessService
+from .preferences_business_service import PreferencesBusinessService
 
 __all__ = [
     'BaseBusinessService',
     'BUSINESS_RULES',
     'BusinessRulesRegistry',
+    'business_rules_registry',
     'TradeBusinessService',
     'ExecutionBusinessService',
     'AlertBusinessService',
     'StatisticsBusinessService',
     'CashFlowBusinessService',
+    'NoteBusinessService',
+    'TradingAccountBusinessService',
+    'TradePlanBusinessService',
+    'TickerBusinessService',
+    'CurrencyBusinessService',
+    'TagBusinessService',
+    'PreferencesBusinessService',
 ]
 

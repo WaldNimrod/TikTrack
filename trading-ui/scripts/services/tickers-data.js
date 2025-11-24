@@ -299,6 +299,141 @@
     return response.json();
   }
 
+  // ========================================================================
+  // Business Logic API Wrappers
+  // ========================================================================
+
+  /**
+   * Validate ticker data using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (60s TTL).
+   * @param {Object} tickerData - Ticker data to validate
+   * @returns {Promise<Object>} Validation result: {is_valid, errors}
+   */
+  async function validateTicker(tickerData) {
+    // Use optimized cache key generation
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-ticker', tickerData)
+      : `business:validate-ticker:${JSON.stringify(tickerData)}`;
+    
+    try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/ticker/validate', {
+            method: 'POST',
+            headers: DEFAULT_HEADERS,
+            body: JSON.stringify(tickerData)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            return {
+              is_valid: false,
+              errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+            };
+          }
+
+          const result = await response.json();
+          return {
+            is_valid: result.status === 'success',
+            errors: []
+          };
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
+      const response = await fetch('/api/business/ticker/validate', {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify(tickerData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return {
+          is_valid: false,
+          errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+        };
+      }
+
+      const result = await response.json();
+      return {
+        is_valid: result.status === 'success',
+        errors: []
+      };
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating ticker', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      return {
+        is_valid: false,
+        errors: [error?.message || 'Validation failed']
+      };
+    }
+  }
+
+  /**
+   * Validate ticker symbol using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (60s TTL).
+   * @param {string} symbol - Ticker symbol to validate
+   * @returns {Promise<Object>} Validation result: {is_valid, errors}
+   */
+  async function validateTickerSymbol(symbol) {
+    const cacheKey = `business:validate-ticker-symbol:${symbol}`;
+    
+    try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/ticker/validate-symbol', {
+            method: 'POST',
+            headers: DEFAULT_HEADERS,
+            body: JSON.stringify({ symbol })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            return {
+              is_valid: false,
+              errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+            };
+          }
+
+          const result = await response.json();
+          return {
+            is_valid: result.status === 'success',
+            errors: []
+          };
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
+      const response = await fetch('/api/business/ticker/validate-symbol', {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify({ symbol })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return {
+          is_valid: false,
+          errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+        };
+      }
+
+      const result = await response.json();
+      return {
+        is_valid: result.status === 'success',
+        errors: []
+      };
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating ticker symbol', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      return {
+        is_valid: false,
+        errors: [error?.message || 'Validation failed']
+      };
+    }
+  }
+
   window.TickersData = {
     KEY: TICKERS_DATA_KEY,
     TTL: TICKERS_TTL,
@@ -311,6 +446,8 @@
     updateTicker,
     deleteTicker,
     fetchTickerDetails,
+    validateTicker,
+    validateTickerSymbol,
   };
 
   window.Logger?.info?.('✅ Tickers Data Service initialized', PAGE_LOG_CONTEXT);

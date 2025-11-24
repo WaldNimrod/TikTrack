@@ -291,6 +291,136 @@
         return analytics;
     }
 
+    // ========================================================================
+    // Business Logic API Wrappers
+    // ========================================================================
+
+    /**
+     * Validate tag data using backend business logic service.
+     * @param {Object} tagData - Tag data to validate
+     * @returns {Promise<Object>} Validation result: {is_valid, errors}
+     */
+    async function validateTagViaAPI(tagData) {
+        const cacheKey = `business:validate-tag:${JSON.stringify(tagData)}`;
+        
+        try {
+            // Use CacheTTLGuard for automatic cache management
+            if (window.CacheTTLGuard?.ensure) {
+                return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+                    const response = await fetch('/api/business/tag/validate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(tagData)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        return {
+                            is_valid: false,
+                            errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+                        };
+                    }
+
+                    const result = await response.json();
+                    return {
+                        is_valid: result.status === 'success',
+                        errors: []
+                    };
+                }, { ttl: 60 * 1000 });
+            }
+            
+            // Fallback if CacheTTLGuard not available
+            const response = await fetch('/api/business/tag/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(tagData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                return {
+                    is_valid: false,
+                    errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+                };
+            }
+
+            const result = await response.json();
+            return {
+                is_valid: result.status === 'success',
+                errors: []
+            };
+        } catch (error) {
+            window.Logger?.error?.('❌ Error validating tag via API', { page: 'tag-service', error: error?.message || error });
+            return {
+                is_valid: false,
+                errors: [error?.message || 'Validation failed']
+            };
+        }
+    }
+
+    /**
+     * Validate tag category using backend business logic service.
+     * @param {string} category - Category name to validate
+     * @returns {Promise<Object>} Validation result: {is_valid, errors}
+     */
+    async function validateTagCategoryViaAPI(category) {
+        const cacheKey = `business:validate-tag-category:${category}`;
+        
+        try {
+            // Use CacheTTLGuard for automatic cache management
+            if (window.CacheTTLGuard?.ensure) {
+                return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+                    const response = await fetch('/api/business/tag/validate-category', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ category })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        return {
+                            is_valid: false,
+                            errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+                        };
+                    }
+
+                    const result = await response.json();
+                    return {
+                        is_valid: result.status === 'success',
+                        errors: []
+                    };
+                }, { ttl: 60 * 1000 });
+            }
+            
+            // Fallback if CacheTTLGuard not available
+            const response = await fetch('/api/business/tag/validate-category', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                return {
+                    is_valid: false,
+                    errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+                };
+            }
+
+            const result = await response.json();
+            return {
+                is_valid: result.status === 'success',
+                errors: []
+            };
+        } catch (error) {
+            window.Logger?.error?.('❌ Error validating tag category via API', { page: 'tag-service', error: error?.message || error });
+            return {
+                is_valid: false,
+                errors: [error?.message || 'Validation failed']
+            };
+        }
+    }
+
     async function invalidateEntity(entityType, entityId) {
         await removeCached(CACHE_KEYS.entity(entityType, entityId));
         await removeCached(CACHE_KEYS.tags('all'));
@@ -320,7 +450,9 @@
         getSuggestions,
         getAnalytics,
         invalidateEntity,
-        clearCache
+        clearCache,
+        validateTagViaAPI,
+        validateTagCategoryViaAPI
     };
 })();
 

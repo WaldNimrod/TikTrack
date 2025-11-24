@@ -31,12 +31,12 @@
 | **Execution** | ✅ `Backend/models/execution.py` | ✅ `ExecutionBusinessService` | ✅ `executions-data.js` | `/api/executions/` | ✅ מוכן |
 | **Alert** | ✅ `Backend/models/alert.py` | ✅ `AlertBusinessService` | ✅ `alerts-data.js` | `/api/alerts/` | ✅ מוכן |
 | **CashFlow** | ✅ `Backend/models/cash_flow.py` | ✅ `CashFlowBusinessService` | ✅ `cash-flows-data.js` | `/api/cash-flows/` | ✅ מוכן |
-| **Note** | ✅ `Backend/models/note.py` | ❌ חסר | ✅ `notes-data.js` | `/api/notes/` | ⏳ צריך Business Service |
-| **TradingAccount** | ✅ `Backend/models/trading_account.py` | ❌ חסר | ✅ `trading-accounts-data.js` | `/api/trading-accounts/` | ⏳ צריך Business Service |
-| **TradePlan** | ✅ `Backend/models/trade_plan.py` | ❌ חסר | ✅ `trade-plans-data.js` | `/api/trade-plans/` | ⏳ צריך Business Service |
-| **Ticker** | ✅ `Backend/models/ticker.py` | ❌ חסר | ✅ `tickers-data.js` | `/api/tickers/` | ⏳ צריך Business Service |
-| **Currency** | ✅ `Backend/models/currency.py` | ❌ חסר | ❌ חסר | `/api/currencies/` | ⏳ צריך הכל |
-| **Tag** | ✅ `Backend/models/tag.py` | ❌ חסר | ❌ חסר | `/api/tags/` | ⏳ צריך הכל |
+| **Note** | ✅ `Backend/models/note.py` | ✅ `NoteBusinessService` | ✅ `notes-data.js` | `/api/notes/` | ✅ מוכן |
+| **TradingAccount** | ✅ `Backend/models/trading_account.py` | ✅ `TradingAccountBusinessService` | ✅ `trading-accounts-data.js` | `/api/trading-accounts/` | ✅ מוכן |
+| **TradePlan** | ✅ `Backend/models/trade_plan.py` | ✅ `TradePlanBusinessService` | ✅ `trade-plans-data.js` | `/api/trade-plans/` | ✅ מוכן |
+| **Ticker** | ✅ `Backend/models/ticker.py` | ✅ `TickerBusinessService` | ✅ `tickers-data.js` | `/api/tickers/` | ✅ מוכן |
+| **Currency** | ✅ `Backend/models/currency.py` | ✅ `CurrencyBusinessService` | ❌ חסר | `/api/currencies/` | ⏳ צריך Frontend wrappers |
+| **Tag** | ✅ `Backend/models/tag.py` | ✅ `TagBusinessService` | ❌ חסר | `/api/tags/` | ⏳ צריך Frontend wrappers |
 | **User** | ✅ `Backend/models/user.py` | ❌ חסר | ❌ חסר | `/api/users/` | ⏳ אופציונלי |
 | **Preferences** | ✅ `Backend/models/preferences.py` | ❌ חסר | ✅ `preferences-data.js` | `/api/preferences/` | ⏳ מורכב |
 
@@ -73,11 +73,11 @@
 | **TradesData** | ✅ `trades-data.js` | ✅ Wrappers קיימים | ✅ מוכן |
 | **ExecutionsData** | ✅ `executions-data.js` | ✅ Wrappers קיימים | ✅ מוכן |
 | **AlertsData** | ✅ `alerts-data.js` | ✅ Wrappers קיימים | ✅ מוכן |
-| **CashFlowsData** | ✅ `cash-flows-data.js` | ❌ חסר | ⏳ צריך Wrappers |
-| **NotesData** | ✅ `notes-data.js` | ❌ חסר | ⏳ צריך Wrappers |
-| **TradingAccountsData** | ✅ `trading-accounts-data.js` | ❌ חסר | ⏳ צריך Wrappers |
-| **TradePlansData** | ✅ `trade-plans-data.js` | ❌ חסר | ⏳ צריך Wrappers |
-| **TickersData** | ✅ `tickers-data.js` | ❌ חסר | ⏳ צריך Wrappers |
+| **CashFlowsData** | ✅ `cash-flows-data.js` | ✅ Wrappers קיימים | ✅ מוכן |
+| **NotesData** | ✅ `notes-data.js` | ✅ Wrappers קיימים | ✅ מוכן |
+| **TradingAccountsData** | ✅ `trading-accounts-data.js` | ✅ Wrappers קיימים | ✅ מוכן |
+| **TradePlansData** | ✅ `trade-plans-data.js` | ✅ Wrappers קיימים | ✅ מוכן |
+| **TickersData** | ✅ `tickers-data.js` | ✅ Wrappers קיימים | ✅ מוכן |
 | **PreferencesData** | ✅ `preferences-data.js` | ❌ חסר | ⏳ מורכב |
 | **ResearchData** | ✅ `research-data.js` | ❌ חסר | ⏳ צריך Wrappers |
 | **DataImportData** | ✅ `data-import-data.js` | ❌ חסר | ⏳ צריך Wrappers |
@@ -97,11 +97,11 @@
 | **Trades** | ✅ `trades.html` | ✅ `trades.js` | ✅ `trades-data.js` | ✅ `TradeBusinessService` | ✅ מוכן |
 | **Executions** | ✅ `executions.html` | ✅ `executions.js` | ✅ `executions-data.js` | ✅ `ExecutionBusinessService` | ✅ מוכן |
 | **Alerts** | ✅ `alerts.html` | ✅ `alerts.js` | ✅ `alerts-data.js` | ✅ `AlertBusinessService` | ✅ מוכן |
-| **Trade Plans** | ✅ `trade_plans.html` | ✅ `trade_plans.js` | ✅ `trade-plans-data.js` | ❌ חסר | ⏳ צריך Business Service |
+| **Trade Plans** | ✅ `trade_plans.html` | ✅ `trade_plans.js` | ✅ `trade-plans-data.js` | ✅ `TradePlanBusinessService` | ✅ מוכן |
 | **Cash Flows** | ✅ `cash_flows.html` | ✅ `cash_flows.js` | ✅ `cash-flows-data.js` | ✅ `CashFlowBusinessService` | ✅ מוכן |
-| **Trading Accounts** | ✅ `trading_accounts.html` | ✅ `trading_accounts.js` | ✅ `trading-accounts-data.js` | ❌ חסר | ⏳ צריך Business Service |
-| **Tickers** | ✅ `tickers.html` | ✅ `tickers.js` | ✅ `tickers-data.js` | ❌ חסר | ⏳ צריך Business Service |
-| **Notes** | ✅ `notes.html` | ✅ `notes.js` | ✅ `notes-data.js` | ❌ חסר | ⏳ צריך Business Service |
+| **Trading Accounts** | ✅ `trading_accounts.html` | ✅ `trading_accounts.js` | ✅ `trading-accounts-data.js` | ✅ `TradingAccountBusinessService` | ✅ מוכן |
+| **Tickers** | ✅ `tickers.html` | ✅ `tickers.js` | ✅ `tickers-data.js` | ✅ `TickerBusinessService` | ✅ מוכן |
+| **Notes** | ✅ `notes.html` | ✅ `notes.js` | ✅ `notes-data.js` | ✅ `NoteBusinessService` | ✅ מוכן |
 | **Data Import** | ✅ `data_import.html` | ✅ `data_import.js` | ✅ `data-import-data.js` | ❌ חסר | ⏳ צריך Business Service |
 | **Research** | ✅ `research.html` | ✅ `research.js` | ✅ `research-data.js` | ❌ חסר | ⏳ צריך Business Service |
 
@@ -255,22 +255,27 @@
 | **TradeBusinessService** | ✅ `Backend/services/business_logic/trade_business_service.py` | ✅ `/api/business/trade/*` | ✅ `trades-data.js` | ✅ מוכן |
 | **ExecutionBusinessService** | ✅ `Backend/services/business_logic/execution_business_service.py` | ✅ `/api/business/execution/*` | ✅ `executions-data.js` | ✅ מוכן |
 | **AlertBusinessService** | ✅ `Backend/services/business_logic/alert_business_service.py` | ✅ `/api/business/alert/*` | ✅ `alerts-data.js` | ✅ מוכן |
-| **StatisticsBusinessService** | ✅ `Backend/services/business_logic/statistics_business_service.py` | ✅ `/api/business/statistics/*` | ❌ חסר | ⏳ צריך Wrappers |
+| **StatisticsBusinessService** | ✅ `Backend/services/business_logic/statistics_business_service.py` | ✅ `/api/business/statistics/*` | ❌ חסר | ⏳ צריך Wrappers<br>📚 [מדריך מפתחים](../GUIDES/STATISTICS_BUSINESS_SERVICE_GUIDE.md) |
 | **CashFlowBusinessService** | ✅ `Backend/services/business_logic/cash_flow_business_service.py` | ✅ `/api/business/cash-flow/*` | ❌ חסר | ⏳ צריך Wrappers |
 
-### Business Services חסרים (7 services)
+### Business Services חדשים (6 services)
 
 | Service | ישות | קובץ | API Endpoints | Frontend Wrappers | סטטוס |
 | --- | --- | --- | --- | --- | --- |
-| **NoteBusinessService** | Note | ❌ חסר | ❌ חסר | ❌ חסר | ❌ לא נוצר |
-| **TradingAccountBusinessService** | TradingAccount | ❌ חסר | ❌ חסר | ❌ חסר | ❌ לא נוצר |
-| **TradePlanBusinessService** | TradePlan | ❌ חסר | ❌ חסר | ❌ חסר | ❌ לא נוצר |
-| **TickerBusinessService** | Ticker | ❌ חסר | ❌ חסר | ❌ חסר | ❌ לא נוצר |
-| **CurrencyBusinessService** | Currency | ❌ חסר | ❌ חסר | ❌ חסר | ❌ לא נוצר |
-| **TagBusinessService** | Tag | ❌ חסר | ❌ חסר | ❌ חסר | ❌ לא נוצר |
+| **NoteBusinessService** | Note | ✅ `note_business_service.py` | ✅ `/api/business/note/*` | ✅ `notes-data.js` | ✅ מוכן |
+| **TradingAccountBusinessService** | TradingAccount | ✅ `trading_account_business_service.py` | ✅ `/api/business/trading-account/*` | ✅ `trading-accounts-data.js` | ✅ מוכן |
+| **TradePlanBusinessService** | TradePlan | ✅ `trade_plan_business_service.py` | ✅ `/api/business/trade-plan/*` | ✅ `trade-plans-data.js` | ✅ מוכן |
+| **TickerBusinessService** | Ticker | ✅ `ticker_business_service.py` | ✅ `/api/business/ticker/*` | ✅ `tickers-data.js` | ✅ מוכן |
+| **CurrencyBusinessService** | Currency | ✅ `currency_business_service.py` | ✅ `/api/business/currency/*` | ❌ חסר | ⏳ צריך Frontend wrappers |
+| **TagBusinessService** | Tag | ✅ `tag_business_service.py` | ✅ `/api/business/tag/*` | ❌ חסר | ⏳ צריך Frontend wrappers |
+
+### Business Services חסרים (1 service)
+
+| Service | ישות | קובץ | API Endpoints | Frontend Wrappers | סטטוס |
+| --- | --- | --- | --- | --- | --- |
 | **PreferencesBusinessService** | Preferences | ❌ חסר | ❌ חסר | ❌ חסר | ❌ מורכב |
 
-**סה"כ Business Services:** 12 services (5 קיימים, 7 חסרים)
+**סה"כ Business Services:** 12 services (11 קיימים, 1 חסר)
 
 ---
 
@@ -312,12 +317,12 @@
 - ⏳ **12 ישויות אופציונליות** (ישויות משניות)
 
 ### Data Services
-- ✅ **3 Data Services מוכנים** (TradesData, ExecutionsData, AlertsData)
-- ⏳ **9 Data Services צריכים Wrappers** (CashFlowsData, NotesData, TradingAccountsData, TradePlansData, TickersData, PreferencesData, ResearchData, DataImportData, DashboardData)
+- ✅ **8 Data Services מוכנים** (TradesData, ExecutionsData, AlertsData, CashFlowsData, NotesData, TradingAccountsData, TradePlansData, TickersData)
+- ⏳ **4 Data Services צריכים Wrappers** (PreferencesData, ResearchData, DataImportData, DashboardData)
 
 ### עמודים
-- ✅ **4 עמודים מוכנים** (Trades, Executions, Alerts, Cash Flows)
-- ⏳ **7 עמודים צריכים Business Service** (Dashboard, Trade Plans, Trading Accounts, Tickers, Notes, Data Import, Research)
+- ✅ **9 עמודים מוכנים** (Trades, Executions, Alerts, Cash Flows, Trade Plans, Trading Accounts, Tickers, Notes)
+- ⏳ **3 עמודים צריכים Business Service** (Dashboard, Data Import, Research)
 - ✅ **17 עמודים טכניים** (מוכנים)
 
 ### מערכות כלליות
@@ -325,12 +330,46 @@
 - ⏳ **12 מערכות צריכות אינטגרציה** (מטמון, איתחול, Business Logic)
 
 ### Business Logic Services
-- ✅ **5 Business Services קיימים** (Trade, Execution, Alert, Statistics, CashFlow)
-- ⏳ **7 Business Services חסרים** (Note, TradingAccount, TradePlan, Ticker, Currency, Tag, Preferences)
+- ✅ **11 Business Services קיימים** (Trade, Execution, Alert, Statistics, CashFlow, Note, TradingAccount, TradePlan, Ticker, Currency, Tag)
+- ⏳ **1 Business Service חסר** (Preferences - מורכב)
 
 ---
 
-**תאריך עדכון אחרון:** 22 נובמבר 2025  
-**גרסה:** 1.0.0  
-**סטטוס:** ✅ מעודכן - כולל כל הישויות, המערכות, העמודים והאינטגרציות
+---
+
+## 📖 תיעוד מפורט - StatisticsBusinessService
+
+`StatisticsBusinessService` מספק חישובי סטטיסטיקה, KPI, וביצועי פורטפוליו.
+
+### תכונות עיקריות:
+- ✅ חישובי סטטיסטיקה בסיסיים: sum, average, count, min/max
+- ✅ חישובי KPI מורכבים
+- ✅ **חישוב Time-Weighted Return (TWR)** לביצועי פורטפוליו
+
+### פונקציות מרכזיות:
+
+#### 1. פונקציות בסיסיות:
+- `calculate_sum(data, field)` - חישוב סכום
+- `calculate_average(data, field)` - חישוב ממוצע
+- `count_records(data, filter_fn)` - ספירה עם פילטר
+- `calculate_min_max(data, field)` - מינימום ומקסימום
+
+#### 2. חישובי KPI:
+- `calculate_kpi(calculation_type, data, params)` - חישוב KPI על פי סוג
+  - סוגים: 'kpi', 'summary', 'average', 'position', 'portfolio'
+
+#### 3. חישוב Time-Weighted Return:
+- `calculate_time_weighted_return(db, account_id, start_date, end_date, include_cash_flows)`
+  - **מטרה**: חישוב ביצועי פורטפוליו ללא השפעה של הפקדות/משיכות
+  - **איך זה עובד**: מחלק את התקופה לתת-תקופות בין cash flows, מחשב תשואה לכל תת-תקופה, ומכפיל את כל התשואות
+  - **למה חשוב**: מתחשב בזמן הכניסה של הכסף - הפקדה בחודש הראשון "עובדת" יותר זמן מהפקדה בחודש האחרון
+
+### תיעוד מפורט:
+📚 **ראה:** [`STATISTICS_BUSINESS_SERVICE_GUIDE.md`](../GUIDES/STATISTICS_BUSINESS_SERVICE_GUIDE.md) למדריך מפורט עם דוגמאות שימוש
+
+---
+
+**תאריך עדכון אחרון:** 23 נובמבר 2025  
+**גרסה:** 1.1.0  
+**סטטוס:** ✅ מעודכן - כולל Phase 2.1-2.3 (Frontend Wrappers, Page Scripts, Cache Integration)
 

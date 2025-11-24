@@ -678,6 +678,8 @@ trading-ui/scripts/
     ├── constraint-manager.js      # Constraint manager
     ├── condition-translator.js    # Condition translator
     └── button-icons.js            # Button icon system
+    ├── icon-system.js             # Icon System - Central icon management (NEW!)
+    └── icon-mappings.js           # Icon Mappings - Icon configuration (NEW!)
     │
 └── 📊 Chart System Files
     ├── chart-management.js        # Chart management page
@@ -1102,6 +1104,34 @@ function translateTableData(data, tableType) {
 - Validation rules
 - Constraint display
 - Constraint management
+
+### icon-system.js & icon-mappings.js
+**Purpose**: Central icon management system
+- Unified icon system for all icons in the application
+- Support for 17 original entity icons (entities/ directory)
+- Support for Tabler Icons (5800+ free icons, MIT license)
+- Integration with UnifiedCacheManager for performance
+- Fallback mechanism for missing icons
+- Async API for icon retrieval
+- CSS classes and ITCSS integration
+
+**Documentation**: [ICON_SYSTEM_GUIDE.md](ICON_SYSTEM_GUIDE.md), [ICON_SYSTEM_ARCHITECTURE.md](ICON_SYSTEM_ARCHITECTURE.md)
+
+**Key Functions**:
+- `window.IconSystem.getIconPath(type, name)` - Get icon path
+- `window.IconSystem.renderIcon(type, name, options)` - Render icon as HTML
+- `window.IconSystem.getEntityIcon(entityType)` - Get entity icon (checks entities/ first)
+- `window.IconSystem.getButtonIcon(buttonType)` - Get button icon (Tabler)
+- `window.IconSystem.getCategoryIcon(category)` - Get category icon (Tabler)
+- `window.IconSystem.getPageIcon(pageName)` - Get page icon (Tabler)
+- `window.IconSystem.getChartIcon(chartIcon)` - Get chart icon (Tabler)
+
+**Icon Types**:
+- Entity icons: 17 original icons (tickers, trades, trade_plans, etc.)
+- Button icons: Replaced Emojis with Tabler icons
+- Category icons: Replaced FontAwesome with Tabler icons
+- Page icons: Replaced Emojis with Tabler icons
+- Chart icons: Tabler icons for chart controls
 
 ## 🎯 Key Principles
 

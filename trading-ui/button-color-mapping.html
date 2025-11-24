@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=0da3519a_20251102_104906"></script>
     
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+    
     
     <!-- ITCSS Structure -->
     
@@ -79,6 +79,7 @@
             margin: 2px;
         }
     </style>
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
 </head>
 <body class="button-color-mapping-page">
     <div id="unified-header"></div>
@@ -89,10 +90,10 @@
                 <div class="top-section" data-section="top">
                     <div class="section-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h2><i class="fas fa-palette"></i> שיוך צבעים לכפתורים</h2>
+                            <h2><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> שיוך צבעים לכפתורים</h2>
                             <div class="section-header-controls">
                                 <button type="button" class="btn btn-success" onclick="copyColorMappings()">
-                                    <i class="fas fa-copy"></i> העתק שיוכים ללוח
+                                    <img src="/trading-ui/images/icons/tabler/copy.svg" width="16" height="16" alt="copy" class="icon"> העתק שיוכים ללוח
                                 </button>
                             </div>
                         </div>
@@ -103,7 +104,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="alert alert-info">
-                                <h5><i class="fas fa-info-circle"></i> הוראות שימוש:</h5>
+                                <h5><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> הוראות שימוש:</h5>
                                 <ul class="mb-0">
                                     <li>בחר צבע לכל סוג כפתור מהרשימה הנפתחת</li>
                                     <li>הצבעים מחוברים למערכת ההעדפות של המשתמש</li>
@@ -360,7 +361,7 @@
                 alert.style.right = '20px';
                 alert.style.zIndex = '9999';
                 alert.innerHTML = `
-                    <i class="fas fa-check-circle"></i> שיוכי הצבעים הועתקו ללוח!
+                    <img src="/trading-ui/images/icons/tabler/check.svg" width="16" height="16" alt="check" class="icon"> שיוכי הצבעים הועתקו ללוח!
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 `;
                 document.body.appendChild(alert);

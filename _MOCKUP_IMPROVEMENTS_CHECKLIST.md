@@ -143,6 +143,7 @@
 - [ ] Fallback לתצוגה ידנית אם `FieldRendererService` לא זמין
 - [ ] עדכון דינמי של סטטוס ב-`DOMContentLoaded`
 - [ ] תמיכה בכל הסטטוסים: `open`, `closed`, `cancelled`
+- [ ] **חשוב:** במערכת יש רק שלושה סטטוסים: `open`, `closed`, `cancelled`. אין להשתמש ב-`active`, `completed`, `pending` - אלה לא קיימים במערכת
 
 ---
 
@@ -222,4 +223,5 @@ async function loadLinkedItemsForEntity(entityType, entityId) {
 ---
 
 **תאריך עדכון אחרון:** 22 נובמבר 2025
+
 

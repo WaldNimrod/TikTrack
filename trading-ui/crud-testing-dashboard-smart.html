@@ -34,14 +34,15 @@
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">    
     
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
+    
     
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+    
     
     <!-- Error Handlers -->
     <script src="scripts/error-handlers.js?v=0da3519a_20251102_104906"></script>
     <script src="scripts/global-favicon.js?v=0da3519a_20251102_104906"></script>
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
 </head>
 <body>
     <div class="background-wrapper">
@@ -101,7 +102,7 @@
                     <div class="section-body">
                         <!-- הסבר על הכלים -->
                         <div class="alert alert-info mb-4">
-                            <h5><i class="fas fa-info-circle"></i> איך להשתמש בכלי הבדיקות</h5>
+                            <h5><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> איך להשתמש בכלי הבדיקות</h5>
                             <p><strong>שלב 1:</strong> לחץ על הטאב של הישות שברצונך לבדוק</p>
                             <p><strong>שלב 2:</strong> לחץ על כפתור "פתח עמוד" כדי לפתוח את העמוד הנבדק</p>
                             <p><strong>שלב 3:</strong> השתמש בכלי הבדיקה האוטומטיים או בדוק ידנית</p>
@@ -113,19 +114,19 @@
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h6><i class="fas fa-tools"></i> כלי בדיקה אוטומטיים</h6>
+                                        <h6><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> כלי בדיקה אוטומטיים</h6>
                                     </div>
                                     <div class="card-body">
                                         <button class="btn btn-primary btn-sm mb-2" onclick="runAllBasicTests()">
-                                            <i class="fas fa-play"></i> בדיקות בסיסיות לכל העמודים
+                                            <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon"> בדיקות בסיסיות לכל העמודים
                                         </button>
                                         <br>
                                         <button class="btn btn-success btn-sm mb-2" onclick="runAllCRUDTests()">
-                                            <i class="fas fa-database"></i> בדיקות CRUD לכל הישויות
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> בדיקות CRUD לכל הישויות
                                         </button>
                                         <br>
                                         <button class="btn btn-warning btn-sm" onclick="checkAllConnections()">
-                                            <i class="fas fa-network-wired"></i> בדיקת חיבורים לשרת
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> בדיקת חיבורים לשרת
                                         </button>
                                     </div>
                                 </div>
@@ -133,20 +134,20 @@
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h6><i class="fas fa-chart-line"></i> דוחות וסטטיסטיקות</h6>
+                                        <h6><img src="/trading-ui/images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon"> דוחות וסטטיסטיקות</h6>
                                     </div>
                                     <div class="card-body">
                                         <button class="btn btn-info btn-sm mb-2" onclick="generateTestReport()">
-                                            <i class="fas fa-file-alt"></i> יצירת דוח בדיקה
+                                            <img src="/trading-ui/images/icons/tabler/file-text.svg" width="16" height="16" alt="file-text" class="icon"> יצירת דוח בדיקה
                                         </button>
                                         <br>
                                         <button class="btn btn-secondary btn-sm mb-2" onclick="exportTestResults()">
-                                            <i class="fas fa-download"></i> ייצוא תוצאות
+                                            <img src="/trading-ui/images/icons/tabler/download.svg" width="16" height="16" alt="download" class="icon"> ייצוא תוצאות
                                         </button>
                                         <br>
                                         <br>
                                         <button class="btn btn-dark btn-sm" onclick="resetAllTests()">
-                                            <i class="fas fa-undo"></i> איפוס כל הבדיקות
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> איפוס כל הבדיקות
                                         </button>
                                     </div>
                                 </div>
@@ -158,7 +159,7 @@
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h6><i class="fas fa-chart-bar"></i> תוצאות בדיקות</h6>
+                                        <h6><img src="/trading-ui/images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> תוצאות בדיקות</h6>
                                     </div>
                                     <div class="card-body">
                                         <div id="testResultsContainer" class="d-none">
@@ -166,7 +167,7 @@
                                             <div id="testResultsContent"></div>
                                         </div>
                                         <div id="noResultsMessage" class="text-muted">
-                                            <i class="fas fa-info-circle"></i> עדיין לא בוצעו בדיקות. לחץ על אחד מכפתורי הבדיקה למעלה.
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> עדיין לא בוצעו בדיקות. לחץ על אחד מכפתורי הבדיקה למעלה.
                                         </div>
                                     </div>
                                 </div>
@@ -254,16 +255,16 @@
                                     
                                     <div class="test-actions">
                                         <a href="/" target="_blank" class="btn btn-primary">
-                                            <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> פתח עמוד
                                         </a>
                                         <button class="btn btn-info btn-sm" onclick="runBasicTest('index', '/')">
-                                            <i class="fas fa-play"></i> בדיקה בסיסית
+                                            <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon"> בדיקה בסיסית
                                         </button>
                                         <button class="btn btn-success" onclick="markPageComplete('index')">
-                                            <i class="fas fa-check"></i> סיימתי בדיקה
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> סיימתי בדיקה
                                         </button>
                                         <button class="btn btn-warning" onclick="markPagePartial('index')">
-                                            <i class="fas fa-exclamation"></i> יש בעיות
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> יש בעיות
                                         </button>
                                     </div>
                     

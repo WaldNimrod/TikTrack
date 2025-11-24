@@ -5,9 +5,10 @@ Data Synchronization
 
 Synchronizes data between development and production databases.
 Handles schema updates (migrations), reference data, preferences, and groups.
+
+Note: Uses SQLAlchemy to support both PostgreSQL and SQLite databases.
 """
 
-import sqlite3
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -24,6 +25,10 @@ except ImportError:
 
 from schema_detector import SchemaDetector, DataDiff
 
+# Import SQLAlchemy for database connections
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import Session, sessionmaker
+
 
 class DataSync:
     """Synchronizes data between databases"""
@@ -34,14 +39,34 @@ class DataSync:
         self.logger = get_logger()
         self.detector = SchemaDetector(project_root)
         
-        dev_db = self.detector.get_dev_db()
-        self.dev_db = dev_db
-        self.prod_db = project_root / "production" / "Backend" / "db" / "tiktrack.db"
+        # Get database URLs from config
+        sys.path.insert(0, str(project_root / "Backend"))
+        from config.settings import DATABASE_URL as DEV_DATABASE_URL
+        
+        sys.path.insert(0, str(project_root / "production" / "Backend"))
+        try:
+            from config.settings import DATABASE_URL as PROD_DATABASE_URL
+        except ImportError:
+            # Fallback if production config not available
+            PROD_DATABASE_URL = DEV_DATABASE_URL
+        
+        self.dev_db_url = DEV_DATABASE_URL
+        self.prod_db_url = PROD_DATABASE_URL
+        
+        # Create engines
+        self.dev_engine = create_engine(DEV_DATABASE_URL)
+        self.prod_engine = create_engine(PROD_DATABASE_URL)
     
     def sync_schema(self) -> bool:
         """Sync schema changes (run migrations)"""
-        if not self.dev_db or not self.prod_db.exists():
-            self.logger.warning("  ⚠️  Cannot sync schema - databases not found")
+        try:
+            # Test connections
+            with self.dev_engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            with self.prod_engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+        except Exception as e:
+            self.logger.warning(f"  ⚠️  Cannot sync schema - database connection failed: {e}")
             return False
         
         self.logger.info("  🔄 Syncing schema changes...")
@@ -61,7 +86,14 @@ class DataSync:
     
     def sync_reference_data(self, diff: Optional[DataDiff] = None) -> bool:
         """Sync reference data (currencies, accounts, etc.)"""
-        if not self.dev_db or not self.prod_db.exists():
+        try:
+            # Test connections
+            with self.dev_engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            with self.prod_engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+        except Exception as e:
+            self.logger.warning(f"  ⚠️  Cannot sync reference data - database connection failed: {e}")
             return False
         
         if diff is None:
@@ -74,7 +106,7 @@ class DataSync:
         self.logger.info("  🔄 Syncing reference data...")
         
         try:
-            with sqlite3.connect(self.dev_db) as dev_conn, sqlite3.connect(self.prod_db) as prod_conn:
+            with self.dev_engine.connect() as dev_conn, self.prod_engine.connect() as prod_conn:
                 # Sync missing records
                 for table, records in diff.missing_records.items():
                     if not records:
@@ -87,21 +119,31 @@ class DataSync:
                         continue
                     
                     columns = list(records[0].keys())
-                    placeholders = ', '.join(['?' for _ in columns])
+                    # Use PostgreSQL/SQLite compatible syntax
+                    placeholders = ', '.join([':col' + str(i) for i in range(len(columns))])
                     columns_str = ', '.join(columns)
                     
                     for record in records:
-                        values = [record[col] for col in columns]
+                        values = {f'col{i}': record[col] for i, col in enumerate(columns)}
                         try:
-                            prod_conn.execute(
-                                f"INSERT OR REPLACE INTO {table} ({columns_str}) VALUES ({placeholders})",
-                                values
-                            )
+                            # Use ON CONFLICT for PostgreSQL, INSERT OR REPLACE for SQLite
+                            insert_sql = f"""
+                                INSERT INTO {table} ({columns_str}) 
+                                VALUES ({placeholders})
+                                ON CONFLICT (id) DO UPDATE SET 
+                                {', '.join([f"{col} = EXCLUDED.{col}" for col in columns if col != 'id'])}
+                            """
+                            prod_conn.execute(text(insert_sql), values)
+                            prod_conn.commit()
                         except Exception as e:
-                            self.logger.warning(f"      ⚠️  Failed to insert record: {e}")
+                            # Fallback for SQLite (deprecated - system uses PostgreSQL)
+                            try:
+                                insert_sql = f"INSERT OR REPLACE INTO {table} ({columns_str}) VALUES ({placeholders})"
+                                prod_conn.execute(text(insert_sql), values)
+                                prod_conn.commit()
+                            except Exception as e2:
+                                self.logger.warning(f"      ⚠️  Failed to insert record: {e2}")
                     
-                    prod_conn.commit()
-                
                 # Sync changed records
                 for table, changes in diff.changed_records.items():
                     if not changes:
@@ -114,19 +156,16 @@ class DataSync:
                         dev_record = change['dev']
                         
                         columns = list(dev_record.keys())
-                        set_clause = ', '.join([f"{col} = ?" for col in columns if col != 'id'])
-                        values = [dev_record[col] for col in columns if col != 'id']
-                        values.append(pk)
+                        set_clause = ', '.join([f"{col} = :{col}" for col in columns if col != 'id'])
+                        values = {col: dev_record[col] for col in columns if col != 'id'}
+                        values['id'] = pk
                         
                         try:
-                            prod_conn.execute(
-                                f"UPDATE {table} SET {set_clause} WHERE id = ?",
-                                values
-                            )
+                            update_sql = f"UPDATE {table} SET {set_clause} WHERE id = :id"
+                            prod_conn.execute(text(update_sql), values)
+                            prod_conn.commit()
                         except Exception as e:
                             self.logger.warning(f"      ⚠️  Failed to update record: {e}")
-                    
-                    prod_conn.commit()
                 
                 self.logger.info("  ✅ Reference data synced")
                 return True
@@ -137,7 +176,14 @@ class DataSync:
     
     def sync_preferences(self, diff: Optional[DataDiff] = None) -> bool:
         """Sync system preferences"""
-        if not self.dev_db or not self.prod_db.exists():
+        try:
+            # Test connections
+            with self.dev_engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            with self.prod_engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+        except Exception as e:
+            self.logger.warning(f"  ⚠️  Cannot sync preferences - database connection failed: {e}")
             return False
         
         if diff is None:
@@ -152,7 +198,14 @@ class DataSync:
     
     def sync_groups(self, diff: Optional[DataDiff] = None, approved: bool = False) -> bool:
         """Sync groups (CRITICAL - requires approval)"""
-        if not self.dev_db or not self.prod_db.exists():
+        try:
+            # Test connections
+            with self.dev_engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            with self.prod_engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+        except Exception as e:
+            self.logger.warning(f"  ⚠️  Cannot sync groups - database connection failed: {e}")
             return False
         
         if not approved and self.require_approval:

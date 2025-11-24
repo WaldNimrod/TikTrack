@@ -1037,9 +1037,12 @@ window.toggleSection = function (sectionId) {
     }
     
     if (sectionBody) {
-      const isCollapsed = sectionBody.style.display === 'none';
+      // Check both inline style and computed style to handle CSS classes like d-flex
+      const inlineDisplay = sectionBody.style.display;
+      const computedDisplay = window.getComputedStyle(sectionBody).display;
+      const isCollapsed = (inlineDisplay === 'none' || computedDisplay === 'none');
       if (DEBUG_MODE) {
-        console.debug(`🔍 Current state - isCollapsed: ${isCollapsed}, display: "${sectionBody.style.display}"`);
+        console.debug(`🔍 Current state - isCollapsed: ${isCollapsed}, inlineDisplay: "${inlineDisplay}", computedDisplay: "${computedDisplay}"`);
       }
 
       // Check if we're in accordion mode
@@ -1091,12 +1094,16 @@ window.toggleSection = function (sectionId) {
           });
         }
         
+        // Remove d-flex/d-block classes that might interfere and set display
+        sectionBody.classList.remove('d-none', 'd-flex', 'd-block');
         sectionBody.style.display = 'block';
         if (DEBUG_MODE) {
           console.debug(`✅ Section "${sectionId}" EXPANDED`);
         }
       } else {
-        // Closing section
+        // Closing section - remove display classes and set to none
+        sectionBody.classList.remove('d-flex', 'd-block');
+        sectionBody.classList.add('d-none');
         sectionBody.style.display = 'none';
         if (DEBUG_MODE) {
           console.debug(`✅ Section "${sectionId}" COLLAPSED`);
@@ -1312,14 +1319,18 @@ window.restoreAllSectionStates = async function () {
           }
         } else {
           // No saved state - apply default state from page config
-          if (defaultState === 'closed') {
-            sectionBody.style.display = 'none';
-            if (icon) { icon.textContent = '▼'; }
-            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" default state CLOSED (no cache)`, { page: "ui-utils" }); }
-          } else {
+          // Special case: trade-creation section should be closed by default (lazy loading)
+          const shouldBeClosed = sectionId === 'trade-creation';
+          const finalState = shouldBeClosed ? 'closed' : defaultState;
+          
+          if (finalState === 'open') {
             sectionBody.style.display = 'block';
             if (icon) { icon.textContent = '▲'; }
             if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" default state OPEN (no cache)`, { page: "ui-utils" }); }
+          } else {
+            sectionBody.style.display = 'none';
+            if (icon) { icon.textContent = '▼'; }
+            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" default state CLOSED (no cache)`, { page: "ui-utils" }); }
           }
         }
       }
@@ -2287,6 +2298,119 @@ function renderUpdatedCell(entity, options = {}) {
   return `<td class="${columnClass}" data-epoch="${epoch}">${displayHtml}</td>`;
 }
 
+// ===== MOCKUPS STANDARDIZATION HELPERS =====
+// Helper functions for mockups standardization and integration with general systems
+
+/**
+ * Create cache key for mockup pages
+ * @param {string} pageName - Page name (e.g., 'trade-history')
+ * @param {string} dataType - Data type (e.g., 'trades', 'accounts')
+ * @param {Object} params - Parameters object
+ * @returns {string} Cache key
+ */
+function createCacheKey(pageName, dataType, params = {}) {
+    const paramsStr = Object.keys(params).sort().map(k => `${k}:${params[k]}`).join('-');
+    return `${pageName}-${dataType}-${paramsStr || 'default'}`;
+}
+
+/**
+ * Safe API call wrapper with error handling
+ * @param {string} url - API URL
+ * @param {Object} options - Fetch options
+ * @returns {Promise<any>} API response
+ */
+async function safeApiCall(url, options = {}) {
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        }
+        return await response.json();
+    } catch (error) {
+        const errorMsg = `שגיאה בקריאת API: ${error.message || 'שגיאה לא ידועה'}`;
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);
+        }
+        if (window.Logger) {
+            window.Logger.error('API call failed', { url, error });
+        }
+        throw error;
+    }
+}
+
+/**
+ * Show loading state for a component
+ * @param {string} componentId - Component ID
+ */
+function showLoadingState(componentId) {
+    const component = document.getElementById(componentId);
+    if (component) {
+        component.classList.add('loading');
+        if (!component.querySelector('.loading-spinner')) {
+            const spinner = document.createElement('div');
+            spinner.className = 'loading-spinner';
+            spinner.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">טוען...</span></div>';
+            component.appendChild(spinner);
+        }
+    }
+}
+
+/**
+ * Hide loading state for a component
+ * @param {string} componentId - Component ID
+ */
+function hideLoadingState(componentId) {
+    const component = document.getElementById(componentId);
+    if (component) {
+        component.classList.remove('loading');
+        const spinner = component.querySelector('.loading-spinner');
+        if (spinner) {
+            spinner.remove();
+        }
+    }
+}
+
+/**
+ * Debounce function for delaying function execution
+ * @param {Function} func - Function to debounce
+ * @param {number} wait - Wait time in milliseconds
+ * @returns {Function} Debounced function
+ */
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+/**
+ * Create page state manager helper
+ * @param {string} pageName - Page name
+ * @returns {Object} Page state manager with save/restore methods
+ */
+function createPageStateManager(pageName) {
+    return {
+        async save(filters, sections, charts) {
+            if (!window.PageStateManager) {
+                return;
+            }
+            const state = { filters, sections, charts };
+            await window.PageStateManager.savePageState(pageName, state);
+        },
+        async restore() {
+            if (!window.PageStateManager) {
+                return null;
+            }
+            return await window.PageStateManager.loadPageState(pageName);
+        }
+    };
+}
+
 // Export functions to global scope
 // toggleSection removed - use toggleSection('top') instead
 // window.toggleSection export removed - using global version from ui-utils.js
@@ -2299,6 +2423,14 @@ window.updatePageSummaryStats = updatePageSummaryStats;
 window.loadScriptOnce = loadScriptOnce;
 window.loadScriptsOnce = loadScriptsOnce;
 window.renderUpdatedCell = renderUpdatedCell;
+
+// Export mockups standardization helpers
+window.createCacheKey = createCacheKey;
+window.safeApiCall = safeApiCall;
+window.showLoadingState = showLoadingState;
+window.hideLoadingState = hideLoadingState;
+window.debounce = debounce;
+window.createPageStateManager = createPageStateManager;
 
 // הוסר - המערכת המאוחדת מטפלת באתחול
 // Load section states when DOM is ready

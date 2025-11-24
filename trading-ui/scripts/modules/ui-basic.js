@@ -733,7 +733,10 @@ window.toggleSection = async function (sectionId) {
   const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
   
   if (sectionBody) {
-    const isCollapsed = sectionBody.style.display === 'none';
+    // Check both inline style and computed style to handle CSS classes like d-flex
+    const inlineDisplay = sectionBody.style.display;
+    const computedDisplay = window.getComputedStyle(sectionBody).display;
+    const isCollapsed = (inlineDisplay === 'none' || computedDisplay === 'none');
 
     // Check if we're in accordion mode
     const pageName = getCurrentPageName();
@@ -773,10 +776,14 @@ window.toggleSection = async function (sectionId) {
         });
       }
       
+      // Remove d-flex/d-block classes that might interfere and set display
+      sectionBody.classList.remove('d-none', 'd-flex', 'd-block');
       sectionBody.style.display = 'block';
       console.log(`✅ Section "${sectionId}" EXPANDED`);
     } else {
-      // Closing section
+      // Closing section - remove display classes and set to none
+      sectionBody.classList.remove('d-flex', 'd-block');
+      sectionBody.classList.add('d-none');
       sectionBody.style.display = 'none';
       console.log(`✅ Section "${sectionId}" COLLAPSED`);
     }
@@ -1020,14 +1027,18 @@ window.restoreAllSectionStates = async function () {
           }
         } else {
           // No saved state - apply default state from page config
-          if (defaultState === 'closed') {
-            sectionBody.style.display = 'none';
-            if (icon) { updateChevronIcon(icon, true); }
-            console.log(`✅ Section "${sectionId}" default state CLOSED (no cache)`);
-          } else {
+          // Special case: trade-creation section should be closed by default (lazy loading)
+          const shouldBeClosed = sectionId === 'trade-creation';
+          const finalState = shouldBeClosed ? 'closed' : defaultState;
+          
+          if (finalState === 'open') {
             sectionBody.style.display = 'block';
             if (icon) { updateChevronIcon(icon, false); }
             console.log(`✅ Section "${sectionId}" default state OPEN (no cache)`);
+          } else {
+            sectionBody.style.display = 'none';
+            if (icon) { updateChevronIcon(icon, true); }
+            console.log(`✅ Section "${sectionId}" default state CLOSED (no cache)`);
           }
         }
       }

@@ -1692,21 +1692,23 @@ function updateVisualHeatmap(filters) {
     sortedData.forEach((item, index) => {
         const value = item[currentSortBy] || 0;
         const percentile = getValuePercentile(value);
-        // getColorClass expects only percentile, but we need to handle positive/negative separately
-        // For visual heatmap, we use the same logic as the table heatmap
+        // Get color class based on value sign and percentile
+        // Positive values: GREEN gradient only (heatmap-excellent to heatmap-very-poor)
+        // Negative values: RED gradient only (heatmap-negative-excellent to heatmap-negative-very-good)
         let colorClass;
         if (value >= 0) {
+            // Positive values: use green gradient classes
             colorClass = getColorClass(percentile);
         } else {
-            // For negative values, invert percentile
+            // Negative values: use red gradient classes (invert percentile)
             const invertedPercentile = 1 - percentile;
-            if (invertedPercentile >= 0.9) colorClass = 'heatmap-very-poor';
-            else if (invertedPercentile >= 0.75) colorClass = 'heatmap-poor';
-            else if (invertedPercentile >= 0.6) colorClass = 'heatmap-below-avg';
-            else if (invertedPercentile >= 0.4) colorClass = 'heatmap-average';
-            else if (invertedPercentile >= 0.25) colorClass = 'heatmap-good';
-            else if (invertedPercentile >= 0.1) colorClass = 'heatmap-very-good';
-            else colorClass = 'heatmap-excellent';
+            if (invertedPercentile >= 0.9) colorClass = 'heatmap-negative-excellent';
+            else if (invertedPercentile >= 0.75) colorClass = 'heatmap-negative-very-poor';
+            else if (invertedPercentile >= 0.6) colorClass = 'heatmap-negative-poor';
+            else if (invertedPercentile >= 0.4) colorClass = 'heatmap-negative-average';
+            else if (invertedPercentile >= 0.25) colorClass = 'heatmap-negative-below-avg';
+            else if (invertedPercentile >= 0.1) colorClass = 'heatmap-negative-good';
+            else colorClass = 'heatmap-negative-very-good';
         }
         
         const cell = document.createElement('div');

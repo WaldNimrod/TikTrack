@@ -1065,6 +1065,7 @@
 }
 
 /* Heatmap gradient colors */
+/* Heatmap color classes - Positive values (GREEN only) */
 .heatmap-excellent {
     background-color: rgba(40, 167, 69, 0.7);
 }
@@ -1078,19 +1079,48 @@
 }
 
 .heatmap-average {
-    background-color: rgba(255, 193, 7, 0.4);
+    background-color: rgba(40, 167, 69, 0.3);
 }
 
 .heatmap-below-avg {
-    background-color: rgba(255, 193, 7, 0.55);
+    background-color: rgba(40, 167, 69, 0.25);
 }
 
 .heatmap-poor {
-    background-color: rgba(220, 53, 69, 0.55);
+    background-color: rgba(40, 167, 69, 0.2);
 }
 
 .heatmap-very-poor {
+    background-color: rgba(40, 167, 69, 0.15);
+}
+
+/* Heatmap color classes - Negative values (RED only) */
+.heatmap-negative-excellent {
     background-color: rgba(220, 53, 69, 0.7);
+}
+
+.heatmap-negative-very-poor {
+    background-color: rgba(220, 53, 69, 0.55);
+}
+
+.heatmap-negative-poor {
+    background-color: rgba(220, 53, 69, 0.4);
+}
+
+.heatmap-negative-average {
+    background-color: rgba(220, 53, 69, 0.3);
+}
+
+.heatmap-negative-below-avg {
+    background-color: rgba(220, 53, 69, 0.25);
+}
+
+.heatmap-negative-good {
+    background-color: rgba(220, 53, 69, 0.2);
+}
+
+.heatmap-negative-very-good {
+    background-color: rgba(220, 53, 69, 0.15);
 }
 
 /* Chart animations */

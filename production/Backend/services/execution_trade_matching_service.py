@@ -51,17 +51,22 @@ class ExecutionTradeMatchingService:
         
         logger.info(f"Finding trade suggestions for execution {execution.id} (ticker_id={execution.ticker_id})")
         
-        # Base query: trades with matching ticker
+        # Map execution action to trade side
+        execution_side = ExecutionTradeMatchingService._map_execution_action_to_trade_side(execution.action)
+        logger.debug(f"Execution {execution.id} action '{execution.action}' maps to side '{execution_side}'")
+        
+        # Base query: trades with matching ticker and side
         query = db.query(Trade).options(
             joinedload(Trade.ticker),
             joinedload(Trade.account)
         ).filter(
-            Trade.ticker_id == execution.ticker_id
+            Trade.ticker_id == execution.ticker_id,
+            Trade.side == execution_side
         )
         
         # Get all matching trades
         matching_trades = query.all()
-        logger.info(f"Found {len(matching_trades)} trades with matching ticker")
+        logger.info(f"Found {len(matching_trades)} trades with matching ticker and side '{execution_side}'")
         
         if not matching_trades:
             return []

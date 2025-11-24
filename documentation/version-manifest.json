@@ -10,13 +10,13 @@
     "notes": "Add comprehensive bug documentation for execution clustering issue"
   },
   "development": {
-    "version": "1.3.20.0",
+    "version": "1.3.21.0",
     "major": 1,
     "minor": 3,
-    "patch": 20,
+    "patch": 21,
     "build": 0,
-    "commit": "b84b03dfef349d661be7bb29c314e02374944464",
-    "updated_at": "2025-11-24T14:56:19+00:00",
-    "notes": "Fix: תיקון מיפוי execution actions ל-trade side - 'sell' actions כעת ממופים ל-'long' במקום 'short'"
+    "commit": "8045ea03bcfd222129a6cba3af8357af56c1386a",
+    "updated_at": "2025-11-24T15:10:50+00:00",
+    "notes": "Fix: הוספת סינון לפי side במערכת שיוך ביצועים - רק trades עם side תואם יוצעו"
   }
 }

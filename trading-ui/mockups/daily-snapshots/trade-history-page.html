@@ -440,7 +440,11 @@
                         <!-- Chart Container Wrapper (קונטיינר ייעודי לגרף) -->
                         <div class="chart-container-wrapper">
                             <div class="tradingview-chart-wrapper timeline-chart-container timeline-chart-container-fixed">
-                                <div class="tradingview-chart-container tradingview-timeline-chart-container" id="timelineChart"></div>
+                                <div class="tradingview-chart-container tradingview-timeline-chart-container" id="timelineChart">
+                                    <div class="chart-loading">
+                                        <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="chart-legend mt-2">
@@ -870,8 +874,12 @@
                     timelineChart = null;
                 }
                 
-                // Clear container
+                // Clear container (but keep loading indicator if exists)
+                const loading = container.querySelector('.chart-loading');
                 container.innerHTML = '';
+                if (loading) {
+                    container.appendChild(loading);
+                }
             } catch (e) {
                 if (window.Logger) {
                     window.Logger.warn('Error during chart cleanup', { page: 'trade-history-page', error: e });
@@ -929,10 +937,15 @@
             
             // Create chart with TradingView
             try {
+                // Get wrapper for width calculation (if exists)
+                const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                const containerWidth = wrapper ? wrapper.clientWidth : (container.clientWidth || 800);
+                const containerHeight = container.clientHeight || 400;
+                
                 // Create chart
                 timelineChart = window.TradingViewChartAdapter.createChart(container, {
-                    width: container.clientWidth || 800,
-                    height: container.clientHeight || 400,
+                    width: containerWidth,
+                    height: containerHeight,
                     layout: {
                         textColor: getCSSVariableValue('--text-color', '#212529'),
                         background: { type: 'solid', color: getCSSVariableValue('--card-background', '#ffffff') }
@@ -1226,6 +1239,10 @@
                         window.Logger.error('❌ [Timeline Chart] Error calling fitContent()', { page: 'trade-history-page', error });
                     }
                 }
+                
+                // Remove loading indicator
+                const loading = container.querySelector('.chart-loading');
+                if (loading) loading.remove();
                 
                 // Store timelineData for tooltip and click handlers
                 timelineChart._timelineData = timelineData;
@@ -1677,6 +1694,18 @@
             
             // Load linked items for the trade
             loadLinkedItemsForTrade();
+        });
+        
+        // Handle window resize for timeline chart
+        window.addEventListener('resize', () => {
+            if (timelineChart) {
+                const container = document.getElementById('timelineChart');
+                if (container) {
+                    const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                    const containerWidth = wrapper ? wrapper.clientWidth : container.clientWidth;
+                    timelineChart.applyOptions({ width: containerWidth });
+                }
+            }
         });
         
         // Function to update trade status badge
@@ -2204,11 +2233,9 @@
                         <td>${plDisplay}</td>
                         <td>
                             <div class="btn-group">
-                                <button class="btn btn-sm" onclick="viewTradeDetails(${trade.id})" title="פרטים">
-                                    👁️
+                                <button class="btn btn-sm" onclick="viewTradeDetails(${trade.id})" title="פרטים" data-icon="eye">
                                 </button>
-                                <button class="btn btn-sm btn-primary" onclick="selectTradeForAnalysis(${trade.id})" title="בחר לניתוח">
-                                    ✓
+                                <button class="btn btn-sm btn-primary" onclick="selectTradeForAnalysis(${trade.id})" title="בחר לניתוח" data-icon="check">
                                 </button>
                             </div>
                         </td>

@@ -75,7 +75,11 @@
                     <!-- Chart Container Wrapper (קונטיינר ייעודי לגרף) -->
                     <div class="chart-container-wrapper">
                         <div class="tradingview-chart-wrapper chart-container-base">
-                            <div class="tradingview-chart-container" id="basic-chart-container"></div>
+                            <div class="tradingview-chart-container" id="basic-chart-container">
+                                <div class="chart-loading">
+                                    <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -87,7 +91,11 @@
                     <!-- Chart Container Wrapper (קונטיינר ייעודי לגרף) -->
                     <div class="chart-container-wrapper">
                         <div class="tradingview-chart-wrapper chart-container-base">
-                            <div class="tradingview-chart-container" id="line-series-container"></div>
+                            <div class="tradingview-chart-container" id="line-series-container">
+                                <div class="chart-loading">
+                                    <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -99,7 +107,11 @@
                     <!-- Chart Container Wrapper (קונטיינר ייעודי לגרף) -->
                     <div class="chart-container-wrapper">
                         <div class="tradingview-chart-wrapper chart-container-base">
-                            <div class="tradingview-chart-container" id="stepped-line-container"></div>
+                            <div class="tradingview-chart-container" id="stepped-line-container">
+                                <div class="chart-loading">
+                                    <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -111,7 +123,11 @@
                     <!-- Chart Container Wrapper (קונטיינר ייעודי לגרף) -->
                     <div class="chart-container-wrapper">
                         <div class="tradingview-chart-wrapper chart-container-base">
-                            <div class="tradingview-chart-container" id="dual-axes-container"></div>
+                            <div class="tradingview-chart-container" id="dual-axes-container">
+                                <div class="chart-loading">
+                                    <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -345,10 +361,19 @@
                                     
                                     function createChart() {
                                         try {
+                                            // Get wrapper for width calculation (if exists)
+                                            const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                                            const containerWidth = wrapper ? wrapper.clientWidth : (container.clientWidth || 600);
+                                            const containerHeight = container.clientHeight || 400;
+                                            
                                             const chart = window.TradingViewChartAdapter.createChart(container, {
-                                                width: container.clientWidth || 600,
-                                                height: container.clientHeight || 400,
+                                                width: containerWidth,
+                                                height: containerHeight,
                                             });
+                                            
+                                            // Remove loading indicator
+                                            const loading = container.querySelector('.chart-loading');
+                                            if (loading) loading.remove();
                                             
                                             if (!chart || typeof chart.addSeries !== 'function') {
                                                 status.className = 'test-status error';
@@ -424,10 +449,20 @@
                                     
                                     function createChart() {
                                         try {
+                                            // Get wrapper for width calculation (if exists)
+                                            const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                                            const containerWidth = wrapper ? wrapper.clientWidth : (container.clientWidth || 600);
+                                            const containerHeight = container.clientHeight || 400;
+                                            
                                             const chart = window.TradingViewChartAdapter.createChart(container, {
-                                                width: container.clientWidth || 600,
-                                                height: container.clientHeight || 400,
+                                                width: containerWidth,
+                                                height: containerHeight,
                                             });
+                                            
+                                            // Remove loading indicator
+                                            const loading = container.querySelector('.chart-loading');
+                                            if (loading) loading.remove();
+                                            
                                             const lineSeries = window.TradingViewChartAdapter.addLineSeries(chart);
                                             
                                             const data = [
@@ -486,10 +521,20 @@
                                     
                                     function createChart() {
                                         try {
+                                            // Get wrapper for width calculation (if exists)
+                                            const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                                            const containerWidth = wrapper ? wrapper.clientWidth : (container.clientWidth || 600);
+                                            const containerHeight = container.clientHeight || 400;
+                                            
                                             const chart = window.TradingViewChartAdapter.createChart(container, {
-                                                width: container.clientWidth || 600,
-                                                height: container.clientHeight || 400,
+                                                width: containerWidth,
+                                                height: containerHeight,
                                             });
+                                            
+                                            // Remove loading indicator
+                                            const loading = container.querySelector('.chart-loading');
+                                            if (loading) loading.remove();
+                                            
                                             const lineSeries = window.TradingViewChartAdapter.addLineSeries(chart, {
                                                 lineType: 1, // Stepped
                                                 color: '#26baac',
@@ -551,10 +596,19 @@
                                     
                                     function createChart() {
                                         try {
+                                            // Get wrapper for width calculation (if exists)
+                                            const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                                            const containerWidth = wrapper ? wrapper.clientWidth : (container.clientWidth || 600);
+                                            const containerHeight = container.clientHeight || 400;
+                                            
                                             const chart = window.TradingViewChartAdapter.createChart(container, {
-                                                width: container.clientWidth || 600,
-                                                height: container.clientHeight || 400,
+                                                width: containerWidth,
+                                                height: containerHeight,
                                             });
+                                            
+                                            // Remove loading indicator
+                                            const loading = container.querySelector('.chart-loading');
+                                            if (loading) loading.remove();
                                             
                                             // Position Size - Left Scale
                                             const positionSizeSeries = window.TradingViewChartAdapter.addLineSeries(chart, {

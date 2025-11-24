@@ -372,13 +372,25 @@
                         <div class="chart-container-wrapper">
                             <div class="chart-container-large">
                                 <div class="tradingview-chart-wrapper chart-container-third">
-                                    <div class="tradingview-chart-container tradingview-portfolio-chart-container" id="portfolio-performance-chart-container"></div>
+                                    <div class="tradingview-chart-container tradingview-portfolio-chart-container" id="portfolio-performance-chart-container">
+                                        <div class="chart-loading">
+                                            <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="tradingview-chart-wrapper chart-container-third-border">
-                                    <div class="tradingview-chart-container tradingview-portfolio-chart-container" id="portfolio-value-chart-container"></div>
+                                    <div class="tradingview-chart-container tradingview-portfolio-chart-container" id="portfolio-value-chart-container">
+                                        <div class="chart-loading">
+                                            <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="tradingview-chart-wrapper chart-container-third-border">
-                                    <div class="tradingview-chart-container tradingview-portfolio-chart-container" id="pl-trend-chart-container"></div>
+                                    <div class="tradingview-chart-container tradingview-portfolio-chart-container" id="pl-trend-chart-container">
+                                        <div class="chart-loading">
+                                            <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1774,8 +1786,9 @@
                 // Use secondary color (orange-red) for performance chart
                 const secondaryColor = getCSSVariableValue('--secondary-color', '#fc5a06');
                 
-                // Ensure container has proper dimensions
-                const containerWidth = container.clientWidth || container.offsetWidth || 800;
+                // Get wrapper for width calculation (if exists)
+                const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                const containerWidth = wrapper ? wrapper.clientWidth : (container.clientWidth || container.offsetWidth || 800);
                 const containerHeight = container.clientHeight || container.offsetHeight || 200;
                 
                 if (containerWidth === 0 || containerHeight === 0) {
@@ -1824,6 +1837,10 @@
                         }
                     }
                 });
+                
+                // Remove loading indicator
+                const loading1 = container.querySelector('.chart-loading');
+                if (loading1) loading1.remove();
                 
                 // Performance series (percentage return - only one axis)
                 const portfolioPerformanceSeries = window.TradingViewChartAdapter.addLineSeries(portfolioPerformanceChart, {
@@ -1958,8 +1975,9 @@
             try {
                 const primaryColor = getCSSVariableValue('--primary-color', '#26baac');
                 
-                // Ensure container has proper dimensions
-                const containerWidth = container.clientWidth || container.offsetWidth || 800;
+                // Get wrapper for width calculation (if exists)
+                const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                const containerWidth = wrapper ? wrapper.clientWidth : (container.clientWidth || container.offsetWidth || 800);
                 const containerHeight = container.clientHeight || container.offsetHeight || 200;
                 
                 if (containerWidth === 0 || containerHeight === 0) {
@@ -2015,6 +2033,10 @@
                         }
                     }
                 });
+                
+                // Remove loading indicator
+                const loading2 = container.querySelector('.chart-loading');
+                if (loading2) loading2.remove();
                 
                 // Get lighter shade for percentage series
                 const primaryColorLighter = getLighterColor(primaryColor, 0.5);
@@ -2168,8 +2190,9 @@
                 const warningColor = getCSSVariableValue('--warning-color', '#ffc107');
                 const primaryColor = getCSSVariableValue('--primary-color', '#007bff');
                 
-                // Ensure container has proper dimensions
-                const containerWidth = container.clientWidth || container.offsetWidth || 800;
+                // Get wrapper for width calculation (if exists)
+                const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                const containerWidth = wrapper ? wrapper.clientWidth : (container.clientWidth || container.offsetWidth || 800);
                 const containerHeight = container.clientHeight || container.offsetHeight || 200;
                 
                 if (containerWidth === 0 || containerHeight === 0) {
@@ -2225,6 +2248,10 @@
                         }
                     }
                 });
+                
+                // Remove loading indicator
+                const loading3 = container.querySelector('.chart-loading');
+                if (loading3) loading3.remove();
                 
                 // Get lighter shades for percentage series
                 const successColorLighter = getLighterColor(successColor, 0.5);
@@ -3182,13 +3209,28 @@
         // Handle window resize for charts
         window.addEventListener('resize', () => {
             if (portfolioPerformanceChart) {
-                portfolioPerformanceChart.applyOptions({ width: document.getElementById('portfolio-performance-chart-container').clientWidth });
+                const container = document.getElementById('portfolio-performance-chart-container');
+                if (container) {
+                    const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                    const containerWidth = wrapper ? wrapper.clientWidth : container.clientWidth;
+                    portfolioPerformanceChart.applyOptions({ width: containerWidth });
+                }
             }
             if (portfolioValueChart) {
-                portfolioValueChart.applyOptions({ width: document.getElementById('portfolio-value-chart-container').clientWidth });
+                const container = document.getElementById('portfolio-value-chart-container');
+                if (container) {
+                    const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                    const containerWidth = wrapper ? wrapper.clientWidth : container.clientWidth;
+                    portfolioValueChart.applyOptions({ width: containerWidth });
+                }
             }
             if (plTrendChart) {
-                plTrendChart.applyOptions({ width: document.getElementById('pl-trend-chart-container').clientWidth });
+                const container = document.getElementById('pl-trend-chart-container');
+                if (container) {
+                    const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                    const containerWidth = wrapper ? wrapper.clientWidth : container.clientWidth;
+                    plTrendChart.applyOptions({ width: containerWidth });
+                }
             }
         });
     </script>

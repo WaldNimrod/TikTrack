@@ -74,16 +74,21 @@ def run_step(dry_run: bool = False) -> dict:
             # Try to import and verify
             try:
                 sys.path.insert(0, str(production_config.parent))
-                from config.settings import IS_PRODUCTION, PORT, DATABASE_URL, UI_DIR, USING_SQLITE
+                from config.settings import IS_PRODUCTION, PORT, DATABASE_URL, UI_DIR
                 
                 logger.info(f"    📍 IS_PRODUCTION: {IS_PRODUCTION}")
                 logger.info(f"    📍 PORT: {PORT}")
                 logger.info(f"    📍 DATABASE_URL: {DATABASE_URL[:50]}...")
-                logger.info(f"    📍 USING_SQLITE: {USING_SQLITE}")
+                logger.info(f"    📍 Database Type: PostgreSQL")
                 logger.info(f"    📍 UI_DIR: {UI_DIR}")
                 
-                if IS_PRODUCTION and PORT == 5001:
-                    logger.info("  ✅ Production settings verified")
+                # Verify PostgreSQL is being used
+                is_postgresql = DATABASE_URL.startswith('postgresql')
+                if not is_postgresql:
+                    logger.warning(f"    ⚠️  Database is not PostgreSQL: {DATABASE_URL[:50]}...")
+                
+                if IS_PRODUCTION and PORT == 5001 and is_postgresql:
+                    logger.info("  ✅ Production settings verified (PostgreSQL)")
                     return {'success': True, 'verified': True}
                 else:
                     logger.warning("  ⚠️  Settings not matching expected production values")

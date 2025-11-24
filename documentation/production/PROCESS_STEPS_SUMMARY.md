@@ -198,7 +198,7 @@ python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
 **תוצאה צפויה:**
 ```
 UI: /path/to/production/trading-ui
-DB: /path/to/production/Backend/db/tiktrack.db
+DB: PostgreSQL (TikTrack-db-prodution)
 Port: 5001
 Production: True
 ```
@@ -206,7 +206,7 @@ Production: True
 **אם לא נכון, תקן:**
 - `IS_PRODUCTION = True` (hardcoded)
 - `PORT = 5001` (hardcoded)
-- `DB_PATH` מצביע על `tiktrack.db`
+- `DATABASE_URL` מצביע על PostgreSQL
 - `UI_DIR` מצביע על `production/trading-ui`
 
 #### תוצאה:

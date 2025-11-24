@@ -6,7 +6,7 @@ Data Synchronization
 Synchronizes data between development and production databases.
 Handles schema updates (migrations), reference data, preferences, and groups.
 
-Note: Uses SQLAlchemy to support both PostgreSQL and SQLite databases.
+Note: Uses SQLAlchemy to support PostgreSQL databases only.
 """
 
 import sys
@@ -119,14 +119,14 @@ class DataSync:
                         continue
                     
                     columns = list(records[0].keys())
-                    # Use PostgreSQL/SQLite compatible syntax
+                    # Use PostgreSQL syntax
                     placeholders = ', '.join([':col' + str(i) for i in range(len(columns))])
                     columns_str = ', '.join(columns)
                     
                     for record in records:
                         values = {f'col{i}': record[col] for i, col in enumerate(columns)}
                         try:
-                            # Use ON CONFLICT for PostgreSQL, INSERT OR REPLACE for SQLite
+                            # Use PostgreSQL ON CONFLICT syntax
                             insert_sql = f"""
                                 INSERT INTO {table} ({columns_str}) 
                                 VALUES ({placeholders})
@@ -136,12 +136,6 @@ class DataSync:
                             prod_conn.execute(text(insert_sql), values)
                             prod_conn.commit()
                         except Exception as e:
-                            # Fallback for SQLite (deprecated - system uses PostgreSQL)
-                            try:
-                                insert_sql = f"INSERT OR REPLACE INTO {table} ({columns_str}) VALUES ({placeholders})"
-                                prod_conn.execute(text(insert_sql), values)
-                                prod_conn.commit()
-                            except Exception as e2:
                                 self.logger.warning(f"      ⚠️  Failed to insert record: {e2}")
                     
                 # Sync changed records

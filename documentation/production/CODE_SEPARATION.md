@@ -53,7 +53,7 @@ git push origin production
 
 - **תקייה נפרדת:** `production/Backend/` - רק קבצים פעילים
 - **Git Branch נפרד:** `production` - קוד נקי ללא tests/migrations
-- **בסיס נתונים נפרד:** `tiktrack.db` - רק נתוני עזר והעדפות
+- **בסיס נתונים נפרד:** PostgreSQL (`TikTrack-db-prodution`) - רק נתוני עזר והעדפות
 - **פורט נפרד:** 5001 (פיתוח: 8080)
 - **לוגים נפרדים:** `production/Backend/logs/`
 
@@ -72,7 +72,7 @@ TikTrackApp/
 │   ├── tests/                             # בדיקות
 │   ├── migrations/                       # מיגרציות
 │   ├── db/
-│   │   └── tiktrack.db            # DB פיתוח
+│   │   └── (PostgreSQL)           # DB פיתוח (PostgreSQL)
 │   └── logs/                              # לוגים פיתוח
 │
 ├── production/                            # סביבת פרודקשן (רק קבצים פעילים)
@@ -89,7 +89,7 @@ TikTrackApp/
 │   │   │   ├── create_production_db.py
 │   │   │   └── map_active_files.py
 │   │   ├── db/
-│   │   │   └── tiktrack.db            # ✅ DB פרודקשן
+│   │   │   └── (PostgreSQL)           # ✅ DB פרודקשן (PostgreSQL)
 │   │   └── logs/                          # ✅ לוגים פרודקשן
 │   │
 │   └── start_production.sh                # ✅ סקריפט הפעלה
@@ -186,16 +186,17 @@ git push origin production
 כל הקבצים בפרודקשן משתמשים ב-`config.settings` לנתיבים:
 
 ```python
-# ✅ נכון - שימוש ב-config.settings
-from config.settings import DB_PATH, UI_DIR
+# ✅ נכון - שימוש ב-config.settings עם PostgreSQL
+from config.settings import DATABASE_URL
+from sqlalchemy import create_engine
 
-conn = sqlite3.connect(str(DB_PATH))
+engine = create_engine(DATABASE_URL)
 ```
 
 ```python
-# ❌ שגוי - נתיב קשיח
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(BASE_DIR, "db", "tiktrack.db")
+# ❌ שגוי - שימוש ב-SQLite או נתיב קשיח
+import sqlite3
+conn = sqlite3.connect("tiktrack.db")  # לא נתמך יותר!
 ```
 
 הסקריפט `scripts/fix_production_paths.py` מתקן אוטומטית נתיבים קשיחים.
@@ -210,8 +211,8 @@ python3 scripts/create_production_db.py
 ```
 
 הסקריפט:
-1. קורא מ-`Backend/db/tiktrack.db` (פיתוח)
-2. יוצר `production/Backend/db/tiktrack.db` (פרודקשן)
+1. קורא מ-PostgreSQL פיתוח (`TikTrack-db-development`)
+2. יוצר PostgreSQL פרודקשן (`TikTrack-db-prodution`)
 3. מעתיק את כל מבנה הטבלאות
 4. מעתיק נתוני עזר והעדפות
 5. מעתיק רק חשבון מסחר אחד (ברירת מחדל)
@@ -264,14 +265,14 @@ cd production
 - כל הקוד כולל tests, migrations, וכו'
 - עבודה יומיומית
 - פורט: 8080
-- DB: `tiktrack.db`
+- DB: PostgreSQL (`TikTrack-db-prodution`)
 
 ### production (production)
 - רק קבצים פעילים מ-`production/Backend/`
 - קוד נקי ללא tests/migrations
 - עדכון רק דרך sync script
 - פורט: 5001
-- DB: `tiktrack.db`
+- DB: PostgreSQL (`TikTrack-db-prodution`)
 
 ## הפרדה בין הסביבות
 
@@ -280,7 +281,7 @@ cd production
 | **תקייה** | `Backend/` | `production/Backend/` |
 | **Git Branch** | `main` | `production` |
 | **פורט** | 8080 | 5001 |
-| **DB** | `tiktrack.db` | `tiktrack.db` |
+| **DB** | PostgreSQL (`TikTrack-db-development`) | PostgreSQL (`TikTrack-db-prodution`) |
 | **לוגים** | `Backend/logs/` | `production/Backend/logs/` |
 | **קבצים** | כל הקבצים | רק פעילים (~145) |
 | **Tests** | ✅ יש | ❌ אין |

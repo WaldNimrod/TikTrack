@@ -32,3 +32,4 @@ This log records every production version update, including manual major/minor a
 | 2025-11-22T11:56:35+00:00 | 1.3.0.0 | 1.2.0.0 | 997679b3129b635a7d1c489ca7b9ca9f3d8ce044 | 568f18f6ed3ea36ed8a65f961234fd064eb697f4 | set | Align production version with development - 1.3.0 |
 | 2025-11-22T22:49:41+00:00 | 1.3.1.0 | 1.3.0.0 | 6ce17ac3a123d40b815a28c39f7e0b9bedf9b455 | 997679b3129b635a7d1c489ca7b9ca9f3d8ce044 | patch | Fix account linking modal - always show interface for user confirmation |
 | 2025-11-23T00:34:13+00:00 | 1.3.2.0 | 1.3.1.0 | f1400d1362076eb88952fbaff62993d861431707 | 6ce17ac3a123d40b815a28c39f7e0b9bedf9b455 | patch | Fix preferences cache version and delete trades with linking issues |
+| 2025-11-24T00:00:43+00:00 | 1.3.3.0 | 1.3.2.0 | 3a481fb891063d83a8018dc80ad11fff2b6e0834 | f1400d1362076eb88952fbaff62993d861431707 | patch | Update production update process - remove SQLite references, add migration check |

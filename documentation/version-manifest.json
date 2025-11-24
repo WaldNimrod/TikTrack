@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.3.2.0",
+    "version": "1.3.3.0",
     "major": 1,
     "minor": 3,
-    "patch": 2,
+    "patch": 3,
     "build": 0,
-    "commit": "f1400d1362076eb88952fbaff62993d861431707",
-    "updated_at": "2025-11-23T00:34:13+00:00",
-    "notes": "Fix preferences cache version and delete trades with linking issues"
+    "commit": "3a481fb891063d83a8018dc80ad11fff2b6e0834",
+    "updated_at": "2025-11-24T00:00:43+00:00",
+    "notes": "Update production update process - remove SQLite references, add migration check"
   },
   "development": {
     "version": "1.3.18.0",

@@ -1,7 +1,7 @@
 # TikTrack Production Update Process - מדריך עדכון פרודקשן
 
-**תאריך:** 2025-11-21  
-**גרסה:** 1.3.0  
+**תאריך:** 2025-11-22  
+**גרסה:** 1.4.0  
 **מטרה:** תהליך מלא ומסודר לעדכון קוד הפרודקשן המקומי מול Git
 
 **⚠️ עדכון חשוב:** גרסה זו כוללת תיקונים קריטיים לבדיקת הגדרות production אחרי sync
@@ -9,6 +9,8 @@
 **🆕 עדכון 1.2.0:** כל ה-hardcoded URLs הוחלפו ב-relative URLs - הקוד עובד אוטומטית בפיתוח ובפרודקשן
 
 **🆕 עדכון 1.3.0:** שינוי מ-whitelist ל-blacklist - כל הקבצים מתעדכנים אוטומטית למעט חריגים ספציפיים (tests, archive, backups, documentation, legacy). הוספת verification מקיף אחרי sync.
+
+**🆕 עדכון 1.4.0:** הסרת אזכורים ל-SQLite מהתיעוד - המערכת עברה ל-PostgreSQL. הוספת סעיף על בדיקת צורך במיגרציות (ידני).
 
 ---
 
@@ -274,9 +276,10 @@ git checkout production
 ```bash
 # בדוק את ההגדרות
 cd production/Backend
-python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
+python3 -c "from config.settings import UI_DIR, DATABASE_URL, PORT, IS_PRODUCTION, USING_SQLITE; \
     print(f'UI: {UI_DIR}'); \
-    print(f'DB: {DB_PATH}'); \
+    print(f'DB: {DATABASE_URL[:50]}...'); \
+    print(f'Using SQLite: {USING_SQLITE}'); \
     print(f'Port: {PORT}'); \
     print(f'Production: {IS_PRODUCTION}')"
 ```
@@ -284,7 +287,7 @@ python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
 **תוצאה צפויה:**
 ```
 UI: /path/to/production/trading-ui
-DB: /path/to/production/Backend/db/TikTrack_DB.db
+DB: PostgreSQL connection string (postgresql+psycopg2://...)
 Port: 5001
 Production: True
 ```
@@ -294,7 +297,7 @@ Production: True
 1. **תקן `production/Backend/config/settings.py`:**
    - ודא ש-`IS_PRODUCTION = True` (hardcoded)
    - ודא ש-`PORT = 5001` (hardcoded)
-   - ודא ש-`DB_PATH` מצביע על `TikTrack_DB.db`
+   - ודא ש-`DATABASE_URL` מצביע על PostgreSQL (לא SQLite)
    - ודא ש-`UI_DIR` מצביע על `production/trading-ui`
 
 2. **תקן `production/Backend/config/logging.py`:**
@@ -363,9 +366,10 @@ python3 scripts/sync_verifier.py
 
 ```bash
 cd production/Backend
-python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
+python3 -c "from config.settings import UI_DIR, DATABASE_URL, PORT, IS_PRODUCTION, USING_SQLITE; \
     print(f'UI: {UI_DIR}'); \
-    print(f'DB: {DB_PATH}'); \
+    print(f'DB: {DATABASE_URL[:50]}...'); \
+    print(f'Using SQLite: {USING_SQLITE}'); \
     print(f'Port: {PORT}'); \
     print(f'Production: {IS_PRODUCTION}')"
 ```
@@ -373,7 +377,7 @@ python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
 **תוצאה צפויה:**
 ```
 UI: /path/to/production/trading-ui
-DB: /path/to/production/Backend/db/TikTrack_DB.db
+DB: PostgreSQL connection string (postgresql+psycopg2://...)
 Port: 5001
 Production: True
 ```
@@ -386,6 +390,38 @@ python3 -c "from services.preferences_service import PreferencesService; print('
 ```
 
 **תוצאה צפויה:** `✅ OK` (ללא שגיאות)
+
+#### בדיקה 4.5: בדיקת צורך במיגרציות
+
+**⚠️ חשוב:** המערכת לא מזהה אוטומטית מיגרציות חדשות. יש לבדוק ידנית:
+
+```bash
+# 1. בדוק אם יש מיגרציות חדשות ב-Backend/migrations/
+ls -lt Backend/migrations/ | head -10
+
+# 2. בדוק אם יש שינויים במודלים (models/)
+git diff main production -- Backend/models/
+
+# 3. אם יש מיגרציות חדשות, בדוק אם הטבלאות/עמודות שהן יוצרות כבר קיימות
+# לדוגמה, אם יש מיגרציה create_ticker_provider_symbols_table:
+cd production/Backend
+python3 -c "
+from sqlalchemy import create_engine, inspect
+from config.settings import DATABASE_URL
+engine = create_engine(DATABASE_URL)
+inspector = inspect(engine)
+tables = inspector.get_table_names()
+if 'ticker_provider_symbols' not in tables:
+    print('⚠️  טבלה ticker_provider_symbols לא קיימת - צריך להריץ מיגרציה')
+else:
+    print('✅ טבלה ticker_provider_symbols קיימת')
+"
+
+# 4. אם צריך, הרץ מיגרציה ידנית:
+# python3 Backend/migrations/create_ticker_provider_symbols_table.py
+```
+
+**הערה:** כרגע אין מערכת אוטומטית לזיהוי מיגרציות. כל מיגרציה היא קובץ Python עם פונקציה `run_migration()` שצריך להריץ ידנית.
 
 #### בדיקה 5: בדיקת הפעלת שרת (אופציונלי)
 
@@ -515,8 +551,9 @@ git commit -m "Resolve merge conflicts"
 ```bash
 # בדוק את ההגדרות
 cd production/Backend
-python3 -c "from config.settings import DB_PATH, UI_DIR, PORT, IS_PRODUCTION; \
-    print(f'DB: {DB_PATH}'); \
+python3 -c "from config.settings import DATABASE_URL, UI_DIR, PORT, IS_PRODUCTION, USING_SQLITE; \
+    print(f'DB: {DATABASE_URL[:50]}...'); \
+    print(f'Using SQLite: {USING_SQLITE}'); \
     print(f'UI: {UI_DIR}'); \
     print(f'Port: {PORT}'); \
     print(f'Production: {IS_PRODUCTION}')"
@@ -525,7 +562,7 @@ python3 -c "from config.settings import DB_PATH, UI_DIR, PORT, IS_PRODUCTION; \
 # ודא ש-IS_PRODUCTION = True (hardcoded)
 # ודא ש-PORT = 5001 (hardcoded)
 # ודא ש-UI_DIR מצביע על production/trading-ui
-# ודא ש-DB_PATH מצביע על production/Backend/db/TikTrack_DB.db
+# ודא ש-DATABASE_URL מצביע על PostgreSQL (לא SQLite)
 ```
 
 ### בעיה: הגדרות production לא נכונות אחרי sync
@@ -538,7 +575,7 @@ python3 -c "from config.settings import DB_PATH, UI_DIR, PORT, IS_PRODUCTION; \
    ```python
    IS_PRODUCTION = True  # Hardcoded!
    PORT = 5001  # Hardcoded!
-   DB_PATH = BASE_DIR / "db" / "TikTrack_DB.db"
+   DATABASE_URL = "postgresql+psycopg2://..."  # PostgreSQL connection string
    UI_DIR = BASE_DIR.parent / "trading-ui"
    ```
 3. פתח `production/Backend/config/logging.py`
@@ -573,7 +610,7 @@ python3 -c "from config.settings import PORT, DB_PATH, UI_DIR; \
 - [ ] **ההגדרות ב-`production/Backend/config/settings.py` נכונות (hardcoded production)**
 - [ ] **ההגדרות ב-`production/Backend/config/logging.py` נכונות (logs directory)**
 - [ ] UI_DIR מצביע על `production/trading-ui`
-- [ ] DB_PATH מצביע על `production/Backend/db/TikTrack_DB.db`
+- [ ] DATABASE_URL מצביע על PostgreSQL (לא SQLite)
 - [ ] PORT = 5001 (hardcoded)
 - [ ] IS_PRODUCTION = True (hardcoded)
 - [ ] ה-commit message ברור ומתאר את השינויים
@@ -662,9 +699,15 @@ echo "🎉 Production update completed successfully!"
 
 ---
 
-**עודכן:** 2025-11-09  
-**גרסה:** 1.3.0  
+**עודכן:** 2025-11-22  
+**גרסה:** 1.4.0  
 **מטרה:** תהליך עדכון מסודר ומובנה
+
+## 📝 שינויים בגרסה 1.4.0
+
+- ✅ **הסרת אזכורים ל-SQLite:** עדכון התיעוד - המערכת עברה ל-PostgreSQL
+- ✅ **בדיקת מיגרציות:** הוספת סעיף על בדיקת צורך במיגרציות (ידני)
+- ✅ **עדכון בדיקות הגדרות:** שינוי מ-`DB_PATH` ל-`DATABASE_URL` ו-`USING_SQLITE`
 
 ## 📝 שינויים בגרסה 1.3.0
 

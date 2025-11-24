@@ -1630,6 +1630,171 @@ function filterByCategory(category) {
     }
 }
 
+// Update visual heatmap
+function updateVisualHeatmap(filters) {
+    const data = generateMockHeatmapData(filters);
+    const grid = document.getElementById('visual-heatmap-grid');
+    const title = document.getElementById('visual-heatmap-title');
+    const sortBySelect = document.getElementById('visualHeatmapSortBy');
+    
+    if (!grid) return;
+    
+    // Get current sort by value
+    const currentSortBy = sortBySelect ? sortBySelect.value : 'totalPL';
+    
+    // Sort data
+    const sortedData = [...data].sort((a, b) => {
+        const aValue = a[currentSortBy] || 0;
+        const bValue = b[currentSortBy] || 0;
+        return bValue - aValue; // Descending order
+    });
+    
+    // Calculate percentiles for current sort key
+    const allValues = sortedData.map(d => d[currentSortBy] || 0);
+    const positiveValues = allValues.filter(v => v >= 0);
+    const negativeValues = allValues.filter(v => v < 0);
+    
+    const getPercentile = (value, arr) => {
+        if (arr.length === 0) return 0.5;
+        const sorted = [...arr].sort((a, b) => a - b);
+        const index = sorted.findIndex(v => v >= value);
+        return index === -1 ? 1 : index / sorted.length;
+    };
+    
+    const getValuePercentile = (value) => {
+        if (value >= 0) {
+            if (positiveValues.length === 0) return 0.5;
+            return getPercentile(value, positiveValues);
+        } else {
+            if (negativeValues.length === 0) return 0.5;
+            const sorted = [...negativeValues].sort((a, b) => a - b);
+            const index = sorted.findIndex(v => v <= value);
+            const percentile = index === -1 ? 1 : index / sorted.length;
+            return 1 - percentile; // Invert for negative values
+        }
+    };
+    
+    // Update title
+    const sortLabels = {
+        'totalPL': 'P/L כולל',
+        'successRate': 'אחוז הצלחה',
+        'trades': 'מספר טריידים',
+        'avgPL': 'P/L ממוצע'
+    };
+    if (title) {
+        title.textContent = `מפת חום - ${sortLabels[currentSortBy] || 'P/L כולל'} לפי קטגוריה`;
+    }
+    
+    // Clear grid
+    grid.innerHTML = '';
+    
+    // Create cells
+    sortedData.forEach((item, index) => {
+        const value = item[currentSortBy] || 0;
+        const percentile = getValuePercentile(value);
+        // getColorClass expects only percentile, but we need to handle positive/negative separately
+        // For visual heatmap, we use the same logic as the table heatmap
+        let colorClass;
+        if (value >= 0) {
+            colorClass = getColorClass(percentile);
+        } else {
+            // For negative values, invert percentile
+            const invertedPercentile = 1 - percentile;
+            if (invertedPercentile >= 0.9) colorClass = 'heatmap-very-poor';
+            else if (invertedPercentile >= 0.75) colorClass = 'heatmap-poor';
+            else if (invertedPercentile >= 0.6) colorClass = 'heatmap-below-avg';
+            else if (invertedPercentile >= 0.4) colorClass = 'heatmap-average';
+            else if (invertedPercentile >= 0.25) colorClass = 'heatmap-good';
+            else if (invertedPercentile >= 0.1) colorClass = 'heatmap-very-good';
+            else colorClass = 'heatmap-excellent';
+        }
+        
+        const cell = document.createElement('div');
+        cell.className = `heatmap-cell ${colorClass}`;
+        cell.dataset.category = item.category;
+        cell.dataset.index = index;
+        
+        // Determine value type
+        let valueType = 'number';
+        let formattedValue = value;
+        if (currentSortBy.includes('PL')) {
+            valueType = 'currency';
+            formattedValue = formatCurrency(value);
+        } else if (currentSortBy.includes('Rate')) {
+            valueType = 'percentage';
+            formattedValue = `${value}%`;
+        } else {
+            formattedValue = value.toString();
+        }
+        
+        cell.innerHTML = `
+            <div class="heatmap-cell-label">${item.category}</div>
+            <div class="heatmap-cell-value">${formattedValue}</div>
+            ${currentSortBy === 'totalPL' ? `<div class="heatmap-cell-percent">${item.successRate}% הצלחה</div>` : ''}
+        `;
+        
+        // Add hover tooltip
+        cell.addEventListener('mouseenter', (e) => {
+            showVisualHeatmapTooltip(e, item);
+        });
+        
+        cell.addEventListener('mouseleave', () => {
+            hideVisualHeatmapTooltip();
+        });
+        
+        cell.addEventListener('click', () => {
+            filterByCategory(item.category);
+        });
+        
+        grid.appendChild(cell);
+    });
+    
+    // Add event listener for sort by change
+    if (sortBySelect && !sortBySelect.dataset.listenerAdded) {
+        sortBySelect.addEventListener('change', () => {
+            updateVisualHeatmap(filters);
+        });
+        sortBySelect.dataset.listenerAdded = 'true';
+    }
+}
+
+// Show visual heatmap tooltip
+function showVisualHeatmapTooltip(event, item) {
+    const tooltip = document.getElementById('visual-heatmap-tooltip');
+    if (!tooltip) {
+        // Create tooltip if it doesn't exist
+        const tooltipEl = document.createElement('div');
+        tooltipEl.id = 'visual-heatmap-tooltip';
+        tooltipEl.className = 'tooltip';
+        document.body.appendChild(tooltipEl);
+    }
+    
+    const tooltipEl = document.getElementById('visual-heatmap-tooltip');
+    tooltipEl.innerHTML = `
+        <strong>${item.category}</strong><br>
+        P/L כולל: ${formatCurrency(item.totalPL)}<br>
+        P/L ממוצע: ${formatCurrency(item.avgPL)}<br>
+        אחוז הצלחה: ${item.successRate}%<br>
+        טריידים: ${item.trades}<br>
+        מקס בנקודה: ${formatCurrency(item.maxInvestmentAtPoint || 0)}<br>
+        סה"כ קניות: ${formatCurrency(item.totalPurchases || 0)}
+    `;
+    tooltipEl.classList.add('show');
+    
+    // Position tooltip
+    const rect = event.target.getBoundingClientRect();
+    tooltipEl.style.left = (rect.left + rect.width / 2 - tooltipEl.offsetWidth / 2) + 'px';
+    tooltipEl.style.top = (rect.top - tooltipEl.offsetHeight - 10) + 'px';
+}
+
+// Hide visual heatmap tooltip
+function hideVisualHeatmapTooltip() {
+    const tooltip = document.getElementById('visual-heatmap-tooltip');
+    if (tooltip) {
+        tooltip.classList.remove('show');
+    }
+}
+
 // Initialize Combined Chart (P/L + Success Rate)
 async function initComparisonChart() {
     try {
@@ -1866,6 +2031,9 @@ async function updateAllVisualizations() {
     
     // Update heatmap
     updateHeatmap(filters);
+    
+    // Update visual heatmap
+    updateVisualHeatmap(filters);
     
     // Update charts (async to handle chart initialization if needed)
     await updateComparisonChart(filters);

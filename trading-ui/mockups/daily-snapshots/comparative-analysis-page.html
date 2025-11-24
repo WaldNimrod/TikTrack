@@ -16,6 +16,143 @@
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../../styles-new/master.css">
     
+    <!-- Visual Heatmap Styles -->
+    <style>
+        .visual-heatmap-container {
+            margin: 20px 0;
+        }
+        
+        .visual-heatmap-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #212529;
+        }
+        
+        .visual-heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .visual-heatmap-controls {
+            margin-bottom: 20px;
+        }
+        
+        .visual-heatmap-controls .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .visual-heatmap-controls .control-group label {
+            font-size: 14px;
+            color: #495057;
+        }
+        
+        .heatmap-cell {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .heatmap-cell:hover {
+            transform: scale(1.05);
+            border-color: #26baac;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+        
+        .heatmap-cell-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+        
+        .heatmap-cell-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #212529;
+        }
+        
+        .heatmap-cell-percent {
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+        
+        .visual-heatmap-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .visual-heatmap-legend .legend-section {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .visual-heatmap-legend .legend-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #212529;
+        }
+        
+        .visual-heatmap-legend .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .visual-heatmap-legend .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+        
+        .visual-heatmap-legend .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .tooltip.show {
+            display: block;
+        }
+    </style>
+    
     <!-- External Libraries -->
     <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
     
@@ -517,19 +654,122 @@
                         <div class="mt-3">
                             <div class="mb-2">
                                 <strong>ערכים חיוביים (ירוק):</strong>
-                                <span class="badge heatmap-excellent me-1">מצוין</span>
-                                <span class="badge heatmap-very-good me-1">טוב מאוד</span>
-                                <span class="badge heatmap-good me-1">טוב</span>
-                                <span class="badge heatmap-average me-1">בינוני</span>
-                                <span class="badge heatmap-below-avg">חלש</span>
+                                <span class="badge heatmap-excellent me-1">מצוין (90%+)</span>
+                                <span class="badge heatmap-very-good me-1">טוב מאוד (75-90%)</span>
+                                <span class="badge heatmap-good me-1">טוב (60-75%)</span>
+                                <span class="badge heatmap-average me-1">בינוני (40-60%)</span>
+                                <span class="badge heatmap-below-avg me-1">חלש (25-40%)</span>
+                                <span class="badge heatmap-poor me-1">חלש מאוד (10-25%)</span>
+                                <span class="badge heatmap-very-poor">חלש ביותר (&lt;10%)</span>
                             </div>
                             <div>
                                 <strong>ערכים שליליים (אדום):</strong>
-                                <span class="badge heatmap-very-poor me-1">גרוע מאוד</span>
-                                <span class="badge heatmap-poor me-1">גרוע</span>
-                                <span class="badge heatmap-average me-1">בינוני</span>
-                                <span class="badge heatmap-below-avg me-1">פחות גרוע</span>
-                                <span class="badge heatmap-good">הכי פחות גרוע</span>
+                                <span class="badge heatmap-very-poor me-1">גרוע מאוד (&lt;10%)</span>
+                                <span class="badge heatmap-poor me-1">גרוע (10-25%)</span>
+                                <span class="badge heatmap-below-avg me-1">פחות גרוע (25-40%)</span>
+                                <span class="badge heatmap-average me-1">בינוני (40-60%)</span>
+                                <span class="badge heatmap-good me-1">טוב (60-75%)</span>
+                                <span class="badge heatmap-very-good me-1">טוב מאוד (75-90%)</span>
+                                <span class="badge heatmap-excellent">מצוין (90%+)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Visual Heatmap Section -->
+                <div class="content-section" id="visual-heatmap-section">
+                    <div class="section-header">
+                        <h2><img src="../../images/icons/tabler/chart-dots.svg" width="16" height="16" alt="grid" class="icon"> מפת חום ויזואלית</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('visual-heatmap-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="visual-heatmap-controls mb-3">
+                            <div class="control-group">
+                                <label for="visualHeatmapSortBy">מיון לפי:</label>
+                                <select id="visualHeatmapSortBy" class="form-select form-select-sm" style="width: auto; display: inline-block;">
+                                    <option value="totalPL">P/L כולל</option>
+                                    <option value="successRate">אחוז הצלחה</option>
+                                    <option value="trades">מספר טריידים</option>
+                                    <option value="avgPL">P/L ממוצע</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="visual-heatmap-container">
+                            <div class="visual-heatmap-title" id="visual-heatmap-title">מפת חום - P/L כולל לפי קטגוריה</div>
+                            <div class="visual-heatmap-grid" id="visual-heatmap-grid">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="visual-heatmap-legend mt-3">
+                            <div class="legend-section">
+                                <div class="legend-title">ערכים חיוביים (ירוק):</div>
+                                <div class="legend-items">
+                                    <div class="legend-item">
+                                        <div class="legend-color heatmap-excellent"></div>
+                                        <span>מצוין (90%+)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color heatmap-very-good"></div>
+                                        <span>טוב מאוד (75-90%)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color heatmap-good"></div>
+                                        <span>טוב (60-75%)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color heatmap-average"></div>
+                                        <span>בינוני (40-60%)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color heatmap-below-avg"></div>
+                                        <span>חלש (25-40%)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color heatmap-poor"></div>
+                                        <span>חלש מאוד (10-25%)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color heatmap-very-poor"></div>
+                                        <span>חלש ביותר (&lt;10%)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="legend-section">
+                                <div class="legend-title">ערכים שליליים (אדום):</div>
+                                <div class="legend-items">
+                                    <div class="legend-item">
+                                        <div class="legend-color heatmap-very-poor"></div>
+                                        <span>גרוע מאוד (&lt;10%)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color heatmap-poor"></div>
+                                        <span>גרוע (10-25%)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color heatmap-below-avg"></div>
+                                        <span>פחות גרוע (25-40%)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color heatmap-average"></div>
+                                        <span>בינוני (40-60%)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color heatmap-good"></div>
+                                        <span>טוב (60-75%)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color heatmap-very-good"></div>
+                                        <span>טוב מאוד (75-90%)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color heatmap-excellent"></div>
+                                        <span>מצוין (90%+)</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

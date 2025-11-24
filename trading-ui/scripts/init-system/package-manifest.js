@@ -1,6 +1,6 @@
 /**
  * Package Manifest - TikTrack Initialization System
- * מנפסט חבילות מרכזי לניהול תלויות ובדיקות תקינות
+ * Central package manifest for dependency management and health checks
  *
  * ⚠️ IMPORTANT FOR DEVELOPERS:
  * ============================
@@ -63,19 +63,19 @@
  * 📋 PACKAGE STRUCTURE (Updated October 2025):
  * ============================================
  *
- * 1. BASE (13 scripts) - חובה לכל עמוד
- * 2. SERVICES (6 scripts) - שירותים כלליים
- * 3. UI-ADVANCED (3 scripts) - ממשק מתקדם
- * 4. CRUD (6 scripts) - עמודים עם טבלאות
- * 5. PREFERENCES (3 scripts) - העדפות
- * 6. VALIDATION (1 script) - ולידציה
- * 7. EXTERNAL-DATA (4 scripts) - נתונים חיצוניים
- * 8. LOGS (4 scripts) - לוגים
- * 9. CACHE (2 scripts) - מטמון
- * 10. ENTITY-SERVICES (9 scripts) - שירותי ישויות
- * 11. HELPER (4 scripts) - עזר
- * 12. MANAGEMENT (5 scripts) - ניהול
- * 13. INIT (3 scripts) - אתחול
+ * 1. BASE (13 scripts) - Required for all pages
+ * 2. SERVICES (6 scripts) - General services
+ * 3. UI-ADVANCED (3 scripts) - Advanced interface
+ * 4. CRUD (6 scripts) - Pages with tables
+ * 5. PREFERENCES (3 scripts) - Preferences
+ * 6. VALIDATION (1 script) - Validation
+ * 7. EXTERNAL-DATA (4 scripts) - External data
+ * 8. LOGS (4 scripts) - Logs
+ * 9. CACHE (2 scripts) - Cache
+ * 10. ENTITY-SERVICES (9 scripts) - Entity services
+ * 11. HELPER (4 scripts) - Helper
+ * 12. MANAGEMENT (5 scripts) - Management
+ * 13. INIT (3 scripts) - Initialization
  *
  * @version 2.0.0
  * @created October 2025
@@ -131,7 +131,7 @@ const PACKAGE_MANIFEST = {
       {
         file: 'warning-system.js',
         globalCheck: 'window.WarningSystem',
-        description: 'מערכת אזהרות',
+        description: 'Warning system',
         required: true,
         loadOrder: 5
       },
@@ -1387,13 +1387,13 @@ const PACKAGE_MANIFEST = {
       {
         file: 'init-system/validators/runtime-validator.js',
         globalCheck: 'window.RuntimeValidator',
-        description: 'ולידטור זמן ריצה',
+        description: 'Runtime validator',
         required: true
       },
       {
         file: 'debug-filter-tooltips-comprehensive.js',
         globalCheck: 'window.debugFilterTooltips',
-        description: 'כלי דיבאג לטולטיפים של פילטרים',
+        description: 'Debug tool for filter tooltips',
         required: false,
         loadOrder: 4
       }
@@ -1402,11 +1402,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~60ms'
   },
 
-  // 15. FILTERS PACKAGE - מערכת סינון
+  // 15. FILTERS PACKAGE - Filter system
   filters: {
     id: 'filters',
     name: 'Filters Package',
-    description: 'מערכת הפילטרים המשולבת (מוטמעת ב-header-system.js)',
+    description: 'Integrated filter system (embedded in header-system.js)',
     version: '2.0.0',
     critical: false,
     loadOrder: 15,
@@ -1414,14 +1414,14 @@ const PACKAGE_MANIFEST = {
     scripts: [],
     estimatedSize: '~0KB',
     initTime: '~0ms',
-    notes: 'המערכת פעילה דרך window.filterSystem שנוצר בתוך header-system.js; אין קובץ טעינה ייעודי.'
+    notes: 'The system is active through window.filterSystem created inside header-system.js; no dedicated loading file.'
   },
 
-  // 16. ADVANCED-NOTIFICATIONS PACKAGE - התראות מתקדמות
+  // 16. ADVANCED-NOTIFICATIONS PACKAGE - Advanced notifications
   'advanced-notifications': {
     id: 'advanced-notifications',
     name: 'Advanced Notifications Package',
-    description: 'מערכת התראות מתקדמת',
+    description: 'Advanced notification system',
     version: '2.0.0',
     critical: false,
     loadOrder: 16,
@@ -1430,13 +1430,13 @@ const PACKAGE_MANIFEST = {
       {
         file: 'notification-system.js',
         globalCheck: 'window.NotificationSystem',
-        description: 'מערכת התראות מתקדמת',
+        description: 'Advanced notification system',
         required: true
       },
       {
         file: 'warning-system.js',
         globalCheck: 'window.WarningSystem',
-        description: 'מערכת אזהרות',
+        description: 'Warning system',
         required: true
       }
     ],
@@ -1445,11 +1445,11 @@ const PACKAGE_MANIFEST = {
   },
 
 
-  // 17. ENTITY DETAILS PACKAGE - פרטי ישויות
+  // 17. ENTITY DETAILS PACKAGE - Entity details
   'entity-details': {
     id: 'entity-details',
     name: 'Entity Details Package',
-    description: 'מערכות פרטי ישויות',
+    description: 'Entity details systems',
     version: '2.0.0',
     critical: false,
     loadOrder: 17,
@@ -1458,21 +1458,21 @@ const PACKAGE_MANIFEST = {
       {
         file: 'entity-details-api.js',
         globalCheck: 'window.EntityDetailsAPI',
-        description: 'API פרטי ישויות',
+        description: 'Entity details API',
         required: true,
         loadOrder: 1
       },
       {
         file: 'entity-details-renderer.js',
         globalCheck: 'window.EntityDetailsRenderer',
-        description: 'מציג פרטי ישויות',
+        description: 'Entity details renderer',
         required: true,
         loadOrder: 2
       },
       {
         file: 'entity-details-modal.js',
         globalCheck: 'window.showEntityDetails',
-        description: 'מודל פרטי ישויות',
+        description: 'Entity details modal',
         required: true,
         loadOrder: 3
       }
@@ -1481,11 +1481,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~30ms'
   },
 
-  // 18. INFO SUMMARY PACKAGE - מערכת סיכום נתונים מאוחדת
+  // 18. INFO SUMMARY PACKAGE - Unified data summary system
   'info-summary': {
     id: 'info-summary',
     name: 'Info Summary Package',
-    description: 'מערכת סיכום נתונים מאוחדת לכל העמודים',
+    description: 'Unified data summary system for all pages',
     version: '1.0.0',
     critical: false,
     loadOrder: 18,
@@ -1494,14 +1494,14 @@ const PACKAGE_MANIFEST = {
       {
         file: 'info-summary-system.js',
         globalCheck: 'window.InfoSummarySystem',
-        description: 'מערכת סיכום נתונים ליבה',
+        description: 'Core data summary system',
         required: true,
         loadOrder: 1
       },
       {
         file: 'info-summary-configs.js',
         globalCheck: 'window.INFO_SUMMARY_CONFIGS',
-        description: 'תצורות עמודים לסיכום נתונים',
+        description: 'Page configurations for data summary',
         required: true,
         loadOrder: 2
       }
@@ -1510,11 +1510,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~15ms'
   },
 
-  // 20. TRADINGVIEW CHARTS PACKAGE - גרפים TradingView
+  // 20. TRADINGVIEW CHARTS PACKAGE - TradingView charts
   'tradingview-charts': {
     id: 'tradingview-charts',
     name: 'TradingView Charts Package',
-    description: 'מערכת גרפים TradingView Lightweight Charts',
+    description: 'TradingView Lightweight Charts system',
     version: '1.0.0',
     critical: false,
     loadOrder: 20,
@@ -1530,14 +1530,14 @@ const PACKAGE_MANIFEST = {
       {
         file: 'charts/tradingview-theme.js',
         globalCheck: 'window.TradingViewTheme',
-        description: 'ערכת נושא TradingView',
+        description: 'TradingView theme',
         required: true,
         loadOrder: 1
       },
       {
         file: 'charts/tradingview-adapter.js',
         globalCheck: 'window.TradingViewChartAdapter',
-        description: 'Adapter למערכת TradingView',
+        description: 'TradingView system adapter',
         required: true,
         loadOrder: 2
       }
@@ -1546,11 +1546,11 @@ const PACKAGE_MANIFEST = {
     initTime: '~20ms'
   },
 
-  // 21. INIT PACKAGE - אתחול
+  // 21. INIT PACKAGE - Initialization
   'init-system': {
     id: 'init-system',
     name: 'Initialization Package',
-    description: 'מערכות אתחול וניטור',
+    description: 'Initialization and monitoring systems',
     version: '2.0.0',
     critical: false,
     loadOrder: 19,
@@ -1559,56 +1559,56 @@ const PACKAGE_MANIFEST = {
       {
         file: 'init-system/package-manifest.js',
         globalCheck: 'window.PACKAGE_MANIFEST',
-        description: 'מנפסט חבילות',
+        description: 'Package manifest',
         required: true,
         loadOrder: 1
       },
       {
         file: 'page-initialization-configs.js',
         globalCheck: 'window.PAGE_INITIALIZATION_CONFIGS',
-        description: 'הגדרות אתחול עמודים',
+        description: 'Page initialization configurations',
         required: true,
         loadOrder: 2
       },
       {
         file: 'init-system-check.js',
         globalCheck: 'window.initSystemCheck',
-        description: 'בדיקת מערכת איתחול',
+        description: 'Initialization system check',
         required: true,
         loadOrder: 3
       },
       {
         file: 'monitoring-functions.js',
         globalCheck: 'window.runDetailedPageScan',
-        description: 'פונקציות ניטור עמודים',
+        description: 'Page monitoring functions',
         required: true,
         loadOrder: 4
       },
       {
         file: 'init-system/all-pages-monitoring-test.js',
         globalCheck: 'window.allPagesMonitoringTest',
-        description: 'בדיקה אוטומטית של כל העמודים',
+        description: 'Automatic check of all pages',
         required: false,
         loadOrder: 5
       },
       {
         file: 'init-system/pages-standardization-plan.js',
         globalCheck: 'window.pagesStandardizationPlan',
-        description: 'תוכנית סטנדרטיזציה לכל העמודים',
+        description: 'Standardization plan for all pages',
         required: false,
         loadOrder: 6
       },
       {
         file: 'init-system/dependency-analyzer.js',
         globalCheck: 'window.dependencyAnalyzer',
-        description: 'ניתוח תלויות במניפסט החבילות',
+        description: 'Dependencies analysis in package manifest',
         required: false,
         loadOrder: 7
       },
       {
         file: 'init-system/load-order-validator.js',
         globalCheck: 'window.loadOrderValidator',
-        description: 'בדיקת סדר טעינה בפועל בעמודים',
+        description: 'Actual loading order check in pages',
         required: false,
         loadOrder: 8
       },
@@ -1631,63 +1631,63 @@ const PACKAGE_MANIFEST = {
       {
         file: 'services/dashboard-data.js',
         globalCheck: 'window.DashboardData',
-        description: 'שירות נתוני דשבורד מאוחד',
+        description: 'Unified dashboard data service',
         required: true,
         loadOrder: 0
       },
       {
         file: 'widgets/recent-trades-widget.js',
         globalCheck: 'window.RecentTradesWidget',
-        description: 'ווידג׳ט טריידים אחרונים',
+        description: 'Recent trades widget',
         required: true,
         loadOrder: 1
       },
       {
         file: 'pending-executions-widget.js',
         globalCheck: 'window.PendingExecutionsHighlights',
-        description: 'ווידג׳ט המלצות שיוך',
+        description: 'Assignment recommendations widget',
         required: true,
         loadOrder: 2
       },
       {
         file: 'pending-execution-trade-creation.js',
         globalCheck: 'window.PendingExecutionTradeCreation',
-        description: 'ממשק יצירת טרייד מביצועים',
+        description: 'Trade creation interface from executions',
         required: false,
         loadOrder: 3
       },
       {
         file: 'pending-trade-plan-widget.js',
         globalCheck: 'window.PendingTradePlanWidget',
-        description: 'ווידג׳ט שיוך תוכניות למסחר',
+        description: 'Trade plan assignment widget',
         required: true,
         loadOrder: 4
       },
       {
         file: 'active-alerts-component.js',
         globalCheck: 'window.updateActiveAlertsComponent',
-        description: 'רכיב התראות פעילות',
+        description: 'Active alerts component',
         required: true,
         loadOrder: 5
       },
       {
         file: 'modal-configs/tag-search-config.js',
         globalCheck: 'window.tagSearchDrawerConfig',
-        description: 'תצורת מגירת חיפוש תגיות',
+        description: 'Tag search drawer configuration',
         required: true,
         loadOrder: 6
       },
       {
         file: 'tag-search-controller.js',
         globalCheck: 'window.TagSearchController',
-        description: 'בקר חיפוש תגיות',
+        description: 'Tag search controller',
         required: true,
         loadOrder: 7
       },
       {
         file: 'index.js',
         globalCheck: 'window.initializeIndexPage',
-        description: 'לוגיקת דף הבית',
+        description: 'Dashboard page logic',
         required: true,
         loadOrder: 8
       }
@@ -1700,7 +1700,7 @@ const PACKAGE_MANIFEST = {
   'dashboard': {
     id: 'dashboard-modules',
     name: 'Dashboard Modules',
-    description: 'מודולים ייעודיים לדשבורד כולל תמיכה ביצירת טרייד',
+    description: 'Dashboard-specific modules including trade creation support',
     version: '1.0.0',
     critical: false,
     loadOrder: 3.6,
@@ -1709,14 +1709,14 @@ const PACKAGE_MANIFEST = {
       {
         file: 'trade-selector-modal.js',
         globalCheck: 'window.openTradeSelectorModal',
-        description: 'מודול בחירת טרייד',
+        description: 'Trade selector module',
         required: false,
         loadOrder: 0
       },
       {
         file: 'modal-configs/trades-config.js',
         globalCheck: 'window.tradesModalConfig',
-        description: 'הגדרות מודל טריידים',
+        description: 'Trades modal configuration',
         required: false,
         loadOrder: 1
       }
@@ -1771,7 +1771,7 @@ const PACKAGE_MANIFEST = {
 
 /**
  * Package Manifest Manager Class
- * מנהל חבילות מתקדם עם פונקציות עזר
+ * Advanced package manager with helper functions
  */
 class PackageManifest {
   /**

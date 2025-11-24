@@ -238,3 +238,68 @@ def get_cache_info():
             'status': 'error',
             'message': f'Failed to get cache information: {str(e)}'
         }), 500
+
+
+@cache_management_bp.route('/log', methods=['POST'])
+def log_cache_action():
+    """
+    Log cache action from frontend for monitoring/debugging.
+    
+    Expected JSON payload:
+    {
+        "action": "full|light|medium|nuclear|memory|local-storage|indexeddb",
+        "layers": ["memory", "localStorage", "indexedDB"],
+        "source": "import-user-data:execute",
+        "timestamp": "2025-11-23T02:35:23.873Z",
+        "durationMs": 123,
+        "context": {...},
+        "error": null
+    }
+    
+    Returns:
+    {
+        "status": "success",
+        "message": "Cache action logged successfully"
+    }
+    """
+    try:
+        data = request.get_json(silent=True) or {}
+        
+        # Extract action details
+        action = data.get('action', 'unknown')
+        source = data.get('source', 'unknown')
+        timestamp = data.get('timestamp')
+        duration_ms = data.get('durationMs')
+        error = data.get('error')
+        
+        # Log to server logs (for debugging/monitoring)
+        if error:
+            logger.warning(f"Cache action '{action}' from '{source}' completed with error: {error}", extra={
+                'action': action,
+                'source': source,
+                'timestamp': timestamp,
+                'duration_ms': duration_ms
+            })
+        else:
+            logger.info(f"Cache action '{action}' from '{source}' completed successfully", extra={
+                'action': action,
+                'source': source,
+                'timestamp': timestamp,
+                'duration_ms': duration_ms
+            })
+        
+        # Note: Could optionally store in database for analytics, but for now just log to server logs
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Cache action logged successfully',
+            'version': '1.0'
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Failed to log cache action: {e}", exc_info=True)
+        return jsonify({
+            'status': 'error',
+            'message': f'Failed to log cache action: {str(e)}',
+            'version': '1.0'
+        }), 500

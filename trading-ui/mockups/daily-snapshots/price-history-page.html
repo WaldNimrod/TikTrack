@@ -1142,60 +1142,72 @@
             const tickersCompareSelect = document.getElementById('tickersCompare');
             
             // Setup unit size buttons in header
-            const unitSizeButtons = document.querySelectorAll('.unit-size-btn[data-unit]');
-            unitSizeButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // Remove active class from all unit buttons
-                    unitSizeButtons.forEach(b => {
-                        b.classList.remove('active');
-                        b.style.border = '1px solid #ddd';
-                        b.style.background = 'white';
-                        b.style.color = '';
+            const unitSizeButtons = document.querySelectorAll('.chart-unit-size-btn[data-unit]');
+            if (unitSizeButtons.length === 0) {
+                if (window.Logger) {
+                    window.Logger.warn('No unit size buttons found', { page: 'price-history-page' });
+                }
+            } else {
+                unitSizeButtons.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Remove active class from all unit buttons
+                        unitSizeButtons.forEach(b => {
+                            b.classList.remove('active');
+                            b.style.border = '1px solid #ddd';
+                            b.style.background = 'white';
+                            b.style.color = '';
+                        });
+                        
+                        // Add active class to clicked button
+                        btn.classList.add('active');
+                        btn.style.border = '1px solid #007bff';
+                        btn.style.background = '#007bff';
+                        btn.style.color = 'white';
+                        
+                        // Reload chart
+                        reloadChart();
                     });
-                    
-                    // Add active class to clicked button
-                    btn.classList.add('active');
-                    btn.style.border = '1px solid #007bff';
-                    btn.style.background = '#007bff';
-                    btn.style.color = 'white';
-                    
-                    // Reload chart
-                    reloadChart();
                 });
-            });
+            }
             
             // Setup time range buttons in header
-            const timeRangeButtons = document.querySelectorAll('.chart-control-btn[data-range]');
-            timeRangeButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // Remove active class from all range buttons
-                    timeRangeButtons.forEach(b => {
-                        b.classList.remove('active');
-                        b.style.border = '1px solid #ddd';
-                        b.style.background = 'white';
-                        b.style.color = '';
+            const timeRangeButtons = document.querySelectorAll('.chart-time-range-btn[data-range]');
+            if (timeRangeButtons.length === 0) {
+                if (window.Logger) {
+                    window.Logger.warn('No time range buttons found', { page: 'price-history-page' });
+                }
+            } else {
+                timeRangeButtons.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Remove active class from all range buttons
+                        timeRangeButtons.forEach(b => {
+                            b.classList.remove('active');
+                            b.style.border = '1px solid #ddd';
+                            b.style.background = 'white';
+                            b.style.color = '';
+                        });
+                        
+                        // Add active class to clicked button
+                        btn.classList.add('active');
+                        btn.style.border = '1px solid #007bff';
+                        btn.style.background = '#007bff';
+                        btn.style.color = 'white';
+                        
+                        // Auto-set unit size based on time range
+                        const timeRange = btn.dataset.range;
+                        autoSetUnitSizeByTimeRange(timeRange);
+                        
+                        // Reload chart
+                        reloadChart();
                     });
-                    
-                    // Add active class to clicked button
-                    btn.classList.add('active');
-                    btn.style.border = '1px solid #007bff';
-                    btn.style.background = '#007bff';
-                    btn.style.color = 'white';
-                    
-                    // Auto-set unit size based on time range
-                    const timeRange = btn.dataset.range;
-                    autoSetUnitSizeByTimeRange(timeRange);
-                    
-                    // Reload chart
-                    reloadChart();
                 });
-            });
+            }
             
             // Setup chart type buttons in header
             const chartTypeButtons = document.querySelectorAll('.chart-type-btn[data-type]');

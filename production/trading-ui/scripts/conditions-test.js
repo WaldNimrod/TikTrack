@@ -1162,7 +1162,7 @@ class ConditionsUIManager {
             const listBody = document.getElementById('conditionsListBody');
             if (!listBody) return;
 
-            listBody.innerHTML = '<div class="text-center p-3 text-muted"><i class="fas fa-spinner fa-spin"></i> טוען תנאים...</div>';
+            listBody.innerHTML = '<div class="text-center p-3 text-muted"><img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> טוען תנאים...</div>';
 
             if (this.crudManager) {
                 this.conditions = await this.crudManager.readConditions(this.currentTradePlanId);
@@ -1248,7 +1248,7 @@ class ConditionsUIManager {
 
         const alertBtn = document.createElement('button');
         alertBtn.className = 'btn btn-sm btn-warning';
-        alertBtn.innerHTML = '<i class="fas fa-bell"></i> התראה';
+        alertBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/bell.svg" width="16" height="16" alt="bell" class="icon me-1"> התראה';
         alertBtn.onclick = () => this.createAlertFromCondition(condition);
 
         actions.appendChild(editBtn);
@@ -1523,7 +1523,7 @@ class ConditionsUIManager {
                 
                 statusIndicator.innerHTML = `
                     <div class="evaluation-result ${evaluation.met ? 'met' : 'not-met'}">
-                        <i class="fas fa-${evaluation.met ? 'check-circle text-success' : 'times-circle text-danger'}"></i>
+                        <img src="/trading-ui/images/icons/tabler/${evaluation.met ? 'check-circle' : 'x-circle'}.svg" width="16" height="16" alt="${evaluation.met ? 'check' : 'x'}" class="icon ${evaluation.met ? 'text-success' : 'text-danger'}">
                         <span>${evaluation.met ? 'התקיים' : 'לא התקיים'}</span>
                         <small>${evaluation.current_price ? `מחיר: ${evaluation.current_price}` : ''}</small>
                     </div>
@@ -1577,11 +1577,11 @@ class ConditionsUIManager {
         
         statusIndicator.innerHTML = `
             <div class="evaluation-result ${evaluation.met ? 'met' : 'not-met'}">
-                <i class="fas fa-${evaluation.met ? 'check-circle text-success' : 'times-circle text-danger'}"></i>
+                <img src="/trading-ui/images/icons/tabler/${evaluation.met ? 'check-circle' : 'x-circle'}.svg" width="16" height="16" alt="${evaluation.met ? 'check' : 'x'}" class="icon ${evaluation.met ? 'text-success' : 'text-danger'}">
                 <span>${evaluation.met ? 'התקיים' : 'לא התקיים'}</span>
                 <small>${evaluation.current_price ? `מחיר: ${evaluation.current_price}` : ''}</small>
                 <button class="btn btn-xs btn-outline-primary" onclick="window.conditionsTestManager.evaluateSingleCondition(${conditionId})">
-                    <i class="fas fa-sync"></i>
+                    <img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon">
                 </button>
             </div>
         `;

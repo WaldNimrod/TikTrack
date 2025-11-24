@@ -319,74 +319,107 @@ function getCurrentFunctionName(stack) {
  * @param {Object} options - Icon options
  * @returns {string} Icon HTML or emoji
  */
-function getCategoryIcon(category, options = {}) {
+async function getCategoryIcon(category, options = {}) {
   try {
     console.log(`🎨 Getting icon for category: ${category}`);
     
+    // Use IconSystem if available
+    if (typeof window.IconSystem !== 'undefined' && window.IconSystem.getCategoryIcon) {
+      try {
+        const iconPath = await window.IconSystem.getCategoryIcon(category);
+        const categoryInfo = {
+          emoji: '📋', // Keep emoji as fallback
+          icon: iconPath,
+          iconPath: iconPath,
+          color: '#6c757d',
+          title: category
+        };
+        
+        // Return format based on options
+        if (options.format === 'html') {
+          return `<img src="${iconPath}" width="16" height="16" alt="${category}" style="color: ${categoryInfo.color};" title="${categoryInfo.title}" class="icon">`;
+        } else if (options.format === 'emoji') {
+          return categoryInfo.emoji;
+        } else if (options.format === 'object') {
+          return categoryInfo;
+        } else if (options.format === 'path') {
+          return iconPath;
+        } else {
+          // Default: return path
+          return iconPath;
+        }
+      } catch (error) {
+        if (typeof window.Logger !== 'undefined') {
+          window.Logger.warn('⚠️ Error getting category icon from IconSystem, using fallback', { category, error, page: 'notification-category-detector' });
+        }
+      }
+    }
+    
+    // Fallback to old method with Tabler paths
     const iconMap = {
       'development': {
         emoji: '🛠️',
-        icon: 'fas fa-tools',
+        icon: '/trading-ui/images/icons/tabler/tools.svg',
         color: '#6c757d',
         title: 'פיתוח'
       },
       'system': {
         emoji: '⚙️',
-        icon: 'fas fa-cog',
+        icon: '/trading-ui/images/icons/tabler/settings.svg',
         color: '#dc3545',
         title: 'מערכת'
       },
       'business': {
         emoji: '💼',
-        icon: 'fas fa-briefcase',
+        icon: '/trading-ui/images/icons/tabler/briefcase.svg',
         color: '#28a745',
         title: 'עסקי'
       },
       'performance': {
         emoji: '⚡',
-        icon: 'fas fa-tachometer-alt',
+        icon: '/trading-ui/images/icons/tabler/gauge.svg',
         color: '#ffc107',
         title: 'ביצועים'
       },
       'ui': {
         emoji: '🎨',
-        icon: 'fas fa-palette',
+        icon: '/trading-ui/images/icons/tabler/palette.svg',
         color: '#17a2b8',
         title: 'ממשק משתמש'
       },
       'security': {
         emoji: '🔒',
-        icon: 'fas fa-shield-alt',
+        icon: '/trading-ui/images/icons/tabler/shield.svg',
         color: '#6f42c1',
         title: 'אבטחה'
       },
       'network': {
         emoji: '🌐',
-        icon: 'fas fa-network-wired',
+        icon: '/trading-ui/images/icons/tabler/network.svg',
         color: '#20c997',
         title: 'רשת'
       },
       'database': {
         emoji: '🗄️',
-        icon: 'fas fa-database',
+        icon: '/trading-ui/images/icons/tabler/database.svg',
         color: '#fd7e14',
         title: 'מסד נתונים'
       },
       'api': {
         emoji: '🔌',
-        icon: 'fas fa-plug',
+        icon: '/trading-ui/images/icons/tabler/plug.svg',
         color: '#e83e8c',
         title: 'API'
       },
       'cache': {
         emoji: '💾',
-        icon: 'fas fa-memory',
+        icon: '/trading-ui/images/icons/tabler/database.svg',
         color: '#6c757d',
         title: 'מטמון'
       },
       'general': {
         emoji: '📢',
-        icon: 'fas fa-bullhorn',
+        icon: '/trading-ui/images/icons/tabler/bell.svg',
         color: '#6c757d',
         title: 'כללי'
       }
@@ -394,26 +427,28 @@ function getCategoryIcon(category, options = {}) {
     
     const categoryInfo = iconMap[category] || {
       emoji: '📋',
-      icon: 'fas fa-info-circle',
+      icon: '/trading-ui/images/icons/tabler/info-circle.svg',
       color: '#6c757d',
       title: 'כללי'
     };
     
     // Return format based on options
     if (options.format === 'html') {
-      return `<i class="${categoryInfo.icon}" style="color: ${categoryInfo.color};" title="${categoryInfo.title}"></i>`;
+      return `<img src="${categoryInfo.icon}" width="16" height="16" alt="${category}" style="color: ${categoryInfo.color};" title="${categoryInfo.title}" class="icon">`;
     } else if (options.format === 'emoji') {
       return categoryInfo.emoji;
     } else if (options.format === 'object') {
       return categoryInfo;
+    } else if (options.format === 'path') {
+      return categoryInfo.icon;
     } else {
-      // Default: return emoji
-      return categoryInfo.emoji;
+      // Default: return path
+      return categoryInfo.icon;
     }
     
   } catch (error) {
     console.error('❌ Error getting category icon:', error);
-    return '📋'; // Default fallback
+    return '/trading-ui/images/icons/tabler/info-circle.svg'; // Default fallback
   }
 }
 
@@ -424,22 +459,27 @@ function getCategoryIcon(category, options = {}) {
  * @param {Object} options - Display options
  * @returns {Object|Array} Category icons information
  */
-function getAllCategoryIcons(options = {}) {
+async function getAllCategoryIcons(options = {}) {
   try {
     console.log('🎨 Getting all category icons...');
     
     const categories = ['development', 'system', 'business', 'performance', 'ui', 'security', 'network', 'database', 'api', 'cache'];
     
     if (options.format === 'array') {
-      return categories.map(category => ({
-        category,
-        icon: getCategoryIcon(category, { format: 'object' })
-      }));
+      const results = await Promise.all(
+        categories.map(async category => ({
+          category,
+          icon: await getCategoryIcon(category, { format: 'object' })
+        }))
+      );
+      return results;
     } else {
       const icons = {};
-      categories.forEach(category => {
-        icons[category] = getCategoryIcon(category, { format: 'object' });
-      });
+      await Promise.all(
+        categories.map(async category => {
+          icons[category] = await getCategoryIcon(category, { format: 'object' });
+        })
+      );
       return icons;
     }
     
@@ -456,9 +496,9 @@ function getAllCategoryIcons(options = {}) {
  * @param {string} category - Category name
  * @returns {string} Color code
  */
-function getCategoryColor(category) {
+async function getCategoryColor(category) {
   try {
-    const categoryInfo = getCategoryIcon(category, { format: 'object' });
+    const categoryInfo = await getCategoryIcon(category, { format: 'object' });
     return categoryInfo.color || '#6c757d';
   } catch (error) {
     console.error('❌ Error getting category color:', error);
@@ -473,9 +513,9 @@ function getCategoryColor(category) {
  * @param {string} category - Category name
  * @returns {string} Hebrew title
  */
-function getCategoryTitle(category) {
+async function getCategoryTitle(category) {
   try {
-    const categoryInfo = getCategoryIcon(category, { format: 'object' });
+    const categoryInfo = await getCategoryIcon(category, { format: 'object' });
     return categoryInfo.title || 'כללי';
   } catch (error) {
     console.error('❌ Error getting category title:', error);

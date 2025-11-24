@@ -18,12 +18,13 @@
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
+    
     
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+    
 
     <!-- Bootstrap JavaScript -->
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
 </head>
 
 <body>
@@ -40,7 +41,7 @@
                 <div class="top-section">
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/development.svg" alt="דשבורד בדיקות CRUD" class="section-icon">
+                            <img src="images/icons/entities/development.svg" alt="דשבורד בדיקות CRUD" class="section-icon">
                             דשבורד בדיקות CRUD
                         </div>
                         <div class="table-actions">
@@ -60,7 +61,7 @@
                                 <div class="card text-center">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-center mb-2">
-                                            <i class="fas fa-chart-line fa-2x text-primary"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                             </div>
                                         <h5 class="card-title">סך בדיקות</h5>
                                         <h3 class="text-primary" id="totalTestsCount">0</h3>
@@ -74,7 +75,7 @@
                                 <div class="card text-center">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-center mb-2">
-                                            <i class="fas fa-check-circle fa-2x text-success"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                         </div>
                                         <h5 class="card-title">מוצלחות</h5>
                                         <h3 class="text-success" id="passedTestsCount">0</h3>
@@ -88,7 +89,7 @@
                                 <div class="card text-center">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-center mb-2">
-                                            <i class="fas fa-times-circle fa-2x text-danger"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                     </div>
                                         <h5 class="card-title">נכשלות</h5>
                                         <h3 class="text-danger" id="failedTestsCount">0</h3>
@@ -102,7 +103,7 @@
                                 <div class="card text-center">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-center mb-2">
-                                            <i class="fas fa-clock fa-2x text-info"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                         </div>
                                         <h5 class="card-title">זמן ביצוע</h5>
                                         <h3 class="text-info" id="executionTime">0ms</h3>
@@ -118,14 +119,14 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <h6 class="mb-0">
-                                            <i class="fas fa-info-circle text-primary"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                             סטטוס מערכת הבדיקות
                                         </h6>
                                     </div>
                                     <div class="card-body">
                                         <div id="systemStatus">
                                             <div class="alert alert-info mb-0">
-                                                <i class="fas fa-info-circle"></i>
+                                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon">
                                                 מערכת הבדיקות מוכנה לפעולה. לחץ על "הרץ כל הבדיקות" כדי להתחיל.
                                         </div>
                                         </div>
@@ -158,25 +159,25 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <h6 class="mb-0">
-                                            <i class="fas fa-cogs text-primary"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                             בקרת בדיקות API
                                         </h6>
                 </div>
                                     <div class="card-body">
                                         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                                             <button class="btn btn-primary btn-lg" data-onclick="runSmartTestAllEntities()">
-                                                <i class="fas fa-play"></i> הרץ בדיקות מהירות (29 עמודים)
+                                                <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon"> הרץ בדיקות מהירות (29 עמודים)
                                             </button>
                                             <button class="btn btn-outline-info" data-onclick="exportReportHTML()">
-                                                <i class="fas fa-download"></i> ייצא דוח HTML
+                                                <img src="/trading-ui/images/icons/tabler/download.svg" width="16" height="16" alt="download" class="icon"> ייצא דוח HTML
                                             </button>
                                             <button class="btn btn-outline-secondary" data-onclick="copyReportToClipboard()">
-                                                <i class="fas fa-copy"></i> העתק דוח
+                                                <img src="/trading-ui/images/icons/tabler/copy.svg" width="16" height="16" alt="copy" class="icon"> העתק דוח
                                             </button>
                                         </div>
                                         <div class="mt-3 text-center">
                                             <small class="text-muted">
-                                                <i class="fas fa-info-circle"></i>
+                                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon">
                                                 בדיקות API מהירות לכל 29 העמודים במערכת (13 עמודי משתמש + 16 כלי פיתוח)
                                             </small>
                     </div>
@@ -192,7 +193,7 @@
                 <div class="content-section" id="crud-test-results">
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/development.svg" alt="תוצאות בדיקות" class="section-icon">
+                            <img src="images/icons/entities/development.svg" alt="תוצאות בדיקות" class="section-icon">
                             תוצאות בדיקות מפורטות
                     </div>
                         <div class="table-actions">
@@ -210,7 +211,7 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <h6 class="mb-0">
-                                            <i class="fas fa-chart-bar text-success"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                             תוצאות בדיקות API
                                         </h6>
                             </div>
@@ -254,14 +255,14 @@
                                 <div class="card" id="finalReportCard" >
                                     <div class="card-header">
                                         <h6 class="mb-0">
-                                            <i class="fas fa-file-alt text-info"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                             דוח סופי
                                         </h6>
                         </div>
                                     <div class="card-body">
                                         <div id="detailedReport">
                                             <div class="text-center text-muted">
-                                                <i class="fas fa-chart-line fa-2x mb-2"></i>
+                                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                                 <p>התחל בדיקות כדי לראות דוח מפורט</p>
                     </div>
                     </div>
@@ -272,7 +273,7 @@
                                         <div class="card" id="deepTestingResults" >
                                             <div class="card-header">
                                                 <h6 class="mb-0">
-                                                    <i class="fas fa-search text-info"></i>
+                                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                                     תוצאות בדיקות מפורטות
                                                 </h6>
                     </div>
@@ -292,7 +293,7 @@
                 <div class="content-section" id="additional-tests">
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/development.svg" alt="בדיקות נוספות" class="section-icon">
+                            <img src="images/icons/entities/development.svg" alt="בדיקות נוספות" class="section-icon">
                             בדיקות נוספות חשובות
                                         </div>
                         <div class="table-actions">
@@ -308,21 +309,21 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <h6 class="mb-0">
-                                            <i class="fas fa-mouse-pointer text-info"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                             בדיקות מערכת כפתורים
                                         </h6>
                                                 </div>
                                     <div class="card-body">
                                         <p class="card-text">בדיקות מקיפות למערכת הכפתורים כולל:</p>
                                         <ul class="list-unstyled">
-                                            <li><i class="fas fa-check text-success"></i> פונקציונליות</li>
-                                            <li><i class="fas fa-check text-success"></i> נגישות</li>
-                                            <li><i class="fas fa-check text-success"></i> ביצועים</li>
-                                            <li><i class="fas fa-check text-success"></i> תאימות דפדפנים</li>
+                                            <li><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> פונקציונליות</li>
+                                            <li><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> נגישות</li>
+                                            <li><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> ביצועים</li>
+                                            <li><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> תאימות דפדפנים</li>
                                             </ul>
                                         <div class="d-grid">
                                             <button class="btn btn-info" data-onclick="runButtonSystemTests()">
-                                                <i class="fas fa-play"></i> הרץ בדיקות כפתורים
+                                                <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon"> הרץ בדיקות כפתורים
                                             </button>
                                         </div>
                                     </div>
@@ -334,21 +335,21 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <h6 class="mb-0">
-                                            <i class="fas fa-database text-warning"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                             בדיקות CRUD Executions
                                         </h6>
                                         </div>
                                     <div class="card-body">
                                         <p class="card-text">בדיקות CRUD מקיפות לטבלת Executions כולל:</p>
                                         <ul class="list-unstyled">
-                                            <li><i class="fas fa-check text-success"></i> יצירת רשומות</li>
-                                            <li><i class="fas fa-check text-success"></i> עדכון רשומות</li>
-                                            <li><i class="fas fa-check text-success"></i> מחיקת רשומות</li>
-                                            <li><i class="fas fa-check text-success"></i> קשרים עם Tickers</li>
+                                            <li><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> יצירת רשומות</li>
+                                            <li><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> עדכון רשומות</li>
+                                            <li><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> מחיקת רשומות</li>
+                                            <li><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> קשרים עם Tickers</li>
                                         </ul>
                                         <div class="d-grid">
                                             <button class="btn btn-warning" data-onclick="runExecutionsCRUDTests()">
-                                                <i class="fas fa-play"></i> הרץ בדיקות Executions
+                                                <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon"> הרץ בדיקות Executions
                                             </button>
                                         </div>
                                         </div>

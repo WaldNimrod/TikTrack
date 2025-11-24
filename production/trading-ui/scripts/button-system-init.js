@@ -334,6 +334,22 @@ class AdvancedButtonSystem {
         // So we don't need to call initializeTooltips here - it would cause duplication
         this.processButtonsInBatches(buttonElements);
         
+        // Enhance Tabler icons to inline SVG for all processed buttons (async, non-blocking)
+        // This allows icons to support dynamic colors via CSS currentColor
+        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+            setTimeout(() => {
+                const processedButtons = container.querySelectorAll('[data-button-processed="true"]');
+                processedButtons.forEach(button => {
+                    this._enhanceButtonIcons(button).catch(err => {
+                        // Silently fail - icons will remain as img tags
+                        if (this.logger) {
+                            this.logger.debug('Icon enhancement failed (non-critical):', err);
+                        }
+                    });
+                });
+            }, 100); // Small delay to ensure buttons are in DOM
+        }
+        
         // Initialize tooltips ONLY for buttons without data-button-type (custom buttons)
         // Buttons with data-button-type are already handled by processButtonElement
         // This is needed for buttons that don't go through processButtonElement (e.g., custom filter buttons)
@@ -604,6 +620,9 @@ class AdvancedButtonSystem {
             // Mark button as processed
             if (createdButton) {
                 createdButton.setAttribute('data-button-processed', 'true');
+                
+                // Enhance Tabler icons to inline SVG for color support
+                this._enhanceButtonIcons(createdButton);
             }
 
             this.buttons.set(id, {
@@ -613,15 +632,78 @@ class AdvancedButtonSystem {
         }
     }
 
+    /**
+     * Enhance button icons - convert img tags to inline SVG for Tabler icons (color support)
+     * @private
+     * @param {HTMLElement} button - Button element
+     */
+    async _enhanceButtonIcons(button) {
+        if (!button || !window.IconSystem) return;
+        
+        // Find all img tags with data-icon-enhance="true"
+        const iconImages = button.querySelectorAll('img.icon[data-icon-enhance="true"]');
+        
+        for (const img of iconImages) {
+            const iconName = img.getAttribute('data-tabler-icon');
+            if (!iconName) continue;
+            
+            try {
+                // Render as inline SVG using IconSystem
+                const inlineSVG = await window.IconSystem.renderIcon('button', iconName, {
+                    size: img.width || img.getAttribute('width') || '16',
+                    alt: img.alt || iconName,
+                    class: img.className
+                });
+                
+                // Check if we got inline SVG (not img tag)
+                if (inlineSVG && inlineSVG.includes('<svg')) {
+                    // Replace img with inline SVG
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = inlineSVG;
+                    const svgElement = tempDiv.firstElementChild;
+                    
+                    if (svgElement && svgElement.tagName === 'svg') {
+                        img.replaceWith(svgElement);
+                    }
+                }
+            } catch (error) {
+                // If enhancement fails, keep img tag (fallback)
+                if (this.logger) {
+                    this.logger.debug(`Failed to enhance icon ${iconName}:`, error);
+                }
+            }
+        }
+    }
+
     createButtonFromData(type, onClick, classes, attributes, text, id,
                          entityType, size, style, variant, iconOverride = '', tooltipConfig = null) {
         if (window.BUTTON_ICONS && window.BUTTON_TEXTS && window.getButtonClass) {
             // Handle null/undefined type (for custom buttons without data-button-type)
             const typeUpper = type ? type.toUpperCase() : '';
-            // Use iconOverride if provided (even if empty string), otherwise try BUTTON_ICONS, otherwise empty
-            const icon = (iconOverride !== undefined && iconOverride !== null && iconOverride !== '') 
+            // Get icon path - Use iconOverride if provided, otherwise try BUTTON_ICONS
+            let iconPath = (iconOverride !== undefined && iconOverride !== null && iconOverride !== '') 
                 ? iconOverride 
                 : (typeUpper && window.BUTTON_ICONS[typeUpper] ? window.BUTTON_ICONS[typeUpper] : '');
+            
+            // Convert icon path to HTML - use img tag initially, enhance to inline SVG later for Tabler icons
+            let icon = '';
+            if (iconPath) {
+                // Check if this is a Tabler icon (will be enhanced to inline SVG after button creation)
+                if (iconPath.includes('/tabler/')) {
+                    // Use img tag with data attributes for later enhancement to inline SVG
+                    const iconName = iconPath.split('/').pop().replace('.svg', '');
+                    icon = `<img src="${iconPath}" width="16" height="16" alt="${typeUpper || 'icon'}" class="icon" data-tabler-icon="${iconName}" data-icon-enhance="true">`;
+                } else if (iconPath.startsWith('/') || iconPath.startsWith('http') || iconPath.endsWith('.svg') || iconPath.endsWith('.png') || iconPath.endsWith('.jpg')) {
+                    // Entity icon or other - use img tag (entity icons have fixed colors, don't enhance)
+                    icon = `<img src="${iconPath}" width="16" height="16" alt="${typeUpper || 'icon'}" class="icon">`;
+                } else if (iconPath.startsWith('<img') || iconPath.startsWith('<svg')) {
+                    // Already HTML tag (inline SVG or img)
+                    icon = iconPath;
+                } else {
+                    // Assume it's emoji or text
+                    icon = iconPath;
+                }
+            }
             // Use text if provided (even if empty string), otherwise try BUTTON_TEXTS, otherwise empty
             const buttonText = (text !== undefined && text !== null && text !== '') 
                 ? text 

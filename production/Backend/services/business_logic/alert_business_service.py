@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any, Dict, List, Optional
+from sqlalchemy.orm import Session
 
 from .base_business_service import BaseBusinessService
 from .business_rules_registry import business_rules_registry
@@ -27,9 +28,14 @@ class AlertBusinessService(BaseBusinessService):
     Handles all alert-related validations and business rules.
     """
     
-    def __init__(self):
+    @property
+    def table_name(self) -> Optional[str]:
+        """Return the database table name for alerts."""
+        return 'alerts'
+    
+    def __init__(self, db_session: Optional[Session] = None):
         """Initialize the alert business service."""
-        super().__init__()
+        super().__init__(db_session)
         self.registry = business_rules_registry
     
     # ========================================================================
@@ -40,6 +46,11 @@ class AlertBusinessService(BaseBusinessService):
         """
         Validate alert data according to business rules.
         
+        Validation order (CRITICAL - must follow this order):
+        1. Database Constraints (ValidationService) - checks NOT NULL, UNIQUE, FOREIGN KEY, ENUM, RANGE, CHECK
+        2. Business Rules Registry - checks min/max, allowed_values, required (only if not in Constraints)
+        3. Complex Business Rules - checks business logic
+        
         Args:
             data: Alert data dictionary
             
@@ -48,6 +59,13 @@ class AlertBusinessService(BaseBusinessService):
         """
         errors = []
         
+        # Step 1: Validate against database constraints (FIRST!)
+        is_valid, constraint_errors = self.validate_with_constraints(data)
+        if not is_valid:
+            errors.extend(constraint_errors)
+            self.logger.debug(f"Constraint validation found {len(constraint_errors)} errors")
+        
+        # Step 2: Validate against business rules registry (SECOND!)
         # Validate required fields
         required_fields = ['condition_attribute']
         for field in required_fields:
@@ -89,8 +107,10 @@ class AlertBusinessService(BaseBusinessService):
                 errors.append("הערך חייב להיות מספר")
         
         # Validate field values using registry
+        from .utils.edge_cases_utils import is_empty_value
+        
         for field, value in data.items():
-            if value is None or value == '':
+            if is_empty_value(value):
                 continue
             
             rule_result = self.registry.validate_value('alert', field, value)

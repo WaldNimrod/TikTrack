@@ -616,7 +616,7 @@ class ExternalDataService {
       // Reset button state
       if (refreshBtn) {
         refreshBtn.disabled = false;
-        refreshBtn.innerHTML = '<span class="action-icon">🔄</span> רענן מחירים';
+        refreshBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1"> רענן מחירים';
       }
     }
   }

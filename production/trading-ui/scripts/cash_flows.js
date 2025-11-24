@@ -2844,6 +2844,32 @@ async function saveCashFlow() {
             window.Logger.warn('saveCashFlow - Validation errors, returning', { page: 'cash_flows' });
             return;
         }
+
+        // Business Logic API validation
+        if (window.CashFlowsData?.validateCashFlow) {
+            try {
+                const validationResult = await window.CashFlowsData.validateCashFlow({
+                    amount: cashFlowData.amount,
+                    type: cashFlowData.type,
+                    currency_id: cashFlowData.currency_id,
+                    trading_account_id: cashFlowData.trading_account_id,
+                    date: cashFlowData.date,
+                    description: cashFlowData.description
+                });
+
+                if (!validationResult.is_valid) {
+                    const errorMessage = validationResult.errors?.join(', ') || 'ולידציה נכשלה';
+                    window.showErrorNotification?.('שגיאת ולידציה', errorMessage);
+                    return;
+                }
+            } catch (validationError) {
+                window.Logger?.warn('⚠️ Cash flow validation error (continuing with save)', {
+                    error: validationError,
+                    page: 'cash_flows'
+                });
+                // Continue with save even if validation fails (fallback)
+            }
+        }
         
         window.Logger.debug('saveCashFlow - Validation passed', { page: 'cash_flows' });
         

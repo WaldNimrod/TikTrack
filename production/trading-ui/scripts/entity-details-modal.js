@@ -662,7 +662,7 @@ class EntityDetailsModal {
             }
 
         // עדכון כותרת המודל
-        this.updateModalTitle(entityType, entityData);
+        await this.updateModalTitle(entityType, entityData);
 
         const finalTitle = this.getModalTitleText(entityType, entityData);
         if (window.ModalNavigationService?.updateModalMetadata) {
@@ -769,26 +769,38 @@ class EntityDetailsModal {
      * @returns {string} - נתיב לאיקון SVG
      * @private
      */
-    getEntityIcon(entityType) {
+    async getEntityIcon(entityType) {
+        // Use IconSystem if available, fallback to old method
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.getEntityIcon) {
+            try {
+                return await window.IconSystem.getEntityIcon(entityType);
+            } catch (error) {
+                if (typeof window.Logger !== 'undefined') {
+                    window.Logger.warn('⚠️ Error getting entity icon from IconSystem, using fallback', { entityType, error, page: 'entity-details-modal' });
+                }
+            }
+        }
+        
+        // Fallback to old method
         const iconMappings = {
-            ticker: '/trading-ui/images/icons/tickers.svg',
-            trade: '/trading-ui/images/icons/trades.svg',
-            trade_plan: '/trading-ui/images/icons/trade_plans.svg',
-            execution: '/trading-ui/images/icons/executions.svg',
-            account: '/trading-ui/images/icons/trading_accounts.svg',
-            alert: '/trading-ui/images/icons/alerts.svg',
-            cash_flow: '/trading-ui/images/icons/cash_flows.svg',
-            note: '/trading-ui/images/icons/notes.svg',
-            preference: '/trading-ui/images/icons/preferences.svg',
-            research: '/trading-ui/images/icons/research.svg',
-            design: '/trading-ui/images/icons/design.svg',
-            constraint: '/trading-ui/images/icons/constraint.svg',
-            development: '/trading-ui/images/icons/development.svg',
-            info: '/trading-ui/images/icons/info.svg',
-            position: '/trading-ui/images/icons/trades.svg'
+            ticker: '/trading-ui/images/icons/entities/tickers.svg',
+            trade: '/trading-ui/images/icons/entities/trades.svg',
+            trade_plan: '/trading-ui/images/icons/entities/trade_plans.svg',
+            execution: '/trading-ui/images/icons/entities/executions.svg',
+            account: '/trading-ui/images/icons/entities/trading_accounts.svg',
+            alert: '/trading-ui/images/icons/entities/alerts.svg',
+            cash_flow: '/trading-ui/images/icons/entities/cash_flows.svg',
+            note: '/trading-ui/images/icons/entities/notes.svg',
+            preference: '/trading-ui/images/icons/entities/preferences.svg',
+            research: '/trading-ui/images/icons/entities/research.svg',
+            design: '/trading-ui/images/icons/tabler/palette.svg',
+            constraint: '/trading-ui/images/icons/tabler/lock.svg',
+            development: '/trading-ui/images/icons/entities/development.svg',
+            info: '/trading-ui/images/icons/tabler/info-circle.svg',
+            position: '/trading-ui/images/icons/entities/trades.svg'
         };
 
-        return iconMappings[entityType] || '/trading-ui/images/icons/home.svg';
+        return iconMappings[entityType] || '/trading-ui/images/icons/entities/home.svg';
     }
 
     /**
@@ -800,7 +812,7 @@ class EntityDetailsModal {
      * @param {Object} entityData - נתוני הישות
      * @private
      */
-    updateModalTitle(entityType, entityDataOrId) {
+    async updateModalTitle(entityType, entityDataOrId) {
         const titleElement = document.getElementById(`${this.modalId}Label`);
         const headerElement = this.modal?.querySelector('.modal-header');
         
@@ -876,7 +888,13 @@ class EntityDetailsModal {
                 ? window.getEntityLabel(finalEntityType) 
                 : finalEntityType;
             
-            const iconPath = this.getEntityIcon(finalEntityType);
+            // Get icon path (async)
+            let iconPath;
+            try {
+                iconPath = await this.getEntityIcon(finalEntityType);
+            } catch (error) {
+                iconPath = '/trading-ui/images/icons/entities/home.svg'; // Fallback
+            }
             
             // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון
             let titleText = '';
@@ -908,7 +926,13 @@ class EntityDetailsModal {
                 ? window.getEntityLabel(finalEntityType) 
                 : finalEntityType;
             
-            const iconPath = this.getEntityIcon(finalEntityType);
+            // Get icon path (async)
+            let iconPath;
+            try {
+                iconPath = await this.getEntityIcon(finalEntityType);
+            } catch (error) {
+                iconPath = '/trading-ui/images/icons/entities/home.svg'; // Fallback
+            }
             
             // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון במקום מספר
             let titleText = '';

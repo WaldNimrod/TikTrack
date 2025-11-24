@@ -1,0 +1,547 @@
+/**
+ * TradingView Lightweight Charts - Container Styles
+ * סגנונות קונטיינרים לגרפי TradingView
+ * 
+ * @version 1.0.0
+ * @created January 2025
+ * @author TikTrack Development Team
+ * 
+ * דרישות TradingView Lightweight Charts:
+ * - Container חייב להיות display: block (חובה)
+ * - Container חייב להיות עם width: 100% (או width מוגדר) (חובה)
+ * - Container חייב להיות עם height מוגדר (חובה)
+ * - Container חייב להיות עם position: relative (אם יש overlays)
+ * - Container חייב להיות עם box-sizing: border-box
+ * - אין להשתמש ב-flexbox על הקונטיינר עצמו (רק על wrapper)
+ * 
+ * מערכת צבעים:
+ * - עדיפות ראשונה: צבעים מהעדפות המשתמש לגרפים (chartBackgroundColor, chartBorderColor, וכו')
+ * - עדיפות שניה: צבעי ישויות עם 3 וריאנטים (11 ישויות × 3 = 33 צבעים לסדרות)
+ */
+
+/* ===== Chart Color Variables (User Preferences - Priority 1) ===== */
+/* צבעים מהעדפות המשתמש - עדיפות ראשונה */
+.tradingview-chart-container {
+    background: var(--chart-background-color, var(--apple-bg-primary));
+    border-color: var(--chart-border-color, var(--apple-border-light));
+}
+
+.tradingview-chart-text {
+    color: var(--chart-text-color, var(--color-text-primary));
+}
+
+.tradingview-chart-grid {
+    color: var(--chart-grid-color, var(--apple-border-light));
+}
+
+.tradingview-chart-point {
+    color: var(--chart-point-color, var(--brand-primary-color, var(--apple-blue)));
+}
+
+/* ===== Entity Color Variants for Series (Priority 2) ===== */
+/* 11 ישויות × 3 וריאנטים = 33 צבעים לסדרות */
+
+/* Trade Entity - 3 Variants */
+.tradingview-series-trade-base {
+    color: var(--entity-trade-color, var(--brand-primary-color));
+}
+
+.tradingview-series-trade-dark {
+    color: var(--entity-trade-text, var(--brand-primary-dark));
+}
+
+.tradingview-series-trade-light {
+    color: var(--entity-trade-bg, var(--brand-primary-light));
+}
+
+/* Trade Plan Entity - 3 Variants */
+.tradingview-series-trade-plan-base {
+    color: var(--entity-trade-plan-color);
+}
+
+.tradingview-series-trade-plan-dark {
+    color: var(--entity-trade-plan-text);
+}
+
+.tradingview-series-trade-plan-light {
+    color: var(--entity-trade-plan-bg);
+}
+
+/* Execution Entity - 3 Variants */
+.tradingview-series-execution-base {
+    color: var(--entity-execution-color);
+}
+
+.tradingview-series-execution-dark {
+    color: var(--entity-execution-text);
+}
+
+.tradingview-series-execution-light {
+    color: var(--entity-execution-bg);
+}
+
+/* Trading Account Entity - 3 Variants */
+.tradingview-series-trading-account-base {
+    color: var(--entity-trading-account-color);
+}
+
+.tradingview-series-trading-account-dark {
+    color: var(--entity-trading-account-text);
+}
+
+.tradingview-series-trading-account-light {
+    color: var(--entity-trading-account-bg);
+}
+
+/* Cash Flow Entity - 3 Variants */
+.tradingview-series-cash-flow-base {
+    color: var(--entity-cash-flow-color);
+}
+
+.tradingview-series-cash-flow-dark {
+    color: var(--entity-cash-flow-text);
+}
+
+.tradingview-series-cash-flow-light {
+    color: var(--entity-cash-flow-bg);
+}
+
+/* Ticker Entity - 3 Variants */
+.tradingview-series-ticker-base {
+    color: var(--entity-ticker-color);
+}
+
+.tradingview-series-ticker-dark {
+    color: var(--entity-ticker-text);
+}
+
+.tradingview-series-ticker-light {
+    color: var(--entity-ticker-bg);
+}
+
+/* Alert Entity - 3 Variants */
+.tradingview-series-alert-base {
+    color: var(--entity-alert-color);
+}
+
+.tradingview-series-alert-dark {
+    color: var(--entity-alert-text);
+}
+
+.tradingview-series-alert-light {
+    color: var(--entity-alert-bg);
+}
+
+/* Note Entity - 3 Variants */
+.tradingview-series-note-base {
+    color: var(--entity-note-color);
+}
+
+.tradingview-series-note-dark {
+    color: var(--entity-note-text);
+}
+
+.tradingview-series-note-light {
+    color: var(--entity-note-bg);
+}
+
+/* Constraint Entity - 3 Variants */
+.tradingview-series-constraint-base {
+    color: var(--entity-constraint-color);
+}
+
+.tradingview-series-constraint-dark {
+    color: var(--entity-constraint-text);
+}
+
+.tradingview-series-constraint-light {
+    color: var(--entity-constraint-bg);
+}
+
+/* Design Entity - 3 Variants */
+.tradingview-series-design-base {
+    color: var(--entity-design-color);
+}
+
+.tradingview-series-design-dark {
+    color: var(--entity-design-text);
+}
+
+.tradingview-series-design-light {
+    color: var(--entity-design-bg);
+}
+
+/* Research Entity - 3 Variants */
+.tradingview-series-research-base {
+    color: var(--entity-research-color);
+}
+
+.tradingview-series-research-dark {
+    color: var(--entity-research-text);
+}
+
+.tradingview-series-research-light {
+    color: var(--entity-research-bg);
+}
+
+/* ===== Base Container Requirements ===== */
+/* דרישות בסיסיות לכל קונטיינר TradingView */
+.tradingview-chart-container {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    /* TradingView charts תמיד LTR - גם ב-RTL mode */
+    direction: ltr;
+    text-align: left;
+}
+
+/* ===== Chart Wrapper (Parent of Container) ===== */
+/* Wrapper יכול להיות flex/grid, אבל הקונטיינר עצמו חייב להיות block */
+.tradingview-chart-wrapper {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    display: block;
+    /* TradingView charts תמיד LTR - גם ב-RTL mode */
+    direction: ltr;
+}
+
+/* ===== Specific Chart Containers ===== */
+
+/* Price Chart Container */
+#price-chart-container,
+.tradingview-price-chart-container {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    position: relative;
+    direction: ltr;
+    text-align: left;
+}
+
+/* Volume Chart Container */
+#volume-chart-container,
+.tradingview-volume-chart-container {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    position: relative;
+    direction: ltr;
+    text-align: left;
+}
+
+/* Comparison Chart Container */
+#comparison-chart-container,
+.comparison-chart-container,
+.tradingview-comparison-chart-container {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    position: relative;
+    direction: ltr;
+    text-align: left;
+}
+
+/* Timeline Chart Container */
+#timelineChart,
+.tradingview-timeline-chart-container {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    position: relative;
+    direction: ltr;
+    text-align: left;
+}
+
+/* Portfolio Charts Containers */
+#portfolio-performance-chart-container,
+#portfolio-value-chart-container,
+#pl-trend-chart-container,
+.tradingview-portfolio-chart-container {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    position: relative;
+    direction: ltr;
+    text-align: left;
+}
+
+/* ===== Chart Wrappers with Fixed Heights ===== */
+
+/* Price Chart Wrapper */
+#price-chart-wrapper {
+    position: relative;
+    height: 450px;
+    width: 100%;
+    min-width: 0;
+    background: var(--chart-background-color, var(--apple-bg-primary));
+    border-radius: var(--apple-radius-small) var(--apple-radius-small) 0 0;
+    overflow: hidden;
+    border-bottom: 2px solid var(--chart-border-color, var(--apple-border-light));
+    display: block;
+    box-sizing: border-box;
+}
+
+/* Volume Chart Wrapper */
+#volume-chart-wrapper {
+    position: relative;
+    height: 150px;
+    width: 100%;
+    min-width: 0;
+    background: var(--chart-background-color, var(--apple-bg-primary));
+    border-radius: 0 0 var(--apple-radius-small) var(--apple-radius-small);
+    overflow: hidden;
+    border-top: 2px solid var(--chart-border-color, var(--apple-border-light));
+    display: block;
+    box-sizing: border-box;
+}
+
+/* Comparison Chart Wrapper */
+#comparison-chart-wrapper,
+.comparison-chart-wrapper {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* ===== Chart Container Wrapper (קונטיינר ייעודי לגרף) ===== */
+/* 
+ * קונטיינר זה יושב בתוך section-body (קונטיינר ראשי אחיד)
+ * הקונטיינר תופס 100% רוחב אבל יושב בתוך הגוף של הקונטיינר הראשי
+ * כך section-body יכול להכיל גם אלמנטים נוספים מעל או מתחת לגרף
+ */
+
+.chart-container-wrapper {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    display: block;
+    /* TradingView charts תמיד LTR */
+    direction: ltr;
+    text-align: left;
+}
+
+/* ===== Section Layout for Charts ===== */
+/* 
+ * הערה חשובה: אין סגנונות מיוחדים ל-section-header או ל-content-section
+ * כל הסגנונות נשארים סטנדרטיים כמו בכל הסקשנים במערכת
+ * רק chart-container-wrapper ו-chart-controls-wrapper מקבלים סגנונות מיוחדים
+ */
+
+/* Chart Controls Wrapper (LTR, in section-body, above chart) */
+#price-chart-section .section-body .chart-controls-wrapper {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: var(--spacing-sm, 12px) var(--spacing-md, 16px);
+    margin-bottom: 4px; /* ריווח של 4px בין הכפתורים לגרף */
+    background: var(--apple-bg-primary);
+    border-bottom: 1px solid var(--apple-border-light);
+    /* LTR for controls */
+    direction: ltr;
+    text-align: left;
+}
+
+#price-chart-section .section-body .chart-controls-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm, 12px);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+#price-chart-section .section-body .chart-controls-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-md, 16px);
+    flex-wrap: wrap;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Section Body - padding של 4px מכל צד */
+#price-chart-section .section-body {
+    padding: 4px; /* 4px מכל צד */
+    box-sizing: border-box;
+}
+
+/* Comparison Chart Section - same treatment */
+#comparison-chart-section .section-body {
+    padding: 4px; /* 4px מכל צד */
+    box-sizing: border-box;
+}
+
+/* ===== Overlays and Toolbars ===== */
+
+/* Drawing Canvas Overlay */
+#drawing-canvas {
+    position: absolute;
+    top: 0;
+    inset-inline-start: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 15;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+/* Indicators Toolbar */
+#indicators-toolbar {
+    position: absolute;
+    top: 10px;
+    inset-inline-end: 10px;
+    z-index: 20;
+    background: var(--apple-bg-primary);
+    opacity: 0.95;
+    padding: var(--spacing-sm);
+    border-radius: var(--apple-radius-small);
+    box-shadow: var(--apple-shadow-medium);
+    display: none;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    min-width: 250px;
+    max-width: 300px;
+    box-sizing: border-box;
+}
+
+#indicators-toolbar.show {
+    display: flex;
+}
+
+/* Drawing Tools Toolbar */
+#drawing-tools-toolbar {
+    position: absolute;
+    top: 10px;
+    inset-inline-start: 10px;
+    z-index: 20;
+    background: var(--apple-bg-primary);
+    opacity: 0.95;
+    padding: var(--spacing-sm);
+    border-radius: var(--apple-radius-small);
+    box-shadow: var(--apple-shadow-medium);
+    display: none;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    box-sizing: border-box;
+}
+
+#drawing-tools-toolbar.show {
+    display: flex;
+}
+
+/* ===== RTL Support for Toolbars ===== */
+/* RTL positioning rules for toolbars - critical for Hebrew/Arabic users */
+[dir="rtl"] #indicators-toolbar {
+    right: auto;
+    left: 10px;
+    inset-inline-end: auto;
+    inset-inline-start: 10px;
+}
+
+[dir="rtl"] #drawing-tools-toolbar {
+    left: auto;
+    right: 10px;
+    inset-inline-start: auto;
+    inset-inline-end: 10px;
+}
+
+/* ===== Responsive Chart Containers ===== */
+
+/* Chart Container Sizes */
+.chart-container-base {
+    display: block;
+    width: 100%;
+    height: 400px;
+    min-width: 0;
+    box-sizing: border-box;
+    position: relative;
+    direction: ltr;
+    text-align: left;
+}
+
+.chart-container-large {
+    display: block;
+    width: 100%;
+    height: 780px;
+    min-width: 0;
+    box-sizing: border-box;
+    position: relative;
+    border: 1px solid var(--chart-border-color, var(--apple-border-light));
+    border-radius: var(--apple-radius-small);
+    direction: ltr;
+    text-align: left;
+}
+
+.chart-container-third {
+    display: block;
+    width: 100%;
+    height: 33.33%;
+    min-width: 0;
+    box-sizing: border-box;
+    position: relative;
+    direction: ltr;
+    text-align: left;
+}
+
+.chart-container-third-border {
+    display: block;
+    width: 100%;
+    height: 33.33%;
+    min-width: 0;
+    box-sizing: border-box;
+    position: relative;
+    border-top: 1px solid var(--chart-border-color, var(--apple-border-light));
+    direction: ltr;
+    text-align: left;
+}
+
+/* ===== Responsive Behavior ===== */
+
+@media (max-width: 768px) {
+    #price-chart-wrapper {
+        height: 300px;
+    }
+    
+    #volume-chart-wrapper {
+        height: 100px;
+    }
+    
+    .chart-container-large {
+        height: 500px;
+    }
+}
+
+/* ===== RTL Support ===== */
+/* TradingView charts תמיד LTR - גם ב-RTL mode */
+/* כל הקונטיינרים וה-wrappers מוגדרים כבר עם direction: ltr */
+/* אין צורך ב-selector נוסף - זה כבר מוגדר בכל הקונטיינרים */
+
+/* ===== Print Styles ===== */
+
+@media print {
+    .tradingview-chart-container,
+    .tradingview-chart-wrapper {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+}
+

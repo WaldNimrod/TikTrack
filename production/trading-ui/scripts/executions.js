@@ -418,6 +418,33 @@ async function saveExecution() {
             return;
         }
         
+        // Validate using Business Logic API if available
+        if (window.ExecutionsData && typeof window.ExecutionsData.validateExecution === 'function') {
+            try {
+                const validationResult = await window.ExecutionsData.validateExecution(executionData);
+                if (!validationResult.is_valid) {
+                    window.Logger?.warn('⚠️ Execution validation failed via Business Logic API', {
+                        page: 'executions',
+                        errors: validationResult.errors
+                    });
+                    if (validationResult.errors && validationResult.errors.length > 0) {
+                        const errorMessage = validationResult.errors.join('\n');
+                        if (window.showErrorNotification) {
+                            window.showErrorNotification('שגיאת ולידציה', errorMessage);
+                        }
+                    }
+                    return;
+                }
+                window.Logger?.debug('✅ Execution validation passed via Business Logic API', { page: 'executions' });
+            } catch (error) {
+                window.Logger?.warn('⚠️ Error calling ExecutionsData.validateExecution, continuing with local validation', {
+                    page: 'executions',
+                    error: error?.message || error
+                });
+                // Continue with save - local validation already passed
+            }
+        }
+        
         // Determine if this is add or edit
         const isEdit = form.dataset.mode === 'edit';
         const executionId = form.dataset.executionId;
@@ -1880,6 +1907,19 @@ window.initializeExecutionsPage = async function() {
           window.Logger?.warn('⚠️ Failed to load tickers list on modal open:', error, { page: "executions" });
         }
       }
+      
+      // Setup calculation event listeners based on mode
+      if (mode === 'add') {
+        // Small delay to ensure fields are rendered
+        setTimeout(() => {
+          setupExecutionCalculationListeners();
+        }, 100);
+      } else if (mode === 'edit') {
+        // Small delay to ensure fields are rendered
+        setTimeout(() => {
+          setupEditExecutionCalculationListeners();
+        }, 100);
+      }
     }
   });
 
@@ -2758,6 +2798,128 @@ async function calculateEditExecutionValues() {
 // הגדרת הפונקציות כגלובליות
 window.calculateAddExecutionValues = calculateAddExecutionValues;
 window.calculateEditExecutionValues = calculateEditExecutionValues;
+
+/**
+ * Setup execution calculation event listeners for add modal
+ * Sets up automatic calculation when form fields change
+ * @returns {void}
+ */
+function setupExecutionCalculationListeners() {
+  try {
+    const quantityInput = document.getElementById('executionQuantity');
+    const priceInput = document.getElementById('executionPrice');
+    const commissionInput = document.getElementById('executionCommission');
+    const actionInput = document.getElementById('executionType');
+
+    if (!quantityInput || !priceInput) {
+      window.Logger?.debug('Execution calculation listeners: Required fields not found yet', { page: "executions" });
+      return; // Required fields not found
+    }
+
+    const calculate = () => {
+      window.Logger?.debug('🔄 Calculating execution values (triggered by field change)', { page: "executions" });
+      calculateExecutionValues('add');
+    };
+
+    // Remove existing listeners by cloning (clean slate)
+    const fields = [quantityInput, priceInput, commissionInput, actionInput].filter(Boolean);
+    fields.forEach(field => {
+      const newField = field.cloneNode(true);
+      field.parentNode.replaceChild(newField, field);
+    });
+
+    // Get fresh references after cloning
+    const freshQuantityInput = document.getElementById('executionQuantity');
+    const freshPriceInput = document.getElementById('executionPrice');
+    const freshCommissionInput = document.getElementById('executionCommission');
+    const freshActionInput = document.getElementById('executionType');
+
+    // Setup event listeners
+    if (freshQuantityInput) {
+      freshQuantityInput.addEventListener('input', calculate);
+      freshQuantityInput.addEventListener('change', calculate);
+    }
+    
+    if (freshPriceInput) {
+      freshPriceInput.addEventListener('input', calculate);
+      freshPriceInput.addEventListener('change', calculate);
+    }
+    
+    if (freshCommissionInput) {
+      freshCommissionInput.addEventListener('input', calculate);
+      freshCommissionInput.addEventListener('change', calculate);
+    }
+    
+    if (freshActionInput) {
+      freshActionInput.addEventListener('change', calculate);
+    }
+
+    window.Logger?.debug('✅ Execution calculation event listeners setup completed', { page: "executions" });
+  } catch (error) {
+    window.Logger?.error('❌ Error setting up execution calculation listeners:', error, { page: "executions" });
+  }
+}
+
+/**
+ * Setup execution calculation event listeners for edit modal
+ * Sets up automatic calculation when edit form fields change
+ * @returns {void}
+ */
+function setupEditExecutionCalculationListeners() {
+  try {
+    const quantityInput = document.getElementById('editExecutionQuantity');
+    const priceInput = document.getElementById('editExecutionPrice');
+    const commissionInput = document.getElementById('editExecutionCommission');
+    const actionInput = document.getElementById('editExecutionType');
+
+    if (!quantityInput || !priceInput) {
+      window.Logger?.debug('Edit execution calculation listeners: Required fields not found yet', { page: "executions" });
+      return; // Required fields not found
+    }
+
+    const calculate = () => {
+      window.Logger?.debug('🔄 Calculating edit execution values (triggered by field change)', { page: "executions" });
+      calculateExecutionValues('edit');
+    };
+
+    // Remove existing listeners by cloning (clean slate)
+    const fields = [quantityInput, priceInput, commissionInput, actionInput].filter(Boolean);
+    fields.forEach(field => {
+      const newField = field.cloneNode(true);
+      field.parentNode.replaceChild(newField, field);
+    });
+
+    // Get fresh references after cloning
+    const freshQuantityInput = document.getElementById('editExecutionQuantity');
+    const freshPriceInput = document.getElementById('editExecutionPrice');
+    const freshCommissionInput = document.getElementById('editExecutionCommission');
+    const freshActionInput = document.getElementById('editExecutionType');
+
+    // Setup event listeners
+    if (freshQuantityInput) {
+      freshQuantityInput.addEventListener('input', calculate);
+      freshQuantityInput.addEventListener('change', calculate);
+    }
+    
+    if (freshPriceInput) {
+      freshPriceInput.addEventListener('input', calculate);
+      freshPriceInput.addEventListener('change', calculate);
+    }
+    
+    if (freshCommissionInput) {
+      freshCommissionInput.addEventListener('input', calculate);
+      freshCommissionInput.addEventListener('change', calculate);
+    }
+    
+    if (freshActionInput) {
+      freshActionInput.addEventListener('change', calculate);
+    }
+
+    window.Logger?.debug('✅ Edit execution calculation event listeners setup completed', { page: "executions" });
+  } catch (error) {
+    window.Logger?.error('❌ Error setting up edit execution calculation listeners:', error, { page: "executions" });
+  }
+}
 
 /**
  * מעבר לטרייד המקושר

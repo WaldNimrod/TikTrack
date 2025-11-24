@@ -1,0 +1,121 @@
+/**
+ * Icon Component - ITCSS Components Layer
+ * =======================================
+ * 
+ * Icon component styles
+ * 
+ * Related Documentation:
+ * - documentation/frontend/ICON_SYSTEM_ARCHITECTURE.md
+ * 
+ * Author: TikTrack Development Team
+ * Version: 1.0.0
+ */
+
+/* Base Icon Class */
+.icon {
+  display: inline-block;
+  width: var(--icon-size-base, 16px);
+  height: var(--icon-size-base, 16px);
+  flex-shrink: 0;
+  vertical-align: middle;
+  color: var(--icon-color-base, currentColor);
+}
+
+/* Icon Size Variants */
+.icon--small {
+  width: var(--icon-size-small, 12px);
+  height: var(--icon-size-small, 12px);
+}
+
+.icon--large {
+  width: var(--icon-size-large, 24px);
+  height: var(--icon-size-large, 24px);
+}
+
+.icon--xlarge {
+  width: var(--icon-size-xlarge, 32px);
+  height: var(--icon-size-xlarge, 32px);
+}
+
+/* Icon State Variants */
+.icon--active {
+  color: var(--icon-color-active, #26baac);
+}
+
+.icon--disabled {
+  color: var(--icon-color-disabled, #6c757d);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.icon--error {
+  color: var(--icon-color-error, #dc3545);
+}
+
+.icon--success {
+  color: var(--icon-color-success, #28a745);
+}
+
+.icon--warning {
+  color: var(--icon-color-warning, #ffc107);
+}
+
+/* Icon in Buttons */
+.btn .icon {
+  margin-right: var(--icon-spacing, 4px);
+  color: inherit; /* Inherit color from button for Tabler icons (currentColor) */
+}
+
+/* Remove margin when icon is only child (icon-only button) */
+.btn:has(> .icon:only-child) .icon,
+.btn:has(> img.icon:only-child) .icon,
+.btn:has(> svg.icon:only-child) .icon {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+[dir="rtl"] .btn .icon {
+  margin-right: 0;
+  margin-left: var(--icon-spacing, 4px);
+}
+
+[dir="rtl"] .btn:has(> .icon:only-child) .icon,
+[dir="rtl"] .btn:has(> img.icon:only-child) .icon,
+[dir="rtl"] .btn:has(> svg.icon:only-child) .icon {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+/* SVG icons (inline) - inherit color from parent */
+.btn svg.icon {
+  color: inherit;
+  fill: none;
+  stroke: currentColor;
+}
+
+/* Ensure Tabler icons use currentColor for dynamic coloring */
+svg.icon[stroke="currentColor"] {
+  stroke: currentColor;
+}
+
+/* Icon Alignment */
+.icon--inline {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.icon--block {
+  display: block;
+  margin: 0 auto;
+}
+
+/* Icon Spacing */
+.icon + .icon {
+  margin-left: var(--icon-spacing, 4px);
+}
+
+[dir="rtl"] .icon + .icon {
+  margin-left: 0;
+  margin-right: var(--icon-spacing, 4px);
+}
+

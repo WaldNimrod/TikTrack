@@ -247,14 +247,29 @@ class ActionsMenuSystem {
                 title = '';
             }
             
-            // Get icon based on button type
+            // Get icon based on button type - use BUTTON_ICONS if available
             let icon = '';
-            switch(buttonType) {
-                case 'LINK': icon = '🔗'; break;
-                case 'EDIT': icon = '✏️'; break;
-                case 'DELETE': icon = '🗑️'; break;
-                case 'VIEW': icon = '👁️'; break;
-                default: icon = '⚙️'; break;
+            if (window.BUTTON_ICONS && window.BUTTON_ICONS[buttonType]) {
+                // Use SVG path from BUTTON_ICONS - convert to img tag
+                const iconPath = window.BUTTON_ICONS[buttonType];
+                if (iconPath.startsWith('/') || iconPath.startsWith('http')) {
+                    // It's a path, convert to img tag
+                    icon = `<img src="${iconPath}" width="16" height="16" alt="${buttonType}" class="icon">`;
+                } else {
+                    // It's already HTML or emoji
+                    icon = iconPath;
+                }
+            } else {
+                // Fallback to emoji if BUTTON_ICONS not available
+                switch(buttonType) {
+                    case 'LINK': icon = '🔗'; break;
+                    case 'EDIT': icon = '✏️'; break;
+                    case 'DELETE': icon = '🗑️'; break;
+                    case 'VIEW': icon = '👁️'; break;
+                    case 'ADD': icon = '➕'; break;
+                    case 'MENU': icon = '⚙️'; break;
+                    default: icon = '⚙️'; break;
+                }
             }
             
             // Escape onclick for HTML attribute - escape single quotes since we use single quotes for the attribute
@@ -284,9 +299,20 @@ class ActionsMenuSystem {
             return buttonHTML;
         }).join('');
         
+        // Get menu trigger icon from BUTTON_ICONS or fallback to emoji
+        let menuIcon = '⚙️';
+        if (window.BUTTON_ICONS && window.BUTTON_ICONS.MENU) {
+            const menuIconPath = window.BUTTON_ICONS.MENU;
+            if (menuIconPath.startsWith('/') || menuIconPath.startsWith('http')) {
+                menuIcon = `<img src="${menuIconPath}" width="16" height="16" alt="פעולות" class="icon">`;
+            } else {
+                menuIcon = menuIconPath;
+            }
+        }
+        
         const fullHTML = `
             <div class="actions-menu-wrapper">
-                <button class="btn actions-trigger" data-tooltip="פעולות" data-tooltip-placement="top" data-tooltip-trigger="hover">⚙️</button>
+                <button class="btn actions-trigger" data-tooltip="פעולות" data-tooltip-placement="top" data-tooltip-trigger="hover">${menuIcon}</button>
                 <div class="actions-menu-popup">
                     ${menuButtons}
                 </div>
@@ -701,14 +727,25 @@ window.createActionsMenu = function(buttons) {
         const onclick = button.onclick || '';
         const title = button.title || '';
         
-        // Get icon
+        // Get icon from BUTTON_ICONS or fallback to emoji
         let icon = '';
-        switch(buttonType) {
-            case 'LINK': icon = '🔗'; break;
-            case 'EDIT': icon = '✏️'; break;
-            case 'DELETE': icon = '🗑️'; break;
-            case 'VIEW': icon = '👁️'; break;
-            default: icon = '⚙️'; break;
+        if (window.BUTTON_ICONS && window.BUTTON_ICONS[buttonType]) {
+            const iconPath = window.BUTTON_ICONS[buttonType];
+            if (iconPath.startsWith('/') || iconPath.startsWith('http')) {
+                icon = `<img src="${iconPath}" width="16" height="16" alt="${buttonType}" class="icon">`;
+            } else {
+                icon = iconPath;
+            }
+        } else {
+            // Fallback to emoji
+            switch(buttonType) {
+                case 'LINK': icon = '🔗'; break;
+                case 'EDIT': icon = '✏️'; break;
+                case 'DELETE': icon = '🗑️'; break;
+                case 'VIEW': icon = '👁️'; break;
+                case 'ADD': icon = '➕'; break;
+                default: icon = '⚙️'; break;
+            }
         }
         
         // Escape onclick for HTML attribute - escape single quotes since we use single quotes for the attribute

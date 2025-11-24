@@ -24,8 +24,9 @@
     
     
     <!-- External Libraries -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
+    
+    
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
@@ -86,7 +87,7 @@
                     <!-- Main header -->
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="section-icon">
+                            <img src="images/icons/entities/trading_accounts.svg" alt="חשבונות מסחר" class="section-icon">
                             חשבונות מסחר
                         </div>
                         <div class="table-actions">
@@ -112,7 +113,7 @@
                     <!-- Accounts header -->
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/trading_accounts.svg" alt="ניהול חשבונות מסחר" class="section-icon">
+                            <img src="images/icons/entities/trading_accounts.svg" alt="ניהול חשבונות מסחר" class="section-icon">
                             ניהול חשבונות מסחר
                         </div>
                         <div class="table-count" id="accountsCount">טוען...</div>
@@ -168,7 +169,7 @@
                     <!-- Account Activity Summary header -->
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/trading_accounts.svg" alt="תנועות חשבון" class="section-icon">
+                            <img src="images/icons/entities/trading_accounts.svg" alt="תנועות חשבון" class="section-icon">
                             סיכום תנועות בחשבון
                         </div>
                         <div class="table-count" id="accountActivityCount">
@@ -276,7 +277,7 @@
                 <div class="content-section" data-section="account-activity-table">
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/trading_accounts.svg" alt="דף חשבון" class="section-icon">
+                            <img src="images/icons/entities/trading_accounts.svg" alt="דף חשבון" class="section-icon">
                             דף חשבון לתאריכים <span id="accountActivityDateRange">[טווח תאריכים]</span>
                         </div>
                         <div class="table-actions">
@@ -338,7 +339,7 @@
                     <!-- Positions header -->
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/trading_accounts.svg" alt="פוזיציות לפי חשבון" class="section-icon">
+                            <img src="images/icons/entities/trading_accounts.svg" alt="פוזיציות לפי חשבון" class="section-icon">
                             פוזיציות לפי חשבון
                         </div>
                         <div class="table-count" id="positionsCount">
@@ -596,6 +597,8 @@
 
     <!-- [50] Load Order: 50 -->
     <script src="scripts/account-service.js?v=1.0.0"></script> <!-- שירות חשבונות -->
+    <!-- [50.1] Load Order: 50.1 -->
+    <script src="scripts/services/trading-accounts-data.js?v=1.0.0"></script> <!-- שירות נתוני חשבונות מסחר -->
     <!-- [51] Load Order: 51 -->
     <script src="scripts/alert-service.js?v=1.0.0"></script> <!-- שירות התראות -->
     <!-- [52] Load Order: 52 -->

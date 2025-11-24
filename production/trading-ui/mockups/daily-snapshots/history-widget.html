@@ -9,43 +9,85 @@
     <meta http-equiv="Expires" content="0">
     <title>דשבורד - TikTrack</title>
     
+    <!-- Preconnect to CDN for faster loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../../styles-new/master.css">
     
     <!-- External Libraries -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
+    
+    
     
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
+    
+    <!-- Header System -->
+    <script src="../../scripts/header-system.js" defer></script>
+    
+    <!-- Icon System -->
+    <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
+    <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    
+    <!-- Logger Service -->
+    <script src="../../scripts/logger-service.js" defer></script>
+    
+    <!-- Notification System -->
+    <script src="../../scripts/notification-system.js" defer></script>
+    
+    <!-- Field Renderer Service -->
+    <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    
+    <!-- Info Summary System -->
+    <script src="../../scripts/info-summary-configs.js" defer></script>
+    <script src="../../scripts/info-summary-system.js" defer></script>
+    
+    <!-- Preferences System -->
+    <script src="../../scripts/services/preferences-data.js" defer></script>
+    <script src="../../scripts/preferences-core-new.js" defer></script>
+    <script src="../../scripts/preferences-lazy-loader.js" defer></script>
+    
+    <!-- Dynamic Colors System -->
+    <script src="../../scripts/color-scheme-system-clean.js" defer></script>
+    
+    <!-- UI Utils (includes toggleSection) -->
+    <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
+    
+    <!-- Button System -->
+    <script src="../../scripts/button-system-init.js" defer></script>
 </head>
 <body class="dashboard-page">
     <!-- Header System -->
     <div id="unified-header"></div>
     
     <!-- Mockups Navigation -->
-    <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 0; margin-bottom: 20px;">
+        <!-- Mockups Navigation -->
+    <div class="mockups-navigation">
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                        <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
-                            <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
-                        </span>                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
-                <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
-                <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
-                <a href="comparative-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח השוואתי</a>
-                <a href="trading-journal-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">יומן מסחר</a>
-                <a href="strategy-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח אסטרטגיות</a>
-                <a href="economic-calendar-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">לוח כלכלי</a>
-                <a href="history-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ווידג'ט היסטוריה</a>
-                <a href="emotional-tracking-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">תיעוד רגשי</a>
-                <a href="date-comparison-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">השוואת תאריכים</a>
-                <a href="journal-entry-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">רשומת יומן</a>
-</div>
+                    <div class="mockups-navigation-content">
+                        <span class="mockups-navigation-label">
+                            <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                        </span>
+                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
+                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
+                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
+                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
+                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
+                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
+                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
+                        <a href="history-widget.html" class="mockups-navigation-link active">ווידג'ט היסטוריה</a>
+                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
+                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
+                        <a href="journal-entry-modal.html" class="mockups-navigation-link">רשומת יומן</a>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
     
     <!-- Page Content -->
@@ -56,7 +98,7 @@
                 <div class="top-section" id="history_widget_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <i class="bi bi-clock-history"></i>
+                            <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="clock" class="icon">
                             היסטוריה מהירה
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
@@ -71,13 +113,13 @@
                                 <h6 class="card-title">קישורים מהירים:</h6>
                                 <div class="list-group">
                                     <a href="#" class="list-group-item list-group-item-action">
-                                        <i class="bi bi-arrow-left"></i> מצב תיק אתמול
+                                        <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> מצב תיק אתמול
                                     </a>
                                     <a href="#" class="list-group-item list-group-item-action">
-                                        <i class="bi bi-arrow-left"></i> טריידים פעילים
+                                        <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> טריידים פעילים
                                     </a>
                                     <a href="#" class="list-group-item list-group-item-action">
-                                        <i class="bi bi-arrow-left"></i> שינויי מחיר היום
+                                        <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> שינויי מחיר היום
                                     </a>
                                 </div>
                             </div>
@@ -87,10 +129,10 @@
                         <div class="card mb-4">
                             <div class="card-body">
                                 <h6 class="card-title">P/L שבועי</h6>
-                                <div class="chart-container" style="height: 150px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                <div class="chart-container chart-container-placeholder-extra-small">
                                     [מיני-גרף P/L שבועי - Line Chart קטן]
                                 </div>
-                                <div class="mt-2" style="font-size: 0.8rem; color: #6c757d; text-align: center;">
+                                <div class="mt-2 text-small-center">
                                     Mon  Tue  Wed  Thu  Fri  Sat  Sun
                                 </div>
                             </div>
@@ -136,5 +178,7 @@
     
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
+    <!-- Page-specific script -->
+    <script src="../../scripts/history-widget.js" defer></script>
 </body>
 </html>

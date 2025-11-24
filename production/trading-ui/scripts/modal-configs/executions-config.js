@@ -137,6 +137,17 @@ const executionsModalConfig = {
             width: 300,
             style: 'width: 300px; min-width: 200px;'
         },
+        // שורה שביעית: סה"כ (תוצאה מחושבת)
+        {
+            type: 'display',
+            id: 'executionTotal',
+            label: 'סה"כ',
+            required: false,
+            defaultValue: '',
+            rowClass: 'row',
+            colClass: 'col-md-12',
+            style: 'font-weight: bold; font-size: 1.1em; color: #26baac;'
+        },
         {
             type: 'select',
             id: 'executionSource',

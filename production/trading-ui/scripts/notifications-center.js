@@ -67,19 +67,19 @@ async function loadCategoriesOverview() {
 
     // Get available categories from the system
     const categories = [
-      { name: 'system', title: 'מערכת', icon: 'fas fa-cog', color: 'var(--primary-color, #26baac)' },
-      { name: 'business', title: 'עסקי', icon: 'fas fa-briefcase', color: 'var(--color-success, #28a745)' },
-      { name: 'ui', title: 'ממשק משתמש', icon: 'fas fa-desktop', color: 'var(--color-info, #17a2b8)' },
-      { name: 'development', title: 'פיתוח', icon: 'fas fa-code', color: 'var(--entity-development-color, #fc5a06)' },
-      { name: 'performance', title: 'ביצועים', icon: 'fas fa-tachometer-alt', color: 'var(--entity-cash_flow-color, #fd7e14)' },
-      { name: 'security', title: 'אבטחה', icon: 'fas fa-shield-alt', color: 'var(--color-danger, #dc3545)' },
-      { name: 'network', title: 'רשת', icon: 'fas fa-network-wired', color: 'var(--entity-ticker-color, #20c997)' },
-      { name: 'database', title: 'מסד נתונים', icon: 'fas fa-database', color: 'var(--entity-preference-color, #6c757d)' },
-      { name: 'user', title: 'משתמש', icon: 'fas fa-user', color: 'var(--entity-constraint-color, #e83e8c)' },
-      { name: 'trade', title: 'עסקאות', icon: 'fas fa-chart-line', color: 'var(--entity-trade-color, #26baac)' },
-      { name: 'ticker', title: 'טיקרים', icon: 'fas fa-coins', color: 'var(--entity-ticker-color, #fd7e14)' },
-      { name: 'alert', title: 'התראות', icon: 'fas fa-bell', color: 'var(--entity-alert-color, #dc3545)' },
-      { name: 'general', title: 'כללי', icon: 'fas fa-info-circle', color: 'var(--color-neutral, #6c757d)' }
+      { name: 'system', title: 'מערכת', icon: 'settings', color: 'var(--primary-color, #26baac)' },
+      { name: 'business', title: 'עסקי', icon: 'briefcase', color: 'var(--color-success, #28a745)' },
+      { name: 'ui', title: 'ממשק משתמש', icon: 'device-desktop', color: 'var(--color-info, #17a2b8)' },
+      { name: 'development', title: 'פיתוח', icon: 'code', color: 'var(--entity-development-color, #fc5a06)' },
+      { name: 'performance', title: 'ביצועים', icon: 'gauge', color: 'var(--entity-cash_flow-color, #fd7e14)' },
+      { name: 'security', title: 'אבטחה', icon: 'shield', color: 'var(--color-danger, #dc3545)' },
+      { name: 'network', title: 'רשת', icon: 'network', color: 'var(--entity-ticker-color, #20c997)' },
+      { name: 'database', title: 'מסד נתונים', icon: 'database', color: 'var(--entity-preference-color, #6c757d)' },
+      { name: 'user', title: 'משתמש', icon: 'user', color: 'var(--entity-constraint-color, #e83e8c)' },
+      { name: 'trade', title: 'עסקאות', icon: 'chart-line', color: 'var(--entity-trade-color, #26baac)' },
+      { name: 'ticker', title: 'טיקרים', icon: 'currency-dollar', color: 'var(--entity-ticker-color, #fd7e14)' },
+      { name: 'alert', title: 'התראות', icon: 'bell', color: 'var(--entity-alert-color, #dc3545)' },
+      { name: 'general', title: 'כללי', icon: 'info-circle', color: 'var(--color-neutral, #6c757d)' }
     ];
 
     let html = '<div class="row">';
@@ -132,7 +132,7 @@ async function loadCategoriesOverview() {
       html += `
         <div class="col-md-4 col-sm-6 mb-3">
           <div class="category-card text-center p-3 border rounded">
-            <i class="${category.icon} fa-2x mb-2" style="color: ${category.color};"></i>
+            <img src="/trading-ui/images/icons/tabler/${category.icon}.svg" width="32" height="32" alt="${category.icon}" class="icon mb-2" style="color: ${category.color};">
             <h6 class="mb-1">${category.title}</h6>
             <h4 class="mb-1" style="color: ${category.color};">${categoryCount.toLocaleString()}</h4>
             <small class="text-muted">${percentage}% מהסך הכל</small>
@@ -214,7 +214,7 @@ async function loadPreferencesOverview() {
         <div class="col-lg-4 col-md-6 mb-3">
           <div class="card">
             <div class="card-header bg-primary text-white">
-              <i class="fas fa-sliders-h me-2"></i>הגדרות בסיסיות
+              <img src="/trading-ui/images/icons/tabler/sliders.svg" width="16" height="16" alt="settings" class="icon me-2">הגדרות בסיסיות
             </div>
             <div class="card-body">
               ${renderPreferenceList(basicSettings, preferences)}
@@ -224,7 +224,7 @@ async function loadPreferencesOverview() {
         <div class="col-lg-4 col-md-6 mb-3">
           <div class="card">
             <div class="card-header bg-success text-white">
-              <i class="fas fa-layer-group me-2"></i>קטגוריות התראות
+              <img src="/trading-ui/images/icons/tabler/layers.svg" width="16" height="16" alt="categories" class="icon me-2">קטגוריות התראות
             </div>
             <div class="card-body">
               ${renderPreferenceList(notificationCategories, preferences)}
@@ -234,7 +234,7 @@ async function loadPreferencesOverview() {
         <div class="col-lg-4 col-md-12 mb-3">
           <div class="card">
             <div class="card-header bg-warning text-white">
-              <i class="fas fa-terminal me-2"></i>לוגים וקונסול
+              <img src="/trading-ui/images/icons/tabler/terminal.svg" width="16" height="16" alt="terminal" class="icon me-2">לוגים וקונסול
             </div>
             <div class="card-body">
               ${renderPreferenceList(consoleLogs, preferences)}
@@ -615,7 +615,7 @@ class NotificationsCenter {
     if (this.history.length === 0) {
       container.innerHTML = `
                 <div class="no-history">
-                    <i class="fas fa-history"></i>
+                    <img src="/trading-ui/images/icons/tabler/clock-history.svg" width="32" height="32" alt="history" class="icon">
                     <p>אין היסטוריית התראות</p>
                 </div>
             `;
@@ -648,7 +648,7 @@ class NotificationsCenter {
     if (filteredHistory.length === 0) {
       container.innerHTML = `
                 <div class="no-history">
-                    <i class="fas fa-filter"></i>
+                    <img src="/trading-ui/images/icons/tabler/filter.svg" width="32" height="32" alt="filter" class="icon">
                     <p>אין התראות לפי הפילטרים שנבחרו</p>
                 </div>
             `;
@@ -804,7 +804,7 @@ class NotificationsCenter {
     return `
             <div class="notification-item ${notification.type}">
                 <div class="notification-icon">
-                    <i class="${iconClass}"></i>
+                    <img src="/trading-ui/images/icons/tabler/${iconClass}.svg" width="16" height="16" alt="${iconClass}" class="icon">
                 </div>
                 <div class="notification-content">
                     <div class="notification-line">
@@ -821,17 +821,18 @@ class NotificationsCenter {
   }
 
   static getIconClass(type) {
+    // Returns Tabler icon name (not CSS class)
     switch (type) {
     case 'success':
-      return 'fas fa-check-circle';
+      return 'check-circle';
     case 'error':
-      return 'fas fa-exclamation-circle';
+      return 'alert-circle';
     case 'warning':
-      return 'fas fa-exclamation-triangle';
+      return 'alert-triangle';
     case 'info':
-      return 'fas fa-info-circle';
+      return 'info-circle';
     default:
-      return 'fas fa-bell';
+      return 'bell';
     }
   }
 
@@ -1220,7 +1221,7 @@ class NotificationsCenter {
     if (!filteredHistory || filteredHistory.length === 0) {
       historyContainer.innerHTML = `
         <div class="empty-state">
-          <i class="fas fa-filter"></i>
+          <img src="/trading-ui/images/icons/tabler/filter.svg" width="32" height="32" alt="filter" class="icon">
           <p>אין התראות המתאימות לסינון הפעיל</p>
         </div>
       `;
@@ -2045,10 +2046,10 @@ async function loadCategoryStats() {
     }
 
     const categories = [
-      { name: 'success', title: 'הצלחה', icon: 'fas fa-check-circle', color: 'var(--color-success, #28a745)' },
-      { name: 'error', title: 'שגיאה', icon: 'fas fa-times-circle', color: 'var(--color-danger, #dc3545)' },
-      { name: 'warning', title: 'אזהרה', icon: 'fas fa-exclamation-triangle', color: 'var(--color-warning, #ffc107)' },
-      { name: 'info', title: 'מידע', icon: 'fas fa-info-circle', color: 'var(--color-info, #17a2b8)' }
+      { name: 'success', title: 'הצלחה', icon: 'check-circle', color: 'var(--color-success, #28a745)' },
+      { name: 'error', title: 'שגיאה', icon: 'alert-circle', color: 'var(--color-danger, #dc3545)' },
+      { name: 'warning', title: 'אזהרה', icon: 'alert-triangle', color: 'var(--color-warning, #ffc107)' },
+      { name: 'info', title: 'מידע', icon: 'info-circle', color: 'var(--color-info, #17a2b8)' }
     ];
 
     let html = '<div class="row">';
@@ -2059,7 +2060,7 @@ async function loadCategoryStats() {
       html += `
         <div class="col-md-3 col-sm-6 mb-3">
           <div class="stat-card text-center p-3 border rounded">
-            <i class="${category.icon} fa-2x mb-2" style="color: ${category.color};"></i>
+            <img src="/trading-ui/images/icons/tabler/${category.icon}.svg" width="32" height="32" alt="${category.icon}" class="icon mb-2" style="color: ${category.color};">
             <h4 class="mb-1" style="color: ${category.color};">${count.toLocaleString()}</h4>
             <p class="mb-1 text-muted">${category.title}</p>
             <small class="text-muted">${percentage}% מהסך הכל</small>

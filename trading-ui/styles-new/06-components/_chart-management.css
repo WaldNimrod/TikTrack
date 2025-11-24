@@ -2682,47 +2682,66 @@
     margin-bottom: var(--spacing-xs);
 }
 
+/* Dynamic entity colors for journal entry badges - using CSS variables */
 .journal-entry-item[data-entry-type="execution"] .journal-entry-type-badge {
-    background: var(--apple-blue-light, #cce5ff);
-    color: var(--apple-blue-dark, #004085);
-    border-color: var(--apple-blue);
+    background: var(--entity-execution-bg, rgba(23, 162, 184, 0.1));
+    color: var(--entity-execution-color, #17a2b8);
+    border-color: var(--entity-execution-color, #17a2b8);
 }
 
 .journal-entry-item[data-entry-type="cash_flow"] .journal-entry-type-badge {
-    background: var(--apple-green-light, #d4edda);
-    color: var(--apple-green-dark, #155724);
-    border-color: var(--apple-green);
+    background: var(--entity-cash-flow-bg, rgba(32, 201, 151, 0.1));
+    color: var(--entity-cash-flow-color, #20c997);
+    border-color: var(--entity-cash-flow-color, #20c997);
 }
 
-.journal-entry-item[data-entry-type="trade_created"] .journal-entry-type-badge,
-.journal-entry-item[data-entry-type="trade_plan_created"] .journal-entry-type-badge {
-    background: var(--brand-primary-light, #6ed8ca);
-    color: var(--brand-primary-dark, #1a8f83);
-    border-color: var(--brand-primary-color);
+.journal-entry-item[data-entry-type="trade"] .journal-entry-type-badge {
+    background: var(--entity-trade-bg, rgba(0, 123, 255, 0.1));
+    color: var(--entity-trade-color, #007bff);
+    border-color: var(--entity-trade-color, #007bff);
 }
 
-.journal-entry-item[data-entry-type="trade_closed"] .journal-entry-type-badge {
-    background: var(--apple-green-light, #d4edda);
-    color: var(--apple-green-dark, #155724);
-    border-color: var(--apple-green);
-}
-
-.journal-entry-item[data-entry-type="trade_plan_cancelled"] .journal-entry-type-badge {
-    background: color-mix(in srgb, var(--apple-orange) 15%, transparent);
-    color: var(--apple-orange-dark, #cc7700);
-    border-color: var(--apple-orange);
+.journal-entry-item[data-entry-type="trade_plan"] .journal-entry-type-badge {
+    background: var(--entity-trade-plan-bg, rgba(0, 86, 179, 0.1));
+    color: var(--entity-trade-plan-color, #0056b3);
+    border-color: var(--entity-trade-plan-color, #0056b3);
 }
 
 .journal-entry-item[data-entry-type="note"] .journal-entry-type-badge {
-    background: color-mix(in srgb, var(--apple-purple) 15%, transparent);
-    color: var(--apple-purple);
-    border-color: var(--apple-purple);
+    background: var(--entity-note-bg, rgba(111, 66, 193, 0.1));
+    color: var(--entity-note-color, #6f42c1);
+    border-color: var(--entity-note-color, #6f42c1);
 }
 
 .journal-entry-item[data-entry-type="alert"] .journal-entry-type-badge {
-    background: color-mix(in srgb, var(--apple-yellow) 15%, transparent);
-    color: var(--apple-orange-dark, #cc7700);
-    border-color: var(--apple-yellow);
+    background: var(--entity-alert-bg, rgba(255, 156, 5, 0.1));
+    color: var(--entity-alert-color, #ff9c05);
+    border-color: var(--entity-alert-color, #ff9c05);
+}
+
+/* Dynamic colors for journal entry items - left border accent */
+.journal-entry-item[data-entry-type="execution"] {
+    border-left: 3px solid var(--entity-execution-color, #17a2b8);
+}
+
+.journal-entry-item[data-entry-type="cash_flow"] {
+    border-left: 3px solid var(--entity-cash-flow-color, #20c997);
+}
+
+.journal-entry-item[data-entry-type="trade"] {
+    border-left: 3px solid var(--entity-trade-color, #007bff);
+}
+
+.journal-entry-item[data-entry-type="trade_plan"] {
+    border-left: 3px solid var(--entity-trade-plan-color, #0056b3);
+}
+
+.journal-entry-item[data-entry-type="note"] {
+    border-left: 3px solid var(--entity-note-color, #6f42c1);
+}
+
+.journal-entry-item[data-entry-type="alert"] {
+    border-left: 3px solid var(--entity-alert-color, #ff9c05);
 }
 
 /* ===== Journal Entries List - Two Columns ===== */

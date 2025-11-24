@@ -24,6 +24,35 @@
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
     
+    <!-- Header System (Must load early) -->
+    <script src="../../scripts/header-system.js" defer></script>
+    <script>
+        // Auto-initialize HeaderSystem when DOM is ready
+        (function() {
+            function initHeader() {
+                if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+                    try {
+                        window.HeaderSystem.initialize();
+                    } catch (error) {
+                        if (window.console && window.console.error) {
+                            window.console.error('Error initializing HeaderSystem:', error);
+                        }
+                    }
+                } else {
+                    // Retry after a short delay
+                    setTimeout(initHeader, 100);
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initHeader);
+            } else {
+                // DOM already loaded, initialize immediately
+                setTimeout(initHeader, 100);
+            }
+        })();
+    </script>
+    
     <!-- TradingView Lightweight Charts -->
     <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js" defer></script>
     <script src="../../scripts/charts/tradingview-theme.js" defer></script>
@@ -45,16 +74,16 @@
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
     <script src="../../scripts/button-system-init.js" defer></script>
     
-    <!-- Linked Items System -->
-    <script src="../../scripts/linked-items.js" defer></script>
-    <script src="../../scripts/services/linked-items-service.js" defer></script>
-    <script src="../../scripts/entity-details-modal.js" defer></script>
+    <!-- Logger Service (Load first before other systems) -->
+    <script src="../../scripts/logger-service.js"></script>
     
     <!-- Notification System -->
     <script src="../../scripts/notification-system.js" defer></script>
     
-    <!-- Logger Service -->
-    <script src="../../scripts/logger-service.js" defer></script>
+    <!-- Linked Items System -->
+    <script src="../../scripts/linked-items.js" defer></script>
+    <script src="../../scripts/services/linked-items-service.js" defer></script>
+    <script src="../../scripts/entity-details-modal.js" defer></script>
     
     <!-- Field Renderer Service -->
     <script src="../../scripts/services/field-renderer-service.js" defer></script>
@@ -62,6 +91,9 @@
     <!-- Info Summary System -->
     <script src="../../scripts/info-summary-configs.js" defer></script>
     <script src="../../scripts/info-summary-system.js" defer></script>
+    
+    <!-- Mock Data -->
+    <script src="../../scripts/mock-data/trade-history-mock-data.js"></script>
     
 </head>
 <body class="trade-history-page">
@@ -75,7 +107,7 @@
                 <div class="col-md-12">
                     <div class="mockups-navigation-content">
                         <span class="mockups-navigation-label">
-                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                    <span data-icon="link" class="icon"></span> ניווט מוקאפים:
                 </span>
                         <a href="trade-history-page.html" class="mockups-navigation-link active">היסטוריית טרייד</a>
                         <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
@@ -101,19 +133,19 @@
                 <div class="top-section" id="trade-history-top-section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="clock" class="icon">
+                            <span data-icon="clock" class="icon"></span>
                             היסטוריית טרייד
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2">
                         <div class="table-actions">
-                                <button class="btn btn-sm btn-primary" onclick="window.tradeHistoryPage.openTradeSelectorModal()" title="בחר טרייד לניתוח">
-                                    <img src="../../images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon"> בחר טרייד
+                                <button class="btn btn-sm btn-primary" data-onclick="window.tradeHistoryPage.openTradeSelectorModal()" title="בחר טרייד לניתוח">
+                                    <span data-icon="search" class="icon"></span> בחר טרייד
                                 </button>
-                                <button class="btn btn-sm btn-outline-primary" onclick="exportData()" title="ייצא נתונים">
-                                    <img src="../../images/icons/tabler/download.svg" width="16" height="16" alt="download" class="icon"> ייצא
+                                <button class="btn btn-sm btn-outline-primary" data-onclick="exportData()" title="ייצא נתונים">
+                                    <span data-icon="download" class="icon"></span> ייצא
                                 </button>
                             </div>
-                            <button class="filter-toggle-btn" onclick="toggleSection('trade-history-top-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('trade-history-top-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -127,8 +159,8 @@
                                     <strong>טרייד נבחר:</strong> 
                                     <span id="selectedTradeInfo">-</span>
                                 </div>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="window.tradeHistoryPage.clearSelectedTrade()">
-                                    <img src="../../images/icons/tabler/x.svg" width="16" height="16" alt="x" class="icon"> נקה בחירה
+                                <button class="btn btn-sm btn-outline-secondary" data-onclick="window.tradeHistoryPage.clearSelectedTrade()">
+                                    <span data-icon="x" class="icon"></span> נקה בחירה
                                 </button>
                             </div>
                         </div>
@@ -139,26 +171,26 @@
                                 <div class="col-md-3">
                                     <div class="compact-stat-card">
                                         <div class="compact-stat-label">משך זמן</div>
-                                        <div class="compact-stat-number">19 ימים</div>
+                                        <div class="compact-stat-number loading" id="statDuration">-</div>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="compact-stat-card">
                                         <div class="compact-stat-label">P/L כולל</div>
-                                        <div class="compact-stat-number positive">$1,110</div>
-                                        <div class="compact-stat-label compact-stat-label-small positive mt-1">(+7.4%)</div>
+                                        <div class="compact-stat-number loading" id="statTotalPL">-</div>
+                                        <div class="compact-stat-label compact-stat-label-small mt-1 loading" id="statTotalPLPercent">-</div>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="compact-stat-card">
                                         <div class="compact-stat-label">אחוז תשואה</div>
-                                        <div class="compact-stat-number positive">+7.4%</div>
+                                        <div class="compact-stat-number loading" id="statReturnPercent">-</div>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="compact-stat-card">
                                         <div class="compact-stat-label">מספר ביצועים</div>
-                                        <div class="compact-stat-number">4</div>
+                                        <div class="compact-stat-number loading" id="statExecutionCount">-</div>
                                     </div>
                                 </div>
                             </div>
@@ -168,10 +200,10 @@
                         <div class="card mb-4">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h5 class="card-title mb-0">
-                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> פרטי הטרייד
+                                    <span data-icon="info-circle" class="icon"></span> פרטי הטרייד
                                 </h5>
-                                <button class="btn btn-sm btn-outline-primary ms-3" onclick="showTradeDetailsModal(); return false;" title="פתח מודול פרטים">
-                                    <img src="../../images/icons/tabler/external-link.svg" width="16" height="16" alt="external-link" class="icon"> פרטים
+                                <button class="btn btn-sm btn-outline-primary ms-3" data-onclick="showTradeDetailsModal(); return false;" title="פתח מודול פרטים">
+                                    <span data-icon="external-link" class="icon"></span> פרטים
                                 </button>
                             </div>
                             <div class="card-body">
@@ -179,51 +211,51 @@
                                     <!-- Column 1 -->
                                     <div class="col-md-3">
                                         <div class="mb-3">
-                                            <strong>טיקר:</strong> AAPL
+                                            <strong>טיקר:</strong> <span class="loading" id="tradeTicker">-</span>
                                         </div>
                                         <div class="mb-3">
-                                            <strong>צד:</strong> <span class="badge bg-success">Long</span>
+                                            <strong>צד:</strong> <span id="tradeSide" class="loading">-</span>
                                         </div>
                                         <div class="mb-3">
-                                            <strong>סוג השקעה:</strong> Swing
+                                            <strong>סוג השקעה:</strong> <span class="loading" id="tradeInvestmentType">-</span>
                                         </div>
                                         <div class="mb-3">
                                             <strong>סטטוס:</strong> 
                                             <span id="tradeStatusBadge">
-                                                <span class="badge bg-secondary">סגור</span>
+                                                <span class="badge loading">-</span>
                                             </span>
                                         </div>
                                         <div class="mb-3">
-                                            <strong>חשבון מסחר:</strong> Account #1
+                                            <strong>חשבון מסחר:</strong> <span class="loading" id="tradeAccount">-</span>
                                         </div>
                                     </div>
                                     
                                     <!-- Column 2 -->
                                     <div class="col-md-3">
                                         <div class="mb-3">
-                                            <strong>תאריך תכנון:</strong> 01/01/2025
+                                            <strong>תאריך תכנון:</strong> <span class="loading" id="tradePlanDate">-</span>
                                         </div>
                                         <div class="mb-3">
-                                            <strong>תאריך פתיחה:</strong> 05/01/2025
+                                            <strong>תאריך פתיחה:</strong> <span class="loading" id="tradeOpenDate">-</span>
                                         </div>
                                         <div class="mb-3">
-                                            <strong>תאריך כניסה:</strong> 05/01/2025
+                                            <strong>תאריך כניסה:</strong> <span class="loading" id="tradeEntryDate">-</span>
                                         </div>
                                         <div class="mb-3">
-                                            <strong>תאריך יציאה:</strong> 20/01/2025
+                                            <strong>תאריך יציאה:</strong> <span class="loading" id="tradeCloseDate">-</span>
                                         </div>
                                     </div>
                                     
                                     <!-- Column 3 -->
                                     <div class="col-md-3">
                                         <div class="mb-3">
-                                            <strong>כמות מתוכננת:</strong> 150 מניות
+                                            <strong>כמות מתוכננת:</strong> <span class="loading" id="tradePlannedQuantity">-</span>
                                         </div>
                                         <div class="mb-3">
-                                            <strong>כמות מקסימאלית:</strong> 150 מניות
+                                            <strong>כמות מקסימאלית:</strong> <span class="loading" id="tradeMaxQuantity">-</span>
                                         </div>
                                         <div class="mb-3">
-                                            <strong>סה"כ קניות:</strong> 150 מניות
+                                            <strong>סה"כ קניות:</strong> <span class="loading" id="tradeTotalPurchases">-</span>
                                         </div>
                                     </div>
                                     
@@ -231,18 +263,16 @@
                                     <div class="col-md-3">
                                         <div class="mb-3">
                                             <strong>תנאים וסיבות:</strong>
-                                            <div class="ms-2 mt-1">
-                                                <div><a href="#" onclick="showConditionDetails(1); return false;">תנאי כניסה #1</a></div>
-                                                <div><a href="#" onclick="showConditionDetails(2); return false;">תנאי יציאה #2</a></div>
-                                                <div><a href="#" onclick="showConditionDetails(3); return false;">סיבה #3</a></div>
+                                            <div class="ms-2 mt-1" id="tradeConditions">
+                                                <span class="loading">-</span>
                                             </div>
                                         </div>
                                         <div class="mb-3">
                                             <strong>רווח והפסד:</strong>
-                                            <div class="ms-2 mt-1">
-                                                <div>ממומש: <span class="text-success">$1,110</span></div>
-                                                <div>לא ממומש: <span class="text-muted">-</span></div>
-                                                <div><strong>סה"כ: <span class="text-success">$1,110</span></strong></div>
+                                            <div class="ms-2 mt-1" id="tradePL">
+                                                <div>ממומש: <span class="loading">-</span></div>
+                                                <div>לא ממומש: <span class="loading">-</span></div>
+                                                <div><strong>סה"כ: <span class="loading">-</span></strong></div>
                                             </div>
                                         </div>
                                     </div>
@@ -256,9 +286,9 @@
                         <!-- Timeline Absolute Section -->
                 <div class="content-section" id="timeline-absolute-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/list.svg" width="16" height="16" alt="list" class="icon"> פירוט צעדים</h2>
+                        <h2><span data-icon="list" class="icon"></span> פירוט צעדים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('timeline-absolute-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('timeline-absolute-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                                 </div>
@@ -266,138 +296,12 @@
                     <div class="section-body">
                         <div class="timeline-absolute-wrapper" id="timelineAbsoluteWrapper">
                             <div id="timelineAbsolute" class="timeline-absolute d-flex overflow-x-auto">
-                                <!-- Trade Plan -->
-                                <div class="timeline-step-absolute" data-step="0" onclick="selectTimelineStep(0)">
-                                    <div class="timeline-point-absolute"></div>
-                                    <div class="timeline-step-info">
-                                        <div class="timeline-step-title">
-                                            <img src="/trading-ui/images/icons/entities/trade_plans.svg" alt="תכנון" class="icon-inline">
-                                            תכנון
-                                        </div>
-                                        <div class="timeline-step-date">01/01/2025</div>
-                                        <div class="timeline-step-details">Target: $160</div>
-                                        <div class="timeline-step-details"><strong>מזהה:</strong> #456</div>
-                                        <a href="#" class="timeline-step-link" onclick="showExecutionDetails(456, 'plan')">פרטים מלאים →</a>
-                            </div>
-                        </div>
-                        
-                                <!-- Execution 1 -->
-                                <div class="timeline-step-absolute" data-step="1" onclick="selectTimelineStep(1)">
-                                    <div class="timeline-point-absolute"></div>
-                                    <div class="timeline-step-info">
-                                        <div class="timeline-step-title execution-title">
-                                            <img src="/trading-ui/images/icons/entities/executions.svg" alt="ביצוע" class="entity-icon-small">
-                                            Buy | 100#
-                                </div>
-                                        <div class="timeline-step-date">05/01/2025</div>
-                                        <div class="timeline-step-details execution-price-pl">
-                                            <span class="execution-price">$150</span>
-                                            <span class="execution-pl me-2">P/L: <span class="numeric-value-zero">$0.00</span></span>
-                                        </div>
-                                        <div class="timeline-step-details"><strong>מזהה:</strong> #101</div>
-                                        <a href="#" class="timeline-step-link" onclick="showExecutionDetails(101, 'execution')">פרטים מלאים →</a>
-                                </div>
-                                </div>
-                                
-                                <!-- Note -->
-                                <div class="timeline-step-absolute timeline-note" data-step="note1">
-                                    <div class="timeline-point-absolute" style="background-color: var(--info-color, #17a2b8);"></div>
-                                    <div class="timeline-step-info">
-                                        <div class="timeline-step-title">
-                                            <img src="/trading-ui/images/icons/entities/notes.svg" alt="הערה" class="entity-icon-small">
-                                            הערה
-                                        </div>
-                                        <div class="timeline-step-date">07/01/2025</div>
-                                        <div class="timeline-step-details">שינוי אסטרטגיה - הוספת stop loss</div>
-                                        <div class="timeline-step-details"><strong>מזהה:</strong> #201</div>
-                                        <a href="#" class="timeline-step-link" onclick="showNoteDetails(201)">פרטים מלאים →</a>
+                                <!-- Timeline steps will be rendered dynamically -->
+                                <div class="text-center py-4 w-100">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">טוען...</span>
                                     </div>
-                                </div>
-                                
-                                <!-- Cash Flow -->
-                                <div class="timeline-step-absolute timeline-cashflow" data-step="cf1">
-                                    <div class="timeline-point-absolute" style="background-color: var(--secondary-color, #fc5a06);"></div>
-                                    <div class="timeline-step-info">
-                                        <div class="timeline-step-title cashflow-title">
-                                            <img src="/trading-ui/images/icons/entities/cash_flows.svg" alt="תזרים מזומן" class="entity-icon-small">
-                                            Deposit | $5,000
-                                        </div>
-                                        <div class="timeline-step-date">08/01/2025</div>
-                                        <div class="timeline-step-details cashflow-amount">
-                                            <span class="numeric-value-positive">$5,000.00</span>
-                                        </div>
-                                        <div class="timeline-step-details"><strong>מזהה:</strong> #301</div>
-                                        <a href="#" class="timeline-step-link" onclick="showCashFlowDetails(301)">פרטים מלאים →</a>
-                                    </div>
-                                </div>
-                                
-                                <!-- Execution 2 -->
-                                <div class="timeline-step-absolute" data-step="2" onclick="selectTimelineStep(2)">
-                                    <div class="timeline-point-absolute"></div>
-                                    <div class="timeline-step-info">
-                                        <div class="timeline-step-title execution-title">
-                                            <img src="/trading-ui/images/icons/entities/executions.svg" alt="ביצוע" class="entity-icon-small">
-                                            Buy | 50#
-                                        </div>
-                                        <div class="timeline-step-date">10/01/2025</div>
-                                        <div class="timeline-step-details execution-price-pl">
-                                            <span class="execution-price">$152</span>
-                                            <span class="execution-pl" style="margin-right: 8px;">P/L: <span class="numeric-value-positive">$100.00</span></span>
-                                        </div>
-                                        <div class="timeline-step-details"><strong>מזהה:</strong> #102</div>
-                                        <a href="#" class="timeline-step-link" onclick="showExecutionDetails(102, 'execution')">פרטים מלאים →</a>
-                                    </div>
-                                </div>
-                                
-                                <!-- Alert -->
-                                <div class="timeline-step-absolute timeline-alert" data-step="alert1">
-                                    <div class="timeline-point-absolute" style="background-color: var(--warning-color, #ffc107);"></div>
-                                    <div class="timeline-step-info">
-                                        <div class="timeline-step-title">
-                                            <img src="/trading-ui/images/icons/entities/alerts.svg" alt="התראה" class="entity-icon-small">
-                                            התראה
-                                        </div>
-                                        <div class="timeline-step-date">12/01/2025</div>
-                                        <div class="timeline-step-details">מחיר התקרב ל-stop loss</div>
-                                        <div class="timeline-step-details"><strong>מזהה:</strong> #401</div>
-                                        <a href="#" class="timeline-step-link" onclick="showAlertDetails(401)">פרטים מלאים →</a>
-                                    </div>
-                                </div>
-                                
-                                <!-- Execution 3 -->
-                                <div class="timeline-step-absolute" data-step="3" onclick="selectTimelineStep(3)">
-                                    <div class="timeline-point-absolute"></div>
-                                    <div class="timeline-step-info">
-                                        <div class="timeline-step-title execution-title">
-                                            <img src="/trading-ui/images/icons/entities/executions.svg" alt="ביצוע" class="entity-icon-small">
-                                            Sell | 30#
-                                        </div>
-                                        <div class="timeline-step-date">15/01/2025</div>
-                                        <div class="timeline-step-details execution-price-pl">
-                                            <span class="execution-price">$155</span>
-                                            <span class="execution-pl" style="margin-right: 8px;">P/L: <span class="numeric-value-positive">$150.00</span></span>
-                                        </div>
-                                        <div class="timeline-step-details"><strong>מזהה:</strong> #103</div>
-                                        <a href="#" class="timeline-step-link" onclick="showExecutionDetails(103, 'execution')">פרטים מלאים →</a>
-                                    </div>
-                                </div>
-                                
-                                <!-- Execution 4 -->
-                                <div class="timeline-step-absolute" data-step="4" onclick="selectTimelineStep(4)">
-                                    <div class="timeline-point-absolute"></div>
-                                    <div class="timeline-step-info">
-                                        <div class="timeline-step-title execution-title">
-                                            <img src="/trading-ui/images/icons/entities/executions.svg" alt="ביצוע" class="entity-icon-small">
-                                            Sell | 120#
-                                        </div>
-                                        <div class="timeline-step-date">20/01/2025</div>
-                                        <div class="timeline-step-details execution-price-pl">
-                                            <span class="execution-price">$158</span>
-                                            <span class="execution-pl" style="margin-right: 8px;">P/L: <span class="numeric-value-positive">$960.00</span></span>
-                                        </div>
-                                        <div class="timeline-step-details"><strong>מזהה:</strong> #104</div>
-                                        <a href="#" class="timeline-step-link" onclick="showExecutionDetails(104, 'execution')">פרטים מלאים →</a>
-                                    </div>
+                                    <p class="mt-2">טוען פירוט צעדים...</p>
                                 </div>
                             </div>
                         </div>
@@ -407,9 +311,9 @@
                 <!-- Timeline Section (Combined) -->
                 <div class="content-section" id="timeline-relative-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon"> טיימליין</h2>
+                        <h2><span data-icon="chart-line" class="icon"></span> טיימליין</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('timeline-relative-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('timeline-relative-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -419,19 +323,19 @@
                         <div class="chart-controls-wrapper">
                             <div class="chart-controls mb-2">
                             <button class="btn btn-sm btn-outline-secondary" id="timelineZoomIn" title="זום פנימה">
-                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
+                                    <span data-icon="info-circle" class="icon"></span>
                             </button>
                             <button class="btn btn-sm btn-outline-secondary" id="timelineZoomOut" title="זום החוצה">
-                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
+                                    <span data-icon="info-circle" class="icon"></span>
                             </button>
                             <button class="btn btn-sm btn-outline-secondary" id="timelineReset" title="איפוס זום">
-                                <img src="../../images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon">
+                                <span data-icon="refresh" class="icon"></span>
                             </button>
                             <button class="btn btn-sm btn-outline-secondary" id="timelinePanLeft" title="תזוזה ימינה (לעבר העתיד)">
-                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
+                                    <span data-icon="info-circle" class="icon"></span>
                             </button>
                             <button class="btn btn-sm btn-outline-secondary" id="timelinePanRight" title="תזוזה שמאלה (לעבר העבר)">
-                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
+                                    <span data-icon="info-circle" class="icon"></span>
                             </button>
                             </div>
                         </div>
@@ -441,7 +345,7 @@
                             <div class="tradingview-chart-wrapper timeline-chart-container timeline-chart-container-fixed">
                                 <div class="tradingview-chart-container tradingview-timeline-chart-container" id="timelineChart">
                                     <div class="chart-loading">
-                                        <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                        <span data-icon="clock" class="icon"></span> טוען גרף...
                                     </div>
                                 </div>
                             </div>
@@ -466,9 +370,9 @@
                 <!-- Plan vs Execution Comparison Section -->
                 <div class="content-section" id="plan-vs-execution-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> תכנון מול ביצוע</h2>
+                        <h2><span data-icon="info-circle" class="icon"></span> תכנון מול ביצוע</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('plan-vs-execution-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('plan-vs-execution-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -486,166 +390,14 @@
                                             <th class="table-col-200">סטטוס</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <!-- Entry Comparison -->
+                                    <tbody id="planVsExecutionTableBody">
+                                        <!-- Table rows will be rendered dynamically -->
                                         <tr>
-                                            <td>
-                                                <strong><img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> כניסה</strong>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value planned">
-                                                    <div class="value">100 מניות</div>
-                                                    <div class="price">@ $150</div>
-                                                    <div class="date">01/01/2025</div>
+                                            <td colspan="5" class="text-center py-4">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">טוען...</span>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value trade">
-                                                    <div class="value">100 מניות</div>
-                                                    <div class="price">@ $150</div>
-                                                    <div class="date">01/01/2025</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value executed">
-                                                    <div class="value">100 מניות</div>
-                                                    <div class="price">@ $150</div>
-                                                    <div class="date">05/01/2025</div>
-                                                    <div class="description">פוזיציה: 0 → 100</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="status-badge status-match">
-                                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> תואם
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        
-                                        <!-- Additional Entry Comparison -->
-                                        <tr>
-                                            <td>
-                                                <strong><img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> הוספה</strong>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value planned">
-                                                    <div class="value">-</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value trade">
-                                                    <div class="value">-</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value executed">
-                                                    <div class="value">+50 מניות</div>
-                                                    <div class="price">@ $152</div>
-                                                    <div class="date">10/01/2025</div>
-                                                    <div class="description">פוזיציה: 100 → 150</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="status-badge status-additional">
-                                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> הוספה לא מתוכננת
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        
-                                        <!-- Partial Exit Comparison -->
-                                        <tr>
-                                            <td>
-                                                <strong><img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> יציאה חלקית</strong>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value planned">
-                                                    <div class="value">150 מניות</div>
-                                                    <div class="price">@ $160 (יעד)</div>
-                                                    <div class="date">15/01/2025 (משוער)</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value trade">
-                                                    <div class="value">150 מניות</div>
-                                                    <div class="price">@ $160 (יעד)</div>
-                                                    <div class="date">15/01/2025 (משוער)</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value executed">
-                                                    <div class="value">30 מניות</div>
-                                                    <div class="price">@ $155</div>
-                                                    <div class="date">15/01/2025</div>
-                                                    <div class="description">פוזיציה: 150 → 120</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="status-badge status-partial">
-                                                    <img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> יציאה חלקית
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        
-                                        <!-- Final Exit Comparison -->
-                                        <tr>
-                                            <td>
-                                                <strong><img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> יציאה סופית</strong>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value planned">
-                                                    <div class="value">150 מניות</div>
-                                                    <div class="price">@ $160 (יעד)</div>
-                                                    <div class="date">15/01/2025 (משוער)</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value trade">
-                                                    <div class="value">120 מניות</div>
-                                                    <div class="price">@ $160 (יעד)</div>
-                                                    <div class="date">20/01/2025 (משוער)</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value executed">
-                                                    <div class="value">120 מניות</div>
-                                                    <div class="price">@ $158</div>
-                                                    <div class="date">20/01/2025</div>
-                                                    <div class="description">פוזיציה: 120 → 0</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="status-badge status-difference">
-                                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> מחיר נמוך מהמתוכנן
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        
-                                        <!-- P/L Comparison -->
-                                        <tr>
-                                            <td>
-                                                <strong><img src="../../images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon"> רווח/הפסד</strong>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value planned">
-                                                    <div class="value">$1,500</div>
-                                                    <div class="description">(150 × $10 רווח משוער)</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value trade">
-                                                    <div class="value">$1,200</div>
-                                                    <div class="description">(120 × $10 רווח משוער)</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="comparison-value executed">
-                                                    <div class="value">$1,110</div>
-                                                    <div class="description">(P/L ממומש)</div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="status-badge status-difference">
-                                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> $390 פחות מהמתוכנן
-                                                </span>
+                                                <p class="mt-2">טוען נתוני השוואה...</p>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -659,9 +411,9 @@
                 <!-- Linked Items Section -->
                 <div class="content-section" id="linked-items-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> פריטים מקושרים</h2>
+                        <h2><span data-icon="link" class="icon"></span> פריטים מקושרים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('linked-items-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('linked-items-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -794,8 +546,10 @@
                                 retries++;
                             }
                             
-                            // Initialize chart only once
-                            await initTimelineChart();
+                            // Initialize chart only once - will use data from tradeHistoryPage
+                            if (typeof window.initTimelineChart === 'function') {
+                                await window.initTimelineChart();
+                            }
                         } finally {
                             isInitializingTimelineChart = false;
                         }
@@ -820,7 +574,8 @@
             }
         }
         
-        async function initTimelineChart() {
+        // Export initTimelineChart globally
+        window.initTimelineChart = async function initTimelineChart() {
             const container = document.getElementById('timelineChart');
             if (!container) {
                 if (window.Logger) {
@@ -887,21 +642,120 @@
                 isInitializingTimelineChart = false;
             }
             
-            // Enhanced data for relative timeline with different time intervals
-            // Each point represents a record (plan/execution/cash flow/dividend) with actual dates
-            // IMPORTANT: Dates must match exactly with market price chart data
-            const timelineData = [
-                { date: '01/01/2025', type: 'Trade Plan', id: 456, positionSize: 0, realizedPL: 0, unrealizedPL: 0, totalPL: 0, daysFromStart: 0, qty: null, price: null },
-                { date: '05/01/2025', type: 'Execution', id: 101, positionSize: 100, realizedPL: 0, unrealizedPL: 0, totalPL: 0, daysFromStart: 4, qty: 100, price: 150, side: 'Buy' },
-                { date: '07/01/2025', type: 'Daily', id: null, positionSize: 100, realizedPL: 0, unrealizedPL: 50, totalPL: 50, daysFromStart: 6, qty: null, price: null },
-                { date: '08/01/2025', type: 'Cash Flow', id: 301, positionSize: 100, realizedPL: 0, unrealizedPL: 50, totalPL: 50, amount: 5000, daysFromStart: 7, qty: null, price: null },
-                { date: '10/01/2025', type: 'Execution', id: 102, positionSize: 150, realizedPL: 0, unrealizedPL: 100, totalPL: 100, daysFromStart: 9, qty: 50, price: 152, side: 'Buy' },
-                { date: '12/01/2025', type: 'Daily', id: null, positionSize: 150, realizedPL: 0, unrealizedPL: 120, totalPL: 120, daysFromStart: 11, qty: null, price: null },
-                { date: '13/01/2025', type: 'Dividend', id: 401, positionSize: 150, realizedPL: 0, unrealizedPL: 120, totalPL: 120, amount: 150, daysFromStart: 12, qty: null, price: null, dividendPerShare: 1.0 },
-                { date: '15/01/2025', type: 'Execution', id: 103, positionSize: 120, realizedPL: 150, unrealizedPL: 120, totalPL: 270, daysFromStart: 14, qty: 30, price: 155, side: 'Sell', realized: 150 },
-                { date: '17/01/2025', type: 'Daily', id: null, positionSize: 120, realizedPL: 150, unrealizedPL: 80, totalPL: 230, daysFromStart: 16, qty: null, price: null },
-                { date: '20/01/2025', type: 'Execution', id: 104, positionSize: 0, realizedPL: 1110, unrealizedPL: 0, totalPL: 1110, daysFromStart: 19, qty: 120, price: 158, side: 'Sell', realized: 960 }
-            ];
+            // Get timeline data from tradeHistoryPage or mock data
+            let timelineData = [];
+            
+            // Try to get data from tradeHistoryPage first
+            if (window.tradeHistoryPage && typeof window.tradeHistoryPage.getTimelineData === 'function') {
+                const rawTimelineData = window.tradeHistoryPage.getTimelineData();
+                if (rawTimelineData && Array.isArray(rawTimelineData) && rawTimelineData.length > 0) {
+                    // Transform to chart format
+                    const startDate = new Date(rawTimelineData[0].date);
+                    
+                    // Calculate cumulative position and P/L
+                    let currentPosition = 0;
+                    let cumulativeRealizedPL = 0;
+                    
+                    timelineData = rawTimelineData.map((point, index) => {
+                        const date = new Date(point.date);
+                        const daysFromStart = Math.floor((date - startDate) / (1000 * 60 * 60 * 24));
+                        
+                        // Update position based on execution
+                        if (point.type === 'Execution') {
+                            if (point.side === 'buy') {
+                                currentPosition += point.quantity || 0;
+                            } else if (point.side === 'sell') {
+                                currentPosition -= point.quantity || 0;
+                            }
+                            cumulativeRealizedPL += point.pl || 0;
+                        }
+                        
+                        // Calculate unrealized PL (placeholder)
+                        const unrealizedPL = 0;
+                        const totalPL = cumulativeRealizedPL + unrealizedPL;
+                        
+                        // Format date as DD/MM/YYYY
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = date.getFullYear();
+                        const dateStr = `${day}/${month}/${year}`;
+                        
+                        return {
+                            date: dateStr,
+                            type: point.type,
+                            id: point.id,
+                            positionSize: currentPosition,
+                            realizedPL: cumulativeRealizedPL,
+                            unrealizedPL: unrealizedPL,
+                            totalPL: totalPL,
+                            daysFromStart: daysFromStart,
+                            qty: point.quantity || null,
+                            price: point.price || null,
+                            side: point.side ? (point.side === 'buy' ? 'Buy' : 'Sell') : null,
+                            amount: point.amount || null,
+                            realized: point.pl || null
+                        };
+                    });
+                }
+            } else if (window.TradeHistoryMockData && window.TradeHistoryMockData.timelineData) {
+                // Fallback to mock data
+                const mockData = window.TradeHistoryMockData.timelineData;
+                if (mockData.length > 0) {
+                    const startDate = new Date(mockData[0].date);
+                    
+                    // Calculate cumulative position and P/L
+                    let currentPosition = 0;
+                    let cumulativeRealizedPL = 0;
+                    
+                    timelineData = mockData.map((point, index) => {
+                        const date = new Date(point.date);
+                        const daysFromStart = Math.floor((date - startDate) / (1000 * 60 * 60 * 24));
+                        
+                        // Update position based on execution
+                        if (point.type === 'Execution') {
+                            if (point.side === 'buy') {
+                                currentPosition += point.quantity || 0;
+                            } else if (point.side === 'sell') {
+                                currentPosition -= point.quantity || 0;
+                            }
+                            cumulativeRealizedPL += point.pl || 0;
+                        }
+                        
+                        const unrealizedPL = 0;
+                        const totalPL = cumulativeRealizedPL + unrealizedPL;
+                        
+                        // Format date as DD/MM/YYYY
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = date.getFullYear();
+                        const dateStr = `${day}/${month}/${year}`;
+                        
+                        return {
+                            date: dateStr,
+                            type: point.type,
+                            id: point.id,
+                            positionSize: currentPosition,
+                            realizedPL: cumulativeRealizedPL,
+                            unrealizedPL: unrealizedPL,
+                            totalPL: totalPL,
+                            daysFromStart: daysFromStart,
+                            qty: point.quantity || null,
+                            price: point.price || null,
+                            side: point.side ? (point.side === 'buy' ? 'Buy' : 'Sell') : null,
+                            amount: point.amount || null,
+                            realized: point.pl || null
+                        };
+                    });
+                }
+            }
+            
+            // If no data available, show empty chart
+            if (!timelineData || timelineData.length === 0) {
+                if (window.Logger) {
+                    window.Logger.warn('No timeline data available for chart, showing empty chart', { page: 'trade-history-page' });
+                }
+                timelineData = []; // Empty array - chart will show empty
+            }
             
             // Store timeline data globally for market price chart to use
             window._timelineData = timelineData;
@@ -1256,6 +1110,9 @@
                 // Setup zoom and pan controls
                 setupTimelineChartControls(timelineChart);
                 
+                // Store chart globally for access from other scripts
+                window.timelineChart = timelineChart;
+                
                 // Subscribe to crosshair move for custom tooltips
                 timelineChart.subscribeCrosshairMove(param => {
                     if (param.point === undefined || !param.time || param.point.x < 0 || param.point.x > container.clientWidth || param.point.y < 0 || param.point.y > container.clientHeight) {
@@ -1478,6 +1335,18 @@
             
             const timeScale = chart.timeScale();
             
+            // Subscribe to visible range changes to save state
+            if (timeScale && typeof timeScale.subscribeVisibleTimeRangeChange === 'function') {
+                timeScale.subscribeVisibleTimeRangeChange(() => {
+                    // Save chart zoom state when it changes
+                    if (window.tradeHistoryPage && typeof window.tradeHistoryPage.savePageState === 'function') {
+                        setTimeout(() => {
+                            window.tradeHistoryPage.savePageState();
+                        }, 500); // Debounce - save after 500ms of no changes
+                    }
+                });
+            }
+            
             // Helper function to get time difference in milliseconds
             function getTimeDiff(from, to) {
                 if (typeof from === 'string' && typeof to === 'string') {
@@ -1674,26 +1543,8 @@
             alert('ייצוא נתונים - ייושם בעתיד');
         }
         
-        // Initialize charts on page load
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Initialize chart immediately - initTimelineChart will handle waiting for libraries
-            try {
-                await initTimelineChart();
-            } catch (e) {
-                if (window.Logger) {
-                    window.Logger.error('Error initializing timeline chart', { page: 'trade-history-page', error: e });
-                }
-            }
-            
-            // P/L Chart removed - no longer needed
-            // Market price chart removed - market price series is now part of timeline chart
-            
-            // Update trade status badge using FieldRendererService if available
-            updateTradeStatusBadge('closed');
-            
-            // Load linked items for the trade
-            loadLinkedItemsForTrade();
-        });
+        // Chart initialization is now handled by trade-history-page.js through UnifiedAppInitializer
+        // This ensures proper integration with all systems
         
         // Handle window resize for timeline chart
         window.addEventListener('resize', () => {
@@ -1774,8 +1625,8 @@
                     // Use the global linked items function
                     container.innerHTML = `
                         <div class="text-center py-4">
-                            <button class="btn btn-primary" onclick="window.viewLinkedItemsForTrade(${tradeId})">
-                                <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> הצג פריטים מקושרים
+                            <button class="btn btn-primary" data-onclick="window.viewLinkedItemsForTrade(${tradeId})">
+                                <span data-icon="link" class="icon"></span> הצג פריטים מקושרים
                             </button>
                         </div>
                     `;
@@ -1783,7 +1634,7 @@
                     // Fallback: show message
                     container.innerHTML = `
                         <div class="alert alert-info">
-                            <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> מערכת המקושרים לא זמינה כרגע
+                            <span data-icon="info-circle" class="icon"></span> מערכת המקושרים לא זמינה כרגע
                         </div>
                     `;
                 }
@@ -1793,7 +1644,7 @@
                 }
                 container.innerHTML = `
                     <div class="alert alert-danger">
-                        <img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> שגיאה בטעינת פריטים מקושרים: ${error.message}
+                        <span data-icon="alert-triangle" class="icon"></span> שגיאה בטעינת פריטים מקושרים: ${error.message}
                     </div>
                 `;
             }
@@ -1804,7 +1655,7 @@
             if (!data || (!data.child_entities && !data.parent_entities)) {
                 container.innerHTML = `
                     <div class="alert alert-info">
-                        <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> אין פריטים מקושרים לטרייד זה
+                        <span data-icon="info-circle" class="icon"></span> אין פריטים מקושרים לטרייד זה
                     </div>
                 `;
                 return;
@@ -1818,7 +1669,7 @@
             if (allItems.length === 0) {
                 container.innerHTML = `
                     <div class="alert alert-info">
-                        <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> אין פריטים מקושרים לטרייד זה
+                        <span data-icon="info-circle" class="icon"></span> אין פריטים מקושרים לטרייד זה
                     </div>
                 `;
                 return;
@@ -1947,7 +1798,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="tradeSelectorModalLabel">
-                        <img src="../../images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon"> בחירת טרייד לניתוח
+                        <span data-icon="search" class="icon"></span> בחירת טרייד לניתוח
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור"></button>
                             </div>
@@ -1959,7 +1810,7 @@
                                 <!-- Ticker Filter -->
                                 <div class="col-md-2">
                                     <label for="filterTicker" class="form-label form-label-small">טיקר</label>
-                                    <select id="filterTicker" class="form-select form-select-sm" onchange="applyTradeFilters()">
+                                    <select id="filterTicker" class="form-select form-select-sm" data-onchange="applyTradeFilters()">
                                         <option value="">הכל</option>
                                         <!-- Will be populated dynamically -->
                                     </select>
@@ -1968,7 +1819,7 @@
                                 <!-- Side Filter -->
                                 <div class="col-md-2">
                                     <label for="filterSide" class="form-label form-label-small">צד</label>
-                                    <select id="filterSide" class="form-select form-select-sm" onchange="applyTradeFilters()">
+                                    <select id="filterSide" class="form-select form-select-sm" data-onchange="applyTradeFilters()">
                                         <option value="">הכל</option>
                                         <option value="Long">Long</option>
                                         <option value="Short">Short</option>
@@ -1978,7 +1829,7 @@
                                 <!-- Investment Type Filter -->
                                 <div class="col-md-2">
                                     <label for="filterInvestmentType" class="form-label form-label-small">סוג השקעה</label>
-                                    <select id="filterInvestmentType" class="form-select form-select-sm" onchange="applyTradeFilters()">
+                                    <select id="filterInvestmentType" class="form-select form-select-sm" data-onchange="applyTradeFilters()">
                                         <option value="">הכל</option>
                                         <!-- Will be populated dynamically -->
                                     </select>
@@ -1987,17 +1838,17 @@
                                 <!-- Date Range Filter -->
                                 <div class="col-md-2">
                                     <label for="filterDateFrom" class="form-label form-label-small">מתאריך</label>
-                                    <input type="date" id="filterDateFrom" class="form-control form-control-sm" onchange="applyTradeFilters()">
+                                    <input type="date" id="filterDateFrom" class="form-control form-control-sm" data-onchange="applyTradeFilters()">
                             </div>
                                 <div class="col-md-2">
                                     <label for="filterDateTo" class="form-label form-label-small">עד תאריך</label>
-                                    <input type="date" id="filterDateTo" class="form-control form-control-sm" onchange="applyTradeFilters()">
+                                    <input type="date" id="filterDateTo" class="form-control form-control-sm" data-onchange="applyTradeFilters()">
                                     </div>
                                 
                                 <!-- Clear Filters Button -->
                                 <div class="col-md-2 d-flex align-items-end">
-                                    <button class="btn btn-outline-secondary btn-sm w-100" onclick="window.tradeHistoryPage.clearTradeFilters()">
-                                        <img src="../../images/icons/tabler/x.svg" width="16" height="16" alt="x" class="icon"> נקה
+                                    <button class="btn btn-outline-secondary btn-sm w-100" data-onclick="window.tradeHistoryPage.clearTradeFilters()">
+                                        <span data-icon="x" class="icon"></span> נקה
                                     </button>
                                         </div>
                                     </div>
@@ -2027,7 +1878,7 @@
                     
                     <!-- No Results Message -->
                     <div id="noTradesMessage" class="alert alert-info text-center d-none">
-                        <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> לא נמצאו טריידים התואמים למסננים
+                        <span data-icon="info-circle" class="icon"></span> לא נמצאו טריידים התואמים למסננים
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -2036,6 +1887,11 @@
             </div>
         </div>
     </div>
+    
+    <!-- Unified App Initializer (Must load before page-specific script) -->
+    <script src="../../scripts/init-system/package-manifest.js?v=1.0.0"></script>
+    <script src="../../scripts/page-initialization-configs.js?v=1.0.0"></script>
+    <script src="../../scripts/unified-app-initializer.js?v=1.0.0"></script>
     
     <!-- Page-specific script -->
     <script src="../../scripts/trade-history-page.js" defer></script>

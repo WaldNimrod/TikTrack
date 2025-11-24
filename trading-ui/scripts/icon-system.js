@@ -49,6 +49,17 @@
                 // Load mappings
                 if (typeof window.IconMappings !== 'undefined') {
                     this.mappings = window.IconMappings;
+                    
+                    // Debug: Log available button mappings
+                    if (typeof window.Logger !== 'undefined' && this.mappings.buttons) {
+                        window.Logger.debug('IconMappings loaded', {
+                            page: 'icon-system',
+                            buttonCount: Object.keys(this.mappings.buttons).length,
+                            hasInfoCircle: 'info-circle' in this.mappings.buttons,
+                            hasBookmark: 'bookmark' in this.mappings.buttons,
+                            hasAlertCircle: 'alert-circle' in this.mappings.buttons
+                        });
+                    }
                 } else {
                     if (typeof window.Logger !== 'undefined') {
                         window.Logger.warn('⚠️ IconMappings not found, using fallback', { page: 'icon-system' });
@@ -132,6 +143,7 @@
             } else {
                 // For other types (button, category, chart, page), use Tabler Icons
                 const mapping = this.mappings?.[type]?.[name];
+                
                 if (mapping) {
                     // Check if it's already a path
                     if (mapping.startsWith('/')) {
@@ -141,8 +153,19 @@
                         iconPath = `${this.tablerPath}${mapping}.svg`;
                     }
                 } else {
-                    // Try direct Tabler name
+                    // Try direct Tabler name (will fail if icon doesn't exist)
                     iconPath = `${this.tablerPath}${name}.svg`;
+                    
+                    // Log missing mapping for debugging (only for known missing icons)
+                    if (typeof window.Logger !== 'undefined' && ['info-circle', 'bookmark', 'alert-circle'].includes(name)) {
+                        window.Logger.warn('Icon mapping not found, trying direct path (will fail)', {
+                            page: 'icon-system',
+                            type: type,
+                            name: name,
+                            hasMappings: !!this.mappings?.[type],
+                            availableMappings: this.mappings?.[type] ? Object.keys(this.mappings[type]).slice(0, 10) : []
+                        });
+                    }
                 }
             }
 

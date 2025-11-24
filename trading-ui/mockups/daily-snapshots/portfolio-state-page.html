@@ -111,7 +111,7 @@
                                 <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
                                 <button data-button-type="COMPARE" data-variant="small" data-text="השווה" data-onclick="window.portfolioStatePage.compareDates()" title="השוואת תאריכים"></button>
                             </div>
-                            <button class="filter-toggle-btn" onclick="toggleSection('portfolio-state-top-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('portfolio-state-top-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -127,48 +127,48 @@
                                         <label class="form-label form-label-small">טווח תאריכים</label>
                                         <div class="filter-group date-range-filter">
                                             <div class="filter-dropdown">
-                                                <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="dateRangeFilterToggle" onclick="window.portfolioStatePage.toggleDateRangeFilterMenu()">
+                                                <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="dateRangeFilterToggle" data-onclick="window.portfolioStatePage.toggleDateRangeFilterMenu()">
                                                     <span class="selected-value selected-date-text" id="selectedDateRange">היום</span>
                                                     <span class="dropdown-arrow">▼</span>
                                                 </button>
                                                 <div class="filter-menu" id="dateRangeFilterMenu">
-                                                    <div class="date-range-filter-item" data-value="כל זמן" onclick="window.portfolioStatePage.selectDateRangeOption('כל זמן')">
+                                                    <div class="date-range-filter-item" data-value="כל זמן" data-onclick="window.portfolioStatePage.selectDateRangeOption('כל זמן')">
                                                         <span class="option-text">כל זמן</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="היום" onclick="window.portfolioStatePage.selectDateRangeOption('היום')">
+                                                    <div class="date-range-filter-item" data-value="היום" data-onclick="window.portfolioStatePage.selectDateRangeOption('היום')">
                                                         <span class="option-text">היום</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="אתמול" onclick="window.portfolioStatePage.selectDateRangeOption('אתמול')">
+                                                    <div class="date-range-filter-item" data-value="אתמול" data-onclick="window.portfolioStatePage.selectDateRangeOption('אתמול')">
                                                         <span class="option-text">אתמול</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="השבוע" onclick="window.portfolioStatePage.selectDateRangeOption('השבוע')">
+                                                    <div class="date-range-filter-item" data-value="השבוע" data-onclick="window.portfolioStatePage.selectDateRangeOption('השבוע')">
                                                         <span class="option-text">השבוע</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="שבוע" onclick="window.portfolioStatePage.selectDateRangeOption('שבוע')">
+                                                    <div class="date-range-filter-item" data-value="שבוע" data-onclick="window.portfolioStatePage.selectDateRangeOption('שבוע')">
                                                         <span class="option-text">שבוע (7 ימים)</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="שבוע קודם" onclick="window.portfolioStatePage.selectDateRangeOption('שבוע קודם')">
+                                                    <div class="date-range-filter-item" data-value="שבוע קודם" data-onclick="window.portfolioStatePage.selectDateRangeOption('שבוע קודם')">
                                                         <span class="option-text">שבוע שעבר</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="החודש" onclick="window.portfolioStatePage.selectDateRangeOption('החודש')">
+                                                    <div class="date-range-filter-item" data-value="החודש" data-onclick="window.portfolioStatePage.selectDateRangeOption('החודש')">
                                                         <span class="option-text">החודש</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="חודש" onclick="window.portfolioStatePage.selectDateRangeOption('חודש')">
+                                                    <div class="date-range-filter-item" data-value="חודש" data-onclick="window.portfolioStatePage.selectDateRangeOption('חודש')">
                                                         <span class="option-text">חודש (30 יום)</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="חודש קודם" onclick="window.portfolioStatePage.selectDateRangeOption('חודש קודם')">
+                                                    <div class="date-range-filter-item" data-value="חודש קודם" data-onclick="window.portfolioStatePage.selectDateRangeOption('חודש קודם')">
                                                         <span class="option-text">חודש קודם</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="השנה" onclick="window.portfolioStatePage.selectDateRangeOption('השנה')">
+                                                    <div class="date-range-filter-item" data-value="השנה" data-onclick="window.portfolioStatePage.selectDateRangeOption('השנה')">
                                                         <span class="option-text">השנה</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="שנה" onclick="window.portfolioStatePage.selectDateRangeOption('שנה')">
+                                                    <div class="date-range-filter-item" data-value="שנה" data-onclick="window.portfolioStatePage.selectDateRangeOption('שנה')">
                                                         <span class="option-text">שנה (365 ימים)</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="שנה קודמת" onclick="window.portfolioStatePage.selectDateRangeOption('שנה קודמת')">
+                                                    <div class="date-range-filter-item" data-value="שנה קודמת" data-onclick="window.portfolioStatePage.selectDateRangeOption('שנה קודמת')">
                                                         <span class="option-text">שנה שעברה</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="מותאם אישית" onclick="window.portfolioStatePage.selectDateRangeOption('מותאם אישית')">
+                                                    <div class="date-range-filter-item" data-value="מותאם אישית" data-onclick="window.portfolioStatePage.selectDateRangeOption('מותאם אישית')">
                                                         <span class="option-text">מותאם אישית</span>
                                                     </div>
                                                 </div>
@@ -182,13 +182,13 @@
                                             <!-- Custom Date From -->
                                             <div class="col-md-6">
                                                 <label for="customDateFrom" class="form-label form-label-small">מתאריך</label>
-                                                <input type="date" id="customDateFrom" class="form-control form-control-sm form-control-full-width" onchange="window.portfolioStatePage.handleCustomDateFromChange()">
+                                                <input type="date" id="customDateFrom" class="form-control form-control-sm form-control-full-width" data-onchange="window.portfolioStatePage.handleCustomDateFromChange()">
                                             </div>
                                             
                                             <!-- Custom Date To -->
                                             <div class="col-md-6">
                                                 <label for="customDateTo" class="form-label form-label-small">עד תאריך</label>
-                                                <input type="date" id="customDateTo" class="form-control form-control-sm form-control-full-width" onchange="window.portfolioStatePage.handleCustomDateToChange()">
+                                                <input type="date" id="customDateTo" class="form-control form-control-sm form-control-full-width" data-onchange="window.portfolioStatePage.handleCustomDateToChange()">
                                             </div>
                                         </div>
                                     </div>
@@ -198,12 +198,12 @@
                                         <label class="form-label form-label-small">חשבון מסחר</label>
                                         <div class="filter-group account-filter">
                                             <div class="filter-dropdown">
-                                                <button class="filter-toggle filter-toggle-full-width account-filter-toggle" id="accountFilterToggle" onclick="window.portfolioStatePage.toggleAccountFilterMenu()">
+                                                <button class="filter-toggle filter-toggle-full-width account-filter-toggle" id="accountFilterToggle" data-onclick="window.portfolioStatePage.toggleAccountFilterMenu()">
                                                     <span class="selected-value selected-account-text" id="selectedAccount">כל חשבון מסחר</span>
                                                     <span class="dropdown-arrow">▼</span>
                                                 </button>
                                                 <div class="filter-menu" id="accountFilterMenu">
-                                                    <div class="account-filter-item" data-value="הכול" onclick="window.portfolioStatePage.selectAccountOption('הכול')">
+                                                    <div class="account-filter-item" data-value="הכול" data-onclick="window.portfolioStatePage.selectAccountOption('הכול')">
                                                         <span class="option-text">הכול</span>
                                                     </div>
                                                     <!-- Will be populated dynamically -->
@@ -215,7 +215,7 @@
                                     <!-- Investment Type Filter -->
                                     <div class="col-md-2">
                                         <label for="filterInvestmentType" class="form-label form-label-small">סוג השקעה</label>
-                                        <select id="filterInvestmentType" class="form-select form-select-sm form-control-full-width" onchange="window.portfolioStatePage.applyFilters()">
+                                        <select id="filterInvestmentType" class="form-select form-select-sm form-control-full-width" data-onchange="window.portfolioStatePage.applyFilters()">
                                             <option value="">הכל</option>
                                             <!-- Will be populated dynamically -->
                                         </select>
@@ -239,7 +239,7 @@
                                             <div class="compact-stat-label">יתרות מזומן</div>
                                             <div class="compact-stat-number" id="total-cash-balance">$50,000</div>
                                         </div>
-                                        <button class="btn btn-sm btn-outline-secondary" onclick="window.portfolioStatePage.toggleCardDetails('cash-balance-details')" title="הצג/הסתר פרטים">
+                                        <button class="btn btn-sm btn-outline-secondary" data-onclick="window.portfolioStatePage.toggleCardDetails('cash-balance-details')" title="הצג/הסתר פרטים">
                                             <img src="/trading-ui/images/icons/tabler/chevron-down.svg" width="16" height="16" alt="chevron-down" class="icon" id="cash-balance-chevron">
                                         </button>
                                     </div>
@@ -275,7 +275,7 @@
                                             <div class="compact-stat-number positive" id="total-pl">$25,000</div>
                                             <div class="compact-stat-label compact-stat-label-small positive" id="pl-percentage">(+50%)</div>
                                         </div>
-                                        <button class="btn btn-sm btn-outline-secondary" onclick="window.portfolioStatePage.toggleCardDetails('pl-details')" title="הצג/הסתר פרטים">
+                                        <button class="btn btn-sm btn-outline-secondary" data-onclick="window.portfolioStatePage.toggleCardDetails('pl-details')" title="הצג/הסתר פרטים">
                                             <img src="/trading-ui/images/icons/tabler/chevron-down.svg" width="16" height="16" alt="chevron-down" class="icon" id="pl-chevron">
                                         </button>
                                     </div>
@@ -301,7 +301,7 @@
                             
                             <!-- Positions Count Card (Expandable) -->
                             <div class="col-md-3">
-                                <div class="compact-stat-card clickable-card" onclick="window.portfolioStatePage.toggleCardDetails('positions-details')">
+                                <div class="compact-stat-card clickable-card" data-onclick="window.portfolioStatePage.toggleCardDetails('positions-details')">
                                     <div class="compact-stat-label">פוזיציות</div>
                                     <div class="compact-stat-number" id="total-positions-count">5</div>
                                     <div class="compact-stat-label compact-stat-label-extra-small">
@@ -330,7 +330,7 @@
                     <div class="section-header">
                         <h2><img src="../../images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon"> גרפים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('charts-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('charts-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -410,28 +410,28 @@
                     <div class="section-header">
                         <h2><img src="../../images/icons/tabler/table.svg" width="16" height="16" alt="table" class="icon"> רשימת טריידים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('trades-table-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('trades-table-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
                         <div class="table-responsive">
-                            <table class="table table-hover" id="tradesTable">
+                            <table class="table table-hover" id="tradesTable" data-table-type="portfolio-trades">
                                 <thead>
                                     <tr>
-                                        <th>טיקר</th>
-                                        <th>מחיר</th>
-                                        <th>שינוי</th>
-                                        <th>פוזיציה</th>
-                                        <th>P/L%</th>
-                                        <th>P/L</th>
-                                        <th>סטטוס</th>
-                                        <th>סוג</th>
-                                        <th>צד</th>
-                                        <th>חשבון</th>
-                                        <th>נוצר ב</th>
-                                        <th>נסגר ב</th>
+                                        <th data-sortable="true">טיקר</th>
+                                        <th data-sortable="true">מחיר</th>
+                                        <th data-sortable="true">שינוי</th>
+                                        <th data-sortable="true">פוזיציה</th>
+                                        <th data-sortable="true">P/L%</th>
+                                        <th data-sortable="true">P/L</th>
+                                        <th data-sortable="true">סטטוס</th>
+                                        <th data-sortable="true">סוג</th>
+                                        <th data-sortable="true">צד</th>
+                                        <th data-sortable="true">חשבון</th>
+                                        <th data-sortable="true">נוצר ב</th>
+                                        <th data-sortable="true">נסגר ב</th>
                                         <th class="col-actions actions-cell">
                                             <span class="actions-header-icon">⋮</span>
                                         </th>
@@ -456,7 +456,7 @@
                     <div class="section-header">
                         <h2><img src="../../images/icons/tabler/arrows-sort.svg" width="16" height="16" alt="arrows-sort" class="icon"> השוואה בין תאריכים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('comparison-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('comparison-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -467,7 +467,7 @@
                             <div class="d-flex gap-2 align-items-center">
                                 <input type="date" id="datePicker2" class="form-control d-inline-block form-control-inline">
                                 <button data-button-type="COMPARE" data-variant="small" data-text="השווה" data-onclick="compareDates()"></button>
-                                <button class="btn btn-sm btn-outline-danger hidden" id="removeComparisonDate" onclick="window.portfolioStatePage.removeComparisonDate()">
+                                <button class="btn btn-sm btn-outline-danger hidden" id="removeComparisonDate" data-onclick="window.portfolioStatePage.removeComparisonDate()">
                                     <img src="../../images/icons/tabler/x.svg" width="16" height="16" alt="x" class="icon"> הסר השוואה
                                 </button>
                             </div>

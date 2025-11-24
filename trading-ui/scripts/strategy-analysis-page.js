@@ -69,7 +69,7 @@ function initializeSeriesControls() {
                        id="series-${series.key}" 
                        class="form-check-input" 
                        ${isChecked ? 'checked' : ''}
-                       onchange="toggleSeries('${series.key}', this.checked)">
+                       data-onchange="toggleSeries('${series.key}', this.checked)">
                 <label for="series-${series.key}" class="series-checkbox-label">
                     <div class="series-color-indicator" style="background-color: ${color};"></div>
                     <span class="form-label-small">${series.label}</span>

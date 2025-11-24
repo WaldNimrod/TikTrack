@@ -110,7 +110,7 @@
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2">                            <div class="table-actions">
                             <button data-button-type="REFRESH" data-variant="small" data-icon="🔄" data-text="רענון" data-onclick="window.historyWidget.refreshWidget()" title="רענון נתונים"></button>
-                        </div><button class="filter-toggle-btn" onclick="toggleSection(\'history_widget_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                        </div><button class="filter-toggle-btn" data-onclick="toggleSection(\'history_widget_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
@@ -143,39 +143,39 @@
                                         </div>
                                         <div class="filter-group date-range-filter" style="min-width: 150px;">
                                             <div class="filter-dropdown">
-                                                <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="chartDateRangeToggle" onclick="window.historyWidget.toggleChartDateRangeMenu()">
+                                                <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="chartDateRangeToggle" data-onclick="window.historyWidget.toggleChartDateRangeMenu()">
                                                     <span class="selected-value selected-date-text" id="selectedChartDateRange">השבוע</span>
                                                     <span class="dropdown-arrow">▼</span>
                                                 </button>
                                                 <div class="filter-menu" id="chartDateRangeMenu">
-                                                    <div class="date-range-filter-item" data-value="היום" onclick="window.historyWidget.selectChartDateRange('היום')">
+                                                    <div class="date-range-filter-item" data-value="היום" data-onclick="window.historyWidget.selectChartDateRange('היום')">
                                                         <span class="option-text">היום</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="אתמול" onclick="window.historyWidget.selectChartDateRange('אתמול')">
+                                                    <div class="date-range-filter-item" data-value="אתמול" data-onclick="window.historyWidget.selectChartDateRange('אתמול')">
                                                         <span class="option-text">אתמול</span>
                                                     </div>
-                                                    <div class="date-range-filter-item selected" data-value="השבוע" onclick="window.historyWidget.selectChartDateRange('השבוע')">
+                                                    <div class="date-range-filter-item selected" data-value="השבוע" data-onclick="window.historyWidget.selectChartDateRange('השבוע')">
                                                         <span class="option-text">השבוע</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="שבוע" onclick="window.historyWidget.selectChartDateRange('שבוע')">
+                                                    <div class="date-range-filter-item" data-value="שבוע" data-onclick="window.historyWidget.selectChartDateRange('שבוע')">
                                                         <span class="option-text">שבוע (7 ימים)</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="שבוע קודם" onclick="window.historyWidget.selectChartDateRange('שבוע קודם')">
+                                                    <div class="date-range-filter-item" data-value="שבוע קודם" data-onclick="window.historyWidget.selectChartDateRange('שבוע קודם')">
                                                         <span class="option-text">שבוע שעבר</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="החודש" onclick="window.historyWidget.selectChartDateRange('החודש')">
+                                                    <div class="date-range-filter-item" data-value="החודש" data-onclick="window.historyWidget.selectChartDateRange('החודש')">
                                                         <span class="option-text">החודש</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="חודש" onclick="window.historyWidget.selectChartDateRange('חודש')">
+                                                    <div class="date-range-filter-item" data-value="חודש" data-onclick="window.historyWidget.selectChartDateRange('חודש')">
                                                         <span class="option-text">חודש (30 יום)</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="חודש קודם" onclick="window.historyWidget.selectChartDateRange('חודש קודם')">
+                                                    <div class="date-range-filter-item" data-value="חודש קודם" data-onclick="window.historyWidget.selectChartDateRange('חודש קודם')">
                                                         <span class="option-text">חודש קודם</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="השנה" onclick="window.historyWidget.selectChartDateRange('השנה')">
+                                                    <div class="date-range-filter-item" data-value="השנה" data-onclick="window.historyWidget.selectChartDateRange('השנה')">
                                                         <span class="option-text">השנה</span>
                                                     </div>
-                                                    <div class="date-range-filter-item" data-value="שנה" onclick="window.historyWidget.selectChartDateRange('שנה')">
+                                                    <div class="date-range-filter-item" data-value="שנה" data-onclick="window.historyWidget.selectChartDateRange('שנה')">
                                                         <span class="option-text">שנה (365 ימים)</span>
                                                     </div>
                                                 </div>

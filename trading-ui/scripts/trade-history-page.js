@@ -21,6 +21,14 @@
     let filteredTrades = [];
     let selectedTradeId = null;
     let allTickers = [];
+    let tradeHistoryData = null;
+    let isPageInitialized = false;
+    let planVsExecutionData = [];
+    
+    // Cache keys
+    const CACHE_KEY_MOCK_DATA = 'trade-history-page_mockData';
+    const CACHE_KEY_SELECTED_TRADE_ID = 'trade-history-page_selectedTradeId';
+    const CACHE_KEY_SECTION_STATES = 'trade-history-page_sectionStates';
 
     // ===== Helper Functions =====
     
@@ -50,12 +58,25 @@
     }
 
     /**
-     * Format date string
+     * Format date string using DateNormalizationService if available
      * @param {string} dateString - Date string
      * @returns {string} Formatted date
      */
     function formatDate(dateString) {
         if (!dateString) return '-';
+        
+        // Use DateNormalizationService if available
+        if (window.DateNormalizationService && typeof window.DateNormalizationService.formatDate === 'function') {
+            try {
+                return window.DateNormalizationService.formatDate(dateString);
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Error formatting date with DateNormalizationService', { page: 'trade-history-page', error });
+                }
+            }
+        }
+        
+        // Fallback to standard formatting
         const date = new Date(dateString);
         return date.toLocaleDateString('he-IL');
     }
@@ -103,35 +124,60 @@
     }
 
     /**
-     * Load tickers from API
+     * Load tickers from API with caching
      */
     async function loadTickers() {
         try {
-            const response = await fetch('/api/tickers/');
-            if (response.ok) {
-                const data = await response.json();
-                const tickers = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
-                allTickers = tickers.map(t => ({
-                    id: t.id,
-                    symbol: t.symbol || t.ticker_symbol || ''
-                })).filter(t => t.symbol).sort((a, b) => a.symbol.localeCompare(b.symbol));
-                
-                // Populate ticker dropdown
-                const tickerSelect = document.getElementById('filterTicker');
-                if (tickerSelect) {
-                    tickerSelect.innerHTML = '<option value="">הכל</option>';
-                    allTickers.forEach(ticker => {
-                        const option = document.createElement('option');
-                        option.value = ticker.symbol;
-                        option.textContent = ticker.symbol;
-                        tickerSelect.appendChild(option);
-                    });
+            // Create cache key
+            const cacheKey = window.createCacheKey ? 
+                window.createCacheKey('trade-history', 'tickers', {}) : 
+                'trade-history-tickers-default';
+            
+            // Try to load from cache
+            if (window.UnifiedCacheManager) {
+                const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
+                if (cachedData) {
+                    allTickers = cachedData;
+                    populateTickerFilter();
+                    return;
                 }
             }
-        } catch (error) {
-            if (window.Logger) {
-                window.Logger.error('Error loading tickers', { page: 'trade-history-page', error });
+            
+            // Load from API using safeApiCall
+            const data = await window.safeApiCall('/api/tickers/');
+            const tickers = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+            allTickers = tickers.map(t => ({
+                id: t.id,
+                symbol: t.symbol || t.ticker_symbol || ''
+            })).filter(t => t.symbol).sort((a, b) => a.symbol.localeCompare(b.symbol));
+            
+            // Save to cache
+            if (window.UnifiedCacheManager) {
+                await window.UnifiedCacheManager.save(cacheKey, allTickers, 'memory', { ttl: 600 }); // 10 minutes
             }
+            
+            populateTickerFilter();
+        } catch (error) {
+            // Error already handled by safeApiCall
+            if (window.Logger) {
+                window.Logger.warn('Error loading tickers, using empty list', { page: 'trade-history-page', error });
+            }
+        }
+    }
+    
+    /**
+     * Populate ticker filter dropdown
+     */
+    function populateTickerFilter() {
+        const tickerSelect = document.getElementById('filterTicker');
+        if (tickerSelect) {
+            tickerSelect.innerHTML = '<option value="">הכל</option>';
+            allTickers.forEach(ticker => {
+                const option = document.createElement('option');
+                option.value = ticker.symbol;
+                option.textContent = ticker.symbol;
+                tickerSelect.appendChild(option);
+            });
         }
     }
 
@@ -152,39 +198,60 @@
     }
 
     /**
-     * Load trades from API
+     * Load trades from API with caching and error handling
      */
     async function loadTrades() {
+        showLoadingState('trades-table-section');
+        
         try {
-            const response = await fetch('/api/trades/');
-            if (response.ok) {
-                const data = await response.json();
-                const trades = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
-                
-                // Transform trades to match our format
-                allTrades = trades.map(trade => ({
-                    id: trade.id,
-                    ticker: trade.ticker_symbol || trade.ticker?.symbol || '',
-                    side: trade.side || '',
-                    investment_type: trade.investment_type || '',
-                    created_at: trade.created_at?.utc || trade.created_at || '',
-                    closed_at: trade.closed_at?.utc || trade.closed_at || '',
-                    pl: trade.realized_pl || trade.pl || 0,
-                    pl_percent: trade.pl_percent || 0
-                })).filter(t => t.ticker); // Only trades with ticker
-                
-                filteredTrades = [...allTrades];
-                loadTradesTable();
-            } else {
-                // Fallback to mock data if API fails
-                loadMockTrades();
+            // Create cache key
+            const cacheKey = window.createCacheKey ? 
+                window.createCacheKey('trade-history', 'trades', {}) : 
+                'trade-history-trades-default';
+            
+            // Try to load from cache
+            if (window.UnifiedCacheManager) {
+                const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
+                if (cachedData) {
+                    allTrades = cachedData;
+                    filteredTrades = [...allTrades];
+                    loadTradesTable();
+                    hideLoadingState('trades-table-section');
+                    return;
+                }
             }
+            
+            // Load from API using safeApiCall
+            const data = await window.safeApiCall('/api/trades/');
+            const trades = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+            
+            // Transform trades to match our format
+            allTrades = trades.map(trade => ({
+                id: trade.id,
+                ticker: trade.ticker_symbol || trade.ticker?.symbol || '',
+                side: trade.side || '',
+                investment_type: trade.investment_type || '',
+                created_at: trade.created_at?.utc || trade.created_at || '',
+                closed_at: trade.closed_at?.utc || trade.closed_at || '',
+                pl: trade.realized_pl || trade.pl || 0,
+                pl_percent: trade.pl_percent || 0
+            })).filter(t => t.ticker); // Only trades with ticker
+            
+            // Save to cache
+            if (window.UnifiedCacheManager) {
+                await window.UnifiedCacheManager.save(cacheKey, allTrades, 'memory', { ttl: 300 }); // 5 minutes
+            }
+            
+            filteredTrades = [...allTrades];
+            loadTradesTable();
         } catch (error) {
-            if (window.Logger) {
-                window.Logger.error('Error loading trades', { page: 'trade-history-page', error });
+            // Error already handled by safeApiCall, but fallback to mock data
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showWarning('טעינת נתונים', 'נטענים נתוני דמה במקום נתונים אמיתיים');
             }
-            // Fallback to mock data
             loadMockTrades();
+        } finally {
+            hideLoadingState('trades-table-section');
         }
     }
 
@@ -296,9 +363,9 @@
                     <td>${plDisplay}</td>
                     <td>
                         <div class="btn-group">
-                            <button class="btn btn-sm" onclick="window.tradeHistoryPage.viewTradeDetails(${trade.id})" title="פרטים" data-icon="eye">
+                            <button class="btn btn-sm" data-onclick="window.tradeHistoryPage.viewTradeDetails(${trade.id})" title="פרטים" data-icon="eye">
                             </button>
-                            <button class="btn btn-sm btn-primary" onclick="window.tradeHistoryPage.selectTradeForAnalysis(${trade.id})" title="בחר לניתוח" data-icon="check">
+                            <button class="btn btn-sm btn-primary" data-onclick="window.tradeHistoryPage.selectTradeForAnalysis(${trade.id})" title="בחר לניתוח" data-icon="check">
                             </button>
                         </div>
                     </td>
@@ -308,14 +375,25 @@
     }
 
     /**
-     * Apply filters
+     * Apply filters (internal implementation)
      */
-    function applyTradeFilters() {
-        const ticker = document.getElementById('filterTicker').value;
-        const side = document.getElementById('filterSide').value;
-        const investmentType = document.getElementById('filterInvestmentType').value;
-        const dateFrom = document.getElementById('filterDateFrom').value;
-        const dateTo = document.getElementById('filterDateTo').value;
+    function applyTradeFiltersInternal() {
+        const ticker = document.getElementById('filterTicker')?.value || '';
+        const side = document.getElementById('filterSide')?.value || '';
+        const investmentType = document.getElementById('filterInvestmentType')?.value || '';
+        const dateFrom = document.getElementById('filterDateFrom')?.value || '';
+        const dateTo = document.getElementById('filterDateTo')?.value || '';
+        
+        // Save filter state
+        if (window.PageStateManager) {
+            window.PageStateManager.savePageState('trade-history-page', {
+                filters: { ticker, side, investmentType, dateFrom, dateTo }
+            }).catch(err => {
+                if (window.Logger) {
+                    window.Logger.warn('Error saving filter state', { page: 'trade-history-page', error: err });
+                }
+            });
+        }
         
         filteredTrades = allTrades.filter(trade => {
             // Ticker filter (exact match from dropdown)
@@ -353,6 +431,18 @@
         });
         
         loadTradesTable();
+    }
+    
+    // Create debounced version of applyTradeFilters
+    const debouncedApplyTradeFilters = window.debounce ? 
+        window.debounce(applyTradeFiltersInternal, 300) : 
+        applyTradeFiltersInternal;
+    
+    /**
+     * Apply filters (public function with debounce)
+     */
+    function applyTradeFilters() {
+        debouncedApplyTradeFilters();
     }
 
     /**
@@ -407,6 +497,10 @@
             }
         }
         
+        // Save selected trade ID to cache and page state
+        saveToCache(CACHE_KEY_SELECTED_TRADE_ID, tradeId);
+        savePageState();
+
         // Load trade data for analysis
         loadTradeForAnalysis(tradeId);
     }
@@ -414,12 +508,17 @@
     /**
      * Clear selected trade
      */
-    function clearSelectedTrade() {
+    async function clearSelectedTrade() {
         selectedTradeId = null;
         const display = document.getElementById('selectedTradeDisplay');
         if (display) {
             display.style.display = 'none';
         }
+        
+        // Clear from cache and page state
+        await saveToCache(CACHE_KEY_SELECTED_TRADE_ID, null);
+        await savePageState();
+        
         // Clear all trade analysis data
         // This would reset all charts, statistics, etc.
     }
@@ -441,31 +540,957 @@
     }
 
     /**
-     * Initialize page
+     * Wait for UnifiedCacheManager to be ready
      */
-    function initializePage() {
-        // Initialize Header System first
-        initializeHeader();
+    async function waitForCacheManager() {
+        let retries = 0;
+        const maxRetries = 50; // 5 seconds max
         
-        // Wait for Preferences to be loaded
-        if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
-            window.PreferencesCore.initializeWithLazyLoading().catch((error) => {
+        while ((!window.UnifiedCacheManager || 
+                (!window.UnifiedCacheManager.initialized && 
+                 !window.UnifiedCacheManager.isInitialized?.())) && 
+               retries < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            retries++;
+        }
+        
+        if (!window.UnifiedCacheManager || 
+            (!window.UnifiedCacheManager.initialized && 
+             !window.UnifiedCacheManager.isInitialized?.())) {
                 if (window.Logger) {
-                    window.Logger.warn('Preferences initialization failed (non-critical)', { 
-                        page: 'trade-history-page', 
-                        error 
+                window.Logger.warn('UnifiedCacheManager not available after wait', { page: 'trade-history-page' });
+            }
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
+     * Wait for TradingView libraries to be ready
+     */
+    async function waitForTradingView() {
+        let retries = 0;
+        const maxRetries = 100; // 10 seconds max
+        
+        while ((typeof window.TradingViewChartAdapter === 'undefined' || 
+               (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined')) && 
+               retries < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            retries++;
+        }
+        
+        if (typeof window.TradingViewChartAdapter === 'undefined') {
+            if (window.Logger) {
+                window.Logger.warn('TradingViewChartAdapter not available after wait', { page: 'trade-history-page' });
+            }
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
+     * Load data from cache or use mock data
+     */
+    async function loadDataFromCache() {
+        try {
+            const cacheAvailable = await waitForCacheManager();
+            
+            if (cacheAvailable && window.UnifiedCacheManager) {
+                // Try to load from cache
+                const cachedData = await window.UnifiedCacheManager.get(CACHE_KEY_MOCK_DATA);
+                if (cachedData) {
+                    tradeHistoryData = cachedData;
+                    if (window.Logger) {
+                        window.Logger.info('Loaded trade history data from cache', { page: 'trade-history-page' });
+                    }
+                    return cachedData;
+                }
+            }
+            
+            // Fallback to mock data
+            if (window.TradeHistoryMockData) {
+                tradeHistoryData = window.TradeHistoryMockData;
+                if (window.Logger) {
+                    window.Logger.info('Using mock data for trade history', { page: 'trade-history-page' });
+                }
+                
+                // Save to cache for next time
+                if (cacheAvailable && window.UnifiedCacheManager) {
+                    await window.UnifiedCacheManager.save(CACHE_KEY_MOCK_DATA, tradeHistoryData, {
+                        layer: 'localStorage',
+                        ttl: null, // persistent
+                        syncToBackend: false
                     });
                 }
-            });
+                
+                return tradeHistoryData;
+            }
+            
+            if (window.Logger) {
+                window.Logger.error('No mock data available', { page: 'trade-history-page' });
+            }
+            return null;
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error loading data from cache', { page: 'trade-history-page', error });
+            }
+            // Fallback to mock data
+            if (window.TradeHistoryMockData) {
+                tradeHistoryData = window.TradeHistoryMockData;
+                return tradeHistoryData;
+            }
+            return null;
         }
     }
 
-    // ===== Initialization =====
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializePage);
+    /**
+     * Save to cache
+     */
+    async function saveToCache(key, data) {
+        try {
+            const cacheAvailable = await waitForCacheManager();
+            if (cacheAvailable && window.UnifiedCacheManager) {
+                await window.UnifiedCacheManager.save(key, data, {
+                    layer: 'localStorage',
+                    ttl: null,
+                    syncToBackend: false
+                });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to save to cache', { page: 'trade-history-page', key, error });
+            }
+        }
+    }
+
+    /**
+     * Initialize page - called from UnifiedAppInitializer
+     */
+    async function initializePage() {
+        if (isPageInitialized) {
+            if (window.Logger) {
+                window.Logger.info('Page already initialized, skipping...', { page: 'trade-history-page' });
+            }
+            return;
+        }
+
+        try {
+            if (window.Logger) {
+                window.Logger.info('📊 Initializing Trade History Page...', { page: 'trade-history-page' });
+            }
+
+            // 1. Wait for UnifiedCacheManager
+            await waitForCacheManager();
+
+            // 2. Wait for HeaderSystem
+            await initializeHeader();
+
+            // 3. Wait for TradingView libraries
+            await waitForTradingView();
+
+            // 4. Load mock data (from cache or fresh)
+            const data = await loadDataFromCache();
+            if (!data) {
+                if (window.Logger) {
+                    window.Logger.error('Failed to load data, cannot initialize page', { page: 'trade-history-page' });
+                }
+                return;
+            }
+
+            // 5. Load selected trade ID from cache if exists
+            const cachedSelectedId = await window.UnifiedCacheManager?.get(CACHE_KEY_SELECTED_TRADE_ID);
+            if (cachedSelectedId) {
+                selectedTradeId = cachedSelectedId;
     } else {
-        // DOM already loaded
-        initializePage();
+                // Default to first trade in mock data
+                selectedTradeId = data.selectedTrade?.id || null;
+            }
+
+            // 6. Register tables
+            registerPlanVsExecutionTable();
+
+            // 7. Setup HeaderSystem filter integration
+            setupHeaderFiltersIntegration();
+
+            // 8. Load page state (sections, chart zoom, etc.)
+            await loadPageState();
+
+            // 9. Render page
+            await renderPage(data);
+
+            isPageInitialized = true;
+
+            if (window.Logger) {
+                window.Logger.info('✅ Trade History Page initialized successfully', { page: 'trade-history-page' });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error initializing Trade History Page', { page: 'trade-history-page', error });
+            }
+            throw error;
+        }
+    }
+
+    /**
+     * Render page with data
+     */
+    async function renderPage(data) {
+        if (!data) return;
+
+        try {
+            // Render statistics
+            renderStatistics(data.statistics);
+
+            // Render trade details
+            renderTradeDetails(data.selectedTrade, data.conditions);
+
+            // Render timeline steps
+            renderTimelineSteps(data.timelineData);
+
+            // Initialize timeline chart with data (after a short delay to ensure DOM is ready)
+            setTimeout(async () => {
+                try {
+                    // Check if initTimelineChart exists (from HTML script)
+                    if (typeof window.initTimelineChart === 'function') {
+                        await window.initTimelineChart();
+                        // Restore chart zoom state after chart is initialized
+                        setTimeout(() => {
+                            if (window.tradeHistoryPage && typeof window.tradeHistoryPage.restoreChartZoomState === 'function') {
+                                window.tradeHistoryPage.restoreChartZoomState();
+                            }
+                        }, 500);
+                    } else {
+                        if (window.Logger) {
+                            window.Logger.warn('initTimelineChart not found in HTML, chart may not initialize', { page: 'trade-history-page' });
+                        }
+                    }
+                } catch (error) {
+                    if (window.Logger) {
+                        window.Logger.error('Error initializing timeline chart', { page: 'trade-history-page', error });
+                    }
+                }
+            }, 300);
+
+            // Render plan vs execution comparison
+            renderPlanVsExecution(data.planVsExecution);
+
+            // Load linked items (already handled by existing function)
+            loadLinkedItemsForTrade();
+
+            if (window.Logger) {
+                window.Logger.info('Page rendered successfully', { page: 'trade-history-page' });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error rendering page', { page: 'trade-history-page', error });
+            }
+        }
+    }
+
+    /**
+     * Render statistics section
+     */
+    function renderStatistics(statistics) {
+        if (!statistics) return;
+
+        // Duration
+        const durationEl = document.getElementById('statDuration');
+        if (durationEl) {
+            durationEl.textContent = `${statistics.durationDays} ימים`;
+            durationEl.classList.remove('loading');
+        }
+
+        // Total P/L
+        const totalPLEl = document.getElementById('statTotalPL');
+        const totalPLPercentEl = document.getElementById('statTotalPLPercent');
+        if (totalPLEl && window.FieldRendererService) {
+            totalPLEl.innerHTML = window.FieldRendererService.renderAmount(statistics.totalPL, '$', 0, true);
+            totalPLEl.classList.remove('loading');
+            
+            if (totalPLPercentEl) {
+                const percent = window.FieldRendererService.renderNumericValue(statistics.totalPLPercent, '%', true);
+                totalPLPercentEl.innerHTML = `(${percent})`;
+                totalPLPercentEl.classList.remove('loading');
+                if (statistics.totalPL >= 0) {
+                    totalPLPercentEl.classList.add('positive');
+                }
+            }
+        }
+
+        // Return percent
+        const returnPercentEl = document.getElementById('statReturnPercent');
+        if (returnPercentEl && window.FieldRendererService) {
+            returnPercentEl.innerHTML = window.FieldRendererService.renderNumericValue(statistics.totalPLPercent, '%', true);
+            returnPercentEl.classList.remove('loading');
+            if (statistics.totalPLPercent >= 0) {
+                returnPercentEl.classList.add('positive');
+            }
+        }
+
+        // Execution count
+        const executionCountEl = document.getElementById('statExecutionCount');
+        if (executionCountEl) {
+            executionCountEl.textContent = statistics.executionCount || 0;
+            executionCountEl.classList.remove('loading');
+        }
+    }
+
+    /**
+     * Render trade details using FieldRendererService
+     */
+    function renderTradeDetails(trade, conditions) {
+        if (!trade) return;
+
+        // Ticker
+        const tickerEl = document.getElementById('tradeTicker');
+        if (tickerEl) {
+            tickerEl.textContent = trade.ticker_symbol || trade.ticker?.symbol || '-';
+            tickerEl.classList.remove('loading');
+        }
+
+        // Side
+        const sideEl = document.getElementById('tradeSide');
+        if (sideEl) {
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderSide === 'function') {
+                sideEl.innerHTML = window.FieldRendererService.renderSide(trade.side);
+            } else {
+                sideEl.innerHTML = `<span class="badge bg-success">${trade.side || '-'}</span>`;
+            }
+            sideEl.classList.remove('loading');
+        }
+
+        // Investment type
+        const investmentTypeEl = document.getElementById('tradeInvestmentType');
+        if (investmentTypeEl) {
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderType === 'function') {
+                investmentTypeEl.innerHTML = window.FieldRendererService.renderType(trade.investment_type);
+            } else {
+                investmentTypeEl.textContent = getInvestmentTypeText(trade.investment_type);
+            }
+            investmentTypeEl.classList.remove('loading');
+        }
+
+        // Status
+        updateTradeStatusBadge(trade.status);
+
+        // Account
+        const accountEl = document.getElementById('tradeAccount');
+        if (accountEl) {
+            accountEl.textContent = trade.trading_account?.name || `Account #${trade.trading_account_id || '-'}`;
+            accountEl.classList.remove('loading');
+        }
+
+        // Dates - using DateNormalizationService if available
+        const planDateEl = document.getElementById('tradePlanDate');
+        if (planDateEl && trade.created_at) {
+            planDateEl.textContent = formatDate(trade.created_at);
+            planDateEl.classList.remove('loading');
+        }
+
+        const openDateEl = document.getElementById('tradeOpenDate');
+        if (openDateEl && trade.opened_at) {
+            openDateEl.textContent = formatDate(trade.opened_at);
+            openDateEl.classList.remove('loading');
+        }
+
+        const entryDateEl = document.getElementById('tradeEntryDate');
+        if (entryDateEl && trade.opened_at) {
+            entryDateEl.textContent = formatDate(trade.opened_at);
+            entryDateEl.classList.remove('loading');
+        }
+
+        const closeDateEl = document.getElementById('tradeCloseDate');
+        if (closeDateEl && trade.closed_at) {
+            closeDateEl.textContent = formatDate(trade.closed_at);
+            closeDateEl.classList.remove('loading');
+        }
+
+        // Quantities
+        const plannedQtyEl = document.getElementById('tradePlannedQuantity');
+        if (plannedQtyEl && trade.planned_quantity !== undefined) {
+            plannedQtyEl.textContent = `${trade.planned_quantity || 0} מניות`;
+            plannedQtyEl.classList.remove('loading');
+        }
+
+        const maxQtyEl = document.getElementById('tradeMaxQuantity');
+        if (maxQtyEl && trade.planned_quantity !== undefined) {
+            maxQtyEl.textContent = `${trade.planned_quantity || 0} מניות`;
+            maxQtyEl.classList.remove('loading');
+        }
+
+        const totalPurchasesEl = document.getElementById('tradeTotalPurchases');
+        if (totalPurchasesEl && trade.planned_quantity !== undefined) {
+            totalPurchasesEl.textContent = `${trade.planned_quantity || 0} מניות`;
+            totalPurchasesEl.classList.remove('loading');
+        }
+
+        // Conditions
+        const conditionsEl = document.getElementById('tradeConditions');
+        if (conditionsEl && conditions && Array.isArray(conditions)) {
+            if (conditions.length > 0) {
+                conditionsEl.innerHTML = conditions.map(cond => 
+                    `<div><a href="#" data-onclick="showConditionDetails(${cond.id}); return false;">${cond.description}</a></div>`
+                ).join('');
+            } else {
+                conditionsEl.innerHTML = '<span class="text-muted">-</span>';
+            }
+            conditionsEl.classList.remove('loading');
+        }
+
+        // P/L
+        const plel = document.getElementById('tradePL');
+        if (plel && window.FieldRendererService) {
+            const realizedPL = window.FieldRendererService.renderAmount(trade.realized_pl || trade.total_pl || 0, '$', 0, true);
+            const unrealizedPL = trade.unrealized_pl !== undefined && trade.unrealized_pl !== null 
+                ? window.FieldRendererService.renderAmount(trade.unrealized_pl, '$', 0, true)
+                : '<span class="text-muted">-</span>';
+            const totalPL = window.FieldRendererService.renderAmount(trade.total_pl || trade.realized_pl || 0, '$', 0, true);
+            
+            plel.innerHTML = `
+                <div>ממומש: ${realizedPL}</div>
+                <div>לא ממומש: ${unrealizedPL}</div>
+                <div><strong>סה"כ: ${totalPL}</strong></div>
+            `;
+            plel.classList.remove('loading');
+        }
+    }
+
+    /**
+     * Render timeline steps using FieldRendererService
+     */
+    function renderTimelineSteps(timelineData) {
+        if (!timelineData || !Array.isArray(timelineData)) return;
+
+        const timelineEl = document.getElementById('timelineAbsolute');
+        if (!timelineEl) return;
+
+        timelineEl.innerHTML = timelineData.map((step, index) => {
+            const dateStr = formatDate(step.date);
+            
+            // Determine step type and classes
+            let stepClass = 'timeline-step-absolute';
+            let pointColor = '';
+            let iconPath = '';
+            let title = step.title || step.type || '-';
+
+            if (step.type === 'Note') {
+                stepClass += ' timeline-note';
+                pointColor = 'var(--info-color, #17a2b8)';
+                iconPath = '/trading-ui/images/icons/entities/notes.svg';
+            } else if (step.type === 'Cash Flow') {
+                stepClass += ' timeline-cashflow';
+                pointColor = 'var(--secondary-color, #fc5a06)';
+                iconPath = '/trading-ui/images/icons/entities/cash_flows.svg';
+            } else if (step.type === 'Alert') {
+                stepClass += ' timeline-alert';
+                pointColor = 'var(--warning-color, #ffc107)';
+                iconPath = '/trading-ui/images/icons/entities/alerts.svg';
+            } else if (step.type === 'Trade Plan') {
+                iconPath = '/trading-ui/images/icons/entities/trade_plans.svg';
+            } else if (step.type === 'Execution') {
+                stepClass += ' execution-title';
+                iconPath = '/trading-ui/images/icons/entities/executions.svg';
+            }
+
+            let detailsHTML = '';
+            let plHTML = '';
+            let actionHTML = '';
+
+            if (step.type === 'Execution') {
+                const priceStr = step.price ? `$${step.price}` : '-';
+                const plValue = step.pl !== undefined ? step.pl : 0;
+                
+                if (window.FieldRendererService) {
+                    plHTML = window.FieldRendererService.renderAmount(plValue, '$', 2, true);
+                } else {
+                    const plClass = plValue >= 0 ? 'numeric-value-positive' : (plValue < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
+                    plHTML = `<span class="${plClass}">$${Math.abs(plValue).toFixed(2)}</span>`;
+                }
+
+                actionHTML = `
+                    <div class="timeline-step-details execution-price-pl">
+                        <span class="execution-price">${priceStr}</span>
+                        <span class="execution-pl me-2">P/L: ${plHTML}</span>
+                    </div>
+                `;
+            } else if (step.type === 'Cash Flow' && step.amount) {
+                if (window.FieldRendererService) {
+                    detailsHTML = `<div class="timeline-step-details cashflow-amount">${window.FieldRendererService.renderAmount(step.amount, '$', 2, true)}</div>`;
+                } else {
+                    detailsHTML = `<div class="timeline-step-details cashflow-amount"><span class="numeric-value-positive">$${step.amount.toFixed(2)}</span></div>`;
+                }
+            } else if (step.displayText) {
+                detailsHTML = `<div class="timeline-step-details">${step.displayText}</div>`;
+            }
+
+            const stepId = step.id || index;
+            const onClickType = step.type === 'Trade Plan' ? 'plan' : 
+                               (step.type === 'Execution' ? 'execution' : 
+                               (step.type === 'Cash Flow' ? 'cashflow' : 
+                               (step.type === 'Note' ? 'note' : 
+                               (step.type === 'Alert' ? 'alert' : 'default'))));
+
+            let onClickFn = '';
+            if (step.type === 'Cash Flow') {
+                onClickFn = `showCashFlowDetails(${stepId})`;
+            } else if (step.type === 'Note') {
+                onClickFn = `showNoteDetails(${stepId})`;
+            } else if (step.type === 'Alert') {
+                onClickFn = `showAlertDetails(${stepId})`;
+            } else {
+                onClickFn = `showExecutionDetails(${stepId}, '${onClickType}')`;
+            }
+
+            return `
+                <div class="${stepClass}" data-step="${index}" data-onclick="selectTimelineStep(${index})">
+                    <div class="timeline-point-absolute" ${pointColor ? `style="background-color: ${pointColor};"` : ''}></div>
+                    <div class="timeline-step-info">
+                        <div class="timeline-step-title ${step.type === 'Execution' ? 'execution-title' : ''}">
+                            <img src="${iconPath}" alt="${step.type}" class="entity-icon-small">
+                            ${title}
+                        </div>
+                        <div class="timeline-step-date">${dateStr}</div>
+                        ${detailsHTML}
+                        ${actionHTML}
+                        <div class="timeline-step-details"><strong>מזהה:</strong> #${stepId}</div>
+                        <a href="#" class="timeline-step-link" data-onclick="${onClickFn}; return false;">פרטים מלאים →</a>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        timelineEl.classList.remove('loading');
+    }
+
+    /**
+     * Render plan vs execution comparison table
+     */
+    function renderPlanVsExecution(comparisonData) {
+        if (!comparisonData || !Array.isArray(comparisonData)) return;
+
+        // Store data for table system
+        planVsExecutionData = comparisonData;
+
+        // Register table if not already registered
+        registerPlanVsExecutionTable();
+
+        // Update table with data
+        updatePlanVsExecutionTable(comparisonData);
+    }
+
+    /**
+     * Register plan vs execution table with UnifiedTableSystem
+     */
+    function registerPlanVsExecutionTable() {
+        if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {
+            if (window.Logger) {
+                window.Logger.warn('UnifiedTableSystem not available for plan vs execution table registration', { page: 'trade-history-page' });
+            }
+            return false;
+        }
+
+        const tableType = 'trade-history-plan-vs-execution';
+
+        // Check if already registered
+        if (window.UnifiedTableSystem.registry.isRegistered && window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+            return true;
+        }
+
+        // Render functions for each column
+        const renderCategory = (row) => {
+            const icon = row.categoryIcon || 'info-circle';
+            return `
+                <strong>
+                    <img src="../../images/icons/tabler/${icon}.svg" width="16" height="16" alt="icon" class="icon">
+                    ${row.category}
+                </strong>
+            `;
+        };
+
+        const renderPlannedValue = (row) => {
+            return renderComparisonValue(row.planned);
+        };
+
+        const renderTradeValue = (row) => {
+            return renderComparisonValue(row.trade);
+        };
+
+        const renderExecutedValue = (row) => {
+            return renderComparisonValue(row.executed);
+        };
+
+        const renderComparisonStatus = (row) => {
+            const statusBadgeClass = `status-badge status-${row.status}`;
+            const statusIcon = row.statusIcon || 'info-circle';
+            return `
+                <span class="${statusBadgeClass}">
+                    <img src="../../images/icons/tabler/${statusIcon}.svg" width="16" height="16" alt="${statusIcon}" class="icon">
+                    ${row.statusText || ''}
+                </span>
+            `;
+        };
+
+        const renderComparisonValue = (value) => {
+            if (!value || (value.quantity === null && value.amount === null && !value.description)) {
+                return '<div class="comparison-value"><div class="value">-</div></div>';
+            }
+
+            let html = '';
+            if (value.quantity !== null && value.quantity !== undefined) {
+                html += `<div class="value">${value.quantity} מניות</div>`;
+            } else if (value.amount !== null && value.amount !== undefined) {
+                if (window.FieldRendererService) {
+                    html += `<div class="value">${window.FieldRendererService.renderAmount(value.amount, '$', 0, true)}</div>`;
+                } else {
+                    html += `<div class="value">$${value.amount}</div>`;
+                }
+            }
+
+            if (value.price) {
+                const priceDisplay = value.isEstimated ? `${value.price} (יעד)` : value.price;
+                html += `<div class="price">@ $${priceDisplay}</div>`;
+            }
+
+            if (value.date) {
+                const dateDisplay = value.isEstimated ? `${formatDate(value.date)} (משוער)` : formatDate(value.date);
+                html += `<div class="date">${dateDisplay}</div>`;
+            }
+
+            if (value.description) {
+                html += `<div class="description">${value.description}</div>`;
+            }
+
+            const valueClass = value === null ? 'planned' : (value.amount !== undefined ? 'executed' : 'trade');
+            return `<div class="comparison-value ${valueClass}">${html}</div>`;
+        };
+
+        // Register table
+        window.UnifiedTableSystem.registry.register(tableType, {
+            dataGetter: () => planVsExecutionData || [],
+            updateFunction: (data) => updatePlanVsExecutionTable(data),
+            tableSelector: '#planVsExecutionTable',
+            columns: [
+                { 
+                    key: 'category', 
+                    header: 'קטגוריה',
+                    render: (row) => renderCategory(row)
+                },
+                { 
+                    key: 'planned', 
+                    header: 'תוכנית',
+                    render: (row) => renderPlannedValue(row)
+                },
+                { 
+                    key: 'trade', 
+                    header: 'טרייד',
+                    render: (row) => renderTradeValue(row)
+                },
+                { 
+                    key: 'executed', 
+                    header: 'ביצוע',
+                    render: (row) => renderExecutedValue(row)
+                },
+                { 
+                    key: 'status', 
+                    header: 'סטטוס',
+                    render: (row) => renderComparisonStatus(row)
+                }
+            ],
+            sortable: false, // Comparison table doesn't need sorting
+            filterable: false // Comparison table doesn't need filtering
+        });
+
+        if (window.Logger) {
+            window.Logger.info('✅ Registered plan vs execution table with UnifiedTableSystem', { page: 'trade-history-page' });
+        }
+
+        return true;
+    }
+
+    /**
+     * Update plan vs execution table with data
+     */
+    function updatePlanVsExecutionTable(comparisonData) {
+        if (!comparisonData || !Array.isArray(comparisonData)) return;
+
+        const tbodyEl = document.getElementById('planVsExecutionTableBody');
+        if (!tbodyEl) return;
+
+        // Render helper function
+        const renderValue = (value) => {
+            if (!value || (value.quantity === null && value.amount === null && !value.description)) {
+                return '<div class="value">-</div>';
+            }
+
+            let html = '';
+            if (value.quantity !== null && value.quantity !== undefined) {
+                html += `<div class="value">${value.quantity} מניות</div>`;
+            } else if (value.amount !== null && value.amount !== undefined) {
+                if (window.FieldRendererService) {
+                    html += `<div class="value">${window.FieldRendererService.renderAmount(value.amount, '$', 0, true)}</div>`;
+                } else {
+                    html += `<div class="value">$${value.amount}</div>`;
+                }
+            }
+
+            if (value.price) {
+                const priceDisplay = value.isEstimated ? `${value.price} (יעד)` : value.price;
+                html += `<div class="price">@ $${priceDisplay}</div>`;
+            }
+
+            if (value.date) {
+                const dateDisplay = value.isEstimated ? `${formatDate(value.date)} (משוער)` : formatDate(value.date);
+                html += `<div class="date">${dateDisplay}</div>`;
+            }
+
+            if (value.description) {
+                html += `<div class="description">${value.description}</div>`;
+            }
+
+            return html;
+        };
+
+        planVsExecutionData = comparisonData;
+        tbodyEl.innerHTML = comparisonData.map(row => {
+            const statusBadgeClass = `status-badge status-${row.status}`;
+            const statusIcon = row.statusIcon || 'info-circle';
+
+            return `
+                <tr>
+                    <td>
+                        <strong>
+                            <img src="../../images/icons/tabler/${row.categoryIcon || 'info-circle'}.svg" width="16" height="16" alt="icon" class="icon">
+                            ${row.category}
+                        </strong>
+                    </td>
+                    <td>
+                        <div class="comparison-value planned">
+                            ${renderValue(row.planned)}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="comparison-value trade">
+                            ${renderValue(row.trade)}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="comparison-value executed">
+                            ${renderValue(row.executed)}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="${statusBadgeClass}">
+                            <img src="../../images/icons/tabler/${statusIcon}.svg" width="16" height="16" alt="${statusIcon}" class="icon">
+                            ${row.statusText || ''}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    /**
+     * Setup HeaderSystem filter integration
+     */
+    function setupHeaderFiltersIntegration() {
+        // The HeaderSystem should automatically handle filters
+        // We just need to ensure the page is ready for filter updates
+        if (window.headerSystem && window.headerSystem.filterManager) {
+            if (window.Logger) {
+                window.Logger.info('HeaderSystem filter manager available', { page: 'trade-history-page' });
+            }
+        } else {
+            if (window.Logger) {
+                window.Logger.warn('HeaderSystem filter manager not available', { page: 'trade-history-page' });
+            }
+        }
+    }
+
+    /**
+     * Save page state using PageStateManager
+     */
+    async function savePageState() {
+        try {
+            if (!window.PageStateManager) {
+                if (window.Logger) {
+                    window.Logger.warn('PageStateManager not available', { page: 'trade-history-page' });
+                }
+                return false;
+            }
+
+            // Initialize PageStateManager if needed
+            if (!window.PageStateManager.initialized) {
+                await window.PageStateManager.initialize();
+            }
+
+            const pageName = 'trade-history-page';
+
+            // Get section states
+            const sections = {};
+            document.querySelectorAll('.content-section, .top-section').forEach(section => {
+                const sectionId = section.id;
+                if (sectionId) {
+                    const body = section.querySelector('.section-body');
+                    const isHidden = section.classList.contains('collapsed') || 
+                                   section.style.display === 'none' ||
+                                   (body && (!body.offsetParent || body.style.display === 'none'));
+                    sections[sectionId] = isHidden;
+                }
+            });
+
+            // Get chart zoom state if chart exists
+            let chartVisibleRange = null;
+            if (timelineChart) {
+                try {
+                    const timeScale = timelineChart.timeScale();
+                    chartVisibleRange = timeScale.getVisibleRange();
+                } catch (error) {
+                    if (window.Logger) {
+                        window.Logger.warn('Error getting chart zoom state', { page: 'trade-history-page', error });
+                    }
+                }
+            }
+
+            // Save state
+            const saved = await window.PageStateManager.savePageState(pageName, {
+                sections: sections,
+                entityFilters: {
+                    selectedTradeId: selectedTradeId,
+                    chartVisibleRange: chartVisibleRange
+                }
+            });
+
+            if (saved && window.Logger) {
+                window.Logger.debug('Saved page state', { page: 'trade-history-page' });
+            }
+
+            return saved;
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error saving page state', { page: 'trade-history-page', error });
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Load page state using PageStateManager
+     */
+    async function loadPageState() {
+        try {
+            if (!window.PageStateManager) {
+                if (window.Logger) {
+                    window.Logger.warn('PageStateManager not available', { page: 'trade-history-page' });
+                }
+                return null;
+            }
+
+            // Initialize PageStateManager if needed
+            if (!window.PageStateManager.initialized) {
+                await window.PageStateManager.initialize();
+            }
+
+            const pageName = 'trade-history-page';
+            const state = await window.PageStateManager.loadPageState(pageName);
+
+            if (!state) {
+                return null;
+            }
+
+            // Restore section states (ui-utils.js handles this automatically, but we can restore here too)
+            if (state.sections) {
+                Object.keys(state.sections).forEach(sectionId => {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        const isHidden = state.sections[sectionId];
+                        if (isHidden) {
+                            section.classList.add('collapsed');
+                            const body = section.querySelector('.section-body');
+                            if (body) {
+                                body.style.display = 'none';
+                            }
+                            const toggleIcon = section.querySelector('.section-toggle-icon');
+                            if (toggleIcon) {
+                                toggleIcon.textContent = '▶';
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Restore filter states
+            if (state.filters) {
+                const { ticker, side, investmentType, dateFrom, dateTo } = state.filters;
+                if (ticker && document.getElementById('filterTicker')) {
+                    document.getElementById('filterTicker').value = ticker;
+                }
+                if (side && document.getElementById('filterSide')) {
+                    document.getElementById('filterSide').value = side;
+                }
+                if (investmentType && document.getElementById('filterInvestmentType')) {
+                    document.getElementById('filterInvestmentType').value = investmentType;
+                }
+                if (dateFrom && document.getElementById('filterDateFrom')) {
+                    document.getElementById('filterDateFrom').value = dateFrom;
+                }
+                if (dateTo && document.getElementById('filterDateTo')) {
+                    document.getElementById('filterDateTo').value = dateTo;
+                }
+                // Reapply filters after restoring state (without debounce to restore immediately)
+                if (ticker || side || investmentType || dateFrom || dateTo) {
+                    applyTradeFiltersInternal();
+                }
+            }
+
+            // Restore selected trade ID
+            if (state.entityFilters && state.entityFilters.selectedTradeId) {
+                selectedTradeId = state.entityFilters.selectedTradeId;
+                // Save to cache as well
+                await saveToCache(CACHE_KEY_SELECTED_TRADE_ID, selectedTradeId);
+            }
+
+            // Store chart state for restoration after chart initialization
+            if (state.entityFilters && state.entityFilters.chartVisibleRange) {
+                window._tradeHistoryPageChartState = {
+                    visibleRange: state.entityFilters.chartVisibleRange
+                };
+            }
+
+            if (window.Logger) {
+                window.Logger.debug('Loaded page state', { page: 'trade-history-page' });
+            }
+
+            return state;
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error loading page state', { page: 'trade-history-page', error });
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Restore chart zoom state after chart is initialized
+     */
+    function restoreChartZoomState() {
+        if (!timelineChart || !window._tradeHistoryPageChartState) return;
+
+        try {
+            const state = window._tradeHistoryPageChartState;
+            if (state.visibleRange) {
+                const timeScale = timelineChart.timeScale();
+                timeScale.setVisibleRange({
+                    from: state.visibleRange.from,
+                    to: state.visibleRange.to
+                });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Error restoring chart zoom state', { page: 'trade-history-page', error });
+            }
+        }
     }
 
     // ===== Export =====
@@ -478,7 +1503,14 @@
         clearSelectedTrade,
         getCSSVariableValue,
         getInvestmentTypeText,
-        formatDate
+        formatDate,
+        initializePage, // Export for UnifiedAppInitializer
+        loadDataFromCache,
+        saveToCache,
+        savePageState,
+        loadPageState,
+        restoreChartZoomState,
+        getTimelineData: () => tradeHistoryData?.timelineData || []
     };
 
 })();

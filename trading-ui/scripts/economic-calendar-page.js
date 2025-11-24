@@ -96,9 +96,12 @@
         if (errorEl) errorEl.classList.remove('hidden');
         if (errorMsgEl) errorMsgEl.textContent = message || 'שגיאה לא ידועה';
         
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה', message || 'שגיאה לא ידועה');
+        }
         if (window.Logger) {
             window.Logger.error('Economic Calendar Widget Error', { 
-                page: 'economic-calendar-page',
+                page: 'economic-calendar-page', 
                 message 
             });
         }
@@ -391,6 +394,234 @@
         return config;
     }
 
+    // ===== EVENT MANAGEMENT =====
+
+    /**
+     * Map TradingView importance to our format
+     * @param {number|string} importance - TradingView importance (-1, 0, 1 or string)
+     * @returns {string} Our importance format (high, medium, low)
+     */
+    function mapTradingViewImportance(importance) {
+        if (typeof importance === 'string') {
+            const lower = importance.toLowerCase();
+            if (lower.includes('high') || lower.includes('גבוה')) return 'high';
+            if (lower.includes('medium') || lower.includes('בינוני')) return 'medium';
+            if (lower.includes('low') || lower.includes('נמוך')) return 'low';
+        }
+        if (typeof importance === 'number') {
+            if (importance === 1 || importance === '1') return 'high';
+            if (importance === 0 || importance === '0') return 'medium';
+            if (importance === -1 || importance === '-1') return 'low';
+        }
+        return 'medium'; // Default
+    }
+
+    /**
+     * Map TradingView event type to our format
+     * @param {string} type - TradingView event type
+     * @returns {string} Our event type format
+     */
+    function mapTradingViewEventType(type) {
+        if (!type) return 'other';
+        const lower = type.toLowerCase();
+        if (lower.includes('interest') || lower.includes('rate') || lower.includes('ריבית')) return 'interest-rate';
+        if (lower.includes('gdp') || lower.includes('תוצר')) return 'gdp';
+        if (lower.includes('employment') || lower.includes('job') || lower.includes('תעסוקה')) return 'employment';
+        if (lower.includes('inflation') || lower.includes('cpi') || lower.includes('אינפלציה')) return 'inflation';
+        return 'other';
+    }
+
+    /**
+     * Save event from widget
+     * @param {Object} eventData - Event data from TradingView widget
+     */
+    function saveEventFromWidget(eventData) {
+        if (!eventData) {
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה', 'נתוני אירוע לא תקינים');
+            }
+            return;
+        }
+
+        // Map TradingView event to our format
+        const newEvent = {
+            id: Date.now(), // Temporary ID
+            title: eventData.title || eventData.name || 'אירוע כלכלי',
+            date: eventData.date || new Date().toISOString(),
+            time: eventData.time || '00:00',
+            country: eventData.country || 'US',
+            importance: mapTradingViewImportance(eventData.importance),
+            eventType: mapTradingViewEventType(eventData.category || eventData.type),
+            description: eventData.description || '',
+            actualValue: eventData.actual || null,
+            forecastValue: eventData.forecast || null,
+            previousValue: eventData.previous || null,
+            linkedTrades: [],
+            savedAt: new Date().toISOString(),
+            userId: 1
+        };
+
+        // Check if event already exists
+        const exists = state.savedEvents.some(e => 
+            e.title === newEvent.title && 
+            e.date === newEvent.date && 
+            e.time === newEvent.time
+        );
+
+        if (exists) {
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showWarning('האירוע כבר שמור', 'האירוע כבר נמצא ברשימת האירועים השמורים');
+            }
+            return;
+        }
+
+        // Add to saved events
+        state.savedEvents.push(newEvent);
+
+        // Save to localStorage (mock - in real system would save to backend)
+        try {
+            localStorage.setItem('economic-calendar-saved-events', JSON.stringify(state.savedEvents));
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to save events to localStorage', {
+                    page: 'economic-calendar-page',
+                    error: error.message
+                });
+            }
+        }
+
+        // Re-render
+        renderSavedEvents();
+
+        // Update summary
+        if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+            const config = window.INFO_SUMMARY_CONFIGS['economic-calendar-page'];
+            if (config && state.savedEvents.length > 0) {
+                window.InfoSummarySystem.calculateAndRender(state.savedEvents, config);
+            }
+        }
+
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showSuccess('האירוע נשמר בהצלחה');
+        }
+
+        if (window.Logger) {
+            window.Logger.info('Event saved from widget', {
+                page: 'economic-calendar-page',
+                event: newEvent.title
+            });
+        }
+    }
+
+    /**
+     * Remove event from saved events
+     * @param {number} eventId - Event ID to remove
+     */
+    function removeEvent(eventId) {
+        const index = state.savedEvents.findIndex(e => e.id === eventId);
+        if (index === -1) {
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה', 'האירוע לא נמצא');
+            }
+            return;
+        }
+
+        const event = state.savedEvents[index];
+        state.savedEvents.splice(index, 1);
+
+        // Save to localStorage
+        try {
+            localStorage.setItem('economic-calendar-saved-events', JSON.stringify(state.savedEvents));
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to save events to localStorage', {
+                    page: 'economic-calendar-page',
+                    error: error.message
+                });
+            }
+        }
+
+        // Re-render
+        renderSavedEvents();
+
+        // Update summary
+        if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+            const config = window.INFO_SUMMARY_CONFIGS['economic-calendar-page'];
+            if (config && state.savedEvents.length > 0) {
+                window.InfoSummarySystem.calculateAndRender(state.savedEvents, config);
+            } else if (state.savedEvents.length === 0) {
+                // Clear summary if no events
+                const summaryContainer = document.getElementById('economic-calendar-summary');
+                if (summaryContainer) {
+                    summaryContainer.innerHTML = '';
+                }
+            }
+        }
+
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showSuccess(`האירוע "${event.title}" הוסר בהצלחה`);
+        }
+
+        if (window.Logger) {
+            window.Logger.info('Event removed', {
+                page: 'economic-calendar-page',
+                eventId: eventId
+            });
+        }
+    }
+
+    /**
+     * Show modal for saving event
+     */
+    function showSaveEventModal() {
+        // Simple prompt for now (can be replaced with proper modal)
+        const title = prompt('הזן כותרת האירוע:');
+        if (!title) return;
+
+        const date = prompt('הזן תאריך (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+        if (!date) return;
+
+        const time = prompt('הזן שעה (HH:MM):', '00:00');
+        if (!time) return;
+
+        const country = prompt('הזן מדינה (US, EU, UK, JP):', 'US');
+        const importance = prompt('הזן חשיבות (high, medium, low):', 'medium');
+        const eventType = prompt('הזן סוג אירוע (interest-rate, gdp, employment, inflation):', 'other');
+
+        const eventData = {
+            title: title,
+            date: date,
+            time: time,
+            country: country || 'US',
+            importance: importance || 'medium',
+            type: eventType || 'other'
+        };
+
+        saveEventFromWidget(eventData);
+    }
+
+    /**
+     * Setup widget event listeners for saving events
+     */
+    function setupWidgetEventListeners() {
+        // Show save button controls
+        const saveControls = document.getElementById('save-event-controls');
+        if (saveControls) {
+            saveControls.style.display = 'block';
+        }
+
+        // Setup button click handler
+        const saveButton = document.getElementById('save-event-from-widget-btn');
+        if (saveButton && !saveButton.dataset.listenerAdded) {
+            saveButton.addEventListener('click', () => {
+                showSaveEventModal();
+            });
+            saveButton.dataset.listenerAdded = 'true';
+        }
+    }
+
+    // ===== WIDGET MANAGEMENT =====
+
     /**
      * Initialize Economic Calendar Widget
      * @returns {Promise<void>}
@@ -409,28 +640,48 @@
         hideError();
 
         try {
-            // Wait for TradingViewWidgetsManager
+            // Wait for TradingViewWidgetsManager to be available
             const managerAvailable = await waitFor(() => {
                 return typeof window.TradingViewWidgetsManager !== 'undefined';
-            }, 10000);
+            }, 5000);
 
             if (!managerAvailable) {
                 throw new Error('TradingViewWidgetsManager not available after timeout');
             }
 
-            // Wait for cache system (optional)
+            // Wait for cache system (optional, non-blocking)
             if (window.cacheSystemReady !== undefined) {
-                await waitFor(() => window.cacheSystemReady === true, 5000);
+                // Use Promise.race to timeout quickly
+                await Promise.race([
+                    waitFor(() => window.cacheSystemReady === true, 2000), // Reduced from 5000
+                    new Promise(resolve => setTimeout(resolve, 2000)) // Max 2 seconds
+                ]).catch(() => {
+                    // Ignore timeout - cache is optional
+                });
             }
 
-            // Wait for preferences (optional)
-            await waitFor(() => {
-                return window.currentPreferences || window.userPreferences;
-            }, 5000);
+            // Wait for preferences (optional, non-blocking)
+            await Promise.race([
+                waitFor(() => {
+                    return window.currentPreferences || window.userPreferences;
+                }, 2000), // Reduced from 5000
+                new Promise(resolve => setTimeout(resolve, 2000)) // Max 2 seconds
+            ]).catch(() => {
+                // Ignore timeout - preferences are optional
+            });
 
-            // Initialize TradingViewWidgetsManager if needed
+            // Initialize TradingViewWidgetsManager if needed (blocking for widget creation)
             if (window.TradingViewWidgetsManager && !window.TradingViewWidgetsManager._initialized) {
                 await window.TradingViewWidgetsManager.init();
+                
+                // Wait for initialization to complete
+                await waitFor(() => {
+                    return window.TradingViewWidgetsManager._initialized === true;
+                }, 5000);
+            } else if (window.TradingViewWidgetsManager && window.TradingViewWidgetsManager._initialized) {
+                // Already initialized, continue
+            } else {
+                throw new Error('TradingViewWidgetsManager not available');
             }
 
             // Get widget configuration
@@ -456,6 +707,9 @@
             hideLoading();
             hideError();
 
+            // Setup event listeners after widget is loaded
+            setupWidgetEventListeners();
+
             if (window.NotificationSystem) {
                 window.NotificationSystem.showSuccess('לוח השנה הכלכלי נטען בהצלחה');
             }
@@ -474,6 +728,9 @@
                 window.NotificationSystem.showError('שגיאה', errorMessage);
             }
 
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה', 'שגיאה באתחול לוח כלכלי');
+            }
             if (window.Logger) {
                 window.Logger.error('Failed to initialize Economic Calendar Widget', {
                     page: 'economic-calendar-page',
@@ -598,43 +855,146 @@
             return;
         }
 
-        // Render events using FieldRendererService
-        const eventsHTML = state.savedEvents.map(event => {
-            const importanceBadge = window.FieldRendererService 
-                ? window.FieldRendererService.renderStatus(event.importance, 'economic-event')
-                : `<span class="badge bg-${event.importance === 'high' ? 'danger' : event.importance === 'medium' ? 'warning' : 'secondary'}">${event.importance}</span>`;
+        // Render events as table with two columns
+        const tableHTML = `
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>תאריך ושעה</th>
+                        <th>אירוע</th>
+                        <th>מדינה</th>
+                        <th>חשיבות</th>
+                        <th>סוג</th>
+                        <th>פעולות</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${state.savedEvents.map(event => {
+                        const importanceBadge = window.FieldRendererService 
+                            ? window.FieldRendererService.renderStatus(event.importance, 'economic-event')
+                            : `<span class="badge bg-${event.importance === 'high' ? 'danger' : event.importance === 'medium' ? 'warning' : 'secondary'}">${event.importance}</span>`;
 
-            const dateDisplay = event.date ? new Date(event.date).toLocaleDateString('he-IL') : '-';
-            const timeDisplay = event.time || '-';
+                        const dateDisplay = event.date ? new Date(event.date).toLocaleDateString('he-IL') : '-';
+                        const timeDisplay = event.time || '-';
+                        
+                        // Get icon for link using IconSystem (async, will be rendered after)
+                        const linkIconPlaceholder = '<span class="icon-placeholder" data-icon="link" data-size="16"></span>';
 
-            return `
-                <div class="list-group-item">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                ${importanceBadge}
-                                <span class="badge bg-primary">${event.eventType || '-'}</span>
-                                <span class="badge bg-secondary">${event.country || '-'}</span>
-                            </div>
-                            <h6 class="mb-1">${event.title || '-'}</h6>
-                            <p class="mb-1">${dateDisplay} ${timeDisplay}</p>
-                            ${event.description ? `<p class="mb-1 text-muted">${event.description}</p>` : ''}
-                            ${event.linkedTrades && event.linkedTrades.length > 0 
-                                ? `<small class="text-muted">
-                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> 
-                                    קשור לטריידים: ${event.linkedTrades.join(', ')}
-                                   </small>`
-                                : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
+                        return `
+                            <tr>
+                                <td>
+                                    <div>${dateDisplay}</div>
+                                    <small class="text-muted">${timeDisplay}</small>
+                                </td>
+                                <td>
+                                    <strong>${event.title || '-'}</strong>
+                                    ${event.description ? `<div class="text-muted small mt-1">${event.description}</div>` : ''}
+                                    ${event.linkedTrades && event.linkedTrades.length > 0 
+                                        ? `<div class="mt-1">
+                                            ${linkIconPlaceholder}
+                                            <small class="text-muted">קשור לטריידים: ${event.linkedTrades.join(', ')}</small>
+                                           </div>`
+                                        : ''}
+                                </td>
+                                <td><span class="badge bg-secondary">${event.country || '-'}</span></td>
+                                <td>${importanceBadge}</td>
+                                <td><span class="badge bg-primary">${event.eventType || '-'}</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger" data-onclick="window.economicCalendarPage?.removeEvent(${event.id})" title="הסר אירוע">
+                                        <span class="icon-placeholder" data-icon="trash" data-size="14"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
 
-        container.innerHTML = `<div class="list-group">${eventsHTML}</div>`;
+        container.innerHTML = tableHTML;
+        
+        // Initialize icons in the rendered table (async, don't block)
+        initializeIcons().catch(() => {
+            // Ignore errors - icons will load when ready
+        });
     }
 
     // ===== INITIALIZATION =====
+
+    /**
+     * Initialize icons using IconSystem
+     */
+    async function initializeIcons() {
+        // Wait for IconSystem to be ready
+        if (!window.IconSystem) {
+            await waitFor(() => {
+                return typeof window.IconSystem !== 'undefined';
+            }, 5000).catch(() => {
+                if (window.Logger) {
+                    window.Logger.warn('IconSystem not available', { page: 'economic-calendar-page' });
+                }
+                return;
+            });
+        }
+
+        // Initialize IconSystem if needed
+        if (window.IconSystem && !window.IconSystem.initialized) {
+            await window.IconSystem.initialize().catch(() => {
+                if (window.Logger) {
+                    window.Logger.warn('Failed to initialize IconSystem', { page: 'economic-calendar-page' });
+                }
+            });
+        }
+
+        if (!window.IconSystem || !window.IconSystem.initialized) {
+            if (window.Logger) {
+                window.Logger.warn('IconSystem not initialized, skipping icon rendering', { 
+                    page: 'economic-calendar-page' 
+                });
+            }
+            return;
+        }
+
+        // Replace all icon placeholders (only if they have a parent node)
+        const placeholders = Array.from(document.querySelectorAll('.icon-placeholder'));
+        
+        for (const placeholder of placeholders) {
+            // Check if placeholder has a parent (is in DOM)
+            if (!placeholder.parentNode) {
+                continue; // Skip if not in DOM
+            }
+
+            const iconName = placeholder.getAttribute('data-icon');
+            const size = placeholder.getAttribute('data-size') || '16';
+            
+            if (iconName) {
+                try {
+                    const iconHTML = await window.IconSystem.renderIcon('button', iconName, {
+                        size: size,
+                        alt: iconName,
+                        class: 'icon'
+                    });
+                    // Only replace if still has parent and is still in the list
+                    if (placeholder.parentNode && document.contains(placeholder)) {
+                        placeholder.outerHTML = iconHTML;
+                    }
+                } catch (error) {
+                    if (window.Logger) {
+                        window.Logger.warn('Failed to render icon', {
+                            page: 'economic-calendar-page',
+                            icon: iconName,
+                            error: error.message
+                        });
+                    }
+                    // Fallback - try to use img tag with path
+                    if (placeholder.parentNode && document.contains(placeholder)) {
+                        const fallbackPath = `/trading-ui/images/icons/tabler/${iconName}.svg`;
+                        placeholder.outerHTML = `<img src="${fallbackPath}" width="${size}" height="${size}" alt="${iconName}" class="icon" onerror="this.style.display='none'">`;
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Initialize Header System
@@ -683,35 +1043,74 @@
         // Initialize Header System first
         initializeHeader();
 
+        // Initialize icons
+        initializeIcons();
+
         // Initialize filters
         initializeFilters();
 
         // Initialize preferences integration
         initializePreferencesIntegration();
 
-        // Wait for required systems
-        await waitFor(() => {
-            return typeof window.TradingViewWidgetsManager !== 'undefined' &&
-                   typeof window.TradingViewWidgetsConfig !== 'undefined' &&
-                   typeof window.TradingViewWidgetsColors !== 'undefined';
-        }, 15000);
+        // Wait for required systems (reduced timeout for faster loading)
+        const systemsReady = await Promise.race([
+            waitFor(() => {
+                return typeof window.TradingViewWidgetsManager !== 'undefined' &&
+                       typeof window.TradingViewWidgetsConfig !== 'undefined' &&
+                       typeof window.TradingViewWidgetsColors !== 'undefined';
+            }, 5000), // Reduced from 15000 to 5000
+            new Promise(resolve => setTimeout(() => resolve(false), 5000)) // Max 5 seconds
+        ]);
 
-        // Initialize widget
-        await initializeEconomicCalendarWidget();
+        if (!systemsReady) {
+            if (window.Logger) {
+                window.Logger.warn('Some TradingView systems not available, continuing anyway', {
+                    page: 'economic-calendar-page'
+                });
+            }
+        }
 
-        // Load mock data
+        // Initialize widget in background (don't block on this - load data immediately)
+        // Load data first, then initialize widget
+        initializeEconomicCalendarWidget().catch(error => {
+            if (window.Logger) {
+                window.Logger.error('Widget initialization failed, but continuing with data load', {
+                    page: 'economic-calendar-page',
+                    error: error.message
+                });
+            }
+        });
+
+        // Load mock data (always do this, even if widget failed)
         if (window.EconomicEventsMockData) {
             state.savedEvents = window.EconomicEventsMockData;
+            
+            if (window.Logger) {
+                window.Logger.info('Loaded mock data', {
+                    page: 'economic-calendar-page',
+                    count: state.savedEvents.length
+                });
+            }
         }
 
         // Render saved events
         renderSavedEvents();
 
+        // Setup widget event listeners for saving events
+        setupWidgetEventListeners();
+
         // Update summary statistics (will be handled by InfoSummarySystem)
         if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
             const config = window.INFO_SUMMARY_CONFIGS['economic-calendar-page'];
-            if (config && state.savedEvents) {
+            if (config && state.savedEvents && state.savedEvents.length > 0) {
                 window.InfoSummarySystem.calculateAndRender(state.savedEvents, config);
+                
+                if (window.Logger) {
+                    window.Logger.info('Updated summary statistics', {
+                        page: 'economic-calendar-page',
+                        eventsCount: state.savedEvents.length
+                    });
+                }
             }
         }
     }
@@ -749,6 +1148,9 @@
         destroyWidget,
         handleFilterChange,
         renderSavedEvents,
+        saveEventFromWidget,
+        removeEvent,
+        showSaveEventModal,
         state: state
     };
 

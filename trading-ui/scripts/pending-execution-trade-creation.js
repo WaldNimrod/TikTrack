@@ -306,28 +306,26 @@
       const card = document.createElement('div');
       card.className = 'card trade-create-cluster-card mb-3';
       card.dataset.clusterId = cluster.cluster_id;
+      card.style.position = 'relative'; // For overlay positioning
 
       const summary = this.computeSelectionSummary(cluster, selectedIds);
+      const dateRange = cluster.stats?.date_range || {};
+      const totalValueDisplay = summary.totalValue ? `$${summary.totalValue.toFixed(2)}` : '-';
+      const averagePriceDisplay = summary.averagePrice ? `$${summary.averagePrice.toFixed(4)}` : '-';
+      const dateRangeText = dateRange.start ? this.renderDateRange(dateRange) : '';
 
       card.innerHTML = `
-        <div class=\"card-body\">
-          <div class=\"d-flex flex-wrap align-items-start gap-3\">
-            <div class=\"flex-grow-1\">
-              <div class=\"d-flex flex-wrap align-items-center gap-2 trade-create-cluster-header\">
+        <div class="card-body">
+          <div class="d-flex flex-wrap align-items-start gap-3">
+            <div class="flex-grow-1">
+              <div class="d-flex flex-wrap align-items-center gap-2 trade-create-cluster-header">
                 ${this.renderTickerBadge(cluster)}
                 ${this.renderAccountBadge(cluster)}
-                <span class=\"badge ${cluster.side === 'long' ? 'badge-long' : 'badge-short'}\">${cluster.side === 'long' ? 'לונג' : 'שורט'}</span>
-                <span class=\"text-muted small\">${cluster.stats.execution_count} ביצועים</span>
-              </div>
-              <div class=\"trade-create-summary mt-2\" data-cluster-summary=\"${cluster.cluster_id}\">
-                ${this.renderSummaryBadge('כמות', summary.totalQuantity.toLocaleString('en-US'))}
-                ${this.renderSummaryBadge('שווי', `$${summary.totalValue.toFixed(2)}`)}
-                ${this.renderSummaryBadge('מחיר ממוצע', summary.averagePrice ? `$${summary.averagePrice.toFixed(4)}` : '-')}
-                ${this.renderSummaryBadge('עלות עמלה', `$${summary.totalFee.toFixed(2)}`)}
-                ${this.renderSummaryBadge('נבחרו', `${summary.selectedCount}/${cluster.stats.execution_count}`)}
+                <span class="badge ${cluster.side === 'long' ? 'badge-long' : 'badge-short'}">${cluster.side === 'long' ? 'לונג' : 'שורט'}</span>
+                <span class="text-muted small">${cluster.stats.execution_count} ביצועים</span>
               </div>
             </div>
-            <div class=\"trade-create-actions d-flex flex-column gap-2 align-items-end\">
+            <div class="trade-create-actions d-flex gap-2 align-items-center">
               <button
                 data-button-type="APPROVE"
                 data-variant="small"
@@ -357,11 +355,31 @@
               </button>
             </div>
           </div>
-          <div class=\"trade-create-executions-table mt-3\">
-            ${this.renderExecutionsTable(cluster, selectedIds)}
+          <!-- Execution details - shown on hover -->
+          <div class="trade-create-cluster-details" data-role="cluster-details" data-cluster-id="${cluster.cluster_id}">
+            <div class="trade-create-summary mt-2 mb-3">
+              ${this.renderSummaryBadge('כמות', summary.totalQuantity.toLocaleString('en-US'))}
+              ${this.renderSummaryBadge('שווי', totalValueDisplay)}
+              ${this.renderSummaryBadge('מחיר ממוצע', averagePriceDisplay)}
+              ${this.renderSummaryBadge('עלות עמלה', `$${summary.totalFee.toFixed(2)}`)}
+              ${this.renderSummaryBadge('נבחרו', `${summary.selectedCount}/${cluster.stats.execution_count}`)}
+              ${dateRangeText ? `<span class="badge bg-body-secondary text-body trade-create-summary-badge">טווח: ${dateRangeText}</span>` : ''}
+            </div>
+            <div class="trade-create-executions-table">
+              ${this.renderExecutionsTable(cluster, selectedIds)}
+            </div>
           </div>
         </div>
       `;
+
+      // Add hover handlers for overlay effect
+      card.addEventListener('mouseenter', () => {
+        card.classList.add('is-hovered');
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        card.classList.remove('is-hovered');
+      });
 
       return card;
     },

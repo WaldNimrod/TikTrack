@@ -5,10 +5,11 @@ Schema & Data Detector
 
 Detects schema and data changes between development and production databases.
 Handles schema comparison, reference data comparison, preferences, and groups.
+
+Note: Uses SQLAlchemy to support PostgreSQL databases (SQLite support removed).
 """
 
 import json
-import sqlite3
 import sys
 from dataclasses import dataclass, asdict
 from pathlib import Path
@@ -23,6 +24,10 @@ try:
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     from logger import get_logger
+
+# Import SQLAlchemy for database connections
+from sqlalchemy import create_engine, text, inspect, MetaData
+from sqlalchemy.engine import Engine
 
 
 @dataclass
@@ -71,149 +76,196 @@ class SchemaDetector:
         self.project_root = project_root
         self.logger = get_logger()
         
-        # Priority: _Tmp/tiktrack.db > Backend/db/tiktrack.db
-        self.dev_db_candidates = [
-            project_root / "_Tmp" / "tiktrack.db",
-            project_root / "Backend" / "db" / "tiktrack.db"
-        ]
-        self.prod_db = project_root / "production" / "Backend" / "db" / "tiktrack.db"
+        # Get database URLs from config
+        sys.path.insert(0, str(project_root / "Backend"))
+        from config.settings import DATABASE_URL as DEV_DATABASE_URL
+        
+        sys.path.insert(0, str(project_root / "production" / "Backend"))
+        try:
+            from config.settings import DATABASE_URL as PROD_DATABASE_URL
+        except ImportError:
+            # Fallback if production config not available
+            PROD_DATABASE_URL = DEV_DATABASE_URL
+        
+        self.dev_db_url = DEV_DATABASE_URL
+        self.prod_db_url = PROD_DATABASE_URL
+        
+        # Create engines
+        self.dev_engine = create_engine(DEV_DATABASE_URL)
+        self.prod_engine = create_engine(PROD_DATABASE_URL)
     
-    def get_dev_db(self) -> Optional[Path]:
-        """Get development database path (prioritize _Tmp)"""
-        for db_path in self.dev_db_candidates:
-            if db_path.exists():
-                return db_path
-        return None
+    def get_dev_db_url(self) -> Optional[str]:
+        """Get development database URL"""
+        return self.dev_db_url
     
-    def fetch_tables(self, conn: sqlite3.Connection) -> List[str]:
+    def get_prod_db_url(self) -> Optional[str]:
+        """Get production database URL"""
+        return self.prod_db_url
+    
+    def fetch_tables(self, engine: Engine) -> List[str]:
         """Get all table names"""
-        cursor = conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name"
-        )
-        return [row[0] for row in cursor.fetchall()]
+        inspector = inspect(engine)
+        return inspector.get_table_names()
     
-    def fetch_columns(self, conn: sqlite3.Connection, table: str) -> List[ColumnInfo]:
+    def fetch_columns(self, engine: Engine, table: str) -> List[ColumnInfo]:
         """Get column information for a table"""
-        cursor = conn.execute(f"PRAGMA table_info('{table}')")
+        inspector = inspect(engine)
+        columns = inspector.get_columns(table)
+        
+        # Get primary key columns
+        pk_constraint = inspector.get_pk_constraint(table)
+        pk_columns = set(pk_constraint.get('constrained_columns', []))
+        
         return [
             ColumnInfo(
-                name=row[1],
-                type=row[2],
-                notnull=row[3],
-                default=row[4],
-                pk=row[5]
+                name=col['name'],
+                type=str(col['type']),
+                notnull=1 if not col.get('nullable', True) else 0,
+                default=str(col.get('default', '')) if col.get('default') is not None else None,
+                pk=1 if col['name'] in pk_columns else 0
             )
-            for row in cursor.fetchall()
+            for col in columns
         ]
     
-    def fetch_indexes(self, conn: sqlite3.Connection) -> Dict[str, str]:
+    def fetch_indexes(self, engine: Engine) -> Dict[str, str]:
         """Get all indexes"""
-        cursor = conn.execute(
-            "SELECT name, sql FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%'"
-        )
-        return {row[0]: (row[1] or "") for row in cursor.fetchall()}
+        inspector = inspect(engine)
+        indexes = {}
+        
+        for table_name in inspector.get_table_names():
+            table_indexes = inspector.get_indexes(table_name)
+            for idx in table_indexes:
+                # Generate index SQL representation
+                idx_name = idx['name']
+                idx_cols = ', '.join(idx['column_names'])
+                idx_unique = 'UNIQUE ' if idx.get('unique', False) else ''
+                indexes[idx_name] = f"CREATE {idx_unique}INDEX {idx_name} ON {table_name} ({idx_cols})"
+        
+        return indexes
     
-    def fetch_triggers(self, conn: sqlite3.Connection) -> Dict[str, str]:
+    def fetch_triggers(self, engine: Engine) -> Dict[str, str]:
         """Get all triggers"""
-        cursor = conn.execute(
-            "SELECT name, sql FROM sqlite_master WHERE type='trigger' AND name NOT LIKE 'sqlite_%'"
-        )
-        return {row[0]: (row[1] or "") for row in cursor.fetchall()}
+        # PostgreSQL doesn't expose triggers via inspect, need to query system tables
+        triggers = {}
+        
+        try:
+            with engine.connect() as conn:
+                # PostgreSQL system query for triggers
+                result = conn.execute(text("""
+                    SELECT trigger_name, event_manipulation, event_object_table, action_statement
+                    FROM information_schema.triggers
+                    WHERE trigger_schema = 'public'
+                """))
+                
+                for row in result:
+                    trigger_name = row[0]
+                    # Build trigger SQL representation
+                    triggers[trigger_name] = f"CREATE TRIGGER {trigger_name} ..."
+        except Exception as e:
+            # If query fails, return empty dict
+            self.logger.warning(f"  ⚠️  Could not fetch triggers: {e}")
+        
+        return triggers
     
-    def get_table_info(self, conn: sqlite3.Connection, table: str) -> TableInfo:
+    def get_table_info(self, engine: Engine, table: str) -> TableInfo:
         """Get complete table information"""
         return TableInfo(
             name=table,
-            columns=self.fetch_columns(conn, table),
-            indexes=self.fetch_indexes(conn),
-            triggers=self.fetch_triggers(conn)
+            columns=self.fetch_columns(engine, table),
+            indexes=self.fetch_indexes(engine),
+            triggers=self.fetch_triggers(engine)
         )
     
     def compare_schema(self) -> Optional[SchemaDiff]:
         """Compare schema between dev and production"""
-        dev_db = self.get_dev_db()
-        if not dev_db:
-            self.logger.error("  ❌ Development database not found")
+        try:
+            # Test connections
+            with self.dev_engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            with self.prod_engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+        except Exception as e:
+            self.logger.error(f"  ❌ Database connection failed: {e}")
             return None
         
-        if not self.prod_db.exists():
-            self.logger.warning("  ⚠️  Production database not found")
-            return None
-        
-        self.logger.info(f"  🔍 Comparing schema: {dev_db.name} vs production")
+        self.logger.info("  🔍 Comparing schema: dev vs production")
         
         try:
-            with sqlite3.connect(dev_db) as dev_conn, sqlite3.connect(self.prod_db) as prod_conn:
-                dev_tables = set(self.fetch_tables(dev_conn))
-                prod_tables = set(self.fetch_tables(prod_conn))
+            dev_tables = set(self.fetch_tables(self.dev_engine))
+            prod_tables = set(self.fetch_tables(self.prod_engine))
+            
+            missing_tables = sorted(dev_tables - prod_tables)
+            extra_tables = sorted(prod_tables - dev_tables)
+            shared_tables = sorted(dev_tables & prod_tables)
+            
+            table_diffs = {}
+            
+            # Compare shared tables
+            for table in shared_tables:
+                dev_cols = self.fetch_columns(self.dev_engine, table)
+                prod_cols = self.fetch_columns(self.prod_engine, table)
                 
-                missing_tables = sorted(dev_tables - prod_tables)
-                extra_tables = sorted(prod_tables - dev_tables)
-                shared_tables = sorted(dev_tables & prod_tables)
+                if len(dev_cols) != len(prod_cols):
+                    table_diffs[table] = {
+                        'type': 'column_count_mismatch',
+                        'dev_count': len(dev_cols),
+                        'prod_count': len(prod_cols)
+                    }
+                    continue
                 
-                table_diffs = {}
+                col_diffs = []
+                for dev_col, prod_col in zip(dev_cols, prod_cols):
+                    if dev_col != prod_col:
+                        col_diffs.append({
+                            'column': dev_col.name,
+                            'dev': asdict(dev_col),
+                            'prod': asdict(prod_col)
+                        })
                 
-                # Compare shared tables
-                for table in shared_tables:
-                    dev_cols = self.fetch_columns(dev_conn, table)
-                    prod_cols = self.fetch_columns(prod_conn, table)
-                    
-                    if len(dev_cols) != len(prod_cols):
-                        table_diffs[table] = {
-                            'type': 'column_count_mismatch',
-                            'dev_count': len(dev_cols),
-                            'prod_count': len(prod_cols)
-                        }
-                        continue
-                    
-                    col_diffs = []
-                    for dev_col, prod_col in zip(dev_cols, prod_cols):
-                        if dev_col != prod_col:
-                            col_diffs.append({
-                                'column': dev_col.name,
-                                'dev': asdict(dev_col),
-                                'prod': asdict(prod_col)
-                            })
-                    
-                    if col_diffs:
-                        table_diffs[table] = {
-                            'type': 'column_differences',
-                            'differences': col_diffs
-                        }
-                
-                # Compare indexes
-                dev_indexes = self.fetch_indexes(dev_conn)
-                prod_indexes = self.fetch_indexes(prod_conn)
-                missing_indexes = sorted(set(dev_indexes.keys()) - set(prod_indexes.keys()))
-                extra_indexes = sorted(set(prod_indexes.keys()) - set(dev_indexes.keys()))
-                
-                # Compare triggers
-                dev_triggers = self.fetch_triggers(dev_conn)
-                prod_triggers = self.fetch_triggers(prod_conn)
-                missing_triggers = sorted(set(dev_triggers.keys()) - set(prod_triggers.keys()))
-                extra_triggers = sorted(set(prod_triggers.keys()) - set(dev_triggers.keys()))
-                
-                return SchemaDiff(
-                    missing_tables=missing_tables,
-                    extra_tables=extra_tables,
-                    table_diffs=table_diffs,
-                    missing_indexes=missing_indexes,
-                    extra_indexes=extra_indexes,
-                    missing_triggers=missing_triggers,
-                    extra_triggers=extra_triggers
-                )
+                if col_diffs:
+                    table_diffs[table] = {
+                        'type': 'column_differences',
+                        'differences': col_diffs
+                    }
+            
+            # Compare indexes
+            dev_indexes = self.fetch_indexes(self.dev_engine)
+            prod_indexes = self.fetch_indexes(self.prod_engine)
+            missing_indexes = sorted(set(dev_indexes.keys()) - set(prod_indexes.keys()))
+            extra_indexes = sorted(set(prod_indexes.keys()) - set(dev_indexes.keys()))
+            
+            # Compare triggers
+            dev_triggers = self.fetch_triggers(self.dev_engine)
+            prod_triggers = self.fetch_triggers(self.prod_engine)
+            missing_triggers = sorted(set(dev_triggers.keys()) - set(prod_triggers.keys()))
+            extra_triggers = sorted(set(prod_triggers.keys()) - set(dev_triggers.keys()))
+            
+            return SchemaDiff(
+                missing_tables=missing_tables,
+                extra_tables=extra_tables,
+                table_diffs=table_diffs,
+                missing_indexes=missing_indexes,
+                extra_indexes=extra_indexes,
+                missing_triggers=missing_triggers,
+                extra_triggers=extra_triggers
+            )
                 
         except Exception as e:
             self.logger.error(f"  ❌ Error comparing schema: {e}")
+            import traceback
+            traceback.print_exc()
             return None
     
     def compare_reference_data(self, tables: Optional[List[str]] = None) -> Optional[DataDiff]:
         """Compare reference data between dev and production"""
-        dev_db = self.get_dev_db()
-        if not dev_db:
-            return None
-        
-        if not self.prod_db.exists():
+        try:
+            # Test connections
+            with self.dev_engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            with self.prod_engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+        except Exception as e:
+            self.logger.error(f"  ❌ Database connection failed: {e}")
             return None
         
         # Default reference data tables
@@ -234,11 +286,11 @@ class SchemaDetector:
         changed_records = {}
         
         try:
-            with sqlite3.connect(dev_db) as dev_conn, sqlite3.connect(self.prod_db) as prod_conn:
+            with self.dev_engine.connect() as dev_conn, self.prod_engine.connect() as prod_conn:
                 for table in tables:
                     # Check if table exists in both
-                    dev_tables = self.fetch_tables(dev_conn)
-                    prod_tables = self.fetch_tables(prod_conn)
+                    dev_tables = self.fetch_tables(self.dev_engine)
+                    prod_tables = self.fetch_tables(self.prod_engine)
                     
                     if table not in dev_tables:
                         continue
@@ -247,13 +299,13 @@ class SchemaDetector:
                         continue
                     
                     # Get all records from both
-                    dev_cursor = dev_conn.execute(f"SELECT * FROM {table}")
-                    dev_cols = [desc[0] for desc in dev_cursor.description]
-                    dev_rows = [dict(zip(dev_cols, row)) for row in dev_cursor.fetchall()]
+                    dev_result = dev_conn.execute(text(f"SELECT * FROM {table}"))
+                    dev_cols = list(dev_result.keys())
+                    dev_rows = [dict(row._mapping) for row in dev_result.fetchall()]
                     
-                    prod_cursor = prod_conn.execute(f"SELECT * FROM {table}")
-                    prod_cols = [desc[0] for desc in prod_cursor.description]
-                    prod_rows = [dict(zip(prod_cols, row)) for row in prod_cursor.fetchall()]
+                    prod_result = prod_conn.execute(text(f"SELECT * FROM {table}"))
+                    prod_cols = list(prod_result.keys())
+                    prod_rows = [dict(row._mapping) for row in prod_result.fetchall()]
                     
                     # Find primary key (assume 'id' or first column)
                     pk_col = 'id' if 'id' in dev_cols else dev_cols[0]
@@ -284,6 +336,8 @@ class SchemaDetector:
                         
         except Exception as e:
             self.logger.error(f"  ❌ Error comparing reference data: {e}")
+            import traceback
+            traceback.print_exc()
             return None
         
         return DataDiff(
@@ -314,16 +368,12 @@ class SchemaDetector:
         ]
         
         # Filter to only existing tables
-        dev_db = self.get_dev_db()
-        if not dev_db:
-            return None
-        
         try:
-            with sqlite3.connect(dev_db) as conn:
-                existing_tables = self.fetch_tables(conn)
-                group_tables = [t for t in group_tables if t in existing_tables]
-        except:
-            pass
+            existing_tables = self.fetch_tables(self.dev_engine)
+            group_tables = [t for t in group_tables if t in existing_tables]
+        except Exception as e:
+            self.logger.warning(f"  ⚠️  Could not check existing tables: {e}")
+            return None
         
         return self.compare_reference_data(group_tables)
     
@@ -423,5 +473,4 @@ def detect_changes(project_root: Optional[Path] = None) -> Dict:
 if __name__ == '__main__':
     report = detect_changes()
     print(json.dumps(report, indent=2, default=str))
-
 

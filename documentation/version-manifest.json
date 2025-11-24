@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.3.4.0",
+    "version": "1.3.5.0",
     "major": 1,
     "minor": 3,
-    "patch": 4,
+    "patch": 5,
     "build": 0,
-    "commit": "fe23e05f83ad0df1db0df2b579245edd2a0e26d6",
-    "updated_at": "2025-11-24T00:02:26+00:00",
-    "notes": "Remove SQLite references from production update scripts"
+    "commit": "cfd1dc3ea095a59c15849fe6f4f0f0c1c155177a",
+    "updated_at": "2025-11-24T00:22:33+00:00",
+    "notes": "Update all production scripts to use PostgreSQL instead of SQLite"
   },
   "development": {
     "version": "1.3.18.0",

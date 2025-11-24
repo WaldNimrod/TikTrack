@@ -75,18 +75,11 @@ check "start_production.sh" "[ -f \"$PROJECT_ROOT/production/start_production.sh
 
 echo ""
 
-# Check database
+# Check database connection (PostgreSQL)
 info "Checking database..."
-check "Production DB" "[ -f \"$PRODUCTION_BACKEND/db/tiktrack.db\" ]" "tiktrack.db exists"
-
-# Check for legacy dev DB (should NOT exist)
-legacy_prefix="simpleTrade"
-legacy_suffix="_new.db"
-legacy_pattern="${legacy_prefix}${legacy_suffix}"
-legacy_dev_count=$(find "$PRODUCTION_BACKEND/db" -maxdepth 1 -name "$legacy_pattern" | wc -l | tr -d ' ')
-if [ "$legacy_dev_count" -gt 0 ]; then
-    warn "Development DB" "${legacy_pattern} found in production (should not exist)"
-fi
+# Note: System uses PostgreSQL - no file-based DB check needed
+# Database connection is verified via config.settings.DATABASE_URL
+check "Database Config" "[ -f \"$PRODUCTION_BACKEND/config/settings.py\" ]" "settings.py exists"
 
 echo ""
 

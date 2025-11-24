@@ -73,11 +73,8 @@ class RollbackManager:
             shutil.copytree(production_config, config_backup / "config", dirs_exist_ok=True)
             snapshot_info['files']['config'] = str(config_backup / "config")
         
-        # Save database backup info (if exists)
-        db_backups = list(Path("Backend/db/backups").glob("*.db")) if Path("Backend/db/backups").exists() else []
-        if db_backups:
-            latest_backup = max(db_backups, key=lambda p: p.stat().st_mtime)
-            snapshot_info['files']['database_backup'] = str(latest_backup)
+        # Note: System uses PostgreSQL - database backups are handled via PostgreSQL tools
+        # No file-based DB backup tracking needed
         
         # Save snapshot info
         info_file = snapshot_path / "snapshot_info.json"
@@ -128,14 +125,8 @@ class RollbackManager:
                 shutil.copytree(config_backup, production_config)
                 self.logger.info("  ✅ Restored config files")
         
-        # Restore database (if backup exists)
-        if 'database_backup' in snapshot_info.get('files', {}):
-            db_backup = Path(snapshot_info['files']['database_backup'])
-            if db_backup.exists():
-                prod_db = Path("production/Backend/db/tiktrack.db")
-                if prod_db.exists():
-                    shutil.copy2(db_backup, prod_db)
-                    self.logger.info("  ✅ Restored database")
+        # Note: System uses PostgreSQL - database restore is handled via PostgreSQL tools
+        # No file-based DB restore needed
         
         # Restore git state (if commit saved)
         if 'git_commit' in snapshot_info:

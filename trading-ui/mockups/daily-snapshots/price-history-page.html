@@ -724,11 +724,11 @@
                 const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
                 
                 // Get time range from header buttons (default: all)
-                const activeRangeBtn = document.querySelector('.chart-control-btn.active[data-range]');
+                const activeRangeBtn = document.querySelector('.chart-time-range-btn.active[data-range]');
                 const timeRange = activeRangeBtn?.dataset.range || 'all';
                 
                 // Get unit size from header buttons (use default if none active)
-                const activeUnitBtn = document.querySelector('.unit-size-btn.active[data-unit]');
+                const activeUnitBtn = document.querySelector('.chart-unit-size-btn.active[data-unit]');
                 let unitSize = activeUnitBtn?.dataset.unit;
                 
                 // If no active unit button, set default based on time range (without triggering events)
@@ -746,7 +746,7 @@
                     }
                     
                     // Set the button as active (without triggering events - do it silently)
-                    const targetUnitBtn = document.querySelector(`.unit-size-btn[data-unit="${unitSize}"]`);
+                    const targetUnitBtn = document.querySelector(`.chart-unit-size-btn[data-unit="${unitSize}"]`);
                     if (targetUnitBtn && !targetUnitBtn.classList.contains('active')) {
                         // Set as active silently (before event listeners are set up)
                         targetUnitBtn.classList.add('active');
@@ -964,7 +964,7 @@
             }
             
             // Find and activate the target unit button
-            const targetUnitBtn = document.querySelector(`.unit-size-btn[data-unit="${targetUnit}"]`);
+            const targetUnitBtn = document.querySelector(`.chart-unit-size-btn[data-unit="${targetUnit}"]`);
             if (targetUnitBtn) {
                 // Check if already active to prevent triggering events
                 if (targetUnitBtn.classList.contains('active')) {
@@ -972,7 +972,7 @@
                 }
                 
                 // Remove active class from all unit buttons (without triggering events)
-                document.querySelectorAll('.unit-size-btn').forEach(btn => {
+                document.querySelectorAll('.chart-unit-size-btn').forEach(btn => {
                     btn.classList.remove('active');
                     btn.style.border = '1px solid #ddd';
                     btn.style.background = 'white';
@@ -1864,9 +1864,9 @@
             }
             
             const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
-            const activeUnitBtn = document.querySelector('.unit-size-btn.active[data-unit]');
+            const activeUnitBtn = document.querySelector('.chart-unit-size-btn.active[data-unit]');
             const unitSize = activeUnitBtn?.dataset.unit || 'day';
-            const activeRangeBtn = document.querySelector('.chart-control-btn.active[data-range]');
+            const activeRangeBtn = document.querySelector('.chart-time-range-btn.active[data-range]');
             const timeRange = activeRangeBtn?.dataset.range || 'all';
             
             const mockData = generateMockPriceData(selectedTicker, unitSize, timeRange);
@@ -2224,73 +2224,183 @@
             });
         }
         
+        // Helper function to convert timestamp to proper format for TradingView
+        function formatTimeForTradingView(timestamp) {
+            if (!timestamp) return null;
+            
+            // If it's already a number (Unix timestamp in seconds), return as is
+            if (typeof timestamp === 'number') {
+                return timestamp;
+            }
+            
+            // If it's a string date (yyyy-mm-dd), convert to Unix timestamp
+            if (typeof timestamp === 'string' && timestamp.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                return Math.floor(new Date(timestamp + 'T00:00:00Z').getTime() / 1000);
+            }
+            
+            // If it's a Date object, convert to Unix timestamp
+            if (timestamp instanceof Date) {
+                return Math.floor(timestamp.getTime() / 1000);
+            }
+            
+            // Try to parse as date string
+            const date = new Date(timestamp);
+            if (!isNaN(date.getTime())) {
+                return Math.floor(date.getTime() / 1000);
+            }
+            
+            return null;
+        }
+        
         function zoomIn() {
-            if (!priceChart) return;
+            if (!priceChart) {
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError('שגיאה', 'גרף לא זמין');
+                }
+                return;
+            }
             
             try {
                 const visibleRange = window.TradingViewChartAdapter.getVisibleRange(priceChart);
-                if (visibleRange) {
-                    const range = visibleRange.to - visibleRange.from;
-                    const newRange = range * 0.8; // Zoom in 20%
-                    const center = visibleRange.from + range / 2;
-                    
-                    window.TradingViewChartAdapter.setVisibleRange(priceChart, {
-                        from: center - newRange / 2,
-                        to: center + newRange / 2
-                    });
+                if (!visibleRange || !visibleRange.from || !visibleRange.to) {
+                    if (window.Logger) {
+                        window.Logger.warn('Cannot zoom in - no visible range', { page: 'price-history-page' });
+                    }
+                    return;
                 }
+                
+                // Convert timestamps to numbers (Unix timestamps in seconds)
+                const from = formatTimeForTradingView(visibleRange.from);
+                const to = formatTimeForTradingView(visibleRange.to);
+                
+                if (!from || !to || isNaN(from) || isNaN(to)) {
+                    if (window.Logger) {
+                        window.Logger.warn('Invalid time range for zoom', { 
+                            page: 'price-history-page', 
+                            from: visibleRange.from, 
+                            to: visibleRange.to 
+                        });
+                    }
+                    return;
+                }
+                
+                const range = to - from;
+                const newRange = range * 0.8; // Zoom in 20%
+                const center = from + range / 2;
+                
+                const newRangeObj = {
+                    from: center - newRange / 2,
+                    to: center + newRange / 2
+                };
+                
+                window.TradingViewChartAdapter.setVisibleRange(priceChart, newRangeObj);
+                
+                // Volume chart will sync automatically via sync listeners
             } catch (e) {
                 if (window.Logger) {
-                    window.Logger.warn('Error zooming in', { page: 'price-history-page', error: e });
+                    window.Logger.error('Error zooming in', { page: 'price-history-page', error: e });
+                }
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError('שגיאה', 'שגיאה בהגדלת זום');
                 }
             }
         }
         
         function zoomOut() {
-            if (!priceChart) return;
+            if (!priceChart) {
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError('שגיאה', 'גרף לא זמין');
+                }
+                return;
+            }
             
             try {
                 const visibleRange = window.TradingViewChartAdapter.getVisibleRange(priceChart);
-                if (visibleRange) {
-                    const range = visibleRange.to - visibleRange.from;
-                    const newRange = range * 1.25; // Zoom out 25%
-                    const center = visibleRange.from + range / 2;
-                    
-                    window.TradingViewChartAdapter.setVisibleRange(priceChart, {
-                        from: center - newRange / 2,
-                        to: center + newRange / 2
-                    });
+                if (!visibleRange || !visibleRange.from || !visibleRange.to) {
+                    if (window.Logger) {
+                        window.Logger.warn('Cannot zoom out - no visible range', { page: 'price-history-page' });
+                    }
+                    return;
                 }
+                
+                // Convert timestamps to numbers (Unix timestamps in seconds)
+                const from = formatTimeForTradingView(visibleRange.from);
+                const to = formatTimeForTradingView(visibleRange.to);
+                
+                if (!from || !to || isNaN(from) || isNaN(to)) {
+                    if (window.Logger) {
+                        window.Logger.warn('Invalid time range for zoom', { 
+                            page: 'price-history-page', 
+                            from: visibleRange.from, 
+                            to: visibleRange.to 
+                        });
+                    }
+                    return;
+                }
+                
+                const range = to - from;
+                const newRange = range * 1.25; // Zoom out 25%
+                const center = from + range / 2;
+                
+                const newRangeObj = {
+                    from: center - newRange / 2,
+                    to: center + newRange / 2
+                };
+                
+                window.TradingViewChartAdapter.setVisibleRange(priceChart, newRangeObj);
+                
+                // Volume chart will sync automatically via sync listeners
             } catch (e) {
                 if (window.Logger) {
-                    window.Logger.warn('Error zooming out', { page: 'price-history-page', error: e });
+                    window.Logger.error('Error zooming out', { page: 'price-history-page', error: e });
+                }
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError('שגיאה', 'שגיאה בהקטנת זום');
                 }
             }
         }
         
         function resetZoom() {
-            if (!priceChart) return;
+            if (!priceChart) {
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError('שגיאה', 'גרף לא זמין');
+                }
+                return;
+            }
             
             try {
                 window.TradingViewChartAdapter.resetTimeScale(priceChart);
                 
-                // Ensure volume chart syncs after reset (100% sync)
-                setTimeout(() => {
-                    if (volumeChart) {
-                        window.TradingViewChartAdapter.resetTimeScale(volumeChart);
-                        
-                        // Double-check sync after reset
-                        setTimeout(() => {
+                // Volume chart will sync automatically via sync listeners
+                // But we also reset it explicitly to ensure both start from same state
+                if (volumeChart) {
+                    setTimeout(() => {
+                        try {
+                            window.TradingViewChartAdapter.resetTimeScale(volumeChart);
+                        } catch (e) {
+                            // If reset fails, sync manually
                             const priceRange = priceChart.timeScale().getVisibleRange();
                             if (priceRange && priceRange.from && priceRange.to) {
-                                volumeChart.timeScale().setVisibleRange(priceRange);
+                                try {
+                                    volumeChart.timeScale().setVisibleRange(priceRange);
+                                } catch (syncError) {
+                                    if (window.Logger) {
+                                        window.Logger.warn('Error syncing volume chart after reset', { 
+                                            page: 'price-history-page', 
+                                            error: syncError 
+                                        });
+                                    }
+                                }
                             }
-                        }, 50);
-                    }
-                }, 50);
+                        }
+                    }, 100);
+                }
             } catch (e) {
                 if (window.Logger) {
-                    window.Logger.warn('Error resetting zoom', { page: 'price-history-page', error: e });
+                    window.Logger.error('Error resetting zoom', { page: 'price-history-page', error: e });
+                }
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError('שגיאה', 'שגיאה באיפוס זום');
                 }
             }
         }
@@ -2300,27 +2410,84 @@
         
         // Feature 62: Moving Average Indicator
         function addMovingAverage(period = 20) {
-            if (!priceChart || !priceChartSeries) return null;
+            if (!priceChart || !priceChartSeries) {
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError('שגיאה', 'גרף לא זמין');
+                }
+                return null;
+            }
             
             // Check if this MA already exists
             const existingMA = activeIndicators.find(ind => ind.type === 'ma' && ind.period === period);
             if (existingMA) {
-                if (window.Logger) {
-                    window.Logger.info(`MA(${period}) כבר קיים`, { page: 'price-history-page', period });
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showInfo('מידע', `MA(${period}) כבר קיים`);
                 }
                 return existingMA;
             }
             
             try {
-                const data = priceChartSeries.data();
+                // Get data from the price series
+                let data = [];
+                try {
+                    // Try to get data from series
+                    if (typeof priceChartSeries.data === 'function') {
+                        data = priceChartSeries.data();
+                    } else if (priceChartSeries._data) {
+                        data = priceChartSeries._data;
+                    } else {
+                        // Fallback: regenerate data from current settings
+                        const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
+                        const activeUnitBtn = document.querySelector('.chart-unit-size-btn.active[data-unit]');
+                        const unitSize = activeUnitBtn?.dataset.unit || 'day';
+                        const activeRangeBtn = document.querySelector('.chart-time-range-btn.active[data-range]');
+                        const timeRange = activeRangeBtn?.dataset.range || 'all';
+                        const mockData = generateMockPriceData(selectedTicker, unitSize, timeRange);
+                        
+                        // Use appropriate data based on chart type
+                        const activeChartTypeBtn = document.querySelector('.chart-type-btn.active');
+                        const chartType = activeChartTypeBtn?.dataset.type || 'candlestick';
+                        if (chartType === 'candlestick' || chartType === 'bar') {
+                            data = mockData.candles.map(c => ({ time: c.time, value: c.close }));
+                        } else {
+                            data = mockData.line;
+                        }
+                    }
+                } catch (e) {
+                    if (window.Logger) {
+                        window.Logger.warn('Error getting data for MA', { page: 'price-history-page', error: e });
+                    }
+                    // Fallback: regenerate data
+                    const selectedTicker = document.getElementById('tickerSelect')?.value || 'AAPL';
+                    const activeUnitBtn = document.querySelector('.chart-unit-size-btn.active[data-unit]');
+                    const unitSize = activeUnitBtn?.dataset.unit || 'day';
+                    const activeRangeBtn = document.querySelector('.chart-time-range-btn.active[data-range]');
+                    const timeRange = activeRangeBtn?.dataset.range || 'all';
+                    const mockData = generateMockPriceData(selectedTicker, unitSize, timeRange);
+                    const activeChartTypeBtn = document.querySelector('.chart-type-btn.active');
+                    const chartType = activeChartTypeBtn?.dataset.type || 'candlestick';
+                    if (chartType === 'candlestick' || chartType === 'bar') {
+                        data = mockData.candles.map(c => ({ time: c.time, value: c.close }));
+                    } else {
+                        data = mockData.line;
+                    }
+                }
+                
                 if (!data || data.length < period) {
                     if (window.NotificationSystem) {
-                        window.NotificationSystem.showError('שגיאה', `נדרשים לפחות ${period} נקודות נתונים לממוצע נע ${period}`);
+                        window.NotificationSystem.showError('שגיאה', `נדרשים לפחות ${period} נקודות נתונים לממוצע נע ${period}. יש ${data ? data.length : 0} נקודות.`);
                     }
                     return null;
                 }
                 
                 const maData = calculateMovingAverage(data, period);
+                
+                if (!maData || maData.length === 0) {
+                    if (window.NotificationSystem) {
+                        window.NotificationSystem.showError('שגיאה', 'שגיאה בחישוב ממוצע נע');
+                    }
+                    return null;
+                }
                 
                 const newMaSeries = window.TradingViewChartAdapter.addLineSeries(priceChart, {
                     color: '#ff9800',
@@ -2348,13 +2515,17 @@
                 updateSeriesLegend();
                 updateActiveIndicatorsList();
                 
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showSuccess('הצלחה', `MA(${period}) נוסף בהצלחה`);
+                }
+                
                 return indicator;
             } catch (e) {
                 if (window.Logger) {
-                    window.Logger.warn('Error adding moving average', { page: 'price-history-page', error: e });
+                    window.Logger.error('Error adding moving average', { page: 'price-history-page', error: e });
                 }
                 if (window.NotificationSystem) {
-                    window.NotificationSystem.showError('שגיאה', 'שגיאה בהוספת ממוצע נע');
+                    window.NotificationSystem.showError('שגיאה', `שגיאה בהוספת ממוצע נע: ${e.message || 'שגיאה לא ידועה'}`);
                 }
                 return null;
             }
@@ -3300,9 +3471,9 @@
             comparisonSection.style.display = 'block';
             
             // Get time range and unit size from active buttons
-            const activeRangeBtn = document.querySelector('.chart-control-btn.active[data-range]');
+            const activeRangeBtn = document.querySelector('.chart-time-range-btn.active[data-range]');
             const timeRange = activeRangeBtn?.dataset.range || 'all';
-            const activeUnitBtn = document.querySelector('.unit-size-btn.active[data-unit]');
+            const activeUnitBtn = document.querySelector('.chart-unit-size-btn.active[data-unit]');
             const unitSize = activeUnitBtn?.dataset.unit || 'day';
             
             // Wait for adapter and create comparison chart

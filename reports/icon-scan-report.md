@@ -4,8 +4,8 @@
 
 ## סיכום
 
-- emoji_icons: 5563
-- total_files_with_issues: 210
+- emoji_icons: 5561
+- total_files_with_issues: 209
 - total_files_using_icon_system: 42
 - missing_icon_system: 21
 - text_content_icons: 22

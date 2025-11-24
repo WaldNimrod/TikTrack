@@ -35,6 +35,7 @@
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Logger Service -->
     <script src="../../scripts/logger-service.js" defer></script>
@@ -78,7 +79,7 @@
                 <div class="col-md-12">
                     <div class="mockups-navigation-content">
                         <span class="mockups-navigation-label">
-                            <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
                         </span>
                         <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
                         <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
@@ -102,10 +103,10 @@
         <div class="page-body">
             <div class="main-content">
                 <!-- History Widget Section -->
-                <div class="top-section" id="history_widget_top_section">
+                <div class="top-section" id="history_widget_top_section" data-section="history_widget_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="clock" class="icon">
+                            <span class="icon-placeholder icon" data-icon="clock" data-size="16" data-alt="clock" aria-label="clock"></span>
                             היסטוריה מהירה
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2">                            <div class="table-actions">
@@ -198,17 +199,17 @@
                                 <ul class="nav nav-tabs mb-3" id="statsTabs" role="tablist">
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link active" id="daily-tab" data-bs-toggle="tab" data-bs-target="#daily-stats" type="button" role="tab" aria-controls="daily-stats" aria-selected="true">
-                                            <img src="../../images/icons/tabler/calendar.svg" width="16" height="16" alt="icon" class="icon"> יומי
+                                            <span class="icon-placeholder icon" data-icon="calendar" data-size="16" data-alt="icon" aria-label="icon"></span> יומי
                                         </button>
                                     </li>
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link" id="pl-tab" data-bs-toggle="tab" data-bs-target="#pl-stats" type="button" role="tab" aria-controls="pl-stats" aria-selected="false">
-                                            <img src="../../images/icons/tabler/chart-line.svg" width="16" height="16" alt="icon" class="icon"> רווח והפסד כולל
+                                            <span class="icon-placeholder icon" data-icon="chart-line" data-size="16" data-alt="icon" aria-label="icon"></span> רווח והפסד כולל
                                         </button>
                                     </li>
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link" id="market-value-tab" data-bs-toggle="tab" data-bs-target="#market-value-stats" type="button" role="tab" aria-controls="market-value-stats" aria-selected="false">
-                                            <img src="../../images/icons/tabler/currency-dollar.svg" width="16" height="16" alt="icon" class="icon"> שווי שוק
+                                            <span class="icon-placeholder icon" data-icon="currency-dollar" data-size="16" data-alt="icon" aria-label="icon"></span> שווי שוק
                                         </button>
                                     </li>
                                 </ul>
@@ -291,5 +292,9 @@
     
     <!-- Page-specific script -->
     <script src="../../scripts/history-widget.js" defer></script>
+    
+    <!-- Notification System Containers -->
+    <div class="notification-container" id="notification-container"></div>
+    <div id="toast-container"></div>
 </body>
 </html>

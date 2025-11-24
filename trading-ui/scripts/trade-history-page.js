@@ -145,12 +145,12 @@
             
             // Load from API using safeApiCall
             const data = await window.safeApiCall('/api/tickers/');
-            const tickers = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
-            allTickers = tickers.map(t => ({
-                id: t.id,
-                symbol: t.symbol || t.ticker_symbol || ''
-            })).filter(t => t.symbol).sort((a, b) => a.symbol.localeCompare(b.symbol));
-            
+                const tickers = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+                allTickers = tickers.map(t => ({
+                    id: t.id,
+                    symbol: t.symbol || t.ticker_symbol || ''
+                })).filter(t => t.symbol).sort((a, b) => a.symbol.localeCompare(b.symbol));
+                
             // Save to cache
             if (window.UnifiedCacheManager) {
                 await window.UnifiedCacheManager.save(cacheKey, allTickers, 'memory', { ttl: 600 }); // 10 minutes
@@ -169,15 +169,15 @@
      * Populate ticker filter dropdown
      */
     function populateTickerFilter() {
-        const tickerSelect = document.getElementById('filterTicker');
-        if (tickerSelect) {
-            tickerSelect.innerHTML = '<option value="">הכל</option>';
-            allTickers.forEach(ticker => {
-                const option = document.createElement('option');
-                option.value = ticker.symbol;
-                option.textContent = ticker.symbol;
-                tickerSelect.appendChild(option);
-            });
+                const tickerSelect = document.getElementById('filterTicker');
+                if (tickerSelect) {
+                    tickerSelect.innerHTML = '<option value="">הכל</option>';
+                    allTickers.forEach(ticker => {
+                        const option = document.createElement('option');
+                        option.value = ticker.symbol;
+                        option.textContent = ticker.symbol;
+                        tickerSelect.appendChild(option);
+                    });
         }
     }
 
@@ -223,27 +223,27 @@
             
             // Load from API using safeApiCall
             const data = await window.safeApiCall('/api/trades/');
-            const trades = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
-            
-            // Transform trades to match our format
-            allTrades = trades.map(trade => ({
-                id: trade.id,
-                ticker: trade.ticker_symbol || trade.ticker?.symbol || '',
-                side: trade.side || '',
-                investment_type: trade.investment_type || '',
-                created_at: trade.created_at?.utc || trade.created_at || '',
-                closed_at: trade.closed_at?.utc || trade.closed_at || '',
-                pl: trade.realized_pl || trade.pl || 0,
-                pl_percent: trade.pl_percent || 0
-            })).filter(t => t.ticker); // Only trades with ticker
+                const trades = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+                
+                // Transform trades to match our format
+                allTrades = trades.map(trade => ({
+                    id: trade.id,
+                    ticker: trade.ticker_symbol || trade.ticker?.symbol || '',
+                    side: trade.side || '',
+                    investment_type: trade.investment_type || '',
+                    created_at: trade.created_at?.utc || trade.created_at || '',
+                    closed_at: trade.closed_at?.utc || trade.closed_at || '',
+                    pl: trade.realized_pl || trade.pl || 0,
+                    pl_percent: trade.pl_percent || 0
+                })).filter(t => t.ticker); // Only trades with ticker
             
             // Save to cache
             if (window.UnifiedCacheManager) {
                 await window.UnifiedCacheManager.save(cacheKey, allTrades, 'memory', { ttl: 300 }); // 5 minutes
             }
-            
-            filteredTrades = [...allTrades];
-            loadTradesTable();
+                
+                filteredTrades = [...allTrades];
+                loadTradesTable();
         } catch (error) {
             // Error already handled by safeApiCall, but fallback to mock data
             if (window.NotificationSystem) {
@@ -500,7 +500,7 @@
         // Save selected trade ID to cache and page state
         saveToCache(CACHE_KEY_SELECTED_TRADE_ID, tradeId);
         savePageState();
-
+        
         // Load trade data for analysis
         loadTradeForAnalysis(tradeId);
     }
@@ -541,10 +541,18 @@
 
     /**
      * Wait for UnifiedCacheManager to be ready
+     * Returns false immediately if not available (no blocking wait)
      */
     async function waitForCacheManager() {
+        // Quick check - if already available and initialized, return immediately
+        if (window.UnifiedCacheManager && 
+            (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
+            return true;
+        }
+        
+        // Short wait for initialization (max 1 second)
         let retries = 0;
-        const maxRetries = 50; // 5 seconds max
+        const maxRetries = 10; // 1 second max
         
         while ((!window.UnifiedCacheManager || 
                 (!window.UnifiedCacheManager.initialized && 
@@ -558,7 +566,7 @@
             (!window.UnifiedCacheManager.initialized && 
              !window.UnifiedCacheManager.isInitialized?.())) {
                 if (window.Logger) {
-                window.Logger.warn('UnifiedCacheManager not available after wait', { page: 'trade-history-page' });
+                window.Logger.warn('UnifiedCacheManager not available, using fallback', { page: 'trade-history-page' });
             }
             return false;
         }
@@ -681,17 +689,18 @@
                 window.Logger.info('📊 Initializing Trade History Page...', { page: 'trade-history-page' });
             }
 
-            // 1. Wait for UnifiedCacheManager
-            await waitForCacheManager();
-
-            // 2. Wait for HeaderSystem
-            await initializeHeader();
-
-            // 3. Wait for TradingView libraries
-            await waitForTradingView();
-
-            // 4. Load mock data (from cache or fresh)
+            // 1. Load mock data (from cache or fresh) - don't wait for cache, use fallback
             const data = await loadDataFromCache();
+            
+            // 2. Wait for HeaderSystem (non-blocking)
+            initializeHeader().catch(() => {
+                // Header initialization is optional
+            });
+
+            // 3. Wait for TradingView libraries (non-blocking for initial render)
+            waitForTradingView().catch(() => {
+                // TradingView is optional for initial render
+            });
             if (!data) {
                 if (window.Logger) {
                     window.Logger.error('Failed to load data, cannot initialize page', { page: 'trade-history-page' });

@@ -61,6 +61,7 @@
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Preferences System -->
     <script src="../../scripts/services/preferences-data.js" defer></script>
@@ -130,7 +131,7 @@
         <div class="page-body">
             <div class="main-content">
                 <!-- Header Section -->
-                <div class="top-section" id="trade-history-top-section">
+                <div class="top-section"  data-section="trade-history-top-section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
                             <span data-icon="clock" class="icon"></span>
@@ -284,7 +285,7 @@
                                     </div>
                         
                         <!-- Timeline Absolute Section -->
-                <div class="content-section" id="timeline-absolute-section">
+                <div class="content-section"  data-section="timeline-absolute-section">
                     <div class="section-header">
                         <h2><span data-icon="list" class="icon"></span> פירוט צעדים</h2>
                         <div class="header-actions">
@@ -309,7 +310,7 @@
                 </div>
                 
                 <!-- Timeline Section (Combined) -->
-                <div class="content-section" id="timeline-relative-section">
+                <div class="content-section"  data-section="timeline-relative-section">
                     <div class="section-header">
                         <h2><span data-icon="chart-line" class="icon"></span> טיימליין</h2>
                         <div class="header-actions">
@@ -368,7 +369,7 @@
                 </div>
                 
                 <!-- Plan vs Execution Comparison Section -->
-                <div class="content-section" id="plan-vs-execution-section">
+                <div class="content-section"  data-section="plan-vs-execution-section">
                     <div class="section-header">
                         <h2><span data-icon="info-circle" class="icon"></span> תכנון מול ביצוע</h2>
                         <div class="header-actions">
@@ -409,7 +410,7 @@
                         
                         <!-- Executions Table Section -->
                 <!-- Linked Items Section -->
-                <div class="content-section" id="linked-items-section">
+                <div class="content-section"  data-section="linked-items-section">
                     <div class="section-header">
                         <h2><span data-icon="link" class="icon"></span> פריטים מקושרים</h2>
                         <div class="header-actions">
@@ -1895,6 +1896,10 @@
     
     <!-- Page-specific script -->
     <script src="../../scripts/trade-history-page.js" defer></script>
+    
+    <!-- Notification System Containers -->
+    <div class="notification-container" id="notification-container"></div>
+    <div id="toast-container"></div>
 </body>
 </html>
 

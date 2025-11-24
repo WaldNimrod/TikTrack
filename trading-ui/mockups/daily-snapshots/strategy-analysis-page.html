@@ -225,6 +225,7 @@
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Logger Service -->
     <script src="../../scripts/logger-service.js" defer></script>
@@ -279,7 +280,7 @@
                 <div class="col-md-12">
                     <div class="mockups-navigation-content">
                         <span class="mockups-navigation-label">
-                            <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
                         </span>
                         <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
                         <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
@@ -303,10 +304,10 @@
         <div class="page-body">
             <div class="main-content">
                 <!-- Header Section -->
-                <div class="top-section" id="strategy_analysis_page_top_section">
+                <div class="top-section"  data-section="strategy_analysis_page_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <img src="../../images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon">
+                            <span class="icon-placeholder icon" data-icon="chart-bar" data-size="16" data-alt="chart-bar" aria-label="chart-bar"></span>
                             ניתוח אסטרטגיות
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2">
@@ -325,18 +326,18 @@
                 </div>
                 
                 <!-- Record Filter Panel (Upper) -->
-                <div class="content-section filter-panel-card" id="record-filter-panel">
+                <div class="content-section filter-panel-card"  data-section="record-filter-panel">
                     <div class="section-header">
                         <div class="header-title-section">
-                            <h3><img src="../../images/icons/tabler/filter.svg" width="16" height="16" alt="filter" class="icon"> סינון רשומות להשוואה</h3>
+                            <h3><span class="icon-placeholder icon" data-icon="filter" data-size="16" data-alt="filter" aria-label="filter"></span> סינון רשומות להשוואה</h3>
                             <p class="text-muted small mb-0">בחר איזה אסטרטגיות להכלל בניתוח</p>
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2">
                             <button class="btn btn-outline-secondary btn-sm" data-onclick="resetRecordFilters()" title="נקה את כל הפילטרים">
-                                <img src="../../images/icons/tabler/x.svg" width="14" height="14" alt="x" class="icon"> נקה
+                                <span class="icon-placeholder icon" data-icon="x" data-size="14" data-alt="x" aria-label="x"></span> נקה
                             </button>
                             <button class="btn btn-outline-primary btn-sm" data-onclick="resetRecordFiltersToDefaults()" title="איפוס לברירת מחדל">
-                                <img src="../../images/icons/tabler/refresh.svg" width="14" height="14" alt="refresh" class="icon"> ברירת מחדל
+                                <span class="icon-placeholder icon" data-icon="refresh" data-size="14" data-alt="refresh" aria-label="refresh"></span> ברירת מחדל
                             </button>
                             <button class="filter-toggle-btn" data-onclick="toggleSection('record-filter-panel')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -424,10 +425,10 @@
                                         <div class="d-flex align-items-center gap-1 mb-1">
                                             <label class="form-label mb-0 form-label-small">חשבון מסחר</label>
                                             <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('recordFilterTradingAccounts')" title="בחר הכל">
-                                                <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
+                                                <span class="icon-placeholder icon" data-icon="check" data-size="8" data-alt="check" aria-label="check"></span>
                                             </button>
                                             <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('recordFilterTradingAccounts')" title="נקה הכל">
-                                                <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
+                                                <span class="icon-placeholder icon" data-icon="x" data-size="8" data-alt="x" aria-label="x"></span>
                                             </button>
                                         </div>
                                         <select id="recordFilterTradingAccounts" class="form-select form-select-sm" multiple data-onchange="applyRecordFilters()" title="בחר חשבונות מסחר">
@@ -440,10 +441,10 @@
                                         <div class="d-flex align-items-center gap-1 mb-1">
                                             <label for="recordFilterTags" class="form-label mb-0 form-label-small">תגיות</label>
                                             <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('recordFilterTags')" title="בחר הכל">
-                                                <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
+                                                <span class="icon-placeholder icon" data-icon="check" data-size="8" data-alt="check" aria-label="check"></span>
                                             </button>
                                             <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('recordFilterTags')" title="נקה הכל">
-                                                <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
+                                                <span class="icon-placeholder icon" data-icon="x" data-size="8" data-alt="x" aria-label="x"></span>
                                             </button>
                                         </div>
                                         <select id="recordFilterTags" class="form-select form-select-sm tag-multi-select" multiple data-onchange="applyRecordFilters()" title="בחר תגיות לסינון">
@@ -481,18 +482,18 @@
                 </div>
                 
                 <!-- Comparison Parameters Panel (Lower) -->
-                <div class="content-section comparison-panel-card" id="comparison-parameters-panel">
+                <div class="content-section comparison-panel-card"  data-section="comparison-parameters-panel">
                     <div class="section-header">
                         <div class="header-title-section">
-                            <h3><img src="../../images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> פרמטרים להשוואה</h3>
+                            <h3><span class="icon-placeholder icon" data-icon="chart-bar" data-size="16" data-alt="chart-bar" aria-label="chart-bar"></span> פרמטרים להשוואה</h3>
                             <p class="text-muted small mb-0">בחר לפי מה להשוות את האסטרטגיות (ניתן לבחור מספר פרמטרים במקביל)</p>
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2">
                             <button class="btn btn-outline-secondary btn-sm" data-onclick="resetComparisonParameters()" title="נקה את כל הפרמטרים">
-                                <img src="../../images/icons/tabler/x.svg" width="14" height="14" alt="x" class="icon"> נקה
+                                <span class="icon-placeholder icon" data-icon="x" data-size="14" data-alt="x" aria-label="x"></span> נקה
                             </button>
                             <button class="btn btn-outline-primary btn-sm" data-onclick="resetComparisonParametersToDefaults()" title="איפוס לברירת מחדל">
-                                <img src="../../images/icons/tabler/refresh.svg" width="14" height="14" alt="refresh" class="icon"> ברירת מחדל
+                                <span class="icon-placeholder icon" data-icon="refresh" data-size="14" data-alt="refresh" aria-label="refresh"></span> ברירת מחדל
                             </button>
                             <button class="filter-toggle-btn" data-onclick="toggleSection('comparison-parameters-panel')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -509,10 +510,10 @@
                                             <input type="checkbox" id="compareByTradingMethods" class="form-check-input" data-onchange="toggleComparisonParameter('tradingMethods')">
                                             <label for="compareByTradingMethods" class="form-check-label fw-bold mb-0">שיטות מסחר</label>
                                             <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('comparisonTradingMethods')" title="בחר הכל" disabled id="btn-select-all-trading-methods">
-                                                <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
+                                                <span class="icon-placeholder icon" data-icon="check" data-size="8" data-alt="check" aria-label="check"></span>
                                             </button>
                                             <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('comparisonTradingMethods')" title="נקה הכל" disabled id="btn-clear-all-trading-methods">
-                                                <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
+                                                <span class="icon-placeholder icon" data-icon="x" data-size="8" data-alt="x" aria-label="x"></span>
                                             </button>
                                         </div>
                                         <select id="comparisonTradingMethods" class="form-select form-select-sm" multiple data-onchange="applyComparisonParameters()" title="בחר שיטות מסחר להשוואה" disabled>
@@ -526,10 +527,10 @@
                                             <input type="checkbox" id="compareByTicker" class="form-check-input" data-onchange="toggleComparisonParameter('ticker')">
                                             <label for="compareByTicker" class="form-check-label fw-bold mb-0">טיקר</label>
                                             <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('comparisonTickers')" title="בחר הכל" disabled id="btn-select-all-tickers">
-                                                <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
+                                                <span class="icon-placeholder icon" data-icon="check" data-size="8" data-alt="check" aria-label="check"></span>
                                             </button>
                                             <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('comparisonTickers')" title="נקה הכל" disabled id="btn-clear-all-tickers">
-                                                <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
+                                                <span class="icon-placeholder icon" data-icon="x" data-size="8" data-alt="x" aria-label="x"></span>
                                             </button>
                                         </div>
                                         <select id="comparisonTickers" class="form-select form-select-sm" multiple data-onchange="applyComparisonParameters()" title="בחר טיקרים להשוואה" disabled>
@@ -543,10 +544,10 @@
                                             <input type="checkbox" id="compareByTags" class="form-check-input" data-onchange="toggleComparisonParameter('tags')">
                                             <label for="compareByTags" class="form-check-label fw-bold mb-0">תגיות</label>
                                             <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('comparisonTags')" title="בחר הכל" disabled id="btn-select-all-comparison-tags">
-                                                <img src="../../images/icons/tabler/check.svg" width="8" height="8" alt="check">
+                                                <span class="icon-placeholder icon" data-icon="check" data-size="8" data-alt="check" aria-label="check"></span>
                                             </button>
                                             <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('comparisonTags')" title="נקה הכל" disabled id="btn-clear-all-comparison-tags">
-                                                <img src="../../images/icons/tabler/x.svg" width="8" height="8" alt="x">
+                                                <span class="icon-placeholder icon" data-icon="x" data-size="8" data-alt="x" aria-label="x"></span>
                                             </button>
                                         </div>
                                         <select id="comparisonTags" class="form-select form-select-sm tag-multi-select" multiple data-onchange="applyComparisonParameters()" title="בחר תגיות להשוואה" disabled>
@@ -560,9 +561,9 @@
                 </div>
                 
                 <!-- Strategy Comparison Table Section -->
-                <div class="content-section" id="comparison-table-section">
+                <div class="content-section"  data-section="comparison-table-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/clipboard-list.svg" width="16" height="16" alt="table" class="icon"> טבלת השוואות</h2>
+                        <h2><span class="icon-placeholder icon" data-icon="clipboard-list" data-size="16" data-alt="table" aria-label="table"></span> טבלת השוואות</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" data-onclick="toggleSection('comparison-table-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -603,9 +604,9 @@
                 </div>
                 
                 <!-- Heatmap Section -->
-                <div class="content-section" id="heatmap-section">
+                <div class="content-section"  data-section="heatmap-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/chart-dots.svg" width="16" height="16" alt="grid" class="icon"> Heatmap - מטריצת השוואות</h2>
+                        <h2><span class="icon-placeholder icon" data-icon="chart-dots" data-size="16" data-alt="grid" aria-label="grid"></span> Heatmap - מטריצת השוואות</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" data-onclick="toggleSection('heatmap-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -657,9 +658,9 @@
                 </div>
                 
                 <!-- Visual Heatmap Section -->
-                <div class="content-section" id="visual-heatmap-section">
+                <div class="content-section"  data-section="visual-heatmap-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/chart-dots.svg" width="16" height="16" alt="grid" class="icon"> מפת חום ויזואלית</h2>
+                        <h2><span class="icon-placeholder icon" data-icon="chart-dots" data-size="16" data-alt="grid" aria-label="grid"></span> מפת חום ויזואלית</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" data-onclick="toggleSection('visual-heatmap-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -756,9 +757,9 @@
                 </div>
                 
                 <!-- Strategy Performance Chart Section -->
-                <div class="content-section" id="strategy-performance-chart-section">
+                <div class="content-section"  data-section="strategy-performance-chart-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> ביצועי אסטרטגיות</h2>
+                        <h2><span class="icon-placeholder icon" data-icon="chart-bar" data-size="16" data-alt="chart-bar" aria-label="chart-bar"></span> ביצועי אסטרטגיות</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" data-onclick="toggleSection('strategy-performance-chart-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -780,7 +781,7 @@
                             <div class="tradingview-chart-wrapper comparison-chart-wrapper">
                                 <div class="tradingview-chart-container tradingview-comparison-chart-container" id="strategy-performance-chart-container">
                                     <div class="chart-loading">
-                                        <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                        <span class="icon-placeholder icon" data-icon="clock" data-size="16" data-alt="hourglass" aria-label="hourglass"></span> טוען גרף...
                                     </div>
                                     <div id="chart-scale-labels" class="chart-scale-labels">
                                         <div id="left-scale-label" class="left-scale-label">
@@ -797,9 +798,9 @@
                 </div>
                 
                 <!-- Strategy Insights Section -->
-                <div class="content-section" id="strategy-insights-section">
+                <div class="content-section"  data-section="strategy-insights-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon"> תובנות</h2>
+                        <h2><span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="icon" aria-label="icon"></span> תובנות</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" data-onclick="toggleSection('strategy-insights-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -813,7 +814,7 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <p class="card-text" id="best-strategy-insight">
-                                            <img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">
+                                            <span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="icon" aria-label="icon"></span>
                                             <strong>אסטרטגיה הטובה ביותר:</strong> טוען...
                                         </p>
                                     </div>
@@ -823,7 +824,7 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <p class="card-text" id="best-success-rate-insight">
-                                            <img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="info-circle" class="icon">
+                                            <span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="info-circle" aria-label="info-circle"></span>
                                             <strong>אחוז הצלחה הגבוה ביותר:</strong> טוען...
                                         </p>
                                     </div>
@@ -833,7 +834,7 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <p class="card-text" id="recommendation-insight">
-                                            <img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">
+                                            <span class="icon-placeholder icon" data-icon="alert-triangle" data-size="16" data-alt="alert-triangle" aria-label="alert-triangle"></span>
                                             <strong>המלצה:</strong> טוען...
                                         </p>
                                     </div>
@@ -902,7 +903,7 @@
                                     <div class="tradingview-chart-wrapper">
                                         <div class="tradingview-chart-container" id="strategy-performance-chart-container">
                                             <div class="chart-loading">
-                                                <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                                <span class="icon-placeholder icon" data-icon="clock" data-size="16" data-alt="hourglass" aria-label="hourglass"></span> טוען גרף...
                                             </div>
                                         </div>
                                     </div>
@@ -968,19 +969,19 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="alert alert-success">
-                                            <img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">
+                                            <span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="icon" aria-label="icon"></span>
                                             <strong>אסטרטגיה הטובה ביותר:</strong> Breakout Strategy עם P/L כולל של $8,000
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="alert alert-info">
-                                            <img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="info-circle" class="icon">
+                                            <span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="info-circle" aria-label="info-circle"></span>
                                             <strong>אחוז הצלחה הגבוה ביותר:</strong> Support Bounce עם 70%
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="alert alert-warning">
-                                            <img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">
+                                            <span class="icon-placeholder icon" data-icon="alert-triangle" data-size="16" data-alt="alert-triangle" aria-label="alert-triangle"></span>
                                             <strong>המלצה:</strong> שקול להגדיל את השימוש ב-Breakout Strategy בגלל ה-Risk/Reward הגבוה (1:3)
                                         </div>
                                     </div>
@@ -997,5 +998,9 @@
     <div class="page-bottom-spacing"></div>
     <!-- Page-specific script -->
     <script src="../../scripts/strategy-analysis-page.js" defer></script>
+    
+    <!-- Notification System Containers -->
+    <div class="notification-container" id="notification-container"></div>
+    <div id="toast-container"></div>
 </body>
 </html>

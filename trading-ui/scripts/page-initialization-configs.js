@@ -572,12 +572,20 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
       // ← NEW: מטאדאטה
       description: 'מעקב ביצועי עסקאות - היסטוריית ביצועים שבוצעו',
-      lastModified: '2025-11-13',
+      lastModified: '2025-11-24',
       pageType: 'crud',
 
       // ← NEW: אופטימיזציה
       preloadAssets: ['executions-data'],
       cacheStrategy: 'aggressive',
+
+      // ← NEW: Section default states
+      // Main section loads open, trade-creation and suggestions load closed (lazy loading)
+      sectionsDefaultState: 'open', // Default for all sections
+      sectionDefaultStates: {
+        'trade-creation': 'closed', // Lazy loading - closed by default
+        'suggestions': 'closed',    // Lazy loading - closed by default
+      },
 
       // קיים
       requiresFilters: true,

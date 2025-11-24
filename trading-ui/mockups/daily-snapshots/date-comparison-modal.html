@@ -33,6 +33,7 @@
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Logger Service -->
     <script src="../../scripts/logger-service.js" defer></script>
@@ -89,7 +90,7 @@
                 <div class="col-md-12">
                     <div class="mockups-navigation-content">
                         <span class="mockups-navigation-label">
-                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
                         </span>
                         <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
                         <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
@@ -108,9 +109,9 @@
                 </div>
                 
                 <!-- Date Selection Section -->
-                <div class="content-section" id="date-selection-section">
+                <div class="content-section"  data-section="date-selection-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/calendar.svg" width="16" height="16" alt="calendar" class="icon"> בחירת תאריכים להשוואה</h2>
+                        <h2><span class="icon-placeholder icon" data-icon="calendar" data-size="16" data-alt="calendar" aria-label="calendar"></span> בחירת תאריכים להשוואה</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" data-onclick="toggleSection('date-selection-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -200,9 +201,9 @@
                 </div>
                 
                 <!-- Comparison Table Section -->
-                <div class="content-section" id="date_comparison_modal-טבלת-השוואות">
+                <div class="content-section"  data-section="date_comparison_modal-טבלת-השוואות">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/clipboard-list.svg" width="16" height="16" alt="icon" class="icon"> טבלת השוואות</h2>
+                        <h2><span class="icon-placeholder icon" data-icon="clipboard-list" data-size="16" data-alt="icon" aria-label="icon"></span> טבלת השוואות</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-טבלת-השוואות')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -232,9 +233,9 @@
                 </div>
                 
                 <!-- Bar Chart Section -->
-                <div class="content-section" id="date_comparison_modal-גרף-bar-chart---השוואה-בין-ה">
+                <div class="content-section"  data-section="date_comparison_modal-גרף-bar-chart---השוואה-בין-ה">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon"> גרף Bar Chart - השוואה בין התאריכים</h2>
+                        <h2><span class="icon-placeholder icon" data-icon="chart-line" data-size="16" data-alt="chart-line" aria-label="chart-line"></span> גרף Bar Chart - השוואה בין התאריכים</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-גרף-bar-chart---השוואה-בין-ה')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -247,7 +248,7 @@
                             <div class="tradingview-chart-wrapper date-comparison-bar-chart-wrapper">
                                 <div class="tradingview-chart-container tradingview-bar-chart-container" id="bar-chart-container">
                                     <div class="chart-loading">
-                                        <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                        <span class="icon-placeholder icon" data-icon="clock" data-size="16" data-alt="hourglass" aria-label="hourglass"></span> טוען גרף...
                                     </div>
                                 </div>
                             </div>
@@ -260,9 +261,9 @@
                 </div>
                 
                 <!-- Line Chart Section -->
-                <div class="content-section" id="date_comparison_modal-גרף-line-chart---מגמה-בין-הת">
+                <div class="content-section"  data-section="date_comparison_modal-גרף-line-chart---מגמה-בין-הת">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon"> גרף Line Chart - מגמה בין התאריכים</h2>
+                        <h2><span class="icon-placeholder icon" data-icon="chart-line" data-size="16" data-alt="chart-line" aria-label="chart-line"></span> גרף Line Chart - מגמה בין התאריכים</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-גרף-line-chart---מגמה-בין-הת')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -275,7 +276,7 @@
                             <div class="tradingview-chart-wrapper date-comparison-line-chart-wrapper">
                                 <div class="tradingview-chart-container tradingview-line-chart-container" id="line-chart-container">
                                     <div class="chart-loading">
-                                        <img src="../../images/icons/tabler/clock.svg" width="16" height="16" alt="hourglass" class="icon"> טוען גרף...
+                                        <span class="icon-placeholder icon" data-icon="clock" data-size="16" data-alt="hourglass" aria-label="hourglass"></span> טוען גרף...
                                     </div>
                                 </div>
                             </div>
@@ -306,5 +307,9 @@
     </div>
     <!-- Page-specific script -->
     <script src="../../scripts/date-comparison-modal.js" defer></script>
+    
+    <!-- Notification System Containers -->
+    <div class="notification-container" id="notification-container"></div>
+    <div id="toast-container"></div>
 </body>
 </html>

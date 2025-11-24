@@ -35,6 +35,7 @@
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Logger Service -->
     <script src="../../scripts/logger-service.js" defer></script>
@@ -75,7 +76,7 @@
                 <div class="col-md-12">
                     <div class="mockups-navigation-content">
                         <span class="mockups-navigation-label">
-                            <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
                         </span>
                         <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
                         <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
@@ -99,10 +100,10 @@
         <div class="page-body">
             <div class="main-content">
                 <!-- Emotional Tracking Widget Section -->
-                <div class="top-section" id="emotional_tracking_widget_top_section">
+                <div class="top-section" id="emotional_tracking_widget_top_section" data-section="emotional_tracking_widget_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">
+                            <span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="icon" aria-label="icon"></span>
                             תיעוד רגשי
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
@@ -210,6 +211,10 @@
     
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
+    
+    <!-- Notification System Containers -->
+    <div class="notification-container" id="notification-container"></div>
+    <div id="toast-container"></div>
     
     <!-- Page-specific script -->
     <script src="../../scripts/emotional-tracking-widget.js" defer></script>

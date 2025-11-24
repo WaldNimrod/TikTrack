@@ -30,6 +30,7 @@
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Logger Service -->
     <script src="../../scripts/logger-service.js" defer></script>
@@ -98,7 +99,7 @@
         <div class="page-body">
             <div class="main-content">
                 <!-- Header Section -->
-                <div class="content-section" id="economic_calendar_page-פילטרים">
+                <div class="content-section"  data-section="economic_calendar_page-פילטרים">
                     <div class="section-header">
                         <h2><span class="icon-placeholder" data-icon="info-circle" data-size="16"></span> פילטרים</h2>
                         <div class="header-actions">
@@ -141,7 +142,7 @@
                         </div>
                         
                         <!-- Calendar View Section -->
-                <div class="content-section" id="economic_calendar_page-אירועים-כלכליים">
+                <div class="content-section"  data-section="economic_calendar_page-אירועים-כלכליים">
                     <div class="section-header">
                         <h2><span class="icon-placeholder" data-icon="info-circle" data-size="16"></span> אירועים כלכליים</h2>
                         <div class="header-actions">
@@ -181,7 +182,7 @@
                 </div>
                 
                 <!-- Saved Events Section -->
-                <div class="content-section" id="economic_calendar_page-אירועים-שמורים">
+                <div class="content-section"  data-section="economic_calendar_page-אירועים-שמורים">
                     <div class="section-header">
                         <h2><span class="icon-placeholder" data-icon="bookmark" data-size="16"></span> אירועים שמורים</h2>
                         <div class="header-actions">
@@ -201,7 +202,7 @@
                 </div>
                 
                 <!-- Summary Statistics Section -->
-                <div class="content-section" id="economic_calendar_page-סטטיסטיקות">
+                <div class="content-section"  data-section="economic_calendar_page-סטטיסטיקות">
                     <div class="section-header">
                         <h2><span class="icon-placeholder" data-icon="chart-bar" data-size="16"></span> סטטיסטיקות</h2>
                         <div class="header-actions">
@@ -227,5 +228,9 @@
     <div class="page-bottom-spacing"></div>
     <!-- Page-specific script -->
     <script src="../../scripts/economic-calendar-page.js" defer></script>
+    
+    <!-- Notification System Containers -->
+    <div class="notification-container" id="notification-container"></div>
+    <div id="toast-container"></div>
 </body>
 </html>

@@ -57,6 +57,7 @@
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script> <!-- Central icon mappings -->
     <!-- [10] Load Order: 10 -->
     <script src="../../scripts/icon-system.js?v=1.0.0"></script> <!-- Central icon system -->
+    <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script> <!-- Mockups icon initializer -->
     <!-- [11] Load Order: 11 -->
     <script src="../../scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- Cache clearing control (Stage B-Lite) -->
     <!-- [12] Load Order: 12 -->
@@ -247,7 +248,7 @@
                 <div class="col-md-12">
                     <div class="mockups-navigation-content">
                         <span class="mockups-navigation-label">
-                            <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
                         </span>
                         <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
                         <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
@@ -270,10 +271,10 @@
         <div class="page-body">
             <div class="main-content">
                 <!-- Header Section -->
-                <div class="top-section" id="trading_journal_page_top_section">
+                <div class="top-section"  data-section="trading_journal_page_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <img src="../../images/icons/tabler/book.svg" width="16" height="16" alt="book" class="icon">
+                            <span class="icon-placeholder icon" data-icon="notebook" data-size="16" data-alt="book" aria-label="book"></span>
                             יומן מסחר
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
@@ -285,9 +286,9 @@
                     
                     <div class="section-body">
                         <!-- Calendar View Section -->
-                <div class="content-section" id="trading_journal_page-תצוגה-חודשית">
+                <div class="content-section"  data-section="trading_journal_page-תצוגה-חודשית">
                     <div class="section-header">
-                                <h2><img src="../../images/icons/tabler/calendar.svg" width="16" height="16" alt="calendar" class="icon"> תצוגה חודשית</h2>
+                                <h2><span class="icon-placeholder icon" data-icon="calendar" data-size="16" data-alt="calendar" aria-label="calendar"></span> תצוגה חודשית</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" data-onclick="toggleSection('trading_journal_page-תצוגה-חודשית')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -440,9 +441,9 @@
                 </div>
                 
                 <!-- Journal Entries List Section -->
-                <div class="content-section" id="journal-entries-list-section">
+                <div class="content-section"  data-section="journal-entries-list-section">
                     <div class="section-header">
-                        <h2><img src="../../images/icons/tabler/list.svg" width="16" height="16" alt="list" class="icon"> רשומות יומן</h2>
+                        <h2><span class="icon-placeholder icon" data-icon="clipboard-list" data-size="16" data-alt="list" aria-label="list"></span> רשומות יומן</h2>
                         <div class="header-actions d-flex align-items-center gap-2">
                             <div>
                                     <input type="text" class="form-control form-control-sm d-inline-block form-control-inline-search" placeholder="חיפוש..." id="journal-search-input">
@@ -551,20 +552,20 @@
                                         <div>
                                             <div class="journal-entry-date">15 בינואר 2025, 14:30</div>
                                             <div class="journal-entry-type-badge">
-                                                <img src="../../images/icons/tabler/activity.svg" width="16" height="16" alt="execution" class="icon"> ביצוע
+                                                <span class="icon-placeholder icon" data-icon="activity" data-size="16" data-alt="execution" aria-label="execution"></span> ביצוע
                                             </div>
                                             <div class="journal-entry-content">
                                                 <strong>AAPL</strong> | <strong>קנייה</strong> | כמות: <strong>10</strong> | מחיר: <strong>$150.25</strong> | עמלה: <strong>$1.00</strong> | Realized P/L: <strong>-$</strong> | MTM P/L: <strong>-$</strong>
                                             </div>
                                             <div class="journal-entry-meta">
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> טרייד #123
+                                                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> טרייד #123
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/wallet.svg" width="16" height="16" alt="account" class="icon"> IBKR Main
+                                                    <span class="icon-placeholder icon" data-icon="wallet" data-size="16" data-alt="account" aria-label="account"></span> IBKR Main
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/database.svg" width="16" height="16" alt="source" class="icon"> manual
+                                                    <span class="icon-placeholder icon" data-icon="database" data-size="16" data-alt="source" aria-label="source"></span> manual
                                                 </div>
                                             </div>
                                         </div>
@@ -580,20 +581,20 @@
                                     <div>
                                             <div class="journal-entry-date">14 בינואר 2025</div>
                                             <div class="journal-entry-type-badge">
-                                                <img src="../../images/icons/tabler/cash.svg" width="16" height="16" alt="cash_flow" class="icon"> תזרים מזומן
+                                                <span class="icon-placeholder icon" data-icon="currency-dollar" data-size="16" data-alt="cash_flow" aria-label="cash_flow"></span> תזרים מזומן
                                             </div>
                                             <div class="journal-entry-content">
                                                 <strong>הפקדה</strong> | סכום: <strong>$5,000.00</strong> | עמלה: <strong>$0.00</strong> | תיאור: הפקדה ראשונית לחשבון
                                             </div>
                                             <div class="journal-entry-meta">
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/wallet.svg" width="16" height="16" alt="account" class="icon"> IBKR Main
+                                                    <span class="icon-placeholder icon" data-icon="wallet" data-size="16" data-alt="account" aria-label="account"></span> IBKR Main
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/currency-dollar.svg" width="16" height="16" alt="currency" class="icon"> USD
+                                                    <span class="icon-placeholder icon" data-icon="currency-dollar" data-size="16" data-alt="currency" aria-label="currency"></span> USD
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/database.svg" width="16" height="16" alt="source" class="icon"> manual
+                                                    <span class="icon-placeholder icon" data-icon="database" data-size="16" data-alt="source" aria-label="source"></span> manual
                                                 </div>
                                             </div>
                                         </div>
@@ -609,26 +610,26 @@
                                             <div>
                                             <div class="journal-entry-date">13 בינואר 2025, 09:15</div>
                                             <div class="journal-entry-type-badge">
-                                                <img src="../../images/icons/tabler/plus-circle.svg" width="16" height="16" alt="trade_created" class="icon"> טרייד נוצר
+                                                <span class="icon-placeholder icon" data-icon="plus" data-size="16" data-alt="trade_created" aria-label="trade_created"></span> טרייד נוצר
                                             </div>
                                             <div class="journal-entry-content">
                                                 <strong>AAPL</strong> | מחיר: <strong>$150.25</strong> | שינוי: <strong>+1.2%</strong> | פוזיציה: <strong>10</strong> | P/L%: <strong>+2.5%</strong> | P/L: <strong>$150.00</strong>
                                             </div>
                                             <div class="journal-entry-meta">
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> טרייד #123
+                                                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> טרייד #123
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/wallet.svg" width="16" height="16" alt="account" class="icon"> IBKR Main
+                                                    <span class="icon-placeholder icon" data-icon="wallet" data-size="16" data-alt="account" aria-label="account"></span> IBKR Main
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="status" class="icon"> פתוח
+                                                    <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="status" aria-label="status"></span> פתוח
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/tag.svg" width="16" height="16" alt="type" class="icon"> סווינג
+                                                    <span class="icon-placeholder icon" data-icon="tag" data-size="16" data-alt="type" aria-label="type"></span> סווינג
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/arrows-left-right.svg" width="16" height="16" alt="side" class="icon"> Long
+                                                    <span class="icon-placeholder icon" data-icon="arrows-sort" data-size="16" data-alt="side" aria-label="side"></span> Long
                                                 </div>
                                             </div>
                                         </div>
@@ -644,26 +645,26 @@
                                             <div>
                                             <div class="journal-entry-date">12 בינואר 2025, 16:45</div>
                                             <div class="journal-entry-type-badge">
-                                                <img src="../../images/icons/tabler/plus-circle.svg" width="16" height="16" alt="trade_plan_created" class="icon"> תוכנית נוצרה
+                                                <span class="icon-placeholder icon" data-icon="plus" data-size="16" data-alt="trade_plan_created" aria-label="trade_plan_created"></span> תוכנית נוצרה
                                             </div>
                                             <div class="journal-entry-content">
                                                 <strong>TSLA</strong> | כמות: <strong>10</strong> | מחיר יעד: <strong>$200.00</strong> | השקעה: <strong>$2,000</strong> | סיכוי: <strong>$500</strong> | סיכון: <strong>$200</strong> | יחס: <strong>2.5</strong>
                                             </div>
                                             <div class="journal-entry-meta">
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> תוכנית #45
+                                                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> תוכנית #45
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/wallet.svg" width="16" height="16" alt="account" class="icon"> IBKR Main
+                                                    <span class="icon-placeholder icon" data-icon="wallet" data-size="16" data-alt="account" aria-label="account"></span> IBKR Main
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="status" class="icon"> פתוח
+                                                    <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="status" aria-label="status"></span> פתוח
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/tag.svg" width="16" height="16" alt="type" class="icon"> סווינג
+                                                    <span class="icon-placeholder icon" data-icon="tag" data-size="16" data-alt="type" aria-label="type"></span> סווינג
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/arrows-left-right.svg" width="16" height="16" alt="side" class="icon"> Long
+                                                    <span class="icon-placeholder icon" data-icon="arrows-sort" data-size="16" data-alt="side" aria-label="side"></span> Long
                                                 </div>
                                             </div>
                                         </div>
@@ -679,26 +680,26 @@
                                             <div>
                                             <div class="journal-entry-date">10 בינואר 2025, 15:20</div>
                                             <div class="journal-entry-type-badge">
-                                                <img src="../../images/icons/tabler/check-circle.svg" width="16" height="16" alt="trade_closed" class="icon"> טרייד נסגר
+                                                <span class="icon-placeholder icon" data-icon="check" data-size="16" data-alt="trade_closed" aria-label="trade_closed"></span> טרייד נסגר
                                             </div>
                                             <div class="journal-entry-content">
                                                 <strong>MSFT</strong> | מחיר: <strong>$350.00</strong> | שינוי: <strong>+0.5%</strong> | פוזיציה: <strong>0</strong> | P/L%: <strong>+4.5%</strong> | P/L: <strong>$450.00</strong>
                                             </div>
                                             <div class="journal-entry-meta">
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> טרייד #120
+                                                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> טרייד #120
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/wallet.svg" width="16" height="16" alt="account" class="icon"> IBKR Main
+                                                    <span class="icon-placeholder icon" data-icon="wallet" data-size="16" data-alt="account" aria-label="account"></span> IBKR Main
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="status" class="icon"> סגור
+                                                    <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="status" aria-label="status"></span> סגור
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/tag.svg" width="16" height="16" alt="type" class="icon"> סווינג
+                                                    <span class="icon-placeholder icon" data-icon="tag" data-size="16" data-alt="type" aria-label="type"></span> סווינג
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/arrows-left-right.svg" width="16" height="16" alt="side" class="icon"> Long
+                                                    <span class="icon-placeholder icon" data-icon="arrows-sort" data-size="16" data-alt="side" aria-label="side"></span> Long
                                                 </div>
                                             </div>
                                         </div>
@@ -714,20 +715,20 @@
                                             <div>
                                             <div class="journal-entry-date">8 בינואר 2025, 11:30</div>
                                             <div class="journal-entry-type-badge">
-                                                <img src="../../images/icons/tabler/x-circle.svg" width="16" height="16" alt="trade_plan_cancelled" class="icon"> תוכנית בוטלה
+                                                <span class="icon-placeholder icon" data-icon="x" data-size="16" data-alt="trade_plan_cancelled" aria-label="trade_plan_cancelled"></span> תוכנית בוטלה
                                             </div>
                                             <div class="journal-entry-content">
                                                 <strong>NVDA</strong> | תוכנית <strong>#42</strong> בוטלה | סיבה: תנאי כניסה לא התקיימו
                                             </div>
                                             <div class="journal-entry-meta">
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> תוכנית #42
+                                                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> תוכנית #42
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/wallet.svg" width="16" height="16" alt="account" class="icon"> IBKR Main
+                                                    <span class="icon-placeholder icon" data-icon="wallet" data-size="16" data-alt="account" aria-label="account"></span> IBKR Main
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="status" class="icon"> בוטל
+                                                    <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="status" aria-label="status"></span> בוטל
                                                 </div>
                                             </div>
                                         </div>
@@ -743,17 +744,17 @@
                                             <div>
                                             <div class="journal-entry-date">5 בינואר 2025, 08:00</div>
                                             <div class="journal-entry-type-badge">
-                                                <img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="note" class="icon"> הערה
+                                                <span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="note" aria-label="note"></span> הערה
                                             </div>
                                             <div class="journal-entry-content">
                                                 תחילת חודש - סקירה כללית. מטרות: שיפור אחוז הצלחה, ניהול סיכון טוב יותר. התמקדות באסטרטגיות RSI ו-MACD.
                                             </div>
                                             <div class="journal-entry-meta">
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> IBKR Main
+                                                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> IBKR Main
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/paperclip.svg" width="16" height="16" alt="attachment" class="icon"> אין קובץ
+                                                    <span class="icon-placeholder icon" data-icon="paperclip" data-size="16" data-alt="attachment" aria-label="attachment"></span> אין קובץ
                                                 </div>
                                             </div>
                                         </div>
@@ -770,20 +771,20 @@
                                             <div>
                                             <div class="journal-entry-date">3 בינואר 2025, 10:15</div>
                                             <div class="journal-entry-type-badge">
-                                                <img src="../../images/icons/tabler/bell.svg" width="16" height="16" alt="alert" class="icon"> התראה הופעלה
+                                                <span class="icon-placeholder icon" data-icon="bell" data-size="16" data-alt="alert" aria-label="alert"></span> התראה הופעלה
                                             </div>
                                             <div class="journal-entry-content">
                                                 <strong>AAPL</strong> | מחיר עלה מעל <strong>$150.00</strong> | תנאי: price | more_than | 150.00
                                             </div>
                                             <div class="journal-entry-meta">
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> התראה #78
+                                                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> התראה #78
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="status" class="icon"> open
+                                                    <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="status" aria-label="status"></span> open
                                                 </div>
                                                 <div class="journal-entry-meta-item">
-                                                    <img src="../../images/icons/tabler/check.svg" width="16" height="16" alt="triggered" class="icon"> הופעל
+                                                    <span class="icon-placeholder icon" data-icon="check" data-size="16" data-alt="triggered" aria-label="triggered"></span> הופעל
                                                 </div>
                                             </div>
                                         </div>

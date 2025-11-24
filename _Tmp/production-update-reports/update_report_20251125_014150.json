@@ -1,0 +1,87 @@
+{
+  "start_time": "2025-11-25T01:41:48.575075",
+  "steps": [
+    {
+      "number": 1,
+      "name": "collect_changes",
+      "success": true,
+      "duration_seconds": 1.664170265197754,
+      "timestamp": "2025-11-25T01:41:50.247752",
+      "details": {
+        "success": true,
+        "commits_count": 15,
+        "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251125_014148.log",
+        "commits": [
+          "f0499983e feat: Complete sections toggle system standardization across all pages",
+          "11d83e5e7 Optimize Economic Calendar page: faster widget loading and clean console",
+          "9d8404fd8 feat: Complete standardization of all 10 mockup pages with general systems integration",
+          "039ffe4ab Implement date comparison modal with multiple dates support",
+          "58d5f1b2b Fix sections toggle system and add missing info-circle icon"
+        ]
+      }
+    },
+    {
+      "number": 2,
+      "name": "check_server",
+      "success": true,
+      "duration_seconds": 0.07184290885925293,
+      "timestamp": "2025-11-25T01:41:50.320070",
+      "details": {
+        "success": true,
+        "running": true,
+        "port": 5001,
+        "pid": 28841,
+        "health": "healthy",
+        "uptime": 25306.83203983307
+      }
+    },
+    {
+      "number": 3,
+      "name": "backup_database",
+      "success": false,
+      "duration_seconds": 0.000579833984375,
+      "timestamp": "2025-11-25T01:41:50.321010",
+      "details": {
+        "success": false,
+        "error": "PostgreSQL environment variables not set"
+      }
+    }
+  ],
+  "files_updated": [],
+  "files_new": [
+    {
+      "path": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251125_014148.log",
+      "timestamp": "2025-11-25T01:41:50.247735",
+      "details": {
+        "type": "release_notes",
+        "commits_count": 15
+      }
+    }
+  ],
+  "files_deleted": [],
+  "warnings": [],
+  "errors": [
+    {
+      "message": "Database backup failed: PostgreSQL environment variables not set",
+      "step": "backup_database",
+      "timestamp": "2025-11-25T01:41:50.320992"
+    },
+    {
+      "message": "Step 3 (backup_database) failed",
+      "step": "backup_database",
+      "timestamp": "2025-11-25T01:41:50.321012"
+    }
+  ],
+  "summary": {
+    "total_duration_seconds": 1.746383,
+    "steps_completed": 2,
+    "steps_failed": 1,
+    "files_updated_count": 0,
+    "files_new_count": 1,
+    "files_deleted_count": 0,
+    "warnings_count": 0,
+    "errors_count": 2
+  },
+  "end_time": "2025-11-25T01:41:50.321458",
+  "success": false
+}

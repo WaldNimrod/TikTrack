@@ -67,7 +67,7 @@ function initializeSeriesControls() {
                        id="series-${series.key}" 
                        class="form-check-input" 
                        ${isChecked ? 'checked' : ''}
-                       onchange="toggleSeries('${series.key}', this.checked)">
+                       data-onchange="toggleSeries('${series.key}', this.checked)">
                 <label for="series-${series.key}" class="series-checkbox-label">
                     <div class="series-color-indicator" style="background-color: ${color};"></div>
                     <span class="form-label-small">${series.label}</span>
@@ -546,7 +546,12 @@ function getDateRange() {
 async function saveFilterState() {
     try {
         const filters = getFilterValues();
-        if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
+        // Use PageStateManager if available
+        if (window.PageStateManager) {
+            await window.PageStateManager.savePageState('comparative-analysis-page', {
+                filters: filters
+            });
+        } else if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
             await window.PreferencesCore.savePreference(PREF_FILTERS, filters);
         } else {
             // Fallback to localStorage
@@ -1551,7 +1556,7 @@ function updateHeatmap(filters) {
         <tr class="heatmap-row" data-category="${item.category}" data-index="${index}" 
             onmouseover="showHeatmapTooltip(event, ${JSON.stringify(item).replace(/"/g, '&quot;')})"
             onmouseout="hideHeatmapTooltip()"
-            onclick="filterByCategory('${item.category}')">
+            data-onclick="filterByCategory('${item.category}')">
             <td><strong>${item.category}</strong></td>
             <td style="${getColorStyle(item.tradesPercentile, item.trades)}" data-value="${item.trades}">${item.trades}</td>
             <td style="${getColorStyle(item.avgPLPercentile, item.avgPL)}" data-value="${item.avgPL}">${formatPLWithPercent(item.avgPL, plPercent)}</td>
@@ -1692,21 +1697,23 @@ function updateVisualHeatmap(filters) {
     sortedData.forEach((item, index) => {
         const value = item[currentSortBy] || 0;
         const percentile = getValuePercentile(value);
-        // getColorClass expects only percentile, but we need to handle positive/negative separately
-        // For visual heatmap, we use the same logic as the table heatmap
+        // Get color class based on value sign and percentile
+        // Positive values: GREEN gradient only (heatmap-excellent to heatmap-very-poor)
+        // Negative values: RED gradient only (heatmap-negative-excellent to heatmap-negative-very-good)
         let colorClass;
         if (value >= 0) {
+            // Positive values: use green gradient classes
             colorClass = getColorClass(percentile);
         } else {
-            // For negative values, invert percentile
+            // Negative values: use red gradient classes (invert percentile)
             const invertedPercentile = 1 - percentile;
-            if (invertedPercentile >= 0.9) colorClass = 'heatmap-very-poor';
-            else if (invertedPercentile >= 0.75) colorClass = 'heatmap-poor';
-            else if (invertedPercentile >= 0.6) colorClass = 'heatmap-below-avg';
-            else if (invertedPercentile >= 0.4) colorClass = 'heatmap-average';
-            else if (invertedPercentile >= 0.25) colorClass = 'heatmap-good';
-            else if (invertedPercentile >= 0.1) colorClass = 'heatmap-very-good';
-            else colorClass = 'heatmap-excellent';
+            if (invertedPercentile >= 0.9) colorClass = 'heatmap-negative-excellent';
+            else if (invertedPercentile >= 0.75) colorClass = 'heatmap-negative-very-poor';
+            else if (invertedPercentile >= 0.6) colorClass = 'heatmap-negative-poor';
+            else if (invertedPercentile >= 0.4) colorClass = 'heatmap-negative-average';
+            else if (invertedPercentile >= 0.25) colorClass = 'heatmap-negative-below-avg';
+            else if (invertedPercentile >= 0.1) colorClass = 'heatmap-negative-good';
+            else colorClass = 'heatmap-negative-very-good';
         }
         
         const cell = document.createElement('div');
@@ -2022,9 +2029,12 @@ function updateChartLegend() {
 }
 
 
-// Update all visualizations
-async function updateAllVisualizations() {
+// Update all visualizations (internal implementation)
+async function updateAllVisualizationsInternal() {
     const filters = getFilterValues();
+    
+    // Save filter state
+    await saveFilterState();
     
     // Update table
     updateComparisonTable(filters);
@@ -2037,6 +2047,16 @@ async function updateAllVisualizations() {
     
     // Update charts (async to handle chart initialization if needed)
     await updateComparisonChart(filters);
+}
+
+// Create debounced version
+const debouncedUpdateAllVisualizations = window.debounce ? 
+    window.debounce(updateAllVisualizationsInternal, 300) : 
+    updateAllVisualizationsInternal;
+
+// Update all visualizations (public function with debounce)
+async function updateAllVisualizations() {
+    await debouncedUpdateAllVisualizations();
 }
 
 // Update Comparison Chart
@@ -2311,7 +2331,7 @@ function updateStatusFilterText() {
 // ===== Record Filter Functions =====
 function applyRecordFilters() {
     saveRecordFilterState();
-    updateAllVisualizations();
+    updateAllVisualizationsInternal();
 }
 
 // Select all options in all record filter selects
@@ -2406,7 +2426,7 @@ function resetRecordFilters() {
     }
     
     saveRecordFilterState();
-    updateAllVisualizations();
+    updateAllVisualizationsInternal();
 }
 
 function resetRecordFiltersToDefaults() {
@@ -2464,7 +2484,7 @@ function resetRecordFiltersToDefaults() {
     }
     
     saveRecordFilterState();
-    updateAllVisualizations();
+    updateAllVisualizationsInternal();
 }
 
 // ===== Comparison Parameter Functions =====
@@ -2568,7 +2588,7 @@ function toggleComparisonParameter(paramType) {
 
 function applyComparisonParameters() {
     saveComparisonParameterState();
-    updateAllVisualizations();
+    updateAllVisualizationsInternal();
 }
 
 // Select all options in all comparison parameter selects
@@ -2636,7 +2656,7 @@ function clearAllComparisonParameters() {
     }
     
     saveComparisonParameterState();
-    updateAllVisualizations();
+    updateAllVisualizationsInternal();
 }
 
 // Reset comparison parameters (clear all)
@@ -2693,7 +2713,7 @@ function resetComparisonParameters() {
     }
     
     saveComparisonParameterState();
-    updateAllVisualizations();
+    updateAllVisualizationsInternal();
 }
 
 // Reset comparison parameters to defaults (no defaults - same as clear)
@@ -2715,16 +2735,35 @@ async function loadTradingAccounts() {
                 `<option value="${acc.id}">${acc.name || `Account #${acc.id}`}</option>`
             ).join('');
         } else {
-            // Fallback: fetch from API
-            const response = await fetch('/api/trading-accounts/');
-            if (response.ok) {
-                const data = await response.json();
+            // Fallback: fetch from API with caching
+            const cacheKey = window.createCacheKey ? 
+                window.createCacheKey('comparative-analysis', 'trading-accounts', {}) : 
+                'comparative-analysis-trading-accounts-default';
+            
+            // Try to load from cache
+            if (window.UnifiedCacheManager) {
+                const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
+                if (cachedData) {
+                    select.innerHTML = cachedData.map(acc => 
+                        `<option value="${acc.id}">${acc.name || `Account #${acc.id}`}</option>`
+                    ).join('');
+                    return;
+                }
+            }
+            
+            try {
+                const data = await window.safeApiCall('/api/trading-accounts/');
                 const accounts = data.data || data || [];
                 select.innerHTML = accounts.map(acc => 
                     `<option value="${acc.id}">${acc.name || `Account #${acc.id}`}</option>`
                 ).join('');
-            } else {
-                // Mock data fallback
+                
+                // Save to cache
+                if (window.UnifiedCacheManager) {
+                    await window.UnifiedCacheManager.save(cacheKey, accounts, 'memory', { ttl: 600 }); // 10 minutes
+                }
+            } catch (apiError) {
+                // Error already handled by safeApiCall, fallback to mock data
                 select.innerHTML = `
                     <option value="1">Account #1</option>
                     <option value="2">Account #2</option>
@@ -2737,6 +2776,9 @@ async function loadTradingAccounts() {
             window.Logger.info('✅ Trading accounts loaded', { page: 'comparative-analysis-page' });
         }
     } catch (error) {
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה בטעינת נתונים', 'שגיאה בטעינת חשבונות מסחר');
+        }
         if (window.Logger) {
             window.Logger.error('❌ Error loading trading accounts', { page: 'comparative-analysis-page', error });
         }
@@ -2826,16 +2868,35 @@ async function loadTickers() {
                 `<option value="${ticker.id}">${ticker.symbol || `Ticker #${ticker.id}`}</option>`
             ).join('');
         } else {
-            // Fallback: fetch from API
-            const response = await fetch('/api/tickers/');
-            if (response.ok) {
-                const data = await response.json();
+            // Fallback: fetch from API with caching
+            const cacheKey = window.createCacheKey ? 
+                window.createCacheKey('comparative-analysis', 'tickers', {}) : 
+                'comparative-analysis-tickers-default';
+            
+            // Try to load from cache
+            if (window.UnifiedCacheManager) {
+                const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
+                if (cachedData) {
+                    select.innerHTML = cachedData.map(ticker => 
+                        `<option value="${ticker.id}">${ticker.symbol || `Ticker #${ticker.id}`}</option>`
+                    ).join('');
+                    return;
+                }
+            }
+            
+            try {
+                const data = await window.safeApiCall('/api/tickers/');
                 const tickers = data.data || data || [];
                 select.innerHTML = tickers.map(ticker => 
                     `<option value="${ticker.id}">${ticker.symbol || `Ticker #${ticker.id}`}</option>`
                 ).join('');
-            } else {
-                // Mock data fallback
+                
+                // Save to cache
+                if (window.UnifiedCacheManager) {
+                    await window.UnifiedCacheManager.save(cacheKey, tickers, 'memory', { ttl: 600 }); // 10 minutes
+                }
+            } catch (apiError) {
+                // Error already handled by safeApiCall, fallback to mock data
                 select.innerHTML = `
                     <option value="1">AAPL</option>
                     <option value="2">TSLA</option>
@@ -2850,6 +2911,9 @@ async function loadTickers() {
             window.Logger.info('✅ Tickers loaded', { page: 'comparative-analysis-page' });
         }
     } catch (error) {
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה בטעינת נתונים', 'שגיאה בטעינת טיקרים');
+        }
         if (window.Logger) {
             window.Logger.error('❌ Error loading tickers', { page: 'comparative-analysis-page', error });
         }
@@ -3148,7 +3212,7 @@ function resetFilters() {
     }
     
     saveFilterState();
-    updateAllVisualizations();
+    updateAllVisualizationsInternal();
 }
 
 // Reset to default values
@@ -3218,7 +3282,7 @@ function resetToDefaults() {
     }
     
     saveFilterState();
-    updateAllVisualizations();
+    updateAllVisualizationsInternal();
 }
 
 // Make functions globally available
@@ -3606,7 +3670,7 @@ async function initializeComparisonTags() {
         
         // Update all visualizations with initial filters
         // This will initialize the chart if needed and update all data
-        updateAllVisualizations();
+        updateAllVisualizationsInternal();
         
         // Setup export button
         const exportBtn = document.querySelector('button[data-button-type="EXPORT"]');

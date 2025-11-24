@@ -1,0 +1,1902 @@
+{
+  "timestamp": "2025-11-25T01:25:34.761807",
+  "total_pages": 12,
+  "pages_scanned": 12,
+  "pages_with_issues": 12,
+  "total_issues": 218,
+  "issues_by_severity": {
+    "critical": 11,
+    "high": 193,
+    "medium": 14,
+    "low": 0
+  },
+  "issues_by_system": {
+    "unknown": 218
+  },
+  "pages": {
+    "trading-journal-page.html": {
+      "total_issues": 15,
+      "issues": {
+        "buttons": [
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 284,
+            "snippet": "</div><button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('trading_journal_page_top_sectio"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 293,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('trading_journal_page-תצוגה-חודשית')\" "
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 462,
+            "snippet": "data-onclick=\"filterJournalByEntityType('all')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 474,
+            "snippet": "data-onclick=\"filterJournalByEntityType('execution')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 486,
+            "snippet": "data-onclick=\"filterJournalByEntityType('cash_flow')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 498,
+            "snippet": "data-onclick=\"filterJournalByEntityType('trade')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 510,
+            "snippet": "data-onclick=\"filterJournalByEntityType('trade_plan')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 522,
+            "snippet": "data-onclick=\"filterJournalByEntityType('note')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 534,
+            "snippet": "data-onclick=\"filterJournalByEntityType('alert')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 542,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('journal-entries-list-section')\" title"
+          }
+        ],
+        "sections": [
+          {
+            "type": "error",
+            "severity": "medium",
+            "check": "style-display-manipulation",
+            "description": "Direct style.display manipulation (should use toggleSection)",
+            "line": 842,
+            "snippet": "entry.style.display = '';"
+          },
+          {
+            "type": "error",
+            "severity": "medium",
+            "check": "style-display-manipulation",
+            "description": "Direct style.display manipulation (should use toggleSection)",
+            "line": 844,
+            "snippet": "entry.style.display = '';"
+          },
+          {
+            "type": "error",
+            "severity": "medium",
+            "check": "style-display-manipulation",
+            "description": "Direct style.display manipulation (should use toggleSection)",
+            "line": 846,
+            "snippet": "entry.style.display = '';"
+          },
+          {
+            "type": "error",
+            "severity": "medium",
+            "check": "style-display-manipulation",
+            "description": "Direct style.display manipulation (should use toggleSection)",
+            "line": 848,
+            "snippet": "entry.style.display = '';"
+          },
+          {
+            "type": "error",
+            "severity": "medium",
+            "check": "style-display-manipulation",
+            "description": "Direct style.display manipulation (should use toggleSection)",
+            "line": 850,
+            "snippet": "entry.style.display = 'none';"
+          }
+        ]
+      },
+      "script_count": 70,
+      "duplicate_scripts": {}
+    },
+    "trade-history-page.html": {
+      "total_issues": 18,
+      "issues": {
+        "buttons": [
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 142,
+            "snippet": "<button class=\"btn btn-sm btn-primary\" data-onclick=\"window.tradeHistoryPage.openTradeSelectorModal("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 145,
+            "snippet": "<button class=\"btn btn-sm btn-outline-primary\" data-onclick=\"exportData()\" title=\"ייצא נתונים\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 149,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('trade-history-top-section')\" title=\"ה"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 163,
+            "snippet": "<button class=\"btn btn-sm btn-outline-secondary\" data-onclick=\"window.tradeHistoryPage.clearSelected"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 206,
+            "snippet": "<button class=\"btn btn-sm btn-outline-primary ms-3\" data-onclick=\"showTradeDetailsModal(); return fa"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 292,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('timeline-absolute-section')\" title=\"ה"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 317,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('timeline-relative-section')\" title=\"ה"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 376,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('plan-vs-execution-section')\" title=\"ה"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 417,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('linked-items-section')\" title=\"הצג/הס"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 1629,
+            "snippet": "<button class=\"btn btn-primary\" data-onclick=\"window.viewLinkedItemsForTrade(${tradeId})\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 1851,
+            "snippet": "<button class=\"btn btn-outline-secondary btn-sm w-100\" data-onclick=\"window.tradeHistoryPage.clearTr"
+          }
+        ],
+        "sections": [
+          {
+            "type": "error",
+            "severity": "medium",
+            "check": "style-display-manipulation",
+            "description": "Direct style.display manipulation (should use toggleSection)",
+            "line": 501,
+            "snippet": "if (absoluteViewWrapper) absoluteViewWrapper.style.display = 'block';"
+          },
+          {
+            "type": "error",
+            "severity": "medium",
+            "check": "style-display-manipulation",
+            "description": "Direct style.display manipulation (should use toggleSection)",
+            "line": 502,
+            "snippet": "if (absoluteView) absoluteView.style.display = 'flex';"
+          },
+          {
+            "type": "error",
+            "severity": "medium",
+            "check": "style-display-manipulation",
+            "description": "Direct style.display manipulation (should use toggleSection)",
+            "line": 504,
+            "snippet": "relativeView.style.display = 'none';"
+          },
+          {
+            "type": "error",
+            "severity": "medium",
+            "check": "style-display-manipulation",
+            "description": "Direct style.display manipulation (should use toggleSection)",
+            "line": 508,
+            "snippet": "if (absoluteViewWrapper) absoluteViewWrapper.style.display = 'none';"
+          },
+          {
+            "type": "error",
+            "severity": "medium",
+            "check": "style-display-manipulation",
+            "description": "Direct style.display manipulation (should use toggleSection)",
+            "line": 509,
+            "snippet": "if (absoluteView) absoluteView.style.display = 'none';"
+          },
+          {
+            "type": "error",
+            "severity": "medium",
+            "check": "style-display-manipulation",
+            "description": "Direct style.display manipulation (should use toggleSection)",
+            "line": 511,
+            "snippet": "relativeView.style.display = 'block';"
+          }
+        ],
+        "initialization": [
+          {
+            "type": "missing",
+            "severity": "critical",
+            "check": "core-systems-script",
+            "description": "Missing core-systems.js script",
+            "line": null,
+            "snippet": null
+          }
+        ]
+      },
+      "script_count": 27,
+      "duplicate_scripts": {}
+    },
+    "portfolio-state-page.html": {
+      "total_issues": 37,
+      "issues": {
+        "icons": [
+          {
+            "type": "error",
+            "severity": "medium",
+            "check": "direct-img-tabler",
+            "description": "Direct <img> tag for Tabler icons (should use IconSystem)",
+            "line": 247,
+            "snippet": "<img src=\"/trading-ui/images/icons/tabler/chevron-down.svg\" width=\"16\" height=\"16\" alt=\"chevron-down"
+          },
+          {
+            "type": "error",
+            "severity": "medium",
+            "check": "direct-img-tabler",
+            "description": "Direct <img> tag for Tabler icons (should use IconSystem)",
+            "line": 283,
+            "snippet": "<img src=\"/trading-ui/images/icons/tabler/chevron-down.svg\" width=\"16\" height=\"16\" alt=\"chevron-down"
+          },
+          {
+            "type": "error",
+            "severity": "medium",
+            "check": "direct-img-tabler",
+            "description": "Direct <img> tag for Tabler icons (should use IconSystem)",
+            "line": 312,
+            "snippet": "<img src=\"/trading-ui/images/icons/tabler/chevron-down.svg\" width=\"16\" height=\"16\" alt=\"chevron-down"
+          }
+        ],
+        "buttons": [
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 116,
+            "snippet": "<button data-button-type=\"COMPARE\" data-variant=\"small\" data-text=\"השווה\" data-onclick=\"window.portf"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 118,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('portfolio-state-top-section')\" title="
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 134,
+            "snippet": "<button class=\"filter-toggle filter-toggle-full-width date-range-filter-toggle\" id=\"dateRangeFilterT"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 139,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"כל זמן\" data-onclick=\"window.portfolioStatePage.sele"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 142,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"היום\" data-onclick=\"window.portfolioStatePage.select"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 145,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"אתמול\" data-onclick=\"window.portfolioStatePage.selec"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 148,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"השבוע\" data-onclick=\"window.portfolioStatePage.selec"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 151,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שבוע\" data-onclick=\"window.portfolioStatePage.select"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 154,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שבוע קודם\" data-onclick=\"window.portfolioStatePage.s"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 157,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"החודש\" data-onclick=\"window.portfolioStatePage.selec"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 160,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"חודש\" data-onclick=\"window.portfolioStatePage.select"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 163,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"חודש קודם\" data-onclick=\"window.portfolioStatePage.s"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 166,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"השנה\" data-onclick=\"window.portfolioStatePage.select"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 169,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שנה\" data-onclick=\"window.portfolioStatePage.selectD"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 172,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שנה קודמת\" data-onclick=\"window.portfolioStatePage.s"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 175,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"מותאם אישית\" data-onclick=\"window.portfolioStatePage"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 205,
+            "snippet": "<button class=\"filter-toggle filter-toggle-full-width account-filter-toggle\" id=\"accountFilterToggle"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 210,
+            "snippet": "<div class=\"account-filter-item\" data-value=\"הכול\" data-onclick=\"window.portfolioStatePage.selectAcc"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 230,
+            "snippet": "<button data-button-type=\"CLEAR\" data-variant=\"small\" data-text=\"נקה מסננים\" data-onclick=\"window.po"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 246,
+            "snippet": "<button class=\"btn btn-sm btn-outline-secondary\" data-onclick=\"window.portfolioStatePage.toggleCardD"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 282,
+            "snippet": "<button class=\"btn btn-sm btn-outline-secondary\" data-onclick=\"window.portfolioStatePage.toggleCardD"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 308,
+            "snippet": "<div class=\"compact-stat-card clickable-card\" data-onclick=\"window.portfolioStatePage.toggleCardDeta"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 337,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('charts-section')\" title=\"הצג/הסתר סקש"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 345,
+            "snippet": "<button data-button-type=\"PERIOD\" data-variant=\"small\" data-text=\"שבוע\" data-onclick=\"setChartPeriod"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 346,
+            "snippet": "<button data-button-type=\"PERIOD\" data-variant=\"small\" data-text=\"חודש\" data-onclick=\"setChartPeriod"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 347,
+            "snippet": "<button data-button-type=\"PERIOD\" data-variant=\"small\" data-text=\"3 חודשים\" data-onclick=\"setChartPe"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 348,
+            "snippet": "<button data-button-type=\"PERIOD\" data-variant=\"small\" data-text=\"שנה\" data-onclick=\"setChartPeriod("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 349,
+            "snippet": "<button data-button-type=\"PERIOD\" data-variant=\"small\" data-text=\"כל הזמן\" data-onclick=\"setChartPer"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 417,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('trades-table-section')\" title=\"הצג/הס"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 463,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('comparison-section')\" title=\"הצג/הסתר"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 473,
+            "snippet": "<button data-button-type=\"COMPARE\" data-variant=\"small\" data-text=\"השווה\" data-onclick=\"compareDates"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 474,
+            "snippet": "<button class=\"btn btn-sm btn-outline-danger hidden\" id=\"removeComparisonDate\" data-onclick=\"window."
+          }
+        ],
+        "initialization": [
+          {
+            "type": "missing",
+            "severity": "critical",
+            "check": "core-systems-script",
+            "description": "Missing core-systems.js script",
+            "line": null,
+            "snippet": null
+          },
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "page-initialization-configs",
+            "description": "Missing page-initialization-configs.js script",
+            "line": null,
+            "snippet": null
+          }
+        ]
+      },
+      "script_count": 25,
+      "duplicate_scripts": {}
+    },
+    "price-history-page.html": {
+      "total_issues": 5,
+      "issues": {
+        "buttons": [
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 113,
+            "snippet": "</div><button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('price_history_page_top_section'"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 159,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('change-statistics-section')\" title=\"ה"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 204,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('tradingview-widget-section')\" title=\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 232,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('linked-items-section')\" title=\"הצג/הס"
+          }
+        ],
+        "initialization": [
+          {
+            "type": "missing",
+            "severity": "critical",
+            "check": "core-systems-script",
+            "description": "Missing core-systems.js script",
+            "line": null,
+            "snippet": null
+          }
+        ]
+      },
+      "script_count": 23,
+      "duplicate_scripts": {}
+    },
+    "comparative-analysis-page.html": {
+      "total_issues": 47,
+      "issues": {
+        "buttons": [
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 321,
+            "snippet": "</div><button class=\"filter-toggle-btn\" data-onclick=\"if(typeof window.toggleAllSections === 'functi"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 337,
+            "snippet": "<button class=\"btn btn-outline-secondary btn-sm\" data-onclick=\"resetRecordFilters()\" title=\"נקה את כ"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 340,
+            "snippet": "<button class=\"btn btn-outline-primary btn-sm\" data-onclick=\"resetRecordFiltersToDefaults()\" title=\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 343,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('record-filter-panel')\" title=\"הצג/הסת"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 358,
+            "snippet": "<button class=\"filter-toggle filter-toggle-full-width date-range-filter-toggle\" id=\"dateRangeFilterT"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 363,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"כל זמן\" data-onclick=\"selectDateRangeOption('כל זמן'"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 366,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"היום\" data-onclick=\"selectDateRangeOption('היום')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 369,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"אתמול\" data-onclick=\"selectDateRangeOption('אתמול')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 372,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"השבוע\" data-onclick=\"selectDateRangeOption('השבוע')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 375,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שבוע\" data-onclick=\"selectDateRangeOption('שבוע')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 378,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שבוע קודם\" data-onclick=\"selectDateRangeOption('שבוע"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 381,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"החודש\" data-onclick=\"selectDateRangeOption('החודש')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 384,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"חודש\" data-onclick=\"selectDateRangeOption('חודש')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 387,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"חודש קודם\" data-onclick=\"selectDateRangeOption('חודש"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 390,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"השנה\" data-onclick=\"selectDateRangeOption('השנה')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 393,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שנה\" data-onclick=\"selectDateRangeOption('שנה')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 396,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שנה קודמת\" data-onclick=\"selectDateRangeOption('שנה "
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 429,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"selectAllOptions("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 432,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"clearAllOptions('"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 445,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"selectAllOptions("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 448,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"clearAllOptions('"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 462,
+            "snippet": "<button class=\"filter-toggle filter-toggle-full-width side-filter-toggle\" id=\"sideFilterToggle\" data"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 467,
+            "snippet": "<div class=\"side-filter-item\" data-value=\"הכול\" data-onclick=\"selectSideOption('הכול')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 470,
+            "snippet": "<div class=\"side-filter-item\" data-value=\"Long\" data-onclick=\"selectSideOption('Long')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 473,
+            "snippet": "<div class=\"side-filter-item\" data-value=\"Short\" data-onclick=\"selectSideOption('Short')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 486,
+            "snippet": "<button class=\"filter-toggle filter-toggle-full-width status-filter-toggle\" id=\"statusFilterToggle\" "
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 491,
+            "snippet": "<div class=\"status-filter-item\" data-value=\"הכול\" data-onclick=\"selectStatusOption('הכול')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 494,
+            "snippet": "<div class=\"status-filter-item\" data-value=\"open\" data-onclick=\"selectStatusOption('open')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 497,
+            "snippet": "<div class=\"status-filter-item\" data-value=\"closed\" data-onclick=\"selectStatusOption('closed')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 500,
+            "snippet": "<div class=\"status-filter-item\" data-value=\"cancelled\" data-onclick=\"selectStatusOption('cancelled')"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 534,
+            "snippet": "<button class=\"btn btn-outline-secondary btn-sm\" data-onclick=\"resetComparisonParameters()\" title=\"נ"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 537,
+            "snippet": "<button class=\"btn btn-outline-primary btn-sm\" data-onclick=\"resetComparisonParametersToDefaults()\" "
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 540,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('comparison-parameters-panel')\" title="
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 554,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"selectAllOptions("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 557,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"clearAllOptions('"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 573,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"selectAllOptions("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 576,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"clearAllOptions('"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 590,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"selectAllOptions("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 593,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"clearAllOptions('"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 607,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"selectAllOptions("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 610,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"clearAllOptions('"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 645,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('comparison-table-section')\" title=\"הצ"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 688,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('heatmap-section')\" title=\"הצג/הסתר סק"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 742,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('visual-heatmap-section')\" title=\"הצג/"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 841,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('comparison-chart-section')\" title=\"הצ"
+          }
+        ],
+        "initialization": [
+          {
+            "type": "missing",
+            "severity": "critical",
+            "check": "core-systems-script",
+            "description": "Missing core-systems.js script",
+            "line": null,
+            "snippet": null
+          },
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "page-initialization-configs",
+            "description": "Missing page-initialization-configs.js script",
+            "line": null,
+            "snippet": null
+          }
+        ]
+      },
+      "script_count": 27,
+      "duplicate_scripts": {}
+    },
+    "strategy-analysis-page.html": {
+      "total_issues": 41,
+      "issues": {
+        "buttons": [
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 318,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"if(typeof window.toggleAllSections === 'function') {"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 336,
+            "snippet": "<button class=\"btn btn-outline-secondary btn-sm\" data-onclick=\"resetRecordFilters()\" title=\"נקה את כ"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 339,
+            "snippet": "<button class=\"btn btn-outline-primary btn-sm\" data-onclick=\"resetRecordFiltersToDefaults()\" title=\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 342,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('record-filter-panel')\" title=\"הצג/הסת"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 357,
+            "snippet": "<button class=\"filter-toggle filter-toggle-full-width date-range-filter-toggle\" id=\"dateRangeFilterT"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 362,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"כל זמן\" data-onclick=\"selectDateRangeOption('כל זמן'"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 365,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"היום\" data-onclick=\"selectDateRangeOption('היום')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 368,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"אתמול\" data-onclick=\"selectDateRangeOption('אתמול')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 371,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"השבוע\" data-onclick=\"selectDateRangeOption('השבוע')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 374,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שבוע\" data-onclick=\"selectDateRangeOption('שבוע')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 377,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שבוע קודם\" data-onclick=\"selectDateRangeOption('שבוע"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 380,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"החודש\" data-onclick=\"selectDateRangeOption('החודש')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 383,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"חודש\" data-onclick=\"selectDateRangeOption('חודש')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 386,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"חודש קודם\" data-onclick=\"selectDateRangeOption('חודש"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 389,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"השנה\" data-onclick=\"selectDateRangeOption('השנה')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 392,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שנה\" data-onclick=\"selectDateRangeOption('שנה')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 395,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שנה קודמת\" data-onclick=\"selectDateRangeOption('שנה "
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 427,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"selectAllOptions("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 430,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"clearAllOptions('"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 443,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"selectAllOptions("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 446,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"clearAllOptions('"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 460,
+            "snippet": "<button class=\"filter-toggle filter-toggle-full-width status-filter-toggle\" id=\"statusFilterToggle\" "
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 465,
+            "snippet": "<div class=\"status-filter-item\" data-value=\"הכול\" data-onclick=\"selectStatusOption('הכול')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 468,
+            "snippet": "<div class=\"status-filter-item\" data-value=\"active\" data-onclick=\"selectStatusOption('active')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 471,
+            "snippet": "<div class=\"status-filter-item\" data-value=\"inactive\" data-onclick=\"selectStatusOption('inactive')\">"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 492,
+            "snippet": "<button class=\"btn btn-outline-secondary btn-sm\" data-onclick=\"resetComparisonParameters()\" title=\"נ"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 495,
+            "snippet": "<button class=\"btn btn-outline-primary btn-sm\" data-onclick=\"resetComparisonParametersToDefaults()\" "
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 498,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('comparison-parameters-panel')\" title="
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 512,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"selectAllOptions("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 515,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"clearAllOptions('"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 529,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"selectAllOptions("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 532,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"clearAllOptions('"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 546,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"selectAllOptions("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 549,
+            "snippet": "<button class=\"btn btn-link btn-link-small p-0 text-decoration-none\" data-onclick=\"clearAllOptions('"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 568,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('comparison-table-section')\" title=\"הצ"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 611,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('heatmap-section')\" title=\"הצג/הסתר סק"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 665,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('visual-heatmap-section')\" title=\"הצג/"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 764,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('strategy-performance-chart-section')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 805,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('strategy-insights-section')\" title=\"ה"
+          }
+        ],
+        "initialization": [
+          {
+            "type": "missing",
+            "severity": "critical",
+            "check": "core-systems-script",
+            "description": "Missing core-systems.js script",
+            "line": null,
+            "snippet": null
+          },
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "page-initialization-configs",
+            "description": "Missing page-initialization-configs.js script",
+            "line": null,
+            "snippet": null
+          }
+        ]
+      },
+      "script_count": 24,
+      "duplicate_scripts": {}
+    },
+    "economic-calendar-page.html": {
+      "total_issues": 6,
+      "issues": {
+        "buttons": [
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 106,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('economic_calendar_page-פילטרים')\" tit"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 149,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('economic_calendar_page-אירועים-כלכליי"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 189,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('economic_calendar_page-אירועים-שמורים"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 209,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('economic_calendar_page-סטטיסטיקות')\" "
+          }
+        ],
+        "initialization": [
+          {
+            "type": "missing",
+            "severity": "critical",
+            "check": "core-systems-script",
+            "description": "Missing core-systems.js script",
+            "line": null,
+            "snippet": null
+          },
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "page-initialization-configs",
+            "description": "Missing page-initialization-configs.js script",
+            "line": null,
+            "snippet": null
+          }
+        ]
+      },
+      "script_count": 20,
+      "duplicate_scripts": {}
+    },
+    "date-comparison-modal.html": {
+      "total_issues": 22,
+      "issues": {
+        "buttons": [
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 116,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('date-selection-section')\" title=\"הצג/"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 128,
+            "snippet": "<button class=\"filter-toggle filter-toggle-full-width date-range-filter-toggle\" id=\"dateComparisonRa"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 133,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"אתמול\" data-onclick=\"selectDateComparisonRangeOption"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 136,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"השבוע\" data-onclick=\"selectDateComparisonRangeOption"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 139,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שבוע\" data-onclick=\"selectDateComparisonRangeOption("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 142,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שבוע קודם\" data-onclick=\"selectDateComparisonRangeOp"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 145,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"החודש\" data-onclick=\"selectDateComparisonRangeOption"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 148,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"חודש\" data-onclick=\"selectDateComparisonRangeOption("
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 151,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"חודש קודם\" data-onclick=\"selectDateComparisonRangeOp"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 154,
+            "snippet": "<div class=\"date-range-filter-item selected\" data-value=\"השנה\" data-onclick=\"selectDateComparisonRan"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 157,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שנה\" data-onclick=\"selectDateComparisonRangeOption('"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 160,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שנה קודמת\" data-onclick=\"selectDateComparisonRangeOp"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 171,
+            "snippet": "<button data-button-type=\"COMPARE\" data-variant=\"primary\" data-text=\"השווה\" data-onclick=\"compareDat"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 188,
+            "snippet": "<button data-button-type=\"ADD\" data-variant=\"secondary\" data-text=\"הוסף\" data-onclick=\"addDateFromIn"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 208,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('date_comparison_modal-טבלת-השוואות')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 240,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('date_comparison_modal-גרף-bar-chart--"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 268,
+            "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('date_comparison_modal-גרף-line-chart-"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 304,
+            "snippet": "<button class=\"btn btn-secondary\" data-onclick=\"window.close()\">סגור</button>"
+          }
+        ],
+        "html-structure": [
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "background-wrapper",
+            "description": "Missing background-wrapper",
+            "line": null,
+            "snippet": null
+          },
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "page-body",
+            "description": "Missing page-body",
+            "line": null,
+            "snippet": null
+          },
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "main-content",
+            "description": "Missing main-content",
+            "line": null,
+            "snippet": null
+          }
+        ],
+        "initialization": [
+          {
+            "type": "missing",
+            "severity": "critical",
+            "check": "core-systems-script",
+            "description": "Missing core-systems.js script",
+            "line": null,
+            "snippet": null
+          }
+        ]
+      },
+      "script_count": 24,
+      "duplicate_scripts": {}
+    },
+    "history-widget.html": {
+      "total_issues": 15,
+      "issues": {
+        "buttons": [
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 113,
+            "snippet": "<button data-button-type=\"REFRESH\" data-variant=\"small\" data-icon=\"🔄\" data-text=\"רענון\" data-onclick"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 114,
+            "snippet": "</div><button class=\"filter-toggle-btn\" data-onclick=\"toggleSection(\\'history_widget_top_section\\')\""
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 147,
+            "snippet": "<button class=\"filter-toggle filter-toggle-full-width date-range-filter-toggle\" id=\"chartDateRangeTo"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 152,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"היום\" data-onclick=\"window.historyWidget.selectChart"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 155,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"אתמול\" data-onclick=\"window.historyWidget.selectChar"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 158,
+            "snippet": "<div class=\"date-range-filter-item selected\" data-value=\"השבוע\" data-onclick=\"window.historyWidget.s"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 161,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שבוע\" data-onclick=\"window.historyWidget.selectChart"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 164,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שבוע קודם\" data-onclick=\"window.historyWidget.select"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 167,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"החודש\" data-onclick=\"window.historyWidget.selectChar"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 170,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"חודש\" data-onclick=\"window.historyWidget.selectChart"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 173,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"חודש קודם\" data-onclick=\"window.historyWidget.select"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 176,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"השנה\" data-onclick=\"window.historyWidget.selectChart"
+          },
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 179,
+            "snippet": "<div class=\"date-range-filter-item\" data-value=\"שנה\" data-onclick=\"window.historyWidget.selectChartD"
+          }
+        ],
+        "initialization": [
+          {
+            "type": "missing",
+            "severity": "critical",
+            "check": "core-systems-script",
+            "description": "Missing core-systems.js script",
+            "line": null,
+            "snippet": null
+          },
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "page-initialization-configs",
+            "description": "Missing page-initialization-configs.js script",
+            "line": null,
+            "snippet": null
+          }
+        ]
+      },
+      "script_count": 21,
+      "duplicate_scripts": {}
+    },
+    "emotional-tracking-widget.html": {
+      "total_issues": 3,
+      "issues": {
+        "buttons": [
+          {
+            "type": "error",
+            "severity": "high",
+            "check": "onclick-attribute",
+            "description": "Using onclick instead of data-onclick",
+            "line": 111,
+            "snippet": "</div><button class=\"filter-toggle-btn\" data-onclick=\"toggleSection(\\'emotional_tracking_widget_top_"
+          }
+        ],
+        "initialization": [
+          {
+            "type": "missing",
+            "severity": "critical",
+            "check": "core-systems-script",
+            "description": "Missing core-systems.js script",
+            "line": null,
+            "snippet": null
+          },
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "page-initialization-configs",
+            "description": "Missing page-initialization-configs.js script",
+            "line": null,
+            "snippet": null
+          }
+        ]
+      },
+      "script_count": 19,
+      "duplicate_scripts": {}
+    },
+    "tradingview-test-page.html": {
+      "total_issues": 5,
+      "issues": {
+        "html-structure": [
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "background-wrapper",
+            "description": "Missing background-wrapper",
+            "line": null,
+            "snippet": null
+          },
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "page-body",
+            "description": "Missing page-body",
+            "line": null,
+            "snippet": null
+          },
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "main-content",
+            "description": "Missing main-content",
+            "line": null,
+            "snippet": null
+          }
+        ],
+        "initialization": [
+          {
+            "type": "missing",
+            "severity": "critical",
+            "check": "core-systems-script",
+            "description": "Missing core-systems.js script",
+            "line": null,
+            "snippet": null
+          },
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "page-initialization-configs",
+            "description": "Missing page-initialization-configs.js script",
+            "line": null,
+            "snippet": null
+          }
+        ]
+      },
+      "script_count": 18,
+      "duplicate_scripts": {}
+    },
+    "heatmap-visual-example.html": {
+      "total_issues": 4,
+      "issues": {
+        "icons": [
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "icon-system-script",
+            "description": "Missing icon-system.js script",
+            "line": null,
+            "snippet": null
+          }
+        ],
+        "notifications": [
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "notification-system-script",
+            "description": "Missing notification-system.js script",
+            "line": null,
+            "snippet": null
+          }
+        ],
+        "initialization": [
+          {
+            "type": "missing",
+            "severity": "critical",
+            "check": "core-systems-script",
+            "description": "Missing core-systems.js script",
+            "line": null,
+            "snippet": null
+          },
+          {
+            "type": "missing",
+            "severity": "high",
+            "check": "page-initialization-configs",
+            "description": "Missing page-initialization-configs.js script",
+            "line": null,
+            "snippet": null
+          }
+        ]
+      },
+      "script_count": 1,
+      "duplicate_scripts": {}
+    }
+  }
+}

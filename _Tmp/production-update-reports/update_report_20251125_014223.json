@@ -1,0 +1,44 @@
+{
+  "start_time": "2025-11-25T01:42:23.819413",
+  "steps": [
+    {
+      "number": 3,
+      "name": "backup_database",
+      "success": false,
+      "duration_seconds": 0.1474771499633789,
+      "timestamp": "2025-11-25T01:42:23.974803",
+      "details": {
+        "success": false,
+        "error": "pg_dump: error: connection to server on socket \"/var/run/postgresql/.s.PGSQL.5432\" failed: FATAL:  database \"TikTrack-db-production\" does not exist"
+      }
+    }
+  ],
+  "files_updated": [],
+  "files_new": [],
+  "files_deleted": [],
+  "warnings": [],
+  "errors": [
+    {
+      "message": "Database backup failed: pg_dump: error: connection to server on socket \"/var/run/postgresql/.s.PGSQL.5432\" failed: FATAL:  database \"TikTrack-db-production\" does not exist",
+      "step": "backup_database",
+      "timestamp": "2025-11-25T01:42:23.974772"
+    },
+    {
+      "message": "Step 3 (backup_database) failed",
+      "step": "backup_database",
+      "timestamp": "2025-11-25T01:42:23.974806"
+    }
+  ],
+  "summary": {
+    "total_duration_seconds": 0.156164,
+    "steps_completed": 0,
+    "steps_failed": 1,
+    "files_updated_count": 0,
+    "files_new_count": 0,
+    "files_deleted_count": 0,
+    "warnings_count": 0,
+    "errors_count": 2
+  },
+  "end_time": "2025-11-25T01:42:23.975577",
+  "success": false
+}

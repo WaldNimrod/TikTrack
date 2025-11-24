@@ -19,49 +19,222 @@
     <!-- External Libraries -->
     <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
     
-    
-    
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
     
-    <!-- Header System -->
-    <script src="../../scripts/header-system.js" defer></script>
-    
-    <!-- Icon System -->
-    <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
-    <script src="../../scripts/icon-system.js?v=1.0.0"></script>
-    
-    <!-- Logger Service -->
-    <script src="../../scripts/logger-service.js" defer></script>
-    
-    <!-- Notification System -->
-    <script src="../../scripts/notification-system.js" defer></script>
-    
-    <!-- Preferences System -->
-    <script src="../../scripts/services/preferences-data.js" defer></script>
-    <script src="../../scripts/preferences-core-new.js" defer></script>
-    <script src="../../scripts/preferences-lazy-loader.js" defer></script>
-    
-    <!-- Dynamic Colors System -->
-    <script src="../../scripts/color-scheme-system-clean.js" defer></script>
-    
-    <!-- Linked Items System -->
-    <script src="../../scripts/linked-items.js" defer></script>
-    <script src="../../scripts/services/linked-items-service.js" defer></script>
-    <script src="../../scripts/entity-details-modal.js" defer></script>
-    
-    <!-- Field Renderer Service -->
-    <script src="../../scripts/services/field-renderer-service.js" defer></script>
-    
-    <!-- Info Summary System -->
-    <script src="../../scripts/info-summary-configs.js" defer></script>
-    <script src="../../scripts/info-summary-system.js" defer></script>
-    
-    <!-- UI Utils (includes toggleSection) -->
-    <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
-    
-    <!-- Button System -->
-    <script src="../../scripts/button-system-init.js" defer></script>
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: trading-journal-page | Generated: 2025-11-24T21:57:50.417Z -->
+    <!-- 📦 Packages: base, services, ui-advanced, crud, preferences, entity-services, init-system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/7: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: Core systems required for all pages -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 2.0.0 -->
+
+    <!-- [1] Load Order: 1 -->
+    <script src="../../scripts/api-config.js?v=1.0.0"></script> <!-- Central API configuration -->
+    <!-- [2] Load Order: 2 -->
+    <script src="../../scripts/global-favicon.js?v=1.0.0"></script> <!-- Favicon management -->
+    <!-- [3] Load Order: 3 -->
+    <script src="../../scripts/notification-system.js?v=1.0.0"></script> <!-- Notification system -->
+    <!-- [4] Load Order: 4 -->
+    <script src="../../scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- Cache synchronization manager -->
+    <!-- [5] Load Order: 5 -->
+    <script src="../../scripts/ui-utils.js?v=1.0.0"></script> <!-- UI utilities -->
+    <!-- [6] Load Order: 6 -->
+    <script src="../../scripts/warning-system.js?v=1.0.0"></script> <!-- Warning system -->
+    <!-- [7] Load Order: 7 -->
+    <script src="../../scripts/error-handlers.js?v=1.0.0"></script> <!-- Error handling system -->
+    <!-- [8] Load Order: 8 -->
+    <script src="../../scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- Unified cache manager -->
+    <!-- [9] Load Order: 9 -->
+    <script src="../../scripts/icon-mappings.js?v=1.0.0"></script> <!-- Central icon mappings -->
+    <!-- [10] Load Order: 10 -->
+    <script src="../../scripts/icon-system.js?v=1.0.0"></script> <!-- Central icon system -->
+    <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script> <!-- Mockups icon initializer -->
+    <!-- [11] Load Order: 11 -->
+    <script src="../../scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- Cache clearing control (Stage B-Lite) -->
+    <!-- [12] Load Order: 12 -->
+    <script src="../../scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
+    <!-- [13] Load Order: 13 -->
+    <script src="../../scripts/logger-service.js?v=1.0.0"></script> <!-- Advanced logging service -->
+    <!-- [14] Load Order: 14 -->
+    <script src="../../scripts/header-system.js?v=1.0.0"></script> <!-- Header system -->
+    <!-- [15] Load Order: 15 -->
+    <script src="../../scripts/page-state-manager.js?v=1.0.0"></script> <!-- Unified page state manager -->
+    <!-- [16] Load Order: 16 -->
+    <script src="../../scripts/page-utils.js?v=1.0.0"></script> <!-- Page utilities -->
+    <!-- [17] Load Order: 17 -->
+    <script src="../../scripts/translation-utils.js?v=1.0.0"></script> <!-- Translations -->
+    <!-- [18] Load Order: 18 -->
+    <script src="../../scripts/button-icons.js?v=1.0.0"></script> <!-- Icon and button system -->
+    <!-- [19] Load Order: 19 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [20] Load Order: 20 -->
+    <script src="../../scripts/event-handler-manager.js?v=1.0.0"></script> <!-- Central event management system -->
+    <!-- [21] Load Order: 21 -->
+    <script src="../../scripts/button-system-init.js?v=1.0.0"></script> <!-- Button system -->
+    <!-- [22] Load Order: 22 -->
+    <script src="../../scripts/color-scheme-system.js?v=1.0.0"></script> <!-- Dynamic color system -->
+    <!-- [23] Load Order: 23 -->
+    <script src="../../scripts/modules/core-systems.js?v=1.0.0"></script> <!-- Unified initialization system - single entry point (required for all pages) -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/7: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2 | Description: General services -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [24] Load Order: 24 -->
+    <script src="../../scripts/services/data-collection-service.js?v=1.0.0"></script> <!-- Data collection service -->
+    <!-- [25] Load Order: 25 -->
+    <script src="../../scripts/services/field-renderer-service.js?v=1.0.0"></script> <!-- Field rendering service -->
+    <!-- [26] Load Order: 26 -->
+    <script src="../../scripts/services/select-populator-service.js?v=1.0.0"></script> <!-- Select box population service -->
+    <!-- [27] Load Order: 27 -->
+    <script src="../../scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- Statistics calculator -->
+    <!-- [28] Load Order: 28 -->
+    <script src="../../scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- Default value service -->
+    <!-- [29] Load Order: 29 -->
+    <script src="../../scripts/services/preferences-data.js?v=1.0.0"></script> <!-- Preferences data service (API + Cache) -->
+    <!-- [30] Load Order: 30 -->
+    <script src="../../scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- CRUD response handler -->
+    <!-- [31] Load Order: 31 -->
+    <script src="../../scripts/services/unified-crud-service.js?v=1.0.0"></script> <!-- Unified CRUD service for all entities -->
+    <!-- [32] Load Order: 32 -->
+    <script src="../../scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- Investment form amount ↔ quantity calculations -->
+    <!-- [33] Load Order: 33 -->
+    <script src="../../scripts/services/tag-service.js?v=1.0.0"></script> <!-- Central tag service (tag management and retrieval) -->
+    <!-- [34] Load Order: 34 -->
+    <script src="../../scripts/services/table-sort-value-adapter.js?v=1.0.0"></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
+    <!-- [35] Load Order: 35 -->
+    <script src="../../scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- Unified linter status service (API reading and data conversion) -->
+    <!-- [36] Load Order: 36 -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [37] Load Order: 37 -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
+    <!-- [38] Load Order: 38 -->
+    <script src="../../scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- Rich text editor service -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/7: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3 | Description: Advanced user interface -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [39] Load Order: 39 -->
+    <script src="../../scripts/table-mappings.js?v=1.0.0"></script> <!-- Table mappings -->
+    <!-- [40] Load Order: 40 -->
+    <script src="../../scripts/tables.js?v=1.0.0"></script> <!-- Table system -->
+    <!-- [41] Load Order: 41 -->
+    <script src="../../scripts/table-data-registry.js?v=1.0.0"></script> <!-- Table data registry -->
+    <!-- [42] Load Order: 42 -->
+    <script src="../../scripts/pagination-system.js?v=1.0.0"></script> <!-- Pagination system -->
+    <!-- [43] Load Order: 43 -->
+    <script src="../../scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- Actions menu system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/7: CRUD OPERATIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 4 | Description: Data and table management systems -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [44] Load Order: 44 -->
+    <script src="../../scripts/date-utils.js?v=1.0.0"></script> <!-- Date utilities -->
+    <!-- [45] Load Order: 45 -->
+    <script src="../../scripts/data-utils.js?v=1.0.0"></script> <!-- General data utilities -->
+    <!-- [46] Load Order: 46 -->
+    <script src="../../scripts/unified-table-system.js?v=1.0.0"></script> <!-- Unified central table system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/7: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: User preferences system v2.0 (6 files) -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [47] Load Order: 47 -->
+    <script src="../../scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
+    <!-- [48] Load Order: 48 -->
+    <script src="../../scripts/preferences-core-new.js?v=1.0.0"></script> <!-- Preferences core (without colors) -->
+    <!-- [49] Load Order: 49 -->
+    <script src="../../scripts/preferences-colors.js?v=1.0.0"></script> <!-- Color system (60+ preferences) -->
+    <!-- [50] Load Order: 50 -->
+    <script src="../../scripts/preferences-profiles.js?v=1.0.0"></script> <!-- Profile management -->
+    <!-- [51] Load Order: 51 -->
+    <script src="../../scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
+    <!-- [52] Load Order: 52 -->
+    <script src="../../scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
+    <!-- [53] Load Order: 53 -->
+    <script src="../../scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- User interface V4 (Group-First) -->
+    <!-- [54] Load Order: 54 -->
+    <script src="../../scripts/preferences-ui.js?v=1.0.0"></script> <!-- User interface -->
+    <!-- [55] Load Order: 55 -->
+    <script src="../../scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- Preferences group manager -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 6/7: ENTITY SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 10 | Description: Entity services -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [56] Load Order: 56 -->
+    <script src="../../scripts/account-service.js?v=1.0.0"></script> <!-- Account service -->
+    <!-- [57] Load Order: 57 -->
+    <script src="../../scripts/alert-service.js?v=1.0.0"></script> <!-- Alert service -->
+    <!-- [58] Load Order: 58 -->
+    <script src="../../scripts/ticker-service.js?v=1.0.0"></script> <!-- Ticker service -->
+    <!-- [59] Load Order: 59 -->
+    <script src="../../scripts/trade-plan-service.js?v=1.0.0"></script> <!-- Trade plan service -->
+    <!-- [60] Load Order: 60 -->
+    <script src="../../scripts/condition-translator.js?v=1.0.0"></script> <!-- Condition translator -->
+    <!-- [61] Load Order: 61 -->
+    <script src="../../scripts/constraints.js?v=1.0.0"></script> <!-- Constraints system -->
+    <!-- [62] Load Order: 62 -->
+    <script src="../../scripts/services/linked-items-service.js?v=1.0.0"></script> <!-- Shared logic service for linked items -->
+    <!-- [63] Load Order: 63 -->
+    <script src="../../scripts/linked-items.js?v=1.0.0"></script> <!-- Linked items -->
+    <!-- [64] Load Order: 64 -->
+    <script src="../../scripts/related-object-filters.js?v=1.0.0"></script> <!-- Related object filters -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 7/7: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 19 | Description: Initialization and monitoring systems -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [65] Load Order: 65 -->
+    <script src="../../scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- Package manifest -->
+    <!-- [66] Load Order: 66 -->
+    <script src="../../scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- Page initialization configurations -->
+    <!-- [67] Load Order: 67 -->
+    <script src="../../scripts/init-system-check.js?v=1.0.0"></script> <!-- Initialization system check -->
+    <!-- [68] Load Order: 68 -->
+    <script src="../../scripts/monitoring-functions.js?v=1.0.0"></script> <!-- Page monitoring functions -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- [69] Page-specific: trading-journal-page -->
+    <!-- Note: trading-journal-page.js is loaded at the end of body to avoid duplication -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 69 | Unique Scripts Loaded: 69 -->
+    <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("trading-journal-page") -->
 </head>
 <body class="trading-journal-page">
     <!-- Header System -->
@@ -75,7 +248,7 @@
                 <div class="col-md-12">
                     <div class="mockups-navigation-content">
                         <span class="mockups-navigation-label">
-                            <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> ניווט מוקאפים:
+                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
                         </span>
                         <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
                         <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
@@ -87,11 +260,10 @@
                         <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
                         <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
                         <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                        <a href="journal-entry-modal.html" class="mockups-navigation-link">רשומת יומן</a>
-                    </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
     
     <!-- Page Content -->
@@ -99,31 +271,31 @@
         <div class="page-body">
             <div class="main-content">
                 <!-- Header Section -->
-                <div class="top-section" id="trading_journal_page_top_section">
+                <div class="top-section"  data-section="trading_journal_page_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <img src="../../images/icons/tabler/book.svg" width="16" height="16" alt="book" class="icon">
+                            <span class="icon-placeholder icon" data-icon="notebook" data-size="16" data-alt="book" aria-label="book"></span>
                             יומן מסחר
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
-                            <button data-button-type="ADD" data-variant="full" data-text="הוסף רשומה" title="הוסף רשומת יומן חדשה"></button>
+                            <button data-button-type="ADD" data-variant="full" data-text="הוסף רשומה" id="add-entry-btn" title="הוסף רשומת יומן חדשה"></button>
                             <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
                             <button data-button-type="SETTINGS" data-variant="small" data-icon="settings" title="הגדרות תצוגה"></button>
-                        </div><button class="filter-toggle-btn" onclick="toggleSection(\'trading_journal_page_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                        </div><button class="filter-toggle-btn" data-onclick="toggleSection('trading_journal_page_top_section')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
                         <!-- Calendar View Section -->
-                        <div class="content-section" id="trading_journal_page-תצוגה-חודשית">
-                            <div class="section-header">
-                                <h2><img src="../../images/icons/tabler/calendar.svg" width="16" height="16" alt="calendar" class="icon"> תצוגה חודשית</h2>
-                                <div class="header-actions">
-                                    <button class="filter-toggle-btn" onclick="toggleSection('trading_journal_page-תצוגה-חודשית')" title="הצג/הסתר סקשן">
-                                        <span class="section-toggle-icon">▼</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="section-body">
+                <div class="content-section"  data-section="trading_journal_page-תצוגה-חודשית">
+                    <div class="section-header">
+                                <h2><span class="icon-placeholder icon" data-icon="calendar" data-size="16" data-alt="calendar" aria-label="calendar"></span> תצוגה חודשית</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('trading_journal_page-תצוגה-חודשית')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
                         <!-- Statistics Section -->
                         <div class="row mb-4">
                             <div class="col-md-4">
@@ -146,10 +318,10 @@
                             </div>
                         </div>
 
-                        <div class="mb-3 d-flex justify-content-between align-items-center">
-                                    <button data-button-type="NAVIGATE" data-variant="small" data-text="חודש קודם" data-icon="chevron-right" title="חודש קודם"></button>
-                                    <h6 class="mb-0">ינואר 2025</h6>
-                                    <button data-button-type="NAVIGATE" data-variant="small" data-text="חודש הבא" data-icon="chevron-left" title="חודש הבא"></button>
+                                <div class="mb-3 d-flex justify-content-between align-items-center">
+                                    <button data-button-type="NAVIGATE" data-variant="small" data-text="חודש קודם" data-icon="chevron-right" data-action="prev-month" title="חודש קודם" id="prev-month-btn"></button>
+                                    <h6 class="mb-0" id="current-month-display">ינואר 2025</h6>
+                                    <button data-button-type="NAVIGATE" data-variant="small" data-text="חודש הבא" data-icon="chevron-left" data-action="next-month" title="חודש הבא" id="next-month-btn"></button>
                                 </div>
                                 <div class="calendar-grid">
                                     <!-- Calendar Headers -->
@@ -168,7 +340,8 @@
                                     <!-- Calendar Days - January 2025 -->
                                     <div class="calendar-day-cell">
                                         <div class="calendar-day-number">1</div>
-                                        <div class="calendar-day-indicator trades">3 טריידים</div>
+                                        <div class="calendar-day-indicator execution">2 ביצועים</div>
+                                        <div class="calendar-day-indicator trade">1 טרייד</div>
                                     </div>
                                     <div class="calendar-day-cell calendar-day-cell-today">
                                         <div class="calendar-day-number">2</div>
@@ -181,7 +354,7 @@
                                     </div>
                                     <div class="calendar-day-cell">
                                         <div class="calendar-day-number">5</div>
-                                        <div class="calendar-day-indicator journal">רשומת יומן</div>
+                                        <div class="calendar-day-indicator note">1 הערה</div>
                                     </div>
                                     <div class="calendar-day-cell">
                                         <div class="calendar-day-number">6</div>
@@ -197,8 +370,7 @@
                                     </div>
                                     <div class="calendar-day-cell">
                                         <div class="calendar-day-number">10</div>
-                                        <div class="calendar-day-indicator journal">רשומת יומן</div>
-                                        <div class="calendar-day-indicator trades">1 טרייד</div>
+                                        <div class="calendar-day-indicator trade">1 טרייד</div>
                                     </div>
                                     <div class="calendar-day-cell">
                                         <div class="calendar-day-number">11</div>
@@ -214,8 +386,7 @@
                                     </div>
                                     <div class="calendar-day-cell calendar-day-cell-active">
                                         <div class="calendar-day-number">15</div>
-                                        <div class="calendar-day-indicator journal">רשומת יומן</div>
-                                        <div class="calendar-day-indicator trades">2 טריידים</div>
+                                        <div class="calendar-day-indicator execution">1 ביצוע</div>
                                     </div>
                                     <div class="calendar-day-cell">
                                         <div class="calendar-day-number">16</div>
@@ -266,91 +437,367 @@
                                         <div class="calendar-day-number">31</div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                    </div>
+                </div>
                 
-                    <!-- Journal Entries List Section -->
-                    <div class="content-section" id="journal-entries-list-section">
-                        <div class="section-header">
-                            <h2><img src="../../images/icons/tabler/list.svg" width="16" height="16" alt="list" class="icon"> רשומות יומן</h2>
-                            <div class="header-actions d-flex align-items-center gap-2">
-                                <div>
-                                    <input type="text" class="form-control form-control-sm d-inline-block form-control-inline-search" placeholder="חיפוש...">
-                                    <select class="form-select form-select-sm d-inline-block form-select-inline">
-                                        <option>כל התאריכים</option>
-                                        <option>השבוע</option>
-                                        <option>החודש</option>
-                                    </select>
-                                </div>
-                                <button class="filter-toggle-btn" onclick="toggleSection('journal-entries-list-section')" title="הצג/הסתר סקשן">
-                                    <span class="section-toggle-icon">▼</span>
-                                </button>
+                <!-- Journal Entries List Section -->
+                <div class="content-section"  data-section="journal-entries-list-section">
+                    <div class="section-header">
+                        <h2><span class="icon-placeholder icon" data-icon="clipboard-list" data-size="16" data-alt="list" aria-label="list"></span> רשומות יומן</h2>
+                        <div class="header-actions d-flex align-items-center gap-2">
+                            <div>
+                                    <input type="text" class="form-control form-control-sm d-inline-block form-control-inline-search" placeholder="חיפוש..." id="journal-search-input">
+                                    <select class="form-select form-select-sm d-inline-block form-select-inline" id="journal-date-filter">
+                                        <option value="all">כל התאריכים</option>
+                                        <option value="week">השבוע</option>
+                                        <option value="month">החודש</option>
+                                </select>
                             </div>
+                                <div class="filter-buttons-container button-row">
+                                    <button
+                                        data-button-type="FILTER"
+                                        data-variant="small"
+                                        data-icon="⚙️"
+                                        data-classes="btn-sm active"
+                                        data-onclick="filterJournalByEntityType('all')"
+                                        data-type="all"
+                                        title="הצג הכל"
+                                        data-tooltip="הצג הכל - כל סוגי הישויות"
+                                        data-tooltip-placement="top"
+                                        data-tooltip-trigger="hover">
+                                    </button>
+                                    <button
+                                        data-button-type="FILTER"
+                                        data-variant="small"
+                                        data-icon="⚡"
+                                        data-classes="btn-sm filter-icon-btn"
+                                        data-onclick="filterJournalByEntityType('execution')"
+                                        data-type="execution"
+                                        title="ביצועים"
+                                        data-tooltip="סינון לפי: ביצועים"
+                                        data-tooltip-placement="top"
+                                        data-tooltip-trigger="hover">
+                                    </button>
+                                    <button
+                                        data-button-type="FILTER"
+                                        data-variant="small"
+                                        data-icon="💰"
+                                        data-classes="btn-sm filter-icon-btn"
+                                        data-onclick="filterJournalByEntityType('cash_flow')"
+                                        data-type="cash_flow"
+                                        title="תזרימי מזומן"
+                                        data-tooltip="סינון לפי: תזרימי מזומן"
+                                        data-tooltip-placement="top"
+                                        data-tooltip-trigger="hover">
+                                    </button>
+                                    <button
+                                        data-button-type="FILTER"
+                                        data-variant="small"
+                                        data-icon="💼"
+                                        data-classes="btn-sm filter-icon-btn"
+                                        data-onclick="filterJournalByEntityType('trade')"
+                                        data-type="trade"
+                                        title="טריידים"
+                                        data-tooltip="סינון לפי: טריידים"
+                                        data-tooltip-placement="top"
+                                        data-tooltip-trigger="hover">
+                                    </button>
+                                    <button
+                                        data-button-type="FILTER"
+                                        data-variant="small"
+                                        data-icon="📝"
+                                        data-classes="btn-sm filter-icon-btn"
+                                        data-onclick="filterJournalByEntityType('trade_plan')"
+                                        data-type="trade_plan"
+                                        title="תוכניות"
+                                        data-tooltip="סינון לפי: תוכניות"
+                                        data-tooltip-placement="top"
+                                        data-tooltip-trigger="hover">
+                                    </button>
+                                    <button
+                                        data-button-type="FILTER"
+                                        data-variant="small"
+                                        data-icon="📄"
+                                        data-classes="btn-sm filter-icon-btn"
+                                        data-onclick="filterJournalByEntityType('note')"
+                                        data-type="note"
+                                        title="הערות"
+                                        data-tooltip="סינון לפי: הערות"
+                                        data-tooltip-placement="top"
+                                        data-tooltip-trigger="hover">
+                                    </button>
+                                    <button
+                                        data-button-type="FILTER"
+                                        data-variant="small"
+                                        data-icon="🔔"
+                                        data-classes="btn-sm filter-icon-btn"
+                                        data-onclick="filterJournalByEntityType('alert')"
+                                        data-type="alert"
+                                        title="התראות"
+                                        data-tooltip="סינון לפי: התראות"
+                                        data-tooltip-placement="top"
+                                        data-tooltip-trigger="hover">
+                                    </button>
+                                </div>
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('journal-entries-list-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
                         </div>
-                        <div class="section-body">
-                            <div class="journal-entries-list">
-                            <div class="journal-entry-item">
-                                <div class="journal-entry-header">
-                                    <div>
-                                        <div class="journal-entry-date">15 בינואר 2025</div>
-                                        <div class="journal-entry-content">ניתוח טרייד AAPL - כניסה טובה, יציאה מוקדמת מדי. צריך לשפר את ניהול הסיכון.</div>
-                                        <div class="journal-entry-meta">
-                                            <div class="journal-entry-meta-item">
-                                                <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> קשור לטרייד #123
+                    </div>
+                    <div class="section-body">
+                            <div class="journal-entries-list journal-entries-list-two-columns">
+                                <!-- Execution Entry -->
+                                <div class="journal-entry-item" data-entry-type="execution">
+                                    <div class="journal-entry-header">
+                                        <div>
+                                            <div class="journal-entry-date">15 בינואר 2025, 14:30</div>
+                                            <div class="journal-entry-type-badge">
+                                                <span class="icon-placeholder icon" data-icon="activity" data-size="16" data-alt="execution" aria-label="execution"></span> ביצוע
                                             </div>
-                                            <div class="journal-entry-meta-item">
-                                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רגש: מרוצה
+                                            <div class="journal-entry-content">
+                                                <strong>AAPL</strong> | <strong>קנייה</strong> | כמות: <strong>10</strong> | מחיר: <strong>$150.25</strong> | עמלה: <strong>$1.00</strong> | Realized P/L: <strong>-$</strong> | MTM P/L: <strong>-$</strong>
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> טרייד #123
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="wallet" data-size="16" data-alt="account" aria-label="account"></span> IBKR Main
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="database" data-size="16" data-alt="source" aria-label="source"></span> manual
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="journal-entry-actions">
-                                        <button data-button-type="EDIT" data-variant="small" data-text="ערוך" title="ערוך רשומה"></button>
-                                        <button data-button-type="DELETE" data-variant="small" data-text="מחק" title="מחק רשומה"></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="journal-entry-item">
-                                <div class="journal-entry-header">
-                                    <div>
-                                        <div class="journal-entry-date">10 בינואר 2025</div>
-                                        <div class="journal-entry-content">טרייד TSLA - הצלחה גדולה! אסטרטגיית RSI עבדה מצוין.</div>
-                                        <div class="journal-entry-meta">
-                                            <div class="journal-entry-meta-item">
-                                                <img src="../../images/icons/tabler/link.svg" width="16" height="16" alt="link" class="icon"> קשור לטרייד #124
-                                            </div>
-                                            <div class="journal-entry-meta-item">
-                                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רגש: שמח
-                                            </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-icon="eye" title="צפה בביצוע"></button>
                                         </div>
                                     </div>
-                                    <div class="journal-entry-actions">
-                                        <button data-button-type="EDIT" data-variant="small" data-text="ערוך" title="ערוך רשומה"></button>
-                                        <button data-button-type="DELETE" data-variant="small" data-text="מחק" title="מחק רשומה"></button>
-                                    </div>
                                 </div>
-                            </div>
-                            <div class="journal-entry-item">
-                                <div class="journal-entry-header">
+
+                                <!-- Cash Flow Entry -->
+                                <div class="journal-entry-item" data-entry-type="cash_flow">
+                                    <div class="journal-entry-header">
                                     <div>
-                                        <div class="journal-entry-date">5 בינואר 2025</div>
-                                        <div class="journal-entry-content">תחילת חודש - סקירה כללית. מטרות: שיפור אחוז הצלחה, ניהול סיכון טוב יותר.</div>
-                                        <div class="journal-entry-meta">
-                                            <div class="journal-entry-meta-item">
-                                                <img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רגש: ניטרלי
+                                            <div class="journal-entry-date">14 בינואר 2025</div>
+                                            <div class="journal-entry-type-badge">
+                                                <span class="icon-placeholder icon" data-icon="currency-dollar" data-size="16" data-alt="cash_flow" aria-label="cash_flow"></span> תזרים מזומן
+                                            </div>
+                                            <div class="journal-entry-content">
+                                                <strong>הפקדה</strong> | סכום: <strong>$5,000.00</strong> | עמלה: <strong>$0.00</strong> | תיאור: הפקדה ראשונית לחשבון
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="wallet" data-size="16" data-alt="account" aria-label="account"></span> IBKR Main
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="currency-dollar" data-size="16" data-alt="currency" aria-label="currency"></span> USD
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="database" data-size="16" data-alt="source" aria-label="source"></span> manual
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="journal-entry-actions">
-                                        <button data-button-type="EDIT" data-variant="small" data-text="ערוך" title="ערוך רשומה"></button>
-                                        <button data-button-type="DELETE" data-variant="small" data-text="מחק" title="מחק רשומה"></button>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בתזרים מזומן"></button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            </div>
-                        </div>
+                                
+                                <!-- Trade Created Entry -->
+                                <div class="journal-entry-item" data-entry-type="trade" data-entry-subtype="trade_created">
+                                    <div class="journal-entry-header">
+                                            <div>
+                                            <div class="journal-entry-date">13 בינואר 2025, 09:15</div>
+                                            <div class="journal-entry-type-badge">
+                                                <span class="icon-placeholder icon" data-icon="plus" data-size="16" data-alt="trade_created" aria-label="trade_created"></span> טרייד נוצר
+                                            </div>
+                                            <div class="journal-entry-content">
+                                                <strong>AAPL</strong> | מחיר: <strong>$150.25</strong> | שינוי: <strong>+1.2%</strong> | פוזיציה: <strong>10</strong> | P/L%: <strong>+2.5%</strong> | P/L: <strong>$150.00</strong>
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> טרייד #123
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="wallet" data-size="16" data-alt="account" aria-label="account"></span> IBKR Main
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="status" aria-label="status"></span> פתוח
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="tag" data-size="16" data-alt="type" aria-label="type"></span> סווינג
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="arrows-sort" data-size="16" data-alt="side" aria-label="side"></span> Long
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בטרייד"></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Trade Plan Created Entry -->
+                                <div class="journal-entry-item" data-entry-type="trade_plan" data-entry-subtype="trade_plan_created">
+                                    <div class="journal-entry-header">
+                                            <div>
+                                            <div class="journal-entry-date">12 בינואר 2025, 16:45</div>
+                                            <div class="journal-entry-type-badge">
+                                                <span class="icon-placeholder icon" data-icon="plus" data-size="16" data-alt="trade_plan_created" aria-label="trade_plan_created"></span> תוכנית נוצרה
+                                            </div>
+                                            <div class="journal-entry-content">
+                                                <strong>TSLA</strong> | כמות: <strong>10</strong> | מחיר יעד: <strong>$200.00</strong> | השקעה: <strong>$2,000</strong> | סיכוי: <strong>$500</strong> | סיכון: <strong>$200</strong> | יחס: <strong>2.5</strong>
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> תוכנית #45
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="wallet" data-size="16" data-alt="account" aria-label="account"></span> IBKR Main
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="status" aria-label="status"></span> פתוח
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="tag" data-size="16" data-alt="type" aria-label="type"></span> סווינג
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="arrows-sort" data-size="16" data-alt="side" aria-label="side"></span> Long
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בתוכנית"></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Trade Closed Entry -->
+                                <div class="journal-entry-item" data-entry-type="trade" data-entry-subtype="trade_closed">
+                                    <div class="journal-entry-header">
+                                            <div>
+                                            <div class="journal-entry-date">10 בינואר 2025, 15:20</div>
+                                            <div class="journal-entry-type-badge">
+                                                <span class="icon-placeholder icon" data-icon="check" data-size="16" data-alt="trade_closed" aria-label="trade_closed"></span> טרייד נסגר
+                                            </div>
+                                            <div class="journal-entry-content">
+                                                <strong>MSFT</strong> | מחיר: <strong>$350.00</strong> | שינוי: <strong>+0.5%</strong> | פוזיציה: <strong>0</strong> | P/L%: <strong>+4.5%</strong> | P/L: <strong>$450.00</strong>
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> טרייד #120
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="wallet" data-size="16" data-alt="account" aria-label="account"></span> IBKR Main
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="status" aria-label="status"></span> סגור
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="tag" data-size="16" data-alt="type" aria-label="type"></span> סווינג
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="arrows-sort" data-size="16" data-alt="side" aria-label="side"></span> Long
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בטרייד"></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Trade Plan Cancelled Entry -->
+                                <div class="journal-entry-item" data-entry-type="trade_plan" data-entry-subtype="trade_plan_cancelled">
+                                    <div class="journal-entry-header">
+                                            <div>
+                                            <div class="journal-entry-date">8 בינואר 2025, 11:30</div>
+                                            <div class="journal-entry-type-badge">
+                                                <span class="icon-placeholder icon" data-icon="x" data-size="16" data-alt="trade_plan_cancelled" aria-label="trade_plan_cancelled"></span> תוכנית בוטלה
+                                            </div>
+                                            <div class="journal-entry-content">
+                                                <strong>NVDA</strong> | תוכנית <strong>#42</strong> בוטלה | סיבה: תנאי כניסה לא התקיימו
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> תוכנית #42
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="wallet" data-size="16" data-alt="account" aria-label="account"></span> IBKR Main
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="status" aria-label="status"></span> בוטל
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בתוכנית"></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Note Entry -->
+                                <div class="journal-entry-item" data-entry-type="note">
+                                    <div class="journal-entry-header">
+                                            <div>
+                                            <div class="journal-entry-date">5 בינואר 2025, 08:00</div>
+                                            <div class="journal-entry-type-badge">
+                                                <span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="note" aria-label="note"></span> הערה
+                                            </div>
+                                            <div class="journal-entry-content">
+                                                תחילת חודש - סקירה כללית. מטרות: שיפור אחוז הצלחה, ניהול סיכון טוב יותר. התמקדות באסטרטגיות RSI ו-MACD.
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> IBKR Main
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="paperclip" data-size="16" data-alt="attachment" aria-label="attachment"></span> אין קובץ
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בהערה"></button>
+                                            <button data-button-type="EDIT" data-variant="small" data-icon="pencil" title="ערוך הערה"></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Alert Triggered Entry -->
+                                <div class="journal-entry-item" data-entry-type="alert">
+                                    <div class="journal-entry-header">
+                                            <div>
+                                            <div class="journal-entry-date">3 בינואר 2025, 10:15</div>
+                                            <div class="journal-entry-type-badge">
+                                                <span class="icon-placeholder icon" data-icon="bell" data-size="16" data-alt="alert" aria-label="alert"></span> התראה הופעלה
+                                            </div>
+                                            <div class="journal-entry-content">
+                                                <strong>AAPL</strong> | מחיר עלה מעל <strong>$150.00</strong> | תנאי: price | more_than | 150.00
+                                            </div>
+                                            <div class="journal-entry-meta">
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> התראה #78
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="status" aria-label="status"></span> open
+                                                </div>
+                                                <div class="journal-entry-meta-item">
+                                                    <span class="icon-placeholder icon" data-icon="check" data-size="16" data-alt="triggered" aria-label="triggered"></span> הופעל
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="journal-entry-actions">
+                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בהתראה"></button>
+                                        </div>
+                                    </div>
+                                </div>
                     </div>
-                    </div>
-                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
             </div>
         </div>
     </div>
@@ -358,8 +805,68 @@
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
     
+    <!-- Notification system -->
+    <div class="notification-container" id="notification-container"></div>
+    
+    <!-- Toast container for notifications -->
+    <div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1000000002;"></div>
+    
     <!-- Page-specific script -->
     <script src="../../scripts/trading-journal-page.js" defer></script>
+    
+    <!-- Journal Filter Script -->
+    <script>
+        /**
+         * Filter journal entries by entity type
+         * @param {string} entityType - Entity type to filter by ('all', 'execution', 'cash_flow', 'trade', 'trade_plan', 'note', 'alert')
+         */
+        function filterJournalByEntityType(entityType) {
+            const normalizedType = entityType || 'all';
+            const entries = document.querySelectorAll('.journal-entry-item');
+            const calendarDays = document.querySelectorAll('.calendar-day-cell');
+            
+            // Update filter buttons
+            const filterButtons = document.querySelectorAll('.filter-buttons-container button[data-type]');
+            filterButtons.forEach(btn => {
+                if (btn.getAttribute('data-type') === normalizedType) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Filter journal entries
+            entries.forEach(entry => {
+                const entryType = entry.getAttribute('data-entry-type');
+                if (normalizedType === 'all') {
+                    entry.style.display = '';
+                } else if (normalizedType === 'trade' && entryType === 'trade') {
+                    entry.style.display = '';
+                } else if (normalizedType === 'trade_plan' && entryType === 'trade_plan') {
+                    entry.style.display = '';
+                } else if (entryType === normalizedType) {
+                    entry.style.display = '';
+                } else {
+                    entry.style.display = 'none';
+                }
+            });
+            
+            // Update calendar indicators (placeholder - will be implemented with real data)
+            // For now, just log the filter change
+            if (window.Logger) {
+                window.Logger.info('Journal filtered by entity type', { entityType: normalizedType });
+            }
+        }
+        
+        // Make function available globally
+        window.filterJournalByEntityType = filterJournalByEntityType;
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set default filter to 'all'
+            filterJournalByEntityType('all');
+        });
+    </script>
 </body>
 </html>
 

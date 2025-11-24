@@ -136,8 +136,23 @@ class UpdateReporter:
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         report_file = self.report_dir / f"update_report_{timestamp}.json"
         
+        # Convert Path objects to strings for JSON serialization
+        def convert_paths(obj):
+            if isinstance(obj, Path):
+                return str(obj)
+            elif isinstance(obj, dict):
+                return {k: convert_paths(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_paths(item) for item in obj]
+            elif isinstance(obj, tuple):
+                return tuple(convert_paths(item) for item in obj)
+            else:
+                return obj
+        
+        serializable_report = convert_paths(self.report)
+        
         with open(report_file, 'w', encoding='utf-8') as f:
-            json.dump(self.report, f, indent=2, ensure_ascii=False)
+            json.dump(serializable_report, f, indent=2, ensure_ascii=False)
         
         return report_file
     

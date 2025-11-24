@@ -76,6 +76,25 @@ async function loadTradingAccounts() {
             window.Logger.info('🔧 Loading trading accounts...', { page: 'portfolio-state-page' });
         }
         
+        // Check cache first
+        const cacheKey = 'portfolio-state-accounts';
+        if (window.UnifiedCacheManager) {
+            const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
+            if (cachedData) {
+                if (window.Logger) {
+                    window.Logger.info(`✅ Loaded ${cachedData.length} accounts from cache`, { page: 'portfolio-state-page' });
+                }
+                // Process cached accounts
+                const openAccounts = cachedData.filter(account => account.status === 'open');
+                allTradingAccounts = openAccounts.map(acc => ({
+                    id: acc.id,
+                    name: acc.name || acc.account_name || `Account #${acc.id}`
+                })).sort((a, b) => a.name.localeCompare(b.name));
+                populateAccountFilterMenu();
+                return;
+            }
+        }
+        
         // Try multiple methods like header system
         let accounts = [];
         
@@ -118,9 +137,21 @@ async function loadTradingAccounts() {
                     window.Logger.info(`📊 Loaded ${accounts.length} accounts via direct API call`, { page: 'portfolio-state-page' });
                 }
             } else {
+                const errorMsg = `שגיאה בטעינת חשבונות מסחר: ${response.status} ${response.statusText}`;
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);
+                }
                 if (window.Logger) {
                     window.Logger.error('❌ Failed to load trading accounts', { page: 'portfolio-state-page', status: response.status, statusText: response.statusText });
                 }
+            }
+        }
+        
+        // Save to cache
+        if (accounts && accounts.length > 0 && window.UnifiedCacheManager) {
+            await window.UnifiedCacheManager.save(cacheKey, accounts, 'memory', { ttl: 600 }); // 10 minutes
+            if (window.Logger) {
+                window.Logger.info(`💾 Saved ${accounts.length} accounts to cache`, { page: 'portfolio-state-page' });
             }
         }
         
@@ -140,8 +171,18 @@ async function loadTradingAccounts() {
             window.Logger.info(`✅ Processed ${allTradingAccounts.length} trading accounts`, { page: 'portfolio-state-page', accounts: allTradingAccounts.map(a => a.name) });
         }
         
-        // Populate account filter menu (same as header system)
-        const accountMenu = document.getElementById('accountFilterMenu');
+        // Populate account filter menu
+        populateAccountFilterMenu();
+    } catch (error) {
+        if (window.Logger) {
+            window.Logger.error('❌ Error loading trading accounts', { page: 'portfolio-state-page', error });
+        }
+    }
+}
+
+// Populate account filter menu (extracted for reuse)
+function populateAccountFilterMenu() {
+    const accountMenu = document.getElementById('accountFilterMenu');
         if (accountMenu) {
             // Remove all items except "הכול"
             const existingItems = accountMenu.querySelectorAll('.account-filter-item:not([data-value="הכול"])');
@@ -156,7 +197,7 @@ async function loadTradingAccounts() {
                 accountItem.className = 'account-filter-item';
                 // Use account ID as data-value (same as header system)
                 accountItem.setAttribute('data-value', account.id.toString());
-                accountItem.onclick = () => selectAccountOption(account.id.toString());
+                accountItem.setAttribute('data-onclick', `window.portfolioStatePage.selectAccountOption('${account.id.toString()}')`);
                 accountItem.innerHTML = `<span class="option-text">${account.name}</span>`;
                 accountMenu.appendChild(accountItem);
                 if (window.Logger) {
@@ -184,7 +225,7 @@ async function loadTradingAccounts() {
             }
         } else {
             if (window.Logger) {
-                window.Logger.error('❌ accountFilterMenu not found!', { page: 'portfolio-state-page' });
+                window.Logger.warn('⚠️ accountFilterMenu not found!', { page: 'portfolio-state-page' });
             }
         }
     } catch (error) {
@@ -596,9 +637,54 @@ function getSelectedAccounts() {
     return selectedIds;
 }
 
+// Debounce helper for filter changes
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Debounced apply filters (300ms delay)
+const debouncedApplyFilters = debounce(() => {
+    applyFiltersInternal();
+}, 300);
+
 function applyFilters() {
-    // Update account filter text
+    // Update account filter text immediately
     updateAccountFilterText();
+    
+    // Use debounced version for actual filter application
+    debouncedApplyFilters();
+}
+
+function applyFiltersInternal() {
+    // Invalidate cache for trades and summary when filters change
+    if (window.CacheSyncManager?.invalidateByPattern) {
+        const patterns = ['portfolio-state-trades-*', 'portfolio-state-summary-*'];
+        patterns.forEach(pattern => {
+            window.CacheSyncManager.invalidateByPattern(pattern).catch(err => {
+                if (window.Logger) {
+                    window.Logger.warn('Failed to invalidate cache pattern', { pattern, error: err, page: 'portfolio-state-page' });
+                }
+            });
+        });
+    } else if (window.UnifiedCacheManager?.invalidate) {
+        // Fallback: invalidate all portfolio-state cache
+        const patterns = ['portfolio-state-trades-*', 'portfolio-state-summary-*'];
+        patterns.forEach(pattern => {
+            window.UnifiedCacheManager.invalidate(pattern).catch(err => {
+                if (window.Logger) {
+                    window.Logger.warn('Failed to invalidate cache pattern', { pattern, error: err, page: 'portfolio-state-page' });
+                }
+            });
+        });
+    }
     
     // Reload portfolio state with filters (this will filter trades, update charts and summary)
     loadPortfolioState();
@@ -771,6 +857,33 @@ async function loadChartDefaultPeriod() {
     }
 }
 
+// Show loading state for a component
+function showLoadingState(componentId) {
+    const component = document.getElementById(componentId);
+    if (component) {
+        component.classList.add('loading');
+        // Add spinner if not exists
+        if (!component.querySelector('.loading-spinner')) {
+            const spinner = document.createElement('div');
+            spinner.className = 'loading-spinner';
+            spinner.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">טוען...</span></div>';
+            component.appendChild(spinner);
+        }
+    }
+}
+
+// Hide loading state for a component
+function hideLoadingState(componentId) {
+    const component = document.getElementById(componentId);
+    if (component) {
+        component.classList.remove('loading');
+        const spinner = component.querySelector('.loading-spinner');
+        if (spinner) {
+            spinner.remove();
+        }
+    }
+}
+
 // Load portfolio state
 async function loadPortfolioState() {
     const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
@@ -778,35 +891,89 @@ async function loadPortfolioState() {
     const selectedAccounts = getSelectedAccounts();
     const investmentType = document.getElementById('filterInvestmentType').value;
     
-    // Load trades from API (only if not already loaded or date range changed)
-    await loadTrades(dateRange, selectedAccounts, investmentType);
+    // Show loading states
+    showLoadingState('trades-table-section');
+    showLoadingState('charts-section');
     
-    // Filter trades based on current filters
-    filterTrades(dateRange, selectedAccounts, investmentType);
-    
-    // Calculate summary from filtered trades
-    const summary = calculateSummaryFromTrades(filteredTrades);
-    updateSummaryCards(summary);
-    
-    // Reload charts with filtered data (all three together)
-    await Promise.all([
-        initPortfolioPerformanceChart(),
-        initPortfolioValueChart(),
-        initPLTrendChart()
-    ]);
-    
-    // Setup chart controls after charts are ready
-    setTimeout(() => {
-        setupChartControls();
-    }, 500);
+    try {
+        // Check cache for summary data
+        const accountsKey = Array.isArray(selectedAccounts) ? selectedAccounts.join(',') : (selectedAccounts || 'all');
+        const summaryCacheKey = `portfolio-state-summary-${dateRange}-${accountsKey}-${investmentType || 'all'}`;
+        let summary = null;
+        
+        if (window.UnifiedCacheManager) {
+            const cachedSummary = await window.UnifiedCacheManager.get(summaryCacheKey, 'memory');
+            if (cachedSummary) {
+                if (window.Logger) {
+                    window.Logger.info(`✅ Loaded summary from cache`, { page: 'portfolio-state-page' });
+                }
+                summary = cachedSummary;
+            }
+        }
+        
+        // Load trades and calculate summary in parallel (optimization)
+        await loadTrades(dateRange, selectedAccounts, investmentType);
+        
+        // Filter trades based on current filters
+        filterTrades(dateRange, selectedAccounts, investmentType);
+        
+        // Calculate summary from filtered trades (if not cached)
+        if (!summary) {
+            summary = await calculateSummaryFromTrades(filteredTrades);
+            // Save summary to cache
+            if (window.UnifiedCacheManager) {
+                await window.UnifiedCacheManager.save(summaryCacheKey, summary, 'memory', { ttl: 180 }); // 3 minutes
+                if (window.Logger) {
+                    window.Logger.info(`💾 Saved summary to cache`, { page: 'portfolio-state-page' });
+                }
+            }
+        }
+        updateSummaryCards(summary);
+        
+        // Reload charts with filtered data (all three together in parallel)
+        await Promise.all([
+            initPortfolioPerformanceChart(),
+            initPortfolioValueChart(),
+            initPLTrendChart()
+        ]);
+        
+        // Setup chart controls after charts are ready
+        setTimeout(() => {
+            setupChartControls();
+        }, 500);
+    } finally {
+        // Hide loading states
+        hideLoadingState('trades-table-section');
+        hideLoadingState('charts-section');
+    }
 }
 
 // Load trades from API
 async function loadTrades(dateRange, selectedAccounts, investmentType) {
     try {
-        // TODO: Load from API endpoint /api/daily-snapshots/{date}/trades
+        // Check cache first
+        const accountsKey = Array.isArray(selectedAccounts) ? selectedAccounts.join(',') : (selectedAccounts || 'all');
+        const cacheKey = `portfolio-state-trades-${dateRange}-${accountsKey}-${investmentType || 'all'}`;
+        
+        if (window.UnifiedCacheManager) {
+            const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
+            if (cachedData) {
+                if (window.Logger) {
+                    window.Logger.info(`✅ Loaded ${cachedData.length} trades from cache`, { page: 'portfolio-state-page', cacheKey });
+                }
+                allTrades = cachedData;
+                return;
+            }
+        }
+        
+        // TODO (Stage 3.3 - Backend): Load from API endpoint /api/daily-snapshots/{date}/trades
         // For now, using mock data
         // In production, this should fetch from: /api/daily-snapshots/{date}/trades?account_id={accountId}&investment_type={investmentType}
+        // This requires:
+        // 1. Creating DailySnapshot model in Backend
+        // 2. Creating API endpoint /api/daily-snapshots/{date}/trades
+        // 3. Background job to create daily snapshots automatically
+        // 4. Replacing mock data with API call using safeApiCall()
         allTrades = [
             {
                 id: 1,
@@ -877,7 +1044,19 @@ async function loadTrades(dateRange, selectedAccounts, investmentType) {
                 closed_at: null
             }
         ];
+        
+        // Save to cache
+        if (allTrades && allTrades.length >= 0 && window.UnifiedCacheManager) {
+            await window.UnifiedCacheManager.save(cacheKey, allTrades, 'memory', { ttl: 300 }); // 5 minutes
+            if (window.Logger) {
+                window.Logger.info(`💾 Saved ${allTrades.length} trades to cache`, { page: 'portfolio-state-page', cacheKey });
+            }
+        }
     } catch (error) {
+        const errorMsg = `שגיאה בטעינת טריידים: ${error.message || 'שגיאה לא ידועה'}`;
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);
+        }
         if (window.Logger) {
             window.Logger.error('Error loading trades', { page: 'portfolio-state-page', error });
         }
@@ -885,8 +1064,62 @@ async function loadTrades(dateRange, selectedAccounts, investmentType) {
     }
 }
 
-// Calculate summary from trades
-function calculateSummaryFromTrades(trades) {
+// Calculate summary from trades (using InfoSummarySystem if available)
+async function calculateSummaryFromTrades(trades) {
+    // Use InfoSummarySystem if available
+    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS?.['portfolio-state-page']) {
+        try {
+            const config = window.INFO_SUMMARY_CONFIGS['portfolio-state-page'];
+            const stats = await window.InfoSummarySystem.calculateStatsFromData(trades, config.stats);
+            
+            // Calculate additional data needed for cards
+            const cashBalanceByAccount = {};
+            const positionsCountByAccount = {};
+            let totalCashBalance = 0;
+            
+            trades.forEach(trade => {
+                const accountId = trade.trading_account_id;
+                const accountName = trade.account_name || `Account #${accountId}`;
+                
+                // Cash balance (mock - should come from snapshot)
+                if (!cashBalanceByAccount[accountId]) {
+                    cashBalanceByAccount[accountId] = {
+                        account_id: accountId,
+                        account_name: accountName,
+                        balance: 20000 // Mock
+                    };
+                    totalCashBalance += 20000;
+                }
+                
+                // Positions count
+                if (!positionsCountByAccount[accountId]) {
+                    positionsCountByAccount[accountId] = {
+                        account_id: accountId,
+                        count: 0
+                    };
+                }
+                positionsCountByAccount[accountId].count++;
+            });
+            
+            return {
+                ...stats,
+                total_cash_balance: stats.total_cash_balance || totalCashBalance,
+                cash_balance_by_account: Object.values(cashBalanceByAccount),
+                total_portfolio_value: stats.total_portfolio_value || (totalCashBalance + (stats.total_unrealized_pl || 0)),
+                total_realized_pl: 0, // Should come from closed trades
+                total_unrealized_pl: stats.total_unrealized_pl || 0,
+                total_pl: stats.total_pl || 0,
+                open_positions_count: stats.open_positions_count || trades.length,
+                positions_count_by_account: Object.values(positionsCountByAccount)
+            };
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to calculate summary using InfoSummarySystem, using fallback', { error, page: 'portfolio-state-page' });
+            }
+        }
+    }
+    
+    // Fallback to manual calculation
     const cashBalanceByAccount = {};
     let totalCashBalance = 0;
     let totalPortfolioValue = 0;
@@ -939,18 +1172,8 @@ function calculateSummaryFromTrades(trades) {
     };
 }
 
-// Update trades table
-function updateTradesTable() {
-    const tbody = document.getElementById('trades-table-body');
-    if (!tbody) return;
-    
-    if (filteredTrades.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="13" class="text-center text-muted">אין טריידים להצגה</td></tr>';
-        document.getElementById('trades-summary').textContent = 'אין טריידים';
-        return;
-    }
-    
-    tbody.innerHTML = filteredTrades.map(trade => {
+// Render trades table row (for UnifiedTableSystem)
+function renderTradeRow(trade) {
         // Use FieldRendererService if available
         // במערכת יש רק שלושה סטטוסים: open, closed, cancelled
         const renderStatus = window.FieldRendererService?.renderStatus 
@@ -1007,29 +1230,57 @@ function updateTradesTable() {
             }
         };
         
-        return `
-            <tr>
-                <td><strong>${trade.ticker_symbol || 'טיקר לא ידוע'}</strong></td>
-                <td>${renderAmount(trade.current_price || 0)}</td>
-                <td>${renderNumericValue(trade.daily_change || 0, '%')}</td>
-                <td>${trade.position_quantity || 0}</td>
-                <td>${renderNumericValue(trade.position_pl_percent || 0, '%')}</td>
-                <td>${renderNumericValue(trade.position_pl_value || 0, '$')}</td>
-                <td>${renderStatus}</td>
-                <td>${renderType}</td>
-                <td>${renderSide}</td>
-                <td>${trade.account_name || `Account #${trade.trading_account_id}`}</td>
-                <td>${formatDate(trade.created_at)}</td>
-                <td>${formatDate(trade.closed_at)}</td>
-                <td class="col-actions actions-cell" data-entity-id="${trade.id}" data-entity-type="trade" data-status="${trade.status || 'open'}"></td>
-            </tr>
-        `;
-    }).join('');
+    return `
+        <tr>
+            <td><strong>${trade.ticker_symbol || 'טיקר לא ידוע'}</strong></td>
+            <td>${renderAmount(trade.current_price || 0)}</td>
+            <td>${renderNumericValue(trade.daily_change || 0, '%')}</td>
+            <td>${trade.position_quantity || 0}</td>
+            <td>${renderNumericValue(trade.position_pl_percent || 0, '%')}</td>
+            <td>${renderNumericValue(trade.position_pl_value || 0, '$')}</td>
+            <td>${renderStatus}</td>
+            <td>${renderType}</td>
+            <td>${renderSide}</td>
+            <td>${trade.account_name || `Account #${trade.trading_account_id}`}</td>
+            <td>${formatDate(trade.created_at)}</td>
+            <td>${formatDate(trade.closed_at)}</td>
+            <td class="col-actions actions-cell" data-entity-id="${trade.id}" data-entity-type="trade" data-status="${trade.status || 'open'}"></td>
+        </tr>
+    `;
+}
+
+// Update trades table (using UnifiedTableSystem if available, fallback to manual rendering)
+function updateTradesTable() {
+    // Use UnifiedTableSystem if available
+    if (window.UnifiedTableSystem && window.UnifiedTableSystem.renderer) {
+        window.UnifiedTableSystem.renderer.render('portfolio-trades', filteredTrades);
+        return;
+    }
+    
+    // Fallback to manual rendering
+    const tbody = document.getElementById('trades-table-body');
+    if (!tbody) return;
+    
+    if (filteredTrades.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="13" class="text-center text-muted">אין טריידים להצגה</td></tr>';
+        document.getElementById('trades-summary').textContent = 'אין טריידים';
+        return;
+    }
+    
+    tbody.innerHTML = filteredTrades.map(trade => renderTradeRow(trade)).join('');
     
     // Update summary
     const totalPL = filteredTrades.reduce((sum, t) => sum + (t.position_pl_value || 0), 0);
     const summaryElement = document.getElementById('trades-summary');
     if (summaryElement) {
+        const renderNumericValue = (value, suffix = '%', showSign = true) => {
+            if (window.FieldRendererService?.renderNumericValue) {
+                return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
+            }
+            const sign = showSign && value >= 0 ? '+' : '';
+            const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
+            return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
+        };
         summaryElement.innerHTML = `
             <strong>סה"כ טריידים: ${filteredTrades.length}</strong> | 
             <strong>סה"כ P/L: ${renderNumericValue(totalPL, '$')}</strong>
@@ -1256,14 +1507,26 @@ async function initPortfolioPerformanceChart() {
     
     if (typeof window.TradingViewChartAdapter === 'undefined') {
         if (window.Logger) {
-            window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'portfolio-state-page', timeout: maxRetries * 50 });
+            const errorMsg = 'ספריית TradingView לא זמינה. נא לרענן את העמוד.';
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה בטעינת גרפים', errorMsg);
+            }
+            if (window.Logger) {
+                window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'portfolio-state-page', timeout: maxRetries * 50 });
+            }
         }
         return;
     }
     
     if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
         if (window.Logger) {
-            window.Logger.error('❌ LightweightCharts library not available', { page: 'portfolio-state-page' });
+            const errorMsg = 'ספריית LightweightCharts לא זמינה. נא לרענן את העמוד.';
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה בטעינת גרפים', errorMsg);
+            }
+            if (window.Logger) {
+                window.Logger.error('❌ LightweightCharts library not available', { page: 'portfolio-state-page' });
+            }
         }
         return;
     }
@@ -1416,7 +1679,13 @@ async function initPortfolioPerformanceChart() {
         
     } catch (error) {
         if (window.Logger) {
-            window.Logger.error('Error creating portfolio performance chart', { page: 'portfolio-state-page', error });
+            const errorMsg = `שגיאה ביצירת גרף ביצועי תיק: ${error.message || 'שגיאה לא ידועה'}`;
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה ביצירת גרף', errorMsg);
+            }
+            if (window.Logger) {
+                window.Logger.error('Error creating portfolio performance chart', { page: 'portfolio-state-page', error });
+            }
         }
         portfolioPerformanceChart = null;
     }
@@ -1453,7 +1722,13 @@ async function initPortfolioValueChart() {
     
     if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
         if (window.Logger) {
-            window.Logger.error('❌ LightweightCharts library not available', { page: 'portfolio-state-page' });
+            const errorMsg = 'ספריית LightweightCharts לא זמינה. נא לרענן את העמוד.';
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה בטעינת גרפים', errorMsg);
+            }
+            if (window.Logger) {
+                window.Logger.error('❌ LightweightCharts library not available', { page: 'portfolio-state-page' });
+            }
         }
         return;
     }
@@ -1630,7 +1905,17 @@ async function initPortfolioValueChart() {
         
     } catch (error) {
         if (window.Logger) {
-            window.Logger.error('Error creating portfolio value chart', { page: 'portfolio-state-page', error });
+            const errorMsg = `שגיאה ביצירת גרף שווי תיק: ${error.message || 'שגיאה לא ידועה'}`;
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה ביצירת גרף', errorMsg);
+            }
+            const errorMsg = `שגיאה ביצירת גרף שווי תיק: ${error.message || 'שגיאה לא ידועה'}`;
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה ביצירת גרף', errorMsg);
+            }
+            if (window.Logger) {
+                window.Logger.error('Error creating portfolio value chart', { page: 'portfolio-state-page', error });
+            }
         }
         portfolioValueChart = null;
     }
@@ -1659,14 +1944,26 @@ async function initPLTrendChart() {
     
     if (typeof window.TradingViewChartAdapter === 'undefined') {
         if (window.Logger) {
-            window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'portfolio-state-page', timeout: maxRetries * 50 });
+            const errorMsg = 'ספריית TradingView לא זמינה. נא לרענן את העמוד.';
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה בטעינת גרפים', errorMsg);
+            }
+            if (window.Logger) {
+                window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'portfolio-state-page', timeout: maxRetries * 50 });
+            }
         }
         return;
     }
     
     if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
         if (window.Logger) {
-            window.Logger.error('❌ LightweightCharts library not available', { page: 'portfolio-state-page' });
+            const errorMsg = 'ספריית LightweightCharts לא זמינה. נא לרענן את העמוד.';
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה בטעינת גרפים', errorMsg);
+            }
+            if (window.Logger) {
+                window.Logger.error('❌ LightweightCharts library not available', { page: 'portfolio-state-page' });
+            }
         }
         return;
     }
@@ -1901,7 +2198,13 @@ async function initPLTrendChart() {
         
     } catch (error) {
         if (window.Logger) {
-            window.Logger.error('Error creating P/L trend chart', { page: 'portfolio-state-page', error });
+            const errorMsg = `שגיאה ביצירת גרף מגמת P/L: ${error.message || 'שגיאה לא ידועה'}`;
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה ביצירת גרף', errorMsg);
+            }
+            if (window.Logger) {
+                window.Logger.error('Error creating P/L trend chart', { page: 'portfolio-state-page', error });
+            }
         }
         plTrendChart = null;
     }
@@ -2715,6 +3018,255 @@ async function waitForScripts() {
     }
 
     /**
+     * Register trades table with UnifiedTableSystem
+     */
+    function registerPortfolioTradesTable() {
+        if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ UnifiedTableSystem not available for table registration', { page: 'portfolio-state-page' });
+            }
+            return;
+        }
+
+        // Get column mappings (use trades mapping as fallback)
+        const getColumns = () => {
+            return window.TABLE_COLUMN_MAPPINGS?.['portfolio-trades'] || 
+                   window.TABLE_COLUMN_MAPPINGS?.['trades'] || [];
+        };
+
+        // Register portfolio trades table
+        window.UnifiedTableSystem.registry.register('portfolio-trades', {
+            dataGetter: () => filteredTrades || [],
+            updateFunction: (data) => {
+                // Update filtered trades
+                filteredTrades = Array.isArray(data) ? data : [];
+                // Render table manually (UnifiedTableSystem will call this)
+                const tbody = document.getElementById('trades-table-body');
+                if (!tbody) return;
+                
+                if (filteredTrades.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="13" class="text-center text-muted">אין טריידים להצגה</td></tr>';
+                    const summaryElement = document.getElementById('trades-summary');
+                    if (summaryElement) {
+                        summaryElement.textContent = 'אין טריידים';
+                    }
+                    return;
+                }
+                
+                tbody.innerHTML = filteredTrades.map(trade => renderTradeRow(trade)).join('');
+                
+                // Update summary
+                const totalPL = filteredTrades.reduce((sum, t) => sum + (t.position_pl_value || 0), 0);
+                const summaryElement = document.getElementById('trades-summary');
+                if (summaryElement) {
+                    const renderNumericValue = (value, suffix = '%', showSign = true) => {
+                        if (window.FieldRendererService?.renderNumericValue) {
+                            return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
+                        }
+                        const sign = showSign && value >= 0 ? '+' : '';
+                        const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
+                        return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
+                    };
+                    summaryElement.innerHTML = `
+                        <strong>סה"כ טריידים: ${filteredTrades.length}</strong> | 
+                        <strong>סה"כ P/L: ${renderNumericValue(totalPL, '$')}</strong>
+                    `;
+                }
+                
+                // Load action buttons
+                if (window.loadTableActionButtons) {
+                    window.loadTableActionButtons('tradesTable', 'trade', {
+                        showDetails: true,
+                        showLinked: true,
+                        showEdit: true,
+                        showDelete: false // Trades shouldn't be deleted from this page
+                    });
+                }
+            },
+            tableSelector: '#tradesTable',
+            columns: getColumns(),
+            sortable: true,
+            filterable: true,
+            // Default sort: created_at desc (column index 10)
+            defaultSort: { columnIndex: 10, direction: 'desc', key: 'created_at' }
+        });
+
+        // Register with TableDataRegistry
+        if (window.TableDataRegistry) {
+            window.TableDataRegistry.registerTable({
+                tableType: 'portfolio-trades',
+                tableId: 'tradesTable',
+                source: 'portfolio-state-page'
+            });
+        }
+
+        if (window.Logger) {
+            window.Logger.info('✅ Registered portfolio trades table with UnifiedTableSystem', { page: 'portfolio-state-page' });
+        }
+    }
+
+    /**
+     * Save page state (filters, sections, charts)
+     */
+    async function savePageState() {
+        if (!window.PageStateManager) {
+            return;
+        }
+
+        try {
+            const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
+            const dateRange = selectedItem ? selectedItem.getAttribute('data-value') : 'היום';
+            const selectedAccounts = getSelectedAccounts();
+            const investmentType = document.getElementById('filterInvestmentType')?.value || '';
+
+            // Get section states
+            const sections = {};
+            const sectionIds = ['portfolio-state-top-section', 'charts-section', 'trades-table-section'];
+            sectionIds.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const sectionBody = section.querySelector('.section-body');
+                    sections[sectionId] = sectionBody ? sectionBody.style.display === 'none' : false;
+                }
+            });
+
+            const state = {
+                filters: {
+                    dateRange: dateRange,
+                    selectedAccounts: selectedAccounts,
+                    investmentType: investmentType
+                },
+                sections: sections,
+                charts: {
+                    period: currentPeriod['both'] || 'month'
+                }
+            };
+
+            await window.PageStateManager.savePageState('portfolio-state', state);
+            if (window.Logger) {
+                window.Logger.debug('✅ Saved page state', { page: 'portfolio-state-page' });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to save page state', { error, page: 'portfolio-state-page' });
+            }
+        }
+    }
+
+    /**
+     * Restore page state (filters, sections, charts)
+     */
+    async function restorePageState() {
+        if (!window.PageStateManager) {
+            return;
+        }
+
+        try {
+            const state = await window.PageStateManager.loadPageState('portfolio-state');
+            if (!state) {
+                return;
+            }
+
+            // Restore filters
+            if (state.filters) {
+                // Restore date range
+                if (state.filters.dateRange) {
+                    const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+                    dateRangeItems.forEach(item => item.classList.remove('selected'));
+                    const targetItem = document.querySelector(`#dateRangeFilterMenu .date-range-filter-item[data-value="${state.filters.dateRange}"]`);
+                    if (targetItem) {
+                        targetItem.classList.add('selected');
+                        selectDateRangeOption(state.filters.dateRange);
+                    }
+                }
+
+                // Restore investment type
+                if (state.filters.investmentType) {
+                    const investmentSelect = document.getElementById('filterInvestmentType');
+                    if (investmentSelect) {
+                        investmentSelect.value = state.filters.investmentType;
+                    }
+                }
+
+                // Restore selected accounts (will be restored after accounts are loaded)
+                if (state.filters.selectedAccounts && Array.isArray(state.filters.selectedAccounts)) {
+                    // Store for later restoration after accounts are loaded
+                    window._pendingAccountRestore = state.filters.selectedAccounts;
+                }
+            }
+
+            // Restore sections
+            if (state.sections) {
+                Object.keys(state.sections).forEach(sectionId => {
+                    const isHidden = state.sections[sectionId];
+                    if (isHidden) {
+                        const section = document.getElementById(sectionId);
+                        if (section) {
+                            const sectionBody = section.querySelector('.section-body');
+                            if (sectionBody) {
+                                sectionBody.style.display = 'none';
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Restore charts period
+            if (state.charts && state.charts.period) {
+                currentPeriod['both'] = state.charts.period;
+                // Set active button
+                document.querySelectorAll('[data-onclick*="setChartPeriod"]').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.getAttribute('data-onclick').includes(`'${state.charts.period}'`)) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+
+            if (window.Logger) {
+                window.Logger.debug('✅ Restored page state', { page: 'portfolio-state-page' });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to restore page state', { error, page: 'portfolio-state-page' });
+            }
+        }
+    }
+
+    /**
+     * Restore selected accounts after accounts are loaded
+     */
+    function restoreSelectedAccounts() {
+        if (!window._pendingAccountRestore) {
+            return;
+        }
+
+        const selectedAccounts = window._pendingAccountRestore;
+        delete window._pendingAccountRestore;
+
+        // Clear all selections
+        const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
+        accountItems.forEach(item => item.classList.remove('selected'));
+
+        // Restore selections
+        if (selectedAccounts.includes('הכול') || selectedAccounts.length === 0) {
+            const allItem = document.querySelector('#accountFilterMenu .account-filter-item[data-value="הכול"]');
+            if (allItem) {
+                allItem.classList.add('selected');
+            }
+        } else {
+            selectedAccounts.forEach(accountId => {
+                const accountItem = document.querySelector(`#accountFilterMenu .account-filter-item[data-value="${accountId}"]`);
+                if (accountItem) {
+                    accountItem.classList.add('selected');
+                }
+            });
+        }
+
+        updateAccountFilterText();
+    }
+
+    /**
      * Initialize page
      */
     async function initializePage() {
@@ -2724,29 +3276,59 @@ async function waitForScripts() {
         // Wait for all scripts to load first
         await waitForScripts();
         
+        // Register table with UnifiedTableSystem
+        registerPortfolioTradesTable();
+        
         // Load user preferences first
         await loadUserPreferences();
         
-        // Set default date range to "היום" (today)
-        const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
-        dateRangeItems.forEach(item => item.classList.remove('selected'));
-        const todayItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item[data-value="היום"]');
-        if (todayItem) {
-            todayItem.classList.add('selected');
+        // Restore page state before setting defaults
+        await restorePageState();
+        
+        // Set default date range to "היום" (today) only if not restored
+        const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
+        if (!selectedItem) {
+            const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+            dateRangeItems.forEach(item => item.classList.remove('selected'));
+            const todayItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item[data-value="היום"]');
+            if (todayItem) {
+                todayItem.classList.add('selected');
+            }
+            updateDateRangeFilterText();
         }
-        updateDateRangeFilterText();
         
         await loadTradingAccounts();
+        // Restore selected accounts after accounts are loaded
+        restoreSelectedAccounts();
+        
         loadInvestmentTypes();
         await loadPortfolioState();
         
-        // Load chart default period from preferences
-        await loadChartDefaultPeriod();
+        // Load chart default period from preferences (only if not restored from state)
+        if (!currentPeriod['both']) {
+            await loadChartDefaultPeriod();
+        }
         
         // Setup chart controls after charts are initialized
         setTimeout(() => {
             setupChartControls();
         }, 1000);
+
+        // Save state on filter changes
+        const originalApplyFilters = applyFilters;
+        window.portfolioStatePage.applyFilters = async function() {
+            await originalApplyFilters();
+            await savePageState();
+        };
+
+        // Save state on section toggle (hook into toggleSection)
+        if (window.toggleSection) {
+            const originalToggleSection = window.toggleSection;
+            window.toggleSection = function(sectionId) {
+                originalToggleSection(sectionId);
+                savePageState();
+            };
+        }
     }
 
     // Initialize when DOM is ready

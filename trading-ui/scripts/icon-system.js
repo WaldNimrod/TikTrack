@@ -46,16 +46,17 @@
             }
 
             try {
-                // Load mappings
+                // Load mappings - retry if not available
                 if (typeof window.IconMappings !== 'undefined') {
                     this.mappings = window.IconMappings;
                 } else {
-                    if (typeof window.Logger !== 'undefined') {
-                        window.Logger.warn('⚠️ IconMappings not found, using fallback', { page: 'icon-system' });
+                    // Retry after a short delay
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    if (typeof window.IconMappings !== 'undefined') {
+                        this.mappings = window.IconMappings;
                     } else {
-                        console.warn('⚠️ IconMappings not found, using fallback');
+                        this.mappings = {};
                     }
-                    this.mappings = {};
                 }
 
                 // Check cache availability
@@ -65,19 +66,8 @@
 
                 this.initialized = true;
 
-                if (typeof window.Logger !== 'undefined') {
-                    window.Logger.info('✅ Icon System initialized successfully', { page: 'icon-system' });
-                } else {
-                    console.log('✅ Icon System initialized successfully');
-                }
-
                 return true;
             } catch (error) {
-                if (typeof window.Logger !== 'undefined') {
-                    window.Logger.error('❌ Failed to initialize Icon System:', error, { page: 'icon-system' });
-                } else {
-                    console.error('❌ Failed to initialize Icon System:', error);
-                }
                 return false;
             }
         }
@@ -132,6 +122,7 @@
             } else {
                 // For other types (button, category, chart, page), use Tabler Icons
                 const mapping = this.mappings?.[type]?.[name];
+                
                 if (mapping) {
                     // Check if it's already a path
                     if (mapping.startsWith('/')) {
@@ -199,7 +190,6 @@
                 } catch (error) {
                     // If loading fails, fallback to img tag
                     if (typeof window.Logger !== 'undefined') {
-                        window.Logger.debug(`⚠️ Failed to load SVG inline for ${path}, using img tag:`, error, { page: 'icon-system' });
                     }
                 }
             }
@@ -408,11 +398,5 @@
         iconSystem.initialize().catch(console.error);
     }
 
-    // Log initialization
-    if (typeof window.Logger !== 'undefined') {
-        window.Logger.info('✅ Icon System loaded successfully', { page: 'icon-system' });
-    } else {
-        console.log('✅ Icon System loaded successfully');
-    }
 })();
 

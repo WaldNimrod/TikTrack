@@ -1600,23 +1600,8 @@ async function copyNotificationsToClipboard() {
   }
 }
 
-function toggleSection() {
-    const topSection = document.querySelector('.top-section .section-body');
-    if (topSection) {
-        if (topSection.style.display === 'none') {
-            topSection.style.display = '';
-            console.log('✅ Top section expanded');
-        } else {
-            topSection.style.display = 'none';
-            console.log('✅ Top section collapsed');
-        }
-    } else {
-        console.warn('❌ Top section not found');
-    }
-}
-
-
 // toggleSection function removed - using global version from ui-utils.js
+// Use window.toggleSection('top') instead
 
 // ייצוא פונקציות ל-window scope
 window.copyNotificationsToClipboard = copyNotificationsToClipboard;

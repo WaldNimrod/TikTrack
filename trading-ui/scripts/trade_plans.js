@@ -3195,7 +3195,7 @@ function restorePlanningSectionState() {
 }
 
 window.setupSortableHeadersLocal = setupSortableHeadersLocal;
-window.toggleSection = toggleSection;
+// window.toggleSection removed - using global version from ui-utils.js
 window.restorePlanningSectionState = restorePlanningSectionState;
 window.addImportantNote = addImportantNote;
 window.addReminder = addReminder;

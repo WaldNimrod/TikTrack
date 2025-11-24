@@ -103,14 +103,14 @@
                 });
             }
         } catch (e) {
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה', 'שגיאה באתחול גרף TradingView');
+            }
             if (window.Logger) {
                 window.Logger.error('Error initializing TradingView Widget', { 
                     page: 'price-history-page', 
                     error: e 
                 });
-            }
-            if (window.NotificationSystem) {
-                window.NotificationSystem.showError('שגיאה', 'שגיאה באתחול גרף TradingView');
             }
         }
     }
@@ -131,6 +131,9 @@
                     }
                 });
             } catch (e) {
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError('שגיאה', 'שגיאה בעדכון סמל בגרף');
+                }
                 if (window.Logger) {
                     window.Logger.error('Error updating TradingView Widget symbol', { 
                         page: 'price-history-page', 
@@ -168,6 +171,8 @@
         tickerSelect.addEventListener('change', (e) => {
             const symbol = e.target.value;
             updateTradingViewWidgetSymbol(symbol);
+            // Save page state
+            savePageState();
         });
     }
 

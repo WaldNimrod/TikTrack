@@ -83,10 +83,20 @@ class EntityDetailsModal {
             // הוספה לאובייקט הגלובלי
             window.entityDetailsModal = this;
             
-            window.Logger.info('EntityDetailsModal initialized successfully', { page: "entity-details-modal" });
+            if (window.Logger && typeof window.Logger.info === 'function') {
+                window.Logger.info('EntityDetailsModal initialized successfully', { page: "entity-details-modal" });
+            }
             
         } catch (error) {
-            window.Logger.error('Error initializing EntityDetailsModal:', error, { page: "entity-details-modal" });
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('Error initializing EntityDetailsModal', { 
+                    page: "entity-details-modal",
+                    error: error instanceof Error ? error.message : String(error),
+                    stack: error instanceof Error ? error.stack : undefined
+                });
+            } else {
+                console.error('Error initializing EntityDetailsModal:', error);
+            }
             if (window.showErrorNotification) {
                 window.showErrorNotification('שגיאה באתחול מערכת פרטי ישויות');
             }
@@ -1896,17 +1906,35 @@ function editTicker(tickerId) {
 /**
  * Auto-initialize when DOM is ready - אתחול אוטומטי כשה-DOM מוכן
  */
-// document.addEventListener('DOMContentLoaded', () => {
-//     try {
-//         // אתחול המחלקה הראשית
-        new EntityDetailsModal();
-        
-        window.Logger.info('Entity Details Modal system loaded and ready', { page: "entity-details-modal" });
-        
-//     } catch (error) {
-//         window.Logger.error('Error auto-initializing EntityDetailsModal:', error, { page: "entity-details-modal" });
-//     }
-// });
+if (typeof document !== 'undefined') {
+    const initModal = () => {
+        try {
+            // אתחול המחלקה הראשית
+            new EntityDetailsModal();
+            
+            if (window.Logger && typeof window.Logger.info === 'function') {
+                window.Logger.info('Entity Details Modal system loaded and ready', { page: "entity-details-modal" });
+            }
+        } catch (error) {
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('Error auto-initializing EntityDetailsModal', { 
+                    page: "entity-details-modal",
+                    error: error instanceof Error ? error.message : String(error),
+                    stack: error instanceof Error ? error.stack : undefined
+                });
+            } else {
+                console.error('Error auto-initializing EntityDetailsModal:', error);
+            }
+        }
+    };
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initModal);
+    } else {
+        // Wait a bit for Logger to be available
+        setTimeout(initModal, 100);
+    }
+}
 
 // ===== FUNCTION INDEX =====
 /*

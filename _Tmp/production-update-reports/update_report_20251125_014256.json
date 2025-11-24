@@ -1,0 +1,44 @@
+{
+  "start_time": "2025-11-25T01:42:56.069065",
+  "steps": [
+    {
+      "number": 5,
+      "name": "merge_main",
+      "success": false,
+      "duration_seconds": 0.010492801666259766,
+      "timestamp": "2025-11-25T01:42:56.087230",
+      "details": {
+        "success": false,
+        "error": "Command '['git', 'pull', 'origin', 'production']' returned non-zero exit status 128."
+      }
+    }
+  ],
+  "files_updated": [],
+  "files_new": [],
+  "files_deleted": [],
+  "warnings": [],
+  "errors": [
+    {
+      "message": "Merge failed: Command '['git', 'pull', 'origin', 'production']' returned non-zero exit status 128.",
+      "step": "merge_main",
+      "timestamp": "2025-11-25T01:42:56.087185"
+    },
+    {
+      "message": "Step 5 (merge_main) failed",
+      "step": "merge_main",
+      "timestamp": "2025-11-25T01:42:56.087232"
+    }
+  ],
+  "summary": {
+    "total_duration_seconds": 0.018764,
+    "steps_completed": 0,
+    "steps_failed": 1,
+    "files_updated_count": 0,
+    "files_new_count": 0,
+    "files_deleted_count": 0,
+    "warnings_count": 0,
+    "errors_count": 2
+  },
+  "end_time": "2025-11-25T01:42:56.087829",
+  "success": false
+}

@@ -438,11 +438,26 @@ class ExecutionTradeMatchingService:
 
     @staticmethod
     def _map_execution_action_to_trade_side(action: Optional[str]) -> str:
+        """
+        Map execution action to trade side.
+        
+        Long trades: buy (opening) + sell (closing)
+        Short trades: short (opening) + cover (closing)
+        
+        Args:
+            action: Execution action (buy, sell, short, cover)
+            
+        Returns:
+            'long' or 'short'
+        """
         if not action:
             return 'long'
         normalized = action.lower()
-        if normalized in {"sell", "sale", "short"}:
+        # Short trades: short (opening) and cover (closing)
+        if normalized in {"short", "cover"}:
             return 'short'
+        # Long trades: buy (opening) and sell (closing)
+        # All other actions (buy, sell) default to long
         return 'long'
 
     @staticmethod

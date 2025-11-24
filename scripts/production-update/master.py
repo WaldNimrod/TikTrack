@@ -71,6 +71,7 @@ start_server = load_step_module("13_start_server")
 verify_stability = load_step_module("14_verify_server_stability")
 bump_version = load_step_module("09_bump_version")
 commit_push = load_step_module("10_commit_push")
+e2e_tests = load_step_module("17_e2e_tests")
 
 
 # Step mapping - Updated to match new plan
@@ -133,6 +134,10 @@ STEP_MODULES[15] = ('bump_version', bump_version)
 
 # Step 16: Commit and push
 STEP_MODULES[16] = ('commit_push', commit_push)
+
+# Step 17: E2E browser tests
+if e2e_tests:
+    STEP_MODULES[17] = ('e2e_tests', e2e_tests)
 
 
 class UpdateMaster:

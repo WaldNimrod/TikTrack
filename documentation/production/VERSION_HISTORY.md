@@ -36,3 +36,4 @@ This log records every production version update, including manual major/minor a
 | 2025-11-24T00:02:26+00:00 | 1.3.4.0 | 1.3.3.0 | fe23e05f83ad0df1db0df2b579245edd2a0e26d6 | 3a481fb891063d83a8018dc80ad11fff2b6e0834 | patch | Remove SQLite references from production update scripts |
 | 2025-11-24T00:22:33+00:00 | 1.3.5.0 | 1.3.4.0 | cfd1dc3ea095a59c15849fe6f4f0f0c1c155177a | fe23e05f83ad0df1db0df2b579245edd2a0e26d6 | patch | Update all production scripts to use PostgreSQL instead of SQLite |
 | 2025-11-24T00:47:24+00:00 | 1.3.6.0 | 1.3.5.0 | 8e35adc94d825b42d6a596f321cbe38c907a9a55 | cfd1dc3ea095a59c15849fe6f4f0f0c1c155177a | patch | Save uncommitted changes before merge |
+| 2025-11-24T02:24:58+00:00 | 1.3.7.0 | 1.3.6.0 | c3ff970200899a9198c499bd05188f5c54cb3e1d | 8e35adc94d825b42d6a596f321cbe38c907a9a55 | patch | Add E2E testing and improve production update process v2.0.0 |

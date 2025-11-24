@@ -4,13 +4,13 @@
 
 ## סיכום
 
-- emoji_icons: 5541
+- emoji_icons: 5563
 - total_files_with_issues: 210
 - total_files_using_icon_system: 42
 - missing_icon_system: 21
-- old_icon_paths: 59
 - text_content_icons: 22
 - fontawesome: 1083
+- old_icon_paths: 32
 - bootstrap_icons: 44
 - icon_cdn: 3
 

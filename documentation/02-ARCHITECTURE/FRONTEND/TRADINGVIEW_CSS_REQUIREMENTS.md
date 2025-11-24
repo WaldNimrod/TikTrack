@@ -1,9 +1,14 @@
 # TradingView Lightweight Charts - דרישות CSS
 
 **תאריך יצירה:** ינואר 2025  
+**תאריך עדכון אחרון:** ינואר 2025  
 **מטרה:** תיעוד מקיף של דרישות CSS עבור TradingView Lightweight Charts במערכת TikTrack
 
 **⚠️ חשוב מאוד:** לפני שילוב גרף TradingView בעמוד חדש, יש לקרוא את המסמך הזה במלואו ולעקוב אחר המבנה המומלץ בדיוק.
+
+**📝 עדכון אחרון:** כל הגרפים במערכת עודכנו למבנה הסטנדרטי עם `chart-container-wrapper` ו-`chart-controls-wrapper` (ינואר 2025).
+
+**📝 עדכון אחרון:** כל הגרפים במערכת עודכנו למבנה הסטנדרטי עם `chart-container-wrapper` ו-`chart-controls-wrapper` (ינואר 2025).
 
 ---
 
@@ -365,6 +370,8 @@ const series = window.TradingViewChartAdapter.addLineSeries(chart, {
 2. הקונטיינר לא עם `width: 100%`
 3. הקונטיינר לא עם `height` מוגדר
 4. בעיית flex layout - צריך `min-width: 0`
+5. TradingView Adapter לא נטען - בדוק בקונסול
+6. הפונקציה initChart לא נקראת - בדוק בקונסול
 
 **פתרון:**
 ```css
@@ -377,6 +384,13 @@ const series = window.TradingViewChartAdapter.addLineSeries(chart, {
     position: relative;
 }
 ```
+
+**בדיקות JavaScript:**
+- בדוק ש-`window.TradingViewChartAdapter` קיים
+- בדוק ש-`window.LightweightCharts` קיים
+- בדוק שהפונקציה `initChart()` נקראת
+- בדוק שאין שגיאות JavaScript בקונסול
+- בדוק ש-container קיים ב-DOM לפני יצירת הגרף
 
 ### בעיה: הגרף מוצג לצד הכפתורים
 
@@ -422,6 +436,68 @@ const series = window.TradingViewChartAdapter.addLineSeries(chart, {
     top: 10px;
     inset-inline-end: 10px;
     z-index: 20;
+}
+```
+
+### בעיה: הגרף לא נטען (TradingView Adapter לא זמין)
+
+**סיבות אפשריות:**
+1. הספריות לא נטענות - בדוק 404 errors
+2. הסדר של טעינת הספריות לא נכון
+3. `waitForTradingViewAdapter()` לא ממתינה מספיק זמן
+4. שגיאות JavaScript מונעות טעינה
+
+**פתרון:**
+```javascript
+// וודא שהספריות נטענות בסדר הנכון:
+// 1. lightweight-charts.standalone.production.js
+// 2. tradingview-theme.js
+// 3. tradingview-adapter.js
+
+// בדוק שהפונקציה waitForTradingViewAdapter ממתינה מספיק:
+async function waitForTradingViewAdapter() {
+    const maxRetries = 100; // 5 שניות
+    for (let i = 0; i < maxRetries; i++) {
+        if (window.TradingViewChartAdapter && window.LightweightCharts) {
+            return;
+        }
+        await new Promise(resolve => setTimeout(resolve, 50));
+    }
+    throw new Error('TradingView adapters not loaded');
+}
+```
+
+### בעיה: הגרף לא מתאתחל (initChart לא נקראת)
+
+**סיבות אפשריות:**
+1. DOMContentLoaded event לא מופעל
+2. הפונקציה initChart לא מוגדרת לפני DOMContentLoaded
+3. שגיאות JavaScript מונעות ביצוע
+4. Container לא קיים ב-DOM
+
+**פתרון:**
+```javascript
+// וודא שהפונקציה מוגדרת לפני DOMContentLoaded
+async function initChart() {
+    await waitForTradingViewAdapter();
+    const container = document.getElementById('chart-container');
+    if (!container) {
+        console.error('Container not found!');
+        return;
+    }
+    // ... create chart
+}
+
+// וודא ש-DOMContentLoaded מופעל
+document.addEventListener('DOMContentLoaded', () => {
+    initChart();
+});
+
+// או אם DOM כבר נטען:
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initChart);
+} else {
+    initChart();
 }
 ```
 

@@ -30,6 +30,10 @@ class NormalizedQuote:
     quality_score: float = 1.0
     provider_count: int = 1
     is_aggregated: bool = False
+    # Open price data (from market open)
+    open_price: Optional[float] = None
+    change_pct_from_open: Optional[float] = None
+    change_amount_from_open: Optional[float] = None
 
 @dataclass
 class NormalizedIntraday:
@@ -111,6 +115,11 @@ class DataNormalizer:
             normalized_change_amount = self._aggregate_change_amounts(valid_quotes)
             normalized_volume = self._aggregate_volumes(valid_quotes)
             
+            # Aggregate open price fields
+            normalized_open_price = self._aggregate_open_prices(valid_quotes)
+            normalized_change_pct_from_open = self._aggregate_change_pct_from_open(valid_quotes)
+            normalized_change_amount_from_open = self._aggregate_change_amount_from_open(valid_quotes)
+            
             # Determine currency (use most common)
             currency = self._determine_currency(valid_quotes)
             
@@ -135,7 +144,11 @@ class DataNormalizer:
                 source='normalized',
                 quality_score=quality_score,
                 provider_count=len(valid_quotes),
-                is_aggregated=len(valid_quotes) > 1
+                is_aggregated=len(valid_quotes) > 1,
+                # Open price data
+                open_price=normalized_open_price,
+                change_pct_from_open=normalized_change_pct_from_open,
+                change_amount_from_open=normalized_change_amount_from_open
             )
             
         except Exception as e:
@@ -276,6 +289,54 @@ class DataNormalizer:
         
         # Use median for volumes to avoid outliers
         return sorted(valid_volumes)[len(valid_volumes) // 2]
+    
+    def _aggregate_open_prices(self, quotes: List[Dict]) -> Optional[float]:
+        """Aggregate open prices"""
+        valid_open_prices = [
+            float(q['open_price']) for q in quotes 
+            if q.get('open_price') is not None and q.get('open_price') > 0
+        ]
+        
+        if not valid_open_prices:
+            return None
+        
+        if len(valid_open_prices) == 1:
+            return valid_open_prices[0]
+        
+        # Use median for open prices to avoid outliers
+        return sorted(valid_open_prices)[len(valid_open_prices) // 2]
+    
+    def _aggregate_change_pct_from_open(self, quotes: List[Dict]) -> Optional[float]:
+        """Aggregate change percentage from open"""
+        valid_changes = [
+            float(q['change_pct_from_open']) for q in quotes 
+            if q.get('change_pct_from_open') is not None
+        ]
+        
+        if not valid_changes:
+            return None
+        
+        if len(valid_changes) == 1:
+            return valid_changes[0]
+        
+        # Use median for percentage changes to avoid outliers
+        return sorted(valid_changes)[len(valid_changes) // 2]
+    
+    def _aggregate_change_amount_from_open(self, quotes: List[Dict]) -> Optional[float]:
+        """Aggregate change amount from open"""
+        valid_changes = [
+            float(q['change_amount_from_open']) for q in quotes 
+            if q.get('change_amount_from_open') is not None
+        ]
+        
+        if not valid_changes:
+            return None
+        
+        if len(valid_changes) == 1:
+            return valid_changes[0]
+        
+        # Use median for change amounts to avoid outliers
+        return sorted(valid_changes)[len(valid_changes) // 2]
     
     def _determine_currency(self, quotes: List[Dict]) -> str:
         """Determine the currency to use (most common)"""
@@ -480,6 +541,10 @@ class DataNormalizer:
                 existing_quote.currency = normalized_quote.currency
                 existing_quote.asof_utc = normalized_quote.asof_utc
                 existing_quote.quality_score = normalized_quote.quality_score
+                # Open price data
+                existing_quote.open_price = normalized_quote.open_price
+                existing_quote.change_pct_from_open = normalized_quote.change_pct_from_open
+                existing_quote.change_amount_from_open = normalized_quote.change_amount_from_open
                 existing_quote.updated_at = datetime.now(timezone.utc)
             else:
                 # Create new normalized quote
@@ -494,7 +559,11 @@ class DataNormalizer:
                     currency=normalized_quote.currency,
                     source=normalized_quote.source,
                     is_stale=False,
-                    quality_score=normalized_quote.quality_score
+                    quality_score=normalized_quote.quality_score,
+                    # Open price data
+                    open_price=normalized_quote.open_price,
+                    change_pct_from_open=normalized_quote.change_pct_from_open,
+                    change_amount_from_open=normalized_quote.change_amount_from_open
                 )
                 self.db_session.add(db_quote)
             
@@ -579,7 +648,11 @@ class DataNormalizer:
                     source=quote.source,
                     quality_score=quote.quality_score,
                     provider_count=1,
-                    is_aggregated=False
+                    is_aggregated=False,
+                    # Open price data
+                    open_price=quote.open_price,
+                    change_pct_from_open=quote.change_pct_from_open,
+                    change_amount_from_open=quote.change_amount_from_open
                 )
             
             return None

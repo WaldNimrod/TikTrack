@@ -493,7 +493,11 @@ class EntityDetailsService:
                         entity_dict['ticker']['volume'] = latest_quote.volume
                         entity_dict['ticker']['yahoo_updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else None
                         entity_dict['ticker']['data_source'] = latest_quote.source
-                        logger.debug(f"Added market data to ticker {entity.ticker.id} for {entity_type} {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%")
+                        # Open price data
+                        entity_dict['ticker']['open_price'] = latest_quote.open_price
+                        entity_dict['ticker']['change_from_open'] = latest_quote.change_amount_from_open
+                        entity_dict['ticker']['change_from_open_percent'] = latest_quote.change_pct_from_open
+                        logger.debug(f"Added market data to ticker {entity.ticker.id} for {entity_type} {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%, change_from_open={latest_quote.change_pct_from_open}%")
                     else:
                         logger.debug(f"No market data found for ticker {entity.ticker.id} in {entity_type} {entity_id}")
                 elif hasattr(entity, 'ticker_id') and entity.ticker_id:
@@ -515,6 +519,10 @@ class EntityDetailsService:
                             entity_dict['ticker']['current_price'] = latest_quote.price
                             entity_dict['ticker']['change_percent'] = latest_quote.change_pct_day
                             entity_dict['ticker']['change_amount'] = latest_quote.change_amount_day
+                            # Open price data
+                            entity_dict['ticker']['open_price'] = latest_quote.open_price
+                            entity_dict['ticker']['change_from_open'] = latest_quote.change_amount_from_open
+                            entity_dict['ticker']['change_from_open_percent'] = latest_quote.change_pct_from_open
             
             # Add trade_plan object for trade
             if entity_type == 'trade':
@@ -589,6 +597,10 @@ class EntityDetailsService:
                     entity_dict['daily_change'] = latest_quote.change_amount_day
                     entity_dict['daily_change_percent'] = latest_quote.change_pct_day
                     entity_dict['volume'] = latest_quote.volume
+                    # Open price data
+                    entity_dict['open_price'] = latest_quote.open_price
+                    entity_dict['change_from_open'] = latest_quote.change_amount_from_open
+                    entity_dict['change_from_open_percent'] = latest_quote.change_pct_from_open
                     entity_dict['yahoo_updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else None
                     entity_dict['updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else entity_dict.get('updated_at')
                     entity_dict['data_source'] = latest_quote.source

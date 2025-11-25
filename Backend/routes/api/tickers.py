@@ -83,6 +83,13 @@ def get_tickers():
                         ticker_dict['yahoo_updated_at'] = ticker.yahoo_updated_at.isoformat() if ticker.yahoo_updated_at else None
                     if hasattr(ticker, 'data_source'):
                         ticker_dict['data_source'] = ticker.data_source
+                    # Open price data
+                    if hasattr(ticker, 'open_price'):
+                        ticker_dict['open_price'] = ticker.open_price
+                    if hasattr(ticker, 'change_from_open'):
+                        ticker_dict['change_from_open'] = ticker.change_from_open
+                    if hasattr(ticker, 'change_from_open_percent'):
+                        ticker_dict['change_from_open_percent'] = ticker.change_from_open_percent
                 except Exception as market_attr_error:
                     # Handle errors when accessing market data attributes
                     logger.warning(f"Error accessing market data attributes for ticker {ticker.id}: {str(market_attr_error)}")

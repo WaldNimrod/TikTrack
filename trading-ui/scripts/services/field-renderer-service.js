@@ -1596,6 +1596,10 @@ class FieldRendererService {
         const changePercent = ticker.daily_change_percent || 0;
         const volume = ticker.volume || 0;
         
+        // Open price data
+        const changeFromOpen = ticker.change_from_open !== null && ticker.change_from_open !== undefined ? ticker.change_from_open : null;
+        const changeFromOpenPercent = ticker.change_from_open_percent !== null && ticker.change_from_open_percent !== undefined ? ticker.change_from_open_percent : null;
+        
         // סמל מטבע דינמי
         const currencySymbol = ticker.currency_symbol || '$';
         
@@ -1603,16 +1607,32 @@ class FieldRendererService {
         const changeColor = change >= 0 ? 'text-success' : 'text-danger';
         const changeIcon = change >= 0 ? '↗' : '↘';
         
+        // צבעים לשינוי מפתיחה
+        const changeFromOpenColor = changeFromOpen !== null && changeFromOpen >= 0 ? 'text-success' : 'text-danger';
+        const changeFromOpenIcon = changeFromOpen !== null && changeFromOpen >= 0 ? '↗' : '↘';
+        
         // פורמט נפח
         const formattedVolume = volume > 0 ? volume.toLocaleString('he-IL') : 'N/A';
         
         // תצוגה קומפקטית בשורה אחת (כפי שיצרנו עבור trade_plan ו-trade)
-        const compactDisplay = `
+        let compactDisplay = `
             <div class="ticker-info-display-inline ${cssClass}" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: center;">
                 <span class="fw-bold">${currencySymbol}${price.toFixed(2)}</span>
                 <span class="${changeColor}">
                     ${changeIcon} ${change >= 0 ? '+' : ''}${change.toFixed(2)} (${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%)
                 </span>
+        `;
+        
+        // הוספת שינוי מפתיחה אם זמין
+        if (changeFromOpen !== null && changeFromOpenPercent !== null) {
+            compactDisplay += `
+                <span class="${changeFromOpenColor} small">
+                    ${changeFromOpenIcon} מפתיחה: ${changeFromOpen >= 0 ? '+' : ''}${changeFromOpen.toFixed(2)} (${changeFromOpenPercent >= 0 ? '+' : ''}${changeFromOpenPercent.toFixed(2)}%)
+                </span>
+            `;
+        }
+        
+        compactDisplay += `
                 <span class="text-muted small">
                     נפח: ${formattedVolume}
                 </span>

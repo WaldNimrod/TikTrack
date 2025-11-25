@@ -2046,11 +2046,23 @@ function renderTickersTableRows(tickers) {
         ? window.renderAmount(priceValue, currencySymbol, 2, false)
         : (priceValue !== null ? `${currencySymbol || ''}${priceValue.toFixed(2)}` : 'N/A');
 
+      // Get change from open values
+      const changeFromOpenValue = toFiniteNumber(ticker.change_from_open);
+      const changeFromOpenPercentValue = toFiniteNumber(ticker.change_from_open_percent);
+      
       const changePercentHtml = (typeof window.renderNumericValue === 'function' && changePercentValue !== null)
         ? window.renderNumericValue(changePercentValue, '%', true)
         : (changePercentValue !== null
             ? `${changePercentValue >= 0 ? '+' : ''}${changePercentValue.toFixed(2)}%`
             : 'N/A');
+      
+      // Build change from open HTML if available
+      let changeFromOpenHtml = '';
+      if (changeFromOpenValue !== null && changeFromOpenPercentValue !== null) {
+        const changeFromOpenColor = changeFromOpenValue >= 0 ? 'text-success' : 'text-danger';
+        const changeFromOpenIcon = changeFromOpenValue >= 0 ? '↗' : '↘';
+        changeFromOpenHtml = `<br><small class="${changeFromOpenColor}">${changeFromOpenIcon} מפתיחה: ${changeFromOpenValue >= 0 ? '+' : ''}${changeFromOpenValue.toFixed(2)} (${changeFromOpenPercentValue >= 0 ? '+' : ''}${changeFromOpenPercentValue.toFixed(2)}%)</small>`;
+      }
 
       // קבלת עיצוב סוג טיקר
       const typeStyle = getTickerTypeStyle(ticker.type);
@@ -2163,8 +2175,8 @@ function renderTickersTableRows(tickers) {
                     <td class="table-cell-center numeric-ltr" title="${priceValue !== null ? `מחיר נוכחי: ${currencySymbol || ''}${priceValue.toFixed(2)}` : 'אין נתוני מחיר'}" dir="ltr">
                         ${priceHtml}
                     </td>
-                    <td class="table-cell-center numeric-ltr" title="${changePercentValue !== null ? `שינוי יומי: ${changePercentValue.toFixed(2)}%` : 'אין נתוני שינוי'}" dir="ltr">
-                        ${changePercentHtml}
+                    <td class="table-cell-center numeric-ltr" title="${changePercentValue !== null ? `שינוי יומי: ${changePercentValue.toFixed(2)}%` : 'אין נתוני שינוי'}${changeFromOpenValue !== null ? ` | שינוי מפתיחה: ${changeFromOpenValue.toFixed(2)} (${changeFromOpenPercentValue.toFixed(2)}%)` : ''}" dir="ltr">
+                        ${changePercentHtml}${changeFromOpenHtml}
                     </td>
                     <td class="table-cell-center numeric-ltr" title="${volumeValue !== null ? `נפח: ${volumeValue.toLocaleString('he-IL')}` : 'אין נתוני נפח'}" dir="ltr">
                         ${window.renderVolume ? window.renderVolume(volumeValue, true) : (volumeValue !== null ? volumeValue.toLocaleString('he-IL') : 'N/A')}

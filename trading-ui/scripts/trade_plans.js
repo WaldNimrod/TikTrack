@@ -10,8 +10,8 @@
  * PAGE INITIALIZATION (4)
  * - setupPriceCalculation() - * View linked items for trade plan
  * - setupEditPriceCalculation() - setupEditPriceCalculation function
- * - initializeTradePlanConditionsSystem() - initializeTradePlanConditionsSystem function
- * - setupSortableHeadersLocal() - setupSortableHeadersLocal function
+ * - (REMOVED: initializeTradePlanConditionsSystem - use centralized window.conditionsInitializer.initialize())
+ * - (REMOVED: setupSortableHeadersLocal - use centralized window.setupSortableHeaders() directly)
  * 
  * DATA LOADING (4)
  * - loadTickerInfo() - * Disable edit form fields
@@ -613,6 +613,37 @@ async function updateEditTickerInfo() {
       changeDisplay.textContent = '-';
       changeDisplay.className = 'form-control-plaintext neutral';
       window.Logger?.warn('⚠️ Missing change data for ticker', { symbol: ticker.symbol, tickerId, page: 'trade_plans' });
+    }
+    
+    // Add change from open display if available
+    const changeFromOpenRaw = Number(ticker.change_from_open);
+    const changeFromOpenPercentRaw = Number(ticker.change_from_open_percent);
+    const hasValidChangeFromOpen = Number.isFinite(changeFromOpenRaw) && Number.isFinite(changeFromOpenPercentRaw);
+    
+    if (hasValidChangeFromOpen) {
+      // Try to find or create change from open display element
+      let changeFromOpenDisplay = document.getElementById('editTradePlanChangeFromOpen');
+      if (!changeFromOpenDisplay) {
+        // Create element if it doesn't exist
+        const changeFromOpenRow = document.createElement('div');
+        changeFromOpenRow.className = 'mb-3';
+        changeFromOpenRow.innerHTML = `
+          <label class="form-label">שינוי מפתיחה</label>
+          <div id="editTradePlanChangeFromOpen" class="form-control-plaintext"></div>
+        `;
+        // Insert after change display
+        if (changeDisplay && changeDisplay.parentElement) {
+          changeDisplay.parentElement.parentElement.insertAdjacentElement('afterend', changeFromOpenRow);
+        }
+        changeFromOpenDisplay = document.getElementById('editTradePlanChangeFromOpen');
+      }
+      
+      if (changeFromOpenDisplay) {
+        const changeFromOpenClass = changeFromOpenRaw >= 0 ? 'positive' : 'negative';
+        const changeFromOpenSign = changeFromOpenRaw >= 0 ? '+' : '';
+        changeFromOpenDisplay.textContent = `${changeFromOpenSign}${changeFromOpenRaw.toFixed(2)} (${changeFromOpenPercentRaw >= 0 ? '+' : ''}${changeFromOpenPercentRaw.toFixed(2)}%)`;
+        changeFromOpenDisplay.className = `form-control-plaintext ${changeFromOpenClass}`;
+      }
     }
   } else {
     tickerDisplay.textContent = 'לא נמצא';
@@ -2266,69 +2297,7 @@ window.updateEditAmountFromShares = updateEditAmountFromShares;
 window.addEditCondition = addEditCondition;
 window.addEditReason = addEditReason;
 window.addEditImportantNote = addEditImportantNote;
-/**
- * Initialize conditions system for trade plans
- * Uses global ConditionsInitializer from conditions package
- * @returns {boolean} True if initialized successfully
- */
-function initializeTradePlanConditionsSystem() {
-  try {
-    // First check if conditionsSystem is already available (most reliable check)
-    if (window.conditionsSystem && window.conditionsSystem.initializer) {
-      window.Logger?.info('✅ Conditions system already initialized for trade plans', { page: "trade_plans" });
-      return true;
-    }
-
-    const initializerInstance = (() => {
-      if (window.conditionsInitializer && typeof window.conditionsInitializer.initialize === 'function') {
-        return window.conditionsInitializer;
-      }
-      if (typeof window.ConditionsInitializer === 'function') {
-        try {
-          return new window.ConditionsInitializer();
-        } catch (error) {
-          window.Logger?.warn('Error creating ConditionsInitializer instance:', error, { page: "trade_plans" });
-          return null;
-        }
-      }
-      return null;
-    })();
-
-    if (initializerInstance && typeof initializerInstance.initialize === 'function') {
-      const afterInit = () => {
-        if (window.conditionsCRUDManager) {
-          window.conditionsCRUDManager.setContext({ entityType: 'plan' });
-          window.conditionsCRUDManager.getTradingMethods();
-        }
-        window.Logger?.info('✅ Trade plans conditions system initialized successfully', { page: "trade_plans" });
-      };
-
-      const initResult = initializerInstance.initialize();
-      if (initResult && typeof initResult.then === 'function') {
-        initResult.then(afterInit).catch(error => {
-          window.Logger?.error('Error initializing trade plans conditions system:', error, { page: "trade_plans" });
-        });
-      } else if (initResult !== false) {
-        afterInit();
-      }
-      return true;
-    }
-
-    // If not available immediately, try deferred check
-    setTimeout(() => {
-      if (window.conditionsSystem && window.conditionsSystem.initializer) {
-        window.Logger?.info('✅ Conditions system initialized for trade plans (deferred check)', { page: "trade_plans" });
-      } else {
-        window.Logger?.warn('⚠️ ConditionsInitializer not available - conditions package may not be loaded', { page: "trade_plans" });
-      }
-    }, 500);
-
-    return false;
-  } catch (error) {
-    window.Logger?.error('Error in initializeTradePlanConditionsSystem:', error, { page: "trade_plans" });
-    return false;
-  }
-}
+// REMOVED: initializeTradePlanConditionsSystem - Use centralized window.conditionsInitializer.initialize() instead
 
 /**
  * Get trade plan modal entity name
@@ -2447,12 +2416,13 @@ async function openTradePlanConditionsModal(modalElement, options = {}) {
 
   window.Logger?.info('Trade plan conditions button triggered', { entityId, modalId: modalElement.id }, { page: 'trade_plans' });
 
+  // Use centralized conditions initializer
   try {
-    const initResult = typeof window.initializeTradePlanConditionsSystem === 'function'
-      ? window.initializeTradePlanConditionsSystem()
-      : false;
-    if (initResult && typeof initResult.then === 'function') {
-      await initResult;
+    if (window.conditionsInitializer && typeof window.conditionsInitializer.initialize === 'function') {
+      await window.conditionsInitializer.initialize();
+      if (window.conditionsCRUDManager) {
+        window.conditionsCRUDManager.setContext({ entityType: 'plan' });
+      }
     }
   } catch (error) {
     window.Logger?.warn('Failed to initialize trade plan conditions system before modal launch', { error, page: 'trade_plans' });
@@ -3150,28 +3120,12 @@ function setupTradePlanConditionsButton(modalElement) {
   window.Logger?.info('Trade plan conditions controls ready', { entityId: modalElement.dataset.entityId, mode: modalElement.dataset.modalMode || modalElement.dataset.mode }, { page: 'trade_plans' });
 }
 
-/**
- * Setup sortable headers for trade plans table
- * Uses global setupSortableHeaders function from page-utils.js
- * @returns {void}
- */
-function setupSortableHeadersLocal() {
-  try {
-    if (typeof window.setupSortableHeaders === 'function') {
-      window.setupSortableHeaders('trade_plans');
-      window.Logger?.debug('Sortable headers setup completed for trade plans', { page: "trade_plans" });
-    } else {
-      window.Logger?.warn('Global setupSortableHeaders not available', { page: "trade_plans" });
-    }
-  } catch (error) {
-    window.Logger?.error('Error setting up sortable headers:', error, { page: "trade_plans" });
-  }
-}
+// REMOVED: setupSortableHeadersLocal - Use centralized window.setupSortableHeaders() directly
 
 window.addEditReminder = addEditReminder;
 window.updatePageSummaryStats = updatePageSummaryStats;
 window.restoreSortState = restoreSortState;
-window.initializeTradePlanConditionsSystem = initializeTradePlanConditionsSystem;
+// REMOVED: window.initializeTradePlanConditionsSystem - Use centralized conditions initializer
 window.setupPriceCalculation = setupPriceCalculation;
 window.setupEditPriceCalculation = setupEditPriceCalculation;
 window.setupTradePlanConditionsButton = setupTradePlanConditionsButton;
@@ -3194,7 +3148,7 @@ function restorePlanningSectionState() {
   }
 }
 
-window.setupSortableHeadersLocal = setupSortableHeadersLocal;
+// REMOVED: window.setupSortableHeadersLocal - Use centralized window.setupSortableHeaders() directly
 // window.toggleSection removed - using global version from ui-utils.js
 window.restorePlanningSectionState = restorePlanningSectionState;
 window.addImportantNote = addImportantNote;

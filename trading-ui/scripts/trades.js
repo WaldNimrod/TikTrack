@@ -10,8 +10,8 @@
  * PAGE INITIALIZATION (4)
  * - initializeTradesPage() - * Load modal data (placeholder - ModalManagerV2 handles this automatically)
  * - setupDateValidation() - setupDateValidation function
- * - initializeTradeConditionsSystem() - * Add buy/sell transaction to trade (placeholder - in development)
- * - setupSortEventListeners() - setupSortEventListeners function
+ * - (REMOVED: initializeTradeConditionsSystem - use centralized window.conditionsInitializer.initialize())
+ * - (REMOVED: setupSortEventListeners - use centralized sorting system)
  * 
  * DATA LOADING (6)
  * - getInvestmentTypeColor() - * עיצוב שינוי יומי עם צבעים לפי העדפות
@@ -2627,7 +2627,7 @@ window.validateDateFields = validateDateFields;
 window.clearDateValidationMessages = clearDateValidationMessages;
 window.addImportantNote = addImportantNote;
 window.addReminder = addReminder;
-window.setupSortEventListeners = setupSortEventListeners;
+// REMOVED: window.setupSortEventListeners - Use centralized sorting system
 // Note: filterTradesData removed - use unified filter system from header-system.js
 window.onShowClosedTradesChange = onShowClosedTradesChange;
 window.refreshPositions = refreshPositions;
@@ -2682,72 +2682,7 @@ window.updateTableStats = updateTableStats;
 window.loadTradePlanDates = loadTradePlanDates;
 window.addEditBuySell = addEditBuySell;
 
-/**
- * Initialize conditions system for trades
- * Uses global ConditionsInitializer from conditions package
- */
-function initializeTradeConditionsSystem() {
-  try {
-    // First check if conditionsSystem is already available (most reliable check)
-    if (window.conditionsSystem && window.conditionsSystem.initializer) {
-      window.Logger?.info('✅ Conditions system already initialized for trades', { page: "trades" });
-      return true;
-    }
-    
-    const initializerInstance = (() => {
-      if (window.conditionsInitializer && typeof window.conditionsInitializer.initialize === 'function') {
-        return window.conditionsInitializer;
-      }
-      if (typeof window.ConditionsInitializer === 'function') {
-        try {
-          return new window.ConditionsInitializer();
-        } catch (error) {
-          window.Logger?.warn('Error creating ConditionsInitializer instance:', error, { page: "trades" });
-          return null;
-        }
-      }
-      return null;
-    })();
-
-    if (initializerInstance && typeof initializerInstance.initialize === 'function') {
-      const afterInit = () => {
-        if (window.conditionsCRUDManager) {
-          window.conditionsCRUDManager.setContext({ entityType: 'trade' });
-          window.conditionsCRUDManager.getTradingMethods();
-        }
-        window.Logger?.info('✅ Trades conditions system initialized successfully', { page: "trades" });
-      };
-
-      const initResult = initializerInstance.initialize();
-      if (initResult && typeof initResult.then === 'function') {
-        initResult.then(afterInit).catch(error => {
-          window.Logger?.error('Error initializing trades conditions system:', error, { page: "trades" });
-        });
-      } else if (initResult !== false) {
-        afterInit();
-      }
-      return true;
-    }
-    
-    // If not available immediately, try deferred check
-    setTimeout(() => {
-      if (window.conditionsSystem && window.conditionsSystem.initializer) {
-        window.Logger?.info('✅ Conditions system initialized for trades (deferred check)', { page: "trades" });
-        return true;
-      } else {
-        // Only log debug level - conditions system is optional
-        window.Logger?.debug('ConditionsInitializer not available after deferred check - conditions package may not be loaded', { page: "trades" });
-      }
-    }, 500);
-    
-    return false;
-  } catch (error) {
-    window.Logger?.error('Error in initializeTradeConditionsSystem:', error, { page: "trades" });
-    return false;
-  }
-}
-
-window.initializeTradeConditionsSystem = initializeTradeConditionsSystem;
+// REMOVED: initializeTradeConditionsSystem - Use centralized window.conditionsInitializer.initialize() instead
 
 function getTradesModalElement() {
   return document.getElementById('tradesModal');
@@ -3223,19 +3158,7 @@ window.setupTradeConditionsButton = setupTradeConditionsButton;
  * @function setupSortEventListeners
  * @returns {void}
  */
-/**
- * Setup sort event listeners
- * Note: This function is deprecated - all sortable headers now use data-onclick attributes
- * Kept for backward compatibility but does nothing (headers use EventHandlerManager)
- */
-function setupSortEventListeners() {
-  // Deprecated: All sortable headers now use data-onclick attributes
-  // EventHandlerManager handles clicks automatically via event delegation
-  // This function is kept for backward compatibility but does nothing
-  if (window.Logger) {
-    window.Logger.debug('setupSortEventListeners called but is deprecated - using data-onclick instead', { page: "trades" });
-  }
-}
+// REMOVED: setupSortEventListeners - Use centralized sorting system via data-onclick attributes and EventHandlerManager
 
 // הוסר - המערכת המאוחדת מטפלת באתחול
 // קריאה לטעינת נתונים כשהדף נטען
@@ -3730,6 +3653,57 @@ async function updateEditTradePriceFromTicker(tickerId) {
           dailyChangeElement.style.color = colors.negative;
           dailyChangeElement.style.fontWeight = 'bold';
         }
+      }
+      
+      // עדכון שינוי מפתיחה
+      const changeFromOpenElement = document.getElementById('editTradeChangeFromOpen');
+      if (ticker.change_from_open !== null && ticker.change_from_open !== undefined && 
+          ticker.change_from_open_percent !== null && ticker.change_from_open_percent !== undefined) {
+        const changeFromOpen = parseFloat(ticker.change_from_open);
+        const changeFromOpenPercent = parseFloat(ticker.change_from_open_percent);
+        
+        if (changeFromOpenElement) {
+          const changeFromOpenValue = `${changeFromOpen >= 0 ? '+' : ''}${changeFromOpen.toFixed(2)} (${changeFromOpenPercent >= 0 ? '+' : ''}${changeFromOpenPercent.toFixed(2)}%)`;
+          changeFromOpenElement.textContent = changeFromOpenValue;
+          
+          // צביעה לפי ערך
+          const colors = window.getTableColors ? window.getTableColors() : { positive: '#28a745', negative: '#dc3545' };
+          if (changeFromOpen >= 0) {
+            changeFromOpenElement.style.color = colors.positive;
+            changeFromOpenElement.style.fontWeight = 'bold';
+          } else {
+            changeFromOpenElement.style.color = colors.negative;
+            changeFromOpenElement.style.fontWeight = 'bold';
+          }
+        } else {
+          // Create element if it doesn't exist
+          const changeFromOpenRow = document.createElement('div');
+          changeFromOpenRow.className = 'mb-3';
+          changeFromOpenRow.innerHTML = `
+            <label class="form-label">שינוי מפתיחה</label>
+            <div id="editTradeChangeFromOpen" class="form-control-plaintext"></div>
+          `;
+          // Insert after daily change element
+          if (dailyChangeElement && dailyChangeElement.parentElement) {
+            dailyChangeElement.parentElement.parentElement.insertAdjacentElement('afterend', changeFromOpenRow);
+            const newElement = document.getElementById('editTradeChangeFromOpen');
+            if (newElement) {
+              const changeFromOpenValue = `${changeFromOpen >= 0 ? '+' : ''}${changeFromOpen.toFixed(2)} (${changeFromOpenPercent >= 0 ? '+' : ''}${changeFromOpenPercent.toFixed(2)}%)`;
+              newElement.textContent = changeFromOpenValue;
+              const colors = window.getTableColors ? window.getTableColors() : { positive: '#28a745', negative: '#dc3545' };
+              if (changeFromOpen >= 0) {
+                newElement.style.color = colors.positive;
+                newElement.style.fontWeight = 'bold';
+              } else {
+                newElement.style.color = colors.negative;
+                newElement.style.fontWeight = 'bold';
+              }
+            }
+          }
+        }
+      } else if (changeFromOpenElement) {
+        changeFromOpenElement.textContent = '-';
+        changeFromOpenElement.style.color = '#6c757d';
       }
     }
   } catch (error) {
@@ -4460,12 +4434,13 @@ function setupTradeConditionsButton(modalElement) {
                 return;
             }
 
+            // Use centralized conditions initializer
             try {
-                const initResult = typeof window.initializeTradeConditionsSystem === 'function'
-                    ? window.initializeTradeConditionsSystem()
-                    : false;
-                if (initResult && typeof initResult.then === 'function') {
-                    await initResult;
+                if (window.conditionsInitializer && typeof window.conditionsInitializer.initialize === 'function') {
+                    await window.conditionsInitializer.initialize();
+                    if (window.conditionsCRUDManager) {
+                        window.conditionsCRUDManager.setContext({ entityType: 'trade' });
+                    }
                 }
             } catch (error) {
                 window.Logger?.warn('Failed to initialize trade conditions system before modal launch', { error, page: 'trades' });

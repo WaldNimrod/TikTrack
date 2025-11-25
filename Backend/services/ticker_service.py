@@ -176,7 +176,11 @@ class TickerService:
                 ticker.volume = latest_quote.volume
                 ticker.yahoo_updated_at = latest_quote.fetched_at
                 ticker.data_source = latest_quote.source
-                logger.debug(f"Added market data to {ticker.symbol}: price={latest_quote.price}")
+                # Open price data
+                ticker.open_price = latest_quote.open_price
+                ticker.change_from_open = latest_quote.change_amount_from_open
+                ticker.change_from_open_percent = latest_quote.change_pct_from_open
+                logger.debug(f"Added market data to {ticker.symbol}: price={latest_quote.price}, change_from_open={latest_quote.change_pct_from_open}%")
             else:
                 logger.debug(f"No market data found for {ticker.symbol}")
         
@@ -201,11 +205,35 @@ class TickerService:
         # Use optimized query with lazy loading
         try:
             from services.query_optimizer import QueryOptimizer
-            return QueryOptimizer.get_ticker_with_full_data(db, ticker_id)
+            ticker = QueryOptimizer.get_ticker_with_full_data(db, ticker_id)
         except ImportError:
             # Fallback to original query if optimizer not available
             logger.warning("QueryOptimizer not available, using fallback query")
-            return db.query(Ticker).filter(Ticker.id == ticker_id).first()
+            ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
+        
+        # Add market data fields if ticker exists
+        if ticker:
+            try:
+                latest_quote = db.query(MarketDataQuote).filter(
+                    MarketDataQuote.ticker_id == ticker.id
+                ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                
+                if latest_quote:
+                    # Add market data fields to ticker object
+                    ticker.current_price = latest_quote.price
+                    ticker.change_percent = latest_quote.change_pct_day
+                    ticker.change_amount = latest_quote.change_amount_day
+                    ticker.volume = latest_quote.volume
+                    ticker.yahoo_updated_at = latest_quote.fetched_at
+                    ticker.data_source = latest_quote.source
+                    # Open price data
+                    ticker.open_price = latest_quote.open_price
+                    ticker.change_from_open = latest_quote.change_amount_from_open
+                    ticker.change_from_open_percent = latest_quote.change_pct_from_open
+            except Exception as e:
+                logger.warning(f"Error adding market data to ticker {ticker_id}: {str(e)}")
+        
+        return ticker
     
     @staticmethod
     def get_by_symbol(db: Session, symbol: str) -> Optional[Ticker]:

@@ -2585,8 +2585,10 @@ function displayExecutionTickerInfo(ticker) {
     }
   }
   
-  // Use the new global renderTickerInfo function
-  if (window.renderTickerInfo) {
+  // Use FieldRendererService.renderTickerInfo for consistent rendering
+  if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
+    tickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker, 'ticker-info-display');
+  } else if (window.renderTickerInfo) {
     tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
   } else {
     // Fallback if renderTickerInfo not available

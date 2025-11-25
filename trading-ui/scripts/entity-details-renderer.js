@@ -987,7 +987,11 @@ class EntityDetailsRenderer {
                 volume: tradeData.ticker.volume || 0,
                 currency_symbol: tradeData.ticker.currency_symbol || 
                                (tradeData.ticker.currency?.symbol) || 
-                               '$'
+                               '$',
+                // Open price data
+                open_price: tradeData.ticker.open_price || null,
+                change_from_open: tradeData.ticker.change_from_open || null,
+                change_from_open_percent: tradeData.ticker.change_from_open_percent || null
             };
             
             console.log('🔍🔍🔍 [renderTrade] tickerData created:', {

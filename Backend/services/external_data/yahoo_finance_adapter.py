@@ -37,6 +37,10 @@ class QuoteData:
     long_name: Optional[str] = None
     exchange_name: Optional[str] = None
     exchange_code: Optional[str] = None
+    # Open price data (from market open)
+    open_price: Optional[float] = None
+    change_pct_from_open: Optional[float] = None
+    change_amount_from_open: Optional[float] = None
 
 @dataclass
 class IntradayData:
@@ -700,6 +704,13 @@ class YahooFinanceAdapter:
             logger.info(f"📊 {symbol}: Available meta keys: {list(meta.keys())}")
             logger.info(f"📊 {symbol}: Current price: ${current_price}")
             
+            # Check for regularMarketOpen availability
+            if 'regularMarketOpen' in meta:
+                open_price_value = meta['regularMarketOpen']
+                logger.info(f"📊 {symbol}: regularMarketOpen found in meta: {open_price_value} (type: {type(open_price_value).__name__})")
+            else:
+                logger.warning(f"📊 {symbol}: regularMarketOpen NOT found in meta. Available keys: {list(meta.keys())}")
+            
             # Enhanced daily change calculation with multiple fallback mechanisms
             # First, try to get change data directly from Yahoo
             if 'regularMarketChange' in meta:
@@ -744,9 +755,28 @@ class YahooFinanceAdapter:
                 quote.volume = int(meta['regularMarketVolume'])
                 logger.info(f"📊 {symbol}: volume = {quote.volume}")
             
+            # Extract open price and calculate change from open
+            if 'regularMarketOpen' in meta:
+                try:
+                    open_price = float(meta['regularMarketOpen'])
+                    quote.open_price = open_price
+                    
+                    # Calculate change from open
+                    if open_price > 0:
+                        quote.change_amount_from_open = current_price - open_price
+                        quote.change_pct_from_open = (quote.change_amount_from_open / open_price) * 100
+                        logger.info(f"📊 {symbol}: Open price: ${open_price}, Change from open: ${quote.change_amount_from_open:.2f} ({quote.change_pct_from_open:.2f}%)")
+                    else:
+                        logger.warning(f"📊 {symbol}: Open price is 0 or negative, cannot calculate change from open")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"📊 {symbol}: Error parsing regularMarketOpen: {e}")
+            else:
+                logger.warning(f"📊 {symbol}: regularMarketOpen not available in Yahoo Finance response")
+            
             change_pct_display = f"{quote.change_pct:.2f}%" if quote.change_pct is not None else "N/A"
             change_amount_display = f"${quote.change_amount:.2f}" if quote.change_amount is not None else "N/A"
-            logger.info(f"📊 {symbol}: Final quote data - price: ${quote.price}, change_pct: {change_pct_display}, change_amount: {change_amount_display}")
+            change_from_open_display = f"${quote.change_amount_from_open:.2f} ({quote.change_pct_from_open:.2f}%)" if quote.change_amount_from_open is not None else "N/A"
+            logger.info(f"📊 {symbol}: Final quote data - price: ${quote.price}, change_pct: {change_pct_display}, change_amount: {change_amount_display}, change_from_open: {change_from_open_display}")
             
             return quote
             
@@ -786,7 +816,11 @@ class YahooFinanceAdapter:
                     volume=quote.volume,
                     currency=quote.currency,
                     asof_utc=quote.asof_utc,
-                    source=quote.source
+                    source=quote.source,
+                    # Open price data
+                    open_price=quote.open_price,
+                    change_pct_from_open=quote.change_pct_from_open,
+                    change_amount_from_open=quote.change_amount_from_open
                 )
             
             return None
@@ -860,7 +894,11 @@ class YahooFinanceAdapter:
                 currency=quote.currency,
                 source=quote.source,
                 is_stale=False,
-                quality_score=1.0
+                quality_score=1.0,
+                # Open price data
+                open_price=quote.open_price,
+                change_pct_from_open=quote.change_pct_from_open,
+                change_amount_from_open=quote.change_amount_from_open
             )
             
             logger.info(f"💾 Adding quote to database: {ticker.symbol} = ${quote.price} ({quote.currency})")

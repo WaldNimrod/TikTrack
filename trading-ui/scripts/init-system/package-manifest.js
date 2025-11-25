@@ -1020,7 +1020,7 @@ const PACKAGE_MANIFEST = {
     description: 'Cache systems',
     version: '2.0.0',
     critical: false,
-    loadOrder: 9,
+    loadOrder: 9.5, // Changed from 9 to 9.5 to differentiate from logs (9)
     dependencies: ['base', 'services'],
     scripts: [
       {
@@ -1418,30 +1418,22 @@ const PACKAGE_MANIFEST = {
   },
 
   // 16. ADVANCED-NOTIFICATIONS PACKAGE - Advanced notifications
+  // ⚠️ DEPRECATED: This package contains scripts that are already in base package
+  // notification-system.js and warning-system.js are already loaded in base package
+  // This package is kept for backward compatibility but should not be used
   'advanced-notifications': {
     id: 'advanced-notifications',
     name: 'Advanced Notifications Package',
-    description: 'Advanced notification system',
+    description: '⚠️ DEPRECATED: Scripts already in base package. Use base package instead.',
     version: '2.0.0',
     critical: false,
     loadOrder: 16,
     dependencies: ['base'],
-    scripts: [
-      {
-        file: 'notification-system.js',
-        globalCheck: 'window.NotificationSystem',
-        description: 'Advanced notification system',
-        required: true
-      },
-      {
-        file: 'warning-system.js',
-        globalCheck: 'window.WarningSystem',
-        description: 'Warning system',
-        required: true
-      }
-    ],
-    estimatedSize: '~60KB',
-    initTime: '~35ms'
+    scripts: [], // ⚠️ Scripts removed - already in base package
+    estimatedSize: '~0KB',
+    initTime: '~0ms',
+    deprecated: true,
+    notes: 'This package is deprecated. notification-system.js and warning-system.js are already loaded in base package (loadOrder 2 and 5). Do not use this package.'
   },
 
 
@@ -1510,14 +1502,14 @@ const PACKAGE_MANIFEST = {
     initTime: '~15ms'
   },
 
-  // 20. TRADINGVIEW CHARTS PACKAGE - TradingView charts
+  // 19. TRADINGVIEW CHARTS PACKAGE - TradingView charts
   'tradingview-charts': {
     id: 'tradingview-charts',
     name: 'TradingView Charts Package',
     description: 'TradingView Lightweight Charts system',
     version: '1.0.0',
     critical: false,
-    loadOrder: 20,
+    loadOrder: 19, // Changed from 20 to 19 to load before init-system (22) and after dashboard-widgets (19.5)
     dependencies: ['base'],
     scripts: [
       {
@@ -1553,8 +1545,8 @@ const PACKAGE_MANIFEST = {
     description: 'Initialization and monitoring systems',
     version: '2.0.0',
     critical: false,
-    loadOrder: 19,
-    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'advanced-notifications', 'entity-details', 'info-summary'],
+    loadOrder: 22, // Changed from 20 to 22 to load after all other packages (dashboard-widgets 19.5, tradingview-charts 19, tradingview-widgets 21)
+    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'advanced-notifications', 'entity-details', 'info-summary', 'dashboard-widgets', 'tradingview-widgets', 'tradingview-charts'],
     scripts: [
       {
         file: 'init-system/package-manifest.js',

@@ -170,6 +170,7 @@ const IconMappings = {
         'tickers.html': 'currency-dollar',
         'executions.html': 'bolt',
         'cash_flows.html': 'currency-dollar',
+        'trading-journal-page.html': 'notebook', // notebook icon for trading journal
         'notes.html': 'note',
         'research.html': 'search',
         'trade_plans.html': 'clipboard-list',

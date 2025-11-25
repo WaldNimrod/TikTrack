@@ -56,7 +56,7 @@ async function loadAllTables() {
   for (const table of tables) {
     try {
       window.Logger?.debug('Loading table', { page: 'db_display', api: table.api });
-      await loadTableData(table.api, table.container);
+      await loadTableDataLocal(table.api, table.container);
     } catch (error) {
       window.Logger?.error('Error loading table', { page: 'db_display', api: table.api, error: error?.message || error });
     }
@@ -71,32 +71,68 @@ async function loadAllTables() {
 
 /**
  * Load data for a specific table type
+ * Uses centralized loadTableData from services package
  * @param {string} tableType - The table type to load (with dashes)
  * @param {string} containerId - The container ID for the table
  */
-async function loadTableData(tableType, containerId) {
+async function loadTableDataLocal(tableType, containerId) {
   try {
     window.Logger?.debug('Loading data for table type', { page: 'db_display', tableType });
 
     // Show loading state
     showLoadingState(tableType);
 
-    // Fetch data from server
-    const data = await fetchTableData(tableType);
+    // Use centralized loadTableData function from services package if available
+    // Otherwise fallback to direct fetch
+    let data = [];
+    
+    if (typeof window.loadTableData === 'function') {
+      // Convert table type with dashes to table type without dashes for mapping
+      const tableTypeNormalized = tableType.replace(/-/g, '_');
+      try {
+        data = await window.loadTableData(tableTypeNormalized, null, {
+          tableId: getTableId(tableType),
+          entityName: tableType,
+          columns: 10 // Default column count for error display
+        });
+      } catch (err) {
+        // If centralized function doesn't support this table type, fetch directly
+        window.Logger?.debug('Centralized loadTableData failed, fetching directly', { 
+          page: 'db_display', 
+          tableType, 
+          error: err?.message 
+        });
+        const response = await fetch(`/api/${tableType}/`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        data = (result.status === 'success' && result.data) ? result.data : [];
+      }
+    } else {
+      // Fallback to direct fetch if centralized function not available
+      window.Logger?.warn('window.loadTableData not available, using direct fetch', { page: 'db_display', tableType });
+      const response = await fetch(`/api/${tableType}/`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      data = (result.status === 'success' && result.data) ? result.data : [];
+    }
 
     // Store data
-    tableData[tableType] = data;
+    tableData[tableType] = Array.isArray(data) ? data : [];
 
     // Update table display
-    updateTableDisplay(data, tableType, containerId);
+    updateTableDisplay(tableData[tableType], tableType, containerId);
 
     // Update table info
-    updateTableInfo(tableType, data.length);
+    updateTableInfo(tableType, tableData[tableType].length);
 
     // Add to total records
-    totalRecords += data.length;
+    totalRecords += tableData[tableType].length;
 
-    window.Logger?.debug('Data loaded for table type', { page: 'db_display', tableType, recordCount: data.length });
+    window.Logger?.debug('Data loaded for table type', { page: 'db_display', tableType, recordCount: tableData[tableType].length });
 
   } catch (error) {
     window.Logger?.error('Error loading data for table type', { page: 'db_display', tableType, error: error?.message || error });
@@ -104,33 +140,7 @@ async function loadTableData(tableType, containerId) {
   }
 }
 
-/**
- * Fetch table data from server
- * @param {string} tableType - The table type to fetch (with dashes)
- * @returns {Promise<Array>} The fetched data
- */
-async function fetchTableData(tableType) {
-  try {
-    window.Logger?.debug('Fetching data from API', { page: 'db_display', tableType, url: `/api/${tableType}/` });
-    const response = await fetch(`/api/${tableType}/`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    window.Logger?.debug('Received response', { page: 'db_display', tableType, result });
-
-    if (result.status === 'success') {
-      return result.data || [];
-    } else {
-      throw new Error(result.error?.message || `Error fetching ${tableType} data`);
-    }
-  } catch (error) {
-    window.Logger?.error('Error fetching data', { page: 'db_display', tableType, error: error?.message || error });
-    // Return empty array on error
-    return [];
-  }
-}
+// REMOVED: fetchTableData - Use centralized window.loadTableData from services package instead
 
 // ===== TABLE DISPLAY =====
 
@@ -366,7 +376,8 @@ function updateSummaryStats() {
 
 // Export functions to global scope
 window.initDatabaseDisplay = initDatabaseDisplay;
-window.loadTableData = loadTableData;
+// REMOVED: window.loadTableData - conflicts with centralized loadTableData from services package
+// Use loadTableDataLocal internally, or window.loadTableData directly if needed
 window.loadDatabaseInfo = async function loadDatabaseInfo() {
   await loadAllTables();
 };

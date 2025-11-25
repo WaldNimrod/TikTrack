@@ -223,13 +223,41 @@ class AdvancedButtonSystem {
             }
         });
 
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-
-        this.observers.push(observer);
-        this.logger.debug('MutationObserver setup completed');
+        // Wait for document.body to be available
+        if (document.body) {
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+            this.observers.push(observer);
+            this.logger.debug('MutationObserver setup completed');
+        } else {
+            // Retry after DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (document.body) {
+                        observer.observe(document.body, {
+                            childList: true,
+                            subtree: true
+                        });
+                        this.observers.push(observer);
+                        this.logger.debug('MutationObserver setup completed (after DOMContentLoaded)');
+                    }
+                });
+            } else {
+                // DOM already loaded but body not available - retry after delay
+                setTimeout(() => {
+                    if (document.body) {
+                        observer.observe(document.body, {
+                            childList: true,
+                            subtree: true
+                        });
+                        this.observers.push(observer);
+                        this.logger.debug('MutationObserver setup completed (after delay)');
+                    }
+                }, 100);
+            }
+        }
     }
 
     setupEntityObserver() {
@@ -254,14 +282,44 @@ class AdvancedButtonSystem {
             });
         });
 
-        observer.observe(document.body, {
-            attributes: true,
-            subtree: true,
-            attributeFilter: ['data-entity-type']
-        });
-
-        this.observers.push(observer);
-        this.logger.debug('Entity observer setup completed');
+        // Wait for document.body to be available
+        if (document.body) {
+            observer.observe(document.body, {
+                attributes: true,
+                subtree: true,
+                attributeFilter: ['data-entity-type']
+            });
+            this.observers.push(observer);
+            this.logger.debug('Entity observer setup completed');
+        } else {
+            // Retry after DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (document.body) {
+                        observer.observe(document.body, {
+                            attributes: true,
+                            subtree: true,
+                            attributeFilter: ['data-entity-type']
+                        });
+                        this.observers.push(observer);
+                        this.logger.debug('Entity observer setup completed (after DOMContentLoaded)');
+                    }
+                });
+            } else {
+                // DOM already loaded but body not available - retry after delay
+                setTimeout(() => {
+                    if (document.body) {
+                        observer.observe(document.body, {
+                            attributes: true,
+                            subtree: true,
+                            attributeFilter: ['data-entity-type']
+                        });
+                        this.observers.push(observer);
+                        this.logger.debug('Entity observer setup completed (after delay)');
+                    }
+                }, 100);
+            }
+        }
     }
 
     debouncedProcessButtons() {

@@ -1,11 +1,11 @@
 # דוח סטנדרטיזציה - עמודי מוקאפ
 # Mockups Standardization Report
 
-**תאריך:** 2025-11-25T01:25:34.761807  
+**תאריך:** 2025-11-25T02:01:06.751038  
 **סה"כ עמודים:** 12  
 **עמודים נסרקו:** 12  
 **עמודים עם בעיות:** 12  
-**סה"כ בעיות:** 218
+**סה"כ בעיות:** 212
 
 ---
 
@@ -13,12 +13,12 @@
 
 ### חלוקה לפי חומרה:
 - **קריטי:** 11
-- **גבוה:** 193
+- **גבוה:** 187
 - **בינוני:** 14
 - **נמוך:** 0
 
 ### חלוקה לפי מערכת:
-- **unknown:** 218
+- **unknown:** 212
 
 ---
 
@@ -176,71 +176,65 @@
 
 ### date-comparison-modal.html
 
-❌ **סה"כ בעיות:** 22
+❌ **סה"כ בעיות:** 19
 **מספר סקריפטים:** 24
 
 #### Button System
 
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 116
+  - שורה: 121
   - קוד: `<button class="filter-toggle-btn" data-onclick="toggleSection('date-selection-section')" title="הצג/`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 128
+  - שורה: 133
   - קוד: `<button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="dateComparisonRa`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 133
+  - שורה: 138
   - קוד: `<div class="date-range-filter-item" data-value="אתמול" data-onclick="selectDateComparisonRangeOption`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 136
+  - שורה: 141
   - קוד: `<div class="date-range-filter-item" data-value="השבוע" data-onclick="selectDateComparisonRangeOption`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 139
+  - שורה: 144
   - קוד: `<div class="date-range-filter-item" data-value="שבוע" data-onclick="selectDateComparisonRangeOption(`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 142
+  - שורה: 147
   - קוד: `<div class="date-range-filter-item" data-value="שבוע קודם" data-onclick="selectDateComparisonRangeOp`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 145
+  - שורה: 150
   - קוד: `<div class="date-range-filter-item" data-value="החודש" data-onclick="selectDateComparisonRangeOption`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 148
+  - שורה: 153
   - קוד: `<div class="date-range-filter-item" data-value="חודש" data-onclick="selectDateComparisonRangeOption(`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 151
+  - שורה: 156
   - קוד: `<div class="date-range-filter-item" data-value="חודש קודם" data-onclick="selectDateComparisonRangeOp`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 154
+  - שורה: 159
   - קוד: `<div class="date-range-filter-item selected" data-value="השנה" data-onclick="selectDateComparisonRan`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 157
+  - שורה: 162
   - קוד: `<div class="date-range-filter-item" data-value="שנה" data-onclick="selectDateComparisonRangeOption('`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 160
+  - שורה: 165
   - קוד: `<div class="date-range-filter-item" data-value="שנה קודמת" data-onclick="selectDateComparisonRangeOp`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 171
+  - שורה: 176
   - קוד: `<button data-button-type="COMPARE" data-variant="primary" data-text="השווה" data-onclick="compareDat`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 188
+  - שורה: 193
   - קוד: `<button data-button-type="ADD" data-variant="secondary" data-text="הוסף" data-onclick="addDateFromIn`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 208
+  - שורה: 213
   - קוד: `<button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-טבלת-השוואות')"`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 240
+  - שורה: 245
   - קוד: `<button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-גרף-bar-chart--`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 268
+  - שורה: 273
   - קוד: `<button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-גרף-line-chart-`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
-  - שורה: 304
+  - שורה: 309
   - קוד: `<button class="btn btn-secondary" data-onclick="window.close()">סגור</button>`
-
-#### HTML Structure
-
-- 🟠 **MISSING:** Missing background-wrapper
-- 🟠 **MISSING:** Missing page-body
-- 🟠 **MISSING:** Missing main-content
 
 #### Initialization System
 
@@ -776,14 +770,8 @@
 
 ### tradingview-test-page.html
 
-❌ **סה"כ בעיות:** 5
+⚠️ **סה"כ בעיות:** 2
 **מספר סקריפטים:** 18
-
-#### HTML Structure
-
-- 🟠 **MISSING:** Missing background-wrapper
-- 🟠 **MISSING:** Missing page-body
-- 🟠 **MISSING:** Missing main-content
 
 #### Initialization System
 

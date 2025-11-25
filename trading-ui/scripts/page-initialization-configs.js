@@ -447,7 +447,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'crud',
         'preferences',
         'validation',
-        'conditions',
         'entity-details',
         'entity-services',
         'info-summary',
@@ -509,17 +508,12 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
         },
         async pageConfig => {
-          window.Logger.info('🔧 Initializing Trades Conditions System...', {
-            page: 'page-initialization-configs',
-          });
-
-          // Initialize conditions system for trades
-          if (typeof window.initializeTradeConditionsSystem === 'function') {
-            window.initializeTradeConditionsSystem();
-          } else {
-            window.Logger.warn('⚠️ Trades conditions system not available', {
-              page: 'page-initialization-configs',
-            });
+          // Use centralized conditions initializer
+          if (window.conditionsInitializer && typeof window.conditionsInitializer.initialize === 'function') {
+            await window.conditionsInitializer.initialize();
+            if (window.conditionsCRUDManager) {
+              window.conditionsCRUDManager.setContext({ entityType: 'trade' });
+            }
           }
         },
       ],
@@ -546,6 +540,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'crud',
         'preferences',
         'validation',
+        'conditions',
         'entity-services',
         'entity-details',
         'info-summary',
@@ -720,7 +715,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'crud',
         'preferences',
         'validation',
-        'conditions',
         'entity-services',
         'entity-details',
         'info-summary',
@@ -772,17 +766,12 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
         },
         async pageConfig => {
-          window.Logger.info('🔧 Initializing Trade Plans Conditions System...', {
-            page: 'page-initialization-configs',
-          });
-
-          // Initialize conditions system for trade plans
-          if (typeof window.initializeTradePlanConditionsSystem === 'function') {
-            window.initializeTradePlanConditionsSystem();
-          } else {
-            window.Logger.warn('⚠️ Trade plans conditions system not available', {
-              page: 'page-initialization-configs',
-            });
+          // Use centralized conditions initializer
+          if (window.conditionsInitializer && typeof window.conditionsInitializer.initialize === 'function') {
+            await window.conditionsInitializer.initialize();
+            if (window.conditionsCRUDManager) {
+              window.conditionsCRUDManager.setContext({ entityType: 'plan' });
+            }
           }
         },
       ],
@@ -1550,7 +1539,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     db_display: {
       name: 'Database Display',
-      packages: ['base', 'crud', 'preferences', 'init-system'],
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: true,
@@ -2015,7 +2004,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
     // Missing pages from documentation
     db_extradata: {
       name: 'Database Extra Data',
-      packages: ['base', 'crud', 'preferences', 'init-system'],
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
       requiredGlobals: [
         'NotificationSystem',
         'window.IconSystem',
@@ -2910,6 +2899,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
   window.PAGE_CONFIGS = PAGE_CONFIGS;
   window.PAGE_CONFIGS.__SOURCE = 'page-initialization-configs';
   window.pageInitializationConfigs = PAGE_CONFIGS;
+  // Also set PAGE_INITIALIZATION_CONFIGS for backward compatibility (used by check-pages-loading.js and package-manifest.js)
+  window.PAGE_INITIALIZATION_CONFIGS = PAGE_CONFIGS;
   console.log('✅ PAGE_CONFIGS loaded, trading_accounts exists:', !!PAGE_CONFIGS.trading_accounts);
 } else {
   // אם PAGE_CONFIGS כבר הוגדר, נמזג רק את הקונפיגים החדשים

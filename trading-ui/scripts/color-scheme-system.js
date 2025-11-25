@@ -830,6 +830,7 @@ const PAGE_TO_ENTITY_MAPPING = {
   'executions-page': 'execution',
   'trade-plans-page': 'trade_plan',
   'planning-page': 'trade_plan', // Alias
+  'trading-journal-page': 'note', // Trading journal page - יומן מסחר
   'preferences-page': 'preference',
   'research-page': 'research',
   'designs-page': 'design',

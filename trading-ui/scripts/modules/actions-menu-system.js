@@ -460,6 +460,9 @@ class ActionsMenuSystem {
     attachHoverPositioning() {
         // Observe all action menu popups and reposition when they become visible
         const observePopup = (popup) => {
+            if (!popup || !popup.nodeType || popup.nodeType !== Node.ELEMENT_NODE) {
+                return; // Skip if popup is not a valid element
+            }
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {
                     if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
@@ -473,7 +476,14 @@ class ActionsMenuSystem {
                     }
                 });
             });
-            observer.observe(popup, { attributes: true, attributeFilter: ['style'] });
+            try {
+                observer.observe(popup, { attributes: true, attributeFilter: ['style'] });
+            } catch (error) {
+                // Popup is not a valid Node - skip
+                if (window.Logger) {
+                    window.Logger.debug('Failed to observe popup:', error);
+                }
+            }
         };
 
         // Observe existing popups
@@ -493,7 +503,27 @@ class ActionsMenuSystem {
                 });
             });
         });
-        documentObserver.observe(document.body, { childList: true, subtree: true });
+        
+        // Wait for document.body to be available
+        if (document.body) {
+            documentObserver.observe(document.body, { childList: true, subtree: true });
+        } else {
+            // Retry after DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (document.body) {
+                        documentObserver.observe(document.body, { childList: true, subtree: true });
+                    }
+                });
+            } else {
+                // DOM already loaded but body not available - retry after delay
+                setTimeout(() => {
+                    if (document.body) {
+                        documentObserver.observe(document.body, { childList: true, subtree: true });
+                    }
+                }, 100);
+            }
+        }
 
         // Also position on mouseenter as fallback
         document.addEventListener('mouseenter', (e) => {

@@ -13,6 +13,9 @@
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
 
+    // Page name for state management
+    const PAGE_NAME = 'trading-journal-page';
+
     /**
      * Initialize Header System
      */
@@ -393,74 +396,6 @@
         }
     }
 
-    /**
-     * Setup month navigation buttons
-     */
-    function setupMonthNavigation() {
-        const prevButton = document.getElementById('prev-month-btn') || document.querySelector('button[data-action="prev-month"]');
-        const nextButton = document.getElementById('next-month-btn') || document.querySelector('button[data-action="next-month"]');
-        const monthDisplay = document.getElementById('current-month-display') || document.querySelector('.content-section h6.mb-0');
-
-        if (!prevButton || !nextButton || !monthDisplay) {
-            if (window.Logger) {
-                window.Logger.warn('Month navigation elements not found', { 
-                    prevButton: !!prevButton, 
-                    nextButton: !!nextButton, 
-                    monthDisplay: !!monthDisplay,
-                    page: 'trading-journal-page' 
-                });
-            }
-            return;
-        }
-
-        // Update month display
-        const updateMonthDisplay = () => {
-            const monthNames = [
-                'ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני',
-                'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'
-            ];
-            monthDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-        };
-
-        // Previous month handler
-        prevButton.addEventListener('click', () => {
-            currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
-            updateMonthDisplay();
-            // TODO: Reload calendar data for new month
-            if (window.Logger) {
-                window.Logger.info('Previous month clicked', { 
-                    month: currentMonth, 
-                    year: currentYear, 
-                    page: 'trading-journal-page' 
-                });
-            }
-        });
-
-        // Next month handler
-        nextButton.addEventListener('click', () => {
-            currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            updateMonthDisplay();
-            // TODO: Reload calendar data for new month
-            if (window.Logger) {
-                window.Logger.info('Next month clicked', { 
-                    month: currentMonth, 
-                    year: currentYear, 
-                    page: 'trading-journal-page' 
-                });
-            }
-        });
-
-        // Initialize display
-        updateMonthDisplay();
-    }
 
     /**
      * Apply dynamic colors to journal entries
@@ -490,6 +425,61 @@
     }
 
     /**
+     * Load page state from PageStateManager
+     */
+    async function loadPageState() {
+        if (window.PageStateManager && typeof window.PageStateManager.loadPageState === 'function') {
+            try {
+                const state = await window.PageStateManager.loadPageState(PAGE_NAME);
+                if (state && state.entityFilters) {
+                    // Restore month/year if saved
+                    if (state.entityFilters.calendarMonth !== undefined) {
+                        currentMonth = state.entityFilters.calendarMonth;
+                    }
+                    if (state.entityFilters.calendarYear !== undefined) {
+                        currentYear = state.entityFilters.calendarYear;
+                    }
+                    // Restore entity filter if saved
+                    if (state.entityFilters.entityFilter) {
+                        window.currentEntityFilter = state.entityFilters.entityFilter;
+                    }
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Failed to load page state', {
+                        page: PAGE_NAME,
+                        error: error?.message
+                    });
+                }
+            }
+        }
+    }
+
+    /**
+     * Save page state to PageStateManager
+     */
+    async function savePageState() {
+        if (window.PageStateManager && typeof window.PageStateManager.savePageState === 'function') {
+            try {
+                await window.PageStateManager.savePageState(PAGE_NAME, {
+                    entityFilters: {
+                        calendarMonth: currentMonth,
+                        calendarYear: currentYear,
+                        entityFilter: window.currentEntityFilter || 'all'
+                    }
+                });
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Failed to save page state', {
+                        page: PAGE_NAME,
+                        error: error?.message
+                    });
+                }
+            }
+        }
+    }
+
+    /**
      * Initialize page
      */
     async function initializePage() {
@@ -501,12 +491,15 @@
             window.PreferencesCore.initializeWithLazyLoading().catch((error) => {
                 if (window.Logger) {
                     window.Logger.warn('Preferences initialization failed (non-critical)', { 
-                        page: 'trading-journal-page', 
+                        page: PAGE_NAME, 
                         error 
                     });
                 }
             });
         }
+
+        // Load saved page state
+        await loadPageState();
 
         // Wait for IconSystem and DOM to be ready
         const initAfterLoad = async () => {
@@ -538,8 +531,14 @@
             // Create dropdown menu
             createAddEntryDropdown();
             
-            // Setup month navigation
-            setupMonthNavigation();
+            // Update initial month display
+            const monthDisplay = document.getElementById('current-month-display');
+            if (monthDisplay) {
+                monthDisplay.textContent = window.CalendarDateUtils.formatMonthDisplay(currentYear, currentMonth);
+            }
+            
+            // Load and render initial calendar with data
+            await loadAndRenderCalendar();
             
             // Apply dynamic colors
             applyDynamicColors();
@@ -563,14 +562,147 @@
         initializePage();
     }
 
-    // Export functions to window for debugging
+    /**
+     * Load and render calendar with data
+     * Uses CalendarDataLoader and CalendarRenderer
+     */
+    async function loadAndRenderCalendar() {
+        // Load data using CalendarDataLoader
+        const dayData = await window.CalendarDataLoader.loadMonthDataWithCache(
+            currentYear, 
+            currentMonth, 
+            { entityFilter: window.currentEntityFilter || 'all' }
+        );
+
+        // Render using CalendarRenderer
+        await window.CalendarRenderer.render(currentYear, currentMonth, dayData);
+    }
+
+    /**
+     * Navigate to previous or next month
+     * @param {string} direction - 'prev' or 'next'
+     */
+    async function navigateMonth(direction) {
+        // Use CalendarDateUtils for navigation
+        const result = window.CalendarDateUtils.navigateMonth(currentYear, currentMonth, direction);
+        currentYear = result.year;
+        currentMonth = result.month;
+        
+        // Update display
+        const monthDisplay = document.getElementById('current-month-display');
+        if (monthDisplay) {
+            monthDisplay.textContent = window.CalendarDateUtils.formatMonthDisplay(currentYear, currentMonth);
+        }
+        
+        // Load and render calendar for new month
+        await loadAndRenderCalendar();
+        
+        // Reload calendar data for new month
+        filterJournalByEntityType(window.currentEntityFilter || 'all');
+        
+        // Save page state
+        await savePageState();
+        
+        if (window.Logger) {
+            window.Logger.info(`${direction === 'prev' ? 'Previous' : 'Next'} month navigated`, { 
+                month: currentMonth, 
+                year: currentYear, 
+                page: PAGE_NAME 
+            });
+        }
+    }
+
+    /**
+     * Navigate to current month (today)
+     */
+    async function navigateToToday() {
+        const today = new Date();
+        currentYear = today.getFullYear();
+        currentMonth = today.getMonth();
+        
+        // Update display
+        const monthDisplay = document.getElementById('current-month-display');
+        if (monthDisplay) {
+            monthDisplay.textContent = window.CalendarDateUtils.formatMonthDisplay(currentYear, currentMonth);
+        }
+        
+        // Load and render calendar for current month
+        await loadAndRenderCalendar();
+        
+        // Reload calendar data for current month
+        filterJournalByEntityType(window.currentEntityFilter || 'all');
+        
+        // Save page state
+        await savePageState();
+        
+        if (window.Logger) {
+            window.Logger.info('Navigated to current month', { 
+                month: currentMonth, 
+                year: currentYear, 
+                page: PAGE_NAME 
+            });
+        }
+    }
+
+    /**
+     * Filter journal entries by entity type
+     * @param {string} entityType - Entity type to filter by ('all', 'execution', 'cash_flow', 'trade', 'trade_plan', 'note', 'alert')
+     */
+    async function filterJournalByEntityType(entityType) {
+        const normalizedType = entityType || 'all';
+        const entries = document.querySelectorAll('.journal-entry-item');
+        
+        // Update filter buttons
+        const filterButtons = document.querySelectorAll('.filter-buttons-container button[data-type]');
+        filterButtons.forEach(btn => {
+            if (btn.getAttribute('data-type') === normalizedType) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        
+        // Filter journal entries
+        entries.forEach(entry => {
+            const entryType = entry.getAttribute('data-entry-type');
+            if (normalizedType === 'all') {
+                entry.style.display = '';
+            } else if (normalizedType === 'trade' && entryType === 'trade') {
+                entry.style.display = '';
+            } else if (normalizedType === 'trade_plan' && entryType === 'trade_plan') {
+                entry.style.display = '';
+            } else if (entryType === normalizedType) {
+                entry.style.display = '';
+            } else {
+                entry.style.display = 'none';
+            }
+        });
+        
+        // Reload calendar with new filter
+        await loadAndRenderCalendar();
+        
+        // Save page state
+        await savePageState();
+        
+        if (window.Logger) {
+            window.Logger.info('Journal filtered by entity type', { 
+                entityType: normalizedType,
+                page: PAGE_NAME 
+            });
+        }
+    }
+
+    // Export functions to window
     window.tradingJournalPage = {
-        getCSSVariableValue,
-        initializeHeader,
-        replaceIconsWithIconSystem,
-        createAddEntryDropdown,
-        setupMonthNavigation,
-        applyDynamicColors
+        navigateMonth,
+        navigateToToday,
+        filterJournalByEntityType,
+        loadAndRenderCalendar,
+        currentMonth: () => currentMonth,
+        currentYear: () => currentYear
     };
+
+    // Make filterJournalByEntityType available globally (for HTML onclick)
+    window.filterJournalByEntityType = filterJournalByEntityType;
 
 })();

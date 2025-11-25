@@ -1,0 +1,9 @@
+{
+  "id": "pre-update_20251124_200738",
+  "label": "pre-update",
+  "timestamp": "2025-11-24T20:07:38.296289",
+  "files": {
+    "config": "_Tmp/production-update-snapshots/pre-update_20251124_200738/config/config"
+  },
+  "git_commit": "c0f1ac3346bc81e74c9158f982bdf73da648c581"
+}

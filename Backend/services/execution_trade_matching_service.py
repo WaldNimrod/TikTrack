@@ -286,7 +286,8 @@ class ExecutionTradeMatchingService:
     @staticmethod
     def get_execution_trade_creation_clusters(
         db: Session,
-        max_items: Optional[int] = None
+        max_items: Optional[int] = None,
+        limit_executions: Optional[int] = None
     ) -> List[Dict[str, Any]]:
         """
         Cluster executions by ticker/account/side for quick trade creation.
@@ -297,9 +298,18 @@ class ExecutionTradeMatchingService:
         
         A trade cannot mix long and short executions.
         
+        Args:
+            db: Database session
+            max_items: Maximum number of clusters to return
+            limit_executions: Maximum number of executions to process (for pagination)
+        
         Note: This method delegates to ExecutionClusteringService for consistency.
         """
-        return ExecutionClusteringService.get_execution_trade_creation_clusters(db, max_items=max_items)
+        return ExecutionClusteringService.get_execution_trade_creation_clusters(
+            db, 
+            max_items=max_items,
+            limit_executions=limit_executions
+        )
 
     @staticmethod
     def _map_execution_action_to_trade_side(action: Optional[str]) -> str:

@@ -418,6 +418,33 @@ async function saveExecution() {
             return;
         }
         
+        // Validate using Business Logic API if available
+        if (window.ExecutionsData && typeof window.ExecutionsData.validateExecution === 'function') {
+            try {
+                const validationResult = await window.ExecutionsData.validateExecution(executionData);
+                if (!validationResult.is_valid) {
+                    window.Logger?.warn('⚠️ Execution validation failed via Business Logic API', {
+                        page: 'executions',
+                        errors: validationResult.errors
+                    });
+                    if (validationResult.errors && validationResult.errors.length > 0) {
+                        const errorMessage = validationResult.errors.join('\n');
+                        if (window.showErrorNotification) {
+                            window.showErrorNotification('שגיאת ולידציה', errorMessage);
+                        }
+                    }
+                    return;
+                }
+                window.Logger?.debug('✅ Execution validation passed via Business Logic API', { page: 'executions' });
+            } catch (error) {
+                window.Logger?.warn('⚠️ Error calling ExecutionsData.validateExecution, continuing with local validation', {
+                    page: 'executions',
+                    error: error?.message || error
+                });
+                // Continue with save - local validation already passed
+            }
+        }
+        
         // Determine if this is add or edit
         const isEdit = form.dataset.mode === 'edit';
         const executionId = form.dataset.executionId;
@@ -1211,7 +1238,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
 
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = (execution.action || execution.type) === 'buy' ? 'קנייה' :
-      (execution.action || execution.type) === 'sale' ? 'מכירה' :
+      (execution.action || execution.type) === 'sell' ? 'מכירה' :
         execution.action || execution.type;
 
     // תמיד להשתמש בחשבון ישירות מהרשומה, או מהטרייד אם אין ישיר
@@ -1771,17 +1798,15 @@ window.initializeExecutionsPage = async function() {
   // הגדרת מודלים שלא נסגרים בלחיצה על הרקע
   setupModalConfigurations();
 
-  // אתחול ממשק יצירת טרייד מאשכול ביצועים - LAZY LOADING
-  // נטען רק כשהמשתמש פותח את הסקשן trade-creation
+  // Initialize trade creation section - lazy loading when section opens
+  // Uses MutationObserver to detect when section opens (no interference with global toggle system)
   const tradeCreationSection = document.getElementById('trade-creation') || document.querySelector('[data-section="trade-creation"]');
   if (tradeCreationSection && window.PendingExecutionTradeCreation) {
     let tradeCreationInitialized = false;
     
-    // Initialize section but don't load data yet
     const initializeTradeCreationSection = () => {
       if (!tradeCreationInitialized && window.PendingExecutionTradeCreation?.initializeExecutionsSection) {
         tradeCreationInitialized = true;
-        window.Logger?.info('🔄 Initializing trade creation section (lazy loading)', { page: "executions" });
         window.PendingExecutionTradeCreation.initializeExecutionsSection({
           containerId: 'executionTradeCreationClustersContainer',
           countElementId: 'executionTradeCreationClustersCount',
@@ -1792,41 +1817,34 @@ window.initializeExecutionsPage = async function() {
       }
     };
     
-    // Wait for sections to be restored before initializing observers
-    // This prevents loading data during initial page load when restoreAllSectionStates opens sections
-    let tradeCreationDebounceTimer = null;
-    const setupTradeCreationObserver = () => {
-      // Check if section is actually visible to user (not just restored state)
-      const sectionBody = tradeCreationSection.querySelector('.section-body');
-      const isActuallyOpen = sectionBody && sectionBody.style.display !== 'none' && !sectionBody.classList.contains('hidden');
-      
-      // Only initialize if section is actually open (user-initiated, not just restored state)
-      if (!isActuallyOpen) {
-        // Observer לבדיקת visibility של הסקשן - רק אחרי ש-sections שוחזרו
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting && !tradeCreationInitialized) {
-              // Debounce to avoid multiple rapid calls
-              if (tradeCreationDebounceTimer) {
-                clearTimeout(tradeCreationDebounceTimer);
-              }
-              tradeCreationDebounceTimer = setTimeout(() => {
-                initializeTradeCreationSection();
-                observer.disconnect();
-              }, 500); // 500ms debounce
-            }
-          });
-        }, { threshold: 0.1 });
-        
-        observer.observe(tradeCreationSection);
+    // Check if section is open after sections are restored
+    const checkAndInitialize = () => {
+      const sectionBody = tradeCreationSection?.querySelector('.section-body');
+      if (sectionBody && window.getComputedStyle(sectionBody).display !== 'none') {
+        initializeTradeCreationSection();
       }
     };
     
-    // Wait for sections:restored event or check if already restored
+    // After sections are restored, check if section is open
     if (window.sectionsRestored) {
-      setupTradeCreationObserver();
+      setTimeout(checkAndInitialize, 100);
     } else {
-      document.addEventListener('sections:restored', setupTradeCreationObserver, { once: true });
+      window.addEventListener('sections:restored', () => setTimeout(checkAndInitialize, 100), { once: true });
+    }
+    
+    // Use MutationObserver to detect when section opens (doesn't interfere with toggle system)
+    const sectionBody = tradeCreationSection?.querySelector('.section-body');
+    if (sectionBody) {
+      const observer = new MutationObserver(() => {
+        if (!tradeCreationInitialized && window.getComputedStyle(sectionBody).display !== 'none') {
+          setTimeout(initializeTradeCreationSection, 100);
+        }
+      });
+      observer.observe(sectionBody, {
+        attributes: true,
+        attributeFilter: ['style'],
+        subtree: false
+      });
     }
   }
 
@@ -1875,112 +1893,69 @@ window.initializeExecutionsPage = async function() {
           window.Logger?.warn('⚠️ Failed to load tickers list on modal open:', error, { page: "executions" });
         }
       }
+      
+      // Setup calculation event listeners based on mode
+      if (mode === 'add') {
+        // Small delay to ensure fields are rendered
+        setTimeout(() => {
+          setupExecutionCalculationListeners();
+        }, 100);
+      } else if (mode === 'edit') {
+        // Small delay to ensure fields are rendered
+        setTimeout(() => {
+          setupEditExecutionCalculationListeners();
+        }, 100);
+      }
     }
   });
 
   // Load trade suggestions - LAZY LOADING: נטען רק כשהמשתמש מגיע לסקשן
-  // Event listener לטעינת המלצות כשהמשתמש פותח את סקשן suggestions
+  // Uses MutationObserver to detect when section opens (no interference with global toggle system)
   const suggestionsSection = document.getElementById('suggestions');
   if (suggestionsSection && typeof loadTradeSuggestionsForAll === 'function') {
     let suggestionsLoaded = false;
     
-    // Wait for sections to be restored before initializing observers
-    // This prevents loading data during initial page load when restoreAllSectionStates opens sections
-    let suggestionsDebounceTimer = null;
-    const setupSuggestionsObserver = () => {
-      // Check if section is actually visible to user (not just restored state)
-      const sectionBody = suggestionsSection.querySelector('.section-body');
-      const isActuallyOpen = sectionBody && sectionBody.style.display !== 'none' && !sectionBody.classList.contains('hidden');
-      
-      // Only initialize if section is actually open (user-initiated, not just restored state)
-      if (!isActuallyOpen) {
-        // Observer לבדיקת visibility של הסקשן - רק אחרי ש-sections שוחזרו
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            // אם הסקשן גלוי ולא טענו עדיין את הנתונים
-            if (entry.isIntersecting && !suggestionsLoaded) {
-              // Debounce to avoid multiple rapid calls
-              if (suggestionsDebounceTimer) {
-                clearTimeout(suggestionsDebounceTimer);
-              }
-              suggestionsDebounceTimer = setTimeout(() => {
-                suggestionsLoaded = true;
-                window.Logger?.info('🔄 Loading trade suggestions (lazy loading - section visible)', { page: "executions" });
-                loadTradeSuggestionsForAll().catch(error => {
-                  window.Logger?.warn('⚠️ Failed to load trade suggestions on section open:', error, { page: "executions" });
-                  suggestionsLoaded = false; // Allow retry
-                });
-                observer.disconnect(); // Stop observing after first load
-              }, 500); // 500ms debounce
-            }
-          });
-        }, { threshold: 0.1 }); // Trigger when 10% of section is visible
-        
-        observer.observe(suggestionsSection);
+    const loadSuggestions = () => {
+      if (!suggestionsLoaded) {
+        suggestionsLoaded = true;
+        loadTradeSuggestionsForAll().catch(error => {
+          window.Logger?.warn('⚠️ Failed to load trade suggestions:', error, { page: "executions" });
+          suggestionsLoaded = false; // Allow retry
+        });
       }
     };
     
-    // Wait for sections:restored event or check if already restored
+    // Check if section is open after sections are restored
+    const checkAndLoad = () => {
+      const sectionBody = suggestionsSection?.querySelector('.section-body');
+      if (sectionBody && window.getComputedStyle(sectionBody).display !== 'none') {
+        loadSuggestions();
+      }
+    };
+    
+    // After sections are restored, check if section is open
     if (window.sectionsRestored) {
-      setupSuggestionsObserver();
+      setTimeout(checkAndLoad, 100);
     } else {
-      document.addEventListener('sections:restored', setupSuggestionsObserver, { once: true });
+      window.addEventListener('sections:restored', () => setTimeout(checkAndLoad, 100), { once: true });
+    }
+    
+    // Use MutationObserver to detect when section opens (doesn't interfere with toggle system)
+    const sectionBody = suggestionsSection?.querySelector('.section-body');
+    if (sectionBody) {
+      const observer = new MutationObserver(() => {
+        if (!suggestionsLoaded && window.getComputedStyle(sectionBody).display !== 'none') {
+          setTimeout(loadSuggestions, 100);
+        }
+      });
+      observer.observe(sectionBody, {
+        attributes: true,
+        attributeFilter: ['style'],
+        subtree: false
+      });
     }
   }
   
-  // Wrapper ל-toggleSection עם lazy loading לסקשנים
-  if (typeof window.toggleSection === 'function') {
-    const originalToggleSection = window.toggleSection;
-    window.toggleSection = function(sectionId) {
-      const result = originalToggleSection.call(this, sectionId);
-      
-      // LAZY LOADING: טעינת נתונים כשהמשתמש פותח סקשן
-      setTimeout(() => {
-        const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
-        if (!section) return;
-        
-        const sectionBody = section.querySelector('.section-body');
-        const isOpen = sectionBody && sectionBody.style.display !== 'none' && !sectionBody.classList.contains('hidden');
-        
-        // Trade creation section - lazy loading
-        if (sectionId === 'trade-creation' && isOpen && window.PendingExecutionTradeCreation) {
-          const containerId = 'executionTradeCreationClustersContainer';
-          const container = document.getElementById(containerId);
-          
-          // אם הסקשן פתוח והקונטיינר לא מכיל נתונים, אתחל
-          if (container && (!container.children.length || container.textContent.trim() === '' || container.textContent.includes('טוען'))) {
-            if (window.PendingExecutionTradeCreation.initializeExecutionsSection) {
-              window.Logger?.info('🔄 Initializing trade creation section (lazy loading - user toggled section)', { page: "executions" });
-              window.PendingExecutionTradeCreation.initializeExecutionsSection({
-                containerId: containerId,
-                countElementId: 'executionTradeCreationClustersCount',
-                loadingElementId: 'executionTradeCreationClustersLoading',
-                emptyStateId: 'executionTradeCreationClustersEmpty',
-                errorElementId: 'executionTradeCreationClustersError'
-              });
-            }
-          }
-        }
-        
-        // Suggestions section - lazy loading
-        if (sectionId === 'suggestions' && isOpen && typeof loadTradeSuggestionsForAll === 'function') {
-          // Check if suggestions are already loaded
-          const suggestionsTable = section.querySelector('table');
-          const hasSuggestions = suggestionsTable && suggestionsTable.querySelector('tbody') && 
-                                 suggestionsTable.querySelector('tbody').children.length > 0;
-          
-          if (!hasSuggestions) {
-            window.Logger?.info('🔄 Loading trade suggestions (lazy loading - user toggled section)', { page: "executions" });
-            loadTradeSuggestionsForAll().catch(error => {
-              window.Logger?.warn('⚠️ Failed to load trade suggestions on toggle:', error, { page: "executions" });
-            });
-          }
-        }
-      }, 100); // Small delay to ensure section is fully opened
-      
-      return result;
-    };
-  }
 
   // עדכון אוטומטי כל 30 שניות - הושבת זמנית למניעת לופים
   // setInterval(() => {
@@ -2755,6 +2730,128 @@ window.calculateAddExecutionValues = calculateAddExecutionValues;
 window.calculateEditExecutionValues = calculateEditExecutionValues;
 
 /**
+ * Setup execution calculation event listeners for add modal
+ * Sets up automatic calculation when form fields change
+ * @returns {void}
+ */
+function setupExecutionCalculationListeners() {
+  try {
+    const quantityInput = document.getElementById('executionQuantity');
+    const priceInput = document.getElementById('executionPrice');
+    const commissionInput = document.getElementById('executionCommission');
+    const actionInput = document.getElementById('executionType');
+
+    if (!quantityInput || !priceInput) {
+      window.Logger?.debug('Execution calculation listeners: Required fields not found yet', { page: "executions" });
+      return; // Required fields not found
+    }
+
+    const calculate = () => {
+      window.Logger?.debug('🔄 Calculating execution values (triggered by field change)', { page: "executions" });
+      calculateExecutionValues('add');
+    };
+
+    // Remove existing listeners by cloning (clean slate)
+    const fields = [quantityInput, priceInput, commissionInput, actionInput].filter(Boolean);
+    fields.forEach(field => {
+      const newField = field.cloneNode(true);
+      field.parentNode.replaceChild(newField, field);
+    });
+
+    // Get fresh references after cloning
+    const freshQuantityInput = document.getElementById('executionQuantity');
+    const freshPriceInput = document.getElementById('executionPrice');
+    const freshCommissionInput = document.getElementById('executionCommission');
+    const freshActionInput = document.getElementById('executionType');
+
+    // Setup event listeners
+    if (freshQuantityInput) {
+      freshQuantityInput.addEventListener('input', calculate);
+      freshQuantityInput.addEventListener('change', calculate);
+    }
+    
+    if (freshPriceInput) {
+      freshPriceInput.addEventListener('input', calculate);
+      freshPriceInput.addEventListener('change', calculate);
+    }
+    
+    if (freshCommissionInput) {
+      freshCommissionInput.addEventListener('input', calculate);
+      freshCommissionInput.addEventListener('change', calculate);
+    }
+    
+    if (freshActionInput) {
+      freshActionInput.addEventListener('change', calculate);
+    }
+
+    window.Logger?.debug('✅ Execution calculation event listeners setup completed', { page: "executions" });
+  } catch (error) {
+    window.Logger?.error('❌ Error setting up execution calculation listeners:', error, { page: "executions" });
+  }
+}
+
+/**
+ * Setup execution calculation event listeners for edit modal
+ * Sets up automatic calculation when edit form fields change
+ * @returns {void}
+ */
+function setupEditExecutionCalculationListeners() {
+  try {
+    const quantityInput = document.getElementById('editExecutionQuantity');
+    const priceInput = document.getElementById('editExecutionPrice');
+    const commissionInput = document.getElementById('editExecutionCommission');
+    const actionInput = document.getElementById('editExecutionType');
+
+    if (!quantityInput || !priceInput) {
+      window.Logger?.debug('Edit execution calculation listeners: Required fields not found yet', { page: "executions" });
+      return; // Required fields not found
+    }
+
+    const calculate = () => {
+      window.Logger?.debug('🔄 Calculating edit execution values (triggered by field change)', { page: "executions" });
+      calculateExecutionValues('edit');
+    };
+
+    // Remove existing listeners by cloning (clean slate)
+    const fields = [quantityInput, priceInput, commissionInput, actionInput].filter(Boolean);
+    fields.forEach(field => {
+      const newField = field.cloneNode(true);
+      field.parentNode.replaceChild(newField, field);
+    });
+
+    // Get fresh references after cloning
+    const freshQuantityInput = document.getElementById('editExecutionQuantity');
+    const freshPriceInput = document.getElementById('editExecutionPrice');
+    const freshCommissionInput = document.getElementById('editExecutionCommission');
+    const freshActionInput = document.getElementById('editExecutionType');
+
+    // Setup event listeners
+    if (freshQuantityInput) {
+      freshQuantityInput.addEventListener('input', calculate);
+      freshQuantityInput.addEventListener('change', calculate);
+    }
+    
+    if (freshPriceInput) {
+      freshPriceInput.addEventListener('input', calculate);
+      freshPriceInput.addEventListener('change', calculate);
+    }
+    
+    if (freshCommissionInput) {
+      freshCommissionInput.addEventListener('input', calculate);
+      freshCommissionInput.addEventListener('change', calculate);
+    }
+    
+    if (freshActionInput) {
+      freshActionInput.addEventListener('change', calculate);
+    }
+
+    window.Logger?.debug('✅ Edit execution calculation event listeners setup completed', { page: "executions" });
+  } catch (error) {
+    window.Logger?.error('❌ Error setting up edit execution calculation listeners:', error, { page: "executions" });
+  }
+}
+
+/**
  * מעבר לטרייד המקושר
  * @param {string} mode - 'add' או 'edit'
  */
@@ -2950,35 +3047,8 @@ window.setupExecutionsFilterFunctions = setupExecutionsFilterFunctions;
 
 // הוסר - המערכת המאוחדת מטפלת באתחול
 // אתחול הדף
-// document.addEventListener('DOMContentLoaded', function () {
-  // DOM Content Loaded - checking notification functions
-  // window.showSuccessNotification
-  // window.showErrorNotification
-  // window.showInfoNotification
-
-  // שחזור מצב הסגירה
-  if (typeof window.restoreAllSectionStates === 'function') {
-    window.restoreAllSectionStates();
-  } else {
-    // window.Logger.warn('⚠️ restoreAllSectionStates function not available, using fallback', { page: "executions" });
-    // Fallback: restore top section state manually
-    const topSectionHidden = localStorage.getItem('executionsTopSectionCollapsed') === 'true';
-    const topSection = document.querySelector('.top-section .section-body');
-    const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleSection"]');
-    const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
-
-    if (topSection && topIcon) {
-      if (topSectionHidden) {
-        topSection.classList.add('d-none');
-        topSection.classList.remove('d-block');
-        topIcon.textContent = '▼';
-      } else {
-        topSection.classList.remove('d-none');
-        topSection.classList.add('d-block');
-        topIcon.textContent = '▲';
-      }
-    }
-  }
+// Section state restoration is handled by the global system (restoreAllSectionStates)
+// No custom code needed - the global system handles all sections automatically
 
   // אתחול וולידציה עם כללים מותאמים לביצועים
   if (window.initializeValidation) {

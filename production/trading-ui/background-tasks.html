@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=0da3519a_20251102_104906">
+    
     
     <!-- Bootstrap JS -->
     
@@ -72,6 +72,7 @@
     <!-- Unified Log Display Styles -->
     <link rel="stylesheet" href="styles-new/06-components/_unified-log-display.css?v=0da3519a_20251102_104906">
 
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
 </head>
 
 <body>
@@ -110,7 +111,7 @@
                     </div>
                 </div>
 
-                <div class="content-section" id="systemStatus">
+                <div class="content-section" id="systemStatus" data-section="systemStatus">
                     <div class="section-header">
                         <h2>📊 מצב המערכת</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('systemStatus')" title="הצג/הסתר סקשן">
@@ -184,7 +185,7 @@
                     </div>
                 </div>
 
-                <div class="content-section" id="tasksList">
+                <div class="content-section" id="tasksList" data-section="tasksList">
                     <div class="section-header">
                         <h2>📋 רשימת משימות</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('tasksList')" title="הצג/הסתר סקשן">
@@ -226,7 +227,7 @@
                 </div>
 
                 <!-- Background Tasks Log Section -->
-                <div class="content-section" id="backgroundTasksLog">
+                <div class="content-section" id="backgroundTasksLog" data-section="backgroundTasksLog">
                     <div class="section-header">
                         <h2>📋 לוג משימות ברקע</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('backgroundTasksLog')" title="הצג/הסתר סקשן">

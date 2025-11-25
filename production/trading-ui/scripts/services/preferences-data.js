@@ -1293,6 +1293,218 @@
     }
   }
 
+  // ========================================================================
+  // Business Logic API Wrappers
+  // ========================================================================
+
+  /**
+   * Validate preference value using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (60s TTL).
+   * @param {string} preferenceName - Preference name
+   * @param {any} value - Value to validate
+   * @param {string} dataType - Expected data type (string, number, boolean, json, color)
+   * @returns {Promise<Object>} Validation result: {is_valid, errors}
+   */
+  async function validatePreference(preferenceName, value, dataType = 'string') {
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-preference', { preferenceName, value, dataType })
+      : `business:validate-preference:${preferenceName}:${value}:${dataType}`;
+    
+    try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/preferences/validate', {
+            method: 'POST',
+            headers: DEFAULT_HEADERS,
+            body: JSON.stringify({
+              preference_name: preferenceName,
+              value: value,
+              data_type: dataType
+            })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            return {
+              is_valid: false,
+              errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+            };
+          }
+
+          const result = await response.json();
+          return {
+            is_valid: result.status === 'success',
+            errors: []
+          };
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
+      const response = await fetch('/api/business/preferences/validate', {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify({
+          preference_name: preferenceName,
+          value: value,
+          data_type: dataType
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return {
+          is_valid: false,
+          errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+        };
+      }
+
+      const result = await response.json();
+      return {
+        is_valid: result.status === 'success',
+        errors: []
+      };
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating preference', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      return {
+        is_valid: false,
+        errors: [error?.message || 'Validation failed']
+      };
+    }
+  }
+
+  /**
+   * Validate profile data using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (60s TTL).
+   * @param {Object} profileData - Profile data to validate
+   * @returns {Promise<Object>} Validation result: {is_valid, errors}
+   */
+  async function validateProfile(profileData) {
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-profile', profileData)
+      : `business:validate-profile:${JSON.stringify(profileData)}`;
+    
+    try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/preferences/validate-profile', {
+            method: 'POST',
+            headers: DEFAULT_HEADERS,
+            body: JSON.stringify(profileData)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            return {
+              is_valid: false,
+              errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+            };
+          }
+
+          const result = await response.json();
+          return {
+            is_valid: result.status === 'success',
+            errors: []
+          };
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
+      const response = await fetch('/api/business/preferences/validate-profile', {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify(profileData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return {
+          is_valid: false,
+          errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+        };
+      }
+
+      const result = await response.json();
+      return {
+        is_valid: result.status === 'success',
+        errors: []
+      };
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating profile', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      return {
+        is_valid: false,
+        errors: [error?.message || 'Validation failed']
+      };
+    }
+  }
+
+  /**
+   * Validate dependencies between preferences using backend business logic service.
+   * Uses UnifiedCacheManager for caching results (60s TTL).
+   * @param {Object} preferences - Dictionary of preference_name -> value
+   * @returns {Promise<Object>} Validation result: {is_valid, errors}
+   */
+  async function validateDependencies(preferences) {
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-dependencies', preferences)
+      : `business:validate-dependencies:${JSON.stringify(preferences)}`;
+    
+    try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch('/api/business/preferences/validate-dependencies', {
+            method: 'POST',
+            headers: DEFAULT_HEADERS,
+            body: JSON.stringify({ preferences })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            return {
+              is_valid: false,
+              errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+            };
+          }
+
+          const result = await response.json();
+          return {
+            is_valid: result.status === 'success',
+            errors: []
+          };
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
+      const response = await fetch('/api/business/preferences/validate-dependencies', {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify({ preferences })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return {
+          is_valid: false,
+          errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+        };
+      }
+
+      const result = await response.json();
+      return {
+        is_valid: result.status === 'success',
+        errors: []
+      };
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating dependencies', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      return {
+        is_valid: false,
+        errors: [error?.message || 'Validation failed']
+      };
+    }
+  }
+
   window.PreferencesData = {
     loadPreference,
     loadPreferenceGroup,
@@ -1311,6 +1523,9 @@
     checkPreferenceExists,
     checkHealth,
     clearPattern: clearCachePattern,
+    validatePreference,
+    validateProfile,
+    validateDependencies,
   };
 
   window.Logger?.info?.('✅ Preferences Data Service initialized', PAGE_LOG_CONTEXT);

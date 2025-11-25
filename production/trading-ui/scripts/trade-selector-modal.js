@@ -399,13 +399,13 @@ class TradeSelectorModal {
                                     <div class="d-flex gap-1 justify-content-center align-items-center">
                                         <button type="button" 
                                                 class="btn btn-sm btn-outline-primary" 
-                                                onclick="window.tradeSelectorModal.viewTradeDetails(${trade.id})"
+                                                data-onclick="window.tradeSelectorModal.viewTradeDetails(${trade.id})"
                                                 title="פרטים">
                                             👁️
                                         </button>
                                         <button type="button" 
                                                 class="btn btn-sm btn-danger" 
-                                                onclick="window.tradeSelectorModal.cancelLink()"
+                                                data-onclick="window.tradeSelectorModal.cancelLink()"
                                                 title="בטל קישור">
                                             ✕
                                         </button>
@@ -417,7 +417,7 @@ class TradeSelectorModal {
                 </div>
             </div>
             <div class="mt-3">
-                <button type="button" class="btn btn-primary" onclick="window.tradeSelectorModal.showSelectionTable()">
+                <button type="button" class="btn btn-primary" data-onclick="window.tradeSelectorModal.showSelectionTable()">
                     שנה קישור
                 </button>
             </div>
@@ -465,13 +465,13 @@ class TradeSelectorModal {
                         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
                             <button type="button" 
                                     class="btn btn-sm btn-outline-primary" 
-                                    onclick="window.tradeSelectorModal.viewTradeDetails(${trade.id})"
+                                    data-onclick="window.tradeSelectorModal.viewTradeDetails(${trade.id})"
                                     title="פרטים">
                                 👁️
                             </button>
                             <button type="button" 
                                     class="btn btn-sm btn-primary" 
-                                    onclick="window.tradeSelectorModal.selectTrade(${trade.id})"
+                                    data-onclick="window.tradeSelectorModal.selectTrade(${trade.id})"
                                     title="בחר">
                                 ✓
                             </button>
@@ -829,13 +829,13 @@ class TradeSelectorModal {
                                     <div class="d-flex gap-1 justify-content-center align-items-center">
                                         <button type="button" 
                                                 class="btn btn-sm btn-outline-primary" 
-                                                onclick="window.tradeSelectorModal.viewTradeDetails(${trade.id})"
+                                                data-onclick="window.tradeSelectorModal.viewTradeDetails(${trade.id})"
                                                 title="פרטים">
                                             👁️
                                         </button>
                                         <button type="button" 
                                                 class="btn btn-sm btn-danger" 
-                                                onclick="window.tradeSelectorModal.cancelLinkFromButton('${this.currentFieldId}')"
+                                                data-onclick="window.tradeSelectorModal.cancelLinkFromButton('${this.currentFieldId}')"
                                                 title="בטל קישור">
                                             ✕
                                         </button>

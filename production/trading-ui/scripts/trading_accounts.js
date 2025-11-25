@@ -1768,19 +1768,10 @@ window.deleteTradingAccount = deleteTradingAccount;
  * @returns {Promise<void>}
  */
 async function restoreTradingAccountsSectionState() {
-  const savedState = await window.unifiedCacheManager?.get('trading_accountsSectionCollapsed') || localStorage.getItem('trading_accountsSectionCollapsed');
-  if (savedState === 'true') {
-    const trading_accountsSection = document.querySelector('.trading_accounts-section');
-    if (trading_accountsSection) {
-      const sectionBody = trading_accountsSection.querySelector('.section-body');
-      // Use data-onclick selector instead of onclick (legacy support)
-      const toggleBtn = trading_accountsSection.querySelector('button[data-onclick*="toggleAccountsSection()"]') || trading_accountsSection.querySelector('button[onclick="toggleAccountsSection()"]');
-
-      if (sectionBody && toggleBtn) {
-        sectionBody.style.display = 'none';
-        toggleBtn.textContent = 'הצג חשבונות';
-      }
-    }
+  // This function now relies on the global restoreAllSectionStates system
+  // No need for manual style.display manipulation - the global system handles it
+  if (typeof window.restoreAllSectionStates === 'function') {
+    await window.restoreAllSectionStates('trading_accounts');
   }
 }
 
@@ -2471,6 +2462,30 @@ async function saveTradingAccount() {
         
         if (hasErrors) {
             return;
+        }
+
+        // Business Logic API validation
+        if (window.TradingAccountsData?.validateTradingAccount) {
+            try {
+                const validationResult = await window.TradingAccountsData.validateTradingAccount({
+                    name: accountData.name,
+                    currency_id: accountData.currency_id,
+                    status: accountData.status,
+                    opening_balance: accountData.opening_balance
+                });
+
+                if (!validationResult.is_valid) {
+                    const errorMessage = validationResult.errors?.join(', ') || 'ולידציה נכשלה';
+                    window.showErrorNotification?.('שגיאת ולידציה', errorMessage);
+                    return;
+                }
+            } catch (validationError) {
+                window.Logger?.warn('⚠️ Trading account validation error (continuing with save)', {
+                    error: validationError,
+                    page: 'trading_accounts'
+                });
+                // Continue with save even if validation fails (fallback)
+            }
         }
         
         // In edit mode, preserve the original currency_id (cannot be changed)

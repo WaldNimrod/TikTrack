@@ -48,10 +48,11 @@
     
     
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
+    
     
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+    
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
 </head>
 <body>
     <!-- Header System -->
@@ -63,17 +64,17 @@
                 <h2>📊 ניהול גרפים</h2>
                 <div class="header-actions">
                     <button data-button-type="TOGGLE" data-onclick="refreshChartsStatus()" data-classes="btn btn-outline-secondary btn-sm">
-                        <i class="fas fa-sync"></i> רענן סטטוס
+                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רענן סטטוס
                     </button>
                     <button data-button-type="EXPORT" data-onclick="exportAllCharts()" data-classes="btn btn-outline-success btn-sm">
-                        <i class="fas fa-download"></i> ייצא הכל
+                        <img src="/trading-ui/images/icons/tabler/download.svg" width="16" height="16" alt="download" class="icon"> ייצא הכל
                     </button>
                 </div>
             </div>
         </div>
         
         <!-- סקירה כללית -->
-        <div class="content-section" id="overviewSection">
+        <div class="content-section" id="overviewSection" data-section="overviewSection">
             <div class="section-header">
                 <h3>📈 סקירת גרפים</h3>
                 <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('overviewSection')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
@@ -83,7 +84,7 @@
                     <div class="col-md-3 mb-3">
                         <div class="card text-center">
                             <div class="card-body">
-                                <i class="fas fa-chart-bar fa-2x text-primary mb-2"></i>
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                 <h5 class="card-title" id="totalCharts">0</h5>
                                 <p class="card-text">סה"כ גרפים</p>
                             </div>
@@ -93,7 +94,7 @@
                     <div class="col-md-3 mb-3">
                         <div class="card text-center">
                             <div class="card-body">
-                                <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                 <h5 class="card-title" id="activeCharts">0</h5>
                                 <p class="card-text">גרפים פעילים</p>
                             </div>
@@ -103,7 +104,7 @@
                     <div class="col-md-3 mb-3">
                         <div class="card text-center">
                             <div class="card-body">
-                                <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                 <h5 class="card-title" id="errorCharts">0</h5>
                                 <p class="card-text">גרפים עם שגיאות</p>
                             </div>
@@ -113,7 +114,7 @@
                     <div class="col-md-3 mb-3">
                         <div class="card text-center">
                             <div class="card-body">
-                                <i class="fas fa-memory fa-2x text-info mb-2"></i>
+                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                 <h5 class="card-title" id="memoryUsage">0MB</h5>
                                 <p class="card-text">שימוש זיכרון</p>
                             </div>
@@ -124,7 +125,7 @@
         </div>
         
         <!-- ניהול גרפים -->
-        <div class="content-section" id="managementSection">
+        <div class="content-section" id="managementSection" data-section="managementSection">
             <div class="section-header">
                 <h3>🔧 ניהול גרפים</h3>
                 <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('managementSection')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
@@ -134,7 +135,7 @@
                     <div class="col-12">
                         <button data-button-type="ADD" data-entity-type="chart" data-variant="full" data-onclick="createNewChart()" data-text="צור גרף חדש" title="צור גרף חדש"></button>
                         <button data-button-type="REFRESH" data-onclick="refreshAllCharts()" data-text="רענן">
-                            <i class="fas fa-sync"></i> רענן הכל
+                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רענן הכל
                         </button>
                         <button data-button-type="DELETE" data-onclick="destroyAllCharts()" data-text="מחק הכל" title="מחק כל הגרפים">
                         </button>
@@ -151,25 +152,25 @@
                                 <div class="row mb-3">
                                     <div class="col-12">
                                         <button class="btn btn-primary btn-sm me-2 mb-2" data-onclick="createTestChart()">
-                                            <i class="fas fa-plus"></i> גרף בדיקה
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> גרף בדיקה
                                         </button>
                                         <button class="btn btn-info btn-sm me-2 mb-2" data-onclick="createPerformanceChart()">
-                                            <i class="fas fa-chart-line"></i> גרף ביצועים
+                                            <img src="/trading-ui/images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon"> גרף ביצועים
                                         </button>
                                         <button class="btn btn-success btn-sm me-2 mb-2" data-onclick="createAccountChart()">
-                                            <i class="fas fa-users"></i> גרף חשבונות
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> גרף חשבונות
                                         </button>
                                         <button class="btn btn-warning btn-sm me-2 mb-2" data-onclick="createMixedChart()">
-                                            <i class="fas fa-layer-group"></i> גרף מעורב
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> גרף מעורב
                                         </button>
                                         <button class="btn btn-secondary btn-sm me-2 mb-2" data-onclick="updateTestChart()">
-                                            <i class="fas fa-sync"></i> עדכן נתונים
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> עדכן נתונים
                                         </button>
                                         <button data-button-type="VIEW" data-onclick="exportTestChart()" data-classes="btn btn-outline-primary">
-                                            <i class="fas fa-download"></i> ייצא גרף
+                                            <img src="/trading-ui/images/icons/tabler/download.svg" width="16" height="16" alt="download" class="icon"> ייצא גרף
                                         </button>
                                         <button data-button-type="DELETE" data-onclick="destroyTestChart()" data-classes="btn btn-outline-danger">
-                                            <i class="fas fa-trash"></i> מחק גרף
+                                            <img src="/trading-ui/images/icons/tabler/trash.svg" width="16" height="16" alt="trash" class="icon"> מחק גרף
                                         </button>
                                     </div>
                                 </div>
@@ -200,7 +201,7 @@
         </div>
         
         <!-- הגדרות מערכת -->
-        <div class="content-section" id="settingsSection">
+        <div class="content-section" id="settingsSection" data-section="settingsSection">
             <div class="section-header">
                 <h3>⚙️ הגדרות מערכת</h3>
                 <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('settingsSection')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>

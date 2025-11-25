@@ -110,7 +110,7 @@ const utils = {
     if (!element) {return;}
 
     if (show) {
-      element.innerHTML = '🔄 טוען...';
+      element.innerHTML = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin me-1"> טוען...';
       element.classList.add('loading');
       element.disabled = true;
     } else {
@@ -120,9 +120,9 @@ const utils = {
       if (elementId.includes('start-scheduler')) {
         element.innerHTML = '▶️ הפעל Scheduler';
       } else if (elementId.includes('stop-scheduler')) {
-        element.innerHTML = '⏹️ עצור Scheduler';
+        element.innerHTML = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1"> עצור Scheduler';
       } else if (elementId.includes('refresh-')) {
-        element.innerHTML = '🔄 רענן';
+        element.innerHTML = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1"> רענן';
       }
     }
   },
@@ -431,7 +431,7 @@ const modalManager = {
     modalTaskName.textContent = `פרטי משימה: ${taskName}`;
 
     // Show loading
-    modalDetails.innerHTML = '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> טוען פרטים...</div>';
+    modalDetails.innerHTML = '<div class="loading-message"><img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin me-1"> טוען פרטים...</div>';
 
     try {
       // Get task details

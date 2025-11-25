@@ -1103,7 +1103,7 @@ async function startFileScan() {
     const scanButton = document.getElementById('startScan');
     if (scanButton) {
         scanButton.disabled = true;
-        scanButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> סורק... 0%';
+        scanButton.innerHTML = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> סורק... 0%';
     }
     
     // Reset all counters to 0
@@ -1262,7 +1262,7 @@ async function performScan() {
         const scanButton = document.getElementById('startScan');
         if (scanButton) {
             scanButton.disabled = false;
-            scanButton.innerHTML = '<i class="fas fa-search"></i> סרוק קבצים';
+            scanButton.innerHTML = '<img src="/trading-ui/images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon me-1"> סרוק קבצים';
         }
         
         return; // Stop the scanning process
@@ -1557,7 +1557,7 @@ function updateRealtimeProgress() {
         // Update scan button text with progress
         const scanButton = document.getElementById('startScan');
         if (scanButton) {
-            scanButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i> סורק... ${progress}%`;
+            scanButton.innerHTML = `<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> סורק... ${progress}%`;
         }
         
         // Add progress log entry every 10 files or at completion
@@ -3058,13 +3058,13 @@ function startMonitoring() {
     
     if (startBtn) {
             startBtn.disabled = true;
-        startBtn.innerHTML = '<i class="fas fa-play"></i> פועל...';
+        startBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="play" class="icon me-1"> פועל...';
         startBtn.className = 'btn btn-success btn-sm';
     }
     
     if (stopBtn) {
         stopBtn.disabled = false;
-        stopBtn.innerHTML = '<i class="fas fa-stop"></i> עצור';
+        stopBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1"> עצור';
         stopBtn.className = 'btn btn-danger btn-sm';
     }
     
@@ -3084,13 +3084,13 @@ function stopMonitoring() {
     
     if (startBtn) {
         startBtn.disabled = false;
-        startBtn.innerHTML = '<i class="fas fa-play"></i> התחל';
+        startBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="play" class="icon me-1"> התחל';
         startBtn.className = 'btn btn-success btn-sm';
     }
     
     if (stopBtn) {
             stopBtn.disabled = true;
-        stopBtn.innerHTML = '<i class="fas fa-stop"></i> עצור';
+        stopBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1"> עצור';
         stopBtn.className = 'btn btn-secondary btn-sm';
     }
     

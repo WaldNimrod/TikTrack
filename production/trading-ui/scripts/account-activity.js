@@ -982,7 +982,6 @@ function getSubtypeDisplay(subtype) {
     // Execution subtypes
     'buy': 'קנייה',
     'sell': 'מכירה',
-    'sale': 'מכירה',
   };
 
   return translations[subtype] || subtype || '-';
@@ -1060,8 +1059,8 @@ function normalizeAmountBySubtype(amount, type, subtype) {
       return -Math.abs(amountNum);
     }
 
-    // Sell/Sale - always positive (money coming in)
-    if (subTypeValue === 'sell' || subTypeValue === 'sale' ||
+    // Sell/Short/Cover - always positive (money coming in)
+    if (subTypeValue === 'sell' || subTypeValue === 'short' || subTypeValue === 'cover' ||
             subTypeValue === 'מכירה') {
       return Math.abs(amountNum);
     }

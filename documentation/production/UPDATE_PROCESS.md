@@ -8,7 +8,7 @@
 
 **🆕 עדכון 1.3.7.0:** מערכת עדכון מלאה עם ניהול שרת, זיהוי מיגרציות אוטומטי, תמיכה מלאה ב-PostgreSQL, ובדיקות E2E בדפדפן
 
-**🆕 עדכון 1.4.0:** הסרת אזכורים ל-SQLite מהתיעוד - המערכת עברה ל-PostgreSQL. הוספת סעיף על בדיקת צורך במיגרציות (ידני).
+**🆕 עדכון 1.4.0:** המערכת משתמשת ב-PostgreSQL בלבד (ללא SQLite). כל התיעוד והסקריפטים עודכנו בהתאם.
 
 **🆕 עדכון 1.3.7.0:** הוספת בדיקות E2E בדפדפן, שיפור ניהול שרת, ותמיכה מלאה ב-PostgreSQL.
 
@@ -314,10 +314,10 @@ git checkout production
 ```bash
 # בדוק את ההגדרות
 cd production/Backend
-python3 -c "from config.settings import UI_DIR, DATABASE_URL, PORT, IS_PRODUCTION, USING_SQLITE; \
+python3 -c "from config.settings import UI_DIR, DATABASE_URL, PORT, IS_PRODUCTION; \
     print(f'UI: {UI_DIR}'); \
     print(f'DB: {DATABASE_URL[:50]}...'); \
-    print(f'Using SQLite: {USING_SQLITE}'); \
+    print(f'Database Type: PostgreSQL'); \
     print(f'Port: {PORT}'); \
     print(f'Production: {IS_PRODUCTION}')"
 ```
@@ -335,7 +335,7 @@ Production: True
 1. **תקן `production/Backend/config/settings.py`:**
    - ודא ש-`IS_PRODUCTION = True` (hardcoded)
    - ודא ש-`PORT = 5001` (hardcoded)
-   - ודא ש-`DATABASE_URL` מצביע על PostgreSQL (לא SQLite)
+   - ודא ש-`DATABASE_URL` מצביע על PostgreSQL
    - ודא ש-`UI_DIR` מצביע על `production/trading-ui`
 
 2. **תקן `production/Backend/config/logging.py`:**
@@ -423,10 +423,10 @@ python3 scripts/sync_verifier.py
 
 ```bash
 cd production/Backend
-python3 -c "from config.settings import UI_DIR, DATABASE_URL, PORT, IS_PRODUCTION, USING_SQLITE; \
+python3 -c "from config.settings import UI_DIR, DATABASE_URL, PORT, IS_PRODUCTION; \
     print(f'UI: {UI_DIR}'); \
     print(f'DB: {DATABASE_URL[:50]}...'); \
-    print(f'Using SQLite: {USING_SQLITE}'); \
+    print(f'Database Type: PostgreSQL'); \
     print(f'Port: {PORT}'); \
     print(f'Production: {IS_PRODUCTION}')"
 ```
@@ -800,9 +800,9 @@ git commit -m "Resolve merge conflicts"
 ```bash
 # בדוק את ההגדרות
 cd production/Backend
-python3 -c "from config.settings import DATABASE_URL, UI_DIR, PORT, IS_PRODUCTION, USING_SQLITE; \
+python3 -c "from config.settings import DATABASE_URL, UI_DIR, PORT, IS_PRODUCTION; \
     print(f'DB: {DATABASE_URL[:50]}...'); \
-    print(f'Using SQLite: {USING_SQLITE}'); \
+    print(f'Database Type: PostgreSQL'); \
     print(f'UI: {UI_DIR}'); \
     print(f'Port: {PORT}'); \
     print(f'Production: {IS_PRODUCTION}')"
@@ -891,7 +891,7 @@ python3 scripts/production-update/steps/11_update_server.py
 - [ ] **ההגדרות ב-`production/Backend/config/settings.py` נכונות (hardcoded production)**
 - [ ] **ההגדרות ב-`production/Backend/config/logging.py` נכונות (logs directory)**
 - [ ] UI_DIR מצביע על `production/trading-ui`
-- [ ] DATABASE_URL מצביע על PostgreSQL (לא SQLite)
+- [ ] DATABASE_URL מצביע על PostgreSQL
 - [ ] PORT = 5001 (hardcoded)
 - [ ] IS_PRODUCTION = True (hardcoded)
 - [ ] **כל המיגרציות רצו בהצלחה** (אם היו)
@@ -1021,9 +1021,9 @@ echo "🎉 Production update completed successfully!"
 
 ## 📝 שינויים בגרסה 1.4.0
 
-- ✅ **הסרת אזכורים ל-SQLite:** עדכון התיעוד - המערכת עברה ל-PostgreSQL
-- ✅ **בדיקת מיגרציות:** הוספת סעיף על בדיקת צורך במיגרציות (ידני - עכשיו אוטומטי!)
-- ✅ **עדכון בדיקות הגדרות:** שינוי מ-`DB_PATH` ל-`DATABASE_URL` ו-`USING_SQLITE`
+- ✅ **PostgreSQL בלבד:** המערכת משתמשת ב-PostgreSQL בלבד (ללא SQLite)
+- ✅ **בדיקת מיגרציות:** זיהוי אוטומטי של מיגרציות נדרשות
+- ✅ **עדכון בדיקות הגדרות:** שימוש ב-`DATABASE_URL` עם PostgreSQL
 
 ## 📝 שינויים בגרסה 1.3.0
 

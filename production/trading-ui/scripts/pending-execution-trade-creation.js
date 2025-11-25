@@ -96,13 +96,6 @@
           return;
         }
 
-        window.Logger?.info('🔄 [PendingExecutionTradeCreation] refreshClusters called', {
-          source,
-          force,
-          hasRenderAction: typeof window.renderAction === 'function',
-          renderActionType: typeof window.renderAction,
-          windowRenderAction: window.renderAction ? window.renderAction.toString().substring(0, 100) : 'not found'
-        });
 
         this.state.isLoading = true;
         this.state.error = null;
@@ -125,21 +118,6 @@
 
         const clusters = Array.isArray(payload.data) ? payload.data : [];
         
-        // LOG: Debug API response
-        window.Logger?.info('📡 [PendingExecutionTradeCreation] API response received', {
-          clusterCount: clusters.length,
-          firstCluster: clusters[0] ? {
-            clusterId: clusters[0].cluster_id,
-            side: clusters[0].side,
-            executionCount: (clusters[0].executions || []).length,
-            firstExecution: clusters[0].executions?.[0] ? {
-              id: clusters[0].executions[0].id,
-              action: clusters[0].executions[0].action,
-              normalized_action: clusters[0].executions[0].normalized_action
-            } : null
-          } : null
-        });
-        
         this.state.clusters = clusters;
         this.state.clusterMap = new Map(clusters.map(cluster => [cluster.cluster_id, cluster]));
         this.state.selection = new Map(
@@ -150,7 +128,6 @@
         );
         this.state.lastFetchedAt = Date.now();
 
-        window.Logger?.info('✅ [PendingExecutionTradeCreation] State updated, calling render functions');
         this.renderExecutionsSection();
         this.renderDashboardWidget();
       } catch (error) {
@@ -329,28 +306,26 @@
       const card = document.createElement('div');
       card.className = 'card trade-create-cluster-card mb-3';
       card.dataset.clusterId = cluster.cluster_id;
+      card.style.position = 'relative'; // For overlay positioning
 
       const summary = this.computeSelectionSummary(cluster, selectedIds);
+      const dateRange = cluster.stats?.date_range || {};
+      const totalValueDisplay = summary.totalValue ? `$${summary.totalValue.toFixed(2)}` : '-';
+      const averagePriceDisplay = summary.averagePrice ? `$${summary.averagePrice.toFixed(4)}` : '-';
+      const dateRangeText = dateRange.start ? this.renderDateRange(dateRange) : '';
 
       card.innerHTML = `
-        <div class=\"card-body\">
-          <div class=\"d-flex flex-wrap align-items-start gap-3\">
-            <div class=\"flex-grow-1\">
-              <div class=\"d-flex flex-wrap align-items-center gap-2 trade-create-cluster-header\">
+        <div class="card-body">
+          <div class="d-flex flex-wrap align-items-start gap-3">
+            <div class="flex-grow-1">
+              <div class="d-flex flex-wrap align-items-center gap-2 trade-create-cluster-header">
                 ${this.renderTickerBadge(cluster)}
                 ${this.renderAccountBadge(cluster)}
-                <span class=\"badge ${cluster.side === 'long' ? 'badge-long' : 'badge-short'}\">${cluster.side === 'long' ? 'לונג' : 'שורט'}</span>
-                <span class=\"text-muted small\">${cluster.stats.execution_count} ביצועים</span>
-              </div>
-              <div class=\"trade-create-summary mt-2\" data-cluster-summary=\"${cluster.cluster_id}\">
-                ${this.renderSummaryBadge('כמות', summary.totalQuantity.toLocaleString('en-US'))}
-                ${this.renderSummaryBadge('שווי', `$${summary.totalValue.toFixed(2)}`)}
-                ${this.renderSummaryBadge('מחיר ממוצע', summary.averagePrice ? `$${summary.averagePrice.toFixed(4)}` : '-')}
-                ${this.renderSummaryBadge('עלות עמלה', `$${summary.totalFee.toFixed(2)}`)}
-                ${this.renderSummaryBadge('נבחרו', `${summary.selectedCount}/${cluster.stats.execution_count}`)}
+                <span class="badge ${cluster.side === 'long' ? 'badge-long' : 'badge-short'}">${cluster.side === 'long' ? 'לונג' : 'שורט'}</span>
+                <span class="text-muted small">${cluster.stats.execution_count} ביצועים</span>
               </div>
             </div>
-            <div class=\"trade-create-actions d-flex flex-column gap-2 align-items-end\">
+            <div class="trade-create-actions d-flex gap-2 align-items-center">
               <button
                 data-button-type="APPROVE"
                 data-variant="small"
@@ -380,11 +355,31 @@
               </button>
             </div>
           </div>
-          <div class=\"trade-create-executions-table mt-3\">
-            ${this.renderExecutionsTable(cluster, selectedIds)}
+          <!-- Execution details - shown on hover -->
+          <div class="trade-create-cluster-details" data-role="cluster-details" data-cluster-id="${cluster.cluster_id}">
+            <div class="trade-create-summary mt-2 mb-3">
+              ${this.renderSummaryBadge('כמות', summary.totalQuantity.toLocaleString('en-US'))}
+              ${this.renderSummaryBadge('שווי', totalValueDisplay)}
+              ${this.renderSummaryBadge('מחיר ממוצע', averagePriceDisplay)}
+              ${this.renderSummaryBadge('עלות עמלה', `$${summary.totalFee.toFixed(2)}`)}
+              ${this.renderSummaryBadge('נבחרו', `${summary.selectedCount}/${cluster.stats.execution_count}`)}
+              ${dateRangeText ? `<span class="badge bg-body-secondary text-body trade-create-summary-badge">טווח: ${dateRangeText}</span>` : ''}
+            </div>
+            <div class="trade-create-executions-table">
+              ${this.renderExecutionsTable(cluster, selectedIds)}
+            </div>
           </div>
         </div>
       `;
+
+      // Add hover handlers for overlay effect
+      card.addEventListener('mouseenter', () => {
+        card.classList.add('is-hovered');
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        card.classList.remove('is-hovered');
+      });
 
       return card;
     },
@@ -481,15 +476,17 @@
     renderExecutionsTable(cluster, selectedIds) {
       const FieldRenderer = window.FieldRendererService;
 
-      // LOG: Debug rendering
-      window.Logger?.info('🔍 [PendingExecutionTradeCreation] renderExecutionsTable called', {
-        clusterId: cluster.cluster_id,
-        executionCount: (cluster.executions || []).length,
-        hasRenderAction: typeof window.renderAction === 'function',
-        hasFieldRenderer: !!FieldRenderer
+      // Sort executions by date (oldest first)
+      const sortedExecutions = [...(cluster.executions || [])].sort((a, b) => {
+        const dateA = this._getExecutionDateValue(a.date);
+        const dateB = this._getExecutionDateValue(b.date);
+        if (!dateA && !dateB) return 0;
+        if (!dateA) return 1;
+        if (!dateB) return -1;
+        return dateA - dateB;
       });
 
-      const rows = (cluster.executions || []).map(execution => {
+      const rows = sortedExecutions.map(execution => {
         const executionId = execution.id;
         const isChecked = selectedIds.has(executionId);
         const price = typeof FieldRenderer?.renderAmount === 'function'
@@ -500,8 +497,11 @@
           ? FieldRenderer.renderShares(execution.quantity)
           : execution.quantity;
 
-        const executionDate = FieldRenderer?.renderDateShort?.(execution.date)
-          || FieldRenderer?.renderDate?.(execution.date, false)
+        // Use renderExecutionDate for consistent date formatting (same as main executions table)
+        const executionDate = FieldRenderer?.renderExecutionDate?.(execution.date)
+          || window.renderExecutionDate?.(execution.date)
+          || FieldRenderer?.renderDate?.(execution.date, true)
+          || window.renderDate?.(execution.date, true)
           || execution.date?.display
           || execution.date?.local
           || execution.date?.utc
@@ -511,30 +511,17 @@
         const valueDisplay = execution.value ? `$${execution.value.toFixed(2)}` : '-';
         const feeDisplay = execution.fee ? `$${Number(execution.fee).toFixed(2)}` : '$0.00';
 
-        // LOG: Debug action rendering
-        const actionValue = execution.normalized_action || execution.action;
-        const actionDisplay = window.renderAction 
-          ? window.renderAction(actionValue)
-          : (() => {
-              const action = ((actionValue || '').trim()).toLowerCase();
-              if (!action) return '<span class="badge badge-secondary">-</span>';
-              const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
-              const actionHebrew = actionTranslations[action] || action;
-              const positiveActions = new Set(['buy', 'short']);
-              const colorClass = positiveActions.has(action) ? ' text-success' : ' text-danger';
-              return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>`;
-            })();
+        // Render created_at date using FieldRendererService
+        const createdDate = FieldRenderer?.renderDate?.(execution.created_at, false)
+          || window.renderDate?.(execution.created_at, false)
+          || execution.created_at?.display
+          || execution.created_at?.local
+          || execution.created_at?.utc
+          || execution.created_at
+          || '-';
 
-        // LOG: Debug first execution
-        if (executionId === (cluster.executions || [])[0]?.id) {
-          window.Logger?.info('🔍 [PendingExecutionTradeCreation] First execution action rendering', {
-            executionId,
-            action: actionValue,
-            actionDisplay: actionDisplay.substring(0, 100),
-            hasRenderAction: typeof window.renderAction === 'function',
-            renderActionResult: typeof window.renderAction === 'function' ? window.renderAction(actionValue) : 'N/A'
-          });
-        }
+        // Use exact same code as main executions table (executions.js line 1241)
+        const typeForFilter = ((execution.action || execution.type || '').trim()).toLowerCase();
 
         return `
           <tr data-execution-id=\"${executionId}\">
@@ -548,7 +535,18 @@
                 ${isChecked ? 'checked' : ''}>
             </td>
             <td>${executionDate}</td>
-            <td class=\"type-cell\" data-type=\"${(actionValue || 'buy').toLowerCase()}\">${actionDisplay}</td>
+            <td>${createdDate}</td>
+            <td class=\"type-cell\" data-type=\"${typeForFilter}\">
+                    ${window.renderAction ? window.renderAction(execution.action || execution.type) : (() => {
+                        const action = ((execution.action || execution.type || '').trim()).toLowerCase();
+                        if (!action) return '<span class="badge badge-secondary">-</span>';
+                        const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
+                        const actionHebrew = actionTranslations[action] || action;
+                        const positiveActions = new Set(['buy', 'short']);
+                        const colorClass = positiveActions.has(action) ? ' text-success' : ' text-danger';
+                        return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>`;
+                    })()}
+            </td>
             <td>${quantity ?? '-'}</td>
             <td>${price ?? '-'}</td>
             <td>${valueDisplay}</td>
@@ -566,6 +564,7 @@
               <tr>
                 <th class=\"text-center\" style=\"width: 48px;\"></th>
                 <th>תאריך</th>
+                <th>תאריך יצירה</th>
                 <th>פעולה</th>
                 <th>כמות</th>
                 <th>מחיר</th>
@@ -585,9 +584,23 @@
 
     renderExecutionsList(cluster) {
       const FieldRenderer = window.FieldRendererService;
-      return (cluster.executions || []).map(execution => {
-        const date = FieldRenderer?.renderDateShort?.(execution.date)
-          || FieldRenderer?.renderDate?.(execution.date, false)
+      
+      // Sort executions by date (oldest first)
+      const sortedExecutions = [...(cluster.executions || [])].sort((a, b) => {
+        const dateA = this._getExecutionDateValue(a.date);
+        const dateB = this._getExecutionDateValue(b.date);
+        if (!dateA && !dateB) return 0;
+        if (!dateA) return 1;
+        if (!dateB) return -1;
+        return dateA - dateB;
+      });
+      
+      return sortedExecutions.map(execution => {
+        // Use renderExecutionDate for consistent date formatting (same as main executions table)
+        const date = FieldRenderer?.renderExecutionDate?.(execution.date)
+          || window.renderExecutionDate?.(execution.date)
+          || FieldRenderer?.renderDate?.(execution.date, true)
+          || window.renderDate?.(execution.date, true)
           || execution.date?.display
           || execution.date?.local
           || execution.date?.utc
@@ -595,14 +608,10 @@
           || '-';
         const value = execution.value ? `$${execution.value.toFixed(2)}` : '-';
         
-        // Use window.renderAction() for consistent action display (same as main executions table)
-        const actionText = window.renderAction 
-          ? window.renderAction(execution.normalized_action || execution.action).replace(/<[^>]*>/g, '')
-          : (() => {
-              const action = ((execution.normalized_action || execution.action || '').trim()).toLowerCase();
-              const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
-              return actionTranslations[action] || action;
-            })();
+        // Use exact same code as main executions table (executions.js line 3802)
+        const actionText = window.renderAction ? 
+                               window.renderAction(execution.action || execution.type).replace(/<[^>]*>/g, '') : 
+                               (execution.action || execution.type || 'buy');
         
         return `
           <div class=\"trade-create-widget-execution d-flex justify-content-between\">
@@ -1089,6 +1098,25 @@
       if (typeof window.showEntityDetails === 'function') {
         window.showEntityDetails(executionId);
       }
+    },
+
+    /**
+     * Get numeric date value for sorting
+     * @param {string|Date|Object} date - Date value
+     * @returns {number} Timestamp for sorting
+     */
+    _getExecutionDateValue(date) {
+      if (!date) return null;
+      if (typeof date === 'object' && date.epochMs) {
+        return date.epochMs;
+      }
+      if (typeof date === 'object' && (date.utc || date.local)) {
+        return new Date(date.utc || date.local).getTime();
+      }
+      if (typeof date === 'string' || date instanceof Date) {
+        return new Date(date).getTime();
+      }
+      return null;
     }
   };
 

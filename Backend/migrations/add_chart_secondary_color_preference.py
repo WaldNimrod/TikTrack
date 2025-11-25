@@ -4,83 +4,95 @@ Add chartSecondaryColor Preference
 ===================================
 
 This script adds chartSecondaryColor preference to the preference_types table.
+Uses PostgreSQL via SQLAlchemy.
 
 Author: TikTrack Development Team
 Date: November 2025
 """
 
-import sqlite3
 import os
+import sys
 from datetime import datetime
+from pathlib import Path
+from sqlalchemy import create_engine, text
 
-def add_chart_secondary_color_preference():
-    """Add chartSecondaryColor preference to preference_types table"""
+def run_migration(database_url: str):
+    """Add chartSecondaryColor preference to preference_types table
     
-    # Database path
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(current_dir, "..", "db", "simpleTrade_new.db")
+    Args:
+        database_url: PostgreSQL database URL
     
-    if not os.path.exists(db_path):
-        print(f"❌ Database not found: {db_path}")
-        return False
-    
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    
+    Returns:
+        True if successful, False otherwise
+    """
     try:
-        print("📊 Adding chartSecondaryColor preference...")
+        engine = create_engine(database_url)
         
-        # Get chart_colors group
-        cursor.execute("SELECT id FROM preference_groups WHERE group_name = 'chart_colors'")
-        chart_colors_group = cursor.fetchone()
-        
-        if not chart_colors_group:
-            print("❌ chart_colors group not found. Please run add_chart_preferences.py first.")
-            return False
-        
-        chart_colors_group_id = chart_colors_group[0]
-        
-        # Check if preference already exists
-        cursor.execute("SELECT id FROM preference_types WHERE preference_name = 'chartSecondaryColor'")
-        if cursor.fetchone():
-            print("⚠️  chartSecondaryColor already exists, skipping")
+        with engine.begin() as conn:
+            print("📊 Adding chartSecondaryColor preference...")
+            
+            # Get chart_colors group
+            result = conn.execute(text("""
+                SELECT id FROM preference_groups WHERE group_name = 'chart_colors'
+            """))
+            chart_colors_group = result.fetchone()
+            
+            if not chart_colors_group:
+                print("❌ chart_colors group not found. Please run add_chart_preferences.py first.")
+                return False
+            
+            chart_colors_group_id = chart_colors_group[0]
+            
+            # Check if preference already exists
+            result = conn.execute(text("""
+                SELECT id FROM preference_types WHERE preference_name = 'chartSecondaryColor'
+            """))
+            if result.fetchone():
+                print("⚠️  chartSecondaryColor already exists, skipping")
+                return True
+            
+            # Insert new preference
+            conn.execute(text("""
+                INSERT INTO preference_types 
+                (group_id, data_type, preference_name, description, default_value, is_required, is_active, created_at, updated_at)
+                VALUES (:group_id, :data_type, :preference_name, :description, :default_value, :is_required, :is_active, :created_at, :updated_at)
+            """), {
+                'group_id': chart_colors_group_id,
+                'data_type': 'color',
+                'preference_name': 'chartSecondaryColor',
+                'description': 'Secondary color for charts (Orange-Red from logo)',
+                'default_value': '#fc5a06',
+                'is_required': 0,
+                'is_active': 1,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
+            })
+            
+            print("✅ Added chartSecondaryColor preference with default value #fc5a06")
             return True
-        
-        # Insert new preference
-        cursor.execute("""
-            INSERT INTO preference_types 
-            (group_id, data_type, preference_name, description, default_value, is_required, is_active, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            chart_colors_group_id,
-            'color',
-            'chartSecondaryColor',
-            'Secondary color for charts (Orange-Red from logo)',
-            '#fc5a06',
-            0,
-            1,
-            datetime.now(),
-            datetime.now()
-        ))
-        
-        conn.commit()
-        print("✅ Added chartSecondaryColor preference with default value #fc5a06")
-        
-        return True
         
     except Exception as e:
         print(f"❌ Error adding chartSecondaryColor preference: {e}")
-        conn.rollback()
+        import traceback
+        traceback.print_exc()
         return False
-        
-    finally:
-        conn.close()
 
 if __name__ == "__main__":
     print("🚀 Starting chartSecondaryColor Migration...")
     print("=" * 50)
     
-    success = add_chart_secondary_color_preference()
+    # Get database URL from config
+    current_dir = Path(__file__).parent
+    backend_dir = current_dir.parent
+    sys.path.insert(0, str(backend_dir))
+    
+    try:
+        from config.settings import DATABASE_URL
+        success = run_migration(DATABASE_URL)
+    except ImportError:
+        print("❌ Could not import DATABASE_URL from config.settings")
+        print("💡 Please provide database URL as argument or set in config")
+        success = False
     
     if success:
         print("\n✅ Migration completed successfully!")
@@ -90,5 +102,5 @@ if __name__ == "__main__":
         print("3. Test the preference via API")
     else:
         print("\n❌ Migration failed!")
-        exit(1)
+        sys.exit(1)
 

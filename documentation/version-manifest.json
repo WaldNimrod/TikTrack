@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.3.8.0",
+    "version": "1.3.9.0",
     "major": 1,
     "minor": 3,
-    "patch": 8,
+    "patch": 9,
     "build": 0,
-    "commit": "c52e595f120b222d20fcb05b126fb0b54d73f898",
-    "updated_at": "2025-11-24T14:13:24+00:00",
-    "notes": "Add comprehensive bug documentation for execution clustering issue"
+    "commit": "c944b39c4f2b04e9e22707f98d72b9628946bfe3",
+    "updated_at": "2025-11-24T23:55:08+00:00",
+    "notes": "Remove all SQLite references - PostgreSQL only"
   },
   "development": {
     "version": "1.3.33.0",

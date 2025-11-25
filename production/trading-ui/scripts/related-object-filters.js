@@ -466,7 +466,7 @@ function generateEntityTypeFilterButton(entityType, options = {}) {
   // Get icon path from LinkedItemsService or fallback
   const iconPath = (window.LinkedItemsService && window.LinkedItemsService.getLinkedItemIcon)
     ? window.LinkedItemsService.getLinkedItemIcon(entityType)
-    : '/trading-ui/images/icons/home.svg';
+    : '/trading-ui/images/icons/entities/home.svg';
   
   // Get entity label from LinkedItemsService or fallback
   const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)

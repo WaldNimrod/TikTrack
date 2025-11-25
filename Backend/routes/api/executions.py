@@ -550,15 +550,6 @@ def batch_assign_executions():
                 "data": results,
                 "version": "1.0"
             }), 500
-        
-    except Exception as e:
-        db.rollback()
-        logger.error(f"Error in batch assign: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": str(e)},
-            "version": "1.0"
-        }), 500
     finally:
         # Explicitly close the session since auto_close=False
         if db:

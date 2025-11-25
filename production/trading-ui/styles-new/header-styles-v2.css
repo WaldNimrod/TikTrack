@@ -1,0 +1,528 @@
+/* Header Styles - v7.0.0 - Complete Rewrite
+ * ==========================================
+ * 
+ * Clean, organized CSS for header system
+ * All selectors must start with #unified-header
+ * 
+ * File: trading-ui/styles-new/header-styles-v2.css
+ * Version: 7.0.0
+ * Last Updated: November 23, 2025
+ */
+
+/* ===== Base Header Styles ===== */
+#unified-header {
+    background: var(--apple-bg-elevated, #ffffff);
+    border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+    box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.05));
+    position: sticky;
+    top: 0;
+    z-index: 950;
+    width: 100%;
+}
+
+#unified-header .header-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#unified-header .header-top {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
+    position: relative;
+    min-height: 70px;
+    direction: rtl;
+    background: var(--apple-bg-elevated, #ffffff);
+    width: 100%;
+}
+
+#unified-header .header-container {
+    margin: 0 auto;
+    padding: var(--spacing-md, 16px) 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: var(--container-xl, 1400px);
+    direction: rtl;
+    overflow: visible;
+    box-sizing: border-box;
+}
+
+/* ===== Logo Styles ===== */
+#unified-header .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    direction: ltr;
+    order: 3;
+    margin-right: auto;
+}
+
+#unified-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    color: inherit;
+}
+
+#unified-header .logo:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+#unified-header .logo-image {
+    width: 125px;
+    height: 37.5px;
+    object-fit: contain;
+    display: block;
+}
+
+#unified-header .logo-text {
+    font-size: 1rem;
+    font-weight: 300;
+    color: #26baac;
+    direction: ltr;
+    text-align: left;
+    align-self: flex-end;
+    margin-bottom: -5px;
+    white-space: nowrap;
+}
+
+/* ===== Navigation Styles ===== */
+#unified-header .header-nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1;
+    direction: rtl;
+    order: 1;
+    margin-left: auto;
+}
+
+#unified-header .main-nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+    direction: rtl;
+}
+
+#unified-header .tiktrack-nav-list {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#unified-header .tiktrack-nav-item {
+    position: relative;
+}
+
+#unified-header .tiktrack-nav-item:first-child {
+    margin-right: 0;
+}
+
+#unified-header .tiktrack-nav-item:first-child .tiktrack-nav-link {
+    padding-right: 0;
+}
+
+#unified-header .tiktrack-nav-item:nth-child(2) {
+    margin-right: 0.5rem;
+}
+
+#unified-header .tiktrack-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: #26baac;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 400;
+    font-size: 16px;
+}
+
+#unified-header .tiktrack-nav-link:hover {
+    color: #1e9a8a;
+}
+
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link {
+    color: #0f766e;
+    font-weight: 600;
+}
+
+/* ===== Dropdown Menu Styles ===== */
+#unified-header .tiktrack-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 3px);
+    right: 0;
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    padding: 0.5rem 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 954;
+    list-style: none;
+}
+
+#unified-header .tiktrack-dropdown-menu[style*="opacity: 1"],
+#unified-header .tiktrack-dropdown-menu[style*="visibility: visible"] {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+#unified-header .tiktrack-dropdown-menu li {
+    list-style: none;
+}
+
+#unified-header .tiktrack-dropdown-arrow {
+    font-size: 0.75rem;
+    color: #666;
+    margin-right: 0.25rem;
+    transition: transform 0.2s ease;
+}
+
+#unified-header .tiktrack-nav-item.dropdown:hover .tiktrack-dropdown-arrow {
+    transform: rotate(90deg);
+}
+
+#unified-header .tiktrack-dropdown-item {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #29a6a8;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+#unified-header .tiktrack-dropdown-item:hover {
+    background: #f5f5f7;
+    color: #ff9e04;
+}
+
+#unified-header .separator {
+    height: 1px;
+    background: #e5e5e5;
+    margin: 0.5rem 0;
+}
+
+/* ===== Filter Toggle Button ===== */
+#unified-header .filter-toggle-section {
+    display: flex;
+    align-items: center;
+}
+
+#unified-header .filter-toggle-main {
+    order: 2;
+}
+
+#unified-header .header-filter-toggle-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: #26baac;
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+}
+
+#unified-header .header-filter-toggle-btn:hover {
+    color: #1e9a8a;
+}
+
+#unified-header .header-filter-toggle-btn.collapsed .header-filter-arrow {
+    transform: rotate(180deg);
+}
+
+/* ===== Filter Styles ===== */
+#unified-header .header-filters {
+    padding: 12px 0;
+    background: white;
+    position: relative;
+    z-index: 950;
+    min-height: 60px;
+    display: block;
+    margin-top: 0;
+}
+
+#unified-header .filters-container {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md, 16px);
+    max-width: var(--container-xl, 1400px);
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+#unified-header .filter-group {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    position: relative;
+}
+
+#unified-header .filter-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.25rem 0.9rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5.4px;
+    color: #1d1d1f;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 400;
+    min-width: 120px;
+    justify-content: space-between;
+}
+
+#unified-header .filter-toggle:hover {
+    border-color: #ff9500;
+    color: #ff9500;
+    background: white;
+}
+
+#unified-header .filter-menu {
+    position: absolute;
+    top: calc(100% + 3px);
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5.4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    padding: 0.35rem 0 0.7rem 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 951;
+    list-style: none;
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+#unified-header .filter-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    display: block;
+}
+
+#unified-header .status-filter-item,
+#unified-header .type-filter-item,
+#unified-header .account-filter-item,
+#unified-header .date-range-filter-item {
+    padding: 0.35rem 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #1d1d1f;
+    font-size: 0.9rem;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+}
+
+#unified-header .status-filter-item:hover,
+#unified-header .type-filter-item:hover,
+#unified-header .account-filter-item:hover,
+#unified-header .date-range-filter-item:hover {
+    background: #f5f5f7;
+    color: #ff9500;
+}
+
+#unified-header .status-filter-item.selected,
+#unified-header .type-filter-item.selected,
+#unified-header .account-filter-item.selected,
+#unified-header .date-range-filter-item.selected {
+    background: #f0f9ff;
+    color: #26baac;
+    font-weight: 500;
+}
+
+#unified-header .option-text {
+    flex: 1;
+}
+
+#unified-header .dropdown-arrow {
+    font-size: 0.75rem;
+    color: #666;
+    transition: transform 0.2s ease;
+}
+
+/* ===== Search Filter ===== */
+#unified-header .search-filter {
+    flex: 1;
+    max-width: 300px;
+}
+
+#unified-header .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+#unified-header .search-filter-input {
+    width: 100%;
+    padding: 0.35rem 2rem 0.35rem 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 5.4px;
+    font-size: 0.9rem;
+    font-weight: 300;
+    transition: all 0.2s ease;
+}
+
+#unified-header .search-filter-input:focus {
+    outline: none;
+    border-color: #ff9500;
+    box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+}
+
+#unified-header .search-clear-btn {
+    position: absolute;
+    left: 0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #999;
+    font-size: 1.2rem;
+    padding: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+#unified-header .search-clear-btn:hover {
+    color: #ff9500;
+}
+
+/* ===== Filter Actions ===== */
+#unified-header .filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#unified-header .reset-btn,
+#unified-header .clear-btn {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5.4px;
+    padding: 0.35rem 0.9rem;
+    cursor: pointer;
+    color: #1d1d1f;
+    font-size: 0.9rem;
+    font-weight: 400;
+    transition: all 0.2s ease;
+}
+
+#unified-header .reset-btn:hover,
+#unified-header .clear-btn:hover {
+    border-color: #ff9500;
+    color: #ff9500;
+    background: #fff5e6;
+}
+
+#unified-header .btn-text {
+    display: inline-block;
+}
+
+/* ===== Selected Value Styles ===== */
+#unified-header .selected-value {
+    flex: 1;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ===== Submenu Styles ===== */
+#unified-header .submenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-width: 240px;
+    z-index: 1000;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: none;
+}
+
+#unified-header .tiktrack-nav-item:hover .submenu {
+    display: block;
+}
+
+#unified-header .submenu li {
+    list-style: none;
+}
+
+#unified-header .submenu a {
+    display: block;
+    padding: 8px 12px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    transition: all 0.2s ease;
+}
+
+#unified-header .submenu a:hover {
+    background: #f5f5f7;
+    color: #ff9500;
+}
+
+#unified-header .submenu a:last-child {
+    border-bottom: none;
+}
+
+/* ===== Responsive Styles ===== */
+@media (max-width: 768px) {
+    #unified-header .header-container {
+        flex-wrap: wrap;
+        padding: 12px 16px;
+    }
+
+    #unified-header .tiktrack-nav-list {
+        gap: 0.5rem;
+    }
+
+    #unified-header .tiktrack-nav-link {
+        padding: 0.4rem 0.8rem;
+        font-size: 14px;
+    }
+
+    #unified-header .filters-container {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        padding: 0 16px;
+    }
+
+    #unified-header .filter-toggle {
+        min-width: 100px;
+        font-size: 0.85rem;
+    }
+}
+

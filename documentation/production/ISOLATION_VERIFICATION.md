@@ -16,8 +16,8 @@
    - אין symlinks או קישורים בין התקיות
 
 2. **בסיס נתונים נפרד**
-   - פיתוח: `Backend/db/tiktrack.db`
-   - פרודקשן: `production/Backend/db/tiktrack.db`
+   - פיתוח: PostgreSQL (`TikTrack-db-development`)
+   - פרודקשן: PostgreSQL (`TikTrack-db-prodution`)
    - אין שיתוף נתונים
 
 3. **פורט נפרד**
@@ -39,7 +39,7 @@
    - `production/Backend/config/settings.py` - hardcoded ל-production
    - `IS_PRODUCTION = True` תמיד
    - `PORT = 5001` תמיד
-   - `DB_PATH` מצביע ל-`tiktrack.db` תמיד
+   - `DATABASE_URL` מצביע ל-PostgreSQL תמיד
 
 ## בדיקות אוטומטיות
 
@@ -82,7 +82,7 @@ python3 -c "from config.settings import DB_PATH, PORT, IS_PRODUCTION; print(f'DB
 
 **תוצאה צפויה:**
 ```
-DB: /path/to/production/Backend/db/tiktrack.db
+DB: PostgreSQL (TikTrack-db-prodution)
 Port: 5001
 Production: True
 ```
@@ -150,7 +150,7 @@ curl http://localhost:5001/api/health
 
 ```bash
 # בדיקה - לא אמור למצוא תוצאות (חוץ מ-scripts)
-grep -r "tiktrack.db" production/Backend --include="*.py" | grep -v "create_production_db\|backup_database\|Development Team"
+grep -r "sqlite\|\.db\|tiktrack\.db" production/Backend --include="*.py" | grep -v "deprecated\|legacy\|Development Team" || echo "✅ No SQLite references found"
 ```
 
 ### ✅ אין imports מ-dev Backend

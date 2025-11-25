@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="tradingview-widgets-showcase-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>תצוגת ווידג'טים של TradingView - TikTrack</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- System CSS -->
+    <link rel="stylesheet" href="styles-new/master.css">
+    <link rel="stylesheet" href="styles-new/header-styles.css">
+    
+    <style>
+        .widget-section {
+            margin-bottom: 3rem;
+            padding: 1.5rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background: #fff;
+        }
+        
+        .widget-section h2 {
+            color: #26baac;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .widget-section h3 {
+            color: #fc5a06;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .widget-description {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border-right: 3px solid #26baac;
+        }
+        
+        .widget-description ul {
+            margin: 0.5rem 0 0 1.5rem;
+            padding: 0;
+        }
+        
+        .widget-description li {
+            margin: 0.25rem 0;
+        }
+        
+        .widget-params {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .widget-params table {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        
+        .widget-params th {
+            background: #f8f9fa;
+            padding: 0.5rem;
+            text-align: right;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .widget-params td {
+            padding: 0.5rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .widget-params code {
+            background: #f8f9fa;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        
+        .widget-container {
+            margin-top: 1rem;
+            min-height: 300px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 0.5rem;
+            background: #fff;
+        }
+        
+        .widget-container iframe {
+            width: 100%;
+            border: none;
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, #26baac 0%, #fc5a06 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .page-header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+        
+        .page-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+        
+        .note-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .note-box strong {
+            color: #856404;
+        }
+        
+        .use-case-box {
+            background: #e7f3ff;
+            border: 1px solid #26baac;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .use-case-box strong {
+            color: #26baac;
+        }
+    </style>
+</head>
+<body class="tradingview-widgets-showcase-page">
+    <!-- Header System -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <div class="main-content">
+                <!-- Top Section: Page Header and Info -->
+                <div class="top-section" data-section="top">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/entities/trade_plans.svg" alt="תצוגת ווידג'טים של TradingView" class="section-icon">
+                            תצוגת ווידג'טים של TradingView
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <p class="text-muted mb-3">עמוד להצגת 13 ווידג'טים של TradingView (iFrame Widgets) עם תיאור הפרמטרים</p>
+                        
+                        <!-- Note -->
+                        <div class="note-box">
+                            <strong>⚠️ הערה חשובה:</strong>
+                            <ul>
+                                <li>כל הווידג'טים הם <strong>iFrame בלבד</strong> - נטענים ישירות מ-TradingView</li>
+                                <li>כל הווידג'טים מגיעים <strong>עם נתונים היסטוריים מלאים</strong> - אבל רק לצפייה בתוך הווידג'ט</li>
+                                <li><strong>אי אפשר למשוך נתונים</strong> מהווידג'טים לשימוש בקוד שלך</li>
+                                <li><strong>אי אפשר overlay</strong> של טריידים משלך על הגרפים</li>
+                                <li>הווידג'טים מציגים נתונים בזמן אמת</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Content Section: Core System Testing -->
+                <div class="content-section" id="core-system-testing">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/entities/trade_plans.svg" alt="ממשק בדיקה - Core System" class="section-icon">
+                            ממשק בדיקה - Core System
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('core-system-testing')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="widget-section" style="background: #e7f3ff; border: 2px solid #26baac; padding: 1.5rem; border-radius: 8px;">
+                            <p>ממשק זה משתמש ב-<code>TradingViewWidgetsManager</code> ליצירה וניהול ווידג'טים</p>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <h3>יצירת ווידג'ט חדש</h3>
+                    <div class="mb-3">
+                        <label class="form-label">סוג ווידג'ט:</label>
+                        <select id="testWidgetType" class="form-select">
+                            <option value="advanced-chart">Advanced Chart</option>
+                            <option value="symbol-overview">Symbol Overview</option>
+                            <option value="mini-chart">Mini Chart</option>
+                            <option value="ticker-tape">Ticker Tape</option>
+                            <option value="market-overview">Market Overview</option>
+                            <option value="market-quotes">Market Quotes</option>
+                            <option value="economic-calendar">Economic Calendar</option>
+                            <option value="financials">Financials</option>
+                            <option value="screener">Screener</option>
+                            <option value="heatmap">Heatmap</option>
+                            <option value="symbol-profile">Symbol Profile</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">סמל (Symbol):</label>
+                        <input type="text" id="testWidgetSymbol" class="form-control" value="NASDAQ:AAPL" placeholder="NASDAQ:AAPL">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">מזהה קונטיינר (אופציונלי):</label>
+                        <input type="text" id="testWidgetContainerId" class="form-control" placeholder="אוטומטי אם ריק">
+                    </div>
+                    <button id="testCreateWidget" class="btn btn-primary">צור ווידג'ט</button>
+                    <button id="testRefreshAll" class="btn btn-secondary ms-2">רענן כל הווידג'טים</button>
+                </div>
+                <div class="col-md-6">
+                    <h3>מידע על המערכת</h3>
+                    <div id="testSystemInfo" class="p-3 bg-light rounded">
+                        <p><strong>סטטוס:</strong> <span id="testSystemStatus">טוען...</span></p>
+                        <p><strong>מספר ווידג'טים:</strong> <span id="testWidgetsCount">0</span></p>
+                        <p><strong>Theme:</strong> <span id="testTheme">-</span></p>
+                        <p><strong>Locale:</strong> <span id="testLocale">-</span></p>
+                        <p><strong>צבעים פעילים:</strong></p>
+                        <div id="testColors" class="small"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <h3>ווידג'טים שנוצרו (Core System)</h3>
+                <div id="testWidgetsContainer" class="widget-container" style="min-height: 200px;">
+                    <p class="text-muted">אין ווידג'טים שנוצרו עדיין. השתמש בטופס למעלה ליצירת ווידג'ט.</p>
+                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Content Section: Widgets Showcase -->
+                <div class="content-section" id="widgets-showcase">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/entities/trade_plans.svg" alt="ווידג'טים של TradingView" class="section-icon">
+                            ווידג'טים של TradingView
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('widgets-showcase')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Widget 1: Advanced Real-Time Chart -->
+                        <div class="widget-section" id="widget-advanced-chart">
+                            <h2>1. Advanced Real-Time Chart Widget (הגרף המלא) ⭐ הכי פופולרי</h2>
+                            <div class="widget-description">
+                <p><strong>מה הוא עושה:</strong></p>
+                <ul>
+                    <li>גרף מלא כמו באתר TradingView (candles, indicators, overlays)</li>
+                    <li>נתונים היסטוריים מובנים (אתה לא צריך להביא)</li>
+                    <li>שליטה על סימול, טווח זמן, אינדיקטורים בסיסיים</li>
+                    <li>RTL עובד</li>
+                    <li>התאמה חלקית עם פרמטרים</li>
+                </ul>
+                <p><strong>מגבלות:</strong></p>
+                <ul>
+                    <li>אי אפשר למשוך ממנו נתונים</li>
+                    <li>אי אפשר overlay של טריידים משלך</li>
+                    <li>iFrame סגור</li>
+                </ul>
+            </div>
+            
+            <div class="use-case-box">
+                <strong>🔵 מתאים ל-TikTrack:</strong> לשימוש כגרף מרכזי טרייד
+            </div>
+            
+            <h3>פרמטרים זמינים:</h3>
+            <div class="widget-params">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>פרמטר</th>
+                            <th>סוג</th>
+                            <th>תיאור</th>
+                            <th>דוגמה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>symbol</code></td>
+                            <td>string</td>
+                            <td>סמל המניה/נכס (פורמט: EXCHANGE:SYMBOL)</td>
+                            <td>NASDAQ:AAPL</td>
+                        </tr>
+                        <tr>
+                            <td><code>interval</code></td>
+                            <td>string</td>
+                            <td>מרווח זמן (1, 5, 15, 60, D, W, M)</td>
+                            <td>D</td>
+                        </tr>
+                        <tr>
+                            <td><code>timezone</code></td>
+                            <td>string</td>
+                            <td>אזור זמן</td>
+                            <td>Asia/Jerusalem</td>
+                        </tr>
+                        <tr>
+                            <td><code>theme</code></td>
+                            <td>string</td>
+                            <td>ערכת נושא (light, dark)</td>
+                            <td>light</td>
+                        </tr>
+                        <tr>
+                            <td><code>style</code></td>
+                            <td>string</td>
+                            <td>סגנון הגרף (1-9)</td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td><code>locale</code></td>
+                            <td>string</td>
+                            <td>שפה (he, en, es, etc.)</td>
+                            <td>he</td>
+                        </tr>
+                        <tr>
+                            <td><code>toolbar_bg</code></td>
+                            <td>string</td>
+                            <td>צבע רקע של סרגל הכלים</td>
+                            <td>#f1f3f6</td>
+                        </tr>
+                        <tr>
+                            <td><code>enable_publishing</code></td>
+                            <td>boolean</td>
+                            <td>האם לאפשר פרסום רעיונות</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td><code>hide_top_toolbar</code></td>
+                            <td>boolean</td>
+                            <td>האם להסתיר את סרגל הכלים העליון</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td><code>hide_legend</code></td>
+                            <td>boolean</td>
+                            <td>האם להסתיר את ה-legend</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td><code>save_image</code></td>
+                            <td>boolean</td>
+                            <td>האם לאפשר שמירת תמונה</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td><code>container_id</code></td>
+                            <td>string</td>
+                            <td>מזהה הקונטיינר</td>
+                            <td>tradingview_chart</td>
+                        </tr>
+                        <tr>
+                            <td><code>autosize</code></td>
+                            <td>boolean</td>
+                            <td>התאמה אוטומטית לגודל</td>
+                            <td>true</td>
+                        </tr>
+                        <tr>
+                            <td><code>width</code></td>
+                            <td>string</td>
+                            <td>רוחב הווידג'ט (אם autosize=false)</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr>
+                            <td><code>height</code></td>
+                            <td>string</td>
+                            <td>גובה הווידג'ט</td>
+                            <td>600</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>דוגמה:</h3>
+            <div class="widget-container">
+                <!-- TradingView Chart BEGIN -->
+                <div class="tradingview-widget-container">
+                    <div id="tradingview_chart_1" style="height: 600px; width: 100%;"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+                    <script type="text/javascript">
+                    new TradingView.widget({
+                        "autosize": true,
+                        "symbol": "NASDAQ:AAPL",
+                        "interval": "D",
+                        "timezone": "Asia/Jerusalem",
+                        "theme": "light",
+                        "style": "1",
+                        "locale": "he",
+                        "toolbar_bg": "#f1f3f6",
+                        "enable_publishing": false,
+                        "hide_top_toolbar": false,
+                        "hide_legend": false,
+                        "save_image": false,
+                        "container_id": "tradingview_chart_1"
+                    });
+                    </script>
+                </div>
+                <!-- TradingView Chart END -->
+            </div>
+        </div>
+        
+        <!-- Widget 2: Symbol Overview -->
+                        <div class="widget-section" id="widget-symbol-overview">
+                            <h2>2. Symbol Overview Widget (סקירת נכס)</h2>
+                            <div class="widget-description">
+                <p><strong>מה הוא עושה:</strong></p>
+                <ul>
+                    <li>גרף קטן + מידע בסיסי על הנכס</li>
+                    <li>נתוני Open / High / Low / Close</li>
+                    <li>שינוי יומי</li>
+                    <li>שוק, סימול, שם</li>
+                </ul>
+            </div>
+            
+            <div class="use-case-box">
+                <strong>🟠 מתאים ל-TikTrack:</strong> Widget צדדי במסכי טרייד פתוח / דשבורד
+            </div>
+            
+            <h3>פרמטרים זמינים:</h3>
+            <div class="widget-params">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>פרמטר</th>
+                            <th>סוג</th>
+                            <th>תיאור</th>
+                            <th>דוגמה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>symbol</code></td>
+                            <td>string</td>
+                            <td>סמל המניה/נכס</td>
+                            <td>NASDAQ:AAPL</td>
+                        </tr>
+                        <tr>
+                            <td><code>width</code></td>
+                            <td>string</td>
+                            <td>רוחב הווידג'ט</td>
+                            <td>350</td>
+                        </tr>
+                        <tr>
+                            <td><code>height</code></td>
+                            <td>string</td>
+                            <td>גובה הווידג'ט</td>
+                            <td>400</td>
+                        </tr>
+                        <tr>
+                            <td><code>dateRange</code></td>
+                            <td>string</td>
+                            <td>טווח תאריכים (1D, 5D, 1M, 3M, 6M, YTD, 1Y, ALL)</td>
+                            <td>1M</td>
+                        </tr>
+                        <tr>
+                            <td><code>colorTheme</code></td>
+                            <td>string</td>
+                            <td>ערכת נושא (light, dark)</td>
+                            <td>light</td>
+                        </tr>
+                        <tr>
+                            <td><code>isTransparent</code></td>
+                            <td>boolean</td>
+                            <td>רקע שקוף</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td><code>locale</code></td>
+                            <td>string</td>
+                            <td>שפה</td>
+                            <td>he</td>
+                        </tr>
+                        <tr>
+                            <td><code>largeChartUrl</code></td>
+                            <td>string</td>
+                            <td>קישור לגרף המלא (לחיצה על הגרף)</td>
+                            <td>https://www.tradingview.com/chart/</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>דוגמה:</h3>
+            <div class="widget-container">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js" async>
+                    {
+                        "symbols": [
+                            {
+                                "proName": "NASDAQ:AAPL",
+                                "title": "Apple Inc."
+                            }
+                        ],
+                        "chartOnly": false,
+                        "width": "100%",
+                        "height": "400",
+                        "locale": "he",
+                        "colorTheme": "light",
+                        "autosize": true,
+                        "showVolume": false,
+                        "hideDateRanges": false,
+                        "scalePosition": "right",
+                        "scaleMode": "Normal",
+                        "fontFamily": "-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif",
+                        "fontSize": "10",
+                        "noTimeScale": false,
+                        "valuesTracking": "1",
+                        "changeMode": "price-and-percent",
+                        "chartType": "area",
+                        "lineColor": "rgba(38, 186, 172, 1)",
+                        "bottomColor": "rgba(38, 186, 172, 0.1)",
+                        "topColor": "rgba(38, 186, 172, 0.3)",
+                        "isTransparent": false
+                    }
+                    </script>
+                </div>
+                <!-- TradingView Widget END -->
+            </div>
+        </div>
+        
+        <!-- Widget 3: Mini Chart -->
+                        <div class="widget-section" id="widget-mini-chart">
+                            <h2>3. Mini Chart Widget (גרף מיני)</h2>
+                            <div class="widget-description">
+                <p><strong>מה הוא עושה:</strong></p>
+                <ul>
+                    <li>גרף קטן בלבד</li>
+                    <li>קטן, אסתטי, טוען מהר</li>
+                </ul>
+            </div>
+            
+            <div class="use-case-box">
+                <strong>🟠 מתאים ל-TikTrack:</strong> בתצוגת רשימת נכסים, list views
+            </div>
+            
+            <h3>פרמטרים זמינים:</h3>
+            <div class="widget-params">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>פרמטר</th>
+                            <th>סוג</th>
+                            <th>תיאור</th>
+                            <th>דוגמה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>symbol</code></td>
+                            <td>string</td>
+                            <td>סמל המניה/נכס</td>
+                            <td>NASDAQ:AAPL</td>
+                        </tr>
+                        <tr>
+                            <td><code>width</code></td>
+                            <td>string</td>
+                            <td>רוחב הווידג'ט</td>
+                            <td>350</td>
+                        </tr>
+                        <tr>
+                            <td><code>height</code></td>
+                            <td>string</td>
+                            <td>גובה הווידג'ט</td>
+                            <td>220</td>
+                        </tr>
+                        <tr>
+                            <td><code>dateRange</code></td>
+                            <td>string</td>
+                            <td>טווח תאריכים (1D, 5D, 1M, 3M, 6M, YTD, 1Y, ALL)</td>
+                            <td>1M</td>
+                        </tr>
+                        <tr>
+                            <td><code>colorTheme</code></td>
+                            <td>string</td>
+                            <td>ערכת נושא (light, dark)</td>
+                            <td>light</td>
+                        </tr>
+                        <tr>
+                            <td><code>isTransparent</code></td>
+                            <td>boolean</td>
+                            <td>רקע שקוף</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td><code>locale</code></td>
+                            <td>string</td>
+                            <td>שפה</td>
+                            <td>he</td>
+                        </tr>
+                        <tr>
+                            <td><code>largeChartUrl</code></td>
+                            <td>string</td>
+                            <td>קישור לגרף המלא (לחיצה על הגרף)</td>
+                            <td>https://www.tradingview.com/chart/</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>דוגמה:</h3>
+            <div class="widget-container">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+                    {
+                        "symbol": "NASDAQ:AAPL",
+                        "width": "100%",
+                        "height": "220",
+                        "dateRange": "1M",
+                        "colorTheme": "light",
+                        "isTransparent": false,
+                        "locale": "he",
+                        "largeChartUrl": ""
+                    }
+                    </script>
+                </div>
+                <!-- TradingView Widget END -->
+            </div>
+        </div>
+        
+        <!-- Widget 4: Ticker Widget -->
+                        <div class="widget-section" id="widget-ticker">
+                            <h2>4. Ticker Widget (טיקר - פס גלילה)</h2>
+                            <div class="widget-description">
+                <p><strong>מה הוא עושה:</strong></p>
+                <ul>
+                    <li>פס נע עם מחירים</li>
+                    <li>סוגים: Ticker tape (רצועה), Single ticker (נכס אחד)</li>
+                </ul>
+            </div>
+            
+            <div class="use-case-box">
+                <strong>🔴 מתאים ל-TikTrack:</strong> בדשבורד - פס גלילה בראש או בתחתית העמוד
+            </div>
+            
+            <h3>פרמטרים זמינים:</h3>
+            <div class="widget-params">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>פרמטר</th>
+                            <th>סוג</th>
+                            <th>תיאור</th>
+                            <th>דוגמה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>symbols</code></td>
+                            <td>array</td>
+                            <td>מערך של סמלי נכסים (עם proName ו-title)</td>
+                            <td>[{proName: "NASDAQ:AAPL", title: "Apple"}]</td>
+                        </tr>
+                        <tr>
+                            <td><code>colorTheme</code></td>
+                            <td>string</td>
+                            <td>ערכת נושא (light, dark)</td>
+                            <td>light</td>
+                        </tr>
+                        <tr>
+                            <td><code>isTransparent</code></td>
+                            <td>boolean</td>
+                            <td>רקע שקוף</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td><code>locale</code></td>
+                            <td>string</td>
+                            <td>שפה</td>
+                            <td>he</td>
+                        </tr>
+                        <tr>
+                            <td><code>displayMode</code></td>
+                            <td>string</td>
+                            <td>מצב תצוגה (regular, compact, adaptive)</td>
+                            <td>regular</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>דוגמה:</h3>
+            <div class="widget-container">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+                    {
+                        "symbols": [
+                            {
+                                "proName": "NASDAQ:AAPL",
+                                "title": "Apple"
+                            },
+                            {
+                                "proName": "NASDAQ:MSFT",
+                                "title": "Microsoft"
+                            },
+                            {
+                                "proName": "NASDAQ:GOOGL",
+                                "title": "Google"
+                            },
+                            {
+                                "proName": "NASDAQ:AMZN",
+                                "title": "Amazon"
+                            },
+                            {
+                                "proName": "NASDAQ:TSLA",
+                                "title": "Tesla"
+                            }
+                        ],
+                        "colorTheme": "light",
+                        "isTransparent": false,
+                        "displayMode": "regular",
+                        "locale": "he"
+                    }
+                    </script>
+                </div>
+                <!-- TradingView Widget END -->
+            </div>
+        </div>
+        
+        <!-- Widget 5: Market Overview -->
+                        <div class="widget-section" id="widget-market-overview">
+                            <h2>5. Market Overview Widget (סקירת שווקים)</h2>
+                            <div class="widget-description">
+                <p><strong>מה הוא עושה:</strong></p>
+                <ul>
+                    <li>מראה רשימת שווקים בענפים</li>
+                    <li>סקטורים, מדדים, מניות מובילות</li>
+                    <li>דומה ללוח מחירים מקצועי</li>
+                </ul>
+            </div>
+            
+            <div class="use-case-box">
+                <strong>🔴 מתאים ל-TikTrack:</strong> בדשבורד - סקירה כללית של השווקים
+            </div>
+            
+            <h3>פרמטרים זמינים:</h3>
+            <div class="widget-params">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>פרמטר</th>
+                            <th>סוג</th>
+                            <th>תיאור</th>
+                            <th>דוגמה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>colorTheme</code></td>
+                            <td>string</td>
+                            <td>ערכת נושא (light, dark)</td>
+                            <td>light</td>
+                        </tr>
+                        <tr>
+                            <td><code>dateRange</code></td>
+                            <td>string</td>
+                            <td>טווח תאריכים (1D, 5D, 1M, 3M, 6M, YTD, 1Y, ALL)</td>
+                            <td>1M</td>
+                        </tr>
+                        <tr>
+                            <td><code>showChart</code></td>
+                            <td>boolean</td>
+                            <td>הצגת גרף</td>
+                            <td>true</td>
+                        </tr>
+                        <tr>
+                            <td><code>locale</code></td>
+                            <td>string</td>
+                            <td>שפה</td>
+                            <td>he</td>
+                        </tr>
+                        <tr>
+                            <td><code>largeChartUrl</code></td>
+                            <td>string</td>
+                            <td>קישור לגרף המלא</td>
+                            <td>https://www.tradingview.com/chart/</td>
+                        </tr>
+                        <tr>
+                            <td><code>isTransparent</code></td>
+                            <td>boolean</td>
+                            <td>רקע שקוף</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td><code>width</code></td>
+                            <td>string</td>
+                            <td>רוחב</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr>
+                            <td><code>height</code></td>
+                            <td>string</td>
+                            <td>גובה</td>
+                            <td>600</td>
+                        </tr>
+                        <tr>
+                            <td><code>tabs</code></td>
+                            <td>array</td>
+                            <td>כרטיסיות להצגה (stocks, forex, crypto, etc.)</td>
+                            <td>[{title: "מניות", symbols: [...]}]</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>דוגמה:</h3>
+            <div class="widget-container">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+                    {
+                        "colorTheme": "light",
+                        "dateRange": "1M",
+                        "showChart": true,
+                        "locale": "he",
+                        "largeChartUrl": "",
+                        "isTransparent": false,
+                        "width": "100%",
+                        "height": "600",
+                        "tabs": [
+                            {
+                                "title": "מניות",
+                                "symbols": [
+                                    {
+                                        "s": "FOREXCOM:SPXUSD",
+                                        "d": "S&P 500"
+                                    },
+                                    {
+                                        "s": "FOREXCOM:NSXUSD",
+                                        "d": "NASDAQ 100"
+                                    },
+                                    {
+                                        "s": "FOREXCOM:DJI",
+                                        "d": "Dow Jones"
+                                    }
+                                ],
+                                "originalTitle": "Indices"
+                            },
+                            {
+                                "title": "מטבעות",
+                                "symbols": [
+                                    {
+                                        "s": "FX:EURUSD",
+                                        "d": "EUR/USD"
+                                    },
+                                    {
+                                        "s": "FX:GBPUSD",
+                                        "d": "GBP/USD"
+                                    },
+                                    {
+                                        "s": "FX:USDJPY",
+                                        "d": "USD/JPY"
+                                    }
+                                ],
+                                "originalTitle": "Forex"
+                            },
+                            {
+                                "title": "קריפטו",
+                                "symbols": [
+                                    {
+                                        "s": "BITSTAMP:BTCUSD",
+                                        "d": "Bitcoin"
+                                    },
+                                    {
+                                        "s": "BITSTAMP:ETHUSD",
+                                        "d": "Ethereum"
+                                    }
+                                ],
+                                "originalTitle": "Crypto"
+                            }
+                        ]
+                    }
+                    </script>
+                </div>
+                <!-- TradingView Widget END -->
+            </div>
+        </div>
+        
+        <!-- Widget 6: Market Data Widgets -->
+                        <div class="widget-section" id="widget-market-data">
+                            <h2>6. Market Data Widgets (נתוני שוק)</h2>
+                            <div class="widget-description">
+                <p><strong>מה הם עושים:</strong></p>
+                <ul>
+                    <li><strong>Market Quotes widget:</strong> רשימת נכסים + שינוי יומי, לא גרפי</li>
+                    <li><strong>Stock Market Widget:</strong> תצוגת שוק מלאה</li>
+                    <li><strong>Cryptocurrency Market Widget:</strong> תומך בקריפטו בלבד</li>
+                </ul>
+            </div>
+            
+            <h3>פרמטרים זמינים (Market Quotes):</h3>
+            <div class="widget-params">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>פרמטר</th>
+                            <th>סוג</th>
+                            <th>תיאור</th>
+                            <th>דוגמה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>colorTheme</code></td>
+                            <td>string</td>
+                            <td>ערכת נושא (light, dark)</td>
+                            <td>light</td>
+                        </tr>
+                        <tr>
+                            <td><code>locale</code></td>
+                            <td>string</td>
+                            <td>שפה</td>
+                            <td>he</td>
+                        </tr>
+                        <tr>
+                            <td><code>largeChartUrl</code></td>
+                            <td>string</td>
+                            <td>קישור לגרף המלא</td>
+                            <td>https://www.tradingview.com/chart/</td>
+                        </tr>
+                        <tr>
+                            <td><code>isTransparent</code></td>
+                            <td>boolean</td>
+                            <td>רקע שקוף</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td><code>width</code></td>
+                            <td>string</td>
+                            <td>רוחב</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr>
+                            <td><code>height</code></td>
+                            <td>string</td>
+                            <td>גובה</td>
+                            <td>600</td>
+                        </tr>
+                        <tr>
+                            <td><code>symbolsGroups</code></td>
+                            <td>array</td>
+                            <td>קבוצות של סמלים</td>
+                            <td>[{name: "מניות", symbols: [...]}]</td>
+                        </tr>
+                        <tr>
+                            <td><code>showSymbolLogo</code></td>
+                            <td>boolean</td>
+                            <td>הצגת לוגו סמל</td>
+                            <td>true</td>
+                        </tr>
+                        <tr>
+                            <td><code>plotLineColorGrowing</code></td>
+                            <td>string</td>
+                            <td>צבע קו גרף לעלייה</td>
+                            <td>#26baac</td>
+                        </tr>
+                        <tr>
+                            <td><code>plotLineColorFalling</code></td>
+                            <td>string</td>
+                            <td>צבע קו גרף לירידה</td>
+                            <td>#fc5a06</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>דוגמה (Market Quotes):</h3>
+            <div class="widget-container">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
+                    {
+                        "width": "100%",
+                        "height": "600",
+                        "symbolsGroups": [
+                            {
+                                "name": "מניות",
+                                "originalName": "Indices",
+                                "symbols": [
+                                    {
+                                        "name": "NASDAQ:AAPL",
+                                        "displayName": "Apple"
+                                    },
+                                    {
+                                        "name": "NASDAQ:MSFT",
+                                        "displayName": "Microsoft"
+                                    },
+                                    {
+                                        "name": "NASDAQ:GOOGL",
+                                        "displayName": "Google"
+                                    },
+                                    {
+                                        "name": "NASDAQ:AMZN",
+                                        "displayName": "Amazon"
+                                    },
+                                    {
+                                        "name": "NASDAQ:TSLA",
+                                        "displayName": "Tesla"
+                                    }
+                                ]
+                            }
+                        ],
+                        "showSymbolLogo": true,
+                        "colorTheme": "light",
+                        "isTransparent": false,
+                        "locale": "he"
+                    }
+                    </script>
+                </div>
+                <!-- TradingView Widget END -->
+            </div>
+        </div>
+        
+        <!-- Widget 7: Economic Calendar -->
+                        <div class="widget-section" id="widget-economic-calendar">
+                            <h2>7. Economic Calendar Widget (לוח אירועים כלכליים)</h2>
+                            <div class="widget-description">
+                <p><strong>מה הוא עושה:</strong></p>
+                <ul>
+                    <li>מציג אירועים מקרו עתידיים</li>
+                    <li>נתונים שפורסמו</li>
+                    <li>השפעה בשוק</li>
+                </ul>
+            </div>
+            
+            <div class="use-case-box">
+                <strong>🟢 מתאים ל-TikTrack:</strong> במסך מחקר - מעקב אחר אירועים כלכליים
+            </div>
+            
+            <h3>פרמטרים זמינים:</h3>
+            <div class="widget-params">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>פרמטר</th>
+                            <th>סוג</th>
+                            <th>תיאור</th>
+                            <th>דוגמה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>colorTheme</code></td>
+                            <td>string</td>
+                            <td>ערכת נושא (light, dark)</td>
+                            <td>light</td>
+                        </tr>
+                        <tr>
+                            <td><code>locale</code></td>
+                            <td>string</td>
+                            <td>שפה</td>
+                            <td>he</td>
+                        </tr>
+                        <tr>
+                            <td><code>importanceFilter</code></td>
+                            <td>string</td>
+                            <td>סינון חשיבות (-1, 0, 1, 2, 3)</td>
+                            <td>-1,0,1</td>
+                        </tr>
+                        <tr>
+                            <td><code>currencyFilter</code></td>
+                            <td>string</td>
+                            <td>סינון מטבע</td>
+                            <td>USD</td>
+                        </tr>
+                        <tr>
+                            <td><code>width</code></td>
+                            <td>string</td>
+                            <td>רוחב</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr>
+                            <td><code>height</code></td>
+                            <td>string</td>
+                            <td>גובה</td>
+                            <td>600</td>
+                        </tr>
+                        <tr>
+                            <td><code>isTransparent</code></td>
+                            <td>boolean</td>
+                            <td>רקע שקוף</td>
+                            <td>false</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>דוגמה:</h3>
+            <div class="widget-container">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+                    {
+                        "colorTheme": "light",
+                        "isTransparent": false,
+                        "width": "100%",
+                        "height": "600",
+                        "locale": "he",
+                        "importanceFilter": "-1,0,1"
+                    }
+                    </script>
+                </div>
+                <!-- TradingView Widget END -->
+            </div>
+        </div>
+        
+        <!-- Widget 8: Financials Widget -->
+                        <div class="widget-section" id="widget-financials">
+                            <h2>8. Financials Widget (נתונים פיננסיים)</h2>
+                            <div class="widget-description">
+                <p><strong>מה הוא עושה:</strong></p>
+                <ul>
+                    <li>נתונים כמו הכנסות, רווח נקי, EPS</li>
+                    <li>מידע פיננסי אמיתי, לא מחיר</li>
+                </ul>
+            </div>
+            
+            <div class="use-case-box">
+                <strong>🟢 מתאים ל-TikTrack:</strong> במסך מחקר - הצגת נתונים פיננסיים של חברות
+            </div>
+            
+            <h3>פרמטרים זמינים:</h3>
+            <div class="widget-params">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>פרמטר</th>
+                            <th>סוג</th>
+                            <th>תיאור</th>
+                            <th>דוגמה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>symbol</code></td>
+                            <td>string</td>
+                            <td>סמל המניה</td>
+                            <td>NASDAQ:AAPL</td>
+                        </tr>
+                        <tr>
+                            <td><code>colorTheme</code></td>
+                            <td>string</td>
+                            <td>ערכת נושא (light, dark)</td>
+                            <td>light</td>
+                        </tr>
+                        <tr>
+                            <td><code>locale</code></td>
+                            <td>string</td>
+                            <td>שפה</td>
+                            <td>he</td>
+                        </tr>
+                        <tr>
+                            <td><code>width</code></td>
+                            <td>string</td>
+                            <td>רוחב</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr>
+                            <td><code>height</code></td>
+                            <td>string</td>
+                            <td>גובה</td>
+                            <td>600</td>
+                        </tr>
+                        <tr>
+                            <td><code>isTransparent</code></td>
+                            <td>boolean</td>
+                            <td>רקע שקוף</td>
+                            <td>false</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>דוגמה:</h3>
+            <div class="widget-container">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-financials.js" async>
+                    {
+                        "symbol": "NASDAQ:AAPL",
+                        "colorTheme": "light",
+                        "isTransparent": false,
+                        "locale": "he",
+                        "width": "100%",
+                        "height": "600"
+                    }
+                    </script>
+                </div>
+                <!-- TradingView Widget END -->
+            </div>
+        </div>
+        
+        <!-- Widget 9: Screener Widget -->
+                        <div class="widget-section" id="widget-screener">
+                            <h2>9. Screener Widget (מסנן מניות)</h2>
+                            <div class="widget-description">
+                <p><strong>מה הוא עושה:</strong></p>
+                <ul>
+                    <li>סורק מניות בסיסי</li>
+                    <li>פילוחים לפי סקטור, שווי, טווח שינוי</li>
+                    <li>רשימות ודירוגים</li>
+                </ul>
+            </div>
+            
+            <h3>פרמטרים זמינים:</h3>
+            <div class="widget-params">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>פרמטר</th>
+                            <th>סוג</th>
+                            <th>תיאור</th>
+                            <th>דוגמה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>width</code></td>
+                            <td>string</td>
+                            <td>רוחב</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr>
+                            <td><code>height</code></td>
+                            <td>string</td>
+                            <td>גובה</td>
+                            <td>600</td>
+                        </tr>
+                        <tr>
+                            <td><code>defaultColumn</code></td>
+                            <td>string</td>
+                            <td>עמודה ברירת מחדל</td>
+                            <td>overview</td>
+                        </tr>
+                        <tr>
+                            <td><code>screener_type</code></td>
+                            <td>string</td>
+                            <td>סוג מסנן (stock_market, crypto, forex, cfd)</td>
+                            <td>stock_market</td>
+                        </tr>
+                        <tr>
+                            <td><code>displayCurrency</code></td>
+                            <td>string</td>
+                            <td>מטבע תצוגה</td>
+                            <td>USD</td>
+                        </tr>
+                        <tr>
+                            <td><code>colorTheme</code></td>
+                            <td>string</td>
+                            <td>ערכת נושא (light, dark)</td>
+                            <td>light</td>
+                        </tr>
+                        <tr>
+                            <td><code>locale</code></td>
+                            <td>string</td>
+                            <td>שפה</td>
+                            <td>he</td>
+                        </tr>
+                        <tr>
+                            <td><code>isTransparent</code></td>
+                            <td>boolean</td>
+                            <td>רקע שקוף</td>
+                            <td>false</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>דוגמה:</h3>
+            <div class="widget-container">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
+                    {
+                        "width": "100%",
+                        "height": "600",
+                        "defaultColumn": "overview",
+                        "screener_type": "stock_market",
+                        "displayCurrency": "USD",
+                        "colorTheme": "light",
+                        "locale": "he",
+                        "isTransparent": false
+                    }
+                    </script>
+                </div>
+                <!-- TradingView Widget END -->
+            </div>
+        </div>
+        
+        <!-- Widget 10: Heatmap Widget -->
+                        <div class="widget-section" id="widget-heatmap">
+                            <h2>10. Heatmap Widget (מפת חום)</h2>
+                            <div class="widget-description">
+                <p><strong>מה הוא עושה:</strong></p>
+                <ul>
+                    <li>מפת חום של השוק</li>
+                    <li>הצגה ויזואלית של ביצועי מניות לפי צבעים</li>
+                </ul>
+            </div>
+            
+            <div class="use-case-box">
+                <strong>🔴 מתאים ל-TikTrack:</strong> בדשבורד - הצגה ויזואלית של ביצועי שוק
+            </div>
+            
+            <h3>פרמטרים זמינים:</h3>
+            <div class="widget-params">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>פרמטר</th>
+                            <th>סוג</th>
+                            <th>תיאור</th>
+                            <th>דוגמה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>exchanges</code></td>
+                            <td>array</td>
+                            <td>בורסות להצגה</td>
+                            <td>["NYSE", "NASDAQ"]</td>
+                        </tr>
+                        <tr>
+                            <td><code>dataSource</code></td>
+                            <td>string</td>
+                            <td>מקור נתונים</td>
+                            <td>SPX500</td>
+                        </tr>
+                        <tr>
+                            <td><code>grouping</code></td>
+                            <td>string</td>
+                            <td>קיבוץ (sector, industry, no_grouping)</td>
+                            <td>sector</td>
+                        </tr>
+                        <tr>
+                            <td><code>blockSize</code></td>
+                            <td>string</td>
+                            <td>גודל בלוק (market_cap, volume)</td>
+                            <td>market_cap</td>
+                        </tr>
+                        <tr>
+                            <td><code>blockColor</code></td>
+                            <td>string</td>
+                            <td>צבע בלוק (change, change_percent)</td>
+                            <td>change</td>
+                        </tr>
+                        <tr>
+                            <td><code>locale</code></td>
+                            <td>string</td>
+                            <td>שפה</td>
+                            <td>he</td>
+                        </tr>
+                        <tr>
+                            <td><code>symbolUrl</code></td>
+                            <td>string</td>
+                            <td>קישור לסמל</td>
+                            <td>https://www.tradingview.com/chart/</td>
+                        </tr>
+                        <tr>
+                            <td><code>colorTheme</code></td>
+                            <td>string</td>
+                            <td>ערכת נושא (light, dark)</td>
+                            <td>light</td>
+                        </tr>
+                        <tr>
+                            <td><code>isTransparent</code></td>
+                            <td>boolean</td>
+                            <td>רקע שקוף</td>
+                            <td>false</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>דוגמה:</h3>
+            <div class="widget-container">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js" async>
+                    {
+                        "exchanges": ["NYSE", "NASDAQ"],
+                        "dataSource": "SPX500",
+                        "grouping": "sector",
+                        "blockSize": "market_cap",
+                        "blockColor": "change",
+                        "locale": "he",
+                        "symbolUrl": "",
+                        "colorTheme": "light",
+                        "isTransparent": false
+                    }
+                    </script>
+                </div>
+                <!-- TradingView Widget END -->
+            </div>
+        </div>
+        
+        <!-- Widget 11: Single Ticker Profile -->
+                        <div class="widget-section" id="widget-ticker-profile">
+                            <h2>11. Single Ticker Profile Widget (פרופיל נכס)</h2>
+                            <div class="widget-description">
+                <p><strong>מה הוא עושה:</strong></p>
+                <ul>
+                    <li>פרופיל מלא של החברה</li>
+                    <li>סקטור, דירוג אנליסטים</li>
+                    <li>מידע פיננסי, נתונים כלליים</li>
+                </ul>
+            </div>
+            
+            <h3>פרמטרים זמינים:</h3>
+            <div class="widget-params">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>פרמטר</th>
+                            <th>סוג</th>
+                            <th>תיאור</th>
+                            <th>דוגמה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>symbol</code></td>
+                            <td>string</td>
+                            <td>סמל המניה</td>
+                            <td>NASDAQ:AAPL</td>
+                        </tr>
+                        <tr>
+                            <td><code>colorTheme</code></td>
+                            <td>string</td>
+                            <td>ערכת נושא (light, dark)</td>
+                            <td>light</td>
+                        </tr>
+                        <tr>
+                            <td><code>locale</code></td>
+                            <td>string</td>
+                            <td>שפה</td>
+                            <td>he</td>
+                        </tr>
+                        <tr>
+                            <td><code>width</code></td>
+                            <td>string</td>
+                            <td>רוחב</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr>
+                            <td><code>height</code></td>
+                            <td>string</td>
+                            <td>גובה</td>
+                            <td>600</td>
+                        </tr>
+                        <tr>
+                            <td><code>isTransparent</code></td>
+                            <td>boolean</td>
+                            <td>רקע שקוף</td>
+                            <td>false</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>דוגמה:</h3>
+            <div class="widget-container">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js" async>
+                    {
+                        "symbol": "NASDAQ:AAPL",
+                        "colorTheme": "light",
+                        "locale": "he",
+                        "width": "100%",
+                        "height": "600",
+                        "isTransparent": false
+                    }
+                    </script>
+                </div>
+                <!-- TradingView Widget END -->
+            </div>
+        </div>
+        
+        <!-- Widget 12: Symbol Search -->
+                        <div class="widget-section" id="widget-symbol-search">
+                            <h2>12. Symbol Search Widget (חיפוש סמלים)</h2>
+                            <div class="widget-description">
+                <p><strong>מה הוא עושה:</strong></p>
+                <ul>
+                    <li>תיבת חיפוש לחיפוש נכסים - מניות, מטבעות, קריפטו ועוד</li>
+                    <li>מציג תוצאות בזמן אמת</li>
+                </ul>
+            </div>
+            
+            <div class="use-case-box">
+                <strong>🟠 מתאים ל-TikTrack:</strong> תיבת חיפוש בעמודים, בחירת נכס להצגה, חיפוש מהיר
+            </div>
+            
+            <h3>פרמטרים זמינים:</h3>
+            <div class="widget-params">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>פרמטר</th>
+                            <th>סוג</th>
+                            <th>תיאור</th>
+                            <th>דוגמה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>width</code></td>
+                            <td>string</td>
+                            <td>רוחב</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr>
+                            <td><code>height</code></td>
+                            <td>string</td>
+                            <td>גובה</td>
+                            <td>400</td>
+                        </tr>
+                        <tr>
+                            <td><code>symbolsTypes</code></td>
+                            <td>array</td>
+                            <td>סוגי נכסים לחיפוש</td>
+                            <td>[{name: "מניות", originalName: "Stock"}]</td>
+                        </tr>
+                        <tr>
+                            <td><code>showSymbolLogo</code></td>
+                            <td>boolean</td>
+                            <td>הצגת לוגו סמל</td>
+                            <td>true</td>
+                        </tr>
+                        <tr>
+                            <td><code>colorTheme</code></td>
+                            <td>string</td>
+                            <td>ערכת נושא (light, dark)</td>
+                            <td>light</td>
+                        </tr>
+                        <tr>
+                            <td><code>locale</code></td>
+                            <td>string</td>
+                            <td>שפה</td>
+                            <td>he</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>דוגמה:</h3>
+            <div class="widget-container">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-search.js" async>
+                    {
+                        "width": "100%",
+                        "height": "400",
+                        "symbolsTypes": [
+                            {
+                                "name": "מניות",
+                                "originalName": "Stock"
+                            },
+                            {
+                                "name": "מטבעות",
+                                "originalName": "Forex"
+                            },
+                            {
+                                "name": "קריפטו",
+                                "originalName": "Crypto"
+                            }
+                        ],
+                        "showSymbolLogo": true,
+                        "colorTheme": "light",
+                        "locale": "he"
+                    }
+                    </script>
+                </div>
+                <!-- TradingView Widget END -->
+            </div>
+        </div>
+        
+        <!-- Widget 13: Technical Analysis -->
+                        <div class="widget-section" id="widget-technical-analysis">
+                            <h2>13. Technical Analysis Widget (אנליזה טכנית)</h2>
+                            <div class="widget-description">
+                <p><strong>מה הוא עושה:</strong></p>
+                <ul>
+                    <li>סיכום אנליזה טכנית אוטומטית עם המלצות מסחר</li>
+                    <li>קנייה, מכירה, החזקה</li>
+                    <li>מבוסס על אינדיקטורים טכניים</li>
+                </ul>
+            </div>
+            
+            <div class="use-case-box">
+                <strong>🟢 מתאים ל-TikTrack:</strong> במסך מחקר - הצגת המלצות אנליזה טכנית, סיכום אינדיקטורים
+            </div>
+            
+            <h3>פרמטרים זמינים:</h3>
+            <div class="widget-params">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>פרמטר</th>
+                            <th>סוג</th>
+                            <th>תיאור</th>
+                            <th>דוגמה</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>symbol</code></td>
+                            <td>string</td>
+                            <td>סמל המניה/נכס</td>
+                            <td>NASDAQ:AAPL</td>
+                        </tr>
+                        <tr>
+                            <td><code>interval</code></td>
+                            <td>string</td>
+                            <td>מרווח זמן (1, 5, 15, 60, D, W, M)</td>
+                            <td>D</td>
+                        </tr>
+                        <tr>
+                            <td><code>width</code></td>
+                            <td>string</td>
+                            <td>רוחב</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr>
+                            <td><code>height</code></td>
+                            <td>string</td>
+                            <td>גובה</td>
+                            <td>500</td>
+                        </tr>
+                        <tr>
+                            <td><code>locale</code></td>
+                            <td>string</td>
+                            <td>שפה</td>
+                            <td>he</td>
+                        </tr>
+                        <tr>
+                            <td><code>colorTheme</code></td>
+                            <td>string</td>
+                            <td>ערכת נושא (light, dark)</td>
+                            <td>light</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>דוגמה:</h3>
+            <div class="widget-container">
+                <!-- TradingView Widget BEGIN -->
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
+                    {
+                        "symbol": "NASDAQ:AAPL",
+                        "interval": "D",
+                        "width": "100%",
+                        "height": "500",
+                        "locale": "he",
+                        "colorTheme": "light"
+                    }
+                    </script>
+                </div>
+                <!-- TradingView Widget END -->
+            </div>
+        </div>
+        
+        <!-- Summary Section -->
+                        <div class="widget-section" style="background: #e7f3ff; border: 2px solid #26baac;">
+            <h2 style="color: #26baac;">📊 סיכום: מה הכי מתאים ל-TikTrack?</h2>
+            
+            <div style="margin-top: 1.5rem;">
+                <h3 style="color: #26baac;">🔵 לשימוש כגרף מרכזי טרייד:</h3>
+                <p><strong>Advanced Real-Time Chart</strong> - הגרף המלא עם כל הפיצ'רים</p>
+                
+                <h3 style="color: #fc5a06; margin-top: 1rem;">🟠 בתצוגת רשימת נכסים:</h3>
+                <ul>
+                    <li><strong>Mini Chart</strong> - גרף קטן ברשימות</li>
+                    <li><strong>Symbol Overview</strong> - מידע בסיסי + גרף קטן</li>
+                </ul>
+                
+                <h3 style="color: #fc5a06; margin-top: 1rem;">🔴 בדשבורד:</h3>
+                <ul>
+                    <li><strong>Heatmap</strong> - מפת חום ויזואלית</li>
+                    <li><strong>Market Overview</strong> - סקירה כללית של השווקים</li>
+                    <li><strong>Ticker Tape</strong> - פס גלילה בראש או בתחתית</li>
+                </ul>
+                
+                <h3 style="color: #26baac; margin-top: 1rem;">🟢 במסך מחקר:</h3>
+                <ul>
+                    <li><strong>Economic Calendar</strong> - לוח אירועים כלכליים</li>
+                    <li><strong>Financials</strong> - נתונים פיננסיים</li>
+                    <li><strong>Single Ticker Profile</strong> - פרופיל מלא של חברה</li>
+                    <li><strong>Technical Analysis</strong> - אנליזה טכנית אוטומטית</li>
+                </ul>
+                
+                <h3 style="color: #fc5a06; margin-top: 1rem;">🔍 כלי חיפוש ובחירה:</h3>
+                <ul>
+                    <li><strong>Symbol Search</strong> - חיפוש נכסים מהיר</li>
+                </ul>
+            </div>
+        </div>
+        
+                        <!-- Footer Note -->
+                        <div class="note-box mt-4">
+                            <strong>📝 הערות חשובות:</strong>
+                            <ul>
+                                <li>כל הווידג'טים הם <strong>iFrame בלבד</strong> - נטענים ישירות מ-TradingView</li>
+                                <li>כל הווידג'טים מגיעים <strong>עם נתונים היסטוריים מלאים</strong> - אבל רק לצפייה בתוך הווידג'ט</li>
+                                <li><strong>אי אפשר למשוך נתונים</strong> מהווידג'טים לשימוש בקוד שלך</li>
+                                <li><strong>אי אפשר overlay</strong> של טריידים משלך על הגרפים</li>
+                                <li>הווידג'טים מציגים נתונים בזמן אמת</li>
+                                <li>חלק מהווידג'טים דורשים הרשאות או מנוי TradingView לשימוש מלא</li>
+                                <li>לשימוש מסחרי או ייצור, יש לבדוק את תנאי השימוש של TradingView</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Scripts -->
+    <!-- 📦 Packages: base, preferences, tradingview-widgets, init-system -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    
+    <!-- Core System Testing Script -->
+    <script>
+        (function() {
+            'use strict';
+            
+            // Wait for TradingViewWidgetsManager to be available
+            function initTestInterface() {
+                if (!window.TradingViewWidgetsManager) {
+                    setTimeout(initTestInterface, 100);
+                    return;
+                }
+
+                // Update system info
+                function updateSystemInfo() {
+                    const manager = window.TradingViewWidgetsManager;
+                    const colors = window.TradingViewWidgetsColors;
+                    
+                    document.getElementById('testSystemStatus').textContent = 
+                        manager._initialized ? '✅ פעיל' : '⏳ ממתין לאתחול';
+                    
+                    const stats = manager.getStats();
+                    document.getElementById('testWidgetsCount').textContent = stats.total;
+                    
+                    if (colors) {
+                        document.getElementById('testTheme').textContent = colors.getTheme();
+                        document.getElementById('testLocale').textContent = colors.getLocale();
+                        
+                        const chartColors = colors.getChartColors();
+                        const colorsHtml = Object.entries(chartColors).map(([key, value]) => 
+                            `<div><strong>${key}:</strong> <span style="color: ${value}">${value}</span></div>`
+                        ).join('');
+                        document.getElementById('testColors').innerHTML = colorsHtml || 'לא זמין';
+                    }
+                }
+
+                // Create widget handler
+                document.getElementById('testCreateWidget').addEventListener('click', async function() {
+                    const widgetType = document.getElementById('testWidgetType').value;
+                    const symbol = document.getElementById('testWidgetSymbol').value;
+                    const containerId = document.getElementById('testWidgetContainerId').value || undefined;
+                    
+                    try {
+                        // Prepare config based on widget type
+                        let config = {};
+                        
+                        if (widgetType === 'advanced-chart') {
+                            config = {
+                                symbol: symbol,
+                                interval: 'D',
+                                height: 500
+                            };
+                        } else if (widgetType === 'symbol-overview' || widgetType === 'mini-chart') {
+                            config = {
+                                symbol: symbol,
+                                height: widgetType === 'mini-chart' ? 220 : 400
+                            };
+                        } else if (widgetType === 'ticker-tape') {
+                            config = {
+                                symbols: [
+                                    { proName: symbol, title: symbol.split(':')[1] || symbol }
+                                ]
+                            };
+                        } else if (widgetType === 'financials' || widgetType === 'symbol-profile') {
+                            config = {
+                                symbol: symbol,
+                                height: 600
+                            };
+                        } else {
+                            config = {
+                                height: 600
+                            };
+                        }
+                        
+                        // Create widget
+                        const widget = window.TradingViewWidgetsManager.createWidget({
+                            type: widgetType,
+                            containerId: containerId,
+                            config: config
+                        });
+                        
+                        // Add container to test area
+                        const container = document.getElementById(widget.containerId || containerId);
+                        if (container) {
+                            const testContainer = document.getElementById('testWidgetsContainer');
+                            const widgetDiv = document.createElement('div');
+                            widgetDiv.className = 'mb-3 p-3 border rounded';
+                            widgetDiv.innerHTML = `
+                                <h5>${widgetType} - ${symbol}</h5>
+                                <div id="${widget.containerId || containerId}"></div>
+                                <button class="btn btn-sm btn-danger mt-2" onclick="window.TradingViewWidgetsManager.destroyWidget('${widget.containerId || containerId}'); this.parentElement.remove(); updateSystemInfo();">מחק</button>
+                            `;
+                            testContainer.appendChild(widgetDiv);
+                            
+                            // Move container to widget div
+                            if (container.parentElement) {
+                                widgetDiv.querySelector('div').appendChild(container);
+                            }
+                        }
+                        
+                        updateSystemInfo();
+                        
+                        if (window.NotificationSystem) {
+                            window.NotificationSystem.showSuccess(`ווידג'ט ${widgetType} נוצר בהצלחה`);
+                        }
+                    } catch (error) {
+                        console.error('Error creating widget:', error);
+                        if (window.NotificationSystem) {
+                            window.NotificationSystem.showError(`שגיאה ביצירת ווידג'ט: ${error.message}`);
+                        }
+                    }
+                });
+
+                // Refresh all widgets handler
+                document.getElementById('testRefreshAll').addEventListener('click', function() {
+                    window.TradingViewWidgetsManager.refreshAllWidgets();
+                    updateSystemInfo();
+                    if (window.NotificationSystem) {
+                        window.NotificationSystem.showInfo('כל הווידג'טים עודכנו');
+                    }
+                });
+
+                // Initial update
+                updateSystemInfo();
+                
+                // Update every 2 seconds
+                setInterval(updateSystemInfo, 2000);
+            }
+
+            // Start initialization
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initTestInterface);
+            } else {
+                initTestInterface();
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,60 +1,61 @@
 {
-  "snapshot_id": "pre-update_20251124_032851",
+  "snapshot_id": "pre-update_20251125_014303",
   "step_1": {
     "completed": true,
-    "timestamp": "2025-11-24T03:28:15.846990",
+    "timestamp": "2025-11-25T01:41:50.247755",
     "result": {
       "success": true,
       "commits_count": 15,
-      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251124_032814.log",
+      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251125_014148.log",
       "commits": [
-        "f992b37a9 Complete comprehensive testing of mockup pages and fix NotificationSystem",
-        "e513f4d71 Integrate Logger Service and FieldRendererService across all 12 mockup pages",
-        "37e762a2b Add Logger Service and improve mockup pages integration",
-        "126bd5c5c Fix duplicate keys in FA_TO_TABLER dictionary",
-        "ad1e68a94 Complete Icon System implementation across all pages and mockups"
+        "f0499983e feat: Complete sections toggle system standardization across all pages",
+        "11d83e5e7 Optimize Economic Calendar page: faster widget loading and clean console",
+        "9d8404fd8 feat: Complete standardization of all 10 mockup pages with general systems integration",
+        "039ffe4ab Implement date comparison modal with multiple dates support",
+        "58d5f1b2b Fix sections toggle system and add missing info-circle icon"
       ]
     }
   },
   "step_2": {
     "completed": true,
-    "timestamp": "2025-11-24T03:28:15.895790",
+    "timestamp": "2025-11-25T01:41:50.320074",
     "result": {
       "success": true,
-      "running": false,
+      "running": true,
       "port": 5001,
-      "pid": null,
-      "health": "not_running"
+      "pid": 28841,
+      "health": "healthy",
+      "uptime": 25306.83203983307
     }
   },
   "step_3": {
     "completed": true,
-    "timestamp": "2025-11-24T03:28:16.103912",
+    "timestamp": "2025-11-25T01:42:37.520372",
     "result": {
       "success": true,
-      "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/backups/postgresql_backup_pre-update_20251124_032815.sql",
-      "backup_path": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/backups/postgresql_backup_pre-update_20251124_032815.sql"
+      "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/backups/postgresql_backup_pre-update_20251125_014237.sql",
+      "backup_path": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/backups/postgresql_backup_pre-update_20251125_014237.sql"
     }
   },
   "step_4": {
     "completed": true,
-    "timestamp": "2025-11-24T03:28:17.678119",
+    "timestamp": "2025-11-25T01:42:39.095858",
     "result": {
       "success": true,
       "commits_count": 15,
-      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251124_032816.log",
+      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251125_014237.log",
       "commits": [
-        "f992b37a9 Complete comprehensive testing of mockup pages and fix NotificationSystem",
-        "e513f4d71 Integrate Logger Service and FieldRendererService across all 12 mockup pages",
-        "37e762a2b Add Logger Service and improve mockup pages integration",
-        "126bd5c5c Fix duplicate keys in FA_TO_TABLER dictionary",
-        "ad1e68a94 Complete Icon System implementation across all pages and mockups"
+        "f0499983e feat: Complete sections toggle system standardization across all pages",
+        "11d83e5e7 Optimize Economic Calendar page: faster widget loading and clean console",
+        "9d8404fd8 feat: Complete standardization of all 10 mockup pages with general systems integration",
+        "039ffe4ab Implement date comparison modal with multiple dates support",
+        "58d5f1b2b Fix sections toggle system and add missing info-circle icon"
       ]
     }
   },
   "step_5": {
     "completed": true,
-    "timestamp": "2025-11-24T03:28:21.049328",
+    "timestamp": "2025-11-25T01:43:06.908151",
     "result": {
       "success": true,
       "conflicts_resolved": 0,
@@ -63,14 +64,14 @@
   },
   "step_6": {
     "completed": true,
-    "timestamp": "2025-11-24T03:28:21.424678",
+    "timestamp": "2025-11-25T01:43:07.521987",
     "result": {
       "success": true
     }
   },
   "step_7": {
     "completed": true,
-    "timestamp": "2025-11-24T03:28:21.425136",
+    "timestamp": "2025-11-25T01:43:07.522545",
     "result": {
       "success": true,
       "stopped": false,
@@ -79,7 +80,7 @@
   },
   "step_8": {
     "completed": true,
-    "timestamp": "2025-11-24T03:28:52.539570",
+    "timestamp": "2025-11-25T01:43:07.591966",
     "result": {
       "success": true,
       "migrations_run": 0,
@@ -89,7 +90,7 @@
   "last_failed_step": null,
   "step_9": {
     "completed": true,
-    "timestamp": "2025-11-24T03:28:52.540264",
+    "timestamp": "2025-11-25T01:43:07.592673",
     "result": {
       "success": true,
       "verified": false,
@@ -98,13 +99,13 @@
   },
   "step_10": {
     "completed": true,
-    "timestamp": "2025-11-24T03:28:56.690100",
+    "timestamp": "2025-11-25T01:43:11.834812",
     "result": {
       "success": true,
-      "needs_update": true,
+      "needs_update": false,
       "report": {
         "dependencies": {
-          "needs_update": true,
+          "needs_update": false,
           "missing_file": false,
           "packages": [
             "Flask",
@@ -129,9 +130,7 @@
             "yfinance",
             "bleach"
           ],
-          "missing_packages": [
-            "bleach"
-          ],
+          "missing_packages": [],
           "outdated_packages": []
         },
         "critical_files": {
@@ -148,26 +147,23 @@
           "ready": true,
           "missing_files": []
         },
-        "warnings": [
-          "Missing packages: bleach"
-        ],
-        "needs_update": true
+        "warnings": [],
+        "needs_update": false
       }
     }
   },
   "step_11": {
     "completed": true,
-    "timestamp": "2025-11-24T03:29:04.864182",
+    "timestamp": "2025-11-25T01:43:11.835314",
     "result": {
       "success": true,
-      "updated": true,
-      "missing_packages": [],
-      "syntax_errors": []
+      "updated": false,
+      "reason": "no_updates_needed"
     }
   },
   "step_12": {
     "completed": true,
-    "timestamp": "2025-11-24T03:29:06.669235",
+    "timestamp": "2025-11-25T01:43:13.657588",
     "result": {
       "success": true,
       "results": {
@@ -180,89 +176,97 @@
   },
   "step_13": {
     "completed": true,
-    "timestamp": "2025-11-24T03:29:36.839745",
+    "timestamp": "2025-11-25T01:43:15.759976",
     "result": {
       "success": true,
-      "pid": 36493,
+      "pid": 23346,
       "port": 5001,
       "background": true,
-      "health_check": "failed",
-      "health_error": "Health check did not pass within 30 seconds (elapsed: 30.1s)"
+      "health_check": "passed"
     }
   },
   "step_14": {
     "completed": true,
-    "timestamp": "2025-11-24T03:30:31.870814",
+    "timestamp": "2025-11-25T01:44:10.912328",
     "result": {
       "success": true,
-      "stable": false,
+      "stable": true,
       "report": {
-        "stable": false,
-        "summary": [],
-        "warnings": [
-          "6 health check(s) failed"
+        "stable": true,
+        "summary": [
+          "All 6 health checks passed",
+          "Process is running"
         ],
-        "errors": [
-          "Process not alive: Process not found",
-          "\u001b[0;31m[03:29:09] ERROR:\u001b[0m Server process exited unexpectedly during startup (PID 36523)"
-        ]
+        "warnings": [],
+        "errors": []
       },
       "stability_result": {
-        "stable": false,
+        "stable": true,
         "health_checks": {
-          "passed": 0,
-          "failed": 6,
+          "passed": 6,
+          "failed": 0,
           "total": 6,
           "results": [
             [
-              false,
-              "<urlopen error [Errno 61] Connection refused>"
+              true,
+              null
             ],
             [
-              false,
-              "<urlopen error [Errno 61] Connection refused>"
+              true,
+              null
             ],
             [
-              false,
-              "<urlopen error [Errno 61] Connection refused>"
+              true,
+              null
             ],
             [
-              false,
-              "<urlopen error [Errno 61] Connection refused>"
+              true,
+              null
             ],
             [
-              false,
-              "<urlopen error [Errno 61] Connection refused>"
+              true,
+              null
             ],
             [
-              false,
-              "<urlopen error [Errno 61] Connection refused>"
+              true,
+              null
             ]
           ]
         },
-        "process_alive": false,
-        "process_error": "Process not found",
-        "log_errors": [
-          "\u001b[0;31m[03:29:09] ERROR:\u001b[0m Server process exited unexpectedly during startup (PID 36523)"
-        ],
-        "log_errors_count": 1
+        "process_alive": true,
+        "process_error": null,
+        "log_errors": [],
+        "log_errors_count": 0
       }
     }
   },
   "step_15": {
     "completed": true,
-    "timestamp": "2025-11-24T03:30:31.922034",
+    "timestamp": "2025-11-25T01:44:10.959338",
     "result": {
       "success": true,
-      "new_version": "1.2.6.0"
+      "new_version": "1.2.9.0"
     }
   },
   "step_16": {
     "completed": true,
-    "timestamp": "2025-11-24T03:30:34.690811",
+    "timestamp": "2025-11-25T01:44:12.912253",
     "result": {
       "success": true,
-      "commit_message": "chore: production update from main - 2025-11-24"
+      "commit_message": "chore: production update from main - 2025-11-25"
+    }
+  },
+  "step_17": {
+    "completed": true,
+    "timestamp": "2025-11-25T01:44:14.336578",
+    "result": {
+      "success": true,
+      "tests_run": 10,
+      "tests_passed": 10,
+      "tests_failed": 0,
+      "errors": [
+        "Playwright tests failed: npm warn \"playwright.config.js\" is being parsed as a normal command line argument.\nnpm warn Unknown cli config \"--config\". This will stop working in the next major version of npm.\nsh: jest: command not found\n"
+      ]
     }
   }
 }

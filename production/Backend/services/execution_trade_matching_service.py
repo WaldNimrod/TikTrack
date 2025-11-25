@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from models.execution import Execution
 from models.trade import Trade
+from services.execution_clustering_service import ExecutionClusteringService, map_execution_action_to_trade_side as clustering_map_action
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +53,7 @@ class ExecutionTradeMatchingService:
         logger.info(f"Finding trade suggestions for execution {execution.id} (ticker_id={execution.ticker_id})")
         
         # Map execution action to trade side
-        execution_side = ExecutionTradeMatchingService._map_execution_action_to_trade_side(execution.action)
+        execution_side = clustering_map_action(execution.action)
         logger.debug(f"Execution {execution.id} action '{execution.action}' maps to side '{execution_side}'")
         
         # Base query: trades with matching ticker and side
@@ -203,15 +204,8 @@ class ExecutionTradeMatchingService:
         Returns:
             List of executions with ticker_id but no trade_id
         """
-        executions = db.query(Execution).options(
-            joinedload(Execution.ticker),
-            joinedload(Execution.trading_account)
-        ).filter(
-            Execution.trade_id.is_(None)
-        ).order_by(Execution.date.desc()).all()
-        
-        logger.info(f"Found {len(executions)} executions pending trade assignment")
-        return executions
+        # Delegate to ExecutionClusteringService for consistency
+        return ExecutionClusteringService.get_pending_executions(db)
     
     @staticmethod
     def suggest_trades_for_all_pending(
@@ -292,154 +286,30 @@ class ExecutionTradeMatchingService:
     @staticmethod
     def get_execution_trade_creation_clusters(
         db: Session,
-        max_items: Optional[int] = None
+        max_items: Optional[int] = None,
+        limit_executions: Optional[int] = None
     ) -> List[Dict[str, Any]]:
-        """Cluster executions (ticker/account/action) for quick trade creation."""
-
-        pending_executions = ExecutionTradeMatchingService.get_pending_executions(db)
-        clusters: Dict[Tuple[int, Optional[int], str], Dict[str, Any]] = {}
-
-        for execution in pending_executions:
-            side = ExecutionTradeMatchingService._map_execution_action_to_trade_side(execution.action)
-            normalized_action = (execution.action or 'buy').lower()
-            account_id = execution.trading_account_id
-            cluster_key = (execution.ticker_id, account_id, side)
-
-            if cluster_key not in clusters:
-                ticker = execution.ticker
-                trading_account = execution.trading_account
-                cluster = {
-                    "cluster_id": f"{execution.ticker_id}-{account_id or 'none'}-{side}",
-                    "ticker": {
-                        "id": execution.ticker_id,
-                        "symbol": ticker.symbol if ticker else None,
-                        "name": ticker.name if ticker else None,
-                        "type": ticker.type if ticker else None
-                    },
-                    "trading_account": {
-                        "id": account_id,
-                        "name": trading_account.name if trading_account else None,
-                        "currency_id": trading_account.currency_id if trading_account else None
-                    },
-                    "action": normalized_action,
-                    "side": side,
-                    "executions": [],
-                    "execution_ids": [],
-                    "stats": {
-                        "total_quantity": 0.0,
-                        "total_value": 0.0,
-                        "total_fee": 0.0,
-                        "earliest_date": None,
-                        "latest_date": None
-                    },
-                    "meta": {
-                        "source_counts": defaultdict(int),
-                        "notes": []
-                    }
-                }
-                clusters[cluster_key] = cluster
-
-            cluster = clusters[cluster_key]
-            stats = cluster["stats"]
-            meta = cluster["meta"]
-
-            execution_dict = execution.to_dict()
-            quantity = execution.quantity or 0
-            price = execution.price or 0
-            execution_value = quantity * price
-            fee = execution.fee or 0
-            execution_dict["value"] = execution_value
-            execution_dict["side"] = side
-            execution_dict["normalized_action"] = normalized_action
-            execution_dict["selected"] = True
-
-            cluster["executions"].append(execution_dict)
-            cluster["execution_ids"].append(execution.id)
-
-            stats["total_quantity"] += quantity
-            stats["total_value"] += execution_value
-            stats["total_fee"] += fee or 0
-
-            execution_date = execution.date
-            if execution_date:
-                if stats["earliest_date"] is None or execution_date < stats["earliest_date"]:
-                    stats["earliest_date"] = execution_date
-                if stats["latest_date"] is None or execution_date > stats["latest_date"]:
-                    stats["latest_date"] = execution_date
-
-            source_value = (execution.source or 'manual').lower()
-            meta["source_counts"][source_value] += 1
-
-            if execution.notes:
-                note_text = execution.notes.strip()
-                if note_text:
-                    meta["notes"].append(note_text)
-
-        clusters_list: List[Dict[str, Any]] = []
-        for cluster in clusters.values():
-            stats = cluster["stats"]
-            meta = cluster.pop("meta", {"source_counts": defaultdict(int), "notes": []})
-
-            total_quantity = stats["total_quantity"]
-            total_value = stats["total_value"]
-            stats["average_price"] = round(total_value / total_quantity, 4) if total_quantity else None
-            stats["total_value"] = round(total_value, 2)
-            stats["total_fee"] = round(stats["total_fee"], 2)
-            stats["execution_count"] = len(cluster["executions"])
-
-            earliest_date = stats.pop("earliest_date", None)
-            latest_date = stats.pop("latest_date", None)
-            stats["date_range"] = {
-                "start": earliest_date,
-                "end": latest_date
-            }
-
-            source_counts = meta.get("source_counts", defaultdict(int))
-            distinct_sources = list(source_counts.keys())
-
-            cluster["flags"] = {
-                "multiple_executions": stats["execution_count"] > 1,
-                "has_notes": len(meta.get("notes", [])) > 0,
-                "has_multiple_sources": len(distinct_sources) > 1
-            }
-
-            cluster["stats"]["distinct_sources"] = distinct_sources
-
-            notes_summary = ExecutionTradeMatchingService._build_notes_summary(meta.get("notes", []))
-            primary_source = ExecutionTradeMatchingService._get_primary_source(source_counts)
-
-            cluster["suggested_trade"] = {
-                "ticker_id": cluster["ticker"]["id"],
-                "ticker_symbol": cluster["ticker"].get("symbol"),
-                "trading_account_id": cluster["trading_account"]["id"],
-                "side": cluster["side"],
-                "action": cluster["action"],
-                "entry_price": stats["average_price"],
-                "entry_date": earliest_date,
-                "last_execution_date": latest_date,
-                "quantity": total_quantity,
-                "amount": stats["total_value"],
-                "fee": stats["total_fee"],
-                "source": primary_source,
-                "execution_ids": cluster["execution_ids"],
-                "notes": notes_summary,
-                "default_selected_execution_ids": cluster["execution_ids"]
-            }
-
-            clusters_list.append(cluster)
-
-        clusters_list.sort(
-            key=lambda item: (
-                item["stats"].get("date_range", {}).get("end") or datetime.min,
-                item["stats"].get("total_value", 0)
-            ),
-            reverse=True
+        """
+        Cluster executions by ticker/account/side for quick trade creation.
+        
+        Clusters combine compatible execution actions:
+        - Long trades: buy (opening) + sell (closing)
+        - Short trades: short (opening) + cover (closing)
+        
+        A trade cannot mix long and short executions.
+        
+        Args:
+            db: Database session
+            max_items: Maximum number of clusters to return
+            limit_executions: Maximum number of executions to process (for pagination)
+        
+        Note: This method delegates to ExecutionClusteringService for consistency.
+        """
+        return ExecutionClusteringService.get_execution_trade_creation_clusters(
+            db, 
+            max_items=max_items,
+            limit_executions=limit_executions
         )
-
-        if max_items and max_items > 0:
-            clusters_list = clusters_list[:max_items]
-
-        return clusters_list
 
     @staticmethod
     def _map_execution_action_to_trade_side(action: Optional[str]) -> str:
@@ -449,21 +319,9 @@ class ExecutionTradeMatchingService:
         Long trades: buy (opening) + sell (closing)
         Short trades: short (opening) + cover (closing)
         
-        Args:
-            action: Execution action (buy, sell, short, cover)
-            
-        Returns:
-            'long' or 'short'
+        Note: This method delegates to the clustering service function for consistency.
         """
-        if not action:
-            return 'long'
-        normalized = action.lower()
-        # Short trades: short (opening) and cover (closing)
-        if normalized in {"short", "cover"}:
-            return 'short'
-        # Long trades: buy (opening) and sell (closing)
-        # All other actions (buy, sell) default to long
-        return 'long'
+        return clustering_map_action(action)
 
     @staticmethod
     def _get_primary_source(source_counts: Dict[str, int]) -> str:

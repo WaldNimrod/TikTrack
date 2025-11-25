@@ -127,15 +127,23 @@
         getThemeOptions(themeName = null) {
             const theme = themeName || this.currentTheme;
             
-            // Get colors from CSS variables
-            const backgroundColor = getCSSVariableValue('--card-background', '#ffffff');
-            const textColor = getCSSVariableValue('--text-color', '#000000');
+            // Priority 1: Get colors from user preferences (chart-specific)
+            // עדיפות ראשונה: צבעים מהעדפות המשתמש לגרפים
+            const backgroundColor = getCSSVariableValue('--chart-background-color', 
+                getCSSVariableValue('--card-background', '#ffffff'));
+            const textColor = getCSSVariableValue('--chart-text-color', 
+                getCSSVariableValue('--text-color', '#000000'));
+            const gridColor = getCSSVariableValue('--chart-grid-color', 
+                getCSSVariableValue('--border-color', '#e0e0e0'));
+            const borderColor = getCSSVariableValue('--chart-border-color', 
+                getCSSVariableValue('--border-color', '#e0e0e0'));
+            
+            // Fallback colors for general use
             const primaryColor = getCSSVariableValue('--primary-color', '#26baac');
             const successColor = getCSSVariableValue('--success-color', '#28a745');
             const warningColor = getCSSVariableValue('--warning-color', '#ffc107');
             const dangerColor = getCSSVariableValue('--danger-color', '#dc3545');
             const infoColor = getCSSVariableValue('--info-color', '#17a2b8');
-            const gridColor = getCSSVariableValue('--border-color', '#e0e0e0');
             const mutedColor = getCSSVariableValue('--muted-color', '#6c757d');
 
             const options = {
@@ -162,10 +170,10 @@
                     mode: 0, // Normal
                 },
                 rightPriceScale: {
-                    borderColor: gridColor,
+                    borderColor: borderColor,
                 },
                 timeScale: {
-                    borderColor: gridColor,
+                    borderColor: borderColor,
                 },
             };
             
@@ -215,21 +223,81 @@
 
         /**
          * Get chart colors object
+         * Priority 1: User preferences (chart-specific)
+         * Priority 2: Entity colors with 3 variants (11 entities × 3 = 33 colors)
          * @function getChartColors
          * @returns {Object} Colors object
          */
         getChartColors() {
             return {
-                primary: this.getSeriesColor('primary'),
+                // Priority 1: User preferences for charts
+                primary: getCSSVariableValue('--chart-primary-color', this.getSeriesColor('primary')),
+                background: getCSSVariableValue('--chart-background-color', 
+                    getCSSVariableValue('--card-background', '#ffffff')),
+                text: getCSSVariableValue('--chart-text-color', 
+                    getCSSVariableValue('--text-color', '#000000')),
+                grid: getCSSVariableValue('--chart-grid-color', 
+                    getCSSVariableValue('--border-color', '#e0e0e0')),
+                border: getCSSVariableValue('--chart-border-color', 
+                    getCSSVariableValue('--border-color', '#e0e0e0')),
+                point: getCSSVariableValue('--chart-point-color', this.getSeriesColor('primary')),
+                // Fallback colors
                 success: this.getSeriesColor('success'),
                 warning: this.getSeriesColor('warning'),
                 danger: this.getSeriesColor('danger'),
                 info: this.getSeriesColor('info'),
                 muted: this.getSeriesColor('muted'),
-                background: getCSSVariableValue('--card-background', '#ffffff'),
-                text: getCSSVariableValue('--text-color', '#000000'),
-                grid: getCSSVariableValue('--border-color', '#e0e0e0'),
             };
+        }
+
+        /**
+         * Get entity color for series (Priority 2)
+         * Returns color from entity with 3 variants: base, dark, light
+         * @function getEntityColorForSeries
+         * @param {string} entityType - Entity type (trade, trade_plan, execution, etc.)
+         * @param {string} variant - Variant: 'base', 'dark', 'light' (default: 'base')
+         * @returns {string} Color value
+         */
+        getEntityColorForSeries(entityType, variant = 'base') {
+            // Map entity type to CSS variable suffix
+            const entityMap = {
+                'trade': 'trade',
+                'trade_plan': 'trade-plan',
+                'execution': 'execution',
+                'trading_account': 'trading-account',
+                'account': 'trading-account',
+                'cash_flow': 'cash-flow',
+                'ticker': 'ticker',
+                'alert': 'alert',
+                'note': 'note',
+                'constraint': 'constraint',
+                'design': 'design',
+                'research': 'research',
+            };
+
+            const entityKey = entityMap[entityType] || 'trade';
+            
+            // Map variant to CSS variable suffix
+            const variantMap = {
+                'base': 'color',
+                'dark': 'text',
+                'light': 'bg',
+            };
+            
+            const variantKey = variantMap[variant] || 'color';
+            
+            // Build CSS variable name: --entity-{entityKey}-{variantKey}
+            const cssVar = `--entity-${entityKey}-${variantKey}`;
+            
+            // Get color with fallback
+            const color = getCSSVariableValue(cssVar, null);
+            
+            if (color) {
+                return color;
+            }
+            
+            // Fallback to primary color if entity color not found
+            return this.getSeriesColor('primary');
         }
     }
 

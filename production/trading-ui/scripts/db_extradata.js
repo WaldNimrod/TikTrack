@@ -392,28 +392,6 @@ function getTableId(tableType) {
   return mapping[tableType] || tableType + 'Table';
 }
 
-/**
- * Toggle section visibility
- * @param {string} sectionId - The section ID to toggle
- */
-function toggleSection(sectionId) {
-  const section = document.getElementById(sectionId);
-  if (section) {
-    const body = section.querySelector('.section-body');
-    const icon = section.querySelector('.filter-icon');
-    
-    if (body && icon) {
-      if (body.style.display === 'none') {
-        body.style.display = 'block';
-        icon.textContent = '▲';
-      } else {
-        body.style.display = 'none';
-        icon.textContent = '▼';
-      }
-    }
-  }
-}
-
 // ===== EVENT LISTENERS =====
 
 // Initialize when DOM is loaded
@@ -426,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Export for global access
 window.initDatabaseExtraData = initDatabaseExtraData;
-window.toggleSection = toggleSection;
+// toggleSection removed - using global version from ui-utils.js
 window.loadExtraData = async function loadExtraData() {
   await loadAllTables();
 };

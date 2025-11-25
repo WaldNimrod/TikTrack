@@ -793,11 +793,27 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
   // Add to page
   let container = document.getElementById('notification-container');
   if (!container) {
+    // Check if document.body exists before creating container
+    if (!document.body) {
+      // DOM not ready yet, skip notification silently
+      if (window.DEBUG_MODE) {
+        window.Logger?.warn?.('Cannot show notification: document.body not ready', { page: "notification-system" });
+      }
+      return;
+    }
     container = document.createElement('div');
     container.id = 'notification-container';
     container.className = 'notification-container';
     document.body.appendChild(container);
     // window.Logger.info('🔍 DEBUG: Created notification container:', container, { page: "notification-system" });
+  }
+  
+  // Final safety check before appending
+  if (!container || !container.appendChild) {
+    if (window.DEBUG_MODE) {
+      window.Logger?.warn?.('Cannot show notification: container invalid', { page: "notification-system" });
+    }
+    return;
   }
   
   container.appendChild(notification);

@@ -1,0 +1,47 @@
+{
+  "start_time": "2025-11-24T20:10:00.243258",
+  "steps": [
+    {
+      "number": 1,
+      "name": "collect_changes",
+      "success": true,
+      "duration_seconds": 2.296555995941162,
+      "timestamp": "2025-11-24T20:10:02.547463",
+      "details": {
+        "success": true,
+        "commits_count": 15,
+        "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251124_201000.log",
+        "commits": [
+          "fdc60f2ea Bump version: 1.3.23.0 -> 1.3.24.0",
+          "a942a059a Complete TradingView Widgets System implementation",
+          "1881fe220 Fix TradingView Widgets System: Remove init-system.js 404 errors, fix syntax, add 2 missing widgets, register all mockup pages",
+          "cdb459489 Fix: הוספת סינון לפי side במערכת שיוך ביצועים לטריידים",
+          "8045ea03b Add Cursor optimization configuration files"
+        ]
+      }
+    },
+    {
+      "number": 2,
+      "name": "check_server",
+      "success": true,
+      "duration_seconds": 0.06985020637512207,
+      "timestamp": "2025-11-24T20:10:02.618383",
+      "details": {
+        "success": true,
+        "running": true,
+        "port": 5001,
+        "pid": 28841,
+        "health": "healthy",
+        "uptime": 5399.130357980728
+      }
+    },
+    {
+      "number": 3,
+      "name": "backup_database",
+      "success": true,
+      "duration_seconds": 0.1664879322052002,
+      "timestamp": "2025-11-24T20:10:02.785273",
+      "details": {
+        "success": true,
+        "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/backups/postgresql_backup_pre-update_20251124_201002.sql",
+        "backup_path": 

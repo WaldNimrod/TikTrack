@@ -270,53 +270,23 @@ class DBProtector:
     
     def __init__(self, project_root: Path):
         self.project_root = project_root
-        # Note: System uses PostgreSQL - these paths are for legacy SQLite support only
-        self.production_db = project_root / "production" / "Backend" / "db" / "tiktrack.db"
-        self.backup_db = project_root / "production" / "Backend" / "db" / "tiktrack.db.backup"
+        # Note: System uses PostgreSQL only - no file-based database paths
+        # These paths are kept for backward compatibility but are not used
+        self.production_db = None  # PostgreSQL only - no file path
+        self.backup_db = None  # PostgreSQL only - no file path
         self.logger = get_logger()
     
     def backup(self) -> bool:
-        """Backup DB before sync"""
-        if not self.production_db.exists():
-            self.logger.info("  ℹ️  No DB to backup (will be created)")
-            return True
-        
-        try:
-            shutil.copy2(self.production_db, self.backup_db)
-            self.logger.info("  ✅ DB backed up before sync")
-            return True
-        except Exception as e:
-            self.logger.error(f"  ❌ Error backing up DB: {e}")
-            return False
+        """Backup DB before sync (PostgreSQL - handled by backup step)"""
+        # PostgreSQL backups are handled by step 04_backup_database.py
+        self.logger.info("  ℹ️  PostgreSQL backup handled by backup step")
+        return True
     
     def restore(self) -> bool:
-        """Restore DB after sync if it was deleted"""
-        if self.production_db.exists():
-            # DB exists, remove backup
-            if self.backup_db.exists():
-                self.backup_db.unlink()
-            return True
-        
-        try:
-            # Ensure directory exists
-            self.production_db.parent.mkdir(parents=True, exist_ok=True)
-            
-            # Priority: backup > _Tmp > dev
-            source_db = None
-            if self.backup_db.exists():
-                source_db = self.backup_db
-                self.logger.info("  💾 Restoring DB from backup...")
-            else:
-                # Legacy SQLite paths (deprecated - system uses PostgreSQL)
-                tmp_db = self.project_root / "_Tmp" / "tiktrack.db"
-                dev_db = self.project_root / "Backend" / "db" / "tiktrack.db"
-                
-                if tmp_db.exists():
-                    source_db = tmp_db
-                    self.logger.info("  💾 Copying DB from _Tmp...")
-                elif dev_db.exists():
-                    source_db = dev_db
-                    self.logger.info("  💾 Copying DB from Backend...")
+        """Restore DB after sync (PostgreSQL - handled by backup step)"""
+        # PostgreSQL restores are handled by backup/restore scripts
+        self.logger.info("  ℹ️  PostgreSQL restore handled by backup/restore scripts")
+        return True
             
             if source_db:
                 shutil.copy2(source_db, self.production_db)

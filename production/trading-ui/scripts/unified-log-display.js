@@ -593,7 +593,7 @@ class UnifiedLogDisplay {
             // Check for CSS conflicts
             const testBtn = document.createElement('button');
             testBtn.className = 'btn btn-action';
-            testBtn.innerHTML = '<i class="fas fa-info"></i>';
+            testBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info" class="icon">';
             testBtn.style.position = 'absolute';
             testBtn.style.top = '-1000px';
             testBtn.style.left = '-1000px';
@@ -673,17 +673,24 @@ class UnifiedLogDisplay {
     /**
      * Format category with icon and color
      */
-    formatCategory(category) {
+    async formatCategory(category) {
         if (!category) return '<span class="badge bg-secondary">כללי</span>';
         
         // Use the category detector system if available
         if (window.getCategoryIcon) {
-            const categoryInfo = window.getCategoryIcon(category, { format: 'object' });
-            return `
-                <span class="badge" style="background-color: ${categoryInfo.color}; color: white;">
-                    ${categoryInfo.emoji} ${categoryInfo.title}
-                </span>
-            `;
+            try {
+                // getCategoryIcon is now async
+                const categoryInfo = await window.getCategoryIcon(category, { format: 'object' });
+                if (categoryInfo) {
+                    return `
+                        <span class="badge" style="background-color: ${categoryInfo.color}; color: white;">
+                            ${categoryInfo.emoji || ''} ${categoryInfo.title}
+                        </span>
+                    `;
+                }
+            } catch (error) {
+                // Fall through to fallback
+            }
         }
         
         // Fallback category mapping
@@ -713,18 +720,23 @@ class UnifiedLogDisplay {
     /**
      * Format page with icon
      */
-    formatPage(page) {
+    async formatPage(page) {
         if (!page) return '<span class="text-muted">-</span>';
         
         // Extract page name from full path
         const pageName = page.includes('/') ? page.split('/').pop() : page;
         
-        // Get page icon based on page type
-        const pageIcon = this.getPageIcon(pageName);
+        // Get page icon based on page type (async)
+        const pageIcon = await this.getPageIcon(pageName);
+        
+        // Check if pageIcon is a path (starts with /) or emoji
+        const iconHTML = pageIcon.startsWith('/') 
+            ? `<img src="${pageIcon}" width="16" height="16" alt="${pageName}" class="icon">`
+            : pageIcon;
         
         return `
             <span class="page-display" title="${page}">
-                ${pageIcon} ${pageName}
+                ${iconHTML} ${pageName}
             </span>
         `;
     }
@@ -732,33 +744,45 @@ class UnifiedLogDisplay {
     /**
      * Get page icon based on page name
      */
-    getPageIcon(pageName) {
+    async getPageIcon(pageName) {
+        // Use IconSystem if available
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.getPageIcon) {
+            try {
+                return await window.IconSystem.getPageIcon(pageName);
+            } catch (error) {
+                if (typeof window.Logger !== 'undefined') {
+                    window.Logger.warn('⚠️ Error getting page icon from IconSystem, using fallback', { pageName, error, page: 'unified-log-display' });
+                }
+            }
+        }
+        
+        // Fallback to Tabler paths
         const pageIcons = {
-            'index.html': '🏠',
-            'trades.html': '📈',
-            'alerts.html': '🔔',
-            'accounts.html': '👤',
-            'system-management.html': '⚙️',
-            'notifications-center.html': '📬',
-            'preferences.html': '⚙️',
-            'tickers.html': '💰',
-            'executions.html': '⚡',
-            'cash_flows.html': '💸',
-            'notes.html': '📝',
-            'research.html': '🔍',
-            'trade_plans.html': '📋',
-            'db_display.html': '🗄️',
-            'db_extradata.html': '📊',
-            'cache-management.html': '⚙️',
-            'linter-realtime-monitor.html': '🔍',
-            'crud-testing-dashboard.html': '🧪',
-            'external-data-dashboard.html': '🌐',
-            'server-monitor.html': '🖥️',
-            'css-management.html': '🎨',
-            'constraints.html': '🔒'
+            'index.html': '/trading-ui/images/icons/tabler/home.svg',
+            'trades.html': '/trading-ui/images/icons/tabler/chart-line.svg',
+            'alerts.html': '/trading-ui/images/icons/tabler/bell.svg',
+            'accounts.html': '/trading-ui/images/icons/tabler/user.svg',
+            'system-management.html': '/trading-ui/images/icons/tabler/settings.svg',
+            'notifications-center.html': '/trading-ui/images/icons/tabler/inbox.svg',
+            'preferences.html': '/trading-ui/images/icons/tabler/settings.svg',
+            'tickers.html': '/trading-ui/images/icons/tabler/currency-dollar.svg',
+            'executions.html': '/trading-ui/images/icons/tabler/bolt.svg',
+            'cash_flows.html': '/trading-ui/images/icons/tabler/currency-dollar.svg',
+            'notes.html': '/trading-ui/images/icons/tabler/note.svg',
+            'research.html': '/trading-ui/images/icons/tabler/search.svg',
+            'trade_plans.html': '/trading-ui/images/icons/tabler/clipboard-list.svg',
+            'db_display.html': '/trading-ui/images/icons/tabler/database.svg',
+            'db_extradata.html': '/trading-ui/images/icons/tabler/database.svg',
+            'cache-management.html': '/trading-ui/images/icons/tabler/database.svg',
+            'linter-realtime-monitor.html': '/trading-ui/images/icons/tabler/search.svg',
+            'crud-testing-dashboard.html': '/trading-ui/images/icons/tabler/flask.svg',
+            'external-data-dashboard.html': '/trading-ui/images/icons/tabler/world.svg',
+            'server-monitor.html': '/trading-ui/images/icons/tabler/server.svg',
+            'css-management.html': '/trading-ui/images/icons/tabler/palette.svg',
+            'constraints.html': '/trading-ui/images/icons/tabler/lock.svg'
         };
         
-        return pageIcons[pageName] || '📄';
+        return pageIcons[pageName] || '/trading-ui/images/icons/tabler/file-text.svg';
     }
 
     /**

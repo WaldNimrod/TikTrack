@@ -1,0 +1,87 @@
+{
+  "start_time": "2025-11-24T20:07:38.296015",
+  "steps": [
+    {
+      "number": 1,
+      "name": "collect_changes",
+      "success": true,
+      "duration_seconds": 2.2586560249328613,
+      "timestamp": "2025-11-24T20:07:40.563669",
+      "details": {
+        "success": true,
+        "commits_count": 15,
+        "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251124_200738.log",
+        "commits": [
+          "fdc60f2ea Bump version: 1.3.23.0 -> 1.3.24.0",
+          "a942a059a Complete TradingView Widgets System implementation",
+          "1881fe220 Fix TradingView Widgets System: Remove init-system.js 404 errors, fix syntax, add 2 missing widgets, register all mockup pages",
+          "cdb459489 Fix: הוספת סינון לפי side במערכת שיוך ביצועים לטריידים",
+          "8045ea03b Add Cursor optimization configuration files"
+        ]
+      }
+    },
+    {
+      "number": 2,
+      "name": "check_server",
+      "success": true,
+      "duration_seconds": 0.07762289047241211,
+      "timestamp": "2025-11-24T20:07:40.645824",
+      "details": {
+        "success": true,
+        "running": true,
+        "port": 5001,
+        "pid": 28841,
+        "health": "healthy",
+        "uptime": 5257.1577780246735
+      }
+    },
+    {
+      "number": 3,
+      "name": "backup_database",
+      "success": false,
+      "duration_seconds": 0.0010530948638916016,
+      "timestamp": "2025-11-24T20:07:40.647252",
+      "details": {
+        "success": false,
+        "error": "PostgreSQL environment variables not set"
+      }
+    }
+  ],
+  "files_updated": [],
+  "files_new": [
+    {
+      "path": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251124_200738.log",
+      "timestamp": "2025-11-24T20:07:40.563660",
+      "details": {
+        "type": "release_notes",
+        "commits_count": 15
+      }
+    }
+  ],
+  "files_deleted": [],
+  "warnings": [],
+  "errors": [
+    {
+      "message": "Database backup failed: PostgreSQL environment variables not set",
+      "step": "backup_database",
+      "timestamp": "2025-11-24T20:07:40.647233"
+    },
+    {
+      "message": "Step 3 (backup_database) failed",
+      "step": "backup_database",
+      "timestamp": "2025-11-24T20:07:40.647254"
+    }
+  ],
+  "summary": {
+    "total_duration_seconds": 2.351639,
+    "steps_completed": 2,
+    "steps_failed": 1,
+    "files_updated_count": 0,
+    "files_new_count": 1,
+    "files_deleted_count": 0,
+    "warnings_count": 0,
+    "errors_count": 2
+  },
+  "end_time": "2025-11-24T20:07:40.647654",
+  "success": false
+}

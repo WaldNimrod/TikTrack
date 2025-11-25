@@ -733,7 +733,10 @@ window.toggleSection = async function (sectionId) {
   const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
   
   if (sectionBody) {
-    const isCollapsed = sectionBody.style.display === 'none';
+    // Check both inline style and computed style to handle CSS classes like d-flex
+    const inlineDisplay = sectionBody.style.display;
+    const computedDisplay = window.getComputedStyle(sectionBody).display;
+    const isCollapsed = (inlineDisplay === 'none' || computedDisplay === 'none');
 
     // Check if we're in accordion mode
     const pageName = getCurrentPageName();
@@ -755,7 +758,7 @@ window.toggleSection = async function (sectionId) {
             const otherIcon = otherSection.querySelector('.section-toggle-icon');
             if (otherSectionBody && (otherSectionBody.style.display !== 'none')) {
               otherSectionBody.style.display = 'none';
-              if (otherIcon) otherIcon.textContent = '▼';
+              if (otherIcon) updateChevronIcon(otherIcon, true);
               // Save state for other sections too using UnifiedCacheManager
               const otherSectionId = otherSection.getAttribute('data-section') || otherSection.id;
               if (otherSectionId) {
@@ -773,18 +776,52 @@ window.toggleSection = async function (sectionId) {
         });
       }
       
+      // Remove d-flex/d-block classes that might interfere and set display
+      sectionBody.classList.remove('d-none', 'd-flex', 'd-block');
       sectionBody.style.display = 'block';
       console.log(`✅ Section "${sectionId}" EXPANDED`);
     } else {
-      // Closing section
+      // Closing section - remove display classes and set to none
+      sectionBody.classList.remove('d-flex', 'd-block');
+      sectionBody.classList.add('d-none');
       sectionBody.style.display = 'none';
       console.log(`✅ Section "${sectionId}" COLLAPSED`);
     }
 
-    // Update icon
+    // Update icon - use SVG icons from BUTTON_ICONS
     if (icon) {
-      const newIcon = sectionBody.style.display === 'none' ? '▼' : '▲';
-      icon.textContent = newIcon;
+      const isCollapsed = sectionBody.style.display === 'none';
+      let newIconHTML = '';
+      
+      if (window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE) {
+        const toggleIconPath = window.BUTTON_ICONS.TOGGLE;
+        if (toggleIconPath.startsWith('/') || toggleIconPath.startsWith('http')) {
+          // Use chevron-down for both states, rotate with CSS when expanded
+          const transformStyle = isCollapsed ? '' : ' style="transform: rotate(180deg);"';
+          newIconHTML = `<img src="${toggleIconPath}" width="16" height="16" alt="${isCollapsed ? 'הצג' : 'הסתר'}" class="icon"${transformStyle}>`;
+        } else {
+          newIconHTML = isCollapsed ? '▼' : '▲'; // Fallback
+        }
+      } else {
+        // Fallback to emoji
+        newIconHTML = isCollapsed ? '▼' : '▲';
+      }
+      
+      // Check if icon is already an img tag or contains one
+      const existingImg = icon.tagName === 'IMG' ? icon : icon.querySelector('img');
+      if (existingImg) {
+        // Update existing img tag
+        if (icon.tagName === 'IMG') {
+          icon.src = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE ? window.BUTTON_ICONS.TOGGLE : '';
+          icon.style.transform = isCollapsed ? '' : 'rotate(180deg)';
+        } else {
+          existingImg.src = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE ? window.BUTTON_ICONS.TOGGLE : '';
+          existingImg.style.transform = isCollapsed ? '' : 'rotate(180deg)';
+        }
+      } else {
+        // Replace text content with img tag
+        icon.innerHTML = newIconHTML;
+      }
     }
     
     // Update toggle button tooltip dynamically based on section state
@@ -837,6 +874,34 @@ window.toggleSection = async function (sectionId) {
  * Works with the unified section toggle system
  * UPDATED: Now uses page-specific localStorage keys
  */
+
+    /**
+     * Helper function to update chevron icon for expand/collapse
+     * @param {HTMLElement} iconElement - The icon element to update
+     * @param {boolean} isCollapsed - Whether the section is collapsed
+     */
+    function updateChevronIcon(iconElement, isCollapsed) {
+        if (!iconElement) return;
+        
+        const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
+            ? window.BUTTON_ICONS.TOGGLE 
+            : '/trading-ui/images/icons/tabler/chevron-down.svg';
+        
+        if (iconElement.tagName === 'IMG') {
+            iconElement.src = toggleIconPath;
+            iconElement.style.transform = isCollapsed ? '' : 'rotate(180deg)';
+        } else if (iconElement.querySelector('img')) {
+            const img = iconElement.querySelector('img');
+            img.src = toggleIconPath;
+            img.style.transform = isCollapsed ? '' : 'rotate(180deg)';
+        } else {
+            // Replace text content with img tag
+            const transformStyle = isCollapsed ? '' : ' style="transform: rotate(180deg);"';
+            iconElement.innerHTML = `<img src="${toggleIconPath}" width="16" height="16" alt="${isCollapsed ? 'הצג' : 'הסתר'}" class="icon"${transformStyle}>`;
+        }
+    }
+
+
 window.restoreAllSectionStates = async function () {
   const pageName = getCurrentPageName();
   
@@ -922,25 +987,25 @@ window.restoreAllSectionStates = async function () {
             if (openSectionId) {
               // Already have an open section, close this one
               sectionBody.style.display = 'none';
-              if (icon) { icon.textContent = '▼'; }
+              if (icon) { updateChevronIcon(icon, true); }
               console.log(`✅ Section "${sectionId}" closed (accordion mode - another section is open)`);
             } else {
               // This is the first open section
               openSectionId = sectionId;
               sectionBody.style.display = 'block';
-              if (icon) { icon.textContent = '▲'; }
+              if (icon) { updateChevronIcon(icon, false); }
               console.log(`✅ Section "${sectionId}" opened (accordion mode)`);
             }
           } else {
             // This section should be closed
             sectionBody.style.display = 'none';
-            if (icon) { icon.textContent = '▼'; }
+            if (icon) { updateChevronIcon(icon, true); }
             console.log(`✅ Section "${sectionId}" closed (accordion mode)`);
           }
         } else {
           // No saved state - in accordion mode, always closed
           sectionBody.style.display = 'none';
-          if (icon) { icon.textContent = '▼'; }
+          if (icon) { updateChevronIcon(icon, true); }
           console.log(`⏭️ Section "${sectionId}" has no saved state - accordion mode default (closed)`);
         }
       } else {
@@ -952,24 +1017,28 @@ window.restoreAllSectionStates = async function () {
           if (isHidden) {
             // Restore collapsed state
             sectionBody.style.display = 'none';
-            if (icon) { icon.textContent = '▼'; }
+            if (icon) { updateChevronIcon(icon, true); }
             console.log(`✅ Section "${sectionId}" RESTORED to COLLAPSED`);
           } else {
             // Restore expanded state
             sectionBody.style.display = 'block';
-            if (icon) { icon.textContent = '▲'; }
+            if (icon) { updateChevronIcon(icon, false); }
             console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
           }
         } else {
           // No saved state - apply default state from page config
-          if (defaultState === 'closed') {
-            sectionBody.style.display = 'none';
-            if (icon) { icon.textContent = '▼'; }
-            console.log(`✅ Section "${sectionId}" default state CLOSED (no cache)`);
-          } else {
+          // Special case: trade-creation section should be closed by default (lazy loading)
+          const shouldBeClosed = sectionId === 'trade-creation';
+          const finalState = shouldBeClosed ? 'closed' : defaultState;
+          
+          if (finalState === 'open') {
             sectionBody.style.display = 'block';
-            if (icon) { icon.textContent = '▲'; }
+            if (icon) { updateChevronIcon(icon, false); }
             console.log(`✅ Section "${sectionId}" default state OPEN (no cache)`);
+          } else {
+            sectionBody.style.display = 'none';
+            if (icon) { updateChevronIcon(icon, true); }
+            console.log(`✅ Section "${sectionId}" default state CLOSED (no cache)`);
           }
         }
       }
@@ -1024,12 +1093,12 @@ window.restoreSectionStates = async function () {
   if (topSection && topSectionHidden) {
     topSection.classList.add('collapsed');
     topSection.style.display = 'none';
-    if (topIcon) { topIcon.textContent = '▼'; }
+    if (topIcon) { updateChevronIcon(topIcon, true); }
     // console.log(`✅ Top section RESTORED to COLLAPSED`);
   } else if (topSection) {
     topSection.classList.remove('collapsed');
     topSection.style.display = 'block';
-    if (topIcon) { topIcon.textContent = '▲'; }
+    if (topIcon) { updateChevronIcon(topIcon, false); }
     // console.log(`✅ Top section RESTORED to EXPANDED`);
   }
 
@@ -1063,14 +1132,14 @@ window.restoreSectionStates = async function () {
         sectionBody.classList.add('collapsed');
         section.classList.add('collapsed');
         sectionBody.style.display = 'none';
-        if (icon) { icon.textContent = '▼'; }
+        if (icon) { updateChevronIcon(icon, true); }
         // console.log(`✅ Section "${sectionId}" RESTORED to COLLAPSED`);
         restoredCount++;
       } else if (sectionBody) {
         sectionBody.classList.remove('collapsed');
         section.classList.remove('collapsed');
         sectionBody.style.display = 'block';
-        if (icon) { icon.textContent = '▲'; }
+        if (icon) { updateChevronIcon(icon, false); }
         // console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
         restoredCount++;
       }
@@ -1411,7 +1480,7 @@ async function loadSectionStates() {
       sectionBody.style.display = 'block';
       section.classList.remove('collapsed');
       section.classList.add('expanded');
-      if (toggleIcon) toggleIcon.textContent = '▼';
+      if (toggleIcon) updateChevronIcon(toggleIcon, true);
       restoredCount++;
     }
   }

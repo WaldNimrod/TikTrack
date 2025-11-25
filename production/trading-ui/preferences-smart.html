@@ -35,8 +35,9 @@
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=0da3519a_20251102_104906">
     
     <!-- External Libraries -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
+    
+    
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
@@ -54,19 +55,19 @@
                 <div class="top-section" data-section="top">
                     <div class="section-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h2><i class="bi bi-gear-fill"></i> העדפות</h2>
+                            <h2><img src="/trading-ui/images/icons/tabler/settings.svg" width="16" height="16" alt="settings" class="icon"> העדפות</h2>
                             <div class="section-header-controls">
                                 <button class="btn btn-outline-secondary btn-sm" onclick="window.toggleSection('infoSummary')" id="toggleInfoBtn">
-                                    <i class="bi bi-chevron-down"></i>
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                 </button>
                                 <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" id="saveAllBtn">
-                                    <i class="bi bi-save"></i> שמור הכל
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> שמור הכל
                                 </button>
                                 <button class="btn btn-warning btn-sm" onclick="window.resetToDefaults()" id="resetBtn">
-                                    <i class="bi bi-arrow-clockwise"></i> איפוס
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> איפוס
                                 </button>
                                 <button class="btn btn-outline-secondary btn-sm" onclick="window.toggleAllSections()" id="toggleAllBtn">
-                                    <i class="bi bi-arrows-expand"></i> פתח/סגור הכל
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> פתח/סגור הכל
                                 </button>
                             </div>
                         </div>
@@ -147,10 +148,10 @@
                             <div class="col-12">
                                 <div class="profile-buttons d-flex flex-wrap gap-2">
                                     <button class="btn btn-primary" onclick="window.saveAsActiveProfile()">
-                                        <i class="bi bi-save"></i> שמור כפרופיל פעיל
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> שמור כפרופיל פעיל
                                     </button>
                                     <button class="btn btn-danger" onclick="window.deleteProfile()">
-                                        <i class="bi bi-trash"></i> מחק
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> מחק
                                     </button>
                                 </div>
                             </div>
@@ -383,7 +384,7 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <h5 class="card-title">
-                                            <i class="fas fa-cog me-2"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                             בחר מצב עבודה למערכת ההתראות
                                         </h5>
                                         <p class="card-text text-muted">
@@ -402,7 +403,7 @@
                                                             <input class="form-check-input" type="radio" name="notificationMode" id="modeDebug" value="debug">
                                                             <label class="form-check-label" for="modeDebug">
                                                                 <div class="d-flex align-items-center">
-                                                                    <i class="fas fa-bug text-muted me-2"></i>
+                                                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                                                     <div>
                                                                         <strong>מצב דיבג</strong>
                                                                         <br><small class="text-muted">כל ההתראות המפורטות</small>
@@ -420,7 +421,7 @@
                                                             <input class="form-check-input" type="radio" name="notificationMode" id="modeDevelopment" value="development">
                                                             <label class="form-check-label" for="modeDevelopment">
                                                                 <div class="d-flex align-items-center">
-                                                                    <i class="fas fa-code text-primary me-2"></i>
+                                                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                                                     <div>
                                                                         <strong>מצב פיתוח</strong>
                                                                         <br><small class="text-muted">הודעות מרכזיות בלבד</small>
@@ -442,7 +443,7 @@
                                                             <input class="form-check-input" type="radio" name="notificationMode" id="modeWork" value="work" checked>
                                                             <label class="form-check-label" for="modeWork">
                                                                 <div class="d-flex align-items-center">
-                                                                    <i class="fas fa-briefcase text-success me-2"></i>
+                                                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                                                     <div>
                                                                         <strong>מצב עבודה</strong>
                                                                         <br><small class="text-muted">הודעות שגיאה ופעולות משתמש</small>
@@ -460,7 +461,7 @@
                                                             <input class="form-check-input" type="radio" name="notificationMode" id="modeSilent" value="silent">
                                                             <label class="form-check-label" for="modeSilent">
                                                                 <div class="d-flex align-items-center">
-                                                                    <i class="fas fa-volume-mute text-danger me-2"></i>
+                                                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                                                     <div>
                                                                         <strong>מצב מושתק</strong>
                                                                         <br><small class="text-muted">הודעות שגיאה בלבד</small>
@@ -479,12 +480,12 @@
                             <!-- Current Mode Status -->
                             <div class="col-md-4">
                                 <h6 class="text-info mb-3">
-                                    <i class="fas fa-info-circle me-2"></i>
+                                    <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                     מצב נוכחי
                                 </h6>
                                 <div id="currentModeStatus" class="p-2 bg-light rounded border">
                                     <div class="d-flex align-items-center">
-                                        <i class="fas fa-briefcase text-success me-2"></i>
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                         <div>
                                             <span class="fw-bold">מצב עבודה</span>
                                             <br><small class="text-muted">ברירת מחדל - מאזן בין מידע לרעש</small>
@@ -495,11 +496,11 @@
                                 <!-- Action Buttons -->
                                 <div class="mt-3">
                                     <button type="button" class="btn btn-primary btn-sm w-100 mb-2" onclick="saveNotificationMode()">
-                                        <i class="fas fa-save me-2"></i>
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                         שמור מצב עבודה
                                     </button>
                                     <button type="button" class="btn btn-outline-secondary btn-sm w-100" onclick="testNotificationMode()">
-                                        <i class="fas fa-play me-2"></i>
+                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                         בדוק מצב נוכחי
                                     </button>
                                 </div>
@@ -510,7 +511,7 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <h6 class="card-title">
-                                            <i class="fas fa-list me-2"></i>
+                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                                             קטגוריות התראות ולוגים
                                         </h6>
                                         <p class="card-text text-muted">

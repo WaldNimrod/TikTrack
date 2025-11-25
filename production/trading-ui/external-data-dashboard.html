@@ -11,7 +11,8 @@
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=0da3519a_20251102_104906">
+    
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
 </head>
 <body class="external-data-dashboard-page">
     <div class="background-wrapper">
@@ -21,7 +22,7 @@
                 <!-- UI Content Section Top Start-->
                 <div class="top-section" data-section="top">
                     <div class="section-header">
-                        <h2>🌐 דשבורד נתונים חיצוניים</h2>
+                        <h2><img src="/trading-ui/images/icons/tabler/world.svg" width="16" height="16" alt="world" class="icon"> דשבורד נתונים חיצוניים</h2>
                         <div class="header-actions d-flex align-items-center gap-2">
                             <button data-button-type="COPY" data-text="העתק לוג מפורט" data-onclick="ExternalDataDashboardActions.copyDetailedLog(event)" data-size="small" data-id="action-copy-log-header"></button>
                             <button class="filter-toggle-btn" data-onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
@@ -88,7 +89,7 @@
                             <div class="col-md-6">
                                 <div class="card h-100">
                                     <div class="card-body">
-                                        <h6 class="card-title mb-3">📊 נתוני ביצועים</h6>
+                                        <h6 class="card-title mb-3"><img src="/trading-ui/images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> נתוני ביצועים</h6>
                                         <div class="d-flex justify-content-between">
                                             <div>
                                                 <small class="text-muted d-block">זמן טעינת עמוד</small>
@@ -125,7 +126,7 @@
                 <!-- UI Content Section Top End-->
 
                 <!-- UI Content Section 1 Start-->
-                <div class="content-section" id="actions-section">
+                <div class="content-section" id="actions-section" data-section="actions-section">
                     <div class="section-header">
                         <h2>פעולות מהירות</h2>
                         <div class="table-actions">
@@ -198,7 +199,7 @@
                 <!-- UI Content Section 1 End-->
 
                 <!-- UI Content Section 2 Start-->
-                <div class="content-section" id="providers-section">
+                <div class="content-section" id="providers-section" data-section="providers-section">
                     <div class="section-header">
                         <h2>ספקי נתונים</h2>
                         <div class="table-actions">
@@ -220,7 +221,7 @@
                 <!-- UI Content Section 2 End-->
 
                 <!-- UI Content Section 3 Start-->
-                <div class="content-section" id="cache-section">
+                <div class="content-section" id="cache-section" data-section="cache-section">
                     <div class="section-header">
                         <h2>ניהול מטמון נתונים חיצוניים</h2>
                         <div class="table-actions">
@@ -279,7 +280,7 @@
                 <!-- UI Content Section 3 End-->
 
                 <!-- UI Content Section 4 Start-->
-                <div class="content-section" id="logs-section">
+                <div class="content-section" id="logs-section" data-section="logs-section">
                     <div class="section-header">
                         <h2>לוגים אחרונים</h2>
                         <div class="table-actions">
@@ -314,7 +315,7 @@
                 <!-- UI Content Section 4 End-->
 
                 <!-- UI Content Section 5 Start-->
-                <div class="content-section" id="history-section">
+                <div class="content-section" id="history-section" data-section="history-section">
                     <div class="section-header">
                         <h2>היסטוריית רענון קבוצתי</h2>
                         <div class="table-actions">
@@ -339,7 +340,7 @@
                 <!-- UI Content Section 5 End-->
 
                 <!-- UI Content Section 6 Start-->
-                <div class="content-section" id="charts-section">
+                <div class="content-section" id="charts-section" data-section="charts-section">
                     <div class="section-header">
                         <h2>גרפי ביצועים</h2>
                         <div class="table-actions">

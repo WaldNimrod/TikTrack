@@ -31,8 +31,9 @@
     <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
     
     <!-- External Libraries -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
+    
+    
     
     <!-- ===== CRITICAL: showModalSafe Helper - Must be loaded before any data-onclick attributes ===== -->
     <script>
@@ -90,7 +91,7 @@
                     <!-- Main header -->
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/cash_flows.svg" alt="תזרימי מזומנים" class="section-icon">
+                            <img src="images/icons/entities/cash_flows.svg" alt="תזרימי מזומנים" class="section-icon">
                             תזרימי מזומנים
                         </div>
                         <div class="table-actions">
@@ -112,11 +113,11 @@
                     </div>
                 </div> <!-- End top-section -->
                 <!-- Cash flows management area - content-section -->
-                <div class="content-section" id="main">
+                <div class="content-section" id="main" data-section="main">
                     <!-- Cash flows header -->
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/cash_flows.svg" alt="ניהול תזרימי מזומנים" class="section-icon">
+                            <img src="images/icons/entities/cash_flows.svg" alt="ניהול תזרימי מזומנים" class="section-icon">
                             ניהול תזרימי מזומנים
                         </div>
                         <div class="table-count" id="cashFlowsCount">טוען...</div>
@@ -188,10 +189,10 @@
                     </div>
                 </div>
                 <!-- Unified Forex Exchanges section -->
-                <div class="content-section" id="forex-unified-section">
+                <div class="content-section" id="forex-unified-section" data-section="forex-unified-section">
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/cash_flows.svg" alt="המרות מטבע מאוחדות" class="section-icon">
+                            <img src="images/icons/entities/cash_flows.svg" alt="המרות מטבע מאוחדות" class="section-icon">
                             המרות מטבע מאוחדות
                         </div>
                         <div class="table-actions">
@@ -463,6 +464,8 @@
     <script src="scripts/ticker-service.js?v=1.0.0"></script> <!-- שירות טיקרים -->
     <!-- [70] Load Order: 70 -->
     <script src="scripts/trade-plan-service.js?v=1.0.0"></script> <!-- שירות תכניות מסחר -->
+    <!-- [70.1] Load Order: 70.1 -->
+    <script src="scripts/services/cash-flows-data.js?v=1.0.0"></script> <!-- שירות נתוני תנועות מזומן -->
     <!-- [71] Load Order: 71 -->
     <script src="scripts/condition-translator.js?v=1.0.0"></script> <!-- מתרגם תנאים -->
     <!-- [72] Load Order: 72 -->

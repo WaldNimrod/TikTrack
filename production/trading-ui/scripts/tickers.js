@@ -886,6 +886,49 @@ async function saveTicker() {
     return;
   }
 
+  // Business Logic API validation - validate ticker symbol
+  if (window.TickersData?.validateTickerSymbol) {
+    try {
+      const symbolValidation = await window.TickersData.validateTickerSymbol(symbol);
+      if (!symbolValidation.is_valid) {
+        const errorMessage = symbolValidation.errors?.join(', ') || 'ולידציה של סמל נכשלה';
+        window.showErrorNotification?.('שגיאת ולידציה', errorMessage);
+        return;
+      }
+    } catch (validationError) {
+      window.Logger?.warn('⚠️ Ticker symbol validation error (continuing with save)', {
+        error: validationError,
+        page: 'tickers'
+      });
+      // Continue with save even if validation fails (fallback)
+    }
+  }
+
+  // Business Logic API validation - validate ticker data
+  if (window.TickersData?.validateTicker) {
+    try {
+      const validationResult = await window.TickersData.validateTicker({
+        symbol,
+        name,
+        type,
+        currency_id: parseInt(currency_id),
+        status
+      });
+
+      if (!validationResult.is_valid) {
+        const errorMessage = validationResult.errors?.join(', ') || 'ולידציה נכשלה';
+        window.showErrorNotification?.('שגיאת ולידציה', errorMessage);
+        return;
+      }
+    } catch (validationError) {
+      window.Logger?.warn('⚠️ Ticker validation error (continuing with save)', {
+        error: validationError,
+        page: 'tickers'
+      });
+      // Continue with save even if validation fails (fallback)
+    }
+  }
+
   const finalStatus = status;
 
   try {
@@ -2345,7 +2388,7 @@ async function checkTickerExternalData() {
     try {
         // Disable button and show loading
         checkBtn.disabled = true;
-        checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> בודק...';
+        checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> בודק...';
         resultDiv.style.display = 'none';
         warningDiv.style.display = 'none';
         
@@ -2465,7 +2508,7 @@ async function checkTickerExternalData() {
     } finally {
         // Re-enable button
         checkBtn.disabled = false;
-        checkBtn.innerHTML = '<i class="fas fa-sync-alt"></i> בדוק נתונים חיצוניים';
+        checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1"> בדוק נתונים חיצוניים';
     }
 }
 

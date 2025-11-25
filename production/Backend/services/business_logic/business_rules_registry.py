@@ -148,6 +148,28 @@ BUSINESS_RULES: Dict[str, Dict[str, Any]] = {
             'required': True,
             'type': 'string'
         }
+    },
+    
+    'preferences': {
+        # Preference validation rules
+        # Note: These are business rules that complement database constraints
+        # Database constraints (NOT NULL, UNIQUE, etc.) are checked first via ValidationService
+        'profile_name': {
+            'min_length': 1,
+            'max_length': 100,
+            'required': True,
+            'type': 'string'
+        },
+        'preference_name': {
+            'min_length': 1,
+            'max_length': 100,
+            'required': True,
+            'type': 'string'
+        },
+        'value': {
+            'required': False,  # Some preferences can be empty
+            'type': 'string'  # Stored as text in DB
+        }
     }
 }
 

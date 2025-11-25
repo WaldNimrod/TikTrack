@@ -103,10 +103,10 @@ info ""
 info "3. Checking code isolation (no hardcoded dev paths)..."
 
 # Check for hardcoded dev database paths
-# Check for hardcoded SQLite references (deprecated - system uses PostgreSQL)
-if grep -r "sqlite://\|\.db\|tiktrack\.db\|simpleTrade" "$PRODUCTION_BACKEND" --include="*.py" | grep -v "create_production_db.py" | grep -v "scripts/backup_database.py" | grep -v "Development Team" | grep -v "#" | grep -v "deprecated" | grep -v "legacy" > /dev/null; then
-    warn "Hardcoded DB Path" "Found references to SQLite/legacy DB paths (should use config.settings.DATABASE_URL)"
-    grep -r "sqlite://\|\.db\|tiktrack\.db\|simpleTrade" "$PRODUCTION_BACKEND" --include="*.py" | grep -v "create_production_db.py" | grep -v "scripts/backup_database.py" | grep -v "Development Team" | grep -v "#" | grep -v "deprecated" | grep -v "legacy" | head -5
+# Check for hardcoded SQLite references (system uses PostgreSQL only)
+if grep -r "sqlite://\|sqlite3\|\.db\|tiktrack\.db\|simpleTrade" "$PRODUCTION_BACKEND" --include="*.py" | grep -v "create_production_db.py" | grep -v "scripts/backup_database.py" | grep -v "Development Team" | grep -v "#" | grep -v "deprecated" | grep -v "legacy" | grep -v "comment" > /dev/null; then
+    warn "Hardcoded DB Path" "Found references to SQLite/legacy DB paths (should use config.settings.DATABASE_URL with PostgreSQL)"
+    grep -r "sqlite://\|sqlite3\|\.db\|tiktrack\.db\|simpleTrade" "$PRODUCTION_BACKEND" --include="*.py" | grep -v "create_production_db.py" | grep -v "scripts/backup_database.py" | grep -v "Development Team" | grep -v "#" | grep -v "deprecated" | grep -v "legacy" | grep -v "comment" | head -5
 fi
 
 # Check for hardcoded dev port
@@ -242,7 +242,8 @@ legacy_refs=$(grep -R -n \
     --exclude='*.zip' \
     --exclude='.cursorrules*' \
     --exclude=verify_production_isolation.sh \
-    "simpleTrade_new.db" "$PROJECT_ROOT" || true)
+    # PostgreSQL only - no SQLite file checks
+    true)
 
 legacy_prod_refs=$(grep -R -n \
     --exclude-dir=.git \

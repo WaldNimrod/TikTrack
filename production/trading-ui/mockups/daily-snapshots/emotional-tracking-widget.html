@@ -9,43 +9,90 @@
     <meta http-equiv="Expires" content="0">
     <title>תיעוד רגשי - TikTrack</title>
     
+    <!-- Preconnect to CDN for faster loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../../styles-new/master.css">
     
     <!-- External Libraries -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
+    
+    
     
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
+    
+    <!-- TradingView Lightweight Charts -->
+    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js" defer></script>
+    <script src="../../scripts/charts/tradingview-theme.js" defer></script>
+    <script src="../../scripts/charts/tradingview-adapter.js" defer></script>
+    
+    <!-- Header System -->
+    <script src="../../scripts/header-system.js" defer></script>
+    
+    <!-- Icon System -->
+    <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
+    <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
+    
+    <!-- Logger Service -->
+    <script src="../../scripts/logger-service.js" defer></script>
+    
+    <!-- Notification System -->
+    <script src="../../scripts/notification-system.js" defer></script>
+    
+    <!-- Field Renderer Service -->
+    <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    
+    <!-- Info Summary System -->
+    <script src="../../scripts/info-summary-configs.js" defer></script>
+    <script src="../../scripts/info-summary-system.js" defer></script>
+    
+    <!-- Preferences System -->
+    <script src="../../scripts/services/preferences-data.js" defer></script>
+    <script src="../../scripts/preferences-core-new.js" defer></script>
+    <script src="../../scripts/preferences-lazy-loader.js" defer></script>
+    
+    <!-- Dynamic Colors System -->
+    <script src="../../scripts/color-scheme-system-clean.js" defer></script>
+    
+    <!-- UI Utils (includes toggleSection) -->
+    <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
+    
+    <!-- Button System -->
+    <script src="../../scripts/button-system-init.js" defer></script>
 </head>
 <body class="dashboard-page">
     <!-- Header System -->
     <div id="unified-header"></div>
     
     <!-- Mockups Navigation -->
-    <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 0; margin-bottom: 20px;">
+        <!-- Mockups Navigation -->
+    <div class="mockups-navigation">
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                        <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
-                            <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
-                        </span>                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
-                <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
-                <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
-                <a href="comparative-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח השוואתי</a>
-                <a href="trading-journal-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">יומן מסחר</a>
-                <a href="strategy-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח אסטרטגיות</a>
-                <a href="economic-calendar-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">לוח כלכלי</a>
-                <a href="history-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ווידג'ט היסטוריה</a>
-                <a href="emotional-tracking-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">תיעוד רגשי</a>
-                <a href="date-comparison-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">השוואת תאריכים</a>
-                <a href="journal-entry-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">רשומת יומן</a>
-</div>
+                    <div class="mockups-navigation-content">
+                        <span class="mockups-navigation-label">
+                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
+                        </span>
+                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
+                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
+                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
+                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
+                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
+                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
+                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
+                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
+                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link active">תיעוד רגשי</a>
+                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
     
     <!-- Page Content -->
@@ -53,18 +100,31 @@
         <div class="page-body">
             <div class="main-content">
                 <!-- Emotional Tracking Widget Section -->
-                <div class="top-section" id="emotional_tracking_widget_top_section">
+                <div class="top-section" id="emotional_tracking_widget_top_section" data-section="emotional_tracking_widget_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
-                            <i class="bi bi-heart"></i>
+                            <span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="icon" aria-label="icon"></span>
                             תיעוד רגשי
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
                             <button data-button-type="ADD" data-variant="small" data-text="הוסף תיעוד" title="הוסף תיעוד רגשי חדש"></button>
-                        </div><button class="filter-toggle-btn" onclick="toggleSection(\'emotional_tracking_widget_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                        </div><button class="filter-toggle-btn" data-onclick="toggleSection(\'emotional_tracking_widget_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
+                        <!-- Mockup Status Notice -->
+                        <div class="alert alert-info mb-4">
+                            <span class="mockup-notice-icon"></span>
+                            <strong>שימו לב:</strong> זהו מוקאפ עם נתוני דמה. המערכת נמצאת בשלב אפיון מוכוון משתמש.
+                            <br>
+                            <small>
+                                <strong>דוקומנטציה למפתח:</strong>
+                                <a href="../../documentation/frontend/EMOTIONAL_TRACKING_DATA_STRUCTURE.md" target="_blank" class="ms-1">מבנה נתונים</a>,
+                                <a href="../../documentation/frontend/EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md" target="_blank" class="ms-1">מדריך מפתח</a>,
+                                <a href="../../documentation/frontend/EMOTIONAL_TRACKING_IMPLEMENTATION_SPEC.md" target="_blank" class="ms-1">מפרט מימוש</a>
+                            </small>
+                        </div>
+                        
                         <!-- Quick Emotional Entry -->
                         <div class="card mb-4">
                             <div class="card-body">
@@ -79,27 +139,27 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">בחר רגש/תחושה:</label>
-                                    <div class="d-flex gap-2 flex-wrap">
-                                        <button class="btn btn-outline-secondary">
-                                            <i class="bi bi-emoji-laughing"></i> שמח
+                                    <div class="d-flex gap-2 flex-wrap" id="emotionButtonsContainer">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="happy">
+                                            <span class="emotion-icon"></span> שמח
                                         </button>
-                                        <button class="btn btn-outline-secondary">
-                                            <i class="bi bi-emoji-smile"></i> מרוצה
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="satisfied">
+                                            <span class="emotion-icon"></span> מרוצה
                                         </button>
-                                        <button class="btn btn-outline-secondary">
-                                            <i class="bi bi-emoji-neutral"></i> ניטרלי
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="neutral">
+                                            <span class="emotion-icon"></span> ניטרלי
                                         </button>
-                                        <button class="btn btn-outline-secondary">
-                                            <i class="bi bi-emoji-frown"></i> עצוב
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="sad">
+                                            <span class="emotion-icon"></span> עצוב
                                         </button>
-                                        <button class="btn btn-outline-secondary">
-                                            <i class="bi bi-emoji-angry"></i> כועס
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="angry">
+                                            <span class="emotion-icon"></span> כועס
                                         </button>
-                                        <button class="btn btn-outline-secondary">
-                                            <i class="bi bi-emoji-dizzy"></i> מבולבל
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="confused">
+                                            <span class="emotion-icon"></span> מבולבל
                                         </button>
-                                        <button class="btn btn-outline-secondary">
-                                            <i class="bi bi-emoji-smile-upside-down"></i> מתוח
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="stressed">
+                                            <span class="emotion-icon"></span> מתוח
                                         </button>
                                     </div>
                                 </div>
@@ -107,7 +167,7 @@
                                     <label for="emotionNotes" class="form-label">הערות (אופציונלי):</label>
                                     <textarea id="emotionNotes" class="form-control" rows="3" placeholder="מה גרם לרגש הזה?"></textarea>
                                 </div>
-                                <button class="btn btn-primary">שמור תיעוד</button>
+                                <button class="btn btn-primary" id="saveEmotionButton">שמור תיעוד</button>
                             </div>
                         </div>
                         
@@ -115,8 +175,8 @@
                         <div class="card mb-4">
                             <div class="card-body">
                                 <h6 class="card-title">ניתוח דפוסים רגשיים</h6>
-                                <div class="chart-container" style="height: 250px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                                    [גרף דפוסים רגשיים - Bar Chart או Pie Chart]
+                                <div class="chart-container chart-container-placeholder-small" id="emotionalPatternsChartContainer">
+                                    <div class="chart-loading">טוען גרף...</div>
                                 </div>
                                 <div class="mt-3">
                                     <small class="text-muted">הגרף מציג את התפלגות הרגשות שלך לאורך זמן</small>
@@ -128,37 +188,8 @@
                         <div class="card mb-4">
                             <div class="card-body">
                                 <h6 class="card-title">תיעודים אחרונים</h6>
-                                <div class="list-group">
-                                    <div class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <i class="bi bi-emoji-smile text-success"></i>
-                                                <strong>מרוצה</strong>
-                                                <span class="text-muted ms-2">15 בינואר 2025, 14:30</span>
-                                            </div>
-                                            <small class="text-muted">קשור לטרייד #123</small>
-                                        </div>
-                                    </div>
-                                    <div class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <i class="bi bi-emoji-laughing text-success"></i>
-                                                <strong>שמח</strong>
-                                                <span class="text-muted ms-2">10 בינואר 2025, 16:00</span>
-                                            </div>
-                                            <small class="text-muted">קשור לטרייד #124</small>
-                                        </div>
-                                    </div>
-                                    <div class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <i class="bi bi-emoji-neutral text-warning"></i>
-                                                <strong>ניטרלי</strong>
-                                                <span class="text-muted ms-2">5 בינואר 2025, 10:00</span>
-                                            </div>
-                                            <small class="text-muted">ללא קישור</small>
-                                        </div>
-                                    </div>
+                                <div class="list-group" id="recentEntriesContainer">
+                                    <!-- Entries will be rendered here by JavaScript -->
                                 </div>
                             </div>
                         </div>
@@ -167,13 +198,8 @@
                         <div class="card mb-4">
                             <div class="card-body">
                                 <h6 class="card-title">תובנות</h6>
-                                <div class="alert alert-info">
-                                    <i class="bi bi-lightbulb"></i>
-                                    <strong>תובנה:</strong> אתה נוטה להיות מרוצה יותר בטריידים עם תוכנית (70% מהמקרים).
-                                </div>
-                                <div class="alert alert-warning">
-                                    <i class="bi bi-exclamation-triangle"></i>
-                                    <strong>דפוס:</strong> רמת מתח גבוהה יותר בטריידים של יום (day trading).
+                                <div id="insightsContainer">
+                                    <!-- Insights will be rendered here by JavaScript -->
                                 </div>
                             </div>
                         </div>
@@ -185,5 +211,12 @@
     
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
+    
+    <!-- Notification System Containers -->
+    <div class="notification-container" id="notification-container"></div>
+    <div id="toast-container"></div>
+    
+    <!-- Page-specific script -->
+    <script src="../../scripts/emotional-tracking-widget.js" defer></script>
 </body>
 </html>

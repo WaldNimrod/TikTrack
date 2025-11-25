@@ -37,13 +37,13 @@ git push origin production
 
 ### סביבת פיתוח (Development)
 - **פורט:** 8080
-- **בסיס נתונים:** `Backend/db/tiktrack.db`
+- **בסיס נתונים:** PostgreSQL (`TikTrack-db-development`)
 - **לוגים:** `Backend/logs/`
 - **הפעלה:** `./start_server.sh`
 
 ### סביבת פרודקשן (Production)
 - **פורט:** 5001
-- **בסיס נתונים:** `production/Backend/db/tiktrack.db`
+- **בסיס נתונים:** PostgreSQL (`TikTrack-db-prodution`)
 - **לוגים:** `production/Backend/logs/`
 - **הפעלה:** `./start_production.sh`
 
@@ -51,7 +51,8 @@ git push origin production
 
 1. Python 3.x מותקן
 2. כל התלויות מ-`Backend/requirements.txt` מותקנות
-3. בסיס נתונים פיתוח קיים (`Backend/db/tiktrack.db`)
+3. PostgreSQL מותקן ופועל (Docker container או מקומי)
+4. בסיס נתונים PostgreSQL פיתוח קיים (`TikTrack-db-development`)
 
 ## תהליך ההקמה
 
@@ -64,7 +65,7 @@ python3 Backend/scripts/create_production_db.py
 ```
 
 הסקריפט:
-- יוצר בסיס נתונים חדש בשם `tiktrack.db`
+- יוצר בסיס נתונים PostgreSQL חדש (`TikTrack-db-prodution`)
 - מעתיק את כל המבנה והטבלאות
 - מעתיק את כל טבלאות העזר והעדפות
 - מנקה את טבלאות המשתמש (trades, executions, cash_flows, וכו')
@@ -95,7 +96,7 @@ python3 Backend/scripts/create_production_db.py
 ```
 
 השרת יתחיל על פורט 5001 עם:
-- בסיס נתונים: `production/Backend/db/tiktrack.db`
+- בסיס נתונים: PostgreSQL (`TikTrack-db-prodution`)
 - לוגים: `production/Backend/logs/`
 - סביבה: Production
 
@@ -211,7 +212,8 @@ python3 scripts/versioning/bump-version.py \
 ### גיבוי בסיס נתונים פרודקשן
 
 ```bash
-python3 Backend/scripts/backup_database.py --output-dir Backend/db/backups
+# גיבוי PostgreSQL (pg_dump)
+pg_dump -h localhost -U TikTrakDBAdmin -d TikTrack-db-prodution > backup_$(date +%Y%m%d_%H%M%S).sql
 ```
 
 ### עדכון בסיס נתונים פרודקשן

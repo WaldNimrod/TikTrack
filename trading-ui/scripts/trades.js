@@ -1387,8 +1387,24 @@ async function cancelTradeRecord(tradeId) {
       return;
     }
 
-    if (!window.confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`)) {
-      return;
+    // Fallback אם מערכת התראות לא זמינה
+    if (typeof window.showConfirmationDialog === 'function') {
+      const confirmed = await new Promise(resolve => {
+        window.showConfirmationDialog(
+          'ביטול טרייד',
+          `האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`,
+          () => resolve(true),
+          () => resolve(false),
+        );
+      });
+      if (!confirmed) {
+        return;
+      }
+    } else {
+      // Fallback למקרה שמערכת התראות לא זמינה
+      if (!window.confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`)) {
+        return;
+      }
     }
     await executeCancellation();
 
@@ -2783,9 +2799,25 @@ async function handleTradeConditionSummaryDelete(conditionId) {
 
   const renderer = window.ConditionsSummaryRenderer;
   const cachedCondition = renderer?.getCondition?.('trade', entityId, numericConditionId);
-  const confirmed = renderer?.confirmDeletion
-    ? await renderer.confirmDeletion(cachedCondition)
-    : window.confirm('האם למחוק את התנאי הנבחר?');
+  let confirmed = false;
+  
+  if (renderer?.confirmDeletion) {
+    confirmed = await renderer.confirmDeletion(cachedCondition);
+  } else if (typeof window.showDeleteWarning === 'function') {
+    confirmed = await new Promise(resolve => {
+      window.showDeleteWarning(
+        'condition',
+        numericConditionId,
+        'תנאי',
+        () => resolve(true),
+        () => resolve(false),
+      );
+    });
+  } else {
+    // Fallback למקרה שמערכת התראות לא זמינה
+    confirmed = window.confirm('האם למחוק את התנאי הנבחר?');
+  }
+  
   if (!confirmed) {
     return;
   }
@@ -3458,35 +3490,14 @@ function showTickerChangeConfirmation(originalSymbol, newSymbol) {
         window.showConfirmationDialog(
           'שינוי טיקר בטרייד',
           message,
-          'אשר שינוי',
-          'ביטול',
           () => resolve(true),
           () => resolve(false),
+          'warning'
         );
       } else {
-        // Fallback לדיאלוג פשוט
-        if (typeof window.showConfirmationDialog === 'function') {
-          window.showConfirmationDialog(
-            'אישור',
-            message,
-            confirmed => resolve(confirmed),
-            () => resolve(false),
-          );
-        } else {
-          if (typeof window.showConfirmationDialog === 'function') {
-            window.showConfirmationDialog(
-              'אישור',
-              message,
-              confirmed => resolve(confirmed),
-              () => resolve(false),
-            );
-          } else {
-            // Fallback למקרה שמערכת התראות לא זמינה
-            const confirmed = window.confirm(message);
-            resolve(confirmed);
-          }
-          resolve(confirmed);
-        }
+        // Fallback למקרה שמערכת התראות לא זמינה
+        const confirmed = window.confirm(message);
+        resolve(confirmed);
       }
     });
   } catch (error) {
@@ -3887,9 +3898,23 @@ function confirmDeleteTrade(tradeId) {
       `סכום: ${trade.amount || 'לא ידוע'}`;
     
     // הצגת חלון אישור
-    if (confirm(confirmMessage)) {
-      // ביצוע המחיקה
-      deleteTradeRecord(tradeId);
+    if (typeof window.showDeleteWarning === 'function') {
+      window.showDeleteWarning(
+        'trade',
+        tradeId,
+        `טרייד (${trade.ticker_symbol || 'לא ידוע'})`,
+        () => {
+          deleteTradeRecord(tradeId);
+        },
+        () => {
+          // המשתמש ביטל - אין צורך לעשות כלום
+        },
+      );
+    } else {
+      // Fallback למקרה שמערכת התראות לא זמינה
+      if (confirm(confirmMessage)) {
+        deleteTradeRecord(tradeId);
+      }
     }
     
   } catch (error) {

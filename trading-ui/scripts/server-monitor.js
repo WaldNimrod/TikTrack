@@ -708,7 +708,23 @@ class ServerMonitor {
     try {
       console.log('🛑 ServerMonitor - מבצע עצירת חירום');
 
-      if (!confirm('האם אתה בטוח שברצונך לבצע עצירת חירום? זה יעצור את השרת מיידית!')) {
+      let confirmed = false;
+      if (typeof window.showConfirmationDialog === 'function') {
+        confirmed = await new Promise(resolve => {
+          window.showConfirmationDialog(
+            'עצירת חירום',
+            'האם אתה בטוח שברצונך לבצע עצירת חירום? זה יעצור את השרת מיידית!',
+            () => resolve(true),
+            () => resolve(false),
+            'danger'
+          );
+        });
+      } else {
+        // Fallback למקרה שמערכת התראות לא זמינה
+        confirmed = confirm('האם אתה בטוח שברצונך לבצע עצירת חירום? זה יעצור את השרת מיידית!');
+      }
+      
+      if (!confirmed) {
         return;
       }
 

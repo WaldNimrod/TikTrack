@@ -120,7 +120,23 @@ function executeTradePlan(planId) {
       `טיקר: ${plan.ticker_symbol || 'לא ידוע'}\n` +
       `סכום: ${plan.amount || 'לא ידוע'}`;
     
-    if (confirm(confirmMessage)) {
+    let confirmed = false;
+    if (typeof window.showConfirmationDialog === 'function') {
+      confirmed = await new Promise(resolve => {
+        window.showConfirmationDialog(
+          'ביצוע תוכנית מסחר',
+          confirmMessage,
+          () => resolve(true),
+          () => resolve(false),
+          'info'
+        );
+      });
+    } else {
+      // Fallback למקרה שמערכת התראות לא זמינה
+      confirmed = confirm(confirmMessage);
+    }
+    
+    if (confirmed) {
       // שליחה לשרת לביצוע התוכנית
       fetch('/api/trade-plans/' + planId + '/execute', {
         method: 'POST',
@@ -543,6 +559,16 @@ async function updateEditTickerInfo() {
                   'ביטול'
                 );
               }) : 
+              (typeof window.showConfirmationDialog === 'function') ?
+              await new Promise(resolve => {
+                window.showConfirmationDialog(
+                  'שינוי טיקר',
+                  'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
+                  () => resolve(true),
+                  () => resolve(false),
+                  'warning'
+                );
+              }) :
               window.confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
             if (confirmed) {
               if (typeof window.showWarningNotification === 'function') {
@@ -1068,7 +1094,23 @@ async function cancelTradePlan(tradePlanId) {
       return;
     }
 
-    if (!window.confirm('האם אתה בטוח שברצונך לבטל את תוכנית המסחר?')) {
+    let confirmed = false;
+    if (typeof window.showConfirmationDialog === 'function') {
+      confirmed = await new Promise(resolve => {
+        window.showConfirmationDialog(
+          'ביטול תוכנית מסחר',
+          'האם אתה בטוח שברצונך לבטל את תוכנית המסחר?',
+          () => resolve(true),
+          () => resolve(false),
+          'warning'
+        );
+      });
+    } else {
+      // Fallback למקרה שמערכת התראות לא זמינה
+      confirmed = window.confirm('האם אתה בטוח שברצונך לבטל את תוכנית המסחר?');
+    }
+    
+    if (!confirmed) {
       return;
     }
     await executeCancellation();
@@ -2507,9 +2549,23 @@ async function handleTradePlanConditionSummaryDelete(conditionId) {
 
   const renderer = window.ConditionsSummaryRenderer;
   const cachedCondition = getCachedConditionSummary(entityId, numericConditionId);
-  const confirmed = renderer?.confirmDeletion
-    ? await renderer.confirmDeletion(cachedCondition)
-    : window.confirm('האם למחוק את התנאי הנבחר?');
+  let confirmed = false;
+  if (renderer?.confirmDeletion) {
+    confirmed = await renderer.confirmDeletion(cachedCondition);
+  } else if (typeof window.showDeleteWarning === 'function') {
+    confirmed = await new Promise(resolve => {
+      window.showDeleteWarning(
+        'condition',
+        numericConditionId,
+        'תנאי',
+        () => resolve(true),
+        () => resolve(false)
+      );
+    });
+  } else {
+    // Fallback למקרה שמערכת התראות לא זמינה
+    confirmed = window.confirm('האם למחוק את התנאי הנבחר?');
+  }
   if (!confirmed) {
     return;
   }
@@ -2555,11 +2611,25 @@ async function confirmTradePlanConditionDeletion(condition) {
     });
   }
 
+  // Fallback למקרה שמערכת התראות לא זמינה
   if (window.showNotification) {
     window.showNotification(`${title}: ${message}`, 'warning');
   }
 
-  return window.confirm(fullMessage);
+  // Fallback למקרה שמערכת התראות לא זמינה
+  if (typeof window.showConfirmationDialog === 'function') {
+    return await new Promise(resolve => {
+      window.showConfirmationDialog(
+        title,
+        fullMessage,
+        () => resolve(true),
+        () => resolve(false),
+        'warning'
+      );
+    });
+  } else {
+    return window.confirm(fullMessage);
+  }
 }
 
 /**

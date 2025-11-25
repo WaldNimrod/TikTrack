@@ -3322,7 +3322,23 @@ async function loadCurrencyExchange(exchangeId) {
  */
 async function deleteCurrencyExchange(exchangeId) {
     try {
-        if (!confirm('האם אתה בטוח שברצונך למחוק את המרת המטבע? פעולה זו תמחק את כל הרשומות המקושרות.')) {
+        let confirmed = false;
+        if (typeof window.showDeleteWarning === 'function') {
+            confirmed = await new Promise(resolve => {
+                window.showDeleteWarning(
+                    'currency_exchange',
+                    exchangeId,
+                    'המרת מטבע',
+                    () => resolve(true),
+                    () => resolve(false),
+                );
+            });
+        } else {
+            // Fallback למקרה שמערכת התראות לא זמינה
+            confirmed = confirm('האם אתה בטוח שברצונך למחוק את המרת המטבע? פעולה זו תמחק את כל הרשומות המקושרות.');
+        }
+        
+        if (!confirmed) {
             return;
         }
         

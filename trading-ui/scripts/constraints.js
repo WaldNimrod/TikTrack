@@ -709,7 +709,7 @@ window.editConstraint = function(constraintName) {
  * Toggle constraint active status
  * @param {string} constraintName - Name of the constraint to toggle
  */
-window.toggleConstraint = function(constraintName) {
+window.toggleConstraint = async function(constraintName) {
     const constraint = constraintsMonitor.constraints.find(c => c.constraint_name === constraintName);
     if (!constraint) {
         constraintsMonitor.showMessage('אילוץ לא נמצא', 'error');
@@ -719,7 +719,23 @@ window.toggleConstraint = function(constraintName) {
     const action = constraint.is_active ? 'השבתה' : 'הפעלה';
     const confirmMessage = `האם אתה בטוח שברצונך ${action} את האילוץ "${constraintName}"?`;
     
-    if (confirm(confirmMessage)) {
+    let confirmed = false;
+    if (typeof window.showConfirmationDialog === 'function') {
+      confirmed = await new Promise(resolve => {
+        window.showConfirmationDialog(
+          action + ' אילוץ',
+          confirmMessage,
+          () => resolve(true),
+          () => resolve(false),
+          'warning'
+        );
+      });
+    } else {
+      // Fallback למקרה שמערכת התראות לא זמינה
+      confirmed = confirm(confirmMessage);
+    }
+    
+    if (confirmed) {
         // Simulate API call
         constraint.is_active = !constraint.is_active;
         constraintsMonitor.renderCurrentLayer();

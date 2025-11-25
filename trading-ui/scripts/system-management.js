@@ -512,7 +512,23 @@ class SystemManagement {
       האם אתה בטוח שברצונך להמשיך?
     `;
 
-      if (confirm(confirmMessage)) {
+      let confirmed = false;
+      if (typeof window.showConfirmationDialog === 'function') {
+        confirmed = await new Promise(resolve => {
+          window.showConfirmationDialog(
+            'שחזור מגיבוי',
+            confirmMessage,
+            () => resolve(true),
+            () => resolve(false),
+            'danger'
+          );
+        });
+      } else {
+        // Fallback למקרה שמערכת התראות לא זמינה
+        confirmed = confirm(confirmMessage);
+      }
+
+      if (confirmed) {
       // Show loading notification
         SystemManagement.showNotification('מתחיל שחזור מגיבוי...', 'warning');
 

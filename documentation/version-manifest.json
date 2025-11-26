@@ -10,13 +10,13 @@
     "notes": "Remove all SQLite references - PostgreSQL only"
   },
   "development": {
-    "version": "1.3.37.0",
+    "version": "1.3.38.0",
     "major": 1,
     "minor": 3,
-    "patch": 37,
+    "patch": 38,
     "build": 0,
-    "commit": "6facf5b5ab005cddd469ee732a046f5e4f7f8eb1",
-    "updated_at": "2025-11-26T03:19:50+00:00",
-    "notes": "Color Scheme System standardization - Phase 3 fixes and Phase 4 automated tests completed"
+    "commit": "4270e4a0f88575e8b52574ac6a56308be09e4a03",
+    "updated_at": "2025-11-26T13:17:05+00:00",
+    "notes": "Event Handler Manager v2.0.0 - Advanced debugging and monitoring system with comprehensive testing (29/29 tests passed)"
   }
 }

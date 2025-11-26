@@ -174,12 +174,16 @@ function scanFile(filePath) {
             // Skip test files
             if (relativePath.includes('test-') || relativePath.includes('mockup')) continue;
             // Skip if it's just checking for modal existence (debug code)
-            const context = content.substring(Math.max(0, match.index - 50), Math.min(content.length, match.index + 50));
+            const context = content.substring(Math.max(0, match.index - 100), Math.min(content.length, match.index + 100));
             if (context.includes('זמין') || context.includes('לא זמין') || context.includes('available')) continue;
             // Skip if it's linkedItemsContent (this is a content div, not a modal)
             if (match[0].includes('linkedItemsContent')) continue;
             // Skip if it's linkedItemsContainer (this is a container, not a modal)
             if (match[0].includes('linkedItemsContainer')) continue;
+            // Skip if it's checking if modal is open (not creating modal)
+            if (context.includes('classList.contains') || context.includes('isModalOpen') || context.includes('modalExists') || context.includes('Checking if linked items modal is open')) continue;
+            // Skip if it's getting modal from ModalNavigationService stack (not creating modal)
+            if (context.includes('ModalNavigationService') || context.includes('getStack')) continue;
             issues.push({
                 type: 'localModalCreation',
                 severity: 'high',

@@ -646,7 +646,7 @@ window.refreshConstraints = function() {
  * View constraint details
  * @param {string} constraintName - Name of the constraint to view
  */
-window.viewConstraint = function(constraintName) {
+window.viewConstraint = async function(constraintName) {
     const constraint = constraintsMonitor.constraints.find(c => c.constraint_name === constraintName);
     if (!constraint) {
         constraintsMonitor.showMessage('אילוץ לא נמצא', 'error');
@@ -782,7 +782,7 @@ window.toggleConstraint = async function(constraintName) {
  * Validate a single constraint
  * @param {string} constraintName - Name of the constraint to validate
  */
-window.validateConstraint = function(constraintName) {
+window.validateConstraint = async function(constraintName) {
     const constraint = constraintsMonitor.constraints.find(c => c.constraint_name === constraintName);
     if (!constraint) {
         constraintsMonitor.showMessage('אילוץ לא נמצא', 'error');
@@ -796,7 +796,7 @@ window.validateConstraint = function(constraintName) {
 /**
  * Validate all constraints
  */
-window.validateAllConstraints = function() {
+window.validateAllConstraints = async function() {
     if (constraintsMonitor.constraints.length === 0) {
         constraintsMonitor.showMessage('אין אילוצים לבדיקה', 'warning');
         return;

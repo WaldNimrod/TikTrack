@@ -383,21 +383,28 @@ const uiManager = {
                     ${task.last_duration_ms ? ` (${utils.formatDuration(task.last_duration_ms)})` : ''}
                 </td>
                 <td>${utils.formatSuccessRate(task.success_rate)}</td>
-                <td>
+                <td class="actions-cell">
+                    ${window.createActionsMenu ? window.createActionsMenu([
+                        { type: 'PLAY', onclick: `executeTask('${task.name.replace(/'/g, "\\'")}')`, title: 'הפעל משימה' },
+                        { type: task.enabled ? 'PAUSE' : 'PLAY', onclick: `toggleTask('${task.name.replace(/'/g, "\\'")}')`, title: task.enabled ? 'כבה משימה' : 'הפעל משימה' },
+                        { type: 'STOP', onclick: `stopTask('${task.name.replace(/'/g, "\\'")}')`, title: 'עצור משימה' },
+                        { type: 'VIEW', onclick: `showTaskDetails('${task.name.replace(/'/g, "\\'")}')`, title: 'פרטי משימה' }
+                    ]) : `
                     <div class="action-buttons">
-                        <button class="btn btn-sm" onclick="executeTask('${task.name}')" ${!task.enabled ? 'disabled' : ''} title="הפעל משימה">
+                        <button class="btn btn-sm" onclick="executeTask('${task.name.replace(/'/g, "\\'")}')" ${!task.enabled ? 'disabled' : ''} title="הפעל משימה">
                             ▶️
                         </button>
-                        <button class="btn btn-sm" onclick="toggleTask('${task.name}')" title="${task.enabled ? 'כבה משימה' : 'הפעל משימה'}">
+                        <button class="btn btn-sm" onclick="toggleTask('${task.name.replace(/'/g, "\\'")}')" title="${task.enabled ? 'כבה משימה' : 'הפעל משימה'}">
                             ${task.enabled ? '⏸️' : '▶️'}
                         </button>
-                        <button class="btn btn-sm" onclick="stopTask('${task.name}')" ${!task.enabled ? 'disabled' : ''} title="עצור משימה">
+                        <button class="btn btn-sm" onclick="stopTask('${task.name.replace(/'/g, "\\'")}')" ${!task.enabled ? 'disabled' : ''} title="עצור משימה">
                             ⏹️
                         </button>
-                        <button class="btn btn-sm" onclick="showTaskDetails('${task.name}')" title="פרטי משימה">
+                        <button class="btn btn-sm" onclick="showTaskDetails('${task.name.replace(/'/g, "\\'")}')" title="פרטי משימה">
                             ℹ️
                         </button>
                     </div>
+                    `}
                 </td>
             </tr>
         `).join('');

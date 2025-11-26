@@ -812,10 +812,14 @@
                                 <td><span class="badge bg-secondary">${event.country || '-'}</span></td>
                                 <td>${importanceBadge}</td>
                                 <td><span class="badge bg-primary">${event.eventType || '-'}</span></td>
-                                <td>
+                                <td class="actions-cell">
+                                    ${window.createActionsMenu ? window.createActionsMenu([
+                                        { type: 'DELETE', onclick: `window.economicCalendarPage?.removeEvent(${event.id})`, title: 'הסר אירוע' }
+                                    ]) : `
                                     <button class="btn btn-sm btn-outline-danger" data-onclick="window.economicCalendarPage?.removeEvent(${event.id})" title="הסר אירוע">
                                         <span class="icon-placeholder" data-icon="trash" data-size="14"></span>
                                     </button>
+                                    `}
                                 </td>
                             </tr>
                         `;

@@ -2700,10 +2700,47 @@ async function initializeComparisonTags() {
 // ===== Initialize Page =====
 
 // Initialize page
+/**
+ * Replace direct action buttons with Actions Menu
+ */
+function replaceStrategyActionButtons() {
+    if (!window.createActionsMenu || typeof window.createActionsMenu !== 'function') {
+        if (window.Logger) {
+            window.Logger.warn('createActionsMenu not available, cannot replace action buttons', { page: 'strategy-analysis-page' });
+        }
+        return;
+    }
+
+    const table = document.querySelector('table[data-table-type="strategy-list"]');
+    if (!table) return;
+
+    const actionCells = table.querySelectorAll('td.actions-cell[data-strategy-name]');
+    actionCells.forEach(cell => {
+        const strategyName = cell.getAttribute('data-strategy-name');
+        if (!strategyName) return;
+
+        // Skip if already replaced
+        if (cell.querySelector('.actions-menu-wrapper')) return;
+
+        // Replace buttons with Actions Menu
+        const actionsMenuHtml = window.createActionsMenu([
+            { type: 'EDIT', onclick: `window.editStrategy && window.editStrategy('${strategyName.replace(/'/g, "\\'")}')`, title: 'ערוך' },
+            { type: 'DELETE', onclick: `window.deleteStrategy && window.deleteStrategy('${strategyName.replace(/'/g, "\\'")}')`, title: 'מחק' }
+        ]);
+
+        if (actionsMenuHtml) {
+            cell.innerHTML = actionsMenuHtml;
+        }
+    });
+}
+
 async function initializePage() {
     try {
         // Initialize Header System first
         await initializeHeader();
+        
+        // Replace direct action buttons with Actions Menu
+        replaceStrategyActionButtons();
         
         // Wait for Preferences to be loaded (needed for default_trading_account)
         if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {

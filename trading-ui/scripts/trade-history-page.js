@@ -58,27 +58,16 @@
     }
 
     /**
-     * Format date string using DateNormalizationService if available
+     * Format date string using FieldRendererService
      * @param {string} dateString - Date string
+     * @param {boolean} includeTime - Whether to include time
      * @returns {string} Formatted date
      */
-    function formatDate(dateString) {
+    function formatDate(dateString, includeTime = false) {
         if (!dateString) return '-';
         
-        // Use DateNormalizationService if available
-        if (window.DateNormalizationService && typeof window.DateNormalizationService.formatDate === 'function') {
-            try {
-                return window.DateNormalizationService.formatDate(dateString);
-            } catch (error) {
-                if (window.Logger) {
-                    window.Logger.warn('Error formatting date with DateNormalizationService', { page: 'trade-history-page', error });
-                }
-            }
-        }
-        
-        // Fallback to standard formatting
-        const date = new Date(dateString);
-        return date.toLocaleDateString('he-IL');
+        // Use FieldRendererService for consistent date formatting
+        return window.FieldRendererService.renderDate(dateString, includeTime);
     }
 
     // ===== Main Functions =====
@@ -310,8 +299,27 @@
      */
     async function openTradeSelectorModal() {
         const modalElement = document.getElementById('tradeSelectorModal');
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
+        if (modalElement) {
+            // Use ModalManagerV2 if available, fallback to Bootstrap
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+                try {
+                    await window.ModalManagerV2.showModal('tradeSelectorModal', 'view');
+                } catch (error) {
+                    // Fallback to Bootstrap if ModalManagerV2 fails
+                    window.Logger?.warn('tradeSelectorModal not available in ModalManagerV2, using Bootstrap fallback', { page: 'trade-history-page' });
+                    if (bootstrap?.Modal) {
+                        const modal = new bootstrap.Modal(modalElement);
+                        modal.show();
+                    }
+                }
+            } else {
+                // Fallback to Bootstrap modal
+                if (bootstrap?.Modal) {
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                }
+            }
+        }
         
         // Load data when modal opens
         await Promise.all([
@@ -449,11 +457,25 @@
      * Clear filters
      */
     function clearTradeFilters() {
-        document.getElementById('filterTicker').value = '';
-        document.getElementById('filterSide').value = '';
-        document.getElementById('filterInvestmentType').value = '';
-        document.getElementById('filterDateFrom').value = '';
-        document.getElementById('filterDateTo').value = '';
+        // Use DataCollectionService to clear fields if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue('filterTicker', '', 'text');
+          window.DataCollectionService.setValue('filterSide', '', 'text');
+          window.DataCollectionService.setValue('filterInvestmentType', '', 'text');
+          window.DataCollectionService.setValue('filterDateFrom', '', 'dateOnly');
+          window.DataCollectionService.setValue('filterDateTo', '', 'dateOnly');
+        } else {
+          const filterTickerEl = document.getElementById('filterTicker');
+          const filterSideEl = document.getElementById('filterSide');
+          const filterInvestmentTypeEl = document.getElementById('filterInvestmentType');
+          const filterDateFromEl = document.getElementById('filterDateFrom');
+          const filterDateToEl = document.getElementById('filterDateTo');
+          if (filterTickerEl) filterTickerEl.value = '';
+          if (filterSideEl) filterSideEl.value = '';
+          if (filterInvestmentTypeEl) filterInvestmentTypeEl.value = '';
+          if (filterDateFromEl) filterDateFromEl.value = '';
+          if (filterDateToEl) filterDateToEl.value = '';
+        }
         filteredTrades = [...allTrades];
         loadTradesTable();
     }
@@ -463,11 +485,15 @@
      * @param {number} tradeId - Trade ID
      */
     function viewTradeDetails(tradeId) {
-        const trade = allTrades.find(t => t.id === tradeId);
-        if (!trade) return;
-        
-        // In production, this would open a trade details modal
-        alert(`פרטי טרייד #${tradeId}\n\nטיקר: ${trade.ticker}\nצד: ${trade.side}\nסוג: ${getInvestmentTypeText(trade.investment_type)}\nתאריך יצירה: ${formatDate(trade.created_at)}\nתאריך סגירה: ${formatDate(trade.closed_at)}\nP/L: $${trade.pl} (${trade.pl >= 0 ? '+' : ''}${trade.pl_percent}%)`);
+        // שימוש במערכת המרכזית Entity Details Modal
+        if (typeof window.showEntityDetails === 'function') {
+            window.showEntityDetails('trade', tradeId, { mode: 'view' });
+        } else {
+            // Fallback למקרה שהמערכת לא זמינה (מוקאפ)
+            const trade = allTrades.find(t => t.id === tradeId);
+            if (!trade) return;
+            alert(`פרטי טרייד #${tradeId}\n\nטיקר: ${trade.ticker}\nצד: ${trade.side}\nסוג: ${getInvestmentTypeText(trade.investment_type)}\nתאריך יצירה: ${formatDate(trade.created_at)}\nתאריך סגירה: ${formatDate(trade.closed_at)}\nP/L: $${trade.pl} (${trade.pl >= 0 ? '+' : ''}${trade.pl_percent}%)`);
+        }
     }
 
     /**
@@ -491,9 +517,16 @@
         // Close modal
         const modalElement = document.getElementById('tradeSelectorModal');
         if (modalElement) {
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) {
-                modal.hide();
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+                window.ModalManagerV2.hideModal('tradeSelectorModal');
+            } else {
+                // Fallback to Bootstrap modal
+                if (bootstrap?.Modal) {
+                    const modal = bootstrap.Modal.getInstance(modalElement);
+                    if (modal) {
+                        modal.hide();
+                    }
+                }
             }
         }
         
@@ -756,7 +789,7 @@
             renderTradeDetails(data.selectedTrade, data.conditions);
 
             // Render timeline steps
-            renderTimelineSteps(data.timelineData);
+            await renderTimelineSteps(data.timelineData);
 
             // Initialize timeline chart with data (after a short delay to ensure DOM is ready)
             setTimeout(async () => {
@@ -957,11 +990,14 @@
                 : '<span class="text-muted">-</span>';
             const totalPL = window.FieldRendererService.renderAmount(trade.total_pl || trade.realized_pl || 0, '$', 0, true);
             
+            // Use textContent for better security, or create elements properly
             plel.innerHTML = `
                 <div>ממומש: ${realizedPL}</div>
                 <div>לא ממומש: ${unrealizedPL}</div>
                 <div><strong>סה"כ: ${totalPL}</strong></div>
             `;
+            // Note: This is a specific P/L display for a single trade, not a summary element
+            // Consider using InfoSummarySystem if this becomes a summary of multiple trades
             plel.classList.remove('loading');
         }
     }
@@ -969,13 +1005,13 @@
     /**
      * Render timeline steps using FieldRendererService
      */
-    function renderTimelineSteps(timelineData) {
+    async function renderTimelineSteps(timelineData) {
         if (!timelineData || !Array.isArray(timelineData)) return;
 
         const timelineEl = document.getElementById('timelineAbsolute');
         if (!timelineEl) return;
 
-        timelineEl.innerHTML = timelineData.map((step, index) => {
+        const stepsHTML = await Promise.all(timelineData.map(async (step, index) => {
             const dateStr = formatDate(step.date);
             
             // Determine step type and classes
@@ -984,23 +1020,68 @@
             let iconPath = '';
             let title = step.title || step.type || '-';
 
-            if (step.type === 'Note') {
-                stepClass += ' timeline-note';
-                pointColor = 'var(--info-color, #17a2b8)';
-                iconPath = '/trading-ui/images/icons/entities/notes.svg';
-            } else if (step.type === 'Cash Flow') {
-                stepClass += ' timeline-cashflow';
-                pointColor = 'var(--secondary-color, #fc5a06)';
-                iconPath = '/trading-ui/images/icons/entities/cash_flows.svg';
-            } else if (step.type === 'Alert') {
-                stepClass += ' timeline-alert';
-                pointColor = 'var(--warning-color, #ffc107)';
-                iconPath = '/trading-ui/images/icons/entities/alerts.svg';
-            } else if (step.type === 'Trade Plan') {
-                iconPath = '/trading-ui/images/icons/entities/trade_plans.svg';
-            } else if (step.type === 'Execution') {
-                stepClass += ' execution-title';
-                iconPath = '/trading-ui/images/icons/entities/executions.svg';
+            // Use IconSystem to get entity icons
+            if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                try {
+                    if (step.type === 'Note') {
+                        stepClass += ' timeline-note';
+                        pointColor = 'var(--info-color, #17a2b8)';
+                        iconPath = await window.IconSystem.getEntityIcon('note');
+                    } else if (step.type === 'Cash Flow') {
+                        stepClass += ' timeline-cashflow';
+                        pointColor = 'var(--secondary-color, #fc5a06)';
+                        iconPath = await window.IconSystem.getEntityIcon('cash_flow');
+                    } else if (step.type === 'Alert') {
+                        stepClass += ' timeline-alert';
+                        pointColor = 'var(--warning-color, #ffc107)';
+                        iconPath = await window.IconSystem.getEntityIcon('alert');
+                    } else if (step.type === 'Trade Plan') {
+                        iconPath = await window.IconSystem.getEntityIcon('trade_plan');
+                    } else if (step.type === 'Execution') {
+                        stepClass += ' execution-title';
+                        iconPath = await window.IconSystem.getEntityIcon('execution');
+                    }
+                } catch (error) {
+                    // Fallback to direct paths
+                    if (step.type === 'Note') {
+                        stepClass += ' timeline-note';
+                        pointColor = 'var(--info-color, #17a2b8)';
+                        iconPath = '/trading-ui/images/icons/entities/notes.svg';
+                    } else if (step.type === 'Cash Flow') {
+                        stepClass += ' timeline-cashflow';
+                        pointColor = 'var(--secondary-color, #fc5a06)';
+                        iconPath = '/trading-ui/images/icons/entities/cash_flows.svg';
+                    } else if (step.type === 'Alert') {
+                        stepClass += ' timeline-alert';
+                        pointColor = 'var(--warning-color, #ffc107)';
+                        iconPath = '/trading-ui/images/icons/entities/alerts.svg';
+                    } else if (step.type === 'Trade Plan') {
+                        iconPath = '/trading-ui/images/icons/entities/trade_plans.svg';
+                    } else if (step.type === 'Execution') {
+                        stepClass += ' execution-title';
+                        iconPath = '/trading-ui/images/icons/entities/executions.svg';
+                    }
+                }
+            } else {
+                // Fallback to direct paths
+                if (step.type === 'Note') {
+                    stepClass += ' timeline-note';
+                    pointColor = 'var(--info-color, #17a2b8)';
+                    iconPath = '/trading-ui/images/icons/entities/notes.svg';
+                } else if (step.type === 'Cash Flow') {
+                    stepClass += ' timeline-cashflow';
+                    pointColor = 'var(--secondary-color, #fc5a06)';
+                    iconPath = '/trading-ui/images/icons/entities/cash_flows.svg';
+                } else if (step.type === 'Alert') {
+                    stepClass += ' timeline-alert';
+                    pointColor = 'var(--warning-color, #ffc107)';
+                    iconPath = '/trading-ui/images/icons/entities/alerts.svg';
+                } else if (step.type === 'Trade Plan') {
+                    iconPath = '/trading-ui/images/icons/entities/trade_plans.svg';
+                } else if (step.type === 'Execution') {
+                    stepClass += ' execution-title';
+                    iconPath = '/trading-ui/images/icons/entities/executions.svg';
+                }
             }
 
             let detailsHTML = '';
@@ -1057,7 +1138,17 @@
                     <div class="timeline-point-absolute" ${pointColor ? `style="background-color: ${pointColor};"` : ''}></div>
                     <div class="timeline-step-info">
                         <div class="timeline-step-title ${step.type === 'Execution' ? 'execution-title' : ''}">
-                            <img src="${iconPath}" alt="${step.type}" class="entity-icon-small">
+                            ${await (async () => {
+                                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                                    try {
+                                        const entityType = step.type === 'Note' ? 'note' : step.type === 'Cash Flow' ? 'cash_flow' : step.type === 'Alert' ? 'alert' : step.type === 'Trade Plan' ? 'trade_plan' : 'execution';
+                                        return await window.IconSystem.renderIcon('entity', entityType, { size: '16', alt: step.type, class: 'entity-icon-small' });
+                                    } catch (error) {
+                                        return `<img src="${iconPath}" alt="${step.type}" class="entity-icon-small">`;
+                                    }
+                                }
+                                return `<img src="${iconPath}" alt="${step.type}" class="entity-icon-small">`;
+                            })()}
                             ${title}
                         </div>
                         <div class="timeline-step-date">${dateStr}</div>
@@ -1086,7 +1177,7 @@
         registerPlanVsExecutionTable();
 
         // Update table with data
-        updatePlanVsExecutionTable(comparisonData);
+        await updatePlanVsExecutionTable(comparisonData);
     }
 
     /**
@@ -1108,11 +1199,19 @@
         }
 
         // Render functions for each column
-        const renderCategory = (row) => {
+        const renderCategory = async (row) => {
             const icon = row.categoryIcon || 'info-circle';
+            let iconHTML = `<img src="../../images/icons/tabler/${icon}.svg" width="16" height="16" alt="icon" class="icon">`;
+            if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                try {
+                    iconHTML = await window.IconSystem.renderIcon('button', icon, { size: '16', alt: 'icon', class: 'icon' });
+                } catch (error) {
+                    // Fallback already set
+                }
+            }
             return `
                 <strong>
-                    <img src="../../images/icons/tabler/${icon}.svg" width="16" height="16" alt="icon" class="icon">
+                    ${iconHTML}
                     ${row.category}
                 </strong>
             `;
@@ -1130,12 +1229,20 @@
             return renderComparisonValue(row.executed);
         };
 
-        const renderComparisonStatus = (row) => {
+        const renderComparisonStatus = async (row) => {
             const statusBadgeClass = `status-badge status-${row.status}`;
             const statusIcon = row.statusIcon || 'info-circle';
+            let iconHTML = `<img src="../../images/icons/tabler/${statusIcon}.svg" width="16" height="16" alt="${statusIcon}" class="icon">`;
+            if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                try {
+                    iconHTML = await window.IconSystem.renderIcon('button', statusIcon, { size: '16', alt: statusIcon, class: 'icon' });
+                } catch (error) {
+                    // Fallback already set
+                }
+            }
             return `
                 <span class="${statusBadgeClass}">
-                    <img src="../../images/icons/tabler/${statusIcon}.svg" width="16" height="16" alt="${statusIcon}" class="icon">
+                    ${iconHTML}
                     ${row.statusText || ''}
                 </span>
             `;
@@ -1178,7 +1285,7 @@
         // Register table
         window.UnifiedTableSystem.registry.register(tableType, {
             dataGetter: () => planVsExecutionData || [],
-            updateFunction: (data) => updatePlanVsExecutionTable(data),
+            updateFunction: async (data) => await updatePlanVsExecutionTable(data),
             tableSelector: '#planVsExecutionTable',
             columns: [
                 { 
@@ -1204,7 +1311,7 @@
                 { 
                     key: 'status', 
                     header: 'סטטוס',
-                    render: (row) => renderComparisonStatus(row)
+                    render: async (row) => await renderComparisonStatus(row)
                 }
             ],
             sortable: false, // Comparison table doesn't need sorting
@@ -1262,7 +1369,7 @@
         };
 
         planVsExecutionData = comparisonData;
-        tbodyEl.innerHTML = comparisonData.map(row => {
+        const rowsHTML = await Promise.all(comparisonData.map(async row => {
             const statusBadgeClass = `status-badge status-${row.status}`;
             const statusIcon = row.statusIcon || 'info-circle';
 
@@ -1270,7 +1377,9 @@
                 <tr>
                     <td>
                         <strong>
-                            <img src="../../images/icons/tabler/${row.categoryIcon || 'info-circle'}.svg" width="16" height="16" alt="icon" class="icon">
+                            ${typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized
+                                ? await window.IconSystem.renderIcon('button', row.categoryIcon || 'info-circle', { size: '16', alt: 'icon', class: 'icon' })
+                                : `<img src="../../images/icons/tabler/${row.categoryIcon || 'info-circle'}.svg" width="16" height="16" alt="icon" class="icon">`}
                             ${row.category}
                         </strong>
                     </td>
@@ -1291,7 +1400,16 @@
                     </td>
                     <td>
                         <span class="${statusBadgeClass}">
-                            <img src="../../images/icons/tabler/${statusIcon}.svg" width="16" height="16" alt="${statusIcon}" class="icon">
+                            ${await (async () => {
+                                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                                    try {
+                                        return await window.IconSystem.renderIcon('button', statusIcon, { size: '16', alt: statusIcon, class: 'icon' });
+                                    } catch (error) {
+                                        return `<img src="../../images/icons/tabler/${statusIcon}.svg" width="16" height="16" alt="${statusIcon}" class="icon">`;
+                                    }
+                                }
+                                return `<img src="../../images/icons/tabler/${statusIcon}.svg" width="16" height="16" alt="${statusIcon}" class="icon">`;
+                            })()}
                             ${row.statusText || ''}
                         </span>
                     </td>
@@ -1432,20 +1550,29 @@
             // Restore filter states
             if (state.filters) {
                 const { ticker, side, investmentType, dateFrom, dateTo } = state.filters;
-                if (ticker && document.getElementById('filterTicker')) {
+                // Use DataCollectionService to set values if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  if (ticker) window.DataCollectionService.setValue('filterTicker', ticker, 'text');
+                  if (side) window.DataCollectionService.setValue('filterSide', side, 'text');
+                  if (investmentType) window.DataCollectionService.setValue('filterInvestmentType', investmentType, 'text');
+                  if (dateFrom) window.DataCollectionService.setValue('filterDateFrom', dateFrom, 'dateOnly');
+                  if (dateTo) window.DataCollectionService.setValue('filterDateTo', dateTo, 'dateOnly');
+                } else {
+                  if (ticker && document.getElementById('filterTicker')) {
                     document.getElementById('filterTicker').value = ticker;
-                }
-                if (side && document.getElementById('filterSide')) {
+                  }
+                  if (side && document.getElementById('filterSide')) {
                     document.getElementById('filterSide').value = side;
-                }
-                if (investmentType && document.getElementById('filterInvestmentType')) {
+                  }
+                  if (investmentType && document.getElementById('filterInvestmentType')) {
                     document.getElementById('filterInvestmentType').value = investmentType;
-                }
-                if (dateFrom && document.getElementById('filterDateFrom')) {
+                  }
+                  if (dateFrom && document.getElementById('filterDateFrom')) {
                     document.getElementById('filterDateFrom').value = dateFrom;
-                }
-                if (dateTo && document.getElementById('filterDateTo')) {
+                  }
+                  if (dateTo && document.getElementById('filterDateTo')) {
                     document.getElementById('filterDateTo').value = dateTo;
+                  }
                 }
                 // Reapply filters after restoring state (without debounce to restore immediately)
                 if (ticker || side || investmentType || dateFrom || dateTo) {

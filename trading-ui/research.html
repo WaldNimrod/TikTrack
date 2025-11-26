@@ -255,7 +255,22 @@
     <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+
+<!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [54] Page-specific: research -->

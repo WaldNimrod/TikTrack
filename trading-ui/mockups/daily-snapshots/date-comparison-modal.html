@@ -102,11 +102,16 @@
                         <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
                         <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
                         <a href="date-comparison-modal.html" class="mockups-navigation-link active">השוואת תאריכים</a>
-                            </div>
+                        <span class="mockups-navigation-separator">|</span>
+                        <a href="../watch-lists-page.html" class="mockups-navigation-link">רשימות צפייה</a>
+                        <a href="../watch-list-modal.html" class="mockups-navigation-link">מודל רשימה</a>
+                        <a href="../add-ticker-modal.html" class="mockups-navigation-link">הוספת טיקר</a>
+                        <a href="../flag-quick-action.html" class="mockups-navigation-link">דגלים</a>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
     
     <!-- Page Content -->
@@ -118,7 +123,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="calendar" data-size="16" data-alt="calendar" aria-label="calendar"></span> בחירת תאריכים להשוואה</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('date-selection-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('date-selection-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -130,7 +135,7 @@
                                 <label for="dateComparisonRangeFilterToggle" class="form-label form-label-small">טווח מוגדר</label>
                                 <div class="filter-group date-range-filter">
                                     <div class="filter-dropdown">
-                                        <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="dateComparisonRangeFilterToggle" data-onclick="toggleDateComparisonRangeFilterMenu()">
+                                        <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="dateComparisonRangeFilterToggle" data-onclick="toggleDateComparisonRangeFilterMenu()" data-button-type="FILTER">
                                             <span class="selected-value selected-date-text" id="selectedDateComparisonRange">השנה</span>
                                             <span class="dropdown-arrow">▼</span>
                                         </button>
@@ -210,7 +215,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="clipboard-list" data-size="16" data-alt="icon" aria-label="icon"></span> טבלת השוואות</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-טבלת-השוואות')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-טבלת-השוואות')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -218,7 +223,7 @@
                     <div class="section-body">
 
                         <div class="table-responsive">
-                            <table class="table" id="comparison-table">
+                            <table class="table" id="comparison-table" data-table-type="date_comparison">
                                 <thead>
                                     <tr>
                                         <th>מדד</th>
@@ -242,7 +247,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="chart-line" data-size="16" data-alt="chart-line" aria-label="chart-line"></span> גרף Bar Chart - השוואה בין התאריכים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-גרף-bar-chart---השוואה-בין-ה')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-גרף-bar-chart---השוואה-בין-ה')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -270,7 +275,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="chart-line" data-size="16" data-alt="chart-line" aria-label="chart-line"></span> גרף Line Chart - מגמה בין התאריכים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-גרף-line-chart---מגמה-בין-הת')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('date_comparison_modal-גרף-line-chart---מגמה-בין-הת')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -305,8 +310,8 @@
             
             <!-- Modal Footer -->
             <div class="modal-footer">
-                <button class="btn btn-outline-primary">ייצא ל-Excel/PDF</button>
-                <button class="btn btn-secondary" data-onclick="window.close()">סגור</button>
+                <button class="btn btn-outline-primary" data-button-type="EXPORT">ייצא ל-Excel/PDF</button>
+                <button class="btn btn-secondary" data-onclick="window.close()" data-button-type="CLOSE">סגור</button>
             </div>
         </div>
     </div>
@@ -319,5 +324,11 @@
     <!-- Notification System Containers -->
     <div class="notification-container" id="notification-container"></div>
     <div id="toast-container"></div>
+
+    <!-- Entity Details System -->
+    <script src="../../scripts/entity-details-api.js" defer></script>
+    <script src="../../scripts/entity-details-renderer.js" defer></script>
+    <script src="../../scripts/entity-details-modal.js" defer></script>
+    
 </body>
 </html>

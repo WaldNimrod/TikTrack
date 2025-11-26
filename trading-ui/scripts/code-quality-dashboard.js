@@ -727,13 +727,14 @@ class CodeQualityDashboard {
 
         categorySelect.innerHTML = options.join('');
 
-        if (categories.includes(currentValue)) {
-            categorySelect.value = currentValue;
-            this.duplicateFilters.category = currentValue;
+        // Use DataCollectionService to set value if available
+        const valueToSet = categories.includes(currentValue) ? currentValue : 'all';
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(categorySelect.id, valueToSet, 'text');
         } else {
-            categorySelect.value = 'all';
-            this.duplicateFilters.category = 'all';
+          categorySelect.value = valueToSet;
         }
+        this.duplicateFilters.category = valueToSet;
     }
 
     getFilteredDuplicates() {
@@ -884,7 +885,12 @@ class CodeQualityDashboard {
         const value = rawValue !== undefined ? rawValue : slider ? parseInt(slider.value, 10) : 70;
 
         if (slider && rawValue === undefined) {
+          // Use DataCollectionService to set value if available
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(slider.id, value, 'int');
+          } else {
             slider.value = value;
+          }
         }
 
         if (display) {
@@ -903,9 +909,16 @@ class CodeQualityDashboard {
         const categorySelect = document.getElementById('duplicateCategoryFilter');
         const similarityRange = document.getElementById('duplicateSimilarityRange');
 
-        if (typeSelect) typeSelect.value = 'all';
-        if (categorySelect) categorySelect.value = 'all';
-        if (similarityRange) similarityRange.value = 70;
+        // Use DataCollectionService to set values if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          if (typeSelect) window.DataCollectionService.setValue(typeSelect.id, 'all', 'text');
+          if (categorySelect) window.DataCollectionService.setValue(categorySelect.id, 'all', 'text');
+          if (similarityRange) window.DataCollectionService.setValue(similarityRange.id, 70, 'int');
+        } else {
+          if (typeSelect) typeSelect.value = 'all';
+          if (categorySelect) categorySelect.value = 'all';
+          if (similarityRange) similarityRange.value = 70;
+        }
 
         this.updateSimilarityDisplay(70);
         this.renderDuplicateTable();
@@ -1015,18 +1028,34 @@ class CodeQualityDashboard {
     /**
      * Show loading state
      */
-    showLoadingState() {
+    async showLoadingState() {
         const sections = ['errorHandlingResults', 'jsdocResults', 'namingResults', 'functionIndexResults', 'duplicateResults'];
-        sections.forEach(sectionId => {
+        sections.forEach(async sectionId => {
             const element = document.getElementById(sectionId);
             if (element) {
-                element.innerHTML = '<div class="text-center text-muted"><img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> טוען...</div>';
+                let loaderIcon = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin">';
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        loaderIcon = await window.IconSystem.renderIcon('button', 'loader', { size: '16', alt: 'loading', class: 'icon fa-spin' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                element.innerHTML = `<div class="text-center text-muted">${loaderIcon} טוען...</div>`;
             }
         });
 
         const duplicateDetails = document.getElementById('duplicateDetailsPanel');
         if (duplicateDetails) {
-            duplicateDetails.innerHTML = '<div class="text-center text-muted"><img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> טוען כפילויות...</div>';
+            let loaderIcon = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin">';
+            if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                try {
+                    loaderIcon = await window.IconSystem.renderIcon('button', 'loader', { size: '16', alt: 'loading', class: 'icon fa-spin' });
+                } catch (error) {
+                    // Fallback already set
+                }
+            }
+            duplicateDetails.innerHTML = `<div class="text-center text-muted">${loaderIcon} טוען כפילויות...</div>`;
         }
     }
 

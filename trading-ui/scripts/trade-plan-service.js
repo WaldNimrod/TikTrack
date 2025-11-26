@@ -131,6 +131,12 @@ function isTradePlansLoaded() {
  * @returns {string} Formatted status
  */
 function formatTradePlanStatus(status) {
+  // Use Translation Utilities if available
+  if (window.translateTradePlanStatus && typeof window.translateTradePlanStatus === 'function') {
+    return window.translateTradePlanStatus(status);
+  }
+  
+  // Fallback to local implementation
   const statusMap = {
     'open': 'פתוח',
     'closed': 'סגור',

@@ -2385,13 +2385,14 @@ async function showSimpleErrorNotification(title, message, duration = 6000, cate
 /**
  * Helper function: Create and show Bootstrap modal without ARIA warnings
  * MODAL SYSTEM - Creates dynamic modal and shows it properly
+ * Uses ModalManagerV2 when available, falls back to Bootstrap
  *
  * @param {string} modalHtml - HTML string of the modal
  * @param {string} modalId - ID of the modal element
  * @param {Object} options - Bootstrap modal options (optional)
- * @returns {Object} Bootstrap modal instance
+ * @returns {Object} Bootstrap modal instance (for backwards compatibility)
  */
-window.createAndShowModal = function (modalHtml, modalId, options = {}) {
+window.createAndShowModal = async function (modalHtml, modalId, options = {}) {
   // Remove ALL existing modals with this ID (in case of duplicates)
   // querySelectorAll catches all instances, not just the first one
   const existingModals = document.querySelectorAll(`#${modalId}`);
@@ -2415,6 +2416,55 @@ window.createAndShowModal = function (modalHtml, modalId, options = {}) {
     return null;
   }
 
+  // Try to use ModalManagerV2 first (supports dynamic modals)
+  // ModalManagerV2 כבר מטפל ב-Modal Navigation System
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    try {
+      await window.ModalManagerV2.showModal(modalId, 'view');
+      // Return Bootstrap instance for backwards compatibility (if available)
+      if (bootstrap?.Modal) {
+        return bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement, { backdrop: false });
+      }
+      return null;
+    } catch (error) {
+      // Fallback to Bootstrap if ModalManagerV2 fails
+      window.Logger?.warn(`createAndShowModal: ${modalId} not available in ModalManagerV2, using Bootstrap fallback`, { page: 'core-systems' });
+    }
+  }
+
+  // Fallback to Bootstrap modal (original implementation)
+  // Modal Navigation System - רק למודלים מקוננים (nested modals)
+  // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
+  const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
+  
+  if (hasStack) {
+    // רישום במערכת רק אם זה מודל מקונן
+    const navigationMetadata = {
+      modalId,
+      modalType: 'dynamic-modal',
+      title: modalElement.querySelector(`#${modalId}Label`)?.textContent || modalElement.querySelector('.modal-title')?.textContent || '',
+    };
+
+    if (window.ModalNavigationService?.registerModalOpen) {
+      await window.ModalNavigationService.registerModalOpen(modalElement, navigationMetadata);
+    } else if (window.pushModalToNavigation) {
+      await window.pushModalToNavigation(modalElement, navigationMetadata);
+    }
+
+    // עדכון UI (breadcrumb וכפתור חזרה) רק במודלים מקוננים
+    if (window.modalNavigationManager?.updateModalNavigation) {
+      window.modalNavigationManager.updateModalNavigation(modalElement);
+    }
+
+    // רישום סגירה
+    modalElement.addEventListener('hidden.bs.modal', () => {
+      if (window.ModalNavigationService?.registerModalClose) {
+        window.ModalNavigationService.registerModalClose(modalId);
+      } else if (window.registerModalNavigationClose) {
+        window.registerModalNavigationClose(modalId);
+      }
+    }, { once: true });
+  }
   // Fix ARIA accessibility: Use MutationObserver to prevent aria-hidden
   // Bootstrap keeps adding aria-hidden, we need to remove it continuously
   const observer = new MutationObserver(mutations => {
@@ -3826,52 +3876,58 @@ async function loadGlobalNotificationStats() {
   };
 }
 
-const BLOCKING_MODAL_COLOR_FALLBACK = {
-  success: '#28a745',
-  error: '#dc3545',
-  warning: '#ffc107',
-  info: '#17a2b8',
-};
+// ⚠️ REMOVED: BLOCKING_MODAL_COLOR_FALLBACK - use centralized Color Scheme System instead
+// No hardcoded fallbacks - system must load colors from preferences
 
 function getBlockingModalColors(type) {
-  let backgroundColor =
-    BLOCKING_MODAL_COLOR_FALLBACK[type] || BLOCKING_MODAL_COLOR_FALLBACK.success;
+  let backgroundColor = '';
 
   try {
+    // Try notification color system first
     if (typeof window.getNotificationColor === 'function') {
       backgroundColor = window.getNotificationColor(type);
-    } else if (typeof window.getEntityColor === 'function') {
+    }
+    
+    // Fallback to entity colors from centralized system
+    if (!backgroundColor && typeof window.getEntityColor === 'function') {
       switch (type) {
         case 'success':
-          backgroundColor = window.getEntityColor('account') || backgroundColor;
+          backgroundColor = window.getEntityColor('account') || '';
           break;
         case 'error':
-          backgroundColor = window.getEntityColor('ticker') || backgroundColor;
+          backgroundColor = window.getEntityColor('ticker') || '';
           break;
         case 'warning':
-          backgroundColor = window.getEntityColor('alert') || backgroundColor;
+          backgroundColor = window.getEntityColor('alert') || '';
           break;
         case 'info':
-          backgroundColor = window.getEntityColor('execution') || backgroundColor;
+          backgroundColor = window.getEntityColor('execution') || '';
           break;
         default:
-          backgroundColor = window.getEntityColor(type) || backgroundColor;
+          backgroundColor = window.getEntityColor(type) || '';
+      }
+    }
+    
+    // If still no color, log warning but don't use hardcoded fallback
+    if (!backgroundColor) {
+      if (window.Logger && window.Logger.warn) {
+        window.Logger.warn(`⚠️ No color found for blocking modal type: ${type} - Color Scheme System should load from preferences`, {
+          page: 'core-systems',
+        });
       }
     }
   } catch (error) {
     if (window.Logger && window.Logger.warn) {
-      window.Logger.warn('⚠️ Failed to resolve blocking modal color, using fallback', error, {
+      window.Logger.warn('⚠️ Failed to resolve blocking modal color from Color Scheme System', error, {
         page: 'core-systems',
       });
-    } else {
-      console.warn('⚠️ Failed to resolve blocking modal color, using fallback:', error);
     }
   }
 
   return {
-    backgroundColor,
-    borderColor: backgroundColor,
-    textColor: '#ffffff',
+    backgroundColor: backgroundColor || '',
+    borderColor: backgroundColor || '',
+    textColor: '#ffffff', // White text is acceptable as it's not a dynamic color
   };
 }
 

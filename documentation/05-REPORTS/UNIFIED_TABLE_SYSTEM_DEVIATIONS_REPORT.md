@@ -1,10 +1,10 @@
 # דוח סטיות - Unified Table System Standardization
 ## Unified Table System Deviations Report
 
-**תאריך יצירה:** 28 בינואר 2025  
-**תאריך עדכון אחרון:** 28 בינואר 2025  
+**תאריך יצירה:** 26.11.2025  
+**תאריך עדכון אחרון:** 26.11.2025  
 **גרסה:** 1.0.0  
-**סטטוס:** 📊 בתהליך סריקה
+**סטטוס:** 📊 סריקה הושלמה
 
 ---
 
@@ -14,32 +14,36 @@
 
 ---
 
-## סיכום כללי
+## 📊 סיכום כללי
 
 ### סטטיסטיקות:
-- **סה"כ עמודים נסרקים:** 0/36 (0%)
-- **עמודים עם סטיות:** 0
-- **פונקציות מקומיות שנמצאו:** 0
-- **כפילויות קוד שנמצאו:** 0
-- **בעיות HTML שנמצאו:** 0
+- **סה"כ עמודים נסרקים:** 36/36 (100.0%)
+- **עמודים עם טבלאות:** 22
+- **עמודים עם סטיות:** 16
+- **סה"כ סטיות:** 37
+- **טבלאות עם data-table-type:** 43/52
 
 ---
 
-## עמודים מרכזיים (11 עמודים)
+## 🔴 עמודים מרכזיים (11 עמודים)
 
 ### 1. index.html
 
 **קובץ HTML:** `trading-ui/index.html`  
 **קובץ JS:** `trading-ui/scripts/index.js`
 
+#### סטטיסטיקות:
+- טבלאות: 1
+- טבלאות עם data-table-type: 1/1
+
 #### סטיות שנמצאו:
-- [ ] טרם נסרק
+- ✅ אין סטיות
 
 #### כפילויות שנמצאו:
-- [ ] טרם נסרק
+- ✅ אין כפילויות
 
 #### בעיות שזוהו:
-- [ ] טרם נסרק
+- ✅ אין בעיות
 
 ---
 
@@ -48,14 +52,18 @@
 **קובץ HTML:** `trading-ui/trades.html`  
 **קובץ JS:** `trading-ui/scripts/trades.js`
 
+#### סטטיסטיקות:
+- טבלאות: 1
+- טבלאות עם data-table-type: 1/1
+
 #### סטיות שנמצאו:
-- [ ] טרם נסרק
+1. **שורה 445:** שימוש ישיר ב-DOM manipulation: .innerHTML = '<tr...
 
 #### כפילויות שנמצאו:
-- [ ] טרם נסרק
+- ✅ אין כפילויות
 
 #### בעיות שזוהו:
-- [ ] טרם נסרק
+- ✅ אין בעיות
 
 ---
 
@@ -64,14 +72,19 @@
 **קובץ HTML:** `trading-ui/trade_plans.html`  
 **קובץ JS:** `trading-ui/scripts/trade_plans.js`
 
+#### סטטיסטיקות:
+- טבלאות: 1
+- טבלאות עם data-table-type: 1/1
+
 #### סטיות שנמצאו:
-- [ ] טרם נסרק
+1. **שורה 1749:** שימוש ישיר ב-DOM manipulation: .innerHTML = `<tr...
+2. **שורה 1749:** שימוש ישיר ב-DOM manipulation: .innerHTML = `<tr...
 
 #### כפילויות שנמצאו:
-- [ ] טרם נסרק
+- ✅ אין כפילויות
 
 #### בעיות שזוהו:
-- [ ] טרם נסרק
+- ✅ אין בעיות
 
 ---
 
@@ -80,14 +93,18 @@
 **קובץ HTML:** `trading-ui/alerts.html`  
 **קובץ JS:** `trading-ui/scripts/alerts.js`
 
+#### סטטיסטיקות:
+- טבלאות: 1
+- טבלאות עם data-table-type: 1/1
+
 #### סטיות שנמצאו:
-- [ ] טרם נסרק
+1. **שורה 406:** שימוש ישיר ב-DOM manipulation: .innerHTML = '<tr...
 
 #### כפילויות שנמצאו:
-- [ ] טרם נסרק
+- ✅ אין כפילויות
 
 #### בעיות שזוהו:
-- [ ] טרם נסרק
+- ✅ אין בעיות
 
 ---
 
@@ -96,14 +113,18 @@
 **קובץ HTML:** `trading-ui/tickers.html`  
 **קובץ JS:** `trading-ui/scripts/tickers.js`
 
+#### סטטיסטיקות:
+- טבלאות: 1
+- טבלאות עם data-table-type: 1/1
+
 #### סטיות שנמצאו:
-- [ ] טרם נסרק
+1. **שורה 2032:** שימוש ישיר ב-DOM manipulation: .innerHTML = '<tr...
 
 #### כפילויות שנמצאו:
-- [ ] טרם נסרק
+- ✅ אין כפילויות
 
 #### בעיות שזוהו:
-- [ ] טרם נסרק
+- ✅ אין בעיות
 
 ---
 
@@ -112,14 +133,19 @@
 **קובץ HTML:** `trading-ui/trading_accounts.html`  
 **קובץ JS:** `trading-ui/scripts/trading_accounts.js`
 
+#### סטטיסטיקות:
+- טבלאות: 3
+- טבלאות עם data-table-type: 3/3
+
 #### סטיות שנמצאו:
-- [ ] טרם נסרק
+1. **שורה 716:** שימוש ישיר ב-DOM manipulation: .innerHTML = '<tr...
+2. **שורה 897:** שימוש ישיר ב-DOM manipulation: .innerHTML = `<tr...
 
 #### כפילויות שנמצאו:
-- [ ] טרם נסרק
+- ✅ אין כפילויות
 
 #### בעיות שזוהו:
-- [ ] טרם נסרק
+- ✅ אין בעיות
 
 ---
 
@@ -128,14 +154,20 @@
 **קובץ HTML:** `trading-ui/executions.html`  
 **קובץ JS:** `trading-ui/scripts/executions.js`
 
+#### סטטיסטיקות:
+- טבלאות: 3
+- טבלאות עם data-table-type: 3/3
+
 #### סטיות שנמצאו:
-- [ ] טרם נסרק
+1. **שורה 1145:** שימוש ישיר ב-DOM manipulation: .innerHTML = '<tr...
+2. **שורה 1145:** שימוש ישיר ב-DOM manipulation: .innerHTML = '<tr...
+3. **שורה 1145:** שימוש ישיר ב-DOM manipulation: .innerHTML = '<tr...
 
 #### כפילויות שנמצאו:
-- [ ] טרם נסרק
+- ✅ אין כפילויות
 
 #### בעיות שזוהו:
-- [ ] טרם נסרק
+- ✅ אין בעיות
 
 ---
 
@@ -144,14 +176,19 @@
 **קובץ HTML:** `trading-ui/cash_flows.html`  
 **קובץ JS:** `trading-ui/scripts/cash_flows.js`
 
+#### סטטיסטיקות:
+- טבלאות: 2
+- טבלאות עם data-table-type: 2/2
+
 #### סטיות שנמצאו:
-- [ ] טרם נסרק
+1. **שורה 1360:** שימוש ישיר ב-DOM manipulation: .innerHTML = `<tr...
+2. **שורה 1360:** שימוש ישיר ב-DOM manipulation: .innerHTML = `<tr...
 
 #### כפילויות שנמצאו:
-- [ ] טרם נסרק
+- ✅ אין כפילויות
 
 #### בעיות שזוהו:
-- [ ] טרם נסרק
+- ✅ אין בעיות
 
 ---
 
@@ -160,30 +197,38 @@
 **קובץ HTML:** `trading-ui/notes.html`  
 **קובץ JS:** `trading-ui/scripts/notes.js`
 
+#### סטטיסטיקות:
+- טבלאות: 1
+- טבלאות עם data-table-type: 1/1
+
 #### סטיות שנמצאו:
-- [ ] טרם נסרק
+1. **שורה 566:** שימוש ישיר ב-DOM manipulation: .innerHTML = '<tr...
 
 #### כפילויות שנמצאו:
-- [ ] טרם נסרק
+- ✅ אין כפילויות
 
 #### בעיות שזוהו:
-- [ ] טרם נסרק
+- ✅ אין בעיות
 
 ---
 
 ### 10. research.html
 
 **קובץ HTML:** `trading-ui/research.html`  
-**קובץ JS:** `trading-ui/scripts/research.js` (אם קיים)
+**קובץ JS:** `trading-ui/scripts/research.js`
+
+#### סטטיסטיקות:
+- טבלאות: 0
+- טבלאות עם data-table-type: 0/0
 
 #### סטיות שנמצאו:
-- [ ] טרם נסרק
+- ✅ אין סטיות
 
 #### כפילויות שנמצאו:
-- [ ] טרם נסרק
+- ✅ אין כפילויות
 
 #### בעיות שזוהו:
-- [ ] טרם נסרק
+- ✅ אין בעיות
 
 ---
 
@@ -192,142 +237,331 @@
 **קובץ HTML:** `trading-ui/preferences.html`  
 **קובץ JS:** `trading-ui/scripts/preferences.js`
 
+#### סטטיסטיקות:
+- טבלאות: 1
+- טבלאות עם data-table-type: 1/1
+
 #### סטיות שנמצאו:
-- [ ] טרם נסרק
+- ✅ אין סטיות
 
 #### כפילויות שנמצאו:
-- [ ] טרם נסרק
+- ✅ אין כפילויות
 
 #### בעיות שזוהו:
-- [ ] טרם נסרק
+- ✅ אין בעיות
 
 ---
 
-## עמודים טכניים (12 עמודים)
+## 🔵 עמודים טכניים (12 עמודים)
 
-### 12. db_display.html
+### 13. db_display.html
 
 **קובץ HTML:** `trading-ui/db_display.html`  
 **קובץ JS:** `trading-ui/scripts/db_display.js`
 
+#### סטטיסטיקות:
+- טבלאות: 8
+- טבלאות עם data-table-type: 8/8
+
 #### סטיות שנמצאו:
-1. **שורה 78:** `loadTableDataLocal()` → צריך להחליף ב-`window.loadTableData()`
-2. **שורה 127:** `updateTableDisplay()` → צריך להחליף ב-`window.updateTable()`
-3. **שורה 153-189:** פונקציה מקומית `updateTableDisplay()` → למחוק ולהחליף ב-`window.updateTable()`
+1. **שורה 78:** פונקציה מקומית לטעינת נתונים: function loadTableDataLocal(
+2. **שורה 78:** פונקציה מקומית לטעינת נתונים: async function loadTableDataLocal(
+3. **שורה 160:** פונקציה מקומית לרינדור: function updateTableDisplay(
+4. **שורה 307:** שימוש ישיר ב-DOM manipulation: .innerHTML = '<tr...
+5. **שורה 323:** שימוש ישיר ב-DOM manipulation: .innerHTML = `<tr...
 
 #### כפילויות שנמצאו:
-1. **שורות 153-189:** פונקציה מקומית `updateTableDisplay()` → למחוק ולהחליף ב-`window.updateTable()`
-2. **שורות 196-246:** פונקציות עזר מקומיות (`getSectionId`, `getContainerId`, `getTableId`) → לבדוק אם צריך להעביר למערכת המרכזית
+- ✅ אין כפילויות
 
 #### בעיות שזוהו:
-1. **HTML:** טבלאות ללא `data-table-type` attribute (שורות 96, 119, 142, 165, 188, 211, 234, 257)
-2. **HTML:** טבלאות ללא `data-sortable` attributes לעמודות
-3. טבלאות לא רשומות ב-TableRegistry
-4. שימוש ב-`tableType` לא נכון (עם dashes במקום underscores)
+- ✅ אין בעיות
 
 ---
 
-### 13. db_extradata.html
+### 14. db_extradata.html
 
 **קובץ HTML:** `trading-ui/db_extradata.html`  
 **קובץ JS:** `trading-ui/scripts/db_extradata.js`
 
-#### סטיות שנמצאו:
-1. **שורה 76:** `loadTableDataLocal()` → צריך להחליף ב-`window.loadTableData()`
-2. **שורה 124:** `updateTableDisplay()` → צריך להחליף ב-`window.updateTable()`
-3. **שורה 184-219:** פונקציה מקומית `updateTableDisplay()` → למחוק ולהחליף ב-`window.updateTable()`
-
-#### כפילויות שנמצאו:
-1. **שורות 184-219:** פונקציה מקומית `updateTableDisplay()` → למחוק ולהחליף ב-`window.updateTable()`
-2. **שורות 229-280:** פונקציות עזר מקומיות (`createTableHeaders`, `createTableRows`, `formatCellValue`) → למחוק ולהחליף במערכת המרכזית
-
-#### בעיות שזוהו:
-1. **HTML:** טבלאות ללא `data-table-type` attribute
-2. **HTML:** טבלאות ללא `data-sortable` attributes לעמודות
-3. טבלאות לא רשומות ב-TableRegistry
-
----
-
-### 14. database.js (constraints.html?)
-
-**קובץ JS:** `trading-ui/scripts/database.js`
+#### סטטיסטיקות:
+- טבלאות: 8
+- טבלאות עם data-table-type: 8/8
 
 #### סטיות שנמצאו:
-1. **שורה 161:** `loadTableData()` → צריך להחליף ב-`window.loadTableData()`
-2. **שורה 195:** `fetchTableData()` → צריך להחליף ב-`window.loadTableData()`
-3. **שורה 223:** `updateTableDisplay()` → צריך להחליף ב-`window.updateTable()`
+1. **שורה 76:** פונקציה מקומית לטעינת נתונים: function loadTableDataLocal(
+2. **שורה 76:** פונקציה מקומית לטעינת נתונים: async function loadTableDataLocal(
+3. **שורה 197:** פונקציה מקומית לרינדור: function updateTableDisplay(
+4. **שורה 167:** שימוש ישיר ב-DOM manipulation: .innerHTML = '<tr...
+5. **שורה 183:** שימוש ישיר ב-DOM manipulation: .innerHTML = `<tr...
 
 #### כפילויות שנמצאו:
-1. **שורות 161-188:** פונקציה מקומית `loadTableData()` → למחוק ולהחליף ב-`window.loadTableData()`
-2. **שורות 195-214:** פונקציה מקומית `fetchTableData()` → למחוק ולהחליף ב-`window.loadTableData()`
-3. **שורות 223-299:** פונקציה מקומית `updateTableDisplay()` → למחוק ולהחליף ב-`window.updateTable()`
+- ✅ אין כפילויות
 
 #### בעיות שזוהו:
-1. טבלאות לא רשומות ב-TableRegistry
-2. שימוש ב-`tableType` לא נכון
+- ✅ אין בעיות
 
 ---
 
-### 15-23. עמודים טכניים נוספים
+### 15. constraints.html
 
-- [ ] constraints.html
-- [ ] background-tasks.html
-- [ ] server-monitor.html
-- [ ] system-management.html
-- [ ] cache-test.html
-- [ ] notifications-center.html
-- [ ] css-management.html
-- [ ] dynamic-colors-display.html
-- [ ] designs.html
-- [ ] tradingview-test-page.html
+**קובץ HTML:** `trading-ui/constraints.html`  
+**קובץ JS:** `trading-ui/scripts/constraints.js`
 
-**טרם נסרקו**
+#### סטטיסטיקות:
+- טבלאות: 1
+- טבלאות עם data-table-type: 1/1
 
----
+#### סטיות שנמצאו:
+- ✅ אין סטיות
 
-## עמודים משניים (2 עמודים)
+#### כפילויות שנמצאו:
+- ✅ אין כפילויות
 
-- [ ] external-data-dashboard.html
-- [ ] chart-management.html
-
-**טרם נסרקו**
+#### בעיות שזוהו:
+- ✅ אין בעיות
 
 ---
 
-## עמודי מוקאפ (11 עמודים)
+### 16. background-tasks.html
 
-- [ ] portfolio-state-page.html
-- [ ] trade-history-page.html
-- [ ] price-history-page.html
-- [ ] comparative-analysis-page.html
-- [ ] trading-journal-page.html
-- [ ] strategy-analysis-page.html
-- [ ] economic-calendar-page.html
-- [ ] history-widget.html
-- [ ] emotional-tracking-widget.html
-- [ ] date-comparison-modal.html
-- [ ] tradingview-test-page.html (מוקאפ)
+**קובץ HTML:** `trading-ui/background-tasks.html`  
+**קובץ JS:** `trading-ui/scripts/background-tasks.js`
 
-**טרם נסרקו**
+#### סטטיסטיקות:
+- טבלאות: 1
+- טבלאות עם data-table-type: 1/1
 
----
+#### סטיות שנמצאו:
+1. **שורה 328:** שימוש ישיר ב-DOM manipulation: .innerHTML = '<tr...
 
-## הערות כלליות
+#### כפילויות שנמצאו:
+- ✅ אין כפילויות
 
-### דפוסי סטיות נפוצים:
-1. פונקציות מקומיות לטעינת נתונים (`loadTableDataLocal`, `fetchTableData`)
-2. פונקציות מקומיות לרינדור (`updateTableDisplay`, `renderTable`)
-3. טבלאות ללא `data-table-type` attributes
-4. טבלאות לא רשומות ב-TableRegistry
-
-### פעולות נדרשות:
-1. החלפת כל הפונקציות המקומיות במערכת המרכזית
-2. הוספת `data-table-type` לכל הטבלאות
-3. רישום כל הטבלאות ב-TableRegistry
-4. מחיקת כפילויות קוד
+#### בעיות שזוהו:
+- ✅ אין בעיות
 
 ---
 
-**עדכון אחרון:** 28 בינואר 2025  
+### 17. server-monitor.html
+
+**קובץ HTML:** `trading-ui/server-monitor.html`  
+**קובץ JS:** `trading-ui/scripts/server-monitor.js`
+
+#### סטטיסטיקות:
+- טבלאות: 0
+- טבלאות עם data-table-type: 0/0
+
+#### סטיות שנמצאו:
+- ✅ אין סטיות
+
+#### כפילויות שנמצאו:
+- ✅ אין כפילויות
+
+#### בעיות שזוהו:
+- ✅ אין בעיות
+
+---
+
+### 18. system-management.html
+
+**קובץ HTML:** `trading-ui/system-management.html`  
+**קובץ JS:** `trading-ui/scripts/system-management.js`
+
+#### סטטיסטיקות:
+- טבלאות: 0
+- טבלאות עם data-table-type: 0/0
+
+#### סטיות שנמצאו:
+- ✅ אין סטיות
+
+#### כפילויות שנמצאו:
+- ✅ אין כפילויות
+
+#### בעיות שזוהו:
+- ✅ אין בעיות
+
+---
+
+### 19. cache-test.html
+
+**קובץ HTML:** `trading-ui/cache-test.html`  
+**קובץ JS:** `trading-ui/N/A`
+
+#### סטטיסטיקות:
+- טבלאות: 0
+- טבלאות עם data-table-type: 0/0
+
+#### סטיות שנמצאו:
+- ✅ אין סטיות
+
+#### כפילויות שנמצאו:
+- ✅ אין כפילויות
+
+#### בעיות שזוהו:
+- ✅ אין בעיות
+
+---
+
+### 20. notifications-center.html
+
+**קובץ HTML:** `trading-ui/notifications-center.html`  
+**קובץ JS:** `trading-ui/scripts/notifications-center.js`
+
+#### סטטיסטיקות:
+- טבלאות: 0
+- טבלאות עם data-table-type: 0/0
+
+#### סטיות שנמצאו:
+- ✅ אין סטיות
+
+#### כפילויות שנמצאו:
+- ✅ אין כפילויות
+
+#### בעיות שזוהו:
+- ✅ אין בעיות
+
+---
+
+### 21. css-management.html
+
+**קובץ HTML:** `trading-ui/css-management.html`  
+**קובץ JS:** `trading-ui/scripts/css-management.js`
+
+#### סטטיסטיקות:
+- טבלאות: 1
+- טבלאות עם data-table-type: 1/1
+
+#### סטיות שנמצאו:
+- ✅ אין סטיות
+
+#### כפילויות שנמצאו:
+- ✅ אין כפילויות
+
+#### בעיות שזוהו:
+- ✅ אין בעיות
+
+---
+
+### 22. dynamic-colors-display.html
+
+**קובץ HTML:** `trading-ui/dynamic-colors-display.html`  
+**קובץ JS:** `trading-ui/scripts/dynamic-colors-display.js`
+
+#### סטטיסטיקות:
+- טבלאות: 0
+- טבלאות עם data-table-type: 0/0
+
+#### סטיות שנמצאו:
+- ✅ אין סטיות
+
+#### כפילויות שנמצאו:
+- ✅ אין כפילויות
+
+#### בעיות שזוהו:
+- ✅ אין בעיות
+
+---
+
+### 23. designs.html
+
+**קובץ HTML:** `trading-ui/designs.html`  
+**קובץ JS:** `trading-ui/scripts/designs.js`
+
+#### סטטיסטיקות:
+- טבלאות: 3
+- טבלאות עם data-table-type: 0/3
+
+#### סטיות שנמצאו:
+1. **שורה HTML:** טבלה 1 ללא data-table-type attribute
+2. **שורה HTML:** טבלה 2 ללא data-table-type attribute
+3. **שורה HTML:** טבלה 3 ללא data-table-type attribute
+
+#### כפילויות שנמצאו:
+- ✅ אין כפילויות
+
+#### בעיות שזוהו:
+- ✅ אין בעיות
+
+---
+
+### 24. tradingview-test-page.html
+
+**קובץ HTML:** `trading-ui/tradingview-test-page.html`  
+**קובץ JS:** `trading-ui/scripts/tradingview-test-page.js`
+
+#### סטטיסטיקות:
+- טבלאות: 0
+- טבלאות עם data-table-type: 0/0
+
+#### סטיות שנמצאו:
+- ✅ אין סטיות
+
+#### כפילויות שנמצאו:
+- ✅ אין כפילויות
+
+#### בעיות שזוהו:
+- ✅ אין בעיות
+
+---
+
+## 🟡 עמודים משניים (2 עמודים)
+
+### 25. external-data-dashboard.html
+
+---
+
+### 26. chart-management.html
+
+---
+
+## 🟢 עמודי מוקאפ (11 עמודים)
+
+### 27. portfolio-state-page.html
+
+---
+
+### 28. trade-history-page.html
+
+---
+
+### 29. price-history-page.html
+
+---
+
+### 30. comparative-analysis-page.html
+
+---
+
+### 31. trading-journal-page.html
+
+---
+
+### 32. strategy-analysis-page.html
+
+---
+
+### 33. economic-calendar-page.html
+
+---
+
+### 34. history-widget.html
+
+---
+
+### 35. emotional-tracking-widget.html
+
+---
+
+### 36. date-comparison-modal.html
+
+---
+
+### 37. tradingview-test-page-mockup.html
+
+---
+
+---
+
+**עדכון אחרון:** 26.11.2025  
 **גרסה:** 1.0.0
 

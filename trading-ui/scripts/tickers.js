@@ -380,14 +380,38 @@ function generateTickerCurrencyOptions(ticker = null) {
 
 /**
  * Update currency options in add/edit ticker forms
+ * Uses SelectPopulatorService if available, falls back to local implementation
  * @param {Object|null} [ticker=null] - Ticker object for pre-selection in edit mode
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function updateCurrencyOptions(ticker = null) {
+async function updateCurrencyOptions(ticker = null) {
   try {
     const addSelect = document.getElementById('addTickerCurrency');
     const editSelect = document.getElementById('editTickerCurrency');
 
+    // Use SelectPopulatorService if available
+    if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateCurrenciesSelect === 'function') {
+      const defaultValue = ticker?.currency_id || ticker?.currency?.id || null;
+      
+      if (addSelect) {
+        await window.SelectPopulatorService.populateCurrenciesSelect(addSelect, {
+          includeEmpty: true,
+          emptyText: 'בחר מטבע...',
+          defaultValue: null // Don't set default in add mode
+        });
+      }
+
+      if (editSelect) {
+        await window.SelectPopulatorService.populateCurrenciesSelect(editSelect, {
+          includeEmpty: true,
+          emptyText: 'בחר מטבע...',
+          defaultValue: defaultValue
+        });
+      }
+      return;
+    }
+
+    // Fallback to local implementation
     const currenciesAvailable = Array.isArray(window.currenciesData) && window.currenciesData.length > 0;
 
     if (addSelect) {
@@ -772,7 +796,12 @@ function populateProviderSymbolFields(mappings) {
     
     const input = document.getElementById(`providerSymbol_${providerName}`);
     if (input) {
-      input.value = mapping.provider_symbol || '';
+      // Use DataCollectionService to set value if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue(input.id, mapping.provider_symbol || '', 'text');
+      } else {
+        input.value = mapping.provider_symbol || '';
+      }
       if (window.Logger) {
         window.Logger.debug('Populated provider symbol field', {
           providerName,
@@ -2205,23 +2234,6 @@ function renderTickersTableRows(tickers) {
                           ]);
                           return result || '';
                         })()}
-                        ${!window.createActionsMenu ? `
-                        <div class="btn-group btn-group-sm" role="group">
-                            <button data-button-type="VIEW" data-variant="small" 
-                                    data-onclick="window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })" 
-                                    data-text="" title="צפה בפרטי טיקר"></button>
-                            <button data-button-type="EDIT" data-variant="small" 
-                                    data-onclick="window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})" 
-                                    data-text="" title="ערוך"></button>
-                            ${ticker.status === 'cancelled' ?
-                            `<button data-button-type="REACTIVATE" data-variant="small" 
-                                     data-onclick="reactivateTicker(${ticker.id})" 
-                                     data-text="" title="הפעל מחדש טיקר"></button>` :
-                            `<button data-button-type="CANCEL" data-variant="small" 
-                                     data-onclick="performTickerCancellation(${ticker.id})" 
-                                     data-text="" title="בטל טיקר"></button>`}
-                        </div>
-                        ` : ''}
                     </td>
                 </tr>
             `;
@@ -2400,7 +2412,18 @@ async function checkTickerExternalData() {
     try {
         // Disable button and show loading
         checkBtn.disabled = true;
-        checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> בודק...';
+        // Use IconSystem to render loader icon
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            const loaderIcon = await window.IconSystem.renderIcon('button', 'refresh', {
+                size: '16',
+                alt: 'loading',
+                class: 'icon fa-spin'
+            });
+            checkBtn.innerHTML = loaderIcon + ' בודק...';
+        } else {
+            // Fallback if IconSystem not available
+            checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> בודק...';
+        }
         resultDiv.style.display = 'none';
         warningDiv.style.display = 'none';
         
@@ -2520,7 +2543,18 @@ async function checkTickerExternalData() {
     } finally {
         // Re-enable button
         checkBtn.disabled = false;
-        checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1"> בדוק נתונים חיצוניים';
+        // Use IconSystem to render refresh icon
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            const refreshIcon = await window.IconSystem.renderIcon('button', 'refresh', {
+                size: '16',
+                alt: 'refresh',
+                class: 'icon me-1'
+            });
+            checkBtn.innerHTML = refreshIcon + ' בדוק נתונים חיצוניים';
+        } else {
+            // Fallback if IconSystem not available
+            checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1"> בדוק נתונים חיצוניים';
+        }
     }
 }
 
@@ -3005,9 +3039,17 @@ function filterTickersByType(type) {
  * Get display name for ticker type in Hebrew
  * @param {string} type - Ticker type
  * @returns {string} Display name in Hebrew
+ * @deprecated Use window.translateTickerType() from translation-utils.js instead
+ * This function is kept for backward compatibility but should use the centralized Translation Utilities
  */
 function getTypeDisplayName(type) {
   try {
+    // Use Translation Utilities if available
+    if (window.translateTickerType && typeof window.translateTickerType === 'function') {
+      return window.translateTickerType(type);
+    }
+    
+    // Fallback to local implementation
     const typeNames = {
       'stock': 'מניות',
       'etf': 'ETF',

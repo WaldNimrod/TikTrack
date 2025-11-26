@@ -56,6 +56,11 @@ class FilterManager {
         ? window.getCurrentPageName() 
         : 'default';
       try {
+        // אתחול PageStateManager אם לא מאותחל
+        if (!window.PageStateManager.initialized) {
+          await window.PageStateManager.initialize();
+        }
+        
         const savedFilters = await window.PageStateManager.loadFilters(pageName);
         if (savedFilters) {
           this.currentFilters = { ...this.currentFilters, ...savedFilters };
@@ -64,34 +69,47 @@ class FilterManager {
         }
       } catch (err) {
         window.Logger?.warn?.('⚠️ Failed to load filters via PageStateManager', err, { page: 'header-system' });
-      }
-    }
-
-    const saved = localStorage.getItem('headerFilters');
-    if (saved) {
-      try {
-        this.currentFilters = { ...this.currentFilters, ...JSON.parse(saved) };
-        this.updateUI();
-      } catch (e) {
-        window.Logger?.warn?.('⚠️ Error loading saved filters', e, { page: 'header-system' });
+        // Fallback ל-localStorage רק אם PageStateManager לא זמין בכלל
+        if (!window.PageStateManager) {
+          const saved = localStorage.getItem('headerFilters');
+          if (saved) {
+            try {
+              this.currentFilters = { ...this.currentFilters, ...JSON.parse(saved) };
+              this.updateUI();
+            } catch (e) {
+              window.Logger?.warn?.('⚠️ Error loading saved filters from localStorage', e, { page: 'header-system' });
+            }
+          }
+        }
       }
     }
   }
 
   async saveFilters() {
-    if (window.PageStateManager && window.PageStateManager.initialized) {
+    if (window.PageStateManager) {
       const pageName = typeof window.getCurrentPageName === 'function' 
         ? window.getCurrentPageName() 
         : 'default';
       try {
+        // אתחול PageStateManager אם לא מאותחל
+        if (!window.PageStateManager.initialized) {
+          await window.PageStateManager.initialize();
+        }
+        
         await window.PageStateManager.saveFilters(pageName, this.currentFilters);
         return;
       } catch (err) {
         window.Logger?.warn?.('⚠️ Failed to save filters via PageStateManager', err, { page: 'header-system' });
+        // Fallback ל-localStorage רק אם PageStateManager לא זמין בכלל
+        if (!window.PageStateManager) {
+          localStorage.setItem('headerFilters', JSON.stringify(this.currentFilters));
+        }
       }
+    } else {
+      // Fallback ל-localStorage רק אם PageStateManager לא זמין בכלל
+      window.Logger?.warn?.('⚠️ PageStateManager not available, using localStorage fallback', { page: 'header-system' });
+      localStorage.setItem('headerFilters', JSON.stringify(this.currentFilters));
     }
-
-    localStorage.setItem('headerFilters', JSON.stringify(this.currentFilters));
   }
 
   setupHoverBehavior() {
@@ -467,22 +485,78 @@ class FilterManager {
 
   async applyFilters() {
     if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.filter) {
+      // Fallback: show all data if UnifiedTableSystem is not available
+      window.Logger?.warn?.('⚠️ applyFilters: UnifiedTableSystem not available, showing all data', {
+        page: 'header-system',
+      });
       return;
     }
 
     const context = this.buildFilterContext();
     const targets = this._resolveTargetTables();
 
-    for (const target of targets) {
-      try {
-        await this.applyFiltersToTable(target.tableId, context, target.tableType);
-      } catch (error) {
+    // Check for double filters (header filters + page-specific filters)
+    const hasPageSpecificFilters = this._detectPageSpecificFilters();
+    if (hasPageSpecificFilters && context.hasActiveFilters) {
+      this._showDoubleFilterNotification();
+    }
+
+    // Apply filters to all tables in parallel
+    const filterPromises = targets.map(target => {
+      return this.applyFiltersToTable(target.tableId, context, target.tableType).catch(error => {
         window.Logger?.warn?.('⚠️ applyFilters: failed to process table', {
           tableId: target.tableId,
           error: error?.message || error,
           page: 'header-system',
         });
+        // Fallback: return empty array to continue processing other tables
+        return [];
+      });
+    });
+
+    await Promise.all(filterPromises);
+  }
+
+  _detectPageSpecificFilters() {
+    // Check for common page-specific filter patterns
+    const pageSpecificFilterSelectors = [
+      '.related-object-filters',
+      '.entity-type-filters',
+      '[data-filter-type="related-object"]',
+      '[data-filter-type="entity-type"]',
+      '#relatedObjectFilters',
+      '#entityTypeFilters',
+      '.portfolio-side-filter-btn.active', // Portfolio local filters
+      '#portfolioAccountFilter', // Portfolio account filter
+    ];
+
+    for (const selector of pageSpecificFilterSelectors) {
+      const element = document.querySelector(selector);
+      if (element && element.offsetParent !== null) {
+        // Check if any filter is active
+        const activeFilters = element.querySelectorAll('.selected, .active, [data-selected="true"]');
+        if (activeFilters.length > 0) {
+          return true;
+        }
       }
+    }
+
+    return false;
+  }
+
+  _showDoubleFilterNotification() {
+    if (typeof window.showNotification === 'function') {
+      window.showNotification(
+        'פילטרים כפולים מופעלים: פילטרים מראש הדף ופילטרים פנימיים. התוצאות מוצגות לפי שני הפילטרים יחד.',
+        'info',
+        'מידע',
+        4000,
+        'system'
+      );
+    } else if (window.Logger) {
+      window.Logger.info('ℹ️ Double filters active: header filters + page-specific filters', {
+        page: 'header-system',
+      });
     }
   }
 
@@ -736,7 +810,7 @@ class HeaderSystem {
     window.Logger?.info?.('🔧 HeaderSystem.init() called', { page: 'header-system' });
 
     try {
-      HeaderSystem.createHeader();
+      await HeaderSystem.createHeader();
       this.setupEventListeners();
       this.menuManager.init();
       this.filterManager.init();
@@ -784,7 +858,7 @@ class HeaderSystem {
                   <ul class="tiktrack-nav-list">
                     <li class="tiktrack-nav-item">
                       <a href="/" class="tiktrack-nav-link" data-page="home">
-                        <img src="${imagePathPrefix}images/icons/entities/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only">
+                        <img src="${imagePathPrefix}images/icons/entities/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only" data-icon-replace="entity:home">
                       </a>
                     </li>
                     <li class="tiktrack-nav-item">
@@ -1222,7 +1296,12 @@ window.handleSearchInput = function(event) {
 window.clearSearchFilter = function() {
   const searchInput = document.getElementById('searchFilterInput');
   if (searchInput) {
-    searchInput.value = '';
+    // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('searchFilterInput', '', 'text');
+    } else {
+      searchInput.value = '';
+    }
     if (window.headerSystem && window.headerSystem.filterManager) {
       window.headerSystem.filterManager.currentFilters.search = '';
       window.headerSystem.filterManager.saveFilters();
@@ -1300,7 +1379,12 @@ window.resetAllFilters = async function() {
     // Reset search input
     const searchInput = document.getElementById('searchFilterInput');
     if (searchInput) {
-      searchInput.value = defaultFilters.search;
+      // Use DataCollectionService to set value if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('searchFilterInput', defaultFilters.search, 'text');
+      } else {
+        searchInput.value = defaultFilters.search;
+      }
     }
 
     window.Logger?.info?.('✅ resetAllFilters completed', { page: 'header-system' });

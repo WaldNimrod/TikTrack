@@ -44,7 +44,9 @@
     <!-- Linked Items System -->
     <script src="../../scripts/linked-items.js" defer></script>
     <script src="../../scripts/services/linked-items-service.js" defer></script>
-    <script src="../../scripts/entity-details-modal.js" defer></script>
+        <script src="../../scripts/entity-details-api.js" defer></script>
+    <script src="../../scripts/entity-details-renderer.js" defer></script>
+<script src="../../scripts/entity-details-modal.js" defer></script>
     
     <!-- Field Renderer Service -->
     <script src="../../scripts/services/field-renderer-service.js" defer></script>
@@ -66,6 +68,9 @@
     
     <!-- Action Buttons System -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
+    
+    <!-- Actions Menu System (required for createActionsMenu) -->
+    <script src="../../scripts/modules/actions-menu-system.js?v=1.0.0" defer></script>
 </head>
 <body class="portfolio-state-page">
     <!-- Notification System Containers -->
@@ -93,6 +98,11 @@
                         <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
                         <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
                         <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
+                        <span class="mockups-navigation-separator">|</span>
+                        <a href="../watch-lists-page.html" class="mockups-navigation-link">רשימות צפייה</a>
+                        <a href="../watch-list-modal.html" class="mockups-navigation-link">מודל רשימה</a>
+                        <a href="../add-ticker-modal.html" class="mockups-navigation-link">הוספת טיקר</a>
+                        <a href="../flag-quick-action.html" class="mockups-navigation-link">דגלים</a>
                     </div>
                 </div>
             </div>
@@ -115,7 +125,7 @@
                                 <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
                                 <button data-button-type="COMPARE" data-variant="small" data-text="השווה" data-onclick="window.portfolioStatePage.compareDates()" title="השוואת תאריכים"></button>
                             </div>
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('portfolio-state-top-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('portfolio-state-top-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -131,7 +141,7 @@
                                         <label class="form-label form-label-small">טווח תאריכים</label>
                                         <div class="filter-group date-range-filter">
                                             <div class="filter-dropdown">
-                                                <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="dateRangeFilterToggle" data-onclick="window.portfolioStatePage.toggleDateRangeFilterMenu()">
+                                                <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="dateRangeFilterToggle" data-onclick="window.portfolioStatePage.toggleDateRangeFilterMenu()" data-button-type="FILTER">
                                                     <span class="selected-value selected-date-text" id="selectedDateRange">היום</span>
                                                     <span class="dropdown-arrow">▼</span>
                                                 </button>
@@ -202,7 +212,7 @@
                                         <label class="form-label form-label-small">חשבון מסחר</label>
                                         <div class="filter-group account-filter">
                                             <div class="filter-dropdown">
-                                                <button class="filter-toggle filter-toggle-full-width account-filter-toggle" id="accountFilterToggle" data-onclick="window.portfolioStatePage.toggleAccountFilterMenu()">
+                                                <button class="filter-toggle filter-toggle-full-width account-filter-toggle" id="accountFilterToggle" data-onclick="window.portfolioStatePage.toggleAccountFilterMenu()" data-button-type="FILTER">
                                                     <span class="selected-value selected-account-text" id="selectedAccount">כל חשבון מסחר</span>
                                                     <span class="dropdown-arrow">▼</span>
                                                 </button>
@@ -243,7 +253,7 @@
                                             <div class="compact-stat-label">יתרות מזומן</div>
                                             <div class="compact-stat-number" id="total-cash-balance">$50,000</div>
                                         </div>
-                                        <button class="btn btn-sm btn-outline-secondary" data-onclick="window.portfolioStatePage.toggleCardDetails('cash-balance-details')" title="הצג/הסתר פרטים">
+                                        <button class="btn btn-sm btn-outline-secondary" data-onclick="window.portfolioStatePage.toggleCardDetails('cash-balance-details')" title="הצג/הסתר פרטים" data-button-type="TOGGLE">
                                             <img src="/trading-ui/images/icons/tabler/chevron-down.svg" width="16" height="16" alt="chevron-down" class="icon" id="cash-balance-chevron">
                                         </button>
                                     </div>
@@ -279,7 +289,7 @@
                                             <div class="compact-stat-number positive" id="total-pl">$25,000</div>
                                             <div class="compact-stat-label compact-stat-label-small positive" id="pl-percentage">(+50%)</div>
                                         </div>
-                                        <button class="btn btn-sm btn-outline-secondary" data-onclick="window.portfolioStatePage.toggleCardDetails('pl-details')" title="הצג/הסתר פרטים">
+                                        <button class="btn btn-sm btn-outline-secondary" data-onclick="window.portfolioStatePage.toggleCardDetails('pl-details')" title="הצג/הסתר פרטים" data-button-type="TOGGLE">
                                             <img src="/trading-ui/images/icons/tabler/chevron-down.svg" width="16" height="16" alt="chevron-down" class="icon" id="pl-chevron">
                                         </button>
                                     </div>
@@ -334,7 +344,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="chart-line" data-size="16" data-alt="chart-line" aria-label="chart-line"></span> גרפים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('charts-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('charts-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -352,19 +362,19 @@
                         <!-- Chart Controls Wrapper (LTR, in section-body, above chart) -->
                         <div class="chart-controls-wrapper">
                             <div class="chart-controls mb-2">
-                            <button class="btn btn-sm btn-outline-secondary" id="chartZoomIn" title="זום פנימה">
+                            <button class="btn btn-sm btn-outline-secondary" id="chartZoomIn" title="זום פנימה" data-button-type="VIEW">
                                 <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="icon" aria-label="icon"></span>
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" id="chartZoomOut" title="זום החוצה">
+                            <button class="btn btn-sm btn-outline-secondary" id="chartZoomOut" title="זום החוצה" data-button-type="VIEW">
                                 <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="icon" aria-label="icon"></span>
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" id="chartReset" title="איפוס זום">
+                            <button class="btn btn-sm btn-outline-secondary" id="chartReset" title="איפוס זום" data-button-type="REFRESH">
                                 <span class="icon-placeholder icon" data-icon="refresh" data-size="16" data-alt="refresh" aria-label="refresh"></span>
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" id="chartPanLeft" title="תזוזה שמאלה">
+                            <button class="btn btn-sm btn-outline-secondary" id="chartPanLeft" title="תזוזה שמאלה" data-button-type="VIEW">
                                 <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="icon" aria-label="icon"></span>
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" id="chartPanRight" title="תזוזה ימינה">
+                            <button class="btn btn-sm btn-outline-secondary" id="chartPanRight" title="תזוזה ימינה" data-button-type="VIEW">
                                 <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="icon" aria-label="icon"></span>
                             </button>
                             </div>
@@ -414,14 +424,14 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="table" data-size="16" data-alt="table" aria-label="table"></span> רשימת טריידים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('trades-table-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('trades-table-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
                         <div class="table-responsive">
-                            <table class="table table-hover" id="tradesTable" data-table-type="portfolio-trades">
+                            <table class="table table-hover" id="tradesTable" data-table-type="trades">
                                 <thead>
                                     <tr>
                                         <th data-sortable="true">טיקר</th>
@@ -460,7 +470,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="arrows-sort" data-size="16" data-alt="arrows-sort" aria-label="arrows-sort"></span> השוואה בין תאריכים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('comparison-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('comparison-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -471,13 +481,13 @@
                             <div class="d-flex gap-2 align-items-center">
                                 <input type="date" id="datePicker2" class="form-control d-inline-block form-control-inline">
                                 <button data-button-type="COMPARE" data-variant="small" data-text="השווה" data-onclick="compareDates()"></button>
-                                <button class="btn btn-sm btn-outline-danger hidden" id="removeComparisonDate" data-onclick="window.portfolioStatePage.removeComparisonDate()">
+                                <button class="btn btn-sm btn-outline-danger hidden" id="removeComparisonDate" data-onclick="window.portfolioStatePage.removeComparisonDate()" data-button-type="PRIMARY">
                                     <span class="icon-placeholder icon" data-icon="x" data-size="16" data-alt="x" aria-label="x"></span> הסר השוואה
                                 </button>
                             </div>
                         </div>
                         <div class="table-responsive hidden" id="comparison-table-wrapper">
-                            <table class="table">
+                            <table class="table" data-table-type="portfolio_comparison">
                                 <thead>
                                     <tr>
                                         <th>מדד</th>

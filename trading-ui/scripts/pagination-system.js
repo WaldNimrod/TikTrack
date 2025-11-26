@@ -77,6 +77,18 @@ window.PaginationSystem = {
      * @returns {Object} - instance של pagination
      */
     create: function(tableId, options = {}) {
+        // Check if table is in a modal - don't create pagination if so
+        if (typeof document !== 'undefined') {
+            const table = document.getElementById(tableId);
+            if (table) {
+                const isInModal = table.closest('.modal, [class*="modal"]');
+                if (isInModal) {
+                    console.warn(`⚠️ [PaginationSystem.create] Skipping pagination creation for table ${tableId} - table is inside a modal`);
+                    return null;
+                }
+            }
+        }
+        
         const resolvedTableType = options.tableType || this.resolveTableType(tableId);
         const config = {
             tableId: tableId,
@@ -333,14 +345,27 @@ class PaginationInstance {
         const table = document.getElementById(this.config.tableId);
         if (!table) return;
         
+        // Check if table is in a modal - skip pagination if so
+        const isInModal = table.closest('.modal, [class*="modal"]');
+        if (isInModal) {
+            console.warn(`⚠️ [PaginationSystem] Skipping pagination for table ${this.config.tableId} - table is inside a modal`);
+            return;
+        }
+        
         // Remove existing pagination
         this.removePagination();
         
-        // Create pagination container
-        const paginationContainer = this.createPaginationContainer();
+        // Create compact pagination container (above table)
+        const compactContainer = this.createCompactPaginationContainer();
         
-        // Insert after table
-        table.parentNode.insertBefore(paginationContainer, table.nextSibling);
+        // Create full pagination container (below table)
+        const fullContainer = this.createPaginationContainer();
+        
+        // Insert compact container before table
+        table.parentNode.insertBefore(compactContainer, table);
+        
+        // Insert full container after table
+        table.parentNode.insertBefore(fullContainer, table.nextSibling);
 
         const pageData = this.getCurrentPageData();
 
@@ -365,7 +390,7 @@ class PaginationInstance {
     }
     
     /**
-     * יצירת container של pagination
+     * יצירת container של pagination (תצוגה מלאה - מתחת לטבלה)
      * @returns {HTMLElement} - container של pagination
      */
     createPaginationContainer() {
@@ -378,47 +403,37 @@ class PaginationInstance {
         
         let html = `
             <div class="pagination-wrapper">
-                <div class="pagination-info">
-                    <span class="items-info">
-                        מציג ${startItem}-${endItem} מתוך ${this.totalItems} פריטים
-                    </span>
+                <button class="pagination-btn pagination-btn-icon-only" onclick="PaginationSystem.get('${this.config.tableId}').previousPage()" 
+                        ${this.currentPage <= 1 ? 'disabled' : ''}
+                        aria-label="עמוד הקודם">
+                    <i class="ti ti-chevron-right"></i>
+                </button>
+                
+                <span class="page-info">
+                    ע. ${this.currentPage} מ: ${this.totalPages}
+                </span>
+                
+                <button class="pagination-btn pagination-btn-icon-only" onclick="PaginationSystem.get('${this.config.tableId}').nextPage()" 
+                        ${this.currentPage >= this.totalPages ? 'disabled' : ''}
+                        aria-label="עמוד הבא">
+                    <i class="ti ti-chevron-left"></i>
+                </button>
+                
+                <span class="items-info">
+                    ${startItem}-${endItem} מתוך: ${this.totalItems}
+                </span>
         `;
         
         // Page size selector
         if (this.config.showPageSizeSelector) {
             html += `
-                    <select class="page-size-selector" onchange="PaginationSystem.get('${this.config.tableId}').setPageSize(parseInt(this.value))">
-                        <option value="5" ${this.pageSize === 5 ? 'selected' : ''}>5 פריטים</option>
-                        <option value="10" ${this.pageSize === 10 ? 'selected' : ''}>10 פריטים</option>
-                        <option value="20" ${this.pageSize === 20 ? 'selected' : ''}>20 פריטים</option>
-                        <option value="50" ${this.pageSize === 50 ? 'selected' : ''}>50 פריטים</option>
-                        <option value="100" ${this.pageSize === 100 ? 'selected' : ''}>100 פריטים</option>
-                    </select>
-            `;
-        }
-        
-        html += `
-                </div>
-        `;
-        
-        // Navigation buttons
-        if (this.config.showNavigation && this.totalPages > 1) {
-            html += `
-                <div class="pagination-navigation">
-                    <button class="pagination-btn" onclick="PaginationSystem.get('${this.config.tableId}').previousPage()" 
-                            ${this.currentPage <= 1 ? 'disabled' : ''}>
-                        <i class="fas fa-chevron-right"></i> הקודם
-                    </button>
-                    
-                    <span class="page-info">
-                        עמוד ${this.currentPage} מתוך ${this.totalPages}
-                    </span>
-                    
-                    <button class="pagination-btn" onclick="PaginationSystem.get('${this.config.tableId}').nextPage()" 
-                            ${this.currentPage >= this.totalPages ? 'disabled' : ''}>
-                        הבא <i class="fas fa-chevron-left"></i>
-                    </button>
-                </div>
+                <select class="page-size-selector" onchange="PaginationSystem.get('${this.config.tableId}').setPageSize(parseInt(this.value))">
+                    <option value="5" ${this.pageSize === 5 ? 'selected' : ''}>5 פריטים</option>
+                    <option value="10" ${this.pageSize === 10 ? 'selected' : ''}>10 פריטים</option>
+                    <option value="20" ${this.pageSize === 20 ? 'selected' : ''}>20 פריטים</option>
+                    <option value="50" ${this.pageSize === 50 ? 'selected' : ''}>50 פריטים</option>
+                    <option value="100" ${this.pageSize === 100 ? 'selected' : ''}>100 פריטים</option>
+                </select>
             `;
         }
         
@@ -431,12 +446,49 @@ class PaginationInstance {
     }
     
     /**
-     * הסרת pagination קיים
+     * יצירת container של pagination מצומצם (תצוגה מצומצמת - מעל הטבלה)
+     * @returns {HTMLElement} - container של pagination מצומצם
+     */
+    createCompactPaginationContainer() {
+        const container = document.createElement('div');
+        container.className = 'pagination-container-compact';
+        container.id = `${this.config.tableId}-pagination-compact`;
+        
+        let html = `
+            <div class="pagination-compact-wrapper">
+                <button class="pagination-btn pagination-btn-icon-only" onclick="PaginationSystem.get('${this.config.tableId}').previousPage()" 
+                        ${this.currentPage <= 1 ? 'disabled' : ''}
+                        aria-label="עמוד הקודם">
+                    <i class="ti ti-chevron-right"></i>
+                </button>
+                
+                <span class="page-info-compact">
+                    ע. ${this.currentPage} מ: ${this.totalPages}
+                </span>
+                
+                <button class="pagination-btn pagination-btn-icon-only" onclick="PaginationSystem.get('${this.config.tableId}').nextPage()" 
+                        ${this.currentPage >= this.totalPages ? 'disabled' : ''}
+                        aria-label="עמוד הבא">
+                    <i class="ti ti-chevron-left"></i>
+                </button>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        return container;
+    }
+    
+    /**
+     * הסרת pagination קיים (גם מצומצם וגם מלא)
      */
     removePagination() {
         const existing = document.getElementById(`${this.config.tableId}-pagination`);
         if (existing) {
             existing.remove();
+        }
+        const existingCompact = document.getElementById(`${this.config.tableId}-pagination-compact`);
+        if (existingCompact) {
+            existingCompact.remove();
         }
     }
     

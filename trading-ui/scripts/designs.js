@@ -101,13 +101,156 @@ function generateDetailedLog() {
 }
 
 /**
- * Copy detailed log to clipboard
+ * Register designs page tables with UnifiedTableSystem
+ * This function registers all tables on the designs page for unified sorting and filtering
  */
+window.registerDesignsTables = function() {
+    if (!window.UnifiedTableSystem) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for registration', { page: "designs" });
+        return;
+    }
 
-// ===== GLOBAL FUNCTION EXPORTS =====
+    // Get column mappings from table-mappings.js
+    const getColumns = (tableType) => {
+        return window.TABLE_COLUMN_MAPPINGS?.[tableType] || [];
+    };
 
-// window.toggleAllSections export removed - using global version from ui-utils.js
-// window.toggleSection export removed - using global version from ui-utils.js
-// window. export removed - using global version from system-management.js
-// window.generateDetailedLog export removed - local function only
+    // Register button-system table
+    const buttonSystemTable = document.getElementById('buttonSystemTable');
+    if (buttonSystemTable) {
+        window.UnifiedTableSystem.registry.register('button-system', {
+            dataGetter: () => {
+                // Get data from table body if available
+                const tbody = buttonSystemTable.querySelector('tbody');
+                if (!tbody) return [];
+                
+                // Extract data from table rows
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                return rows.map(row => {
+                    const cells = row.querySelectorAll('td');
+                    return {
+                        id: cells[0]?.textContent?.trim() || '',
+                        name: cells[1]?.textContent?.trim() || '',
+                        description: cells[2]?.textContent?.trim() || '',
+                        // Add more fields as needed
+                    };
+                });
+            },
+            updateFunction: (data) => {
+                // Update table if needed
+                if (typeof window.updateButtonSystemTable === 'function') {
+                    window.updateButtonSystemTable(data);
+                }
+            },
+            tableSelector: '#buttonSystemTable',
+            columns: getColumns('button-system') || [],
+            sortable: true,
+            filterable: true,
+        });
+    }
 
+    // Register color-tokens table
+    const colorTokensTable = document.getElementById('colorTokensTable');
+    if (colorTokensTable) {
+        window.UnifiedTableSystem.registry.register('color-tokens', {
+            dataGetter: () => {
+                const tbody = colorTokensTable.querySelector('tbody');
+                if (!tbody) return [];
+                
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                return rows.map(row => {
+                    const cells = row.querySelectorAll('td');
+                    return {
+                        group: cells[0]?.textContent?.trim() || '',
+                        name: cells[1]?.textContent?.trim() || '',
+                        identifier: cells[2]?.textContent?.trim() || '',
+                        value: cells[3]?.textContent?.trim() || '',
+                        details: cells[4]?.textContent?.trim() || '',
+                    };
+                });
+            },
+            updateFunction: (data) => {
+                if (typeof window.updateColorTokensTable === 'function') {
+                    window.updateColorTokensTable(data);
+                }
+            },
+            tableSelector: '#colorTokensTable',
+            columns: getColumns('color-tokens') || [],
+            sortable: true,
+            filterable: true,
+        });
+    }
+
+    // Register entity-colors table
+    const entityColorsTable = document.querySelector('table[data-table-type="entity-colors"]');
+    if (entityColorsTable) {
+        window.UnifiedTableSystem.registry.register('entity-colors', {
+            dataGetter: () => {
+                const tbody = entityColorsTable.querySelector('tbody');
+                if (!tbody) return [];
+                
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                return rows.map(row => {
+                    const cells = row.querySelectorAll('td');
+                    return {
+                        button: cells[0]?.textContent?.trim() || '',
+                        ticker: cells[1]?.textContent?.trim() || '',
+                        trade: cells[2]?.textContent?.trim() || '',
+                        trade_plan: cells[3]?.textContent?.trim() || '',
+                        alert: cells[4]?.textContent?.trim() || '',
+                    };
+                });
+            },
+            updateFunction: (data) => {
+                if (typeof window.updateEntityColorsTable === 'function') {
+                    window.updateEntityColorsTable(data);
+                }
+            },
+            tableSelector: 'table[data-table-type="entity-colors"]',
+            columns: getColumns('entity-colors') || [],
+            sortable: true,
+            filterable: true,
+        });
+    }
+
+    window.Logger?.info('✅ Designs tables registered with UnifiedTableSystem', { 
+        page: "designs",
+        tables: ['button-system', 'color-tokens', 'entity-colors']
+    });
+};
+
+// Register tables when DOM is ready and UnifiedTableSystem is available
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Wait for UnifiedTableSystem
+        const waitForUnifiedTableSystem = setInterval(() => {
+            if (window.UnifiedTableSystem && typeof window.registerDesignsTables === 'function') {
+                window.registerDesignsTables();
+                clearInterval(waitForUnifiedTableSystem);
+            }
+        }, 100);
+        
+        // Timeout after 5 seconds
+        setTimeout(() => {
+            clearInterval(waitForUnifiedTableSystem);
+        }, 5000);
+    });
+} else {
+    // DOM already loaded
+    if (window.UnifiedTableSystem && typeof window.registerDesignsTables === 'function') {
+        window.registerDesignsTables();
+    } else {
+        // Wait for UnifiedTableSystem
+        const waitForUnifiedTableSystem = setInterval(() => {
+            if (window.UnifiedTableSystem && typeof window.registerDesignsTables === 'function') {
+                window.registerDesignsTables();
+                clearInterval(waitForUnifiedTableSystem);
+            }
+        }, 100);
+        
+        // Timeout after 5 seconds
+        setTimeout(() => {
+            clearInterval(waitForUnifiedTableSystem);
+        }, 5000);
+    }
+}

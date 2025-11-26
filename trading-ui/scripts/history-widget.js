@@ -644,21 +644,32 @@
     /**
      * Create Quick Links Actions Menu with icons and text
      */
-    function createQuickLinksActionsMenu(buttons) {
+    async function createQuickLinksActionsMenu(buttons) {
         if (!buttons || buttons.length === 0) {
             return '';
         }
         
-        const menuButtons = buttons.map((button) => {
-            const icon = button.icon || '../../images/icons/tabler/eye.svg';
+        const menuButtonsPromises = buttons.map(async (button) => {
+            const iconPath = button.icon || '../../images/icons/tabler/eye.svg';
             const text = button.text || '';
             const title = button.title || '';
             const onclick = button.onclick || '';
             
+            let iconHtml = `<img src="${iconPath}" width="16" height="16" alt="${text}" class="icon me-1">`;
+            if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                try {
+                    const iconName = iconPath.split('/').pop().replace('.svg', '');
+                    iconHtml = await window.IconSystem.renderIcon('button', iconName, { size: '16', alt: text, class: 'icon me-1' });
+                } catch (error) {
+                    // Fallback already set
+                }
+            }
+            
             return `<button class="btn actions-menu-item" data-variant="small" data-button-type="LINK" data-onclick='${onclick}' title="${title}" style="margin-right: 4px;">
-                <img src="${icon}" width="16" height="16" alt="${text}" class="icon me-1"> ${text}
+                ${iconHtml} ${text}
             </button>`;
-        }).join('');
+        });
+        const menuButtons = (await Promise.all(menuButtonsPromises)).join('');
         
         // Get menu trigger icon - using ⋮ (three dots) if icon not available
         const menuIcon = '<span style="font-size: 18px; line-height: 1;">⋮</span>';
@@ -777,7 +788,7 @@
             ];
             
             // Custom create actions menu with icons and text
-            const actionsMenuHTML = createQuickLinksActionsMenu(quickLinksButtons);
+            const actionsMenuHTML = await createQuickLinksActionsMenu(quickLinksButtons);
             container.innerHTML = actionsMenuHTML;
             
             // Setup positioning that checks available space

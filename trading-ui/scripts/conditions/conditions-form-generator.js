@@ -262,7 +262,12 @@ class ConditionsFormGenerator {
             });
 
         if (conditionData?.method_id) {
-            methodSelect.value = conditionData.method_id;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue('methodSelect', conditionData.method_id, 'int');
+            } else {
+                methodSelect.value = conditionData.method_id;
+            }
             this.handleMethodChange(conditionData.method_id);
         }
 
@@ -623,12 +628,22 @@ class ConditionsFormGenerator {
     populateForm(conditionData) {
         const logicalOperator = document.getElementById('logicalOperator');
         if (logicalOperator && conditionData.logical_operator) {
-            logicalOperator.value = conditionData.logical_operator;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue('logicalOperator', conditionData.logical_operator, 'text');
+            } else {
+                logicalOperator.value = conditionData.logical_operator;
+            }
         }
 
         const conditionGroup = document.getElementById('conditionGroup');
         if (conditionGroup && conditionData.condition_group !== undefined) {
-            conditionGroup.value = conditionData.condition_group;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue('conditionGroup', conditionData.condition_group, 'text');
+            } else {
+                conditionGroup.value = conditionData.condition_group;
+            }
         }
 
         const isActive = document.getElementById('isActive');
@@ -638,7 +653,12 @@ class ConditionsFormGenerator {
 
         const triggerAction = document.getElementById('triggerAction');
         if (triggerAction && conditionData.trigger_action) {
-            triggerAction.value = conditionData.trigger_action;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue('triggerAction', conditionData.trigger_action, 'text');
+            } else {
+                triggerAction.value = conditionData.trigger_action;
+            }
         }
 
         const parameters = conditionData.parameters_json || conditionData.parameters;

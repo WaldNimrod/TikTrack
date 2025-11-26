@@ -32,16 +32,16 @@
                     <div class="section-header entity-test-sub-header">
                         <h2>🔧 מנהל מערכת</h2>
                         <div class="header-actions">
-                            <button class="btn btn-sm btn-outline-success" id="quickRestartSystemBtn" title="איתחול מהיר של השרת">
+                            <button class="btn btn-sm btn-outline-success" id="quickRestartSystemBtn" title="איתחול מהיר של השרת" data-button-type="PLAY">
                                 <img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon"> איתחול מהיר
                             </button>
-                            <button class="btn btn-sm btn-outline-warning" id="changeModeSystemBtn" title="שינוי מצב מטמון">
+                            <button class="btn btn-sm btn-outline-warning" id="changeModeSystemBtn" title="שינוי מצב מטמון" data-button-type="MENU">
                                 <img src="/trading-ui/images/icons/tabler/settings.svg" width="16" height="16" alt="settings" class="icon"> מצב מטמון
                             </button>
-                            <button class="btn btn-sm btn-outline-info" id="openServerMonitorBtn" title="פתח דשבורד ניטור שרת">
+                            <button class="btn btn-sm btn-outline-info" id="openServerMonitorBtn" title="פתח דשבורד ניטור שרת" data-button-type="VIEW">
                                 <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> ניטור שרת
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" id="refreshSystemDataBtn" title="רענן נתוני מערכת">
+                            <button class="btn btn-sm btn-outline-primary" id="refreshSystemDataBtn" title="רענן נתוני מערכת" data-button-type="REFRESH">
                                 <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רענן
                             </button>
                             </div>
@@ -173,6 +173,8 @@
     <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
     <!-- [7] Load Order: 7 -->
     <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [7.5] Load Order: 7.5 -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
     <!-- [8] Load Order: 8 -->
     <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
     <!-- [9] Load Order: 9 -->
@@ -305,7 +307,22 @@
     <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+
+<!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [49] Page-specific: system-management -->

@@ -20,40 +20,9 @@ function getCSSVariableValue(variableName, fallback) {
     }
 }
 
-// Get entity color dynamically from system
-function getEntityColor(entityType) {
-    // Try to use color-scheme-system if available
-    if (window.getEntityColor && typeof window.getEntityColor === 'function') {
-        const color = window.getEntityColor(entityType);
-        if (color) return color;
-    }
-    
-    // Try CSS variable
-    const cssVar = getCSSVariableValue(`--entity-${entityType.replace('_', '-')}-color`, '');
-    if (cssVar) return cssVar;
-    
-    // Fallback to default entity colors from color-scheme-system
-    const defaultColors = {
-        'trade': '#26baac',
-        'trade_plan': '#28a745',
-        'execution': '#17a2b8',
-        'account': '#6f42c1',
-        'trading_account': '#28a745',
-        'cash_flow': '#fd7e14',
-        'ticker': '#20c997',
-        'alert': '#dc3545',
-        'note': '#6c757d',
-        'constraint': '#e83e8c',
-        'design': '#6f42c1',
-        'research': '#17a2b8',
-        'preference': '#adb5bd',
-        'development': '#fc5a06',
-        'position': '#0d6efd',
-        'strategy': '#6f42c1'
-    };
-    
-    return defaultColors[entityType] || getCSSVariableValue('--primary-color', '#26baac');
-}
+// ⚠️ REMOVED: Local getEntityColor() function - use centralized Color Scheme System
+// Use window.getEntityColor() directly instead
+// All hardcoded fallbacks removed - system must load colors from preferences
 
 // Initialize series checkboxes UI
 function initializeSeriesControls() {
@@ -61,7 +30,10 @@ function initializeSeriesControls() {
     if (!container) return;
     
     container.innerHTML = AVAILABLE_SERIES.map(series => {
-        const color = getEntityColor(series.entityType);
+        // Use centralized Color Scheme System directly - no local function
+        const color = (typeof window.getEntityColor === 'function') 
+            ? window.getEntityColor(series.entityType) 
+            : '';
         const isChecked = seriesVisibility[series.key] !== false; // Default true
         return `
             <div class="series-checkbox-container">
@@ -476,11 +448,13 @@ function selectDateRangeOption(dateRange) {
     // Clear custom date inputs when preset is selected
     const fromInput = document.getElementById('customDateFrom');
     const toInput = document.getElementById('customDateTo');
-    if (fromInput) {
-        fromInput.value = '';
-    }
-    if (toInput) {
-        toInput.value = '';
+    // Use DataCollectionService to clear fields if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      if (fromInput) window.DataCollectionService.setValue(fromInput.id, '', 'dateOnly');
+      if (toInput) window.DataCollectionService.setValue(toInput.id, '', 'dateOnly');
+    } else {
+      if (fromInput) fromInput.value = '';
+      if (toInput) toInput.value = '';
     }
     
     updateDateRangeFilterText();
@@ -761,7 +735,12 @@ function toggleComparisonParameter(paramType) {
             if (select.multiple) {
                 Array.from(select.options).forEach(opt => opt.selected = false);
             } else {
-                select.value = '';
+                // Use DataCollectionService to clear field if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(select.id, '', 'text');
+                } else {
+                  select.value = '';
+                }
             }
         }
         
@@ -1652,6 +1631,8 @@ function updateStrategyComparisonTable(filters) {
         summary.style.transition = 'opacity 0.3s';
         summary.style.opacity = '0';
         setTimeout(() => {
+            // Note: This is a mockup page summary display, not a standard summary element
+            // Consider using InfoSummarySystem if this page becomes production-ready
             summary.innerHTML = `
                 <strong>סיכום:</strong>
                 סה"כ קטגוריות: ${totalCategories} |
@@ -1955,7 +1936,10 @@ async function initStrategyPerformanceChart() {
                         categories = seriesData.categories;
                     }
                     
-                    const color = getEntityColor(seriesConfig.entityType);
+                    // Use centralized Color Scheme System directly - no local function
+                    const color = (typeof window.getEntityColor === 'function') 
+                        ? window.getEntityColor(seriesConfig.entityType) 
+                        : '';
                     const series = strategyPerformanceChart.addSeries(lightweightCharts.HistogramSeries, {
                         color: color,
                         priceFormat: {
@@ -1980,7 +1964,10 @@ async function initStrategyPerformanceChart() {
                         categories = seriesData.categories;
                     }
                     
-                    const color = getEntityColor(seriesConfig.entityType);
+                    // Use centralized Color Scheme System directly - no local function
+                    const color = (typeof window.getEntityColor === 'function') 
+                        ? window.getEntityColor(seriesConfig.entityType) 
+                        : '';
                     const series = window.TradingViewChartAdapter.addAreaSeries(strategyPerformanceChart, {
                         lineColor: color,
                         topColor: color,
@@ -2050,7 +2037,15 @@ async function initStrategyPerformanceChart() {
         if (container) {
             const loading = container.querySelector('.chart-loading');
             if (loading) {
-                loading.innerHTML = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> שגיאה בטעינת גרף';
+                let alertIcon = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">';
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert-triangle', class: 'icon' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                loading.innerHTML = alertIcon + ' שגיאה בטעינת גרף';
                 loading.style.color = '#dc3545';
             }
         }
@@ -2067,7 +2062,10 @@ function updateChartLegend() {
     // Add legend item for each visible series
     AVAILABLE_SERIES.forEach(seriesConfig => {
         if (seriesVisibility[seriesConfig.key] !== false && chartSeries[seriesConfig.key]) {
-            const color = getEntityColor(seriesConfig.entityType);
+            // Use centralized Color Scheme System directly - no local function
+            const color = (typeof window.getEntityColor === 'function') 
+                ? window.getEntityColor(seriesConfig.entityType) 
+                : '';
             legendItems.push(`
                 <div class="series-checkbox-container">
                     <div class="series-legend-color" style="background-color: ${color};"></div>
@@ -2128,7 +2126,10 @@ async function updateStrategyPerformanceChart(filters) {
                         categories = seriesData.categories;
                     }
                     
-                    const color = getEntityColor(seriesConfig.entityType);
+                    // Use centralized Color Scheme System directly - no local function
+                    const color = (typeof window.getEntityColor === 'function') 
+                        ? window.getEntityColor(seriesConfig.entityType) 
+                        : '';
                     const series = strategyPerformanceChart.addSeries(lightweightCharts.HistogramSeries, {
                         color: color,
                         priceFormat: {
@@ -2153,7 +2154,10 @@ async function updateStrategyPerformanceChart(filters) {
                         categories = seriesData.categories;
                     }
                     
-                    const color = getEntityColor(seriesConfig.entityType);
+                    // Use centralized Color Scheme System directly - no local function
+                    const color = (typeof window.getEntityColor === 'function') 
+                        ? window.getEntityColor(seriesConfig.entityType) 
+                        : '';
                     const series = window.TradingViewChartAdapter.addAreaSeries(strategyPerformanceChart, {
                         lineColor: color,
                         topColor: color,
@@ -2228,11 +2232,11 @@ async function updateAllVisualizations() {
     await updateStrategyPerformanceChart(filters);
     
     // Update insights
-    updateStrategyInsights(filters);
+    await updateStrategyInsights(filters);
 }
 
 // Update strategy insights
-function updateStrategyInsights(filters) {
+async function updateStrategyInsights(filters) {
     const data = generateMockStrategyComparisonTableData(filters).data;
     
     if (data.length === 0) {
@@ -2240,9 +2244,19 @@ function updateStrategyInsights(filters) {
         const bestSuccessRate = document.getElementById('best-success-rate-insight');
         const recommendation = document.getElementById('recommendation-insight');
         
-        if (bestStrategy) bestStrategy.innerHTML = '<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon"><strong>אסטרטגיה הטובה ביותר:</strong> אין נתונים';
-        if (bestSuccessRate) bestSuccessRate.innerHTML = '<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="info-circle" class="icon"><strong>אחוז הצלחה הגבוה ביותר:</strong> אין נתונים';
-        if (recommendation) recommendation.innerHTML = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"><strong>המלצה:</strong> אין נתונים להצגה';
+        let noteIcon = '<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">';
+        let alertIcon = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                noteIcon = await window.IconSystem.renderIcon('button', 'note', { size: '16', alt: 'icon', class: 'icon' });
+                alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert-triangle', class: 'icon' });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
+        if (bestStrategy) bestStrategy.innerHTML = noteIcon + '<strong>אסטרטגיה הטובה ביותר:</strong> אין נתונים';
+        if (bestSuccessRate) bestSuccessRate.innerHTML = noteIcon + '<strong>אחוז הצלחה הגבוה ביותר:</strong> אין נתונים';
+        if (recommendation) recommendation.innerHTML = alertIcon + '<strong>המלצה:</strong> אין נתונים להצגה';
         return;
     }
     
@@ -2336,11 +2350,25 @@ async function loadRecordFilterState() {
             // Restore custom dates
             if (savedState.dateRangeStart) {
                 const fromInput = document.getElementById('customDateFrom');
-                if (fromInput) fromInput.value = savedState.dateRangeStart;
+                // Use DataCollectionService to set value if available
+        if (fromInput) {
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(fromInput.id, savedState.dateRangeStart, 'dateOnly');
+          } else {
+            fromInput.value = savedState.dateRangeStart;
+          }
+        }
             }
             if (savedState.dateRangeEnd) {
                 const toInput = document.getElementById('customDateTo');
-                if (toInput) toInput.value = savedState.dateRangeEnd;
+                // Use DataCollectionService to set value if available
+        if (toInput) {
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(toInput.id, savedState.dateRangeEnd, 'dateOnly');
+          } else {
+            toInput.value = savedState.dateRangeEnd;
+          }
+        }
             }
             updateDateRangeFilterText();
             

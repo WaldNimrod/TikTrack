@@ -20,38 +20,9 @@ function getCSSVariableValue(variableName, fallback) {
 }
 
 // Get entity color dynamically from system
-function getEntityColor(entityType) {
-    // Try to use color-scheme-system if available
-    if (window.getEntityColor && typeof window.getEntityColor === 'function') {
-        const color = window.getEntityColor(entityType);
-        if (color) return color;
-    }
-    
-    // Try CSS variable
-    const cssVar = getCSSVariableValue(`--entity-${entityType.replace('_', '-')}-color`, '');
-    if (cssVar) return cssVar;
-    
-    // Fallback to default entity colors from color-scheme-system
-    const defaultColors = {
-        'trade': '#26baac',
-        'trade_plan': '#28a745',
-        'execution': '#17a2b8',
-        'account': '#6f42c1',
-        'trading_account': '#28a745',
-        'cash_flow': '#fd7e14',
-        'ticker': '#20c997',
-        'alert': '#dc3545',
-        'note': '#6c757d',
-        'constraint': '#e83e8c',
-        'design': '#6f42c1',
-        'research': '#17a2b8',
-        'preference': '#adb5bd',
-        'development': '#fc5a06',
-        'position': '#0d6efd'
-    };
-    
-    return defaultColors[entityType] || getCSSVariableValue('--primary-color', '#26baac');
-}
+// ⚠️ REMOVED: Local getEntityColor() function - use centralized Color Scheme System
+// Use window.getEntityColor() directly instead
+// All hardcoded fallbacks removed - system must load colors from preferences
 
 // Initialize series checkboxes UI
 function initializeSeriesControls() {
@@ -59,7 +30,10 @@ function initializeSeriesControls() {
     if (!container) return;
     
     container.innerHTML = AVAILABLE_SERIES.map(series => {
-        const color = getEntityColor(series.entityType);
+        // Use centralized Color Scheme System directly - no local function
+        const color = (typeof window.getEntityColor === 'function') 
+            ? window.getEntityColor(series.entityType) 
+            : '';
         const isChecked = seriesVisibility[series.key] !== false; // Default true
         return `
             <div class="series-checkbox-container">
@@ -620,11 +594,21 @@ async function loadFilterState() {
                     if (customInputs) {
                         customInputs.style.display = 'block';
                     }
-                    if (filters.dateRangeStart && document.getElementById('customDateFrom')) {
-                        document.getElementById('customDateFrom').value = filters.dateRangeStart;
-                    }
-                    if (filters.dateRangeEnd && document.getElementById('customDateTo')) {
-                        document.getElementById('customDateTo').value = filters.dateRangeEnd;
+                    // Use DataCollectionService to set values if available
+                    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                        if (filters.dateRangeStart) {
+                            window.DataCollectionService.setValue('customDateFrom', filters.dateRangeStart, 'dateOnly');
+                        }
+                        if (filters.dateRangeEnd) {
+                            window.DataCollectionService.setValue('customDateTo', filters.dateRangeEnd, 'dateOnly');
+                        }
+                    } else {
+                        if (filters.dateRangeStart && document.getElementById('customDateFrom')) {
+                            document.getElementById('customDateFrom').value = filters.dateRangeStart;
+                        }
+                        if (filters.dateRangeEnd && document.getElementById('customDateTo')) {
+                            document.getElementById('customDateTo').value = filters.dateRangeEnd;
+                        }
                     }
                 }
                 updateDateRangeFilterText();
@@ -1496,6 +1480,8 @@ function updateComparisonTable(filters) {
         summary.style.transition = 'opacity 0.3s';
         summary.style.opacity = '0';
         setTimeout(() => {
+            // Note: This is a mockup page summary display, not a standard summary element
+            // Consider using InfoSummarySystem if this page becomes production-ready
             summary.innerHTML = `
                 <strong>סיכום:</strong>
                 סה"כ קטגוריות: ${totalCategories} |
@@ -1599,6 +1585,7 @@ function showHeatmapTooltip(event, item) {
         pointer-events: none;
         box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     `;
+    // Note: This is a tooltip for a mockup page, not a standard summary element
     tooltip.innerHTML = `
         <strong>${item.category}</strong><br>
         טריידים: ${item.trades}<br>
@@ -1777,6 +1764,7 @@ function showVisualHeatmapTooltip(event, item) {
     }
     
     const tooltipEl = document.getElementById('visual-heatmap-tooltip');
+    // Note: This is a tooltip for a mockup page, not a standard summary element
     tooltipEl.innerHTML = `
         <strong>${item.category}</strong><br>
         P/L כולל: ${formatCurrency(item.totalPL)}<br>
@@ -1903,7 +1891,10 @@ async function initComparisonChart() {
                         categories = seriesData.categories;
                     }
                     
-                    const color = getEntityColor(seriesConfig.entityType);
+                    // Use centralized Color Scheme System directly - no local function
+                    const color = (typeof window.getEntityColor === 'function') 
+                        ? window.getEntityColor(seriesConfig.entityType) 
+                        : '';
                     const series = comparisonChart.addSeries(lightweightCharts.HistogramSeries, {
                         color: color,
                     priceFormat: {
@@ -1928,7 +1919,10 @@ async function initComparisonChart() {
                         categories = seriesData.categories;
                     }
                     
-                    const color = getEntityColor(seriesConfig.entityType);
+                    // Use centralized Color Scheme System directly - no local function
+                    const color = (typeof window.getEntityColor === 'function') 
+                        ? window.getEntityColor(seriesConfig.entityType) 
+                        : '';
                     const series = window.TradingViewChartAdapter.addAreaSeries(comparisonChart, {
                         lineColor: color,
                         topColor: color,
@@ -1998,7 +1992,15 @@ async function initComparisonChart() {
         if (container) {
             const loading = container.querySelector('.chart-loading');
             if (loading) {
-                loading.innerHTML = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> שגיאה בטעינת גרף';
+                let alertIcon = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">';
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert-triangle', class: 'icon' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                loading.innerHTML = alertIcon + ' שגיאה בטעינת גרף';
                 loading.style.color = '#dc3545';
             }
         }
@@ -2015,7 +2017,10 @@ function updateChartLegend() {
     // Add legend item for each visible series
     AVAILABLE_SERIES.forEach(seriesConfig => {
         if (seriesVisibility[seriesConfig.key] !== false && chartSeries[seriesConfig.key]) {
-            const color = getEntityColor(seriesConfig.entityType);
+            // Use centralized Color Scheme System directly - no local function
+            const color = (typeof window.getEntityColor === 'function') 
+                ? window.getEntityColor(seriesConfig.entityType) 
+                : '';
         legendItems.push(`
                 <div class="series-checkbox-container">
                     <div class="series-legend-color" style="background-color: ${color};"></div>
@@ -2100,7 +2105,10 @@ async function updateComparisonChart(filters) {
                         categories = seriesData.categories;
                     }
                     
-                    const color = getEntityColor(seriesConfig.entityType);
+                    // Use centralized Color Scheme System directly - no local function
+                    const color = (typeof window.getEntityColor === 'function') 
+                        ? window.getEntityColor(seriesConfig.entityType) 
+                        : '';
                     const series = comparisonChart.addSeries(lightweightCharts.HistogramSeries, {
                         color: color,
                     priceFormat: {
@@ -2381,10 +2389,16 @@ function resetRecordFilters() {
     dateRangeItems.forEach(item => item.classList.remove('selected'));
     
     // Clear custom date inputs
-    const fromInput = document.getElementById('customDateFrom');
-    const toInput = document.getElementById('customDateTo');
-    if (fromInput) fromInput.value = '';
-    if (toInput) toInput.value = '';
+    // Use DataCollectionService to clear fields if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('customDateFrom', '', 'dateOnly');
+        window.DataCollectionService.setValue('customDateTo', '', 'dateOnly');
+    } else {
+        const fromInput = document.getElementById('customDateFrom');
+        const toInput = document.getElementById('customDateTo');
+        if (fromInput) fromInput.value = '';
+        if (toInput) toInput.value = '';
+    }
     updateDateRangeFilterText();
     
     // Clear trading accounts
@@ -2437,10 +2451,16 @@ function resetRecordFiltersToDefaults() {
     if (yearItem) yearItem.classList.add('selected');
     
     // Clear custom date inputs
-    const fromInput = document.getElementById('customDateFrom');
-    const toInput = document.getElementById('customDateTo');
-    if (fromInput) fromInput.value = '';
-    if (toInput) toInput.value = '';
+    // Use DataCollectionService to clear fields if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('customDateFrom', '', 'dateOnly');
+        window.DataCollectionService.setValue('customDateTo', '', 'dateOnly');
+    } else {
+        const fromInput = document.getElementById('customDateFrom');
+        const toInput = document.getElementById('customDateTo');
+        if (fromInput) fromInput.value = '';
+        if (toInput) toInput.value = '';
+    }
     updateDateRangeFilterText();
     
     // Set trading accounts to first account only

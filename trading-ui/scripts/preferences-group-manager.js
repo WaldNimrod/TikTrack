@@ -285,7 +285,12 @@ class PreferencesGroupManager {
       });
     } catch (error) {
       window.Logger?.error(`Failed to load group ${groupName}:`, error, { page: 'preferences-group-manager' });
-      window.showErrorNotification?.(`שגיאה בטעינת קבוצה ${this.getGroupDisplayName(groupName)}`);
+      // Use CRUDResponseHandler for error notification if available
+      if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {
+        window.CRUDResponseHandler.handleError(error, `טעינת קבוצת העדפות ${this.getGroupDisplayName(groupName)}`);
+      } else if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification?.(`שגיאה בטעינת קבוצה ${this.getGroupDisplayName(groupName)}`);
+      }
     }
   }
 
@@ -343,16 +348,28 @@ class PreferencesGroupManager {
           const sourceValue = normalizedPreferences[rawKey];
           const normalizedValue = this.normalizePreferenceValue(canonicalKey, sourceValue, 'toEnglish');
           const previousValue = field.value;
-          field.value = normalizedValue;
-
-          // If direct assignment failed (option not found), try fallback to original value
-          if (field.value !== normalizedValue && sourceValue !== undefined && sourceValue !== null) {
-            field.value = sourceValue;
-          }
-
-          // If still empty and there was a previous value, restore it to avoid blank selection
-          if (field.value === '' && previousValue !== '') {
-            field.value = previousValue;
+          // Use DataCollectionService to set value if available
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(field.id, normalizedValue, 'text');
+            // Check if assignment succeeded (for selects)
+            if (field.tagName === 'SELECT') {
+              const currentValue = window.DataCollectionService.getValue(field.id, 'text', '');
+              if (currentValue !== normalizedValue && sourceValue !== undefined && sourceValue !== null) {
+                window.DataCollectionService.setValue(field.id, sourceValue, 'text');
+              } else if (currentValue === '' && previousValue !== '') {
+                window.DataCollectionService.setValue(field.id, previousValue, 'text');
+              }
+            }
+          } else {
+            field.value = normalizedValue;
+            // If direct assignment failed (option not found), try fallback to original value
+            if (field.value !== normalizedValue && sourceValue !== undefined && sourceValue !== null) {
+              field.value = sourceValue;
+            }
+            // If still empty and there was a previous value, restore it to avoid blank selection
+            if (field.value === '' && previousValue !== '') {
+              field.value = previousValue;
+            }
           }
         }
         populatedCount++;
@@ -409,7 +426,12 @@ class PreferencesGroupManager {
     if (!sectionId) {
       const error = new Error(`Group ${groupName} not found in mapping`);
       window.Logger?.error(error.message, { page: 'preferences-group-manager' });
-      window.showErrorNotification?.('קבוצה לא נמצאה');
+      // Use CRUDResponseHandler for error notification if available
+      if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {
+        window.CRUDResponseHandler.handleError(error, 'שמירת קבוצת העדפות');
+      } else if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification?.('קבוצה לא נמצאה');
+      }
       throw error;
     }
 
@@ -417,6 +439,10 @@ class PreferencesGroupManager {
     if (!section) {
       const error = new Error(`Section ${sectionId} not found`);
       window.Logger?.error(error.message, { page: 'preferences-group-manager' });
+      // Use CRUDResponseHandler for error notification if available
+      if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {
+        window.CRUDResponseHandler.handleError(error, 'שמירת קבוצת העדפות');
+      }
       throw error;
     }
 
@@ -435,7 +461,12 @@ class PreferencesGroupManager {
       if (!window.PreferencesCore || !window.PreferencesCore.saveGroupPreferences) {
         const error = new Error('PreferencesCore.saveGroupPreferences not available');
         window.Logger?.error(error.message, { page: 'preferences-group-manager' });
-        window.showErrorNotification?.('מערכת העדפות לא זמינה');
+        // Use CRUDResponseHandler for error notification if available
+        if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {
+          window.CRUDResponseHandler.handleError(error, 'שמירת קבוצת העדפות');
+        } else if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification?.('מערכת העדפות לא זמינה');
+        }
         throw error;
       }
 
@@ -455,9 +486,18 @@ class PreferencesGroupManager {
 
       await this.refreshGroupState(groupName, savedKeys);
 
-      // הודעת הצלחה
-      const displayName = this.getGroupDisplayName(groupName);
-      window.showSuccessNotification?.(`✅ ${displayName} נשמרו בהצלחה`);
+      // Note: Success notification is handled by CRUDResponseHandler in PreferencesData.savePreferences()
+      // Only show additional notification if save was successful but CRUDResponseHandler didn't show one
+      if (results.saved > 0 && typeof window.showSuccessNotification === 'function') {
+        const displayName = this.getGroupDisplayName(groupName);
+        // Only show if CRUDResponseHandler didn't already show a notification
+        // (CRUDResponseHandler shows notification automatically, so this is a fallback)
+        window.Logger?.debug?.('Preferences group saved successfully', {
+          page: 'preferences-group-manager',
+          groupName,
+          savedCount: results.saved,
+        });
+      }
 
       window.Logger?.info(`✅ Saved ${results.saved} preferences for group ${groupName}`, { page: 'preferences-group-manager' });
 
@@ -475,7 +515,12 @@ class PreferencesGroupManager {
       return results;
     } catch (error) {
       window.Logger?.error(`Failed to save group ${groupName}:`, error, { page: 'preferences-group-manager' });
-      window.showErrorNotification?.('שגיאה בשמירת הגדרות');
+      // Error notification is handled by CRUDResponseHandler in PreferencesData.savePreferences()
+      // Only show additional notification if CRUDResponseHandler didn't show one
+      if (typeof window.showErrorNotification === 'function' && 
+          typeof window.CRUDResponseHandler === 'undefined') {
+        window.showErrorNotification?.('שגיאה בשמירת הגדרות');
+      }
       throw error; // Re-throw to allow caller to handle
     }
   }

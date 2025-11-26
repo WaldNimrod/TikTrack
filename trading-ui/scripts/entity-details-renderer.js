@@ -148,27 +148,34 @@ class EntityDetailsRenderer {
      * @private
      */
     async loadEntityColors() {
-        // צבעי ברירת מחדל
-        this.entityColors = {
-            ticker: '#019193',
-            trade: '#26baac', 
-            trade_plan: '#0056b3',
-            execution: '#17a2b8',
-            account: '#28a745',
-            alert: '#ff9c05',
-            cash_flow: '#20c997',
-            note: '#6c757d',
-            import_session: '#17a2b8'
-        };
+        // ⚠️ REMOVED: Hardcoded default colors - use centralized Color Scheme System instead
+        // Initialize empty colors object - will be populated from centralized system
+        this.entityColors = {};
 
         // ניסיון לטעון צבעים מהעדפות ראשית
         try {
-            window.Logger.info('🎨 Loading entity colors from preferences...', { page: "entity-details-renderer" });
-            window.Logger.info('🔍 Debug - window.ENTITY_COLORS:', window.ENTITY_COLORS, { page: "entity-details-renderer" });
-            window.Logger.info('🔍 Debug - window.currentPreferences:', window.currentPreferences, { page: "entity-details-renderer" });
-            window.Logger.info('🔍 Debug - window.userPreferences:', window.userPreferences, { page: "entity-details-renderer" });
+            window.Logger.info('🎨 Loading entity colors from Color Scheme System...', { page: "entity-details-renderer" });
             
-            // נסה מערכת העדפות
+            // Use centralized Color Scheme System API
+            if (typeof window.getEntityColor === 'function') {
+                // Load colors for all known entity types from centralized system
+                const entityTypes = ['ticker', 'trade', 'trade_plan', 'execution', 'account', 'trading_account', 
+                                    'alert', 'cash_flow', 'note', 'import_session', 'position'];
+                
+                for (const entityType of entityTypes) {
+                    const color = window.getEntityColor(entityType);
+                    if (color) {
+                        this.entityColors[entityType] = color;
+                    }
+                }
+                
+                if (Object.keys(this.entityColors).length > 0) {
+                    window.Logger.info('✅ Loaded entity colors from Color Scheme System', { page: "entity-details-renderer" });
+                    return;
+                }
+            }
+            
+            // נסה מערכת העדפות (legacy compatibility)
             if (window.preferences && window.preferences.preferences && window.preferences.preferences.colorScheme) {
                 const colorScheme = window.preferences.preferences.colorScheme;
                 if (colorScheme.entities) {
@@ -178,24 +185,10 @@ class EntityDetailsRenderer {
                 }
             }
             
-            // נסה מערכת currentPreferences
+            // נסה מערכת currentPreferences (legacy compatibility)
             if (window.currentPreferences && window.currentPreferences.entityColors) {
                 Object.assign(this.entityColors, window.currentPreferences.entityColors);
                 window.Logger.info('✅ Loaded entity colors from currentPreferences', { page: "entity-details-renderer" });
-                return;
-            }
-            
-            // נסה מערכת גלובלית (compatibility layer)
-            if (window.ENTITY_COLORS && Object.keys(window.ENTITY_COLORS).length > 0) {
-                Object.assign(this.entityColors, window.ENTITY_COLORS);
-                window.Logger.info('✅ Loaded entity colors from global system', { page: "entity-details-renderer" });
-                return;
-            }
-            
-            // Fallback ל-userPreferences
-            if (window.userPreferences && window.userPreferences.entityColors) {
-                Object.assign(this.entityColors, window.userPreferences.entityColors);
-                window.Logger.info('✅ Loaded entity colors from userPreferences', { page: "entity-details-renderer" });
                 return;
             }
             
@@ -210,14 +203,18 @@ class EntityDetailsRenderer {
                     }
                 }
             } catch (prefError) {
-                window.Logger.debug('loadPreferences not available, using defaults', { page: "entity-details-renderer" });
+                window.Logger.debug('loadPreferences not available', { page: "entity-details-renderer" });
             }
             
         } catch (error) {
-            window.Logger.debug('Could not load entity colors from preferences, using defaults', { page: "entity-details-renderer" });
+            if (window.Logger && window.Logger.warn) {
+                window.Logger.warn('⚠️ Could not load entity colors - Color Scheme System should be loaded', error, { page: "entity-details-renderer" });
+            }
         }
         
-        window.Logger.info('🔄 Using default entity colors', { page: "entity-details-renderer" });
+        if (Object.keys(this.entityColors).length === 0) {
+            window.Logger.warn('⚠️ No entity colors loaded - Color Scheme System should initialize colors from preferences', { page: "entity-details-renderer" });
+        }
     }
 
     /**
@@ -359,8 +356,11 @@ class EntityDetailsRenderer {
             `;
         }
         
-        // עיצוב שינוי
-        const changeColor = change >= 0 ? '#28a745' : '#dc3545';
+        // עיצוב שינוי - שימוש במערכת המרכזית
+        const getNumericColorFn = (typeof window.getNumericValueColor === 'function') ? window.getNumericValueColor : null;
+        const changeColor = change >= 0 
+            ? (getNumericColorFn ? getNumericColorFn(1, 'medium') : '') 
+            : (getNumericColorFn ? getNumericColorFn(-1, 'medium') : '');
         const changeIcon = change >= 0 ? '↗' : '↘';
         const changeSign = change >= 0 ? '+' : '';
         
@@ -442,7 +442,7 @@ class EntityDetailsRenderer {
             }
 
             const FieldRenderer = window.FieldRendererService || null;
-            const planColor = this.entityColors.trade_plan || '#0056b3';
+            const planColor = this.entityColors.trade_plan || (typeof window.getEntityColor === 'function' ? window.getEntityColor('trade_plan') : '');
 
             let tickerData = tradePlanData.ticker
                 || (Array.isArray(window.tickersData) ? window.tickersData.find(t => t?.id === tradePlanData.ticker_id) : null)
@@ -461,10 +461,11 @@ class EntityDetailsRenderer {
                 tickerInfoHTML = FieldRenderer.renderTickerInfo(tickerData, 'mb-2');
             }
 
+            // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
             const statusDisplay = tradePlanData.status
-                ? (FieldRenderer?.renderStatus
-                    ? FieldRenderer.renderStatus(tradePlanData.status, 'trade_plan')
-                    : this.getStatusBadge(tradePlanData.status))
+                ? (window.FieldRendererService?.renderStatus
+                    ? window.FieldRendererService.renderStatus(tradePlanData.status, 'trade_plan')
+                    : this.getStatusBadge(tradePlanData.status, 'trade_plan'))
                 : '<span class="text-muted">לא זמין</span>';
 
             const tickerSymbol = tickerData?.symbol || tradePlanData.symbol || `תוכנית #${tradePlanData.id}`;
@@ -532,7 +533,7 @@ class EntityDetailsRenderer {
         }
 
         const FieldRenderer = window.FieldRendererService || null;
-        const color = planColor || this.entityColors.trade_plan || '#0056b3';
+        const color = planColor || this.entityColors.trade_plan || (typeof window.getEntityColor === 'function' ? window.getEntityColor('trade_plan') : '');
 
         const sideHtml = tradePlanData.side
             ? (FieldRenderer?.renderSide
@@ -778,7 +779,7 @@ class EntityDetailsRenderer {
      */
     renderTicker(tickerData, options = {}) {
         // קבלת צבע הטיקר מההעדפות
-        const tickerColor = this.entityColors.ticker || '#019193';
+        const tickerColor = this.entityColors.ticker || (typeof window.getEntityColor === 'function' ? window.getEntityColor('ticker') : '');
         const sourceInfo = (options && options.sourceInfo) ? options.sourceInfo : null;
         
         // לוג לבדיקת linked_items
@@ -840,7 +841,7 @@ class EntityDetailsRenderer {
      * @public
      */
     renderTickerSpecific(tickerData, tickerColor = null) {
-        const color = tickerColor || this.entityColors.ticker || '#019193';
+        const color = tickerColor || this.entityColors.ticker || (typeof window.getEntityColor === 'function' ? window.getEntityColor('ticker') : '');
         
         // סוג נכס
         const type = tickerData.type || null;
@@ -948,7 +949,7 @@ class EntityDetailsRenderer {
      */
     renderTrade(tradeData, options = {}) {
         try {
-        const entityColor = this.entityColors.trade || '#26baac';
+        const entityColor = this.entityColors.trade || (typeof window.getEntityColor === 'function' ? window.getEntityColor('trade') : '');
         
         // סטטוס - שימוש במערכת הרינדור הכללית
         const statusDisplay = window.FieldRendererService.renderStatus(tradeData.status, 'trade');
@@ -1077,7 +1078,7 @@ class EntityDetailsRenderer {
                                     page: "entity-details-renderer"
                                 });
                             }
-                            return this.renderLinkedItems(tradeData.linked_items || [], this.entityColors.trade || '#26baac', 'trade', tradeData.id, options?.sourceInfo || null, options);
+                            return this.renderLinkedItems(tradeData.linked_items || [], this.entityColors.trade || (typeof window.getEntityColor === 'function' ? window.getEntityColor('trade') : ''), 'trade', tradeData.id, options?.sourceInfo || null, options);
                         })()}
                     </div>
                 </div>
@@ -1127,7 +1128,7 @@ class EntityDetailsRenderer {
      */
     renderTradeSpecific(tradeData, tradeColor = null) {
         try {
-            const color = tradeColor || this.entityColors.trade || '#26baac';
+            const color = tradeColor || this.entityColors.trade || (typeof window.getEntityColor === 'function' ? window.getEntityColor('trade') : '');
             const FieldRenderer = window.FieldRendererService || null;
         
         // Trade Plan Link
@@ -1503,18 +1504,14 @@ class EntityDetailsRenderer {
             }
         };
         
-        // פורמט סכום
-        // אם null - מציג "לא זמין" (לא fallback!)
+        // פורמט סכום - שימוש ישיר ב-FieldRendererService
+        // אם null - מציג "לא זמין"
         const formatAmount = (amt) => {
             if (amt === null || amt === undefined) {
                 return '<span class="text-muted">לא זמין</span>';
             }
             if (amt === 0) return '$0.00';
-            return FieldRenderer?.renderAmount
-                ? FieldRenderer.renderAmount(amt, '$', 2, false)
-                : (window.renderAmount
-                    ? window.renderAmount(amt, '$', 2, false)
-                    : `$${amt.toFixed(2)}`);
+            return window.FieldRendererService.renderAmount(amt, '$', 2, false);
         };
         
         // פונקציה עזר לפורמט P/L עם אחוזים
@@ -1668,7 +1665,7 @@ class EntityDetailsRenderer {
         }
 
         const FieldRenderer = window.FieldRendererService || null;
-        const entityColor = this.entityColors.trade_plan || this.entityColors.trade || '#26baac';
+        const entityColor = this.entityColors.trade_plan || this.entityColors.trade || (typeof window.getEntityColor === 'function' ? (window.getEntityColor('trade_plan') || window.getEntityColor('trade')) : '');
 
         const tickerSymbol = tradePlanData.ticker_symbol ||
             tradePlanData.ticker?.symbol ||
@@ -2891,38 +2888,26 @@ class EntityDetailsRenderer {
     }
 
     /**
-     * Get status badge HTML - Fallback function
-     * 
-     * ⚠️ FALLBACK ONLY - משמש רק כ-Fallback אם FieldRendererService לא זמין
-     * 
-     * העדיפות היא להשתמש ב-FieldRendererService.renderStatus() אם זמין.
-     * פונקציה זו משמשת רק במקרים שבהם FieldRendererService לא זמין.
+     * Get status badge HTML - משתמש ב-FieldRendererService המרכזי
+     * @deprecated - השתמש ישירות ב-window.FieldRendererService.renderStatus()
      * 
      * @param {string} status - סטטוס הישות
+     * @param {string} entityType - סוג ישות (לשימוש ב-FieldRendererService)
      * @returns {string} HTML של badge סטטוס
      * @private
      */
-    getStatusBadge(status) {
+    getStatusBadge(status, entityType = 'default') {
         if (!status) {
-            return '<span class="badge bg-light text-muted">לא זמין</span>';
+            return '<span class="status-badge" data-status-category="unknown">-</span>';
         }
 
-        const normalized = String(status).toLowerCase();
-        const classMap = {
-            'open': 'badge bg-success',
-            'active': 'badge bg-success',
-            'triggered': 'badge bg-warning text-dark',
-            'closed': 'badge bg-secondary',
-            'inactive': 'badge bg-secondary',
-            'cancelled': 'badge bg-danger',
-            'archived': 'badge bg-dark'
-        };
-        const badgeClass = classMap[normalized] || 'badge bg-light text-dark';
-        const label = (window.translateStatus && typeof window.translateStatus === 'function')
-            ? window.translateStatus(status)
-            : status;
-
-        return `<span class="${badgeClass}">${label}</span>`;
+        // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+        if (window.FieldRendererService?.renderStatus) {
+            return window.FieldRendererService.renderStatus(status, entityType);
+        }
+        
+        // Fallback למקרה נדיר ביותר שהמערכת לא זמינה
+        return '<span class="badge bg-light text-muted">-</span>';
     }
 
     getEntityIcon(entityType) {
@@ -2948,7 +2933,7 @@ class EntityDetailsRenderer {
      */
     renderExecution(executionData, options = {}) {
         // קבלת צבע הביצוע מההעדפות
-        const executionColor = this.entityColors.execution || '#17a2b8';
+        const executionColor = this.entityColors.execution || (typeof window.getEntityColor === 'function' ? window.getEntityColor('execution') : '');
         
         // Execution לא כולל שדה status - זה לא ישות עם סטטוס
         const sourceInfo = (options && options.sourceInfo) ? options.sourceInfo : null;
@@ -2990,7 +2975,7 @@ class EntityDetailsRenderer {
      * Render execution specific information - רנדור מידע ספציפי לביצוע
      */
     renderExecutionSpecific(executionData, executionColor = null) {
-        const color = executionColor || this.entityColors.execution || '#17a2b8';
+        const color = executionColor || this.entityColors.execution || (typeof window.getEntityColor === 'function' ? window.getEntityColor('execution') : '');
         
         // כמות ומחיר
         const quantity = executionData.quantity !== null && executionData.quantity !== undefined ? 
@@ -3249,7 +3234,7 @@ class EntityDetailsRenderer {
             window.Logger.error('❌ trading_account color not found in entityColors!', { entityColors: this.entityColors }, { page: "entity-details-renderer" });
         }
         
-        const accountColor = this.entityColors.trading_account || '#0d6efd';
+        const accountColor = this.entityColors.trading_account || (typeof window.getEntityColor === 'function' ? window.getEntityColor('trading_account') : '');
         const statusDisplay = window.FieldRendererService.renderStatus(accountData.status, 'trading_account');
         
         const accountName = accountData.name || accountData.account_name || 'לא מוגדר';
@@ -3475,7 +3460,7 @@ class EntityDetailsRenderer {
             // יצירת פריטים מקושרים (ללא פילטר)
             const linkedItems = this.renderLinkedItems(
                 alertData.linked_items || [],
-                this.entityColors.alert || '#ffc107',
+                this.entityColors.alert || (typeof window.getEntityColor === 'function' ? window.getEntityColor('alert') : ''),
                 'alert',
                 alertData.id,
                 options?.sourceInfo || null,
@@ -3935,7 +3920,7 @@ class EntityDetailsRenderer {
         }
     }
     renderCashFlow(cashFlowData, options = {}) {
-        const entityColor = this.entityColors.cash_flow || '#fd7e14';
+        const entityColor = this.entityColors.cash_flow || (typeof window.getEntityColor === 'function' ? window.getEntityColor('cash_flow') : '');
         
         // 🔍 DEBUG: Log all cash flow data for debugging
         console.group('🔍 [CASH_FLOW_DEBUG] Rendering cash flow');
@@ -4386,7 +4371,7 @@ class EntityDetailsRenderer {
     renderCashFlowLinkedItems(cashFlowData) {
         // Use the general renderLinkedItems method like other entities
         let linkedItems = Array.isArray(cashFlowData.linked_items) ? [...cashFlowData.linked_items] : [];
-        const entityColor = this.entityColors.cash_flow || '#fd7e14';
+        const entityColor = this.entityColors.cash_flow || (typeof window.getEntityColor === 'function' ? window.getEntityColor('cash_flow') : '');
 
         const tradingAccountId = cashFlowData.trading_account_id 
             || cashFlowData.account?.id 
@@ -4509,9 +4494,12 @@ class EntityDetailsRenderer {
         const entityType = String(item.type || '').toLowerCase();
         
         // Entities that have status - show status
+        // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
         if (['trade', 'trade_plan', 'alert', 'trading_account', 'ticker'].includes(entityType)) {
-            return window.FieldRendererService.renderStatus(item.status, item.type);
-            return this.getStatusBadge(item.status);
+            if (window.FieldRendererService?.renderStatus) {
+                return window.FieldRendererService.renderStatus(item.status, entityType);
+            }
+            return this.getStatusBadge(item.status, entityType);
         }
         
         // Entities without status - show alternative data
@@ -4546,9 +4534,12 @@ class EntityDetailsRenderer {
         }
         
         // Default: show status if exists, otherwise show "-"
+        // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
         if (item.status !== null && item.status !== undefined) {
-            return window.FieldRendererService.renderStatus(item.status, item.type);
-            return this.getStatusBadge(item.status);
+            if (window.FieldRendererService?.renderStatus) {
+                return window.FieldRendererService.renderStatus(item.status, entityType);
+            }
+            return this.getStatusBadge(item.status, entityType);
         }
         
         return '<span class="text-muted">-</span>';
@@ -4578,7 +4569,7 @@ class EntityDetailsRenderer {
      */
     renderNote(noteData, options = {}) {
         // קבלת צבע ההערה מההעדפות
-        const noteColor = this.entityColors.note || '#6c757d';
+        const noteColor = this.entityColors.note || (typeof window.getEntityColor === 'function' ? window.getEntityColor('note') : '');
         const sourceInfo = options?.sourceInfo || null;
         const linkedItemsOptions = Object.assign({}, options, { disableFilter: true });
         const sanitizedContent = this._sanitizeRichText(noteData?.content);
@@ -4726,7 +4717,7 @@ class EntityDetailsRenderer {
      */
     renderImportSession(sessionData, options = {}) {
         try {
-            const sessionColor = this.entityColors.import_session || '#17a2b8';
+            const sessionColor = this.entityColors.import_session || (typeof window.getEntityColor === 'function' ? window.getEntityColor('import_session') || window.getEntityColor('execution') : '');
             const sourceInfo = options?.sourceInfo || null;
             const linkedItemsOptions = Object.assign({}, options, { disableFilter: true });
             
@@ -5721,7 +5712,7 @@ class EntityDetailsRenderer {
             `;
         } else if (entityType === 'trade') {
             const FieldRenderer = window.FieldRendererService || null;
-            const color = this.entityColors.trade || '#26baac';
+            const color = this.entityColors.trade || (typeof window.getEntityColor === 'function' ? window.getEntityColor('trade') : '');
             
             // Side (Long/Short)
             const sideDisplay = FieldRenderer?.renderSide

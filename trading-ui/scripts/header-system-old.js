@@ -4523,7 +4523,14 @@ window.clearAllFilters = function () {
 
     // איפוס UI
     const searchInput = document.getElementById('searchFilterInput');
-    if (searchInput) searchInput.value = '';
+    if (searchInput) {
+      // Use DataCollectionService to clear field if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('searchFilterInput', '', 'text');
+      } else {
+        searchInput.value = '';
+      }
+    }
 
     // איפוס בחירות בפילטרים
     const allFilterItems = document.querySelectorAll(
@@ -4588,7 +4595,12 @@ window.updateFilterUI = function (filters) {
   // עדכון שדה החיפוש
   const searchInput = document.getElementById('searchFilterInput');
   if (searchInput) {
-    searchInput.value = filters.search || '';
+    // Use DataCollectionService to set value if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('searchFilterInput', filters.search || '', 'text');
+    } else {
+      searchInput.value = filters.search || '';
+    }
   }
 
   // עדכון פילטר סטטוס
@@ -4877,7 +4889,12 @@ window.resetAllFilters = async function () {
       // עדכון שדה החיפוש
       const searchInput = document.getElementById('searchFilterInput');
       if (searchInput) {
-        searchInput.value = defaultFilters.search || '';
+        // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue('searchFilterInput', defaultFilters.search || '', 'text');
+        } else {
+          searchInput.value = defaultFilters.search || '';
+        }
       }
 
       // עדכון בחירות בתפריטים

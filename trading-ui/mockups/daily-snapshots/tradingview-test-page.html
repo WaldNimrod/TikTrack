@@ -28,7 +28,7 @@
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h1 class="mb-0">בדיקת TradingView Lightweight Charts</h1>
-                    <button class="btn btn-primary" id="copyLogBtn" title="העתק לוג מפורט">
+                    <button class="btn btn-primary" id="copyLogBtn" title="העתק לוג מפורט" data-button-type="COPY">
                         <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="icon" aria-label="icon"></span>
                         העתק לוג מפורט
                     </button>
@@ -207,6 +207,12 @@
     <!-- Notification System Containers -->
     <div class="notification-container" id="notification-container"></div>
     <div id="toast-container"></div>
+
+    <!-- Entity Details System -->
+    <script src="../../scripts/entity-details-api.js" defer></script>
+    <script src="../../scripts/entity-details-renderer.js" defer></script>
+    <script src="../../scripts/entity-details-modal.js" defer></script>
+    
 </body>
 </html>
 

@@ -151,19 +151,19 @@
                             <div class="card-body">
                                 <div class="row mb-3">
                                     <div class="col-12">
-                                        <button class="btn btn-primary btn-sm me-2 mb-2" data-onclick="createTestChart()">
+                                        <button class="btn btn-primary btn-sm me-2 mb-2" data-onclick="createTestChart()" data-button-type="PRIMARY">
                                             <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> גרף בדיקה
                                         </button>
-                                        <button class="btn btn-info btn-sm me-2 mb-2" data-onclick="createPerformanceChart()">
+                                        <button class="btn btn-info btn-sm me-2 mb-2" data-onclick="createPerformanceChart()" data-button-type="PRIMARY">
                                             <img src="/trading-ui/images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon"> גרף ביצועים
                                         </button>
-                                        <button class="btn btn-success btn-sm me-2 mb-2" data-onclick="createAccountChart()">
+                                        <button class="btn btn-success btn-sm me-2 mb-2" data-onclick="createAccountChart()" data-button-type="PRIMARY">
                                             <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> גרף חשבונות
                                         </button>
-                                        <button class="btn btn-warning btn-sm me-2 mb-2" data-onclick="createMixedChart()">
+                                        <button class="btn btn-warning btn-sm me-2 mb-2" data-onclick="createMixedChart()" data-button-type="PRIMARY">
                                             <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> גרף מעורב
                                         </button>
-                                        <button class="btn btn-secondary btn-sm me-2 mb-2" data-onclick="updateTestChart()">
+                                        <button class="btn btn-secondary btn-sm me-2 mb-2" data-onclick="updateTestChart()" data-button-type="PRIMARY">
                                             <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> עדכן נתונים
                                         </button>
                                         <button data-button-type="VIEW" data-onclick="exportTestChart()" data-classes="btn btn-outline-primary">
@@ -348,7 +348,22 @@
     <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+
+<!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [26] Page-specific: chart-management -->

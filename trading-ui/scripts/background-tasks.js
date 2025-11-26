@@ -105,12 +105,25 @@ const utils = {
   /**
      * Show loading state
      */
-  showLoading: (elementId, show = true) => {
+  showLoading: async (elementId, show = true) => {
     const element = document.getElementById(elementId);
     if (!element) {return;}
 
     if (show) {
-      element.innerHTML = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin me-1"> טוען...';
+      // Use IconSystem to render loader icon
+      let loaderIcon = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin me-1">';
+      if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+        try {
+          loaderIcon = await window.IconSystem.renderIcon('button', 'loader', {
+            size: '16',
+            alt: 'loading',
+            class: 'icon fa-spin me-1'
+          });
+        } catch (error) {
+          // Fallback already set
+        }
+      }
+      element.innerHTML = loaderIcon + ' טוען...';
       element.classList.add('loading');
       element.disabled = true;
     } else {
@@ -120,9 +133,35 @@ const utils = {
       if (elementId.includes('start-scheduler')) {
         element.innerHTML = '▶️ הפעל Scheduler';
       } else if (elementId.includes('stop-scheduler')) {
-        element.innerHTML = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1"> עצור Scheduler';
+        // Use IconSystem to render stop icon
+        let stopIcon = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+          try {
+            stopIcon = await window.IconSystem.renderIcon('button', 'stop', {
+              size: '16',
+              alt: 'stop',
+              class: 'icon me-1'
+            });
+          } catch (error) {
+            // Fallback already set
+          }
+        }
+        element.innerHTML = stopIcon + ' עצור Scheduler';
       } else if (elementId.includes('refresh-')) {
-        element.innerHTML = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1"> רענן';
+        // Use IconSystem to render refresh icon
+        let refreshIcon = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+          try {
+            refreshIcon = await window.IconSystem.renderIcon('button', 'refresh', {
+              size: '16',
+              alt: 'refresh',
+              class: 'icon me-1'
+            });
+          } catch (error) {
+            // Fallback already set
+          }
+        }
+        element.innerHTML = refreshIcon + ' רענן';
       }
     }
   },
@@ -430,8 +469,20 @@ const modalManager = {
     // Update modal title
     modalTaskName.textContent = `פרטי משימה: ${taskName}`;
 
-    // Show loading
-    modalDetails.innerHTML = '<div class="loading-message"><img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin me-1"> טוען פרטים...</div>';
+    // Show loading - Use IconSystem to render loader icon
+    let loaderIcon = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin me-1">';
+    if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+      try {
+        loaderIcon = await window.IconSystem.renderIcon('button', 'loader', {
+          size: '16',
+          alt: 'loading',
+          class: 'icon fa-spin me-1'
+        });
+      } catch (error) {
+        // Fallback already set
+      }
+    }
+    modalDetails.innerHTML = `<div class="loading-message">${loaderIcon} טוען פרטים...</div>`;
 
     try {
       // Get task details
@@ -613,7 +664,7 @@ const eventHandlers = {
      */
   async startScheduler() {
     try {
-      utils.showLoading('start-scheduler', true);
+      await utils.showLoading('start-scheduler', true);
       const result = await apiService.startScheduler();
       utils.showNotification('Scheduler הופעל בהצלחה', 'success');
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -622,7 +673,7 @@ const eventHandlers = {
       console.error('❌ Error in startScheduler:', error);
       utils.showNotification(`שגיאה בהפעלת Scheduler: ${error.message}`, 'error');
     } finally {
-      utils.showLoading('start-scheduler', false);
+      await utils.showLoading('start-scheduler', false);
     }
   },
 
@@ -631,7 +682,7 @@ const eventHandlers = {
      */
   async stopScheduler() {
     try {
-      utils.showLoading('stop-scheduler', true);
+      await utils.showLoading('stop-scheduler', true);
       const result = await apiService.stopScheduler();
       utils.showNotification('Scheduler נעצר בהצלחה', 'success');
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -641,7 +692,7 @@ const eventHandlers = {
       console.error('❌ Error in stopScheduler:', error);
       utils.showNotification(`שגיאה בעצירת Scheduler: ${error.message}`, 'error');
     } finally {
-      utils.showLoading('stop-scheduler', false);
+      await utils.showLoading('stop-scheduler', false);
     }
   },
 
@@ -670,7 +721,7 @@ const eventHandlers = {
      */
   async refreshTasks() {
     try {
-      utils.showLoading('refresh-tasks', true);
+      await utils.showLoading('refresh-tasks', true);
       
       // Clear cache before refreshing to ensure fresh data
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
@@ -686,7 +737,7 @@ const eventHandlers = {
       console.error('❌ Failed to refresh tasks:', error);
       utils.showNotification('שגיאה בטעינת רשימת המשימות', 'error');
     } finally {
-      utils.showLoading('refresh-tasks', false);
+      await utils.showLoading('refresh-tasks', false);
     }
   },
 
@@ -714,7 +765,7 @@ const eventHandlers = {
      */
   async refreshHistory() {
     try {
-      utils.showLoading('refresh-history', true);
+      await utils.showLoading('refresh-history', true);
       
       // Clear cache before refreshing to ensure fresh data
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
@@ -730,7 +781,7 @@ const eventHandlers = {
       console.error('❌ Failed to refresh history:', error);
       utils.showNotification('שגיאה בטעינת היסטוריית המשימות', 'error');
     } finally {
-      utils.showLoading('refresh-history', false);
+      await utils.showLoading('refresh-history', false);
     }
   },
 
@@ -759,7 +810,7 @@ const eventHandlers = {
      */
   async refreshAnalytics() {
     try {
-      utils.showLoading('refresh-analytics', true);
+      await utils.showLoading('refresh-analytics', true);
       
       // Clear cache before refreshing to ensure fresh data
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
@@ -775,7 +826,7 @@ const eventHandlers = {
       console.error('❌ Failed to refresh analytics:', error);
       utils.showNotification('שגיאה בטעינת אנליטיקס המשימות', 'error');
     } finally {
-      utils.showLoading('refresh-analytics', false);
+      await utils.showLoading('refresh-analytics', false);
     }
   },
 
@@ -1358,6 +1409,59 @@ function generateDetailedLog() {
 
 // ייצוא לגלובל scope
 // window. export removed - using global version from system-management.js
+
+/**
+ * Register background_tasks table with UnifiedTableSystem
+ */
+window.registerBackgroundTasksTable = function() {
+    if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {
+        window.Logger?.warn?.('⚠️ UnifiedTableSystem not available for background_tasks registration', { page: 'background-tasks' });
+        return false;
+    }
+
+    const tableType = 'background_tasks';
+
+    if (window.UnifiedTableSystem.registry.isRegistered && window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+        window.Logger?.debug?.('ℹ️ Background tasks table already registered', { page: 'background-tasks' });
+        return true;
+    }
+
+    window.UnifiedTableSystem.registry.register(tableType, {
+        dataGetter: () => {
+            return window.backgroundTasksState?.tasks || [];
+        },
+        updateFunction: (data) => {
+            if (window.backgroundTasksState && typeof window.backgroundTasksState.renderTasks === 'function') {
+                window.backgroundTasksState.renderTasks(Array.isArray(data) ? data : []);
+            }
+        },
+        tableSelector: '#tasks-table',
+        columns: window.TABLE_COLUMN_MAPPINGS?.background_tasks || [],
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' }
+    });
+
+    window.Logger?.info?.('✅ Registered background_tasks table with UnifiedTableSystem', { page: 'background-tasks' });
+    return true;
+};
+
+// Auto-register when page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            if (typeof window.registerBackgroundTasksTable === 'function') {
+                window.registerBackgroundTasksTable();
+            }
+        }, 1000);
+    });
+} else {
+    setTimeout(() => {
+        if (typeof window.registerBackgroundTasksTable === 'function') {
+            window.registerBackgroundTasksTable();
+        }
+    }, 1000);
+}
 
 // ===== REAL-TIME LOG LISTENER =====
 

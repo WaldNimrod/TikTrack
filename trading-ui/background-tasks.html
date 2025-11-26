@@ -91,7 +91,7 @@
                     <div class="section-header">
                         <h1>🔧 ניהול משימות רקע</h1>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                            <button class="filter-toggle-btn" data-onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -114,7 +114,7 @@
                 <div class="content-section" id="systemStatus" data-section="systemStatus">
                     <div class="section-header">
                         <h2>📊 מצב המערכת</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('systemStatus')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('systemStatus')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -172,13 +172,13 @@
 
                 <!-- Control Buttons -->
                 <div class="control-buttons mb-3">
-                    <button id="start-scheduler" class="btn btn-success btn-sm" onclick="startScheduler()">
+                    <button id="start-scheduler" class="btn btn-success btn-sm" data-onclick="startScheduler()" data-button-type="PLAY">
                         <i class="fas fa-play me-1"></i> הפעל Scheduler
                     </button>
-                    <button id="stop-scheduler" class="btn btn-danger btn-sm" onclick="stopScheduler()">
+                    <button id="stop-scheduler" class="btn btn-danger btn-sm" data-onclick="stopScheduler()" data-button-type="PLAY">
                         <i class="fas fa-stop me-1"></i> עצור Scheduler
                     </button>
-                    <button id="refresh-status" class="btn btn-primary btn-sm" onclick="refreshStatus()">
+                    <button id="refresh-status" class="btn btn-primary btn-sm" data-onclick="refreshStatus()" data-button-type="REFRESH">
                         <i class="fas fa-sync-alt me-1"></i> רענן
                     </button>
                 </div>
@@ -188,7 +188,7 @@
                 <div class="content-section" id="tasksList" data-section="tasksList">
                     <div class="section-header">
                         <h2>📋 רשימת משימות</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('tasksList')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('tasksList')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -197,14 +197,14 @@
                             <div class="card-header bg-light">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h3 class="mb-0"><i class="fas fa-tasks me-2"></i> רשימת משימות</h3>
-                                    <button id="refresh-tasks" class="btn btn-secondary btn-sm" onclick="refreshTasks()">
+                                    <button id="refresh-tasks" class="btn btn-secondary btn-sm" data-onclick="refreshTasks()" data-button-type="REFRESH">
                                         <i class="fas fa-sync me-1"></i> רענן
                                     </button>
                                 </div>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table class="data-table table-striped" id="tasks-table">
+                                    <table class="data-table table-striped" id="tasks-table" data-table-type="background_tasks">
                                         <thead>
                                             <tr>
                                                 <th>שם המשימה</th>
@@ -230,7 +230,7 @@
                 <div class="content-section" id="backgroundTasksLog" data-section="backgroundTasksLog">
                     <div class="section-header">
                         <h2>📋 לוג משימות ברקע</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('backgroundTasksLog')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('backgroundTasksLog')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -239,7 +239,7 @@
                             <div class="card-header bg-light">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h3 class="mb-0"><i class="fas fa-tasks me-2"></i> לוג משימות ברקע</h3>
-                                    <button id="refresh-background-tasks-log" class="btn btn-secondary btn-sm" onclick="refreshBackgroundTasksLog()">
+                                    <button id="refresh-background-tasks-log" class="btn btn-secondary btn-sm" data-onclick="refreshBackgroundTasksLog()" data-button-type="REFRESH">
                                         <i class="fas fa-sync me-1"></i> רענן
                                     </button>
                                 </div>
@@ -300,6 +300,8 @@
     <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
     <!-- [11] Load Order: 11 -->
     <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <!-- [11.5] Load Order: 11.5 -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
     <!-- [12] Load Order: 12 -->
     <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
     <!-- [13] Load Order: 13 -->
@@ -366,7 +368,22 @@
     <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+
+<!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [32] Page-specific: background-tasks -->

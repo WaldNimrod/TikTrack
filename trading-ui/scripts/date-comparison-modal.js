@@ -74,13 +74,21 @@
      * Validate dates
      * @returns {boolean} True if valid
      */
-    function validateDates() {
+    async function validateDates() {
         const validationMessage = document.getElementById('date-validation-message');
 
         // Need at least 2 dates
         if (selectedDates.length < 2) {
             if (validationMessage) {
-                validationMessage.innerHTML = '<div class="alert alert-warning"><img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert" class="icon"> נדרשים לפחות 2 תאריכים להשוואה</div>';
+                let alertIcon = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert" class="icon">';
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert', class: 'icon' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                validationMessage.innerHTML = `<div class="alert alert-warning">${alertIcon} נדרשים לפחות 2 תאריכים להשוואה</div>`;
             }
             if (window.showNotification) {
                 window.showNotification('נדרשים לפחות 2 תאריכים להשוואה', 'warning');
@@ -92,7 +100,15 @@
         const uniqueDates = [...new Set(selectedDates)];
         if (uniqueDates.length !== selectedDates.length) {
             if (validationMessage) {
-                validationMessage.innerHTML = '<div class="alert alert-danger"><img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert" class="icon"> יש תאריכים כפולים ברשימה</div>';
+                let alertIcon2 = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert" class="icon">';
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        alertIcon2 = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert', class: 'icon' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                validationMessage.innerHTML = `<div class="alert alert-danger">${alertIcon2} יש תאריכים כפולים ברשימה</div>`;
             }
             if (window.showNotification) {
                 window.showNotification('יש תאריכים כפולים ברשימה', 'error');
@@ -169,7 +185,12 @@
         selectedDates = sortDates(selectedDates);
 
         // Clear input
-        newDateInput.value = '';
+        // Use DataCollectionService to clear field if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(newDateInput.id, '', 'dateOnly');
+        } else {
+            newDateInput.value = '';
+        }
         handleNewDateInput();
 
         // Render dates list
@@ -225,7 +246,12 @@
         if (!dateValue) {
             // If date is cleared, restore original or remove if not required
             if (oldDate) {
-                dateInput.value = oldDate;
+                // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(dateInput.id, oldDate, 'dateOnly');
+        } else {
+            dateInput.value = oldDate;
+        }
             }
             return;
         }
@@ -235,7 +261,12 @@
             if (window.showNotification) {
                 window.showNotification('תאריך זה כבר קיים ברשימה', 'warning');
             }
+            // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(dateInput.id, oldDate || '', 'dateOnly');
+        } else {
             dateInput.value = oldDate || '';
+        }
             return;
         }
 
@@ -361,7 +392,7 @@
      * Works with multiple dates from selectedDates array
      */
     async function compareDates() {
-        if (!validateDates()) {
+        if (!(await validateDates())) {
             return;
         }
 
@@ -1511,7 +1542,12 @@
         // Clear new date input
         const newDateInput = document.getElementById('new-date-input');
         if (newDateInput) {
+            // Use DataCollectionService to clear field if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(newDateInput.id, '', 'dateOnly');
+        } else {
             newDateInput.value = '';
+        }
         }
         
         // Get date range and update selectedDates

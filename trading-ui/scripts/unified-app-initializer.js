@@ -798,6 +798,18 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         //     customInitializers: config.customInitializers
         // }, { page: "unified-app-initializer" });
       }
+      
+      // Replace icons with IconSystem for all pages
+      if (typeof window.replaceIconsInContext === 'function') {
+        try {
+          await window.replaceIconsInContext();
+        } catch (error) {
+          window.Logger?.warn('Failed to replace icons', { 
+            page: 'unified-app-initializer', 
+            error: error?.message || error 
+          });
+        }
+      }
     }
 
     /**

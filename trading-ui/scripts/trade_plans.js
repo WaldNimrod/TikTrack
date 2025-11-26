@@ -99,7 +99,7 @@
  * @param {number|string} planId - Trade plan ID
  * @returns {void}
  */
-function executeTradePlan(planId) {
+async function executeTradePlan(planId) {
   try {
     window.Logger.info('⚡ מבצע תוכנית מסחר:', planId, { page: "trade_plans" });
     
@@ -138,45 +138,37 @@ function executeTradePlan(planId) {
     
     if (confirmed) {
       // שליחה לשרת לביצוע התוכנית
-      fetch('/api/trade-plans/' + planId + '/execute', {
+      const response = await fetch('/api/trade-plans/' + planId + '/execute', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         }
-      })
-      .then(response => {
+      });
+      
+      // שימוש ב-CRUDResponseHandler לטיפול אחיד בתגובה
+      if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleSaveResponse) {
+        await window.CRUDResponseHandler.handleSaveResponse(response, {
+          modalId: null, // אין modal לסגירה בפונקציה זו
+          successMessage: 'תוכנית מסחר בוצעה בהצלחה',
+          entityName: 'תוכנית מסחר',
+          reloadFn: window.loadTradePlansData,
+          requiresHardReload: false
+        });
+      } else {
+        // Fallback אם CRUDResponseHandler לא זמין
+        window.Logger.warn('⚠️ CRUDResponseHandler not available, using fallback', { page: "trade_plans" });
         if (!response.ok) {
           throw new Error('שגיאה בביצוע תוכנית מסחר');
         }
-        return response.json();
-      })
-      .then(data => {
+        const data = await response.json();
         window.Logger.info('✅ תוכנית מסחר בוצעה:', data, { page: "trade_plans" });
-        
-        // רענון הטבלה
-        const reloadPromise = typeof window.loadTradePlansData === 'function'
-          ? window.loadTradePlansData()
-          : (handleFunctionNotFound('loadTradePlansData'), Promise.reject(new Error('loadTradePlansData function not available')));
-
-        reloadPromise.catch((reloadError) => {
-          window.Logger?.error('⚠️ Failed to reload trade plans after execution', reloadError, { page: 'trade_plans' });
-        });
-        
-        // הודעת הצלחה
+        if (typeof window.loadTradePlansData === 'function') {
+          await window.loadTradePlansData();
+        }
         if (typeof window.showSuccessNotification === 'function') {
           window.showSuccessNotification('תוכנית מסחר בוצעה בהצלחה', '', 4000, 'business');
-        } else if (typeof window.showNotification === 'function') {
-          window.showNotification('תוכנית מסחר בוצעה בהצלחה', 'success');
         }
-      })
-      .catch(error => {
-        window.Logger.error('שגיאה בביצוע תוכנית מסחר:', error, { page: "trade_plans" });
-        if (typeof window.showErrorNotification === 'function') {
-          window.showErrorNotification('שגיאה בביצוע תוכנית מסחר', error.message, 6000, 'system');
-        } else if (typeof window.showNotification === 'function') {
-          window.showNotification('שגיאה בביצוע תוכנית מסחר', 'error');
-        }
-      });
+      }
     }
     
   } catch (error) {
@@ -291,9 +283,16 @@ function displayTradePlanTickerInfo(ticker) {
   }
   
   // Set default entry price to current price if field exists
-  const entryPriceField = document.getElementById('tradePlanEntryPrice');
-  if (entryPriceField && ticker.current_price) {
-    entryPriceField.value = ticker.current_price;
+  // Use DataCollectionService to set value if available
+  if (ticker.current_price) {
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('tradePlanEntryPrice', ticker.current_price, 'number');
+    } else {
+      const entryPriceField = document.getElementById('tradePlanEntryPrice');
+      if (entryPriceField) {
+        entryPriceField.value = ticker.current_price;
+      }
+    }
   }
 
   if (typeof window.updateSharesFromAmount === 'function') {
@@ -459,11 +458,20 @@ function hideEditTickerInfo() {
  * @returns {Promise<void>}
  */
 async function updateEditTickerInfo() {
-  const tickerId = document.getElementById('editTradePlanTickerId').value;
+  // Use DataCollectionService to get values if available
+  let tickerId, tradePlanId;
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+    tickerId = window.DataCollectionService.getValue('editTradePlanTickerId', 'int', 0);
+    tradePlanId = window.DataCollectionService.getValue('editTradePlanId', 'int', 0);
+  } else {
+    const tickerIdEl = document.getElementById('editTradePlanTickerId');
+    const tradePlanIdEl = document.getElementById('editTradePlanId');
+    tickerId = tickerIdEl ? tickerIdEl.value : 0;
+    tradePlanId = tradePlanIdEl ? tradePlanIdEl.value : 0;
+  }
   const tickerDisplay = document.getElementById('editSelectedTickerDisplay');
   const priceDisplay = document.getElementById('editCurrentPriceDisplay');
   const changeDisplay = document.getElementById('editDailyChangeDisplay');
-  const tradePlanId = document.getElementById('editTradePlanId').value;
 
   if (!tickerId) {
     tickerDisplay.textContent = 'לא נבחר';
@@ -492,14 +500,26 @@ async function updateEditTickerInfo() {
               );
             }
             // החזרת הטיקר למצבו המקורי
-            document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue('editTradePlanTickerId', originalTradePlan.ticker_id, 'int');
+            } else {
+              const tickerIdEl = document.getElementById('editTradePlanTickerId');
+              if (tickerIdEl) tickerIdEl.value = originalTradePlan.ticker_id;
+            }
             // עדכון התצוגה עם הטיקר המקורי
             updateEditTickerInfo();
             return;
           },
           () => {
             // המשתמש ביטל - מחזירים את הטיקר המקורי
-            document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue('editTradePlanTickerId', originalTradePlan.ticker_id, 'int');
+            } else {
+              const tickerIdEl = document.getElementById('editTradePlanTickerId');
+              if (tickerIdEl) tickerIdEl.value = originalTradePlan.ticker_id;
+            }
             // עדכון התצוגה עם הטיקר המקורי
             updateEditTickerInfo();
             return;
@@ -518,11 +538,23 @@ async function updateEditTickerInfo() {
                   'שינוי טיקר לתכנון לא נתמך עדיין. הטיקר יוחזר למצבו המקורי.',
                 );
               }
-              document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+              // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue('editTradePlanTickerId', originalTradePlan.ticker_id, 'int');
+            } else {
+              const tickerIdEl = document.getElementById('editTradePlanTickerId');
+              if (tickerIdEl) tickerIdEl.value = originalTradePlan.ticker_id;
+            }
               updateEditTickerInfo();
             },
             () => {
-              document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+              // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue('editTradePlanTickerId', originalTradePlan.ticker_id, 'int');
+            } else {
+              const tickerIdEl = document.getElementById('editTradePlanTickerId');
+              if (tickerIdEl) tickerIdEl.value = originalTradePlan.ticker_id;
+            }
               updateEditTickerInfo();
             },
           );
@@ -538,11 +570,23 @@ async function updateEditTickerInfo() {
                     'שינוי טיקר לתכנון לא נתמך עדיין. הטיקר יוחזר למצבו המקורי.',
                   );
                 }
-                document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+                // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue('editTradePlanTickerId', originalTradePlan.ticker_id, 'int');
+            } else {
+              const tickerIdEl = document.getElementById('editTradePlanTickerId');
+              if (tickerIdEl) tickerIdEl.value = originalTradePlan.ticker_id;
+            }
                 updateEditTickerInfo();
               },
               () => {
-                document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+                // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue('editTradePlanTickerId', originalTradePlan.ticker_id, 'int');
+            } else {
+              const tickerIdEl = document.getElementById('editTradePlanTickerId');
+              if (tickerIdEl) tickerIdEl.value = originalTradePlan.ticker_id;
+            }
                 updateEditTickerInfo();
               },
             );
@@ -577,10 +621,22 @@ async function updateEditTickerInfo() {
                   'שינוי טיקר לתכנון לא נתמך עדיין. הטיקר יוחזר למצבו המקורי.',
                 );
               }
-              document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+              // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue('editTradePlanTickerId', originalTradePlan.ticker_id, 'int');
+            } else {
+              const tickerIdEl = document.getElementById('editTradePlanTickerId');
+              if (tickerIdEl) tickerIdEl.value = originalTradePlan.ticker_id;
+            }
               updateEditTickerInfo();
             } else {
-              document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+              // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue('editTradePlanTickerId', originalTradePlan.ticker_id, 'int');
+            } else {
+              const tickerIdEl = document.getElementById('editTradePlanTickerId');
+              if (tickerIdEl) tickerIdEl.value = originalTradePlan.ticker_id;
+            }
               updateEditTickerInfo();
             }
           }
@@ -702,7 +758,12 @@ function updateEditSharesFromAmount() {
 
   if (price > 0) {
     const result = convertAmountToShares(amount, price);
-    sharesInput.value = result.shares;
+    // Use DataCollectionService to set value if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue(sharesInput.id, result.shares, 'number');
+    } else {
+      sharesInput.value = result.shares;
+    }
   }
   
   } catch (error) {
@@ -731,7 +792,12 @@ function updateEditAmountFromShares() {
 
   if (price > 0) {
     const amount = convertSharesToAmount(shares, price);
-    amountInput.value = amount;
+    // Use DataCollectionService to set value if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue(amountInput.id, amount, 'number');
+    } else {
+      amountInput.value = amount;
+    }
   }
   
   } catch (error) {
@@ -826,11 +892,32 @@ async function reactivateTradePlan(tradePlanId) {
 
 /**
  * Add condition to edit modal
- * Add/edit condition (placeholder for future functionality)
+ * @deprecated Use ConditionsModalController.open() instead
+ * This function is kept for backward compatibility but should use the centralized Conditions System
  * @returns {void}
  */
 function addEditCondition() {
   try {
+    // Use ConditionsModalController if available
+    const modalElement = getTradePlansModalElement();
+    if (modalElement && window.conditionsModalController?.open) {
+      const entityId = modalElement.dataset.entityId;
+      if (!entityId) {
+        window.showNotification?.('יש לשמור את התכנית לפני ניהול תנאים.', 'info');
+        return;
+      }
+      const entityName = modalElement.querySelector('[data-field="name"]')?.value || '';
+      window.conditionsModalController.open({
+        entityType: 'plan',
+        entityId: Number(entityId),
+        entityName,
+        parentModalId: modalElement.id,
+        layoutMode: 'form-only'
+      });
+      return;
+    }
+    
+    // Fallback to notification if system not available
     if (typeof window.showNotification === 'function') {
       window.showNotification('פונקציונליות זו תהיה זמינה בקרוב', 'info');
     }
@@ -1012,7 +1099,7 @@ function buildTradePlanConfirmationDetails(tradePlan, tradePlanId) {
  * @returns {void}
  * @since 2.1.0 - Updated to use Bootstrap.Modal.getOrCreateInstance when ModalManagerV2 is available
  */
-function openCancelTradePlanModal(tradePlanId) {
+async function openCancelTradePlanModal(tradePlanId) {
   try {
     const tradePlan = window.tradePlansData.find(tp => tp.id === tradePlanId);
     if (!tradePlan) {
@@ -1032,17 +1119,27 @@ function openCancelTradePlanModal(tradePlanId) {
 
   // פתיחת מודל ביטול דרך ModalManagerV2 (אם זמין) או fallback ל-Bootstrap
   // זה מודל מיוחד לביטול תכנון, לא חלק מ-ModalManagerV2 CRUD
-  if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
-    // ModalManagerV2 לא מטפל בפתיחת מודלים מיוחדים, נשתמש ב-Bootstrap
-    const modalElement = document.getElementById('cancelTradePlanModal');
-    if (modalElement) {
-      const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-      modal.show();
+  const modalElement = document.getElementById('cancelTradePlanModal');
+  if (modalElement) {
+    // נסה להשתמש ב-ModalManagerV2.showModal למודל מיוחד
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      try {
+        await window.ModalManagerV2.showModal('cancelTradePlanModal', 'view');
+      } catch (error) {
+        // אם המודל לא קיים במערכת, נשתמש ב-Bootstrap
+        window.Logger?.warn('cancelTradePlanModal not in ModalManagerV2, using Bootstrap fallback', { page: 'trade_plans' });
+        if (bootstrap?.Modal) {
+          const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+          modal.show();
+        }
+      }
+    } else {
+      // Fallback ל-Bootstrap modal
+      if (bootstrap?.Modal) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+      }
     }
-  } else {
-    // Fallback ל-Bootstrap modal
-    const modal = new bootstrap.Modal(document.getElementById('cancelTradePlanModal'));
-    modal.show();
   }
   
   } catch (error) {
@@ -1198,7 +1295,12 @@ function updatePricesFromPercentages(
     const stopPercentage = parseFloat(stopPercentageInput.value) || 0;
     if (stopPercentage > 0 && typeof window.calculateStopPrice === 'function') {
       const stopPrice = window.calculateStopPrice(currentPrice, stopPercentage, side);
-      stopPriceInput.value = stopPrice.toFixed(2);
+      // Use DataCollectionService to set value if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue(stopPriceInput.id, stopPrice.toFixed(2), 'number');
+      } else {
+        stopPriceInput.value = stopPrice.toFixed(2);
+      }
     }
   }
   
@@ -1415,41 +1517,33 @@ async function applyTradePlanDefaultRiskLevels(options = {}) {
   if (entryDateInput && (!entryDateInput.dataset.userModified || options.force) && !entryDateInput.value) {
     let assignedValue = null;
 
-    if (entryDateInput.type === 'date') {
-      if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+    // Use DefaultValueSetter for consistent date handling
+    if (window.DefaultValueSetter) {
+      const includeTime = entryDateInput.type === 'datetime-local';
+      if (includeTime && typeof window.DefaultValueSetter.setCurrentDateTime === 'function') {
+        assignedValue = window.DefaultValueSetter.setCurrentDateTime(entryDateInput.id);
+      } else if (typeof window.DefaultValueSetter.setCurrentDate === 'function') {
         assignedValue = window.DefaultValueSetter.setCurrentDate(entryDateInput.id);
       }
+    }
 
-      if (!assignedValue) {
-        // Use dateUtils for consistent date handling (if available)
-        let today;
-        if (window.dateUtils && typeof window.dateUtils.now === 'function') {
-          today = window.dateUtils.now();
-        } else {
-          today = new Date();
-        }
-        today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    // Fallback only if DefaultValueSetter is not available
+    if (!assignedValue) {
+      // Use dateUtils for consistent date handling (if available)
+      let today;
+      if (window.dateUtils && typeof window.dateUtils.now === 'function') {
+        today = window.dateUtils.now();
+      } else {
+        today = new Date();
+      }
+      today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+      
+      if (entryDateInput.type === 'datetime-local') {
+        assignedValue = today.toISOString().slice(0, 16);
+      } else {
         assignedValue = today.toISOString().slice(0, 10);
       }
-
-      entryDateInput.value = assignedValue;
-    } else {
-      // Use dateUtils for consistent date handling (if available)
-      let now;
-      if (window.dateUtils && typeof window.dateUtils.now === 'function') {
-        now = window.dateUtils.now();
-      } else {
-        now = new Date();
-      }
-      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-      const isoString = now.toISOString();
-
-      if (entryDateInput.type === 'datetime-local') {
-        assignedValue = isoString.slice(0, 16);
-      } else {
-        assignedValue = isoString;
-      }
-
+      
       entryDateInput.value = assignedValue;
     }
 
@@ -1673,100 +1767,17 @@ async function loadTradePlansData() {
  * @param {Array} trade_plans - Array of trade plans
  * @returns {void}
  */
-function updateTradePlansTable(trade_plans) {
-  try {
-    // === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===
-    window.Logger.info(`🔄 updateTradePlansTable called with ${trade_plans ? trade_plans.length : 0} trade plans`, { page: "trade_plans" });
-
-    const tbody = document.querySelector('#trade_plansTable tbody');
-    window.Logger.info(`🔍 Looking for tbody:`, tbody, { page: "trade_plans" });
-    // Looking for table body
-
-    if (!tbody) {
-      handleElementNotFound('#trade_plansTable tbody', 'CRITICAL');
-      return;
-    }
-
-    // Checking if there is data to display
-    window.Logger.info(`🔍 Checking data: trade_plans =`, trade_plans, `length =`, trade_plans?.length, { page: "trade_plans" });
-  window.Logger.info(`🔍 Condition check: !trade_plans =`, !trade_plans, `trade_plans.length === 0 =`, trade_plans?.length === 0, { page: "trade_plans" });
+/**
+ * Render trade plans table rows
+ * @param {Array} trade_plans - Array of trade plans to render
+ * @returns {string} HTML string of table rows
+ */
+function renderTradePlansTableRows(trade_plans) {
   if (!trade_plans || trade_plans.length === 0) {
-    window.Logger.info(`❌ No data to display - entering error condition`, { page: "trade_plans" });
-    // No trade plans to display
-
-    // Checking if it's because of filters or if there are no data at all
-    const hasOriginalData = window.tradePlanService?.getTradePlans()?.length > 0 || window.tradePlansData && window.tradePlansData.length > 0;
-    // Has original data check
-
-    // Checking if there are active filters
-    const hasActiveFilters = (() => {
-      // Search check
-      if (window.searchTermForFilter && window.searchTermForFilter.trim() !== '') {
-        return true;
-      }
-
-      // Status check (if not all statuses are selected)
-      if (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) {
-        const allStatuses = ['open', 'closed', 'cancelled'];
-        const selectedStatuses = window.selectedStatusesForFilter.map(s => s.toLowerCase());
-        if (!allStatuses.every(status => selectedStatuses.includes(status))) {
-          return true;
-        }
-      }
-
-      // Type check (if not all types are selected)
-      if (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) {
-        const allTypes = ['swing', 'investment', 'passive'];
-        const selectedTypes = window.selectedTypesForFilter.map(t => t.toLowerCase());
-        if (!allTypes.every(type => selectedTypes.includes(type))) {
-          return true;
-        }
-      }
-
-      // Date range check
-      if (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') {
-        return true;
-      }
-
-      return false;
-    })();
-
-    // Has active filters check
-
-    if (hasOriginalData && hasActiveFilters) {
-      // There is data but the filter didn't find results
-      // Showing "no results" message due to filters
-      tbody.innerHTML = `<tr><td colspan="13" class="text-center text-info">
-                <i class="fas fa-search"></i> לא נמצאו תוצאות
-                <br><small>נסה לשנות את הפילטרים או מונח החיפוש</small>
-            </td></tr>`;
-    } else {
-      // No data at all
-      // Showing "no data" message
-      tbody.innerHTML = `<tr><td colspan="13" class="text-center text-muted">
-                <i class="fas fa-info-circle"></i> אין תכנונים להצגה
-                <br><small>לא נמצאו תכנונים במערכת</small>
-            </td></tr>`;
-    }
-
-    // Updating record count - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
-    if (window.updateTableCount) {
-      window.updateTableCount('#trade_plansCount', 'trade_plans', 'תכנונים', 0);
-    } else {
-      // Fallback
-      const countElement = document.querySelector('#trade_plansCount');
-      if (countElement) {
-        countElement.textContent = '0 תכנונים';
-      }
-    }
-
-    // Updating statistics - use the non-recursive function
-    updateTradePlansPageSummaryStats();
-    return;
+    return '';
   }
 
-  window.Logger.info(`✅ Data exists, proceeding to build table HTML`, { page: "trade_plans" });
-  const tableHTML = trade_plans.map((design, index) => {
+  return trade_plans.map((design, index) => {
     try {
       // Safeguarding against invalid data
       if (!design || typeof design !== 'object') {
@@ -1774,26 +1785,25 @@ function updateTradePlansTable(trade_plans) {
         return '';
       }
 
+      // Using global FieldRendererService for rendering - no need for local CSS classes
 
-    // Using global FieldRendererService for rendering - no need for local CSS classes
+      // Type correction - ensuring a valid value is passed
+      const typeDisplay = design.investment_type ? window.translateTradePlanType ? window.translateTradePlanType(design.investment_type) : design.investment_type : 'לא מוגדר';
+      const sideDisplay = design.side === 'Long' ? 'Long' : 'Short';
+      const amountDisplay = formatCurrency(design.planned_amount);
+      const targetDisplay = formatCurrency(design.target_price);
+      const stopDisplay = formatCurrency(design.stop_price);
+      const currentDisplay = formatCurrency(design.current || 0);
+      const statusDisplay = window.translateTradePlanStatus ? window.translateTradePlanStatus(design.status) : design.status;
 
-    // Type correction - ensuring a valid value is passed
-    const typeDisplay = design.investment_type ? window.translateTradePlanType ? window.translateTradePlanType(design.investment_type) : design.investment_type : 'לא מוגדר';
-    const sideDisplay = design.side === 'Long' ? 'Long' : 'Short';
-    const amountDisplay = formatCurrency(design.planned_amount);
-    const targetDisplay = formatCurrency(design.target_price);
-    const stopDisplay = formatCurrency(design.stop_price);
-    const currentDisplay = formatCurrency(design.current || 0);
-    const statusDisplay = window.translateTradePlanStatus ? window.translateTradePlanStatus(design.status) : design.status;
+      // Displaying ticker symbol or name
+      const tickerDisplay = design.ticker ? design.ticker.symbol || design.ticker.name || 'לא מוגדר' : 'לא מוגדר';
 
-    // Displaying ticker symbol or name
-    const tickerDisplay = design.ticker ? design.ticker.symbol || design.ticker.name || 'לא מוגדר' : 'לא מוגדר';
+      // שמירת הערכים המקוריים באנגלית לפילטר
+      const typeForFilter = design.investment_type || '';
+      const statusForFilter = design.status || '';
 
-    // שמירת הערכים המקוריים באנגלית לפילטר
-    const typeForFilter = design.investment_type || '';
-    const statusForFilter = design.status || '';
-
-    return `
+      return `
       <tr>
         <td class="ticker-cell">
           <span class="entity-trade-plan-badge entity-badge-base">
@@ -2014,58 +2024,32 @@ function updateTradePlansTable(trade_plans) {
               ? window.dateUtils.ensureDateEnvelope(rawDate)
               : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
                 ? rawDate
-                : null;
+                : rawDate;
 
-            // Derive epoch milliseconds in a canonical way
-            epoch = (() => {
+            if (envelope) {
               if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-                return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                epoch = window.dateUtils.getEpochMilliseconds(envelope);
+              } else if (envelope instanceof Date) {
+                epoch = envelope.getTime();
+              } else if (envelope.epochMs) {
+                epoch = envelope.epochMs;
               }
-              if (typeof window.getEpochMilliseconds === 'function') {
-                return window.getEpochMilliseconds(envelope || rawDate);
-              }
-              if (envelope && typeof envelope.epochMs === 'number') {
-                return envelope.epochMs;
-              }
-              if (rawDate instanceof Date) {
-                return rawDate.getTime();
-              }
-              if (typeof rawDate === 'string') {
-                const parsed = Date.parse(rawDate);
-                return Number.isNaN(parsed) ? null : parsed;
-              }
-              return null;
-            })();
 
-            if (epoch === null || Number.isNaN(epoch)) {
-              return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-            }
-
-            // Build date display using unified date utilities
-            dateDisplay = (() => {
-              if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
-                return window.dateUtils.formatDateTime(envelope || rawDate);
-              }
               if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
-                return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+                dateDisplay = window.dateUtils.formatDate(envelope, { includeTime: true });
+              } else if (envelope instanceof Date) {
+                dateDisplay = envelope.toLocaleString('he-IL');
+              } else if (envelope.local) {
+                dateDisplay = new Date(envelope.local).toLocaleString('he-IL');
+              } else {
+                dateDisplay = 'לא זמין';
               }
-              try {
-                const dateObj = new Date(epoch);
-                return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                }));
-              } catch (err) {
-                window.Logger?.warn('⚠️ trade_plans updated-cell date formatting failed', { err, planId: design?.id }, { page: 'trade_plans' });
-                return 'לא מוגדר';
-              }
-            })();
+            } else {
+              dateDisplay = 'לא זמין';
+            }
           }
 
-          if (!dateDisplay || dateDisplay === '-') {
+          if (!dateDisplay || dateDisplay.trim() === '') {
             return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
           }
 
@@ -2105,15 +2089,156 @@ function updateTradePlansTable(trade_plans) {
       return `<tr><td colspan="11" class="text-center text-danger">שגיאה בעיבוד תכנון ${index + 1}</td></tr>`;
     }
   }).join('');
+}
+
+async function updateTradePlansTable(trade_plans, options = {}) {
+  try {
+    const { skipPagination = false } = options;
+    // === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===
+    window.Logger.info(`🔄 updateTradePlansTable called with ${trade_plans ? trade_plans.length : 0} trade plans`, { page: "trade_plans" });
+
+    const tbody = document.querySelector('#trade_plansTable tbody');
+    window.Logger.info(`🔍 Looking for tbody:`, tbody, { page: "trade_plans" });
+    // Looking for table body
+
+    if (!tbody) {
+      handleElementNotFound('#trade_plansTable tbody', 'CRITICAL');
+      return;
+    }
+
+    const safeTradePlans = Array.isArray(trade_plans) ? trade_plans : [];
+
+    // Check if we should use pagination
+    if (!skipPagination && typeof window.updateTableWithPagination === 'function') {
+      try {
+        window.tradePlansPaginationInstance = await window.updateTableWithPagination({
+          tableId: 'trade_plansTable',
+          tableType: 'trade_plans',
+          data: safeTradePlans,
+          render: async (pageData, context) => {
+            const tbody = document.querySelector('#trade_plansTable tbody');
+            if (!tbody) {
+              handleElementNotFound('#trade_plansTable tbody', 'CRITICAL');
+              return;
+            }
+            tbody.innerHTML = renderTradePlansTableRows(pageData);
+            if (window.setPageTableData) {
+              window.setPageTableData('trade_plans', pageData, {
+                tableId: 'trade_plansTable',
+                pageInfo: context?.pageInfo,
+              });
+            }
+            // Update counts and summary after rendering
+            if (window.updateTableCount) {
+              window.updateTableCount('#trade_plansCount', 'trade_plans', 'תכנונים', pageData.length);
+            }
+            updateTradePlansPageSummaryStats();
+            if (window.applyEntityColorsToHeaders) {
+              window.applyEntityColorsToHeaders('trade_plan');
+            }
+          },
+          onFilteredDataChange: ({ filteredData }) => {
+            if (window.updateTableCount) {
+              window.updateTableCount('#trade_plansCount', 'trade_plans', 'תכנונים', filteredData.length);
+            }
+            updateTradePlansPageSummaryStats();
+          },
+        });
+        return;
+      } catch (error) {
+        window.Logger?.warn('updateTradePlansTable pagination fallback triggered', { error, page: 'trade_plans' });
+      }
+    }
+
+    // Checking if there is data to display
+    window.Logger.info(`🔍 Checking data: trade_plans =`, safeTradePlans, `length =`, safeTradePlans?.length, { page: "trade_plans" });
+  window.Logger.info(`🔍 Condition check: !trade_plans =`, !safeTradePlans, `trade_plans.length === 0 =`, safeTradePlans?.length === 0, { page: "trade_plans" });
+  if (!safeTradePlans || safeTradePlans.length === 0) {
+    window.Logger.info(`❌ No data to display - entering error condition`, { page: "trade_plans" });
+    // No trade plans to display
+
+    // Checking if it's because of filters or if there are no data at all
+    const hasOriginalData = window.tradePlanService?.getTradePlans()?.length > 0 || window.tradePlansData && window.tradePlansData.length > 0;
+    // Has original data check
+
+    // Checking if there are active filters
+    const hasActiveFilters = (() => {
+      // Search check
+      if (window.searchTermForFilter && window.searchTermForFilter.trim() !== '') {
+        return true;
+      }
+
+      // Status check (if not all statuses are selected)
+      if (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) {
+        const allStatuses = ['open', 'closed', 'cancelled'];
+        const selectedStatuses = window.selectedStatusesForFilter.map(s => s.toLowerCase());
+        if (!allStatuses.every(status => selectedStatuses.includes(status))) {
+          return true;
+        }
+      }
+
+      // Type check (if not all types are selected)
+      if (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) {
+        const allTypes = ['swing', 'investment', 'passive'];
+        const selectedTypes = window.selectedTypesForFilter.map(t => t.toLowerCase());
+        if (!allTypes.every(type => selectedTypes.includes(type))) {
+          return true;
+        }
+      }
+
+      // Date range check
+      if (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') {
+        return true;
+      }
+
+      return false;
+    })();
+
+    // Has active filters check
+
+    if (hasOriginalData && hasActiveFilters) {
+      // There is data but the filter didn't find results
+      // Showing "no results" message due to filters
+      tbody.innerHTML = `<tr><td colspan="13" class="text-center text-info">
+                <i class="fas fa-search"></i> לא נמצאו תוצאות
+                <br><small>נסה לשנות את הפילטרים או מונח החיפוש</small>
+            </td></tr>`;
+    } else {
+      // No data at all
+      // Showing "no data" message
+      tbody.innerHTML = `<tr><td colspan="13" class="text-center text-muted">
+                <i class="fas fa-info-circle"></i> אין תכנונים להצגה
+                <br><small>לא נמצאו תכנונים במערכת</small>
+            </td></tr>`;
+    }
+
+    // Updating record count - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+    if (window.updateTableCount) {
+      window.updateTableCount('#trade_plansCount', 'trade_plans', 'תכנונים', 0);
+    } else {
+      // Fallback
+      const countElement = document.querySelector('#trade_plansCount');
+      if (countElement) {
+        countElement.textContent = '0 תכנונים';
+      }
+    }
+
+    // Updating statistics - use the non-recursive function
+    updateTradePlansPageSummaryStats();
+    return;
+  }
+
+  window.Logger.info(`✅ Data exists, proceeding to build table HTML`, { page: "trade_plans" });
+  const tableHTML = renderTradePlansTableRows(safeTradePlans);
 
   window.Logger.info(`🔄 Table HTML built successfully, length: ${tableHTML.length}`, { page: "trade_plans" });
-  window.Logger.info(`🔄 Setting tbody.innerHTML with ${trade_plans.length} rows`, { page: "trade_plans" });
+  window.Logger.info(`🔄 Setting tbody.innerHTML with ${safeTradePlans.length} rows`, { page: "trade_plans" });
   tbody.innerHTML = tableHTML;
   window.Logger.info(`✅ Table updated successfully`, { page: "trade_plans" });
 
       // Updating record count - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
     if (window.updateTableCount) {
-      window.updateTableCount('#trade_plansCount', 'trade_plans', 'תכנונים', trade_plans.length);
+      window.updateTableCount('#trade_plansCount', 'trade_plans', 'תכנונים', safeTradePlans.length);
     } else {
       // Fallback
       const countElement = document.querySelector('#trade_plansCount');
@@ -2704,7 +2829,11 @@ function buildTradePlanModalNavigationMetadata(modalElement) {
  * @returns {Promise<void>}
  */
 async function registerTradePlanModalNavigation(modalElement) {
-  if (!modalElement || !window.ModalNavigationService?.registerModalOpen) {
+  // Modal Navigation System - רק למודלים מקוננים (nested modals)
+  // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
+  const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
+  
+  if (!modalElement || !window.ModalNavigationService?.registerModalOpen || !hasStack) {
     return;
   }
   const metadata = buildTradePlanModalNavigationMetadata(modalElement);
@@ -2714,6 +2843,7 @@ async function registerTradePlanModalNavigation(modalElement) {
   try {
     const entry = await window.ModalNavigationService.registerModalOpen(modalElement, metadata);
     modalElement.dataset.navigationInstanceId = entry?.instanceId || '';
+    // עדכון UI (breadcrumb וכפתור חזרה) רק במודלים מקוננים
     if (window.modalNavigationManager?.updateModalNavigation) {
       window.modalNavigationManager.updateModalNavigation(modalElement);
     }
@@ -2887,6 +3017,23 @@ async function getTradePlanConditionsForEvaluation(entityId) {
   if (Array.isArray(cached) && cached.length) {
     return cached;
   }
+  
+  // Use ConditionsCRUDManager if available
+  if (window.conditionsCRUDManager) {
+    try {
+      window.conditionsCRUDManager.setContext({ entityType: 'plan' });
+      const data = await window.conditionsCRUDManager.readConditions(entityId, false);
+      if (Array.isArray(data)) {
+        window.ConditionsSummaryRenderer?.setConditions?.('plan', numericId, data);
+      }
+      return data || [];
+    } catch (error) {
+      window.Logger?.error('Failed to load conditions via ConditionsCRUDManager', { error: error?.message, entityId }, { page: 'trade_plans' });
+      throw new Error('טעינת התנאים נכשלה');
+    }
+  }
+  
+  // Fallback to direct API call if ConditionsCRUDManager not available
   const response = await fetch(`/api/plan-conditions/trade-plans/${entityId}/conditions`);
   if (!response.ok) {
     throw new Error('טעינת התנאים נכשלה');

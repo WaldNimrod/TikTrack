@@ -59,7 +59,7 @@
                     <div class="section-header">
                         <h2><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> מבוא למערכת הצבעים הדינמית</h2>
                         <div class="section-actions">
-                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleAllSections()" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
                             </button>
                         </div>
@@ -74,7 +74,7 @@
                 <div class="content-section" id="section1" data-section="section1">
                     <div class="section-header">
                         <h2><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> ערכים מספריים</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('section1')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -88,7 +88,7 @@
                 <div class="content-section" id="section2" data-section="section2">
                     <div class="section-header">
                         <h2><img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> ישויות מערכת</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('section2')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -102,7 +102,7 @@
                 <div class="content-section" id="section3" data-section="section3">
                     <div class="section-header">
                         <h2><img src="/trading-ui/images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon"> סטטוסים ומודלים</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('section3')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -116,7 +116,7 @@
                 <div class="content-section" id="section4" data-section="section4">
                     <div class="section-header">
                         <h2><img src="/trading-ui/images/icons/tabler/settings.svg" width="16" height="16" alt="settings" class="icon"> API ופונקציות</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('section4')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -162,6 +162,8 @@
     <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
     <!-- [7] Load Order: 7 -->
     <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [7.5] Load Order: 7.5 -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
     <!-- [8] Load Order: 8 -->
     <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
     <!-- [9] Load Order: 9 -->
@@ -208,7 +210,22 @@
     <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+
+<!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [26] Page-specific: dynamic-colors-display -->

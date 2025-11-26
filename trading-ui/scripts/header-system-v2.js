@@ -1223,7 +1223,12 @@ window.handleSearchInput = function(event) {
 window.clearSearchFilter = function() {
   const searchInput = document.getElementById('searchFilterInput');
   if (searchInput) {
-    searchInput.value = '';
+    // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('searchFilterInput', '', 'text');
+    } else {
+      searchInput.value = '';
+    }
     if (window.headerSystem && window.headerSystem.filterManager) {
       window.headerSystem.filterManager.currentFilters.search = '';
       window.headerSystem.filterManager.saveFilters();
@@ -1301,7 +1306,12 @@ window.resetAllFilters = async function() {
     // Reset search input
     const searchInput = document.getElementById('searchFilterInput');
     if (searchInput) {
-      searchInput.value = defaultFilters.search;
+      // Use DataCollectionService to set value if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('searchFilterInput', defaultFilters.search, 'text');
+      } else {
+        searchInput.value = defaultFilters.search;
+      }
     }
 
     window.Logger?.info?.('✅ resetAllFilters completed', { page: 'header-system' });

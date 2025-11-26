@@ -247,13 +247,22 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
   // Show the modal
   const modalElement = document.getElementById(modalId);
   
-  // הגדרת רקע אזהרה לכותרת המודול במצב warningBlock
+  // הגדרת רקע אזהרה לכותרת המודול במצב warningBlock - שימוש במערכת המרכזית
   if (mode === 'warningBlock') {
     const headerElement = modalElement.querySelector('.modal-header');
     if (headerElement) {
-      headerElement.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
-      headerElement.style.color = 'white';
-      headerElement.style.borderBottom = '2px solid #c82333';
+      // קבלת צבע שלילי מהמערכת המרכזית
+      const getNumericColorFn = (typeof window.getNumericValueColor === 'function') ? window.getNumericValueColor : null;
+      const negativeColor = getNumericColorFn ? getNumericColorFn(-1, 'medium') : '';
+      
+      if (negativeColor) {
+        // יצירת גרסה כהה יותר ל-gradient
+        const darkerColor = negativeColor; // אפשר להחשיך אם נדרש
+        headerElement.style.background = `linear-gradient(135deg, ${negativeColor}, ${darkerColor})`;
+        headerElement.style.color = 'white';
+        headerElement.style.borderBottom = `2px solid ${darkerColor}`;
+      }
+      // אם אין צבע, נשאיר את הסגנונות הריקים - המערכת תטען בהמשך
     }
   }
   
@@ -279,30 +288,36 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
   }, { once: true });
   
   modalElement.addEventListener('shown.bs.modal', async () => {
-    // רישום המודל במערכת הניווט
-    if (window.ModalNavigationService?.registerModalOpen) {
-      await window.ModalNavigationService.registerModalOpen(modalElement, {
-        modalId,
-        modalType: 'linked-items-modal',
-        entityType: itemType,
-        entityId: itemId ?? null,
-        title: modalTitle,
-        metadata: { mode }
-      });
-    } else if (window.pushModalToNavigation) {
-      await window.pushModalToNavigation(modalElement, {
-        modalId,
-        modalType: 'linked-items-modal',
-        entityType: itemType,
-        entityId: itemId ?? null,
-        title: modalTitle,
-        metadata: { mode }
-      });
-    }
+    // Modal Navigation System - רק למודלים מקוננים (nested modals)
+    // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
+    const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
+    
+    if (hasStack) {
+      // רישום המודל במערכת הניווט
+      if (window.ModalNavigationService?.registerModalOpen) {
+        await window.ModalNavigationService.registerModalOpen(modalElement, {
+          modalId,
+          modalType: 'linked-items-modal',
+          entityType: itemType,
+          entityId: itemId ?? null,
+          title: modalTitle,
+          metadata: { mode }
+        });
+      } else if (window.pushModalToNavigation) {
+        await window.pushModalToNavigation(modalElement, {
+          modalId,
+          modalType: 'linked-items-modal',
+          entityType: itemType,
+          entityId: itemId ?? null,
+          title: modalTitle,
+          metadata: { mode }
+        });
+      }
 
-    // עדכון UI של ניווט (breadcrumb וכפתור חזרה)
-    if (window.modalNavigationManager?.updateModalNavigation) {
-      window.modalNavigationManager.updateModalNavigation(modalElement);
+      // עדכון UI של ניווט (breadcrumb וכפתור חזרה) רק במודלים מקוננים
+      if (window.modalNavigationManager?.updateModalNavigation) {
+        window.modalNavigationManager.updateModalNavigation(modalElement);
+      }
     }
 
     // Initialize tooltips for filter buttons after modal is shown
@@ -384,14 +399,47 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
     itemName = `רשומה ${itemId}`;
   }
 
+  // קבלת צבעים מהמערכת המרכזית לפני יצירת ה-template
+  const getNumericColorFn = (typeof window.getNumericValueColor === 'function') ? window.getNumericValueColor : null;
+  const getNumericBgColorFn = (typeof window.getNumericValueBackgroundColor === 'function') ? window.getNumericValueBackgroundColor : null;
+  const getNumericBorderColorFn = (typeof window.getNumericValueBorderColor === 'function') ? window.getNumericValueBorderColor : null;
+  const getStatusColorFn = (typeof window.getStatusColor === 'function') ? window.getStatusColor : null;
+  const getStatusBgColorFn = (typeof window.getStatusBackgroundColor === 'function') ? window.getStatusBackgroundColor : null;
+  const getStatusBorderColorFn = (typeof window.getStatusBorderColor === 'function') ? window.getStatusBorderColor : null;
+  
+  // צבעים לערכים מספריים
+  const positiveColor = getNumericColorFn ? getNumericColorFn(1, 'medium') : '';
+  const positiveBg = getNumericBgColorFn ? getNumericBgColorFn(1) : '';
+  const positiveBorder = getNumericBorderColorFn ? getNumericBorderColorFn(1) : '';
+  const negativeColor = getNumericColorFn ? getNumericColorFn(-1, 'medium') : '';
+  const negativeBg = getNumericBgColorFn ? getNumericBgColorFn(-1) : '';
+  const negativeBorder = getNumericBorderColorFn ? getNumericBorderColorFn(-1) : '';
+  
+  // צבעים לסטטוסים
+  const openStatusColor = getStatusColorFn ? getStatusColorFn('open', 'medium') : '';
+  const openStatusBg = getStatusBgColorFn ? getStatusBgColorFn('open') : '';
+  const openStatusBorder = getStatusBorderColorFn ? getStatusBorderColorFn('open') : '';
+  const closedStatusColor = getStatusColorFn ? getStatusColorFn('closed', 'medium') : '';
+  const closedStatusBg = getStatusBgColorFn ? getStatusBgColorFn('closed') : '';
+  const closedStatusBorder = getStatusBorderColorFn ? getStatusBorderColorFn('closed') : '';
+  const cancelledStatusColor = getStatusColorFn ? getStatusColorFn('cancelled', 'medium') : '';
+  const cancelledStatusBg = getStatusBgColorFn ? getStatusBgColorFn('cancelled') : '';
+  const cancelledStatusBorder = getStatusBorderColorFn ? getStatusBorderColorFn('cancelled') : '';
+  
+  // צבעים למצב warningBlock
+  const headerNegativeColor = negativeColor || '';
+  const headerPositiveColor = positiveColor || '';
+  const headerBorderNegative = negativeBorder || negativeColor || '';
+  const headerBorderPositive = positiveBorder || positiveColor || '';
+
   let content = `
     <div class="linked-items-container">
       <style>
-        /* כותרת המודול עם רקע צבעוני לפי mode */
+        /* כותרת המודול עם רקע צבעוני לפי mode - שימוש במערכת המרכזית */
         .modal-header {
-          background: linear-gradient(135deg, ${mode === 'warningBlock' ? (window.getTableColors ? window.getTableColors().negative : '#dc3545') + ', #c82333' : (window.getTableColors ? window.getTableColors().positive : '#28a745') + ', #20c997'});
+          background: linear-gradient(135deg, ${mode === 'warningBlock' ? (headerNegativeColor ? `${headerNegativeColor}, ${headerNegativeColor}` : '') : (headerPositiveColor ? `${headerPositiveColor}, ${headerPositiveColor}` : '')});
           color: white;
-          border-bottom: 2px solid ${mode === 'warningBlock' ? '#c82333' : '#20c997'};
+          border-bottom: 2px solid ${mode === 'warningBlock' ? headerBorderNegative : headerBorderPositive};
           position: relative;
           padding-left: 60px;
           min-height: 60px;
@@ -406,8 +454,8 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
           top: 50%;
           transform: translateY(-50%);
           background-color: white;
-          color: ${mode === 'warningBlock' ? window.getTableColors ? window.getTableColors().negative : '#dc3545' : window.getTableColors ? window.getTableColors().positive : '#28a745'};
-          border: 2px solid ${mode === 'warningBlock' ? window.getTableColors ? window.getTableColors().negative : '#dc3545' : window.getTableColors ? window.getTableColors().positive : '#28a745'};
+          color: ${mode === 'warningBlock' ? headerNegativeColor : headerPositiveColor};
+          border: 2px solid ${mode === 'warningBlock' ? headerBorderNegative : headerBorderPositive};
           border-radius: 6px;
           padding: 6px 12px;
           font-size: 14px;
@@ -417,7 +465,7 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
           z-index: 1056;
         }
         .modal-header .btn-close-custom:hover {
-          background-color: ${mode === 'warningBlock' ? window.getTableColors ? window.getTableColors().negative : '#dc3545' : window.getTableColors ? window.getTableColors().positive : '#28a745'};
+          background-color: ${mode === 'warningBlock' ? headerNegativeColor : headerPositiveColor};
           color: white;
         }
         
@@ -436,56 +484,58 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
           display: inline-block !important;
         }
         
-        .status-badge.status-open {
-          background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(67, 160, 71, 0.15) 100%) !important;
-          color: #2e7d32 !important;
-          border: 1px solid rgba(76, 175, 80, 0.3) !important;
-          box-shadow: 0 2px 8px rgba(76, 175, 80, 0.15) !important;
-        }
+        ${openStatusBg ? `.status-badge.status-open {
+          background: linear-gradient(135deg, ${openStatusBg} 0%, ${openStatusBg} 100%) !important;
+          color: ${openStatusColor} !important;
+          border: 1px solid ${openStatusBorder} !important;
+          box-shadow: 0 2px 8px ${openStatusBg} !important;
+        }` : ''}
         
-        .status-badge.status-closed {
-          background: linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(30, 136, 229, 0.15) 100%) !important;
-          color: #1565c0 !important;
-          border: 1px solid rgba(33, 150, 243, 0.3) !important;
-          box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15) !important;
-        }
+        ${closedStatusBg ? `.status-badge.status-closed {
+          background: linear-gradient(135deg, ${closedStatusBg} 0%, ${closedStatusBg} 100%) !important;
+          color: ${closedStatusColor} !important;
+          border: 1px solid ${closedStatusBorder} !important;
+          box-shadow: 0 2px 8px ${closedStatusBg} !important;
+        }` : ''}
         
-        .status-badge.status-cancelled {
-          background: linear-gradient(135deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 143, 0, 0.15) 100%) !important;
-          color: #ef6c00 !important;
-          border: 1px solid rgba(255, 152, 0, 0.3) !important;
-          box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15) !important;
-        }
+        ${cancelledStatusBg ? `.status-badge.status-cancelled {
+          background: linear-gradient(135deg, ${cancelledStatusBg} 0%, ${cancelledStatusBg} 100%) !important;
+          color: ${cancelledStatusColor} !important;
+          border: 1px solid ${cancelledStatusBorder} !important;
+          box-shadow: 0 2px 8px ${cancelledStatusBg} !important;
+        }` : ''}
         
+        ${getStatusBgColorFn && getStatusColorFn ? `
         .status-badge.status-active {
-          background: linear-gradient(135deg, rgba(100, 181, 246, 0.2) 0%, rgba(66, 165, 245, 0.2) 100%) !important;
-          color: #1976d2 !important;
-          box-shadow: 0 2px 6px rgba(100, 181, 246, 0.1) !important;
+          background: linear-gradient(135deg, ${getStatusBgColorFn('active') || ''} 0%, ${getStatusBgColorFn('active') || ''} 100%) !important;
+          color: ${getStatusColorFn('active', 'medium') || ''} !important;
+          box-shadow: 0 2px 6px ${getStatusBgColorFn('active') || ''} !important;
         }
         
         .status-badge.status-inactive {
-          background: linear-gradient(135deg, rgba(158, 158, 158, 0.2) 0%, rgba(117, 117, 117, 0.2) 100%) !important;
-          color: #616161 !important;
-          box-shadow: 0 2px 6px rgba(158, 158, 158, 0.1) !important;
+          background: linear-gradient(135deg, ${getStatusBgColorFn('inactive') || ''} 0%, ${getStatusBgColorFn('inactive') || ''} 100%) !important;
+          color: ${getStatusColorFn('inactive', 'medium') || ''} !important;
+          box-shadow: 0 2px 6px ${getStatusBgColorFn('inactive') || ''} !important;
         }
         
         .status-badge.status-pending {
-          background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 143, 0, 0.2) 100%) !important;
-          color: #f57c00 !important;
-          box-shadow: 0 2px 6px rgba(255, 152, 0, 0.1) !important;
+          background: linear-gradient(135deg, ${getStatusBgColorFn('pending') || ''} 0%, ${getStatusBgColorFn('pending') || ''} 100%) !important;
+          color: ${getStatusColorFn('pending', 'medium') || ''} !important;
+          box-shadow: 0 2px 6px ${getStatusBgColorFn('pending') || ''} !important;
         }
         
         .status-badge.status-completed {
-          background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(67, 160, 71, 0.2) 100%) !important;
-          color: #388e3c !important;
-          box-shadow: 0 2px 6px rgba(76, 175, 80, 0.1) !important;
+          background: linear-gradient(135deg, ${getStatusBgColorFn('completed') || ''} 0%, ${getStatusBgColorFn('completed') || ''} 100%) !important;
+          color: ${getStatusColorFn('completed', 'medium') || ''} !important;
+          box-shadow: 0 2px 6px ${getStatusBgColorFn('completed') || ''} !important;
         }
         
         .status-badge.status-archived {
-          background: linear-gradient(135deg, rgba(158, 158, 158, 0.2) 0%, rgba(117, 117, 117, 0.2) 100%) !important;
-          color: #616161 !important;
-          box-shadow: 0 2px 6px rgba(158, 158, 158, 0.1) !important;
+          background: linear-gradient(135deg, ${getStatusBgColorFn('archived') || ''} 0%, ${getStatusBgColorFn('archived') || ''} 100%) !important;
+          color: ${getStatusColorFn('archived', 'medium') || ''} !important;
+          box-shadow: 0 2px 6px ${getStatusBgColorFn('archived') || ''} !important;
         }
+        ` : ''}
       </style>
   `;
 
@@ -499,7 +549,7 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
   // Get entity color for the table
   const entityColor = (window.getEntityColor && typeof window.getEntityColor === 'function')
     ? window.getEntityColor(itemType)
-    : '#019193';
+    : '';
   
   // Use EntityDetailsRenderer to render linked items as table (same as in entity details modal)
   if (window.entityDetailsRenderer && typeof window.entityDetailsRenderer.renderLinkedItems === 'function') {
@@ -868,7 +918,7 @@ function createModal(id, title, content, mode = 'view') {
     <div class="modal fade modal-nested" id="${id}" tabindex="-1" aria-labelledby="${id}Label" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
-          <div class="modal-header linkedItems_modal-header-colored modal-header-${mode}" ${mode === 'warningBlock' ? 'style="background: linear-gradient(135deg, #dc3545, #c82333) !important; color: white !important; border-bottom: 2px solid #c82333 !important;"' : ''}>
+          <div class="modal-header linkedItems_modal-header-colored modal-header-${mode}">
             <div class="modal-navigation-breadcrumb" id="${id}Breadcrumb" style="display: none;"></div>
             <button type="button" class="btn-close-custom btn-close-${mode}" data-bs-dismiss="modal" aria-label="Close">
               ✕
@@ -1466,8 +1516,8 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
       }
       relatedIcon = '📈';
       relatedClass = 'related-trade entity-trade-badge';
-      relatedColor = window.getEntityColor ? window.getEntityColor('trade') : '#26baac';
-      relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('trade') : 'rgba(0, 123, 255, 0.1)';
+      relatedColor = window.getEntityColor ? window.getEntityColor('trade') : '';
+      relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('trade') : '';
       break;
     }
     case 3: { // תוכנית

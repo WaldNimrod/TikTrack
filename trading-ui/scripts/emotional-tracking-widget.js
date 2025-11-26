@@ -240,7 +240,7 @@
      * Update Recent Emotional Entries
      * Updates the list of recent emotional entries with mock data
      */
-    function updateRecentEntries() {
+    async function updateRecentEntries() {
         const container = document.getElementById('recentEntriesContainer');
         if (!container) {
             return;
@@ -262,7 +262,7 @@
 
             // Render entries
             entries.forEach(entry => {
-                const entryElement = createEntryElement(entry);
+                const entryElement = await createEntryElement(entry);
                 container.appendChild(entryElement);
             });
 
@@ -319,7 +319,7 @@
      * @param {Object} entry - Emotional entry object
      * @returns {HTMLElement} Entry element
      */
-    function createEntryElement(entry) {
+    async function createEntryElement(entry) {
         const item = document.createElement('div');
         item.className = 'list-group-item';
 
@@ -327,9 +327,17 @@
         const emotion = EMOTION_TYPES[entry.emotion_type];
         let iconHtml = '';
         
-        // Use relative path for mockup pages
+        // Use IconSystem if available
         const fallbackIcon = EMOTION_ICON_FALLBACKS[entry.emotion_type] || 'note';
-        iconHtml = `<img src="../../images/icons/tabler/${fallbackIcon}.svg" width="16" height="16" alt="icon" class="icon">`;
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                iconHtml = await window.IconSystem.renderIcon('button', fallbackIcon, { size: '16', alt: 'icon', class: 'icon' });
+            } catch (error) {
+                iconHtml = `<img src="../../images/icons/tabler/${fallbackIcon}.svg" width="16" height="16" alt="icon" class="icon">`;
+            }
+        } else {
+            iconHtml = `<img src="../../images/icons/tabler/${fallbackIcon}.svg" width="16" height="16" alt="icon" class="icon">`;
+        }
 
         // Format date
         let dateDisplay = '-';
@@ -371,7 +379,7 @@
      * Update Insights
      * Updates the insights section with mock data
      */
-    function updateInsights() {
+    async function updateInsights() {
         const container = document.getElementById('insightsContainer');
         if (!container) {
             return;
@@ -385,10 +393,10 @@
             container.innerHTML = '';
 
             // Render insights
-            insights.forEach(insight => {
-                const insightElement = createInsightElement(insight);
+            for (const insight of insights) {
+                const insightElement = await createInsightElement(insight);
                 container.appendChild(insightElement);
-            });
+            }
 
             if (window.Logger) {
                 window.Logger.info('✅ Insights updated', { page: 'emotional-tracking-widget', count: insights.length });
@@ -431,12 +439,19 @@
      * @param {Object} insight - Insight object
      * @returns {HTMLElement} Insight element
      */
-    function createInsightElement(insight) {
+    async function createInsightElement(insight) {
         const alert = document.createElement('div');
         alert.className = `alert alert-${insight.severity}`;
 
-        // Get icon - use relative path for mockup pages
-        const iconHtml = `<img src="../../images/icons/tabler/${insight.icon}.svg" width="16" height="16" alt="${insight.icon}" class="icon">`;
+        // Get icon - use IconSystem if available
+        let iconHtml = `<img src="../../images/icons/tabler/${insight.icon}.svg" width="16" height="16" alt="${insight.icon}" class="icon">`;
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                iconHtml = await window.IconSystem.renderIcon('button', insight.icon, { size: '16', alt: insight.icon, class: 'icon' });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
 
         alert.innerHTML = `
             ${iconHtml}
@@ -450,10 +465,10 @@
      * Setup Quick Entry Form
      * Sets up event handlers for the quick entry form
      */
-    function setupQuickEntryForm() {
+    async function setupQuickEntryForm() {
         // Setup emotion buttons with icons
         const emotionButtons = document.querySelectorAll('.emotion-button');
-        emotionButtons.forEach(button => {
+        for (const button of emotionButtons) {
             const emotionKey = button.getAttribute('data-emotion');
             const emotion = EMOTION_TYPES[emotionKey];
             
@@ -462,7 +477,16 @@
                 const iconSpan = button.querySelector('.emotion-icon');
                 if (iconSpan) {
                     const fallbackIcon = EMOTION_ICON_FALLBACKS[emotionKey] || 'note';
-                    iconSpan.innerHTML = `<img src="../../images/icons/tabler/${fallbackIcon}.svg" width="16" height="16" alt="icon" class="icon">`;
+                    // Render icon using IconSystem
+                    let iconHTML = `<img src="../../images/icons/tabler/${fallbackIcon}.svg" width="16" height="16" alt="icon" class="icon">`;
+                    if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                        try {
+                            iconHTML = await window.IconSystem.renderIcon('button', fallbackIcon, { size: '16', alt: 'icon', class: 'icon' });
+                        } catch (error) {
+                            // Fallback already set
+                        }
+                    }
+                    iconSpan.innerHTML = iconHTML;
                 }
             }
 
@@ -513,7 +537,7 @@
      * Handle Save Emotion
      * Handles saving a new emotional entry (mock - no API call)
      */
-    function handleSaveEmotion() {
+    async function handleSaveEmotion() {
         if (!selectedEmotion) {
             if (window.NotificationSystem) {
                 window.NotificationSystem.showError('נא לבחור רגש/תחושה', 'תיעוד רגשי');
@@ -554,11 +578,17 @@
             btn.classList.add('btn-outline-secondary');
         });
 
-        if (tradeSelect) tradeSelect.value = '';
-        if (notesTextarea) notesTextarea.value = '';
+        // Use DataCollectionService to clear fields if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          if (tradeSelect) window.DataCollectionService.setValue(tradeSelect.id, '', 'text');
+          if (notesTextarea) window.DataCollectionService.setValue(notesTextarea.id, '', 'text');
+        } else {
+          if (tradeSelect) tradeSelect.value = '';
+          if (notesTextarea) notesTextarea.value = '';
+        }
 
         // Update UI
-        updateRecentEntries();
+        await updateRecentEntries();
         updateEmotionalPatternsChart();
 
         if (window.Logger) {
@@ -599,11 +629,19 @@
     /**
      * Setup mockup notice icon
      */
-    function setupMockupNotice() {
+    async function setupMockupNotice() {
         const noticeIcon = document.querySelector('.mockup-notice-icon');
         if (noticeIcon) {
-            // Use relative path for mockup pages - note is fallback for info-circle
-            noticeIcon.innerHTML = `<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">`;
+            // Render icon using IconSystem
+            let iconHTML = `<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">`;
+            if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                try {
+                    iconHTML = await window.IconSystem.renderIcon('button', 'note', { size: '16', alt: 'icon', class: 'icon' });
+                } catch (error) {
+                    // Fallback already set
+                }
+            }
+            noticeIcon.innerHTML = iconHTML;
         }
     }
 
@@ -613,19 +651,19 @@
     async function initializeWidgets() {
         try {
             // Setup mockup notice icon
-            setupMockupNotice();
+            await setupMockupNotice();
 
             // Initialize chart
             await initEmotionalPatternsChart();
 
             // Update recent entries
-            updateRecentEntries();
+            await updateRecentEntries();
 
             // Update insights
-            updateInsights();
+            await updateInsights();
 
             // Setup form
-            setupQuickEntryForm();
+            await setupQuickEntryForm();
 
             if (window.Logger) {
                 window.Logger.info('✅ All widgets initialized', { page: 'emotional-tracking-widget' });

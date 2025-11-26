@@ -300,6 +300,8 @@
     <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
     <!-- [11] Load Order: 11 -->
     <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <!-- [11.5] Load Order: 11.5 -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
     <!-- [12] Load Order: 12 -->
     <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
     <!-- [13] Load Order: 13 -->
@@ -320,6 +322,44 @@
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
 
     <!-- =============================================================== -->
+    <!-- ===== PACKAGE: SERVICES (Partial - required files only) ===== -->
+    <!-- =============================================================== -->
+    
+    <!-- [20.5] Load Order: 20.5 -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script> <!-- שירות רינדור שדות -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE: UI-ADVANCED (Partial - actions-menu-system only) ===== -->
+    <!-- =============================================================== -->
+    
+    <!-- [20.6] Load Order: 20.6 -->
+    <script src="scripts/table-mappings.js?v=1.0.0"></script> <!-- מיפוי טבלאות -->
+    <!-- [20.7] Load Order: 20.7 -->
+    <script src="scripts/tables.js?v=1.0.0"></script> <!-- מערכת טבלאות -->
+    <!-- [20.8] Load Order: 20.8 -->
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- מערכת תפריט פעולות -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE: CRUD (Partial - required files only) ===== -->
+    <!-- =============================================================== -->
+    
+    <!-- [20.9] Load Order: 20.9 -->
+    <script src="scripts/date-utils.js?v=1.0.0"></script> <!-- כלי עזר תאריכים -->
+    <!-- [20.10] Load Order: 20.10 -->
+    <script src="scripts/data-utils.js?v=1.0.0"></script> <!-- כלי עזר נתונים -->
+    <!-- [20.11] Load Order: 20.11 -->
+    <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- מערכת טבלאות מרכזית מאוחדת -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== ICON SYSTEM (Required) ===== -->
+    <!-- =============================================================== -->
+    
+    <!-- [20.12] Load Order: 20.12 -->
+    <script src="scripts/icon-mappings.js?v=1.0.0"></script> <!-- מיפוי איקונים מרכזי -->
+    <!-- [20.13] Load Order: 20.13 -->
+    <script src="scripts/icon-system.js?v=1.0.0"></script> <!-- מערכת איקונים מרכזית -->
+    
+    <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/2: INITIALIZATION PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
@@ -335,10 +375,25 @@
     <!-- [24] Load Order: 24 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
     <!-- [25] Load Order: 25 -->
-    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכת אתחול מאוחדת - נקודת כניסה אחת (חובה לכל עמוד) -->
 
     <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+
+<!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [26] Page-specific: constraints -->

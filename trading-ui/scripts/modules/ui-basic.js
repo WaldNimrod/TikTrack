@@ -138,9 +138,14 @@ function updatePricesFromPercentages(formId, currentPrice) {
   const newStopPrice = calculateStopPrice(currentPrice, stopPercentage, side);
   const newTargetPrice = calculateTargetPrice(currentPrice, targetPercentage, side);
 
-  // Update form fields
-  stopPriceElement.value = newStopPrice.toFixed(2);
-  targetPriceElement.value = newTargetPrice.toFixed(2);
+  // Update form fields using DataCollectionService if available
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+    window.DataCollectionService.setValue(stopPriceElement.id, newStopPrice.toFixed(2), 'number');
+    window.DataCollectionService.setValue(targetPriceElement.id, newTargetPrice.toFixed(2), 'number');
+  } else {
+    stopPriceElement.value = newStopPrice.toFixed(2);
+    targetPriceElement.value = newTargetPrice.toFixed(2);
+  }
 
   // Updated prices from percentages
   // console.log('Updated prices from percentages:', {
@@ -185,9 +190,14 @@ function updatePercentagesFromPrices(formId, currentPrice) {
   const newStopPercentage = calculatePercentageFromPrice(currentPrice, stopPrice, side);
   const newTargetPercentage = calculatePercentageFromPrice(currentPrice, targetPrice, side);
 
-  // Update form fields
-  stopPercentageElement.value = newStopPercentage.toFixed(2);
-  targetPercentageElement.value = newTargetPercentage.toFixed(2);
+  // Update form fields using DataCollectionService if available
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+    window.DataCollectionService.setValue(stopPercentageElement.id, newStopPercentage.toFixed(2), 'number');
+    window.DataCollectionService.setValue(targetPercentageElement.id, newTargetPercentage.toFixed(2), 'number');
+  } else {
+    stopPercentageElement.value = newStopPercentage.toFixed(2);
+    targetPercentageElement.value = newTargetPercentage.toFixed(2);
+  }
 
   // Updated percentages from prices
   // console.log('Updated percentages from prices:', {
@@ -758,7 +768,7 @@ window.toggleSection = async function (sectionId) {
             const otherIcon = otherSection.querySelector('.section-toggle-icon');
             if (otherSectionBody && (otherSectionBody.style.display !== 'none')) {
               otherSectionBody.style.display = 'none';
-              if (otherIcon) updateChevronIcon(otherIcon, true);
+              if (otherIcon) await updateChevronIcon(otherIcon, true);
               // Save state for other sections too using UnifiedCacheManager
               const otherSectionId = otherSection.getAttribute('data-section') || otherSection.id;
               if (otherSectionId) {
@@ -880,14 +890,34 @@ window.toggleSection = async function (sectionId) {
      * @param {HTMLElement} iconElement - The icon element to update
      * @param {boolean} isCollapsed - Whether the section is collapsed
      */
-    function updateChevronIcon(iconElement, isCollapsed) {
+    async function updateChevronIcon(iconElement, isCollapsed) {
         if (!iconElement) return;
         
-        const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
-            ? window.BUTTON_ICONS.TOGGLE 
-            : '/trading-ui/images/icons/tabler/chevron-down.svg';
-        
-        if (iconElement.tagName === 'IMG') {
+        // Use IconSystem if available
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized && iconElement.tagName === 'IMG') {
+            try {
+                const iconHTML = await window.IconSystem.renderIcon('button', 'toggle', {
+                    size: iconElement.getAttribute('width') || '16',
+                    alt: iconElement.getAttribute('alt') || 'toggle',
+                    class: iconElement.getAttribute('class') || 'icon'
+                });
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = iconHTML;
+                const newIcon = tempDiv.firstElementChild;
+                if (newIcon) {
+                    iconElement.parentNode.replaceChild(newIcon, iconElement);
+                }
+            } catch (error) {
+                // Fallback to direct path
+                const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
+                    ? window.BUTTON_ICONS.TOGGLE 
+                    : '/trading-ui/images/icons/tabler/chevron-down.svg';
+                iconElement.src = toggleIconPath;
+            }
+        } else if (iconElement.tagName === 'IMG') {
+            const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
+                ? window.BUTTON_ICONS.TOGGLE 
+                : '/trading-ui/images/icons/tabler/chevron-down.svg';
             iconElement.src = toggleIconPath;
             iconElement.style.transform = isCollapsed ? '' : 'rotate(180deg)';
         } else if (iconElement.querySelector('img')) {
@@ -987,25 +1017,25 @@ window.restoreAllSectionStates = async function () {
             if (openSectionId) {
               // Already have an open section, close this one
               sectionBody.style.display = 'none';
-              if (icon) { updateChevronIcon(icon, true); }
+              if (icon) { await updateChevronIcon(icon, true); }
               console.log(`✅ Section "${sectionId}" closed (accordion mode - another section is open)`);
             } else {
               // This is the first open section
               openSectionId = sectionId;
               sectionBody.style.display = 'block';
-              if (icon) { updateChevronIcon(icon, false); }
+              if (icon) { await updateChevronIcon(icon, false); }
               console.log(`✅ Section "${sectionId}" opened (accordion mode)`);
             }
           } else {
             // This section should be closed
             sectionBody.style.display = 'none';
-            if (icon) { updateChevronIcon(icon, true); }
+            if (icon) { await updateChevronIcon(icon, true); }
             console.log(`✅ Section "${sectionId}" closed (accordion mode)`);
           }
         } else {
           // No saved state - in accordion mode, always closed
           sectionBody.style.display = 'none';
-          if (icon) { updateChevronIcon(icon, true); }
+          if (icon) { await updateChevronIcon(icon, true); }
           console.log(`⏭️ Section "${sectionId}" has no saved state - accordion mode default (closed)`);
         }
       } else {
@@ -1017,12 +1047,12 @@ window.restoreAllSectionStates = async function () {
           if (isHidden) {
             // Restore collapsed state
             sectionBody.style.display = 'none';
-            if (icon) { updateChevronIcon(icon, true); }
+            if (icon) { await updateChevronIcon(icon, true); }
             console.log(`✅ Section "${sectionId}" RESTORED to COLLAPSED`);
           } else {
             // Restore expanded state
             sectionBody.style.display = 'block';
-            if (icon) { updateChevronIcon(icon, false); }
+            if (icon) { await updateChevronIcon(icon, false); }
             console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
           }
         } else {
@@ -1033,11 +1063,11 @@ window.restoreAllSectionStates = async function () {
           
           if (finalState === 'open') {
             sectionBody.style.display = 'block';
-            if (icon) { updateChevronIcon(icon, false); }
+            if (icon) { await updateChevronIcon(icon, false); }
             console.log(`✅ Section "${sectionId}" default state OPEN (no cache)`);
           } else {
             sectionBody.style.display = 'none';
-            if (icon) { updateChevronIcon(icon, true); }
+            if (icon) { await updateChevronIcon(icon, true); }
             console.log(`✅ Section "${sectionId}" default state CLOSED (no cache)`);
           }
         }
@@ -1093,12 +1123,12 @@ window.restoreSectionStates = async function () {
   if (topSection && topSectionHidden) {
     topSection.classList.add('collapsed');
     topSection.style.display = 'none';
-    if (topIcon) { updateChevronIcon(topIcon, true); }
+    if (topIcon) { await updateChevronIcon(topIcon, true); }
     // console.log(`✅ Top section RESTORED to COLLAPSED`);
   } else if (topSection) {
     topSection.classList.remove('collapsed');
     topSection.style.display = 'block';
-    if (topIcon) { updateChevronIcon(topIcon, false); }
+    if (topIcon) { await updateChevronIcon(topIcon, false); }
     // console.log(`✅ Top section RESTORED to EXPANDED`);
   }
 
@@ -1132,14 +1162,14 @@ window.restoreSectionStates = async function () {
         sectionBody.classList.add('collapsed');
         section.classList.add('collapsed');
         sectionBody.style.display = 'none';
-        if (icon) { updateChevronIcon(icon, true); }
+        if (icon) { await updateChevronIcon(icon, true); }
         // console.log(`✅ Section "${sectionId}" RESTORED to COLLAPSED`);
         restoredCount++;
       } else if (sectionBody) {
         sectionBody.classList.remove('collapsed');
         section.classList.remove('collapsed');
         sectionBody.style.display = 'block';
-        if (icon) { updateChevronIcon(icon, false); }
+        if (icon) { await updateChevronIcon(icon, false); }
         // console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
         restoredCount++;
       }
@@ -1150,9 +1180,12 @@ window.restoreSectionStates = async function () {
 };
 
 // ===== ACTION BUTTONS SYSTEM =====
+// ⚠️ DEPRECATED: This function is deprecated. Use window.createActionsMenu() from actions-menu-system.js instead.
+// This function is kept for backward compatibility only and should not be used in new code.
 
 /**
  * Generate action buttons HTML for table rows
+ * @deprecated Use window.createActionsMenu() from actions-menu-system.js instead
  * @param {string} entityId - Entity ID for the row
  * @param {string} entityType - Entity type (e.g., 'ticker', 'trade', 'account')
  * @param {string} status - Current status (for cancel/restore logic)
@@ -1273,6 +1306,7 @@ window.generateActionButtons = generateActionButtons;
 
 /**
  * פונקציה לטעינת כפתורי פעולות לכל הטבלה
+ * @deprecated Use window.createActionsMenu() directly in table rendering instead
  * @param {string} tableId - מזהה הטבלה
  * @param {string} entityType - סוג הישות (ticker, trade, etc.)
  * @param {Object} config - הגדרות הכפתורים
@@ -1480,7 +1514,7 @@ async function loadSectionStates() {
       sectionBody.style.display = 'block';
       section.classList.remove('collapsed');
       section.classList.add('expanded');
-      if (toggleIcon) updateChevronIcon(toggleIcon, true);
+      if (toggleIcon) await updateChevronIcon(toggleIcon, true);
       restoredCount++;
     }
   }

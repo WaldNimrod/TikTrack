@@ -93,7 +93,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="accountsContainer">
-                            <table class="table" id="accountsTable">
+                            <table class="table" id="accountsTable" data-table-type="trading_accounts">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -116,7 +116,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="tradesContainer">
-                            <table class="table" id="tradesTable">
+                            <table class="table" id="tradesTable" data-table-type="trades">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -139,7 +139,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="tickersContainer">
-                            <table class="table" id="tickersTable">
+                            <table class="table" id="tickersTable" data-table-type="tickers">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -162,7 +162,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="tradePlansContainer">
-                            <table class="table" id="tradePlansTable">
+                            <table class="table" id="tradePlansTable" data-table-type="trade_plans">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -185,7 +185,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="executionsContainer">
-                            <table class="table" id="executionsTable">
+                            <table class="table" id="executionsTable" data-table-type="executions">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -208,7 +208,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="alertsContainer">
-                            <table class="table" id="alertsTable">
+                            <table class="table" id="alertsTable" data-table-type="alerts">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -231,7 +231,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="notesContainer">
-                            <table class="table" id="notesTable">
+                            <table class="table" id="notesTable" data-table-type="notes">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -254,7 +254,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="cashFlowsContainer">
-                            <table class="table" id="cashFlowsTable">
+                            <table class="table" id="cashFlowsTable" data-table-type="cash_flows">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -450,7 +450,22 @@
     <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+
+<!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [36] Page-specific: db_display -->

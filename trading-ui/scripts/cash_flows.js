@@ -201,7 +201,17 @@ function applyFallbackDateSort(data) {
 
   try {
     const sortedData = [...data].sort((a, b) => {
-      // Use dateUtils for consistent date comparison
+      const dateA = a && a.date ? a.date : null;
+      const dateB = b && b.date ? b.date : null;
+      
+      // Use TableSortValueAdapter if available
+      if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+        const sortValueA = window.TableSortValueAdapter.getSortValue({ value: dateA, type: 'auto' });
+        const sortValueB = window.TableSortValueAdapter.getSortValue({ value: dateB, type: 'auto' });
+        return (sortValueB || 0) - (sortValueA || 0);
+      }
+      
+      // Fallback to dateUtils for consistent date comparison
       const getEpoch = (dateValue) => {
         if (!dateValue) return 0;
         if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
@@ -220,8 +230,8 @@ function applyFallbackDateSort(data) {
           return 0;
         }
       };
-      const aEpoch = a && a.date ? getEpoch(a.date) : 0;
-      const bEpoch = b && b.date ? getEpoch(b.date) : 0;
+      const aEpoch = dateA ? getEpoch(dateA) : 0;
+      const bEpoch = dateB ? getEpoch(dateB) : 0;
       return bEpoch - aEpoch;
     });
 
@@ -444,9 +454,15 @@ function setActiveCashFlowTypeButton(value) {
   const normalizedValue = value || 'all';
   
   // Update dropdown
-  const select = document.getElementById('cashFlowTypeFilter');
-  if (select) {
-    select.value = normalizedValue;
+  const selectId = 'cashFlowTypeFilter';
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+    window.DataCollectionService.setValue(selectId, normalizedValue, 'text');
+  } else {
+    // Fallback if DataCollectionService is not available
+    const select = document.getElementById(selectId);
+    if (select) {
+      select.value = normalizedValue;
+    }
   }
   
   // Buttons removed - only dropdown remains
@@ -465,7 +481,16 @@ function setupCashFlowTypeFilterDropdown() {
   }
 
   // Set initial value
-  select.value = activeCashFlowTypeFilter || 'all';
+  const selectId = 'cashFlowTypeFilter';
+  const initialValue = activeCashFlowTypeFilter || 'all';
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+    window.DataCollectionService.setValue(selectId, initialValue, 'text');
+  } else {
+    // Fallback if DataCollectionService is not available
+    if (select) {
+      select.value = initialValue;
+    }
+  }
   
   // EventHandlerManager will handle the change event automatically via data-onchange attribute
   // No need for manual event listeners - just like buttons with data-onclick!
@@ -2155,29 +2180,40 @@ function hydrateCashFlowExchangeDisplay(cashFlowId) {
 // getSourceDisplayName -> translateCashFlowSource
 
 /**
- * Format amount
+ * Format amount - משתמש ב-FieldRendererService המרכזי
+ * @deprecated - השתמש ישירות ב-window.FieldRendererService.renderAmount()
  * @function formatAmount
  * @param {number} amount - Amount to format
- * @returns {string} Formatted amount
+ * @returns {string} Formatted amount HTML
  */
 function formatAmount(amount) {
   try {
-    // שימוש במערכת הפורמט החדשה
-    if (window.formatCurrencyWithCommas) {
-      return window.formatCurrencyWithCommas(amount, 'USD');
+    const numericAmount = Number(amount);
+    if (!Number.isFinite(numericAmount)) {
+      return '<span class="text-muted">לא זמין</span>';
     }
-
-    // גיבוי למערכת הישנה
+    
+    // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+    if (window.FieldRendererService?.renderAmount) {
+      return window.FieldRendererService.renderAmount(numericAmount, '$', 2, false);
+    }
+    
+    // Fallback ל-Translation Utilities
+    if (window.formatCurrencyWithCommas && typeof window.formatCurrencyWithCommas === 'function') {
+      return window.formatCurrencyWithCommas(numericAmount, 'USD');
+    }
+    
+    // Fallback למקרה נדיר ביותר שהמערכת לא זמינה
     return new Intl.NumberFormat('he-IL', {
       style: 'currency',
       currency: 'USD',
-    }).format(amount);
+    }).format(numericAmount);
   } catch (error) {
-    window.Logger.error('שגיאה בעיצוב סכום:', error, { page: "cash_flows" });
+    window.Logger?.error('שגיאה בעיצוב סכום:', error, { page: "cash_flows" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בעיצוב סכום', error.message);
     }
-    return amount.toString();
+    return amount?.toString() || '-';
   }
 }
 
@@ -2347,19 +2383,10 @@ function formatCashFlowAmount(amount, type = null, currencySymbol = '$') {
     }
   }
 
-  const baseAmount = window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function'
+  // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+  const baseAmount = window.FieldRendererService?.renderAmount
     ? window.FieldRendererService.renderAmount(effectiveAmount, currencySymbol || '$', 2, true)
-    : (() => {
-        const absValue = Math.abs(effectiveAmount).toLocaleString('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
-        const sign = effectiveAmount < 0 ? '-' : (effectiveAmount > 0 ? '+' : '');
-        const colorClass = effectiveAmount > 0 ? 'numeric-value-positive' : (effectiveAmount < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
-        const base = `${currencySymbol || '$'}${absValue}`;
-        const display = sign ? `${sign}${base}` : base;
-        return `<span class="${colorClass}" dir="ltr">${display}</span>`;
-      })();
+    : '<span class="numeric-value-zero">-</span>';
 
   if (window.getTableColors && typeof window.getTableColors === 'function') {
     const colors = window.getTableColors();
@@ -2580,8 +2607,14 @@ function applyUserPreferences(preferences) {
     
     // החלת העדפת מטבע ברירת מחדל
     const defaultCurrency = preferences.default_currency || 'USD';
-    if (document.getElementById('currency')) {
-      document.getElementById('currency').value = defaultCurrency;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('currency', defaultCurrency, 'text');
+    } else {
+      // Fallback אם DataCollectionService לא זמין
+      const currencyElement = document.getElementById('currency');
+      if (currencyElement) {
+        currencyElement.value = defaultCurrency;
+      }
     }
     
     // החלת העדפת תצוגת המרת מטבע
@@ -3036,12 +3069,29 @@ async function saveCurrencyExchange() {
         }
 
         // Ensure calculated to amount is positive
-        const toAmountField = document.getElementById('currencyExchangeToAmount');
-        let calculatedToAmount = toAmountField ? parseFloat(toAmountField.value) : NaN;
+        const toAmountFieldId = 'currencyExchangeToAmount';
+        let calculatedToAmount = NaN;
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+            const currentValue = window.DataCollectionService.getValue(toAmountFieldId, 'number', NaN);
+            calculatedToAmount = currentValue;
+        } else {
+            // Fallback if DataCollectionService is not available
+            const toAmountField = document.getElementById(toAmountFieldId);
+            calculatedToAmount = toAmountField ? parseFloat(toAmountField.value) : NaN;
+        }
+        
         if (isNaN(calculatedToAmount) || calculatedToAmount <= 0) {
             calculatedToAmount = (exchangeData.from_amount || 0) * (exchangeData.exchange_rate || 0);
-            if (toAmountField) {
-                toAmountField.value = calculatedToAmount ? calculatedToAmount.toFixed(6) : '';
+            const formattedValue = calculatedToAmount ? calculatedToAmount.toFixed(6) : '';
+            
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue(toAmountFieldId, formattedValue, 'number');
+            } else {
+                // Fallback if DataCollectionService is not available
+                const toAmountField = document.getElementById(toAmountFieldId);
+                if (toAmountField) {
+                    toAmountField.value = formattedValue;
+                }
             }
         }
         if (!calculatedToAmount || calculatedToAmount <= 0) {
@@ -3236,45 +3286,101 @@ async function loadCurrencyExchange(exchangeId) {
         const toFlow = exchangeData.to_flow;
         const feeAmount = exchangeData.fee_amount ?? (fromFlow ? Math.abs(fromFlow.fee_amount || 0) : 0);
         
-        // Populate form fields
-        const accountField = document.getElementById('currencyExchangeAccount');
-        if (accountField) {
-            accountField.value = fromFlow.trading_account_id;
-        }
-        if (document.getElementById('currencyExchangeFromCurrency')) {
-            document.getElementById('currencyExchangeFromCurrency').value = fromFlow.currency_id;
-        }
-        if (document.getElementById('currencyExchangeToCurrency')) {
-            document.getElementById('currencyExchangeToCurrency').value = toFlow.currency_id;
-        }
-        if (document.getElementById('currencyExchangeFromAmount')) {
-            document.getElementById('currencyExchangeFromAmount').value = Math.abs(fromFlow.amount);
-        }
-        if (document.getElementById('currencyExchangeRate')) {
-            document.getElementById('currencyExchangeRate').value = exchangeData.exchange_rate;
-        }
-        if (document.getElementById('currencyExchangeFeeAmount')) {
-            document.getElementById('currencyExchangeFeeAmount').value = feeAmount;
-        }
-        // Note: fee currency is now a label, not a select field - it's updated automatically based on account
-        if (document.getElementById('currencyExchangeSource')) {
-            document.getElementById('currencyExchangeSource').value = fromFlow.source || 'manual';
-        }
-        if (document.getElementById('currencyExchangeExternalId')) {
-            const externalField = document.getElementById('currencyExchangeExternalId');
-            externalField.value = fromFlow.external_id || '0';
+        // Populate form fields using DataCollectionService
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setFormData) {
+            // Field map for currency exchange form
+            const currencyExchangeFieldMap = {
+                trading_account_id: { id: 'currencyExchangeAccount', type: 'int' },
+                from_currency_id: { id: 'currencyExchangeFromCurrency', type: 'int' },
+                to_currency_id: { id: 'currencyExchangeToCurrency', type: 'int' },
+                from_amount: { id: 'currencyExchangeFromAmount', type: 'number' },
+                exchange_rate: { id: 'currencyExchangeRate', type: 'number' },
+                fee_amount: { id: 'currencyExchangeFeeAmount', type: 'number' },
+                source: { id: 'currencyExchangeSource', type: 'text' },
+                external_id: { id: 'currencyExchangeExternalId', type: 'text' },
+                date: { id: 'currencyExchangeDate', type: 'dateOnly' }
+            };
+            
+            // Prepare values for form population
+            const exchangeValues = {
+                trading_account_id: fromFlow.trading_account_id,
+                from_currency_id: fromFlow.currency_id,
+                to_currency_id: toFlow.currency_id,
+                from_amount: Math.abs(fromFlow.amount),
+                exchange_rate: exchangeData.exchange_rate,
+                fee_amount: feeAmount,
+                source: fromFlow.source || 'manual',
+                external_id: fromFlow.external_id || '0',
+                date: fromFlow.date
+            };
+            
+            // Set form data using DataCollectionService
+            window.DataCollectionService.setFormData(currencyExchangeFieldMap, exchangeValues);
+            
+            // Handle external ID field state
             manageExternalIdField((fromFlow.source || 'manual'), 'exchange');
-        }
-        if (document.getElementById('currencyExchangeDate')) {
-            document.getElementById('currencyExchangeDate').value = fromFlow.date;
-        }
-        const descriptionContent = fromFlow.description || '';
-        if (window.RichTextEditorService && typeof window.RichTextEditorService.setContent === 'function') {
-            window.RichTextEditorService.setContent('currencyExchangeDescription', descriptionContent);
+            
+            // Handle rich text description separately (uses RichTextEditorService)
+            const descriptionContent = fromFlow.description || '';
+            if (window.RichTextEditorService && typeof window.RichTextEditorService.setContent === 'function') {
+                window.RichTextEditorService.setContent('currencyExchangeDescription', descriptionContent);
+            }
         } else {
-            const descriptionField = document.getElementById('currencyExchangeDescription');
-            if (descriptionField) {
-                descriptionField.value = descriptionContent;
+            // Fallback if DataCollectionService is not available
+            // Use DataCollectionService to set values if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue('currencyExchangeAccount', fromFlow.trading_account_id, 'int');
+                window.DataCollectionService.setValue('currencyExchangeFromCurrency', fromFlow.currency_id, 'int');
+                window.DataCollectionService.setValue('currencyExchangeToCurrency', toFlow.currency_id, 'int');
+                window.DataCollectionService.setValue('currencyExchangeFromAmount', Math.abs(fromFlow.amount), 'number');
+                window.DataCollectionService.setValue('currencyExchangeRate', exchangeData.exchange_rate, 'number');
+                window.DataCollectionService.setValue('currencyExchangeFeeAmount', feeAmount, 'number');
+                window.DataCollectionService.setValue('currencyExchangeSource', fromFlow.source || 'manual', 'text');
+                window.DataCollectionService.setValue('currencyExchangeExternalId', fromFlow.external_id || '0', 'text');
+                window.DataCollectionService.setValue('currencyExchangeDate', fromFlow.date, 'date');
+                manageExternalIdField((fromFlow.source || 'manual'), 'exchange');
+            } else {
+                // Fallback if DataCollectionService is not available
+                const accountField = document.getElementById('currencyExchangeAccount');
+                if (accountField) {
+                    accountField.value = fromFlow.trading_account_id;
+                }
+                if (document.getElementById('currencyExchangeFromCurrency')) {
+                    document.getElementById('currencyExchangeFromCurrency').value = fromFlow.currency_id;
+                }
+                if (document.getElementById('currencyExchangeToCurrency')) {
+                    document.getElementById('currencyExchangeToCurrency').value = toFlow.currency_id;
+                }
+                if (document.getElementById('currencyExchangeFromAmount')) {
+                    document.getElementById('currencyExchangeFromAmount').value = Math.abs(fromFlow.amount);
+                }
+                if (document.getElementById('currencyExchangeRate')) {
+                    document.getElementById('currencyExchangeRate').value = exchangeData.exchange_rate;
+                }
+                if (document.getElementById('currencyExchangeFeeAmount')) {
+                    document.getElementById('currencyExchangeFeeAmount').value = feeAmount;
+                }
+                // Note: fee currency is now a label, not a select field - it's updated automatically based on account
+                if (document.getElementById('currencyExchangeSource')) {
+                    document.getElementById('currencyExchangeSource').value = fromFlow.source || 'manual';
+                }
+                if (document.getElementById('currencyExchangeExternalId')) {
+                    const externalField = document.getElementById('currencyExchangeExternalId');
+                    externalField.value = fromFlow.external_id || '0';
+                    manageExternalIdField((fromFlow.source || 'manual'), 'exchange');
+                }
+                if (document.getElementById('currencyExchangeDate')) {
+                    document.getElementById('currencyExchangeDate').value = fromFlow.date;
+                }
+            }
+            const descriptionContent = fromFlow.description || '';
+            if (window.RichTextEditorService && typeof window.RichTextEditorService.setContent === 'function') {
+                window.RichTextEditorService.setContent('currencyExchangeDescription', descriptionContent);
+            } else {
+                const descriptionField = document.getElementById('currencyExchangeDescription');
+                if (descriptionField) {
+                    descriptionField.value = descriptionContent;
+                }
             }
         }
         
@@ -3493,7 +3599,12 @@ function manageExternalIdField(source, modalType) {
   // אם המקור הוא ידני, השדה לא פעיל
   if (source === 'manual') {
     externalIdField.disabled = true;
-    externalIdField.value = '0'; // ערך ברירת מחדל
+    // Use DataCollectionService if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue(fieldId, '0', 'text');
+    } else {
+      externalIdField.value = '0'; // ערך ברירת מחדל
+    }
     externalIdField.classList.add('form-control-disabled');
   } else {
     // אם המקור אינו ידני, השדה פעיל
@@ -3501,8 +3612,19 @@ function manageExternalIdField(source, modalType) {
     externalIdField.classList.remove('form-control-disabled');
 
     // אם השדה ריק, אפשר למשתמש להזין ערך
-    if (externalIdField.value === '0') {
-      externalIdField.value = '';
+    let currentValue = '';
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      currentValue = window.DataCollectionService.getValue(fieldId, 'text', '0');
+    } else {
+      currentValue = externalIdField.value || '0';
+    }
+    
+    if (currentValue === '0') {
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue(fieldId, '', 'text');
+      } else {
+        externalIdField.value = '';
+      }
     }
   }
 }

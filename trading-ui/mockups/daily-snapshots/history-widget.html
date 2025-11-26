@@ -91,6 +91,11 @@
                         <a href="history-widget.html" class="mockups-navigation-link active">ווידג'ט היסטוריה</a>
                         <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
                         <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
+                        <span class="mockups-navigation-separator">|</span>
+                        <a href="../watch-lists-page.html" class="mockups-navigation-link">רשימות צפייה</a>
+                        <a href="../watch-list-modal.html" class="mockups-navigation-link">מודל רשימה</a>
+                        <a href="../add-ticker-modal.html" class="mockups-navigation-link">הוספת טיקר</a>
+                        <a href="../flag-quick-action.html" class="mockups-navigation-link">דגלים</a>
                     </div>
                 </div>
             </div>
@@ -111,7 +116,7 @@
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2">                            <div class="table-actions">
                             <button data-button-type="REFRESH" data-variant="small" data-icon="🔄" data-text="רענון" data-onclick="window.historyWidget.refreshWidget()" title="רענון נתונים"></button>
-                        </div><button class="filter-toggle-btn" data-onclick="toggleSection(\'history_widget_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                        </div><button class="filter-toggle-btn" data-onclick="toggleSection(\'history_widget_top_section\')" title="הצג/הסתר סקשן" data-button-type="FILTER"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
@@ -144,7 +149,7 @@
                                         </div>
                                         <div class="filter-group date-range-filter" style="min-width: 150px;">
                                             <div class="filter-dropdown">
-                                                <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="chartDateRangeToggle" data-onclick="window.historyWidget.toggleChartDateRangeMenu()">
+                                                <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="chartDateRangeToggle" data-onclick="window.historyWidget.toggleChartDateRangeMenu()" data-button-type="FILTER">
                                                     <span class="selected-value selected-date-text" id="selectedChartDateRange">השבוע</span>
                                                     <span class="dropdown-arrow">▼</span>
                                                 </button>
@@ -198,17 +203,17 @@
                                 <!-- Tabs -->
                                 <ul class="nav nav-tabs mb-3" id="statsTabs" role="tablist">
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link active" id="daily-tab" data-bs-toggle="tab" data-bs-target="#daily-stats" type="button" role="tab" aria-controls="daily-stats" aria-selected="true">
+                                        <button class="nav-link active" id="daily-tab" data-bs-toggle="tab" data-bs-target="#daily-stats" type="button" role="tab" aria-controls="daily-stats" aria-selected="true" data-button-type="TOGGLE">
                                             <span class="icon-placeholder icon" data-icon="calendar" data-size="16" data-alt="icon" aria-label="icon"></span> יומי
                                         </button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="pl-tab" data-bs-toggle="tab" data-bs-target="#pl-stats" type="button" role="tab" aria-controls="pl-stats" aria-selected="false">
+                                        <button class="nav-link" id="pl-tab" data-bs-toggle="tab" data-bs-target="#pl-stats" type="button" role="tab" aria-controls="pl-stats" aria-selected="false" data-button-type="TOGGLE">
                                             <span class="icon-placeholder icon" data-icon="chart-line" data-size="16" data-alt="icon" aria-label="icon"></span> רווח והפסד כולל
                                         </button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="market-value-tab" data-bs-toggle="tab" data-bs-target="#market-value-stats" type="button" role="tab" aria-controls="market-value-stats" aria-selected="false">
+                                        <button class="nav-link" id="market-value-tab" data-bs-toggle="tab" data-bs-target="#market-value-stats" type="button" role="tab" aria-controls="market-value-stats" aria-selected="false" data-button-type="TOGGLE">
                                             <span class="icon-placeholder icon" data-icon="currency-dollar" data-size="16" data-alt="icon" aria-label="icon"></span> שווי שוק
                                         </button>
                                     </li>
@@ -219,7 +224,7 @@
                                     <!-- Daily Stats Tab -->
                                     <div class="tab-pane fade show active" id="daily-stats" role="tabpanel" aria-labelledby="daily-tab">
                                         <div class="table-responsive">
-                                            <table class="table table-sm table-hover" id="dailyStatsTable">
+                                            <table class="table table-sm table-hover" id="dailyStatsTable" data-table-type="daily_stats">
                                                 <thead>
                                                     <tr>
                                                         <th>Instrument</th>
@@ -237,7 +242,7 @@
                                     <!-- P/L Stats Tab -->
                                     <div class="tab-pane fade" id="pl-stats" role="tabpanel" aria-labelledby="pl-tab">
                                         <div class="table-responsive">
-                                            <table class="table table-sm table-hover" id="plStatsTable">
+                                            <table class="table table-sm table-hover" id="plStatsTable" data-table-type="pl_stats">
                                                 <thead>
                                                     <tr>
                                                         <th>Instrument</th>
@@ -255,7 +260,7 @@
                                     <!-- Market Value Stats Tab -->
                                     <div class="tab-pane fade" id="market-value-stats" role="tabpanel" aria-labelledby="market-value-tab">
                                         <div class="table-responsive">
-                                            <table class="table table-sm table-hover" id="marketValueStatsTable">
+                                            <table class="table table-sm table-hover" id="marketValueStatsTable" data-table-type="market_value_stats">
                                                 <thead>
                                                     <tr>
                                                         <th>Instrument</th>
@@ -296,5 +301,11 @@
     <!-- Notification System Containers -->
     <div class="notification-container" id="notification-container"></div>
     <div id="toast-container"></div>
+
+    <!-- Entity Details System -->
+    <script src="../../scripts/entity-details-api.js" defer></script>
+    <script src="../../scripts/entity-details-renderer.js" defer></script>
+    <script src="../../scripts/entity-details-modal.js" defer></script>
+    
 </body>
 </html>

@@ -129,10 +129,29 @@ async function loadCategoriesOverview() {
       
       const percentage = stats.total > 0 ? Math.round((categoryCount / stats.total) * 100) : 0;
       
+      // Use IconSystem to render category icon
+      let iconHTML = '';
+      if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+        try {
+          iconHTML = await window.IconSystem.renderIcon('category', category.icon, {
+            size: '32',
+            alt: category.icon,
+            class: 'icon mb-2',
+            style: `color: ${category.color};`
+          });
+        } catch (error) {
+          // Fallback if IconSystem fails
+          iconHTML = `<img src="/trading-ui/images/icons/tabler/${category.icon}.svg" width="32" height="32" alt="${category.icon}" class="icon mb-2" style="color: ${category.color};">`;
+        }
+      } else {
+        // Fallback if IconSystem not available
+        iconHTML = `<img src="/trading-ui/images/icons/tabler/${category.icon}.svg" width="32" height="32" alt="${category.icon}" class="icon mb-2" style="color: ${category.color};">`;
+      }
+      
       html += `
         <div class="col-md-4 col-sm-6 mb-3">
           <div class="category-card text-center p-3 border rounded">
-            <img src="/trading-ui/images/icons/tabler/${category.icon}.svg" width="32" height="32" alt="${category.icon}" class="icon mb-2" style="color: ${category.color};">
+            ${iconHTML}
             <h6 class="mb-1">${category.title}</h6>
             <h4 class="mb-1" style="color: ${category.color};">${categoryCount.toLocaleString()}</h4>
             <small class="text-muted">${percentage}% מהסך הכל</small>
@@ -209,12 +228,27 @@ async function loadPreferencesOverview() {
       { key: 'console_logs_performance_enabled', title: 'לוגי ביצועים', type: 'boolean' }
     ];
 
+    // Render icons using IconSystem
+    let slidersIcon = '<img src="/trading-ui/images/icons/tabler/sliders.svg" width="16" height="16" alt="settings" class="icon me-2">';
+    let layersIcon = '<img src="/trading-ui/images/icons/tabler/layers.svg" width="16" height="16" alt="categories" class="icon me-2">';
+    let terminalIcon = '<img src="/trading-ui/images/icons/tabler/terminal.svg" width="16" height="16" alt="terminal" class="icon me-2">';
+    
+    if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+      try {
+        slidersIcon = await window.IconSystem.renderIcon('button', 'sliders', { size: '16', alt: 'settings', class: 'icon me-2' });
+        layersIcon = await window.IconSystem.renderIcon('button', 'layers', { size: '16', alt: 'categories', class: 'icon me-2' });
+        terminalIcon = await window.IconSystem.renderIcon('button', 'terminal', { size: '16', alt: 'terminal', class: 'icon me-2' });
+      } catch (error) {
+        // Fallback already set above
+      }
+    }
+
     const preferencesHtml = `
       <div class="row">
         <div class="col-lg-4 col-md-6 mb-3">
           <div class="card">
             <div class="card-header bg-primary text-white">
-              <img src="/trading-ui/images/icons/tabler/sliders.svg" width="16" height="16" alt="settings" class="icon me-2">הגדרות בסיסיות
+              ${slidersIcon}הגדרות בסיסיות
             </div>
             <div class="card-body">
               ${renderPreferenceList(basicSettings, preferences)}
@@ -224,7 +258,7 @@ async function loadPreferencesOverview() {
         <div class="col-lg-4 col-md-6 mb-3">
           <div class="card">
             <div class="card-header bg-success text-white">
-              <img src="/trading-ui/images/icons/tabler/layers.svg" width="16" height="16" alt="categories" class="icon me-2">קטגוריות התראות
+              ${layersIcon}קטגוריות התראות
             </div>
             <div class="card-body">
               ${renderPreferenceList(notificationCategories, preferences)}
@@ -234,7 +268,7 @@ async function loadPreferencesOverview() {
         <div class="col-lg-4 col-md-12 mb-3">
           <div class="card">
             <div class="card-header bg-warning text-white">
-              <img src="/trading-ui/images/icons/tabler/terminal.svg" width="16" height="16" alt="terminal" class="icon me-2">לוגים וקונסול
+              ${terminalIcon}לוגים וקונסול
             </div>
             <div class="card-body">
               ${renderPreferenceList(consoleLogs, preferences)}
@@ -468,7 +502,7 @@ class NotificationsCenter {
     this.updateStats();
 
     // עדכון UI
-    this.updateHistoryUI();
+    await this.updateHistoryUI();
     this.updateStatsUI();
     this.updateOverviewStats();
 
@@ -606,16 +640,26 @@ class NotificationsCenter {
   }
 
 
-  updateHistoryUI() {
+  async updateHistoryUI() {
     const container = document.getElementById('unified-logs-container');
     if (!container) {
       return; // לא בעמוד מרכז ההתראות
     }
 
     if (this.history.length === 0) {
+      // Render icon using IconSystem
+      let clockHistoryIcon = '<img src="/trading-ui/images/icons/tabler/clock-history.svg" width="32" height="32" alt="history" class="icon">';
+      if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+        try {
+          clockHistoryIcon = await window.IconSystem.renderIcon('button', 'clock-history', { size: '32', alt: 'history', class: 'icon' });
+        } catch (error) {
+          // Fallback already set
+        }
+      }
+      
       container.innerHTML = `
                 <div class="no-history">
-                    <img src="/trading-ui/images/icons/tabler/clock-history.svg" width="32" height="32" alt="history" class="icon">
+                    ${clockHistoryIcon}
                     <p>אין היסטוריית התראות</p>
                 </div>
             `;
@@ -646,16 +690,30 @@ class NotificationsCenter {
     filteredHistory = filteredHistory.filter(n => now - n.timestamp <= periodMs);
 
     if (filteredHistory.length === 0) {
+      // Render icon using IconSystem
+      let filterIcon = '<img src="/trading-ui/images/icons/tabler/filter.svg" width="32" height="32" alt="filter" class="icon">';
+      if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+        try {
+          filterIcon = await window.IconSystem.renderIcon('button', 'filter', { size: '32', alt: 'filter', class: 'icon' });
+        } catch (error) {
+          // Fallback already set
+        }
+      }
+      
       container.innerHTML = `
                 <div class="no-history">
-                    <img src="/trading-ui/images/icons/tabler/filter.svg" width="32" height="32" alt="filter" class="icon">
+                    ${filterIcon}
                     <p>אין התראות לפי הפילטרים שנבחרו</p>
                 </div>
             `;
       return;
     }
 
-    container.innerHTML = filteredHistory.map(notification => this.createNotificationHTML(notification)).join('');
+    // Render all notifications with icons
+    const notificationHTMLs = await Promise.all(
+      filteredHistory.map(notification => this.createNotificationHTML(notification))
+    );
+    container.innerHTML = notificationHTMLs.join('');
   }
 
   updateStats() {
@@ -797,14 +855,24 @@ class NotificationsCenter {
     }
   }
 
-  createNotificationHTML(notification) {
+  async createNotificationHTML(notification) {
     const timeAgo = NotificationsCenter.getTimeAgo(notification.time);
     const iconClass = NotificationsCenter.getIconClass(notification.type);
+
+    // Render icon using IconSystem
+    let iconHTML = `<img src="/trading-ui/images/icons/tabler/${iconClass}.svg" width="16" height="16" alt="${iconClass}" class="icon">`;
+    if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+      try {
+        iconHTML = await window.IconSystem.renderIcon('button', iconClass, { size: '16', alt: iconClass, class: 'icon' });
+      } catch (error) {
+        // Fallback already set
+      }
+    }
 
     return `
             <div class="notification-item ${notification.type}">
                 <div class="notification-icon">
-                    <img src="/trading-ui/images/icons/tabler/${iconClass}.svg" width="16" height="16" alt="${iconClass}" class="icon">
+                    ${iconHTML}
                 </div>
                 <div class="notification-content">
                     <div class="notification-line">
@@ -925,7 +993,7 @@ class NotificationsCenter {
     this.updateStats();
 
     // עדכון UI
-    this.updateHistoryUI();
+    await this.updateHistoryUI();
     this.updateStatsUI();
     this.updateOverviewStats();
   }
@@ -985,8 +1053,21 @@ class NotificationsCenter {
       }
     });
     
-    // Sort by timestamp
-    return merged.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    // Sort by timestamp using TableSortValueAdapter
+    return merged.sort((a, b) => {
+        const timestampA = a.timestamp || 0;
+        const timestampB = b.timestamp || 0;
+        
+        // Use TableSortValueAdapter if available
+        if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+            const sortValueA = window.TableSortValueAdapter.getSortValue({ value: timestampA, type: 'numeric' });
+            const sortValueB = window.TableSortValueAdapter.getSortValue({ value: timestampB, type: 'numeric' });
+            return (sortValueB || 0) - (sortValueA || 0);
+        }
+        
+        // Fallback to direct comparison
+        return timestampB - timestampA;
+    });
   }
 
   async loadGlobalHistory() {
@@ -1053,8 +1134,21 @@ class NotificationsCenter {
       }
     });
 
-    // המרה חזרה למערך ומיון לפי זמן
-    return Array.from(historyMap.values()).sort((a, b) => b.timestamp - a.timestamp);
+    // המרה חזרה למערך ומיון לפי זמן using TableSortValueAdapter
+    return Array.from(historyMap.values()).sort((a, b) => {
+        const timestampA = a.timestamp || 0;
+        const timestampB = b.timestamp || 0;
+        
+        // Use TableSortValueAdapter if available
+        if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+            const sortValueA = window.TableSortValueAdapter.getSortValue({ value: timestampA, type: 'numeric' });
+            const sortValueB = window.TableSortValueAdapter.getSortValue({ value: timestampB, type: 'numeric' });
+            return (sortValueB || 0) - (sortValueA || 0);
+        }
+        
+        // Fallback to direct comparison
+        return timestampB - timestampA;
+    });
   }
 
   addTestNotifications() {
@@ -1167,9 +1261,9 @@ class NotificationsCenter {
     }
   }
 
-  refreshNotifications() {
+  async refreshNotifications() {
     // this.loadFromLocalStorage(); - הוסרה כי המערכת עברה ל-IndexedDB
-    this.updateHistoryUI();
+    await this.updateHistoryUI();
     this.updateStatsUI();
     this.updateOverviewStats();
 
@@ -1179,10 +1273,21 @@ class NotificationsCenter {
 
   // generateDetailedLog function moved to global scope below
 
-  filterHistory() {
-    const typeFilter = document.getElementById('historyFilter')?.value || '';
-    const pageFilter = document.getElementById('pageFilter')?.value || '';
-    const period = document.getElementById('historyPeriod')?.value || '24h';
+  async filterHistory() {
+    // Use DataCollectionService to get values if available
+    let typeFilter, pageFilter, period;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      typeFilter = window.DataCollectionService.getValue('historyFilter', 'text', '') || '';
+      pageFilter = window.DataCollectionService.getValue('pageFilter', 'text', '') || '';
+      period = window.DataCollectionService.getValue('historyPeriod', 'text', '24h') || '24h';
+    } else {
+      const typeFilterEl = document.getElementById('historyFilter');
+      const pageFilterEl = document.getElementById('pageFilter');
+      const periodEl = document.getElementById('historyPeriod');
+      typeFilter = typeFilterEl ? typeFilterEl.value : '';
+      pageFilter = pageFilterEl ? pageFilterEl.value : '';
+      period = periodEl ? periodEl.value : '24h';
+    }
     
     // סינון לפי זמן
     const now = new Date();
@@ -1207,10 +1312,10 @@ class NotificationsCenter {
     }
     
     // עדכון UI עם ההיסטוריה המסוננת
-    this.updateHistoryUIWithFilteredData(filteredHistory);
+    await this.updateHistoryUIWithFilteredData(filteredHistory);
   }
 
-  updateHistoryUIWithFilteredData(filteredHistory) {
+  async updateHistoryUIWithFilteredData(filteredHistory) {
     const historyContainer = document.getElementById('notificationHistory');
     if (!historyContainer) return;
 
@@ -1219,9 +1324,19 @@ class NotificationsCenter {
 
     // בדיקה אם יש היסטוריה מסוננת
     if (!filteredHistory || filteredHistory.length === 0) {
+      // Render icon using IconSystem
+      let filterIcon = '<img src="/trading-ui/images/icons/tabler/filter.svg" width="32" height="32" alt="filter" class="icon">';
+      if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+        try {
+          filterIcon = await window.IconSystem.renderIcon('button', 'filter', { size: '32', alt: 'filter', class: 'icon' });
+        } catch (error) {
+          // Fallback already set
+        }
+      }
+      
       historyContainer.innerHTML = `
         <div class="empty-state">
-          <img src="/trading-ui/images/icons/tabler/filter.svg" width="32" height="32" alt="filter" class="icon">
+          ${filterIcon}
           <p>אין התראות המתאימות לסינון הפעיל</p>
         </div>
       `;
@@ -1229,12 +1344,12 @@ class NotificationsCenter {
     }
 
     // הוספת התראות מסוננות לרשימה
-    filteredHistory.forEach(notification => {
-      const notificationHTML = this.createNotificationHTML(notification);
+    for (const notification of filteredHistory) {
+      const notificationHTML = await this.createNotificationHTML(notification);
       const notificationElement = document.createElement('div');
       notificationElement.innerHTML = notificationHTML;
       historyContainer.appendChild(notificationElement.firstElementChild);
-    });
+    }
   }
 
   startAutoRefresh() {
@@ -1311,9 +1426,20 @@ async function copyFilteredHistoryToClipboard() {
     console.log('📋 העתקת היסטוריה מסוננת ללוח...');
     
     // קבלת פילטרים פעילים
-    const typeFilter = document.getElementById('historyFilter')?.value || '';
-    const pageFilter = document.getElementById('pageFilter')?.value || '';
-    const period = document.getElementById('historyPeriod')?.value || '24h';
+    // Use DataCollectionService to get values if available
+    let typeFilter, pageFilter, period;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      typeFilter = window.DataCollectionService.getValue('historyFilter', 'text', '') || '';
+      pageFilter = window.DataCollectionService.getValue('pageFilter', 'text', '') || '';
+      period = window.DataCollectionService.getValue('historyPeriod', 'text', '24h') || '24h';
+    } else {
+      const typeFilterEl = document.getElementById('historyFilter');
+      const pageFilterEl = document.getElementById('pageFilter');
+      const periodEl = document.getElementById('historyPeriod');
+      typeFilter = typeFilterEl ? typeFilterEl.value : '';
+      pageFilter = pageFilterEl ? pageFilterEl.value : '';
+      period = periodEl ? periodEl.value : '24h';
+    }
     
     let log = '=== היסטוריית התראות מסוננת - TikTrack ===\n\n';
     log += `📅 תאריך: ${new Date().toLocaleString('he-IL')}\n`;
@@ -1747,8 +1873,19 @@ async function generateDetailedLog() {
     
     // פילטרים פעילים
     log.push('--- פילטרים פעילים ---');
-    log.push(`פילטר סוג: ${document.getElementById('historyFilter')?.value || 'כל ההתראות'}`);
-    log.push(`פילטר עמוד: ${document.getElementById('pageFilter')?.value || 'כל העמודים'}`);
+    // Use DataCollectionService to get values if available
+    let typeFilterValue, pageFilterValue;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      typeFilterValue = window.DataCollectionService.getValue('historyFilter', 'text', '') || 'כל ההתראות';
+      pageFilterValue = window.DataCollectionService.getValue('pageFilter', 'text', '') || 'כל העמודים';
+    } else {
+      const typeFilterEl = document.getElementById('historyFilter');
+      const pageFilterEl = document.getElementById('pageFilter');
+      typeFilterValue = typeFilterEl ? typeFilterEl.value : 'כל ההתראות';
+      pageFilterValue = pageFilterEl ? pageFilterEl.value : 'כל העמודים';
+    }
+    log.push(`פילטר סוג: ${typeFilterValue}`);
+    log.push(`פילטר עמוד: ${pageFilterValue}`);
     
     return log.join('\n');
 }
@@ -1901,11 +2038,28 @@ async function exportAllLogs() {
             </div>
         `;
         
+        modal.id = 'exportAllLogsModal';
         document.body.appendChild(modal);
         
-        // Show modal
-        const bsModal = new bootstrap.Modal(modal);
-        bsModal.show();
+        // Show modal via ModalManagerV2 (supports dynamic modals)
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+            try {
+                await window.ModalManagerV2.showModal('exportAllLogsModal', 'view');
+            } catch (error) {
+                // Fallback to Bootstrap if ModalManagerV2 fails
+                window.Logger?.warn('exportAllLogsModal not available in ModalManagerV2, using Bootstrap fallback', { page: 'notifications-center' });
+                if (bootstrap?.Modal) {
+                    const bsModal = new bootstrap.Modal(modal);
+                    bsModal.show();
+                }
+            }
+        } else {
+            // Fallback to Bootstrap modal
+            if (bootstrap?.Modal) {
+                const bsModal = new bootstrap.Modal(modal);
+                bsModal.show();
+            }
+        }
         
         // Export buttons
         const exportBtns = modal.querySelectorAll('.export-btn');
@@ -2038,21 +2192,36 @@ async function loadCategoryStats() {
     ];
 
     let html = '<div class="row">';
-    categories.forEach(category => {
+    for (const category of categories) {
       const count = stats[category.name] || 0;
       const percentage = stats.total > 0 ? Math.round((count / stats.total) * 100) : 0;
+      
+      // Render icon using IconSystem
+      let categoryIconHTML = `<img src="/trading-ui/images/icons/tabler/${category.icon}.svg" width="32" height="32" alt="${category.icon}" class="icon mb-2" style="color: ${category.color};">`;
+      if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+        try {
+          categoryIconHTML = await window.IconSystem.renderIcon('button', category.icon, {
+            size: '32',
+            alt: category.icon,
+            class: 'icon mb-2',
+            style: `color: ${category.color};`
+          });
+        } catch (error) {
+          // Fallback already set
+        }
+      }
       
       html += `
         <div class="col-md-3 col-sm-6 mb-3">
           <div class="stat-card text-center p-3 border rounded">
-            <img src="/trading-ui/images/icons/tabler/${category.icon}.svg" width="32" height="32" alt="${category.icon}" class="icon mb-2" style="color: ${category.color};">
+            ${categoryIconHTML}
             <h4 class="mb-1" style="color: ${category.color};">${count.toLocaleString()}</h4>
             <p class="mb-1 text-muted">${category.title}</p>
             <small class="text-muted">${percentage}% מהסך הכל</small>
           </div>
         </div>
       `;
-    });
+    }
     html += '</div>';
 
     container.innerHTML = html;

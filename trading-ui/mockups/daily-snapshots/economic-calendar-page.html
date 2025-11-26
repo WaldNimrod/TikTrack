@@ -88,6 +88,11 @@
                         <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
                         <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
                         <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
+                        <span class="mockups-navigation-separator">|</span>
+                        <a href="../watch-lists-page.html" class="mockups-navigation-link">רשימות צפייה</a>
+                        <a href="../watch-list-modal.html" class="mockups-navigation-link">מודל רשימה</a>
+                        <a href="../add-ticker-modal.html" class="mockups-navigation-link">הוספת טיקר</a>
+                        <a href="../flag-quick-action.html" class="mockups-navigation-link">דגלים</a>
                     </div>
                 </div>
             </div>
@@ -103,7 +108,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder" data-icon="info-circle" data-size="16"></span> פילטרים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-פילטרים')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-פילטרים')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -146,7 +151,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder" data-icon="info-circle" data-size="16"></span> אירועים כלכליים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-אירועים-כלכליים')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-אירועים-כלכליים')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -154,7 +159,7 @@
                     <div class="section-body">
                         <!-- Save Event Button (shown after widget loads) -->
                         <div id="save-event-controls" class="mb-3" style="display: none;">
-                            <button id="save-event-from-widget-btn" class="btn btn-primary btn-sm">
+                            <button id="save-event-from-widget-btn" class="btn btn-primary btn-sm" data-button-type="SAVE">
                                 <span class="icon-placeholder" data-icon="bookmark" data-size="16"></span>
                                 שמור אירוע נבחר
                             </button>
@@ -186,7 +191,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder" data-icon="bookmark" data-size="16"></span> אירועים שמורים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-אירועים-שמורים')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-אירועים-שמורים')" title="הצג/הסתר סקשן" data-button-type="SAVE">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -206,7 +211,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder" data-icon="chart-bar" data-size="16"></span> סטטיסטיקות</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-סטטיסטיקות')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-סטטיסטיקות')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -232,5 +237,11 @@
     <!-- Notification System Containers -->
     <div class="notification-container" id="notification-container"></div>
     <div id="toast-container"></div>
+
+    <!-- Entity Details System -->
+    <script src="../../scripts/entity-details-api.js" defer></script>
+    <script src="../../scripts/entity-details-renderer.js" defer></script>
+    <script src="../../scripts/entity-details-modal.js" defer></script>
+    
 </body>
 </html>

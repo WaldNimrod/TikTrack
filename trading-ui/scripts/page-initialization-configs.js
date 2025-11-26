@@ -191,6 +191,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // - 'crud': מערכות CRUD ו-entity-details
       // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
       // - 'entity-details': מערכות פרטי ישויות
+      // - 'info-summary': מערכת סיכום נתונים מאוחדת
       // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
       packages: [
         'base',
@@ -200,6 +201,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'preferences',
         'entity-services',
         'entity-details',
+        'info-summary',
         'dashboard-widgets',
         'init-system',
       ],
@@ -333,6 +335,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // - 'crud': מערכות CRUD ו-entity-details
       // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
       // - 'validation': מערכת ולידציה (validation-utils.js)
+      // - 'info-summary': מערכת סיכום נתונים מאוחדת
       // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
       // NOTE: constraint-manager.js נטען בנפרד כקובץ page-specific (לא דרך חבילת system-management)
       packages: [
@@ -343,6 +346,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'preferences',
         'validation',
         'entity-details',
+        'info-summary',
         'init-system',
       ],
 
@@ -447,6 +451,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'crud',
         'preferences',
         'validation',
+        'conditions',
         'entity-details',
         'entity-services',
         'info-summary',
@@ -633,6 +638,11 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             });
             window.initializeImportUserDataModal();
           }
+          
+          // Replace icons with IconSystem
+          if (typeof window.replaceIconsInContext === 'function') {
+            await window.replaceIconsInContext();
+          }
         },
       ],
     },
@@ -715,6 +725,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'crud',
         'preferences',
         'validation',
+        'conditions',
         'entity-services',
         'entity-details',
         'info-summary',
@@ -796,6 +807,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'crud',
         'preferences',
         'validation',
+        'conditions',
         'entity-services',
         'entity-details',
         'info-summary',
@@ -813,6 +825,11 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',
+        'window.conditionsCRUDManager',
+        'window.conditionsFormGenerator',
+        'window.ConditionsUIManager',
+        'window.ConditionsModalController',
+        'window.conditionsModalConfig',
       ],
 
       // ← NEW: מטאדאטה
@@ -1394,7 +1411,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
     'external-data-dashboard': {
       name: 'External Data',
 
-      packages: ['base', 'external-data', 'charts', 'logs', 'init-system'],
+      packages: ['base', 'external-data', 'charts', 'logs', 'info-summary', 'init-system'],
 
       requiredGlobals: [
         'NotificationSystem',
@@ -1455,7 +1472,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     'notifications-center': {
       name: 'Notifications Center',
-      packages: ['base', 'crud', 'logs', 'init-system'],
+      packages: ['base', 'crud', 'logs', 'info-summary', 'init-system'],
       requiredGlobals: ['NotificationSystem',
         'window.IconSystem', 'window.initializeNotificationsCenter'],
       requiresFilters: false,
@@ -1539,7 +1556,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     db_display: {
       name: 'Database Display',
-      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'info-summary', 'init-system'],
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: true,
@@ -1598,7 +1615,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     'background-tasks': {
       name: 'Background Tasks',
-      packages: ['base', 'crud', 'logs', 'init-system'],
+      packages: ['base', 'crud', 'logs', 'info-summary', 'init-system'],
       requiredGlobals: [
         'NotificationSystem',
         'window.IconSystem',
@@ -2036,9 +2053,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     constraints: {
       name: 'System Constraints',
-      packages: ['base', 'init-system'],
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'init-system'],
       requiredGlobals: ['NotificationSystem',
-        'window.IconSystem', 'window.loadConstraints', 'window.ConstraintManager'],
+        'window.IconSystem', 'window.loadConstraints', 'window.ConstraintManager', 'window.createActionsMenu'],
       description: 'ניהול אילוצי מערכת',
       lastModified: '2025-10-19',
       pageType: 'system',

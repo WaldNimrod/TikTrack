@@ -178,7 +178,12 @@ class AlertConditionRenderer {
             if (container) {
                 const input = container.querySelector('input');
                 if (input) {
-                    input.value = currentValue;
+                    // Use DataCollectionService to set value if available
+                    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                      window.DataCollectionService.setValue(input.id, currentValue, 'text');
+                    } else {
+                      input.value = currentValue;
+                    }
                 }
             }
         }

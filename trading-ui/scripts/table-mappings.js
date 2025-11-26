@@ -629,6 +629,15 @@ function getColumnValue(item, columnIndex, tableType) {
     if (!value && value !== 0) {
       return null;
     }
+    
+    // Use TableSortValueAdapter if available for consistent date parsing
+    if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+      const sortValue = window.TableSortValueAdapter.getSortValue({ value: value, type: 'auto' });
+      if (typeof sortValue === 'number' && !Number.isNaN(sortValue)) {
+        return sortValue;
+      }
+    }
+    
     // If it's already a DateEnvelope object
     if (value && typeof value === 'object' && typeof value.epochMs === 'number' && !Number.isNaN(value.epochMs)) {
       return value.epochMs;
@@ -663,6 +672,16 @@ function getColumnValue(item, columnIndex, tableType) {
     if (typeof rawValue === 'number' && Number.isFinite(rawValue)) {
       return rawValue;
     }
+    
+    // Use TableSortValueAdapter if available for consistent date parsing
+    if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+      const sortValue = window.TableSortValueAdapter.getSortValue({ value: rawValue, type: 'date' });
+      if (typeof sortValue === 'number' && !Number.isNaN(sortValue)) {
+        return sortValue;
+      }
+    }
+    
+    // Fallback to manual parsing
     if (typeof rawValue === 'string') {
       const trimmed = rawValue.trim();
       if (!trimmed) {

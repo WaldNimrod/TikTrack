@@ -88,6 +88,11 @@
                         <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
                         <a href="emotional-tracking-widget.html" class="mockups-navigation-link active">תיעוד רגשי</a>
                         <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
+                        <span class="mockups-navigation-separator">|</span>
+                        <a href="../watch-lists-page.html" class="mockups-navigation-link">רשימות צפייה</a>
+                        <a href="../watch-list-modal.html" class="mockups-navigation-link">מודל רשימה</a>
+                        <a href="../add-ticker-modal.html" class="mockups-navigation-link">הוספת טיקר</a>
+                        <a href="../flag-quick-action.html" class="mockups-navigation-link">דגלים</a>
                     </div>
                 </div>
             </div>
@@ -108,7 +113,7 @@
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
                             <button data-button-type="ADD" data-variant="small" data-text="הוסף תיעוד" title="הוסף תיעוד רגשי חדש"></button>
-                        </div><button class="filter-toggle-btn" data-onclick="toggleSection(\'emotional_tracking_widget_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                        </div><button class="filter-toggle-btn" data-onclick="toggleSection(\'emotional_tracking_widget_top_section\')" title="הצג/הסתר סקשן" data-button-type="FILTER"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
@@ -140,25 +145,25 @@
                                 <div class="mb-3">
                                     <label class="form-label">בחר רגש/תחושה:</label>
                                     <div class="d-flex gap-2 flex-wrap" id="emotionButtonsContainer">
-                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="happy">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="happy" data-button-type="PRIMARY">
                                             <span class="emotion-icon"></span> שמח
                                         </button>
-                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="satisfied">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="satisfied" data-button-type="PRIMARY">
                                             <span class="emotion-icon"></span> מרוצה
                                         </button>
-                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="neutral">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="neutral" data-button-type="PRIMARY">
                                             <span class="emotion-icon"></span> ניטרלי
                                         </button>
-                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="sad">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="sad" data-button-type="PRIMARY">
                                             <span class="emotion-icon"></span> עצוב
                                         </button>
-                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="angry">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="angry" data-button-type="PRIMARY">
                                             <span class="emotion-icon"></span> כועס
                                         </button>
-                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="confused">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="confused" data-button-type="PRIMARY">
                                             <span class="emotion-icon"></span> מבולבל
                                         </button>
-                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="stressed">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="stressed" data-button-type="PRIMARY">
                                             <span class="emotion-icon"></span> מתוח
                                         </button>
                                     </div>
@@ -167,7 +172,7 @@
                                     <label for="emotionNotes" class="form-label">הערות (אופציונלי):</label>
                                     <textarea id="emotionNotes" class="form-control" rows="3" placeholder="מה גרם לרגש הזה?"></textarea>
                                 </div>
-                                <button class="btn btn-primary" id="saveEmotionButton">שמור תיעוד</button>
+                                <button class="btn btn-primary" id="saveEmotionButton" data-button-type="SAVE">שמור תיעוד</button>
                             </div>
                         </div>
                         
@@ -218,5 +223,11 @@
     
     <!-- Page-specific script -->
     <script src="../../scripts/emotional-tracking-widget.js" defer></script>
+
+    <!-- Entity Details System -->
+    <script src="../../scripts/entity-details-api.js" defer></script>
+    <script src="../../scripts/entity-details-renderer.js" defer></script>
+    <script src="../../scripts/entity-details-modal.js" defer></script>
+    
 </body>
 </html>

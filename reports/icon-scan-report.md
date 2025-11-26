@@ -4,10 +4,10 @@
 
 ## סיכום
 
-- emoji_icons: 5442
-- total_files_with_issues: 205
-- total_files_using_icon_system: 44
-- fontawesome: 611
+- emoji_icons: 5493
+- total_files_with_issues: 201
+- total_files_using_icon_system: 55
+- fontawesome: 569
 - missing_icon_system: 27
 - text_content_icons: 20
 - old_icon_paths: 32

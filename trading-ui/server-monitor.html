@@ -80,18 +80,18 @@
                         
                         <!-- כפתורים מרכזיים -->
                         <div class="section-actions">
-                            <button class="btn btn-sm btn-outline-success" id="quickRestartBtn" title="איתחול מהיר של השרת">
+                            <button class="btn btn-sm btn-outline-success" id="quickRestartBtn" title="איתחול מהיר של השרת" data-button-type="PLAY">
                                 🔄 איתחול מהיר
                             </button>
-                            <button class="btn btn-sm btn-outline-warning" id="changeModeBtn" title="שינוי מצב מטמון">
+                            <button class="btn btn-sm btn-outline-warning" id="changeModeBtn" title="שינוי מצב מטמון" data-button-type="MENU">
                                 🎛️ מצב מטמון
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" id="monitoringAnalysisBtn" title="הצג ניתוח מפורט של מצב הניתור">
+                            <button class="btn btn-sm btn-outline-primary" id="monitoringAnalysisBtn" title="הצג ניתוח מפורט של מצב הניתור" data-button-type="VIEW">
                                 📊 ניתוח ניתור
                             </button>
                             </div>
                         
-                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                        <button class="filter-toggle-btn" data-onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים" data-button-type="FILTER">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -112,13 +112,13 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="monitoring-controls">
-                                        <button class="btn btn-success btn-sm" id="startMonitoringBtn">
+                                        <button class="btn btn-success btn-sm" id="startMonitoringBtn" data-button-type="PLAY">
                                             ▶️ התחל
                                         </button>
-                                        <button class="btn btn-warning btn-sm" id="pauseMonitoringBtn">
+                                        <button class="btn btn-warning btn-sm" id="pauseMonitoringBtn" data-button-type="PAUSE">
                                             ⏸️ השהייה
                                         </button>
-                                        <button class="btn btn-danger btn-sm" id="stopMonitoringBtn">
+                                        <button class="btn btn-danger btn-sm" id="stopMonitoringBtn" data-button-type="STOP">
                                             ⏹️ עצור
                                         </button>
                                     </div>
@@ -168,14 +168,14 @@
                     <div class="section-header">
                         <h2>🎮 Cursor Tasks Management</h2>
                         <div class="section-actions">
-                            <button class="btn btn-sm btn-outline-info" id="openSystemManagementBtn" title="פתח דשבורד ניהול מערכת">
+                            <button class="btn btn-sm btn-outline-info" id="openSystemManagementBtn" title="פתח דשבורד ניהול מערכת" data-button-type="VIEW">
                                 🔧 ניהול מערכת
                             </button>
-                            <button class="btn btn-sm btn-outline-primary" id="openAllDashboardsBtn" title="פתח כל הדשבורדים">
+                            <button class="btn btn-sm btn-outline-primary" id="openAllDashboardsBtn" title="פתח כל הדשבורדים" data-button-type="VIEW">
                                 🚀 כל הדשבורדים
                             </button>
                         </div>
-                        <button class="filter-toggle-btn" onclick="toggleSection('cursorTasksSection')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('cursorTasksSection')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -191,16 +191,16 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="d-grid gap-2">
-                                            <button class="btn btn-success" id="quickStartBtn">
+                                            <button class="btn btn-success" id="quickStartBtn" data-button-type="PLAY">
                                                 <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon"> התחלה מהירה
                                             </button>
-                                            <button class="btn btn-warning" id="quickRestartBtn2">
+                                            <button class="btn btn-warning" id="quickRestartBtn2" data-button-type="PLAY">
                                                 <img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon"> איתחול מהיר
                                             </button>
-                                            <button class="btn btn-info" id="quickStopBtn">
+                                            <button class="btn btn-info" id="quickStopBtn" data-button-type="STOP">
                                                 <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> עצירה מהירה
                                             </button>
-                                            <button class="btn btn-secondary" id="quickStatusBtn">
+                                            <button class="btn btn-secondary" id="quickStatusBtn" data-button-type="VIEW">
                                                 <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon"> סטטוס שרת
                                             </button>
                                         </div>
@@ -216,16 +216,16 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="d-grid gap-2">
-                                            <button class="btn btn-outline-primary" id="devModeBtn">
+                                            <button class="btn btn-outline-primary" id="devModeBtn" data-button-type="MENU">
                                                 <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> Development (10s)
                                             </button>
-                                            <button class="btn btn-outline-danger" id="noCacheBtn">
+                                            <button class="btn btn-outline-danger" id="noCacheBtn" data-button-type="MENU">
                                                 <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> No Cache
                                             </button>
-                                            <button class="btn btn-outline-success" id="productionModeBtn">
+                                            <button class="btn btn-outline-success" id="productionModeBtn" data-button-type="MENU">
                                                 <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> Production (5min)
                                             </button>
-                                            <button class="btn btn-outline-secondary" id="preserveModeBtn">
+                                            <button class="btn btn-outline-secondary" id="preserveModeBtn" data-button-type="MENU">
                                                 <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> Preserve
                                             </button>
                                         </div>
@@ -274,7 +274,7 @@
                 <div class="content-section" id="section1" data-section="section1">
                     <div class="section-header">
                         <h2>⚡ פעולות מהירות</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('section1')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -302,12 +302,12 @@
             </select>
         </div>
         
-        <button class="btn btn-success w-100 mb-3" onclick="restartServerAdvanced()">
+        <button class="btn btn-success w-100 mb-3" data-onclick="restartServerAdvanced()" data-button-type="PLAY">
             🔄 הפעל שרת
         </button>
                             </div>
                             <div class="col-md-3">
-                                <button class="btn btn-warning w-100 mb-3" onclick="stopServer()">
+                                <button class="btn btn-warning w-100 mb-3" data-onclick="stopServer()" data-button-type="STOP">
                                     ⏹️ עצור שרת
                                 </button>
                             </div>
@@ -315,7 +315,7 @@
                                 <button data-button-type="REFRESH" data-onclick="refreshData()" data-classes="refresh-btn" data-text="רענן" data-attributes="title=\"רענן\""></button>
                             </div>
                             <div class="col-md-3">
-                                <button class="btn btn-secondary w-100 mb-3" onclick="clearLogs()">
+                                <button class="btn btn-secondary w-100 mb-3" data-onclick="clearLogs()" data-button-type="PRIMARY">
                                     🗑️ נקה לוגים
                                 </button>
                             </div>
@@ -328,7 +328,7 @@
                 <div class="content-section" id="section2" data-section="section2">
                     <div class="section-header">
                         <h2>📊 סטטיסטיקות מערכת</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('section2')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -395,7 +395,7 @@
                 <div class="content-section" id="section3" data-section="section3">
                     <div class="section-header">
                         <h2>🔌 API Status & Endpoints</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('section3')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -434,7 +434,7 @@
                                             </div>
                                         </div>
                                         <div class="mt-3 text-center">
-                                            <button class="btn btn-primary" onclick="checkApiHealth()">
+                                            <button class="btn btn-primary" data-onclick="checkApiHealth()" data-button-type="PRIMARY">
                                                 ❤️ בדיקת בריאות מפורטת
                                             </button>
                                         </div>
@@ -452,10 +452,10 @@
                                             <small class="text-muted">מקרא: 🟢 פעיל | 🔴 שגיאה | 🟡 בדיקה | ⚫ לא נבדק | ⏱️ Rate Limited | ❓ לא נמצא</small>
                                         </div>
                                         <div>
-                                            <button class="btn btn-sm btn-success" onclick="scanNewEndpoints()">
+                                            <button class="btn btn-sm btn-success" data-onclick="scanNewEndpoints()" data-button-type="PRIMARY">
                                                 🔍 סריקה חוזרת
                                             </button>
-                                            <button class="btn btn-sm btn-primary" onclick="testAllEndpoints()">
+                                            <button class="btn btn-sm btn-primary" data-onclick="testAllEndpoints()" data-button-type="PRIMARY">
                                                 🧪 בדוק הכל
                                             </button>
                                             <button data-button-type="REFRESH" data-onclick="refreshData()" data-classes="refresh-btn" data-text="רענן" data-attributes="title=\"רענן\""></button>
@@ -481,7 +481,7 @@
                 <div class="content-section" id="section4" data-section="section4">
                     <div class="section-header">
                         <h2>📋 לוגים</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('section4')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -543,6 +543,8 @@
     <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
     <!-- [11] Load Order: 11 -->
     <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <!-- [11.5] Load Order: 11.5 -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
     <!-- [12] Load Order: 12 -->
     <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
     <!-- [13] Load Order: 13 -->
@@ -593,7 +595,22 @@
     <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+
+<!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [28] Page-specific: server-monitor -->

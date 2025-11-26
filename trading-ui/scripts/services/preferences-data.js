@@ -867,46 +867,105 @@
       throw new Error('Preference name is required');
     }
 
-    const payload = await fetchJson('/api/preferences/user/single', {
+    // Use CRUDResponseHandler for consistent response handling
+    const url = buildUrlWithParams('/api/preferences/user/single', {});
+    const response = await fetch(url, {
       method: 'POST',
-      body: {
+      headers: DEFAULT_HEADERS,
+      body: JSON.stringify({
         preference_name: preferenceName,
         value,
         user_id: userId,
         profile_id: profileId,
-      },
+      }),
     });
 
-    // Cache invalidation via CacheSyncManager (preferred method)
-    if (window.CacheSyncManager?.invalidateByAction) {
-      try {
-        await window.CacheSyncManager.invalidateByAction('preference-updated');
-      } catch (error) {
-        window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
-          ...PAGE_LOG_CONTEXT,
-          error: error?.message,
-        });
-        // Fallback to direct cache clearing
+    // Use CRUDResponseHandler for consistent response handling
+    if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleSaveResponse) {
+      const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {
+        successMessage: `העדפה ${preferenceName} נשמרה בהצלחה`,
+        entityName: 'העדפה',
+        requiresHardReload: false,
+        // Note: preferences don't use modals or tables, so modalId and reloadFn are not needed
+      });
+      
+      // Cache invalidation via CacheSyncManager (preferred method)
+      if (window.CacheSyncManager?.invalidateByAction) {
+        try {
+          await window.CacheSyncManager.invalidateByAction('preference-updated');
+        } catch (error) {
+          window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+            ...PAGE_LOG_CONTEXT,
+            error: error?.message,
+          });
+          // Fallback to direct cache clearing
+          await clearCachePattern(KEY_PREFIXES.single);
+          await clearCachePattern(KEY_PREFIXES.all);
+        }
+      } else {
+        // Fallback to direct cache clearing if CacheSyncManager not available
         await clearCachePattern(KEY_PREFIXES.single);
         await clearCachePattern(KEY_PREFIXES.all);
       }
+      
+      // Unified cache refresh: request profile refresh when available
+      if (window.UnifiedCacheManager?.refreshUserPreferences) {
+        try {
+          await window.UnifiedCacheManager.refreshUserPreferences(
+            profileId ?? 'active',
+            null,
+            { userId, preferenceNames: [preferenceName] },
+          );
+        } catch (_) { /* best-effort */ }
+      }
+      
+      return crudResult;
     } else {
-      // Fallback to direct cache clearing if CacheSyncManager not available
-      await clearCachePattern(KEY_PREFIXES.single);
-      await clearCachePattern(KEY_PREFIXES.all);
+      // Fallback to original fetchJson if CRUDResponseHandler not available
+      window.Logger?.warn?.('⚠️ CRUDResponseHandler not available, using fallback', {
+        ...PAGE_LOG_CONTEXT,
+      });
+      const payload = await fetchJson('/api/preferences/user/single', {
+        method: 'POST',
+        body: {
+          preference_name: preferenceName,
+          value,
+          user_id: userId,
+          profile_id: profileId,
+        },
+      });
+
+      // Cache invalidation via CacheSyncManager (preferred method)
+      if (window.CacheSyncManager?.invalidateByAction) {
+        try {
+          await window.CacheSyncManager.invalidateByAction('preference-updated');
+        } catch (error) {
+          window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+            ...PAGE_LOG_CONTEXT,
+            error: error?.message,
+          });
+          // Fallback to direct cache clearing
+          await clearCachePattern(KEY_PREFIXES.single);
+          await clearCachePattern(KEY_PREFIXES.all);
+        }
+      } else {
+        // Fallback to direct cache clearing if CacheSyncManager not available
+        await clearCachePattern(KEY_PREFIXES.single);
+        await clearCachePattern(KEY_PREFIXES.all);
+      }
+      
+      // Unified cache refresh: request profile refresh when available
+      if (window.UnifiedCacheManager?.refreshUserPreferences) {
+        try {
+          await window.UnifiedCacheManager.refreshUserPreferences(
+            profileId ?? 'active',
+            null,
+            { userId, preferenceNames: [preferenceName] },
+          );
+        } catch (_) { /* best-effort */ }
+      }
+      return payload;
     }
-    
-    // Unified cache refresh: request profile refresh when available
-    if (window.UnifiedCacheManager?.refreshUserPreferences) {
-      try {
-        await window.UnifiedCacheManager.refreshUserPreferences(
-          profileId ?? 'active',
-          null,
-          { userId, preferenceNames: [preferenceName] },
-        );
-      } catch (_) { /* best-effort */ }
-    }
-    return payload;
   }
 
   /**
@@ -934,45 +993,103 @@
       return { success: false, message: 'No preferences provided' };
     }
 
-    const payload = await fetchJson('/api/preferences/user', {
+    // Use CRUDResponseHandler for consistent response handling
+    const url = buildUrlWithParams('/api/preferences/user', {});
+    const response = await fetch(url, {
       method: 'POST',
-      body: {
+      headers: DEFAULT_HEADERS,
+      body: JSON.stringify({
         preferences,
         user_id: userId,
         profile_id: profileId,
-      },
+      }),
     });
 
-    // Cache invalidation via CacheSyncManager (preferred method)
-    if (window.CacheSyncManager?.invalidateByAction) {
-      try {
-        await window.CacheSyncManager.invalidateByAction('preference-updated');
-      } catch (error) {
-        window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
-          ...PAGE_LOG_CONTEXT,
-          error: error?.message,
-        });
-        // Fallback to direct cache clearing
+    // Use CRUDResponseHandler for consistent response handling
+    if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleSaveResponse) {
+      const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {
+        successMessage: `${Object.keys(preferences).length} העדפות נשמרו בהצלחה`,
+        entityName: 'העדפות',
+        requiresHardReload: false,
+        // Note: preferences don't use modals or tables, so modalId and reloadFn are not needed
+      });
+      
+      // Cache invalidation via CacheSyncManager (preferred method)
+      if (window.CacheSyncManager?.invalidateByAction) {
+        try {
+          await window.CacheSyncManager.invalidateByAction('preference-updated');
+        } catch (error) {
+          window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+            ...PAGE_LOG_CONTEXT,
+            error: error?.message,
+          });
+          // Fallback to direct cache clearing
+          await clearCachePattern(KEY_PREFIXES.single);
+          await clearCachePattern(KEY_PREFIXES.all);
+        }
+      } else {
+        // Fallback to direct cache clearing if CacheSyncManager not available
         await clearCachePattern(KEY_PREFIXES.single);
         await clearCachePattern(KEY_PREFIXES.all);
       }
+      
+      // Unified cache refresh: request profile refresh when available
+      if (window.UnifiedCacheManager?.refreshUserPreferences) {
+        try {
+          await window.UnifiedCacheManager.refreshUserPreferences(
+            profileId ?? 'active',
+            null,
+            { userId, preferenceNames: Object.keys(preferences) },
+          );
+        } catch (_) { /* best-effort */ }
+      }
+      
+      return crudResult;
     } else {
-      // Fallback to direct cache clearing if CacheSyncManager not available
-      await clearCachePattern(KEY_PREFIXES.single);
-      await clearCachePattern(KEY_PREFIXES.all);
+      // Fallback to original fetchJson if CRUDResponseHandler not available
+      window.Logger?.warn?.('⚠️ CRUDResponseHandler not available, using fallback', {
+        ...PAGE_LOG_CONTEXT,
+      });
+      const payload = await fetchJson('/api/preferences/user', {
+        method: 'POST',
+        body: {
+          preferences,
+          user_id: userId,
+          profile_id: profileId,
+        },
+      });
+
+      // Cache invalidation via CacheSyncManager (preferred method)
+      if (window.CacheSyncManager?.invalidateByAction) {
+        try {
+          await window.CacheSyncManager.invalidateByAction('preference-updated');
+        } catch (error) {
+          window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+            ...PAGE_LOG_CONTEXT,
+            error: error?.message,
+          });
+          // Fallback to direct cache clearing
+          await clearCachePattern(KEY_PREFIXES.single);
+          await clearCachePattern(KEY_PREFIXES.all);
+        }
+      } else {
+        // Fallback to direct cache clearing if CacheSyncManager not available
+        await clearCachePattern(KEY_PREFIXES.single);
+        await clearCachePattern(KEY_PREFIXES.all);
+      }
+      
+      // Unified cache refresh: request profile refresh when available
+      if (window.UnifiedCacheManager?.refreshUserPreferences) {
+        try {
+          await window.UnifiedCacheManager.refreshUserPreferences(
+            profileId ?? 'active',
+            null,
+            { userId, preferenceNames: Object.keys(preferences) },
+          );
+        } catch (_) { /* best-effort */ }
+      }
+      return payload;
     }
-    
-    // Unified cache refresh: request profile refresh when available
-    if (window.UnifiedCacheManager?.refreshUserPreferences) {
-      try {
-        await window.UnifiedCacheManager.refreshUserPreferences(
-          profileId ?? 'active',
-          null,
-          { userId, preferenceNames: Object.keys(preferences) },
-        );
-      } catch (_) { /* best-effort */ }
-    }
-    return payload;
   }
 
   async function loadProfiles({ userId = 1, force = false, ttl = DEFAULT_TTL.profiles } = {}) {

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Ticker Modal - TikTrack Mockup</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 2rem;
+            background: #f8f9fa;
+        }
+        .modal-demo {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .search-result-item {
+            padding: 0.75rem;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+            border-color: #26baac;
+        }
+        .search-result-item.selected {
+            background-color: #e7f5f3;
+            border-color: #26baac;
+        }
+        .mockups-navigation {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .mockups-navigation-content {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .mockups-navigation-label {
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        .mockups-navigation-link {
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.2s;
+        }
+        .mockups-navigation-link:hover {
+            background: #e9ecef;
+            color: #26baac;
+        }
+        .mockups-navigation-link.active {
+            background: #26baac;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mockups Navigation -->
+    <div class="mockups-navigation">
+        <div class="mockups-navigation-content">
+            <span class="mockups-navigation-label">📋 ניווט מוקאפים:</span>
+            <a href="watch-lists-page.html" class="mockups-navigation-link">רשימות צפייה</a>
+            <a href="watch-list-modal.html" class="mockups-navigation-link">מודל רשימה</a>
+            <a href="add-ticker-modal.html" class="mockups-navigation-link active">הוספת טיקר</a>
+            <a href="flag-quick-action.html" class="mockups-navigation-link">דגלים</a>
+        </div>
+    </div>
+    <!-- Add Ticker Modal -->
+    <div class="modal fade show" id="addTickerModal" tabindex="-1" style="display: block; position: static;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">הוסף טיקר לרשימה: מניות טכנולוגיה</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addTickerForm">
+                        <!-- Search Ticker from System -->
+                        <div class="mb-4">
+                            <label for="tickerSearch" class="form-label fw-bold">חיפוש טיקר מהמערכת</label>
+                            <div class="input-group">
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="tickerSearch" 
+                                       placeholder="הקלד symbol או שם (לדוגמה: AAPL או Apple)..."
+                                       autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" id="searchTickerBtn">
+                                    <img src="../images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon">
+                                </button>
+                            </div>
+                            <div id="tickerSearchResults" class="mt-3">
+                                <!-- Example search results -->
+                                <div class="search-result-item" data-ticker-id="5">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>AAPL</strong> - Apple Inc.
+                                            <br>
+                                            <small class="text-muted">Stock • USD</small>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-primary" data-onclick="window.WatchListsPage?.selectTicker(5)">
+                                            הוסף
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="search-result-item" data-ticker-id="12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>MSFT</strong> - Microsoft Corporation
+                                            <br>
+                                            <small class="text-muted">Stock • USD</small>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-primary" data-onclick="window.WatchListsPage?.selectTicker(12)">
+                                            הוסף
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- External Ticker -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">או הוסף טיקר חיצוני</label>
+                            <p class="text-muted small mb-3">
+                                טיקר שלא נמצא במערכת. נתוני מחיר ייטענו אוטומטית מהשרת.
+                            </p>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label for="externalSymbol" class="form-label small">Symbol *</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="externalSymbol" 
+                                           placeholder="לדוגמה: TSLA"
+                                           maxlength="10"
+                                           style="text-transform: uppercase;">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="externalName" class="form-label small">שם (אופציונלי)</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="externalName" 
+                                           placeholder="לדוגמה: Tesla Inc."
+                                           maxlength="100">
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Optional Settings -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">הגדרות נוספות (אופציונלי)</label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="itemFlagColor" class="form-label small">דגל</label>
+                                    <select class="form-select" id="itemFlagColor">
+                                        <option value="">ללא דגל</option>
+                                        <option value="#26baac">Trade (#26baac)</option>
+                                        <option value="#fc5a06">Alert (#fc5a06)</option>
+                                        <option value="#28a745">Account (#28a745)</option>
+                                        <option value="#20c997">Cash Flow (#20c997)</option>
+                                        <option value="#dc3545">Ticker (#dc3545)</option>
+                                        <option value="#6f42c1">Note (#6f42c1)</option>
+                                        <option value="#17a2b8">Execution (#17a2b8)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="itemNotes" class="form-label small">הערות</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="itemNotes" 
+                                           placeholder="הערות אישיות..."
+                                           maxlength="500">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" 
+                            class="btn btn-primary" 
+                            data-onclick="window.WatchListsPage?.addTickerToList()">
+                        הוסף טיקר
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

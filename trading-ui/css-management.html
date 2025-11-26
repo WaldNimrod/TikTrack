@@ -164,7 +164,7 @@
                                             <label class="form-label">Components:</label>
                                             <span class="badge bg-success">פעיל</span>
                                         </div>
-                                        <button class="btn btn-primary">רענן שכבות</button>
+                                        <button class="btn btn-primary" data-button-type="REFRESH">רענן שכבות</button>
                                     </div>
                                 </div>
                             </div>
@@ -183,7 +183,7 @@
                                             <label class="form-label">דחיסה:</label>
                                             <span class="badge bg-success">פעיל</span>
                                         </div>
-                                        <button class="btn btn-secondary">רענן כלים</button>
+                                        <button class="btn btn-secondary" data-button-type="REFRESH">רענן כלים</button>
                                     </div>
                                 </div>
                             </div>
@@ -200,7 +200,7 @@
                             <button data-button-type="REFRESH" data-onclick="loadCssFilesList()" data-classes="btn btn-sm btn-outline-success" data-attributes="title='רענן רשימת קבצים'">
                                 <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רענן
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('section3')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
                             </button>
                         </div>
@@ -208,7 +208,7 @@
                     <div class="section-body">
                         <!-- טבלת קבצי CSS -->
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover" id="cssFilesTable">
+                            <table class="table table-striped table-hover" id="cssFilesTable" data-table-type="css_files">
                                 <thead class="table-dark">
                                     <tr>
                                         <th>שם קובץ</th>
@@ -232,7 +232,7 @@
                 <div class="content-section" id="section4" data-section="section4">
                     <div class="section-header">
                         <h2>📋 פעולות CSS</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('section4')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -240,17 +240,17 @@
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <button class="btn btn-success w-100" onclick="refreshCssStats()" title="רענן נתוני CSS">
+                                <button class="btn btn-success w-100" data-onclick="refreshCssStats()" title="רענן נתוני CSS" data-button-type="REFRESH">
                                     <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רענן CSS
                                 </button>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <button class="btn btn-info w-100" onclick="minifyCss()" title="דחוס קבצי CSS">
+                                <button class="btn btn-info w-100" data-onclick="minifyCss()" title="דחוס קבצי CSS" data-button-type="PRIMARY">
                                     <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> דחוס קבצים
                                 </button>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <button class="btn btn-warning w-100" onclick="validateCss()" title="בדוק תקינות CSS">
+                                <button class="btn btn-warning w-100" data-onclick="validateCss()" title="בדוק תקינות CSS" data-button-type="CHECK">
                                     <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> בדוק תקינות
                                 </button>
                             </div>
@@ -259,22 +259,22 @@
                         <!-- כפתורי פעולה נוספים -->
                         <div class="row mt-3">
                             <div class="col-md-3 mb-2">
-                                <button class="btn btn-outline-primary w-100" onclick="detectCssDuplicates()" title="זהה כפילויות CSS">
+                                <button class="btn btn-outline-primary w-100" data-onclick="detectCssDuplicates()" title="זהה כפילויות CSS" data-button-type="SEARCH">
                                     <img src="/trading-ui/images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon"> זהה כפילויות
                                 </button>
                             </div>
                             <div class="col-md-3 mb-2">
-                                <button class="btn btn-outline-secondary w-100" onclick="checkArchitectureCompliance()" title="בדוק תאימות ITCSS">
+                                <button class="btn btn-outline-secondary w-100" data-onclick="checkArchitectureCompliance()" title="בדוק תאימות ITCSS" data-button-type="CHECK">
                                     <img src="/trading-ui/images/icons/tabler/check.svg" width="16" height="16" alt="check" class="icon"> בדוק תאימות
                                 </button>
                             </div>
                             <div class="col-md-3 mb-2">
-                                <button class="btn btn-outline-danger w-100" onclick="removeUnusedCss()" title="הסר CSS לא בשימוש">
+                                <button class="btn btn-outline-danger w-100" data-onclick="removeUnusedCss()" title="הסר CSS לא בשימוש" data-button-type="DELETE">
                                     <img src="/trading-ui/images/icons/tabler/trash.svg" width="16" height="16" alt="trash" class="icon"> הסר לא בשימוש
                                 </button>
                             </div>
                             <div class="col-md-3 mb-2">
-                                <button class="btn btn-outline-success w-100" onclick="showAddCssFileModal()" title="הוסף קובץ CSS חדש">
+                                <button class="btn btn-outline-success w-100" data-onclick="showAddCssFileModal()" title="הוסף קובץ CSS חדש" data-button-type="ADD">
                                     <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> הוסף קובץ
                                 </button>
                             </div>
@@ -287,7 +287,7 @@
                 <div class="content-section" id="section5" data-section="section5">
                     <div class="section-header">
                         <h2>🔍 חיפוש CSS</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('section5')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -300,10 +300,10 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="d-flex gap-2 justify-content-start">
-                                    <button class="btn btn-primary" onclick="searchCssRules()" title="חפש בקבצי CSS">
+                                    <button class="btn btn-primary" data-onclick="searchCssRules()" title="חפש בקבצי CSS" data-button-type="SEARCH">
                                         <img src="/trading-ui/images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon"> חפש
                                     </button>
-                                    <button class="btn btn-outline-secondary" onclick="clearCssSearch()" title="נקה חיפוש">
+                                    <button class="btn btn-outline-secondary" data-onclick="clearCssSearch()" title="נקה חיפוש" data-button-type="SEARCH">
                                         <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> נקה
                                     </button>
                                 </div>
@@ -351,6 +351,8 @@
     <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
     <!-- [7] Load Order: 7 -->
     <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [7.5] Load Order: 7.5 -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
     <!-- [8] Load Order: 8 -->
     <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
     <!-- [9] Load Order: 9 -->
@@ -397,7 +399,22 @@
     <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+
+<!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [26] Page-specific: css-management -->

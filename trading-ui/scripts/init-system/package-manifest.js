@@ -164,6 +164,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 7.6
       },
       {
+        file: 'icon-replacement-helper.js',
+        globalCheck: 'window.replaceIconsInContext',
+        description: 'Icon replacement helper for standardizing icon usage',
+        required: true,
+        loadOrder: 7.7
+      },
+      {
         file: 'cache-clear-menu.js',
         globalCheck: 'window.CacheControlMenu',
         description: 'Cache clearing control (Stage B-Lite)',

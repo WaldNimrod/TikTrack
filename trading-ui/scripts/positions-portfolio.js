@@ -290,12 +290,22 @@ async function populatePositionsAccountSelector(autoSelectDefault = false) {
                     defaultAccountId = selector.options[1].value;
                 }
                 
-                selector.value = defaultAccountId;
+                // Use DataCollectionService to set value if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(selector.id, defaultAccountId, 'int');
+                } else {
+                  selector.value = defaultAccountId;
+                }
                 handlePositionsAccountSelection({ target: selector });
             } catch (error) {
                 window.Logger.error('❌ Error getting default trading account:', error, { page: "trading_accounts" });
                 const firstAccountId = selector.options[1].value;
-                selector.value = firstAccountId;
+                // Use DataCollectionService to set value if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(selector.id, firstAccountId, 'int');
+                } else {
+                  selector.value = firstAccountId;
+                }
                 handlePositionsAccountSelection({ target: selector });
             }
         }
@@ -616,12 +626,9 @@ function renderPositionsTable(positions) {
                     ${percentAccount.toFixed(2)}%
                 </td>
                 <td class="col-actions actions-cell">
-                    <button class="btn actions-menu-item"
-                            data-button-type="VIEW"
-                            data-variant="small"
-                            data-onclick="window.showPositionDetails && window.showPositionDetails(${position.trading_account_id}, ${position.ticker_id})"
-                            title="פרטי פוזיציה"
-                            aria-label="פרטי פוזיציה"></button>
+                    ${window.createActionsMenu ? window.createActionsMenu([
+                      { type: 'VIEW', onclick: `window.showPositionDetails && window.showPositionDetails(${position.trading_account_id}, ${position.ticker_id})`, title: 'פרטי פוזיציה' }
+                    ]) : '<!-- Actions menu not available -->'}
                 </td>
             </tr>
         `;
@@ -650,7 +657,12 @@ async function populatePortfolioAccountSelector() {
             });
 
             if (previousValue) {
-                selector.value = previousValue;
+                // Use DataCollectionService to set value if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(selector.id, previousValue, 'text');
+                } else {
+                  selector.value = previousValue;
+                }
             }
 
             window.Logger?.info('✅ Portfolio account selector populated via SelectPopulatorService', { page: "positions-portfolio" });
@@ -760,7 +772,14 @@ async function loadPortfolio() {
         }
         
         // Get filter values
-        const accountFilter = document.getElementById('portfolioAccountFilter')?.value || '';
+        // Use DataCollectionService to get value if available
+        let accountFilter;
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+          accountFilter = window.DataCollectionService.getValue('portfolioAccountFilter', 'text', '') || '';
+        } else {
+          const accountFilterEl = document.getElementById('portfolioAccountFilter');
+          accountFilter = accountFilterEl ? accountFilterEl.value : '';
+        }
         
         // Get side filter from buttons (new design) or select (old design)
         let sideFilter = '';
@@ -988,15 +1007,12 @@ function renderPortfolioTable(positions) {
                     ${percentPortfolio.toFixed(2)}%
                 </td>
                 <td class="col-actions actions-cell">
-                    <button class="btn actions-menu-item"
-                            data-button-type="VIEW"
-                            data-variant="small"
-                            data-onclick="window.showPositionDetails && window.showPositionDetails(${position.trading_account_id}, ${position.ticker_id})"
-                            title="פרטי פוזיציה"
-                            aria-label="פרטי פוזיציה"></button>
+                    ${window.createActionsMenu ? window.createActionsMenu([
+                      { type: 'VIEW', onclick: `window.showPositionDetails && window.showPositionDetails(${position.trading_account_id}, ${position.ticker_id})`, title: 'פרטי פוזיציה' }
+                    ]) : '<!-- Actions menu not available -->'}
                 </td>
             </tr>
-            `;
+        `;
     });
     
     // Update table HTML

@@ -35,7 +35,7 @@
 
 .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--text-color, var(--color-text-primary, black)) 10%, transparent);
 }
 
 .stat-icon {
@@ -125,7 +125,7 @@
 
 .chart-item:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--text-color, var(--color-text-primary, black)) 10%, transparent);
 }
 
 .chart-item.active {
@@ -432,7 +432,13 @@
 }
 
 .mockups-navigation-link.active {
-    background-color: var(--brand-primary-color, var(--apple-blue));
+    background-color: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
+}
+
+.mockups-navigation-separator {
+    margin: 0 var(--spacing-sm);
+    color: var(--apple-gray-3);
+    font-weight: normal;
 }
 
 /* RTL Support */
@@ -480,8 +486,8 @@
 }
 
 .chart-control-btn.active {
-    border: 1px solid var(--brand-primary-color, var(--apple-blue));
-    background: var(--brand-primary-color, var(--apple-blue));
+    border: 1px solid var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
+    background: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
     color: white;
 }
 
@@ -526,8 +532,8 @@
 }
 
 .chart-unit-size-btn.active {
-    border: 1px solid var(--brand-primary-color, var(--apple-blue));
-    background: var(--brand-primary-color, var(--apple-blue));
+    border: 1px solid var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
+    background: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
     color: white;
 }
 
@@ -571,8 +577,8 @@
 }
 
 .chart-time-range-btn.active {
-    border: 1px solid var(--brand-primary-color, var(--apple-blue));
-    background: var(--brand-primary-color, var(--apple-blue));
+    border: 1px solid var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
+    background: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
     color: white;
 }
 
@@ -618,8 +624,8 @@
 }
 
 .chart-type-btn.active {
-    border: 1px solid var(--brand-primary-color, var(--apple-blue));
-    background: var(--brand-primary-color, var(--apple-blue));
+    border: 1px solid var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
+    background: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
     color: white;
 }
 
@@ -667,8 +673,8 @@
 }
 
 .chart-view-mode-btn.active {
-    border: 1px solid var(--brand-primary-color, var(--apple-blue));
-    background: var(--brand-primary-color, var(--apple-blue));
+    border: 1px solid var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
+    background: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
     color: white;
 }
 
@@ -712,8 +718,8 @@
 }
 
 .chart-y-scale-btn.active {
-    border: 1px solid var(--brand-primary-color, var(--apple-blue));
-    background: var(--brand-primary-color, var(--apple-blue));
+    border: 1px solid var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
+    background: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
     color: white;
 }
 
@@ -853,7 +859,7 @@
 
 .filter-item:hover {
     background: var(--apple-bg-secondary);
-    color: var(--brand-primary-color, var(--apple-blue));
+    color: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
 }
 
 .filter-item:last-child {
@@ -862,14 +868,14 @@
 
 .filter-item.selected {
     background-color: var(--apple-bg-secondary);
-    color: var(--brand-primary-color, var(--apple-green));
+    color: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     font-weight: 500;
 }
 
 .filter-item.selected::before {
     content: "✓";
     margin-inline-end: var(--spacing-sm);
-    color: var(--brand-primary-color, var(--apple-green));
+    color: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     font-weight: bold;
 }
 
@@ -893,20 +899,20 @@
 .side-filter-item:hover,
 .status-filter-item:hover {
     background: var(--apple-bg-secondary);
-    color: var(--brand-primary-color, var(--apple-blue));
+    color: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
 }
 
 .side-filter-item.selected,
 .status-filter-item.selected {
     background: var(--apple-bg-secondary);
-    color: var(--brand-primary-color, var(--apple-blue));
+    color: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
     font-weight: 500;
 }
 
 /* Panel Styling - Record Filter Panel (Blue) */
 .filter-panel-card {
     background-color: var(--apple-bg-secondary);
-    border: 2px solid var(--brand-primary-color, var(--apple-blue));
+    border: 2px solid var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
     border-radius: 8px;
     margin-bottom: 20px;
 }
@@ -914,7 +920,7 @@
 .filter-panel-card .section-header {
     background-color: var(--apple-bg-secondary);
     padding: 12px 16px;
-    border-bottom: 2px solid var(--brand-primary-color, var(--apple-blue));
+    border-bottom: 2px solid var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -922,13 +928,13 @@
 }
 
 .filter-panel-card .section-header h3 {
-    color: var(--brand-primary-color, var(--apple-blue));
+    color: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
     margin: 0;
     font-size: 1.1rem;
 }
 
 .filter-panel-card .section-header .text-muted {
-    color: var(--brand-primary-color, var(--apple-blue));
+    color: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
     font-size: 0.85rem;
 }
 
@@ -951,7 +957,7 @@
     width: auto;
     height: auto;
     color: var(--color-text-primary);
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: color-mix(in srgb, var(--card-background, var(--background-color, white)) 70%, transparent);
     border: 1px solid var(--apple-border-light);
     border-radius: 4px;
     display: inline-flex;
@@ -963,7 +969,7 @@
 }
 
 .filter-panel-card .section-header .header-actions .btn-link:hover {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: color-mix(in srgb, var(--card-background, var(--background-color, white)) 90%, transparent);
     border-color: var(--apple-border);
     opacity: 1;
     transform: scale(1.05);
@@ -983,7 +989,7 @@
 /* Panel Styling - Comparison Parameters Panel (Green) */
 .comparison-panel-card {
     background-color: var(--apple-bg-secondary);
-    border: 2px solid var(--brand-primary-color, var(--apple-green));
+    border: 2px solid var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     border-radius: 8px;
     margin-bottom: 20px;
 }
@@ -991,7 +997,7 @@
 .comparison-panel-card .section-header {
     background-color: var(--apple-bg-secondary);
     padding: 12px 16px;
-    border-bottom: 2px solid var(--brand-primary-color, var(--apple-green));
+    border-bottom: 2px solid var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -999,13 +1005,13 @@
 }
 
 .comparison-panel-card .section-header h3 {
-    color: var(--brand-primary-color, var(--apple-green));
+    color: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     margin: 0;
     font-size: 1.1rem;
 }
 
 .comparison-panel-card .section-header .text-muted {
-    color: var(--brand-primary-color, var(--apple-green));
+    color: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     font-size: 0.85rem;
 }
 
@@ -1028,7 +1034,7 @@
     width: auto;
     height: auto;
     color: var(--color-text-primary);
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: color-mix(in srgb, var(--card-background, var(--background-color, white)) 70%, transparent);
     border: 1px solid var(--apple-border-light);
     border-radius: 4px;
     display: inline-flex;
@@ -1040,7 +1046,7 @@
 }
 
 .comparison-panel-card .section-header .header-actions .btn-link:hover {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: color-mix(in srgb, var(--card-background, var(--background-color, white)) 90%, transparent);
     border-color: var(--apple-border);
     opacity: 1;
     transform: scale(1.05);
@@ -1065,62 +1071,62 @@
 }
 
 /* Heatmap gradient colors */
-/* Heatmap color classes - Positive values (GREEN only) */
+/* Heatmap color classes - Positive values - שימוש במערכת המרכזית */
 .heatmap-excellent {
-    background-color: rgba(40, 167, 69, 0.7);
+    background-color: color-mix(in srgb, var(--numeric-positive-medium, var(--color-success, #28a745)) 70%, transparent);
 }
 
 .heatmap-very-good {
-    background-color: rgba(40, 167, 69, 0.55);
+    background-color: color-mix(in srgb, var(--numeric-positive-medium, var(--color-success, #28a745)) 55%, transparent);
 }
 
 .heatmap-good {
-    background-color: rgba(40, 167, 69, 0.4);
+    background-color: color-mix(in srgb, var(--numeric-positive-medium, var(--color-success, #28a745)) 40%, transparent);
 }
 
 .heatmap-average {
-    background-color: rgba(40, 167, 69, 0.3);
+    background-color: color-mix(in srgb, var(--numeric-positive-medium, var(--color-success, #28a745)) 30%, transparent);
 }
 
 .heatmap-below-avg {
-    background-color: rgba(40, 167, 69, 0.25);
+    background-color: color-mix(in srgb, var(--numeric-positive-medium, var(--color-success, #28a745)) 25%, transparent);
 }
 
 .heatmap-poor {
-    background-color: rgba(40, 167, 69, 0.2);
+    background-color: color-mix(in srgb, var(--numeric-positive-medium, var(--color-success, #28a745)) 20%, transparent);
 }
 
 .heatmap-very-poor {
-    background-color: rgba(40, 167, 69, 0.15);
+    background-color: color-mix(in srgb, var(--numeric-positive-medium, var(--color-success, #28a745)) 15%, transparent);
 }
 
-/* Heatmap color classes - Negative values (RED only) */
+/* Heatmap color classes - Negative values - שימוש במערכת המרכזית */
 .heatmap-negative-excellent {
-    background-color: rgba(220, 53, 69, 0.7);
+    background-color: color-mix(in srgb, var(--numeric-negative-medium, var(--color-danger, #dc3545)) 70%, transparent);
 }
 
 .heatmap-negative-very-poor {
-    background-color: rgba(220, 53, 69, 0.55);
+    background-color: color-mix(in srgb, var(--numeric-negative-medium, var(--color-danger, #dc3545)) 55%, transparent);
 }
 
 .heatmap-negative-poor {
-    background-color: rgba(220, 53, 69, 0.4);
+    background-color: color-mix(in srgb, var(--numeric-negative-medium, var(--color-danger, #dc3545)) 40%, transparent);
 }
 
 .heatmap-negative-average {
-    background-color: rgba(220, 53, 69, 0.3);
+    background-color: color-mix(in srgb, var(--numeric-negative-medium, var(--color-danger, #dc3545)) 30%, transparent);
 }
 
 .heatmap-negative-below-avg {
-    background-color: rgba(220, 53, 69, 0.25);
+    background-color: color-mix(in srgb, var(--numeric-negative-medium, var(--color-danger, #dc3545)) 25%, transparent);
 }
 
 .heatmap-negative-good {
-    background-color: rgba(220, 53, 69, 0.2);
+    background-color: color-mix(in srgb, var(--numeric-negative-medium, var(--color-danger, #dc3545)) 20%, transparent);
 }
 
 .heatmap-negative-very-good {
-    background-color: rgba(220, 53, 69, 0.15);
+    background-color: color-mix(in srgb, var(--numeric-negative-medium, var(--color-danger, #dc3545)) 15%, transparent);
 }
 
 /* Chart animations */
@@ -1145,7 +1151,7 @@
 
 .heatmap-row:hover {
     transform: scale(1.01);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px color-mix(in srgb, var(--text-color, var(--color-text-primary, black)) 10%, transparent);
 }
 
 .btn-primary:active {
@@ -1221,7 +1227,7 @@
     font-size: 0.75rem;
     color: var(--color-text-secondary);
     font-weight: 500;
-    background: rgba(255, 255, 255, 0.8);
+    background: color-mix(in srgb, var(--card-background, var(--background-color, white)) 80%, transparent);
     padding: 2px 6px;
     border-radius: 3px;
 }
@@ -1242,7 +1248,7 @@
 /* Table summary row */
 .table-summary-row {
     background-color: var(--apple-bg-secondary);
-    border-top: 2px solid var(--brand-primary-color, var(--apple-blue));
+    border-top: 2px solid var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
 }
 
 /* Series color indicator */
@@ -1279,7 +1285,7 @@
     width: 14px;
     height: 14px;
     border-radius: 2px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid color-mix(in srgb, var(--text-color, var(--color-text-primary, black)) 10%, transparent);
     flex-shrink: 0;
 }
 
@@ -1319,17 +1325,17 @@
     height: 400px;
 }
 
-/* Chart legend colors */
+/* Chart legend colors - שימוש במערכת המרכזית */
 .chart-legend-color-primary {
-    background: var(--brand-primary-color, #26baac);
+    background: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
 }
 
 .chart-legend-color-success {
-    background: var(--apple-green, #28a745);
+    background: var(--numeric-positive-medium, var(--color-success));
 }
 
 .chart-legend-color-danger {
-    background: var(--apple-red, #dc3545);
+    background: var(--numeric-negative-medium, var(--color-danger));
 }
 
 .chart-legend-color-circle {
@@ -1378,9 +1384,9 @@
 }
 
 .timeline-view-toggle button.active {
-    background: var(--brand-primary-color, var(--apple-green));
+    background: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     color: white;
-    border-color: var(--brand-primary-color, var(--apple-green));
+    border-color: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
 }
 
 .timeline-absolute-wrapper {
@@ -1402,7 +1408,7 @@
 }
 
 .timeline-absolute-wrapper::-webkit-scrollbar-thumb {
-    background: var(--brand-primary-color, var(--apple-green));
+    background: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     border-radius: 4px;
 }
 
@@ -1515,8 +1521,8 @@
 .view-mode-btn.active,
 .y-scale-btn.active,
 .volume-toggle-btn.active {
-    border: 1px solid var(--brand-primary-color, var(--apple-blue));
-    background: var(--brand-primary-color, var(--apple-blue));
+    border: 1px solid var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
+    background: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
     color: white;
 }
 
@@ -1602,8 +1608,8 @@
 .indicator-add-btn {
     flex: 1;
     padding: 6px 8px;
-    border: 1px solid var(--brand-primary-color, var(--apple-blue));
-    background: var(--brand-primary-color, var(--apple-blue));
+    border: 1px solid var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
+    background: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
     color: white;
     border-radius: 4px;
     cursor: pointer;
@@ -1750,13 +1756,13 @@
 .series-legend-color {
     width: 12px;
     height: 2px;
-    background: var(--brand-primary-color, var(--apple-blue));
+    background: var(--brand-primary-color, var(--entity-trade-color, var(--primary-color)));
 }
 
 .series-legend-color-square {
     width: 12px;
     height: 12px;
-    background: var(--brand-primary-color, var(--apple-green));
+    background: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     border-radius: 2px;
 }
 
@@ -1852,7 +1858,7 @@
 }
 
 .multi-select-actions button {
-    color: var(--brand-primary-color, var(--apple-green));
+    color: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     text-decoration: none;
     padding: 0;
     border: none;
@@ -1959,7 +1965,7 @@
 }
 
 .badge-legend-secondary {
-    background: var(--brand-primary-color, var(--apple-green));
+    background: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
 }
 
 .badge-legend-success {
@@ -1991,9 +1997,9 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: var(--brand-primary-color, var(--apple-green));
+    background: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     border: 4px solid var(--apple-bg-primary);
-    box-shadow: 0 0 0 2px var(--brand-primary-color, var(--apple-green));
+    box-shadow: 0 0 0 2px var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     cursor: pointer;
     transition: all 0.3s;
     margin-bottom: var(--spacing-sm);
@@ -2002,7 +2008,7 @@
 .timeline-point-absolute:hover,
 .timeline-point-absolute.selected {
     transform: scale(1.2);
-    box-shadow: 0 0 0 3px var(--brand-primary-color, var(--apple-green)), 0 0 10px rgba(38, 186, 172, 0.5);
+    box-shadow: 0 0 0 3px var(--brand-primary-color, var(--entity-trade-color, var(--primary-color))), 0 0 10px color-mix(in srgb, var(--brand-primary-color, var(--entity-trade-color, var(--primary-color))) 50%, transparent);
 }
 
 .timeline-step-info {
@@ -2017,7 +2023,7 @@
 
 .timeline-step-title {
     font-weight: bold;
-    color: var(--brand-primary-color, var(--apple-green));
+    color: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     margin-bottom: 5px;
 }
 
@@ -2035,7 +2041,7 @@
 
 .timeline-step-link {
     font-size: 0.85rem;
-    color: var(--brand-primary-color, var(--apple-green));
+    color: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     text-decoration: none;
     cursor: pointer;
 }
@@ -2099,7 +2105,7 @@
 
 .timeline-relative-point-link {
     font-size: 0.85rem;
-    color: var(--brand-primary-color, var(--apple-green));
+    color: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     text-decoration: none;
     cursor: pointer;
     margin-top: 3px;
@@ -2261,7 +2267,7 @@
 }
 
 #planVsExecutionTable tbody td:first-child i {
-    color: var(--brand-primary-color, var(--apple-green));
+    color: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     margin-inline-start: 6px;
 }
 
@@ -2318,7 +2324,7 @@
 
 .test-section h3 {
     margin-bottom: var(--spacing-md);
-    color: var(--brand-primary-color, var(--apple-green));
+    color: var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
 }
 
 .test-status {
@@ -2408,7 +2414,7 @@
 
 .calendar-day-cell-active {
     padding: var(--spacing-sm);
-    border: 1px solid var(--brand-primary-color, var(--apple-green));
+    border: 1px solid var(--brand-primary-color, var(--numeric-positive-medium, var(--color-success)));
     border-radius: 4px;
     min-height: 80px;
     background: var(--brand-primary-light, var(--apple-green-light));
@@ -2452,7 +2458,7 @@
     inset-inline-start: 0;
     inset-inline-end: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: color-mix(in srgb, var(--text-color, var(--color-text-primary, black)) 50%, transparent);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2580,13 +2586,13 @@
 }
 
 .calendar-day-indicator.execution {
-    background: var(--apple-blue-light, #cce5ff);
-    color: var(--apple-blue-dark, #004085);
+    background: var(--entity-execution-color-light, var(--entity-ticker-color-light, var(--color-info-light)));
+    color: var(--entity-execution-color-dark, var(--entity-ticker-color-dark, var(--color-info-dark)));
 }
 
 .calendar-day-indicator.cash_flow {
-    background: var(--apple-green-light, #d4edda);
-    color: var(--apple-green-dark, #155724);
+    background: var(--numeric-positive-light, var(--color-success-light));
+    color: var(--numeric-positive-dark, var(--color-success-dark));
 }
 
 .calendar-day-indicator.trade {

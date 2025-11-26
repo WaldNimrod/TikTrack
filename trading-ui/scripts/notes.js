@@ -87,6 +87,118 @@ if (!window.notesData) {
   window.notesData = [];
 }
 
+// Pagination instance variable
+let notesPaginationInstance = null;
+
+/**
+ * Load additional data needed for rendering notes table (accounts, trades, tradePlans, tickers)
+ * @returns {Promise<Object>} Object with accounts, trades, tradePlans, tickers arrays
+ */
+async function loadAdditionalNotesData() {
+    // טעינת נתונים נוספים לצורך הצגת אובייקטים מקושרים
+    let accounts = [];
+    let trades = [];
+    let tradePlans = [];
+    let tickers = [];
+
+    // פונקציה לטעינת נתונים נוספים באמצעות שירותי ישויות כלליים כשאפשר
+    const loadAdditionalData = async () => {
+      try {
+        window.Logger.info('📡 טוען נתונים נוספים עבור הערות (שירותי ישויות)...', { page: "notes" });
+
+        const loadAccounts = async () => {
+          if (typeof window.getAccounts === 'function') {
+            return await window.getAccounts();
+          }
+          const response = await fetch('/api/trading-accounts/');
+          if (!response.ok) { return []; }
+          const payload = await response.json();
+          return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+        };
+
+        const loadTrades = async () => {
+          // כרגע אין שירות טריידים כללי – שימוש ב-API ישיר
+          const response = await fetch('/api/trades/');
+          if (!response.ok) { return []; }
+          const payload = await response.json();
+          return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+        };
+
+        const loadTradePlans = async () => {
+          try {
+            // בדיקה אם TradePlansData זמין לפני שימוש ב-service
+            // אם לא זמין, נדלג על השימוש ב-service ונעבור ישירות ל-API
+            if (window.TradePlansData && typeof window.TradePlansData.loadTradePlansData === 'function') {
+              if (window.tradePlanService && typeof window.tradePlanService.loadTradePlansData === 'function') {
+                const data = await window.tradePlanService.loadTradePlansData();
+                return Array.isArray(data) ? data : [];
+              }
+              if (typeof window.loadTradePlansData === 'function') {
+                const data = await window.loadTradePlansData();
+                return Array.isArray(data) ? data : [];
+              }
+            }
+            // אם TradePlansData לא זמין, נשתמש ב-API ישיר
+            const response = await fetch('/api/trade-plans/');
+            if (!response.ok) { return []; }
+            const payload = await response.json();
+            return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+          } catch (error) {
+            // אם יש שגיאה, נחזיר מערך ריק במקום לזרוק שגיאה
+            window.Logger?.warn('⚠️ שגיאה בטעינת תוכניות מסחר, מחזיר מערך ריק', { error: error.message }, { page: 'notes' });
+            return [];
+          }
+        };
+
+        const loadTickers = async () => {
+          if (window.tickerService && typeof window.tickerService.getTickers === 'function') {
+            const data = await window.tickerService.getTickers();
+            return Array.isArray(data) ? data : [];
+          }
+          if (typeof window.getTickers === 'function') {
+            const data = await window.getTickers();
+            return Array.isArray(data) ? data : [];
+          }
+          const response = await fetch('/api/tickers/');
+          if (!response.ok) { return []; }
+          const payload = await response.json();
+          return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+        };
+
+        const [accountsData, tradesData, tradePlansData, tickersData] = await Promise.all([
+          loadAccounts(),
+          loadTrades(),
+          loadTradePlans(),
+          loadTickers()
+        ]);
+
+        accounts = accountsData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+        trades = tradesData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+        tradePlans = tradePlansData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+        tickers = tickersData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+        
+        window.Logger.info('✅ נתונים נוספים נטענו (שירותי ישויות):', {
+          accounts: accounts.length,
+          trades: trades.length,
+          tradePlans: tradePlans.length,
+          tickers: tickers.length
+        }, { page: "notes" });
+      } catch (error) {
+        window.Logger.error('❌ שגיאה בטעינת נתונים נוספים (שירותי ישויות):', error, { page: "notes" });
+        // המשך עם מערכים ריקים
+        accounts = [];
+        trades = [];
+        tradePlans = [];
+        tickers = [];
+      }
+    };
+
+    // טעינת נתונים
+    await loadAdditionalData();
+    
+    return { accounts, trades, tradePlans, tickers };
+}
+
 // ייצוא מוקדם של הפונקציה למניעת שגיאות
 window.loadNotesData = window.loadNotesData || function() {
   // loadNotesData not yet defined, using placeholder
@@ -265,21 +377,25 @@ function downloadFile(noteId, fileName) {
 
 // פונקציות בסיסיות
 /**
- * Open note details modal
- * @param {number} _id - The ID of the note
+ * Open add note modal (not view details)
+ * 
+ * NOTE: This function opens the ADD note modal, not the view details modal.
+ * For viewing note details, use viewNote(noteId) which uses showEntityDetails().
+ * 
+ * @param {number} _id - Not used (kept for backward compatibility)
  */
 function openNoteDetails(_id) {
   try {
-    // Use ModalManagerV2 directly
+    // Use ModalManagerV2 directly to open ADD modal
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
       window.ModalManagerV2.showModal('notesModal', 'add');
     } else {
       window.Logger?.error('ModalManagerV2 לא זמין', { page: "notes" });
     }
   } catch (error) {
-    window.Logger.error('שגיאה בפתיחת פרטי הערה:', error, { page: "notes" });
+    window.Logger.error('שגיאה בפתיחת מודל הוספת הערה:', error, { page: "notes" });
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בפתיחת פרטי הערה', error.message);
+      window.showErrorNotification('שגיאה בפתיחת מודל הוספת הערה', error.message);
     }
   }
 }
@@ -447,8 +563,9 @@ window.deleteNote = deleteNote;
  * @param {Array} tickers - Tickers array
  * @returns {Promise<void>}
  */
-async function updateNotesTable(notes) {
+async function updateNotesTable(notes, options = {}) {
   try {
+    const { skipPagination = false } = options;
     window.Logger.info('🟢🟢🟢 updateNotesTable נקראה (פונקציה רגילה) עם', notes ? notes.length : 0, 'הערות', { page: "notes" });
     window.Logger.info('🔍🔍🔵 Stack trace:', new Error().stack, { page: "notes" });
     
@@ -459,116 +576,55 @@ async function updateNotesTable(notes) {
       return;
     }
 
-    // טעינת נתונים נוספים לצורך הצגת אובייקטים מקושרים
-    let accounts = [];
-    let trades = [];
-    let tradePlans = [];
-    let tickers = [];
+    const safeNotes = Array.isArray(notes) ? notes : [];
 
-    // פונקציה לטעינת נתונים נוספים באמצעות שירותי ישויות כלליים כשאפשר
-    const loadAdditionalData = async () => {
+    // Check if we should use pagination
+    if (!skipPagination && typeof window.updateTableWithPagination === 'function') {
       try {
-        window.Logger.info('📡 טוען נתונים נוספים עבור הערות (שירותי ישויות)...', { page: "notes" });
-
-        const loadAccounts = async () => {
-          if (typeof window.getAccounts === 'function') {
-            return await window.getAccounts();
-          }
-          const response = await fetch('/api/trading-accounts/');
-          if (!response.ok) { return []; }
-          const payload = await response.json();
-          return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
-        };
-
-        const loadTrades = async () => {
-          // כרגע אין שירות טריידים כללי – שימוש ב-API ישיר
-          const response = await fetch('/api/trades/');
-          if (!response.ok) { return []; }
-          const payload = await response.json();
-          return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
-        };
-
-        const loadTradePlans = async () => {
-          try {
-            // בדיקה אם TradePlansData זמין לפני שימוש ב-service
-            // אם לא זמין, נדלג על השימוש ב-service ונעבור ישירות ל-API
-            if (window.TradePlansData && typeof window.TradePlansData.loadTradePlansData === 'function') {
-              if (window.tradePlanService && typeof window.tradePlanService.loadTradePlansData === 'function') {
-                const data = await window.tradePlanService.loadTradePlansData();
-                return Array.isArray(data) ? data : [];
-              }
-              if (typeof window.loadTradePlansData === 'function') {
-                const data = await window.loadTradePlansData();
-                return Array.isArray(data) ? data : [];
-              }
-            }
-            // אם TradePlansData לא זמין, נשתמש ב-API ישיר
-            const response = await fetch('/api/trade-plans/');
-            if (!response.ok) { return []; }
-            const payload = await response.json();
-            return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
-          } catch (error) {
-            // אם יש שגיאה, נחזיר מערך ריק במקום לזרוק שגיאה
-            window.Logger?.warn('⚠️ שגיאה בטעינת תוכניות מסחר, מחזיר מערך ריק', { error: error.message }, { page: 'notes' });
-            return [];
-          }
-        };
-
-        const loadTickers = async () => {
-          if (window.tickerService && typeof window.tickerService.getTickers === 'function') {
-            const data = await window.tickerService.getTickers();
-            return Array.isArray(data) ? data : [];
-          }
-          if (typeof window.getTickers === 'function') {
-            const data = await window.getTickers();
-            return Array.isArray(data) ? data : [];
-          }
-          const response = await fetch('/api/tickers/');
-          if (!response.ok) { return []; }
-          const payload = await response.json();
-          return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
-        };
-
-        const [accountsData, tradesData, tradePlansData, tickersData] = await Promise.all([
-          loadAccounts(),
-          loadTrades(),
-          loadTradePlans(),
-          loadTickers()
-        ]);
-
-        accounts = accountsData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
-        trades = tradesData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
-        tradePlans = tradePlansData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
-        tickers = tickersData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+        // Load additional data first (needed for rendering)
+        const additionalData = await loadAdditionalNotesData();
         
-        window.Logger.info('✅ נתונים נוספים נטענו (שירותי ישויות):', {
-          accounts: accounts.length,
-          trades: trades.length,
-          tradePlans: tradePlans.length,
-          tickers: tickers.length
-        }, { page: "notes" });
+        window.notesPaginationInstance = await window.updateTableWithPagination({
+          tableId: 'notesTable',
+          tableType: 'notes',
+          data: safeNotes,
+          render: async (pageData, context) => {
+            // Render with additional data
+            const rows = renderNotesTableRows(pageData, additionalData);
+            tbody.innerHTML = rows;
+            
+            // Update buttons
+            if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+              window.advancedButtonSystem.processButtons(tbody);
+            } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+              window.ButtonSystem.initializeButtons();
+            }
+            
+            if (window.setPageTableData) {
+              window.setPageTableData('notes', pageData, {
+                tableId: 'notesTable',
+                pageInfo: context?.pageInfo,
+              });
+            }
+          },
+          onFilteredDataChange: ({ filteredData }) => {
+            if (typeof window.updateNotesSummary === 'function') {
+              window.updateNotesSummary(Array.isArray(filteredData) ? filteredData : []);
+            }
+          },
+        });
+        return;
       } catch (error) {
-        window.Logger.error('❌ שגיאה בטעינת נתונים נוספים (שירותי ישויות):', error, { page: "notes" });
-        // המשך עם מערכים ריקים
-        accounts = [];
-        trades = [];
-        tradePlans = [];
-        tickers = [];
+        window.Logger?.warn('updateNotesTable pagination fallback triggered', { error, page: 'notes' });
       }
-    };
-
-    // טעינת נתונים ועדכון הטבלה
-    await loadAdditionalData();
-    
-    // בדיקה שהנתונים קיימים
-    if (!notes || !Array.isArray(notes)) {
-      window.Logger.warn('⚠️ notes parameter is not available or not an array', { page: "notes" });
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center">אין הערות להצגה</td></tr>';
-      return;
     }
 
-    if (notes.length === 0) {
-      tbody.innerHTML = `
+    // טעינת נתונים נוספים לצורך הצגת אובייקטים מקושרים
+    const additionalData = await loadAdditionalNotesData();
+    
+    // בדיקה שהנתונים קיימים
+    if (!safeNotes || safeNotes.length === 0) {
+      const emptyMessage = `
         <tr>
           <td colspan="6" class="text-center text-muted">
           <div style="padding: 20px;">
@@ -579,16 +635,63 @@ async function updateNotesTable(notes) {
         </td>
       </tr>
     `;
-    
+      tbody.innerHTML = emptyMessage;
+      
       // 🔘 עדכון כפתורים דינמיים
       if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
         window.ButtonSystem.initializeButtons();
+      }
+      
+      if (typeof window.updateNotesSummary === 'function' && !window._notesUpdateInProgress) {
+        window.updateNotesSummary([]);
       }
       return;
     }
 
     // בניית שורות הטבלה
-    const rows = notes.map(note => {
+    const rows = renderNotesTableRows(safeNotes, additionalData);
+    tbody.innerHTML = rows;
+    
+    window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', safeNotes.length, 'הערות', { page: "notes", keepInfo: true });
+    
+    // עדכון table-count ו-info-summary
+    if (typeof window.updateNotesSummary === 'function' && !window._notesUpdateInProgress) {
+      window.updateNotesSummary(safeNotes);
+    }
+    
+    // 🔘 עדכון כפתורים דינמיים
+    if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+      window.advancedButtonSystem.processButtons(tbody);
+    } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+      window.ButtonSystem.initializeButtons();
+    }
+    
+  } catch (error) {
+    window.Logger.error('שגיאה בעדכון טבלת הערות:', error, { page: "notes" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון טבלת הערות', error.message);
+    }
+  }
+}
+
+/**
+ * Render notes table rows
+ * @param {Array} notes - Array of notes to render
+ * @param {Object} additionalData - Object with accounts, trades, tradePlans, tickers arrays
+ * @returns {string} HTML string of table rows
+ */
+function renderNotesTableRows(notes, additionalData = {}) {
+    if (!notes || notes.length === 0) {
+        return '';
+    }
+    
+    const accounts = additionalData.accounts || [];
+    const trades = additionalData.trades || [];
+    const tradePlans = additionalData.tradePlans || [];
+    const tickers = additionalData.tickers || [];
+    
+    return notes.map(note => {
+        try {
         const createdEnvelope = window.dateUtils?.ensureDateEnvelope
           ? window.dateUtils.ensureDateEnvelope(note.created_at)
           : note.created_at;
@@ -965,43 +1068,12 @@ async function updateNotesTable(notes) {
             </td>
           </tr>
         `;
-      }).join('');
-
-    tbody.innerHTML = rows;
-    window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות', { page: "notes", keepInfo: true });
-    window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "notes" });
-
-    // עדכון table-count ו-info-summary
-    // הערה: updateNotesSummary נקראת גם מ-loadNotesData, אז אין צורך לקרוא כאן שוב
-    // אם זו קריאה ישירה (לא דרך loadNotesData), נעדכן את הסיכום
-    if (typeof window.updateNotesSummary === 'function' && !window._notesUpdateInProgress) {
-      window.updateNotesSummary(notes);
-    }
-    
-    // 🔘 עדכון כפתורים דינמיים
-    // NOTE: processButtons already handles tooltip initialization for buttons with data-button-type
-    // initializeTooltips is only needed for custom buttons without data-button-type
-    if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
-      // Process all buttons including actions-menu buttons
-      // This will also initialize tooltips for buttons with data-button-type
-      window.advancedButtonSystem.processButtons(tbody);
-    } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
-      window.ButtonSystem.initializeButtons();
-    }
-    
-    // 🔘 אתחול טולטיפים רק לכפתורים מותאמים אישית (ללא data-button-type)
-    // כפתורים עם data-button-type כבר טופלו ב-processButtons
-    if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
-      // Initialize tooltips for custom filter buttons (if any don't have data-button-type)
-      const filterContainer = document.querySelector('.filter-buttons-container');
-      if (filterContainer) {
-        // Only initialize tooltips for buttons without data-button-type
-        const customFilterButtons = filterContainer.querySelectorAll('[data-tooltip]:not([data-button-type]):not([data-button-processed])');
-        if (customFilterButtons.length > 0) {
-          window.advancedButtonSystem.initializeTooltips(filterContainer);
+        } catch (error) {
+          window.Logger.error(`❌ Error processing note ${note?.id}:`, error, { page: "notes" });
+          return `<tr><td colspan="6" class="text-center text-danger">שגיאה בעיבוד הערה ${note?.id}</td></tr>`;
         }
-      }
-    }
+    }).join('');
+}
   
   } catch (error) {
     window.Logger.error('שגיאה בעדכון טבלת הערות:', error, { page: "notes" });
@@ -1280,66 +1352,136 @@ function onNoteRelationTypeChange() {
 
 /**
  * Populate edit select by type
+ * Uses SelectPopulatorService for consistent select population
  * @param {string} relationType - Relation type
  * @param {number|string} selectedId - Selected ID
  * @returns {Promise<void>}
  */
 async function populateEditSelectByType(relationType, selectedId) {
   try {
-    let data = [];
-    let displayField = '';
-    let placeholder = '';
+    const select = document.getElementById('editNoteRelatedObjectSelect');
+    if (!select) {
+      window.Logger?.warn('⚠️ editNoteRelatedObjectSelect not found', { page: 'notes' });
+      return;
+    }
+
+    // Check if SelectPopulatorService is available
+    if (!window.SelectPopulatorService) {
+      window.Logger?.warn('⚠️ SelectPopulatorService not available - using fallback', { page: 'notes' });
+      // Fallback to old method if service not available
+      await populateEditSelectByTypeFallback(relationType, selectedId);
+      return;
+    }
 
     switch (parseInt(relationType)) {
     case 1: { // חשבון מסחר
-      const accountsResponse = await fetch('/api/trading-accounts/');
-      const accountsData = await accountsResponse.json();
-      data = Array.isArray(accountsData.data) ? accountsData.data : [];
-      displayField = 'name';
-      placeholder = 'חשבון מסחר';
+      await window.SelectPopulatorService.populateAccountsSelect(select, {
+        includeEmpty: true,
+        emptyText: 'בחר חשבון מסחר...',
+        defaultValue: selectedId ? parseInt(selectedId) : null
+      });
       break;
     }
     case 2: { // טרייד
-      const tradesResponse = await fetch('/api/trades/');
-      const tradesData = await tradesResponse.json();
-      data = Array.isArray(tradesData.data) ? tradesData.data : [];
-      displayField = 'id';
-      placeholder = 'טרייד';
+      await window.SelectPopulatorService.populateTradesSelect(select, {
+        includeEmpty: true,
+        emptyText: 'בחר טרייד...',
+        defaultValue: selectedId ? parseInt(selectedId) : null
+      });
       break;
     }
     case 3: { // תוכנית
-      const plansResponse = await fetch('/api/trade-plans/');
-      const plansData = await plansResponse.json();
-      data = Array.isArray(plansData.data) ? plansData.data : [];
-      displayField = 'id';
-      placeholder = 'תוכנית';
+      await window.SelectPopulatorService.populateTradePlansSelect(select, {
+        includeEmpty: true,
+        emptyText: 'בחר תכנון...',
+        defaultValue: selectedId ? parseInt(selectedId) : null
+      });
       break;
     }
     case 4: { // טיקר
-      const tickersResponse = await fetch('/api/tickers/');
-      const tickersData = await tickersResponse.json();
-      data = Array.isArray(tickersData.data) ? tickersData.data : [];
-      displayField = 'symbol';
-      placeholder = 'טיקר';
+      await window.SelectPopulatorService.populateTickersSelect(select, {
+        includeEmpty: true,
+        emptyText: 'בחר טיקר...',
+        defaultValue: selectedId ? parseInt(selectedId) : null
+      });
       break;
     }
+    default:
+      window.Logger?.warn('⚠️ Unknown relation type', { relationType, page: 'notes' });
     }
 
-    // מילוי הרשימה
-    populateSelect('editNoteRelatedObjectSelect', data, displayField, placeholder);
+  } catch (error) {
+    window.Logger?.error('❌ Error populating edit select by type', error, { relationType, selectedId, page: 'notes' });
+    // Fallback to old method on error
+    try {
+      await populateEditSelectByTypeFallback(relationType, selectedId);
+    } catch (fallbackError) {
+      window.Logger?.error('❌ Fallback also failed', fallbackError, { page: 'notes' });
+    }
+  }
+}
 
-    // בחירת הערך הנכון
-    if (selectedId) {
-      setTimeout(() => {
-        const select = document.getElementById('editNoteRelatedObjectSelect');
-        if (select) {
+/**
+ * Fallback method for populateEditSelectByType
+ * Used when SelectPopulatorService is not available
+ * @private
+ */
+async function populateEditSelectByTypeFallback(relationType, selectedId) {
+  let data = [];
+  let displayField = '';
+  let placeholder = '';
+
+  switch (parseInt(relationType)) {
+  case 1: { // חשבון מסחר
+    const accountsResponse = await fetch('/api/trading-accounts/');
+    const accountsData = await accountsResponse.json();
+    data = Array.isArray(accountsData.data) ? accountsData.data : [];
+    displayField = 'name';
+    placeholder = 'חשבון מסחר';
+    break;
+  }
+  case 2: { // טרייד
+    const tradesResponse = await fetch('/api/trades/');
+    const tradesData = await tradesResponse.json();
+    data = Array.isArray(tradesData.data) ? tradesData.data : [];
+    displayField = 'id';
+    placeholder = 'טרייד';
+    break;
+  }
+  case 3: { // תוכנית
+    const plansResponse = await fetch('/api/trade-plans/');
+    const plansData = await plansResponse.json();
+    data = Array.isArray(plansData.data) ? plansData.data : [];
+    displayField = 'id';
+    placeholder = 'תוכנית';
+    break;
+  }
+  case 4: { // טיקר
+    const tickersResponse = await fetch('/api/tickers/');
+    const tickersData = await tickersResponse.json();
+    data = Array.isArray(tickersData.data) ? tickersData.data : [];
+    displayField = 'symbol';
+    placeholder = 'טיקר';
+    break;
+  }
+  }
+
+  // מילוי הרשימה
+  populateSelect('editNoteRelatedObjectSelect', data, displayField, placeholder);
+
+  // בחירת הערך הנכון
+  if (selectedId) {
+    setTimeout(() => {
+      const select = document.getElementById('editNoteRelatedObjectSelect');
+      if (select) {
+        // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(select.id, selectedId, 'int');
+        } else {
           select.value = selectedId;
         }
-      }, 100);
-    }
-
-  } catch {
-    // שגיאה במילוי רשימה לעריכה
+      }
+    }, 100);
   }
 }
 
@@ -1989,7 +2131,12 @@ function clearSelectedFile() {
     const actionsElement = document.getElementById('attachmentActions');
 
   if (fileInput) {
-    fileInput.value = '';
+    // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue(fileInput.id, '', 'text');
+    } else {
+      fileInput.value = '';
+    }
   }
 
   if (displayElement) {
@@ -2370,11 +2517,19 @@ function filterNotesByType(type) {
 // פונקציה לקבלת שם תצוגה לסוג
 /**
  * Get display name for type
+ * @deprecated Use window.translateEntityType() from translation-utils.js instead
+ * This function is kept for backward compatibility but should use the centralized Translation Utilities
  * @param {string} type - Type to get display name for
  * @returns {string} Display name
  */
 function getTypeDisplayName(type) {
   try {
+    // Use Translation Utilities if available
+    if (window.translateEntityType && typeof window.translateEntityType === 'function') {
+      return window.translateEntityType(type);
+    }
+    
+    // Fallback to local implementation
     switch (type) {
     case 'account': return 'חשבונות';
     case 'trade': return 'טריידים';
@@ -2417,18 +2572,28 @@ function viewNote(noteId) {
       }
 
       // הצגת המודל דרך ModalManagerV2 (אם זמין) או fallback ל-Bootstrap
-      if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-        // אם יש config ל-viewNoteModal, נשתמש ב-ModalManagerV2
-        // אחרת, נשתמש ב-Bootstrap (מודל view-only מיוחד)
-        const modalElement = document.getElementById('viewNoteModal');
-        if (modalElement) {
-          const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-          modal.show();
+      // viewNoteModal הוא מודל view-only מיוחד, לא חלק מ-ModalManagerV2 CRUD
+      const modalElement = document.getElementById('viewNoteModal');
+      if (modalElement) {
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+          // נסה להשתמש ב-ModalManagerV2 - אם המודל קיים במערכת
+          try {
+            await window.ModalManagerV2.showModal('viewNoteModal', 'view');
+          } catch (error) {
+            // אם המודל לא קיים במערכת, נשתמש ב-Bootstrap
+            window.Logger?.warn('viewNoteModal not in ModalManagerV2, using Bootstrap fallback', { page: 'notes' });
+            const modal = bootstrap?.Modal?.getOrCreateInstance(modalElement);
+            if (modal) {
+              modal.show();
+            }
+          }
+        } else {
+          // Fallback ל-Bootstrap modal
+          if (bootstrap?.Modal) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+          }
         }
-      } else {
-        // Fallback ל-Bootstrap modal
-        const modal = new bootstrap.Modal(document.getElementById('viewNoteModal'));
-        modal.show();
       }
     }
   
@@ -2700,7 +2865,12 @@ function removeCurrentAttachment() {
   }
 
   if (fileInput) {
-    fileInput.value = '';
+    // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue(fileInput.id, '', 'text');
+    } else {
+      fileInput.value = '';
+    }
   }
 
   // סימון שמחיקת הקובץ נדרשת

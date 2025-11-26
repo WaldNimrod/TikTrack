@@ -287,6 +287,17 @@
                 headers: { Accept: 'application/json' }
             });
 
+            // שימוש ב-CRUDResponseHandler לטיפול בשגיאות טעינה (אם זמין)
+            if (!response.ok && window.CRUDResponseHandler?.handleLoadResponse) {
+                // CRUDResponseHandler.handleLoadResponse מטפל בשגיאה ומחזיר []
+                const emptyData = window.CRUDResponseHandler.handleLoadResponse(response, {
+                    tableId: 'pendingTradePlanAssignmentsList',
+                    entityName: 'הצעות שיוך תוכניות',
+                    onRetry: () => this.fetchAssignments(limit)
+                });
+                return [[], {}];
+            }
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
@@ -320,6 +331,17 @@
             const response = await fetch(`${CREATIONS_ENDPOINT}?${params.toString()}`, {
                 headers: { Accept: 'application/json' }
             });
+
+            // שימוש ב-CRUDResponseHandler לטיפול בשגיאות טעינה (אם זמין)
+            if (!response.ok && window.CRUDResponseHandler?.handleLoadResponse) {
+                // CRUDResponseHandler.handleLoadResponse מטפל בשגיאה ומחזיר []
+                const emptyData = window.CRUDResponseHandler.handleLoadResponse(response, {
+                    tableId: 'pendingTradePlanCreationsList',
+                    entityName: 'הצעות יצירת תוכניות',
+                    onRetry: () => this.fetchCreations(limit, assignmentIndex)
+                });
+                return [];
+            }
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -554,36 +576,51 @@
             try {
                 window.Logger?.info('🔗 Linking trade to plan', { tradeId, planId }, { page: 'index' });
 
+                // שימוש ב-CRUDResponseHandler לטיפול אחיד בתגובה
                 const response = await fetch(LINK_ENDPOINT(tradeId), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ trade_plan_id: planId })
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData?.error?.message || 'שיוך לתוכנית נכשל');
+                // טיפול בתגובה דרך CRUDResponseHandler (אם זמין)
+                let result = null;
+                if (window.CRUDResponseHandler?.handleSaveResponse) {
+                    result = await window.CRUDResponseHandler.handleSaveResponse(response, {
+                        modalId: null, // אין modal לסגירה כאן
+                        successMessage: `טרייד #${tradeId} שויך לתוכנית #${planId}`,
+                        entityName: 'שיוך תוכנית',
+                        reloadFn: null, // נטפל ב-reload בנפרד
+                        requiresHardReload: true // נדרש hard reload אחרי שיוך
+                    });
+                } else {
+                    // Fallback אם CRUDResponseHandler לא זמין
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData?.error?.message || 'שיוך לתוכנית נכשל');
+                    }
+
+                    const payload = await response.json().catch(() => null);
+                    if (!payload || payload.status !== 'success') {
+                        throw new Error(payload?.error?.message || 'שיוך לתוכנית נכשל');
+                    }
+                    result = payload;
                 }
 
-                const payload = await response.json().catch(() => null);
-                if (!payload || payload.status !== 'success') {
-                    throw new Error(payload?.error?.message || 'שיוך לתוכנית נכשל');
+                // אם השיוך הצליח
+                if (result) {
+                    await this.clearCachesAfterLink();
+
+                    const dismissKey = this.getDismissKey('assignment', tradeId, planId);
+                    this.state.dismissed.add(dismissKey);
+                    this.persistDismissedItems();
+
+                    this.refreshSoon();
                 }
-
-                await this.clearCachesAfterLink();
-
-                if (typeof window.showSuccessNotification === 'function') {
-                    window.showSuccessNotification('שיוך הושלם', `טרייד #${tradeId} שויך לתוכנית #${planId}`);
-                }
-
-                const dismissKey = this.getDismissKey('assignment', tradeId, planId);
-                this.state.dismissed.add(dismissKey);
-                this.persistDismissedItems();
-
-                this.refreshSoon();
             } catch (error) {
                 window.Logger?.error('❌ Failed to link trade to plan', { tradeId, planId, error: error?.message }, { page: 'index' });
-                if (typeof window.showErrorNotification === 'function') {
+                // CRUDResponseHandler כבר טיפל בהודעת שגיאה, אבל נוסיף fallback
+                if (!window.CRUDResponseHandler?.handleError && typeof window.showErrorNotification === 'function') {
                     window.showErrorNotification('שגיאה בשיוך תוכנית', error?.message || 'שיוך התוכנית נכשל');
                 }
             }

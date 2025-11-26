@@ -860,7 +860,15 @@
             const copyBtn = document.getElementById('copyLogBtn');
             if (copyBtn) {
                 copyBtn.disabled = true;
-                copyBtn.innerHTML = '<img src="../../images/icons/tabler/hourglass.svg" width="16" height="16" alt="hourglass" class="icon"> מעתיק...';
+                let hourglassIcon = '<img src="../../images/icons/tabler/hourglass.svg" width="16" height="16" alt="hourglass" class="icon">';
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        hourglassIcon = await window.IconSystem.renderIcon('button', 'hourglass', { size: '16', alt: 'hourglass', class: 'icon' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                copyBtn.innerHTML = hourglassIcon + ' מעתיק...';
             }
             
             testResults.endTime = new Date();
@@ -940,9 +948,25 @@
             
             if (copyBtn) {
                 copyBtn.disabled = false;
-                copyBtn.innerHTML = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> הועתק!';
-                setTimeout(() => {
-                    copyBtn.innerHTML = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> העתק לוג מפורט';
+                let infoIcon = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">';
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        infoIcon = await window.IconSystem.renderIcon('button', 'info-circle', { size: '16', alt: 'icon', class: 'icon' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                copyBtn.innerHTML = infoIcon + ' הועתק!';
+                setTimeout(async () => {
+                    let infoIcon2 = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">';
+                    if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                        try {
+                            infoIcon2 = await window.IconSystem.renderIcon('button', 'info-circle', { size: '16', alt: 'icon', class: 'icon' });
+                        } catch (error) {
+                            // Fallback already set
+                        }
+                    }
+                    copyBtn.innerHTML = infoIcon2 + ' העתק לוג מפורט';
                 }, 2000);
             }
             
@@ -964,7 +988,16 @@
             const copyBtn = document.getElementById('copyLogBtn');
             if (copyBtn) {
                 copyBtn.disabled = false;
-                copyBtn.innerHTML = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> העתק לוג מפורט';
+                // Render icon using IconSystem
+                let iconHTML = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">';
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        iconHTML = await window.IconSystem.renderIcon('button', 'info-circle', { size: '16', alt: 'icon', class: 'icon' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                copyBtn.innerHTML = iconHTML + ' העתק לוג מפורט';
             }
         }
     }

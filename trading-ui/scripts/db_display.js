@@ -123,8 +123,14 @@ async function loadTableDataLocal(tableType, containerId) {
     // Store data
     tableData[tableType] = Array.isArray(data) ? data : [];
 
-    // Update table display
-    updateTableDisplay(tableData[tableType], tableType, containerId);
+    // Update table display using centralized system
+    const tableTypeNormalized = tableType.replace(/-/g, '_');
+    if (typeof window.updateTable === 'function') {
+      window.updateTable(tableTypeNormalized, tableData[tableType]);
+    } else {
+      // Fallback to local function if centralized system not available
+      updateTableDisplay(tableData[tableType], tableType, containerId);
+    }
 
     // Update table info
     updateTableInfo(tableType, tableData[tableType].length);
@@ -145,7 +151,8 @@ async function loadTableDataLocal(tableType, containerId) {
 // ===== TABLE DISPLAY =====
 
 /**
- * Update table display with data
+ * Update table display with data (FALLBACK - Use window.updateTable() instead)
+ * @deprecated Use window.updateTable() from unified-table-system.js
  * @param {Array} data - The data to display
  * @param {string} tableType - The table type (with dashes)
  * @param {string} containerId - The container ID for the table
@@ -173,7 +180,7 @@ function updateTableDisplay(data, tableType, containerId) {
     return;
   }
 
-  window.Logger?.debug('Updating table display', { page: 'db_display', tableType, recordCount: data.length });
+  window.Logger?.debug('Updating table display (fallback)', { page: 'db_display', tableType, recordCount: data.length });
 
   // Create table headers from first data row
   const thead = table.querySelector('thead');
@@ -247,7 +254,8 @@ function getTableId(tableType) {
 
 
 /**
- * Create table headers from data
+ * Create table headers from data (FALLBACK - Use UnifiedTableSystem instead)
+ * @deprecated Use window.UnifiedTableSystem.renderer.render() instead
  * @param {Array} data - The table data
  * @returns {string} The table headers HTML
  */
@@ -258,7 +266,8 @@ function createTableHeaders(data) {
 }
 
 /**
- * Create table body HTML from data
+ * Create table body HTML from data (FALLBACK - Use UnifiedTableSystem instead)
+ * @deprecated Use window.UnifiedTableSystem.renderer.render() instead
  * @param {Array} data - The table data
  * @param {string} tableType - The table type
  * @returns {string} The table body HTML

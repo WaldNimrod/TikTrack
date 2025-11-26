@@ -106,9 +106,22 @@ function loadSavedCredentials(usernameId = 'username', passwordId = 'password', 
       const passwordField = document.getElementById(passwordId);
       const rememberMeField = document.getElementById(rememberMeId);
 
-      if (usernameField) {usernameField.value = savedUsername;}
-      if (passwordField) {passwordField.value = savedPassword;}
-      if (rememberMeField) {rememberMeField.checked = true;}
+      // Use DataCollectionService to set values if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        if (usernameField) window.DataCollectionService.setValue(usernameId, savedUsername, 'text');
+        if (passwordField) window.DataCollectionService.setValue(passwordId, savedPassword, 'text');
+      } else {
+        if (usernameField) usernameField.value = savedUsername;
+        if (passwordField) passwordField.value = savedPassword;
+      }
+      // Use DefaultValueSetter for logical default
+      if (rememberMeField) {
+        if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setLogicalDefault === 'function') {
+          window.DefaultValueSetter.setLogicalDefault(rememberMeField.id || 'rememberMe', true);
+        } else {
+          rememberMeField.checked = true;
+        }
+      }
     }
   }
 }
@@ -184,8 +197,17 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    const username = document.getElementById('username')?.value;
-    const password = document.getElementById('password')?.value;
+    // Use DataCollectionService to get values if available
+    let username, password;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      username = window.DataCollectionService.getValue('username', 'text', '');
+      password = window.DataCollectionService.getValue('password', 'text', '');
+    } else {
+      const usernameEl = document.getElementById('username');
+      const passwordEl = document.getElementById('password');
+      username = usernameEl ? usernameEl.value : '';
+      password = passwordEl ? passwordEl.value : '';
+    }
 
     if (!username || !password) {
       showLoginError('אנא מלא את כל השדות');

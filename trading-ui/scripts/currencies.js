@@ -53,11 +53,40 @@ function showEditCurrencyModal(id) {
     return;
   }
 
-  // מילוי הטופס
-  document.getElementById('editCurrencyId').value = currency.id;
-  document.getElementById('editCurrencySymbol').value = currency.symbol;
-  document.getElementById('editCurrencyName').value = currency.name;
-  document.getElementById('editCurrencyUsdRate').value = currency.usd_rate;
+  // מילוי הטופס באמצעות DataCollectionService
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setFormData) {
+    const fieldMap = {
+      id: { id: 'editCurrencyId', type: 'int' },
+      symbol: { id: 'editCurrencySymbol', type: 'text' },
+      name: { id: 'editCurrencyName', type: 'text' },
+      usd_rate: { id: 'editCurrencyUsdRate', type: 'number' }
+    };
+    const values = {
+      id: currency.id,
+      symbol: currency.symbol,
+      name: currency.name,
+      usd_rate: currency.usd_rate
+    };
+    window.DataCollectionService.setFormData(fieldMap, values);
+  } else {
+    // Fallback if DataCollectionService is not available
+    // Use DataCollectionService to set values if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('editCurrencyId', currency.id, 'int');
+        window.DataCollectionService.setValue('editCurrencySymbol', currency.symbol, 'text');
+        window.DataCollectionService.setValue('editCurrencyName', currency.name, 'text');
+        window.DataCollectionService.setValue('editCurrencyUsdRate', currency.usd_rate, 'number');
+    } else {
+        const editIdEl = document.getElementById('editCurrencyId');
+        const editSymbolEl = document.getElementById('editCurrencySymbol');
+        const editNameEl = document.getElementById('editCurrencyName');
+        const editRateEl = document.getElementById('editCurrencyUsdRate');
+        if (editIdEl) editIdEl.value = currency.id;
+        if (editSymbolEl) editSymbolEl.value = currency.symbol;
+        if (editNameEl) editNameEl.value = currency.name;
+        if (editRateEl) editRateEl.value = currency.usd_rate;
+    }
+  }
 
   // הצגת המודל
   const modal = new bootstrap.Modal(document.getElementById('editCurrencyModal'));
@@ -76,7 +105,18 @@ function showDeleteCurrencyModal(id) {
   }
 
   // מילוי פרטי המחיקה
-  document.getElementById('deleteCurrencyId').value = currency.id;
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+    window.DataCollectionService.setValue('deleteCurrencyId', currency.id, 'int');
+  } else {
+    // Fallback if DataCollectionService is not available
+    // Use DataCollectionService to set value if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('deleteCurrencyId', currency.id, 'int');
+    } else {
+        const deleteIdEl = document.getElementById('deleteCurrencyId');
+        if (deleteIdEl) deleteIdEl.value = currency.id;
+    }
+  }
   document.getElementById('deleteCurrencyName').textContent = `${currency.symbol} - ${currency.name}`;
 
   // הצגת המודל
@@ -135,7 +175,14 @@ async function loadCurrencies() {
  */
 async function confirmDeleteCurrency() {
   try {
-    const id = parseInt(document.getElementById('deleteCurrencyId').value);
+    // Use DataCollectionService to get value if available
+    let id;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        id = parseInt(window.DataCollectionService.getValue('deleteCurrencyId', 'int', 0));
+    } else {
+        const deleteIdEl = document.getElementById('deleteCurrencyId');
+        id = deleteIdEl ? parseInt(deleteIdEl.value) : 0;
+    }
 
     // בדיקת פריטים מקושרים לפני מחיקה
     if (typeof window.checkLinkedItemsBeforeDelete === 'function') {

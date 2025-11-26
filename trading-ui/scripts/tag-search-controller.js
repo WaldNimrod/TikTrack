@@ -204,7 +204,12 @@
 
         applyTagFromCloud(tag) {
             if (elements.quickSearchInput) {
-                elements.quickSearchInput.value = tag.name || '';
+                // Use DataCollectionService to set value if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(elements.quickSearchInput.id, tag.name || '', 'text');
+                } else {
+                  elements.quickSearchInput.value = tag.name || '';
+                }
                 elements.quickSearchInput.focus();
             }
             this.performSearch({

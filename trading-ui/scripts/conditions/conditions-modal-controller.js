@@ -194,7 +194,10 @@
                 }
             }
 
-            const navigationAvailable = Boolean(window.ModalNavigationService?.registerModalOpen);
+            // Modal Navigation System - רק למודלים מקוננים (nested modals)
+            // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
+            const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
+            const navigationAvailable = Boolean(window.ModalNavigationService?.registerModalOpen) && hasStack;
             let parentEntry = null;
 
             if (navigationAvailable && typeof window.ModalNavigationService.getActiveEntry === 'function') {
@@ -237,6 +240,11 @@
                 } catch (error) {
                     window.Logger?.warn('[ConditionsModalController] Failed to register modal in navigation service', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
                     this.navigationInstanceId = null;
+                }
+
+                // עדכון UI (breadcrumb וכפתור חזרה) רק במודלים מקוננים
+                if (window.modalNavigationManager?.updateModalNavigation) {
+                    window.modalNavigationManager.updateModalNavigation(this.modalElement);
                 }
             } else if (this.parentModalId) {
                 const parentElement = document.getElementById(this.parentModalId);
@@ -322,6 +330,22 @@
 
         onModalHidden() {
             window.Logger?.info('[ConditionsModalController] onModalHidden triggered', {}, { page: 'conditions-modal-controller' });
+            
+            // רישום סגירה במערכת Modal Navigation (אם היה רשום)
+            if (this.navigationInstanceId && window.ModalNavigationService?.registerModalClose) {
+                try {
+                    window.ModalNavigationService.registerModalClose(MODAL_ID, { instanceId: this.navigationInstanceId });
+                } catch (error) {
+                    window.Logger?.warn('[ConditionsModalController] Failed to register modal close in navigation service', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
+                }
+            } else if (window.registerModalNavigationClose) {
+                try {
+                    window.registerModalNavigationClose(MODAL_ID);
+                } catch (error) {
+                    window.Logger?.warn('[ConditionsModalController] Failed to register modal close (fallback)', { error: error?.message }, { page: 'conditions-modal-controller' });
+                }
+            }
+            
             if (!window.ModalNavigationService?.registerModalOpen) {
                 this.restoreParentModal();
             } else {

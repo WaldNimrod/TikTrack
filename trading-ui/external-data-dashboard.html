@@ -25,7 +25,7 @@
                         <h2><img src="/trading-ui/images/icons/tabler/world.svg" width="16" height="16" alt="world" class="icon"> דשבורד נתונים חיצוניים</h2>
                         <div class="header-actions d-flex align-items-center gap-2">
                             <button data-button-type="COPY" data-text="העתק לוג מפורט" data-onclick="ExternalDataDashboardActions.copyDetailedLog(event)" data-size="small" data-id="action-copy-log-header"></button>
-                            <button class="filter-toggle-btn" data-onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                            <button class="filter-toggle-btn" data-onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -130,7 +130,7 @@
                     <div class="section-header">
                         <h2>פעולות מהירות</h2>
                         <div class="table-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('actions-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('actions-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -203,7 +203,7 @@
                     <div class="section-header">
                         <h2>ספקי נתונים</h2>
                         <div class="table-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('providers-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('providers-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -225,7 +225,7 @@
                     <div class="section-header">
                         <h2>ניהול מטמון נתונים חיצוניים</h2>
                         <div class="table-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('cache-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('cache-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -288,7 +288,7 @@
                                 <button data-button-type="REFRESH" data-text="רענון לוגים" data-onclick="ExternalDataDashboardActions.refreshLogs(event)" data-size="small" data-id="action-refresh-logs"></button>
                                 <button data-button-type="DELETE" data-text="ניקוי לוגים" data-onclick="ExternalDataDashboardActions.clearLogs(event)" data-size="small" data-id="action-clear-logs"></button>
                             </div>
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('logs-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('logs-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -328,7 +328,7 @@
                                 </select>
                                 <button data-button-type="REFRESH" data-text="רענון היסטוריה" data-onclick="ExternalDataDashboardActions.refreshHistory(event)" data-size="small" data-id="action-refresh-history"></button>
                             </div>
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('history-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('history-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -347,7 +347,7 @@
                             <div class="section-actions">
                                 <button data-button-type="REFRESH" data-text="רענון גרפים" data-onclick="ExternalDataDashboardActions.refreshPerformanceCharts(event)" data-size="small" data-id="action-refresh-charts"></button>
                             </div>
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('charts-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('charts-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -433,6 +433,8 @@
     <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
     <!-- [7] Load Order: 7 -->
     <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [7.5] Load Order: 7.5 -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
     <!-- [8] Load Order: 8 -->
     <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
     <!-- [9] Load Order: 9 -->
@@ -531,7 +533,22 @@
     <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+
+<!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [40] Page-specific: external-data-dashboard -->

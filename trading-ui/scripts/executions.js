@@ -268,7 +268,12 @@ function updateRealizedPLField() {
     // Disable Realized P/L for buy, short, and any unknown types (opening positions)
     realizedPLField.disabled = true;
     realizedPLField.required = false;
-    realizedPLField.value = '';
+    // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('realizedPL', '', 'text');
+    } else {
+      realizedPLField.value = '';
+    }
     window.Logger?.debug('✅ updateRealizedPLField: Disabled Realized P/L', {
       actionType,
       page: 'executions'
@@ -548,14 +553,46 @@ window.updateExecution = updateExecution;
 
 /**
  * Display linked items for execution
+ * @deprecated Use window.showLinkedItemsModal() from linked-items.js instead
+ * This function is kept for backward compatibility but should use the centralized Linked Items Service
  * @param {Object} linkedItems - Object containing linked items (trades, plans, alerts, notes)
  * @returns {void}
  */
 function displayLinkedItems(linkedItems) {
   try {
-  // הצגת פריטים מקושרים
-  // סוג הנתונים
-  // מפתחות
+    // Use Linked Items Service if available
+    if (window.showLinkedItemsModal && typeof window.showLinkedItemsModal === 'function') {
+      // Convert linkedItems format to the format expected by showLinkedItemsModal
+      const executionId = linkedItems.execution_id || linkedItems.id;
+      if (executionId) {
+        // Use the wrapper function if available
+        if (window.viewLinkedItemsForExecution && typeof window.viewLinkedItemsForExecution === 'function') {
+          window.viewLinkedItemsForExecution(executionId);
+          return;
+        }
+        // Otherwise use the generic function
+        if (window.loadLinkedItemsData && typeof window.loadLinkedItemsData === 'function') {
+          window.loadLinkedItemsData('execution', executionId)
+            .then(data => {
+              if (data) {
+                window.showLinkedItemsModal(data, 'execution', executionId, 'view');
+              }
+            })
+            .catch(error => {
+              window.Logger?.error('Error loading linked items:', error, { page: "executions" });
+              if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה בטעינת פריטים מקושרים');
+              }
+            });
+          return;
+        }
+      }
+    }
+    
+    // Fallback to local implementation (legacy)
+    // הצגת פריטים מקושרים
+    // סוג הנתונים
+    // מפתחות
 
   const contentDiv = document.getElementById('linkedItemsContent');
   let html = '';
@@ -714,16 +751,18 @@ function displayLinkedItems(linkedItems) {
     `;
   }
 
-  // HTML שנוצר
+  // HTML שנוצר (legacy fallback)
   if (!html) {
     html = '<div class="alert alert-success">✅ לא נמצאו פריטים מקושרים פתוחים. ' +
       'ניתן למחוק את הטיקר בבטחה.</div>';
   }
 
-  contentDiv.innerHTML = html;
+  if (contentDiv) {
+    contentDiv.innerHTML = html;
+  }
   
   } catch (error) {
-    window.Logger.error('שגיאה בהצגת פריטים מקושרים:', error, { page: "executions" });
+    window.Logger?.error('שגיאה בהצגת פריטים מקושרים:', error, { page: "executions" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהצגת פריטים מקושרים', error.message);
     }
@@ -1065,7 +1104,7 @@ function updateExecutionsSummary(filteredDataOverride = null) {
       const summaryStatsElement = document.getElementById('summaryStats');
       if (summaryStatsElement) {
         summaryStatsElement.innerHTML = `
-          <div style="color: #dc3545; font-weight: bold;">
+          <div class="text-danger" style="font-weight: bold;">
             ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
           </div>
         `;
@@ -1152,11 +1191,15 @@ async function updateExecutionsTableMain(executions, options = {}) {
   const negativeColor = colors.negative;
   const secondaryColor = colors.secondary;
   
-  // קבלת צבעי רקע ומסגרת לערכי חיובי/שלילי
-  const positiveBgColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'light') : 'rgba(40, 167, 69, 0.1)';
-  const positiveBorderColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'border') : 'rgba(40, 167, 69, 0.3)';
-  const negativeBgColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'light') : 'rgba(220, 53, 69, 0.1)';
-  const negativeBorderColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'border') : 'rgba(220, 53, 69, 0.3)';
+  // קבלת צבעי רקע ומסגרת לערכי חיובי/שלילי - שימוש במערכת המרכזית ללא fallbacks hardcoded
+  const getNumericColorFn = (typeof window.getNumericValueColor === 'function') ? window.getNumericValueColor : null;
+  const getNumericBgColorFn = (typeof window.getNumericValueBackgroundColor === 'function') ? window.getNumericValueBackgroundColor : null;
+  const getNumericBorderColorFn = (typeof window.getNumericValueBorderColor === 'function') ? window.getNumericValueBorderColor : null;
+  
+  const positiveBgColor = getNumericBgColorFn ? getNumericBgColorFn(1) : (getNumericColorFn ? getNumericColorFn(1, 'light') : '');
+  const positiveBorderColor = getNumericBorderColorFn ? getNumericBorderColorFn(1) : (getNumericColorFn ? getNumericColorFn(1, 'border') : '');
+  const negativeBgColor = getNumericBgColorFn ? getNumericBgColorFn(-1) : (getNumericColorFn ? getNumericColorFn(-1, 'light') : '');
+  const negativeBorderColor = getNumericBorderColorFn ? getNumericBorderColorFn(-1) : (getNumericColorFn ? getNumericColorFn(-1, 'border') : '');
 
   // טעינת נתוני טריידים וטיקרים
   let trades = [];
@@ -1260,7 +1303,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
                 <td class="ticker-cell">
                     <div class="table-cell-flex">
                         <strong class="table-link-positive" 
-                          data-onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
+                          data-onclick="if(window.showEntityDetails) { window.showEntityDetails('ticker', ${ticker ? ticker.id : 'null'}, { mode: 'view' }); } else { window.Logger?.error('showEntityDetails לא זמין', { page: 'executions' }); }" 
                           title="פתח פרטי סימבול">${symbol}</strong>
                     </div>
                 </td>
@@ -1276,7 +1319,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
                     })()}
                 </td>
                 <td class="table-cell-clickable" data-account="${accountName}" 
-                  data-onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
+                  data-onclick="if(window.showEntityDetails) { window.showEntityDetails('trading_account', '${accountName}', { mode: 'view' }); } else { window.Logger?.error('showEntityDetails לא זמין', { page: 'executions' }); }" 
                   title="פתח פרטי חשבון מסחר">${accountName}</td>
                 <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
                 <td>${window.formatPrice ? window.formatPrice(execution.price) : (execution.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-')}</td>
@@ -1434,29 +1477,44 @@ async function updateExecutionsTableMain(executions, options = {}) {
       });
     }
     
-    // הוספת CSS animation אם לא קיים
+    // הוספת CSS animation אם לא קיים - שימוש בצבעים דינמיים מהמערכת המרכזית
     if (!document.getElementById('new-execution-styles')) {
-      const style = document.createElement('style');
-      style.id = 'new-execution-styles';
-      style.textContent = `
-        .execution-row.newly-added {
-          background-color: rgba(40, 167, 69, 0.2) !important;
-          animation: fadeNewExecution 3s ease-out forwards;
-        }
-        
-        @keyframes fadeNewExecution {
-          0% {
-            background-color: rgba(40, 167, 69, 0.3);
+      const getNumericBgColorFn = (typeof window.getNumericValueBackgroundColor === 'function') 
+        ? window.getNumericValueBackgroundColor 
+        : null;
+      
+      // קבלת צבע רקע חיובי מהמערכת המרכזית (ללא fallback hardcoded)
+      let positiveBgLight = '';
+      if (getNumericBgColorFn) {
+        positiveBgLight = getNumericBgColorFn(1);
+      } else if (typeof window.getNumericValueColor === 'function') {
+        positiveBgLight = window.getNumericValueColor(1, 'light');
+      }
+      
+      // אם אין צבע זמין, לא נוסיף animation - המערכת תטען צבעים בהמשך
+      if (positiveBgLight) {
+        const style = document.createElement('style');
+        style.id = 'new-execution-styles';
+        style.textContent = `
+          .execution-row.newly-added {
+            background-color: ${positiveBgLight} !important;
+            animation: fadeNewExecution 3s ease-out forwards;
           }
-          50% {
-            background-color: rgba(40, 167, 69, 0.15);
+          
+          @keyframes fadeNewExecution {
+            0% {
+              background-color: ${positiveBgLight};
+            }
+            50% {
+              background-color: ${positiveBgLight ? positiveBgLight.replace('0.1', '0.15').replace('0.2', '0.15') : 'transparent'};
+            }
+            100% {
+              background-color: transparent;
+            }
           }
-          100% {
-            background-color: transparent;
-          }
-        }
-      `;
-      document.head.appendChild(style);
+        `;
+        document.head.appendChild(style);
+      }
     }
     
     // הוספת class לרשומות החדשות
@@ -1794,6 +1852,13 @@ function restoreSortState() {
  */
 window.initializeExecutionsPage = async function() {
   window.Logger.info('⚡ Executions page initialized via unified system', { page: "executions" });
+  
+  // Replace icons with IconSystem
+  if (typeof window.replaceIconsInContext === 'function') {
+    await window.replaceIconsInContext().catch(() => {
+      // Ignore errors - icons will load when ready
+    });
+  }
   
   // הגדרת מודלים שלא נסגרים בלחיצה על הרקע
   setupModalConfigurations();
@@ -2515,28 +2580,43 @@ async function loadExecutionTickerInfo(tickerId) {
     displayExecutionTickerInfo(ticker);
     
     // Set default quantity to 100
-    const quantityField = document.getElementById('executionQuantity');
-    if (quantityField) {
-      quantityField.value = 100;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('executionQuantity', 100, 'int');
+    } else {
+      const quantityField = document.getElementById('executionQuantity');
+      if (quantityField) {
+        quantityField.value = 100;
+      }
     }
     
     // Set default price to current price
-    const priceField = document.getElementById('executionPrice');
-    if (priceField && ticker.current_price) {
-      priceField.value = ticker.current_price;
+    if (ticker.current_price) {
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('executionPrice', ticker.current_price, 'number');
+      } else {
+        const priceField = document.getElementById('executionPrice');
+        if (priceField) {
+          priceField.value = ticker.current_price;
+        }
+      }
     }
     
     // Set default commission from preferences
-    const commissionField = document.getElementById('executionCommission');
-    if (commissionField) {
-      try {
-        if (typeof window.getPreference === 'function') {
-          const defaultCommission = await window.getPreference('defaultCommission');
-          if (defaultCommission !== null && defaultCommission !== undefined) {
-            commissionField.value = defaultCommission;
+    try {
+      if (typeof window.getPreference === 'function') {
+        const defaultCommission = await window.getPreference('defaultCommission');
+        if (defaultCommission !== null && defaultCommission !== undefined) {
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue('executionCommission', defaultCommission, 'number');
+          } else {
+            const commissionField = document.getElementById('executionCommission');
+            if (commissionField) {
+              commissionField.value = defaultCommission;
+            }
           }
         }
-      } catch (error) {
+      }
+    } catch (error) {
         window.Logger.warn('⚠️ Could not load default commission from preferences:', error, { page: "executions" });
       }
     }
@@ -2639,10 +2719,20 @@ async function calculateExecutionValues(formType) {
   const isEdit = formType === 'edit';
   const prefix = isEdit ? 'editExecution' : 'execution';
   
-  const quantity = parseFloat(document.getElementById(`${prefix}Quantity`).value) || 0;
-  const price = parseFloat(document.getElementById(`${prefix}Price`).value) || 0;
-  const commission = parseFloat(document.getElementById(`${prefix}Commission`).value) || 0;
-  const action = document.getElementById(`${prefix}Type`)?.value || 'buy';
+  // Use DataCollectionService to get values if available
+  let quantity, price, commission, action;
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+    quantity = parseFloat(window.DataCollectionService.getValue(`${prefix}Quantity`, 'number', 0)) || 0;
+    price = parseFloat(window.DataCollectionService.getValue(`${prefix}Price`, 'number', 0)) || 0;
+    commission = parseFloat(window.DataCollectionService.getValue(`${prefix}Commission`, 'number', 0)) || 0;
+    action = window.DataCollectionService.getValue(`${prefix}Type`, 'text', 'buy') || 'buy';
+  } else {
+    // Fallback if DataCollectionService is not available
+    quantity = parseFloat(document.getElementById(`${prefix}Quantity`)?.value) || 0;
+    price = parseFloat(document.getElementById(`${prefix}Price`)?.value) || 0;
+    commission = parseFloat(document.getElementById(`${prefix}Commission`)?.value) || 0;
+    action = document.getElementById(`${prefix}Type`)?.value || 'buy';
+  }
 
   // Use backend Business Logic API if available
   if (window.ExecutionsData && typeof window.ExecutionsData.calculateExecutionValues === 'function') {
@@ -2658,7 +2748,9 @@ async function calculateExecutionValues(formType) {
         const totalElement = document.getElementById(`${prefix}Total`);
         if (totalElement) {
           const sign = result.total >= 0 ? '' : '-';
-          totalElement.innerHTML = `<strong>${result.label || 'סה"כ:'}</strong> ${sign}$${Math.abs(result.total).toFixed(2)}`;
+          // Use textContent instead of innerHTML for better security and consistency
+          const formattedValue = `${sign}$${Math.abs(result.total).toFixed(2)}`;
+          totalElement.innerHTML = `<strong>${result.label || 'סה"כ:'}</strong> ${formattedValue}`;
         }
         return;
       }
@@ -2858,17 +2950,32 @@ function setupEditExecutionCalculationListeners() {
  * @param {string} mode - 'add' או 'edit'
  */
 function goToLinkedTrade(mode = 'edit') {
-  const tradeId = mode === 'add'
-    ? document.getElementById('executionTradeId').value
-    : document.getElementById('editExecutionTradeLink').getAttribute('data-trade-id');
+  let tradeId;
+  if (mode === 'add') {
+    // Use DataCollectionService to get value if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      tradeId = window.DataCollectionService.getValue('executionTradeId', 'int', null);
+    } else {
+      const tradeIdEl = document.getElementById('executionTradeId');
+      tradeId = tradeIdEl ? tradeIdEl.value : null;
+    }
+  } else {
+    const tradeLinkEl = document.getElementById('editExecutionTradeLink');
+    tradeId = tradeLinkEl ? tradeLinkEl.getAttribute('data-trade-id') : null;
+  }
 
   if (tradeId) {
     // Going to trade
-    // סגירת המודל
+    // סגירת המודל דרך ModalManagerV2
     const modalId = mode === 'add' ? 'addExecutionModal' : 'editExecutionModal';
-    const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
-    if (modal) {
-      modal.hide();
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+      window.ModalManagerV2.hideModal(modalId);
+    } else {
+      // Fallback ל-Bootstrap modal
+      const modal = bootstrap?.Modal?.getInstance(document.getElementById(modalId));
+      if (modal) {
+        modal.hide();
+      }
     }
 
     // מעבר לדף הטריידים
@@ -3455,7 +3562,12 @@ function toggleExternalIdField(mode) {
     externalIdContainer.classList.add('d-none');
     externalIdContainer.classList.remove('d-block');
     if (externalIdField) {
-      externalIdField.value = '';
+      // Use DataCollectionService to clear field if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue(externalIdField.id, '', 'text');
+      } else {
+        externalIdField.value = '';
+      }
     }
     // שדה מזהה חיצוני מוסתר (מקור ידני)
   } else {
@@ -3674,18 +3786,14 @@ async function refreshTickersSummary() {
  * צפייה בפרטי טיקר
  */
 function viewTickerDetails(tickerId) {
-  // window.Logger.info('🔄 צפייה בפרטי טיקר:', tickerId, { page: "executions" });
-
-  // מציאת הטיקר
-  const ticker = tickersSummaryData.find(t => t.id === tickerId);
-  if (!ticker) {
-    // window.Logger.warn('⚠️ טיקר לא נמצא:', tickerId, { page: "executions" });
-    return;
-  }
-
-  // הצגת פרטי טיקר (בפיתוח)
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('פרטי טיקר', `טיקר: ${ticker.symbol} - ${ticker.name}\nסטטוס: ${ticker.status}\nטריידים: ${ticker.totalTrades}`);
+  // שימוש במערכת המרכזית Entity Details Modal
+  if (typeof window.showEntityDetails === 'function') {
+    window.showEntityDetails('ticker', tickerId, { mode: 'view' });
+  } else {
+    window.Logger?.error('showEntityDetails לא זמין', { page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'מערכת פרטי ישויות לא זמינה');
+    }
   }
 }
 
@@ -3713,7 +3821,12 @@ function addExecutionForTicker(tickerId) {
   setTimeout(() => {
     const tickerSelect = document.getElementById('executionTicker');
     if (tickerSelect) {
-      tickerSelect.value = tickerId;
+      // Use DataCollectionService to set value if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('executionTicker', tickerId, 'int');
+      } else {
+        tickerSelect.value = tickerId;
+      }
       // הפעלת שינוי הטיקר
       if (typeof updateTradesOnTickerChange === 'function') {
         updateTradesOnTickerChange('add');
@@ -4322,7 +4435,7 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
     const executionInfo = showExecutionInfo
         ? `<div class="table-cell-flex">
              <strong class="table-link-positive" 
-               data-onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('execution', ${executionId}, 'view'); }"
+               data-onclick="if(window.showEntityDetails) { window.showEntityDetails('execution', ${executionId}, { mode: 'view' }); } else { window.Logger?.error('showEntityDetails לא זמין', { page: 'executions' }); }"
                title="פתח פרטי ביצוע">
                #${executionId}
              </strong>
@@ -4634,14 +4747,14 @@ async function applySelectedSuggestions() {
  * Helper function to open trade details modal from suggestion table
  */
 function openTradeDetailsModal(tradeId) {
-    if (window.entityDetailsModal && window.entityDetailsModal.show) {
-        window.entityDetailsModal.show('trade', tradeId, { mode: 'view' });
-    } else if (window.showEntityDetailsModal) {
-        window.showEntityDetailsModal('trade', tradeId, { mode: 'view' });
-    } else if (window.showEntityDetails) {
+    // שימוש במערכת המרכזית Entity Details Modal
+    if (typeof window.showEntityDetails === 'function') {
         window.showEntityDetails('trade', tradeId, { mode: 'view' });
     } else {
-        window.Logger?.warn('No entity details modal function available', { page: "executions" });
+        window.Logger?.error('showEntityDetails לא זמין', { page: "executions" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'מערכת פרטי ישויות לא זמינה');
+        }
     }
 }
 

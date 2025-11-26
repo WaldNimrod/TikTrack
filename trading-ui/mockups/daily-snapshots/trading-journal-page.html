@@ -224,7 +224,22 @@
     <script src="../../scripts/monitoring-functions.js?v=1.0.0"></script> <!-- Page monitoring functions -->
 
     <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+
+<!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [69] Page-specific: trading-journal-page -->
@@ -260,7 +275,12 @@
                         <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
                         <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
                         <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                </div>
+                        <span class="mockups-navigation-separator">|</span>
+                        <a href="../watch-lists-page.html" class="mockups-navigation-link">רשימות צפייה</a>
+                        <a href="../watch-list-modal.html" class="mockups-navigation-link">מודל רשימה</a>
+                        <a href="../add-ticker-modal.html" class="mockups-navigation-link">הוספת טיקר</a>
+                        <a href="../flag-quick-action.html" class="mockups-navigation-link">דגלים</a>
+                    </div>
             </div>
         </div>
     </div>
@@ -281,7 +301,7 @@
                             <button data-button-type="ADD" data-variant="full" data-text="הוסף רשומה" id="add-entry-btn" title="הוסף רשומת יומן חדשה"></button>
                             <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
                             <button data-button-type="SETTINGS" data-variant="small" data-icon="/trading-ui/images/icons/tabler/settings.svg" title="הגדרות תצוגה"></button>
-                        </div><button class="filter-toggle-btn" data-onclick="toggleSection('trading_journal_page_top_section')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                        </div><button class="filter-toggle-btn" data-onclick="toggleSection('trading_journal_page_top_section')" title="הצג/הסתר סקשן" data-button-type="FILTER"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
@@ -290,7 +310,7 @@
                     <div class="section-header">
                                 <h2><span class="icon-placeholder icon" data-icon="calendar" data-size="16" data-alt="calendar" aria-label="calendar"></span> תצוגה חודשית</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('trading_journal_page-תצוגה-חודשית')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('trading_journal_page-תצוגה-חודשית')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -542,7 +562,7 @@
                                         data-tooltip-trigger="hover">
                                     </button>
                                 </div>
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('journal-entries-list-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('journal-entries-list-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>

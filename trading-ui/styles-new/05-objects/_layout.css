@@ -28,10 +28,10 @@
 
 /* Detailed Statistics Row */
 .dashboard-row.detailed-stats {
-  background: #ffffff;
+  background: var(--card-background, var(--background-color, white));
   border-radius: 10px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--text-color, var(--color-text-primary, black)) 10%, transparent);
 }
 
 /* Content wrapper */
@@ -156,22 +156,22 @@
   min-height: 48px;
   
   /* Borders */
-  border-bottom: 2px solid var(--current-entity-color-dark, #e9ecef);
-  border-inline-start: 3px solid var(--current-entity-color-dark, #e9ecef);
+  border-bottom: 2px solid var(--current-entity-color-dark, var(--border-color, var(--color-border)));
+  border-inline-start: 3px solid var(--current-entity-color-dark, var(--border-color, var(--color-border)));
   border-radius: 8px;
   
   /* Background */
-  background: var(--current-entity-color-light, #ffffff);
+  background: var(--current-entity-color-light, var(--card-background, var(--background-color, white)));
   
   /* Effects */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--text-color, var(--color-text-primary, black)) 8%, transparent);
   transition: all 0.3s ease;
   
   /* Typography - אחיד לגמרי */
   font-size: 1.125rem; /* 18px */
   font-weight: 600;
   line-height: 1.5;
-  color: var(--current-entity-color-dark, #333333);
+  color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary)));
 }
 
 
@@ -191,7 +191,7 @@
   font-size: 1.125rem; /* 18px - זהה ל-section-header */
   font-weight: 600;
   line-height: 1.5;
-  color: var(--current-entity-color-dark, #333333);
+  color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary)));
 }
 
 
@@ -210,7 +210,7 @@
   align-items: center;
   
   /* Background - צבע ישות בהיר */
-  background: var(--current-entity-color-light, rgba(0, 123, 255, 0.1));
+  background: var(--current-entity-color-light, color-mix(in srgb, var(--entity-ticker-color, var(--color-info)) 10%, transparent));
   color: var(--current-entity-color-dark); /* טקסט כהה */
   
   /* Borders - צבע ישות כהה */
@@ -380,20 +380,20 @@
 
 /* כותרות טבלאות - צבעים דינמיים */
 .sortable-header {
-  background: var(--current-entity-color-light, #ffffff);
-  color: var(--current-entity-color-dark, #333333);
-  border-bottom: 1px solid var(--current-entity-color-dark, #e9ecef);
+  background: var(--current-entity-color-light, var(--card-background, var(--background-color, white)));
+  color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary)));
+  border-bottom: 1px solid var(--current-entity-color-dark, var(--border-color, var(--color-border)));
 }
 
 .sortable-header:hover {
-  background: var(--current-entity-color-light, #f8f9fa);
-  color: var(--current-entity-color-dark, #333333);
+  background: var(--current-entity-color-light, var(--card-background, var(--background-color-light)));
+  color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary)));
 }
 
 /* כותרות טבלאות - ללא רקע, רק טקסט */
 .table-title {
   background: transparent; /* אין רקע */
-  color: var(--current-entity-color-dark, #333333);
+  color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary)));
 }
 
 .table-title h1,
@@ -402,34 +402,34 @@
 .table-title h4,
 .table-title h5,
 .table-title h6 {
-  color: var(--current-entity-color-dark, #333333);
+  color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary)));
 }
 
 /* כרטיסים - צבעים דינמיים */
 .card {
-  background: var(--current-entity-color-light, #ffffff);
-  border: 1px solid var(--current-entity-color-dark, #e9ecef);
+  background: var(--current-entity-color-light, var(--card-background, var(--background-color, white)));
+  border: 1px solid var(--current-entity-color-dark, var(--border-color, var(--color-border)));
 }
 
 .card-header {
-  background: var(--current-entity-color-light, #f8f9fa);
-  border-bottom: 1px solid var(--current-entity-color-dark, #e9ecef);
-  color: var(--current-entity-color-dark, #333333);
+  background: var(--current-entity-color-light, var(--card-background, var(--background-color-light)));
+  border-bottom: 1px solid var(--current-entity-color-dark, var(--border-color, var(--color-border)));
+  color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary)));
 }
 
 .card-title {
-  color: var(--current-entity-color-dark, #333333);
+  color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary)));
 }
 
 .card-text {
-  color: var(--current-entity-color-dark, #666666);
+  color: var(--current-entity-color-dark, var(--text-muted, var(--color-text-secondary)));
 }
 
 /* סיכום מידע - צבעים דינמיים */
 .info-summary {
-  background: var(--current-entity-color-light, #ffffff);
-  border: 1px solid var(--current-entity-color-dark, #e9ecef);
-  color: var(--current-entity-color-dark, #333333);
+  background: var(--current-entity-color-light, var(--card-background, var(--background-color, white)));
+  border: 1px solid var(--current-entity-color-dark, var(--border-color, var(--color-border)));
+  color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary)));
 }
 
 .info-summary > div {
@@ -438,7 +438,7 @@
 }
 
 .info-summary strong {
-  color: var(--current-entity-color-dark, #333333);
+  color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary)));
 }
 
 /* כפתורים בשורת הכותרת - ייצוא ורענון */
@@ -448,8 +448,8 @@
 .section-header .refresh-btn {
   margin-inline-end: 0.5rem;
   align-self: center;
-  color: var(--current-entity-color-dark, #333333); /* טקסט כהה של הישות */
-  border-color: var(--current-entity-color-dark, #333333); /* גבול כהה של הישות */
+  color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary))); /* טקסט כהה של הישות */
+  border-color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary))); /* גבול כהה של הישות */
 }
 
 /* כפתורי toggle בסקשנים - תמיד בגוון הכהה של הישות */
@@ -473,9 +473,9 @@
 
 /* כפתורים דינמיים - צבעים לפי ישות */
 .btn[data-entity-type] {
-  color: var(--current-entity-color-dark, #333333);
-  border-color: var(--current-entity-color-dark, #333333);
-  background: var(--current-entity-color-light, #ffffff);
+  color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary)));
+  border-color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary)));
+  background: var(--current-entity-color-light, var(--card-background, var(--background-color, white)));
 }
 
 .btn[data-entity-type]:hover {
@@ -662,11 +662,11 @@
 /* אזור תוכן */
 .content-section {
   width: 100%;
-  background: white;
+  background: var(--card-background, var(--background-color, white));
   padding: var(--spacing-md, 16px);
   border-radius: 16px;
-  border: 1px solid #e8e8e8;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--border-color, var(--color-border));
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--text-color, var(--color-text-primary, black)) 12%, transparent);
   margin-bottom: 10px;
   margin-left: auto;
   margin-right: auto;

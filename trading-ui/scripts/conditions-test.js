@@ -1162,11 +1162,24 @@ class ConditionsUIManager {
             const listBody = document.getElementById('conditionsListBody');
             if (!listBody) return;
 
-            listBody.innerHTML = '<div class="text-center p-3 text-muted"><img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> טוען תנאים...</div>';
+            // Use IconSystem to render loader icon
+            let loaderIcon = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin">';
+            if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                try {
+                    loaderIcon = await window.IconSystem.renderIcon('button', 'loader', {
+                        size: '16',
+                        alt: 'loading',
+                        class: 'icon fa-spin'
+                    });
+                } catch (error) {
+                    // Fallback already set
+                }
+            }
+            listBody.innerHTML = `<div class="text-center p-3 text-muted">${loaderIcon} טוען תנאים...</div>`;
 
             if (this.crudManager) {
                 this.conditions = await this.crudManager.readConditions(this.currentTradePlanId);
-                this.renderConditions();
+                await this.renderConditions();
                 console.log(`✅ Loaded ${this.conditions.length} conditions using modular system`);
             } else {
                 // Fallback to direct API call
@@ -1175,7 +1188,7 @@ class ConditionsUIManager {
 
                 if (result.status === 'success') {
                     this.conditions = result.data;
-                    this.renderConditions();
+                    await this.renderConditions();
                     console.log(`✅ Loaded ${this.conditions.length} conditions using fallback`);
                 }
             }
@@ -1188,7 +1201,7 @@ class ConditionsUIManager {
         }
     }
 
-    renderConditions() {
+    async renderConditions() {
         const listBody = document.getElementById('conditionsListBody');
         if (!listBody) return;
 
@@ -1198,13 +1211,16 @@ class ConditionsUIManager {
         }
 
         listBody.innerHTML = '';
-        this.conditions.forEach(condition => {
-            const item = this.createConditionItem(condition);
+        // Use Promise.all to create all items in parallel
+        const items = await Promise.all(
+            this.conditions.map(condition => this.createConditionItem(condition))
+        );
+        items.forEach(item => {
             listBody.appendChild(item);
         });
     }
 
-    createConditionItem(condition) {
+    async createConditionItem(condition) {
         const div = document.createElement('div');
         div.className = 'condition-item';
         div.dataset.id = condition.id;
@@ -1248,7 +1264,20 @@ class ConditionsUIManager {
 
         const alertBtn = document.createElement('button');
         alertBtn.className = 'btn btn-sm btn-warning';
-        alertBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/bell.svg" width="16" height="16" alt="bell" class="icon me-1"> התראה';
+        // Use IconSystem to render bell icon
+        let bellIcon = '<img src="/trading-ui/images/icons/tabler/bell.svg" width="16" height="16" alt="bell" class="icon me-1">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                bellIcon = await window.IconSystem.renderIcon('button', 'bell', {
+                    size: '16',
+                    alt: 'bell',
+                    class: 'icon me-1'
+                });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
+        alertBtn.innerHTML = bellIcon + ' התראה';
         alertBtn.onclick = () => this.createAlertFromCondition(condition);
 
         actions.appendChild(editBtn);
@@ -1461,7 +1490,7 @@ class ConditionsUIManager {
                 });
                 
                 // Update the conditions list with evaluation results
-                this.updateConditionsWithEvaluations(results);
+                await this.updateConditionsWithEvaluations(results);
                 
                 // Show notification
                 if (window.showNotificationSmart) {
@@ -1496,7 +1525,7 @@ class ConditionsUIManager {
     /**
      * Update conditions list with evaluation results
      */
-    updateConditionsWithEvaluations(evaluationResults) {
+    async updateConditionsWithEvaluations(evaluationResults) {
         const conditionsListBody = document.getElementById('conditionsListBody');
         if (!conditionsListBody) return;
 
@@ -1508,7 +1537,7 @@ class ConditionsUIManager {
 
         // Update each condition item with evaluation status
         const conditionItems = conditionsListBody.querySelectorAll('.condition-item');
-        conditionItems.forEach(item => {
+        for (const item of conditionItems) {
             const conditionId = item.dataset.conditionId;
             const evaluation = evaluationMap[conditionId];
             
@@ -1521,15 +1550,29 @@ class ConditionsUIManager {
                     item.appendChild(statusIndicator);
                 }
                 
+                // Render icon using IconSystem
+                let statusIcon = `<img src="/trading-ui/images/icons/tabler/${evaluation.met ? 'check-circle' : 'x-circle'}.svg" width="16" height="16" alt="${evaluation.met ? 'check' : 'x'}" class="icon ${evaluation.met ? 'text-success' : 'text-danger'}">`;
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        statusIcon = await window.IconSystem.renderIcon('button', evaluation.met ? 'check-circle' : 'x-circle', {
+                            size: '16',
+                            alt: evaluation.met ? 'check' : 'x',
+                            class: `icon ${evaluation.met ? 'text-success' : 'text-danger'}`
+                        });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                
                 statusIndicator.innerHTML = `
                     <div class="evaluation-result ${evaluation.met ? 'met' : 'not-met'}">
-                        <img src="/trading-ui/images/icons/tabler/${evaluation.met ? 'check-circle' : 'x-circle'}.svg" width="16" height="16" alt="${evaluation.met ? 'check' : 'x'}" class="icon ${evaluation.met ? 'text-success' : 'text-danger'}">
+                        ${statusIcon}
                         <span>${evaluation.met ? 'התקיים' : 'לא התקיים'}</span>
                         <small>${evaluation.current_price ? `מחיר: ${evaluation.current_price}` : ''}</small>
                     </div>
                 `;
             }
-        });
+        }
     }
 
     /**
@@ -1551,7 +1594,7 @@ class ConditionsUIManager {
                 });
                 
                 // Update the specific condition item
-                this.updateSingleConditionEvaluation(conditionId, result);
+                await this.updateSingleConditionEvaluation(conditionId, result);
                 
                 return result;
             }
@@ -1564,7 +1607,7 @@ class ConditionsUIManager {
     /**
      * Update a single condition with evaluation result
      */
-    updateSingleConditionEvaluation(conditionId, evaluation) {
+    async updateSingleConditionEvaluation(conditionId, evaluation) {
         const conditionItem = document.querySelector(`[data-condition-id="${conditionId}"]`);
         if (!conditionItem) return;
 
@@ -1575,13 +1618,34 @@ class ConditionsUIManager {
             conditionItem.appendChild(statusIndicator);
         }
         
+        // Render icons using IconSystem
+        let statusIcon = `<img src="/trading-ui/images/icons/tabler/${evaluation.met ? 'check-circle' : 'x-circle'}.svg" width="16" height="16" alt="${evaluation.met ? 'check' : 'x'}" class="icon ${evaluation.met ? 'text-success' : 'text-danger'}">`;
+        let refreshIcon = `<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon">`;
+        
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                statusIcon = await window.IconSystem.renderIcon('button', evaluation.met ? 'check-circle' : 'x-circle', {
+                    size: '16',
+                    alt: evaluation.met ? 'check' : 'x',
+                    class: `icon ${evaluation.met ? 'text-success' : 'text-danger'}`
+                });
+                refreshIcon = await window.IconSystem.renderIcon('button', 'refresh', {
+                    size: '16',
+                    alt: 'refresh',
+                    class: 'icon'
+                });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
+        
         statusIndicator.innerHTML = `
             <div class="evaluation-result ${evaluation.met ? 'met' : 'not-met'}">
-                <img src="/trading-ui/images/icons/tabler/${evaluation.met ? 'check-circle' : 'x-circle'}.svg" width="16" height="16" alt="${evaluation.met ? 'check' : 'x'}" class="icon ${evaluation.met ? 'text-success' : 'text-danger'}">
+                ${statusIcon}
                 <span>${evaluation.met ? 'התקיים' : 'לא התקיים'}</span>
                 <small>${evaluation.current_price ? `מחיר: ${evaluation.current_price}` : ''}</small>
                 <button class="btn btn-xs btn-outline-primary" onclick="window.conditionsTestManager.evaluateSingleCondition(${conditionId})">
-                    <img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon">
+                    ${refreshIcon}
                 </button>
             </div>
         `;

@@ -16,7 +16,7 @@
 | UI Utilities & Section Toggle | `trading-ui/scripts/ui-utils.js` | [SECTION_TOGGLE_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/SECTION_TOGGLE_SYSTEM.md)<br>[JAVASCRIPT_ARCHITECTURE.md](../02-ARCHITECTURE/FRONTEND/JAVASCRIPT_ARCHITECTURE.md#ui-utilities) | פונקציות משותפות ל-Toggle, Refresh, טיפול בפעולות UI כלליות + כלי טעינת סקריפטים עצלה (`loadScriptOnce`, `loadScriptsOnce`) |
 | Page State Management | `trading-ui/scripts/page-utils.js` | [PAGE_STATE_MANAGEMENT_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/PAGE_STATE_MANAGEMENT_SYSTEM.md) | שמירת מצב עמוד, שחזור פילטרים וסקשנים, איפוס מצב |
 | Translation Utilities | `trading-ui/scripts/translation-utils.js` | [TRANSLATION_FUNCTIONS.md](../02-ARCHITECTURE/FRONTEND/TRANSLATION_FUNCTIONS.md) | טיפול במחרוזות, בחירת שפה ותמיכה ב-RTL |
-| Event Handler Manager | `trading-ui/scripts/event-handler-manager.js` | [EVENT_HANDLER_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/EVENT_HANDLER_SYSTEM.md) | Delegation גלובלי, מניעת כפילויות, ניטור האזנות |
+| Event Handler Manager | `trading-ui/scripts/event-handler-manager.js` | [EVENT_HANDLER_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/EVENT_HANDLER_SYSTEM.md)<br>[EVENT_HANDLER_DEBUGGING_GUIDE.md](../03-DEVELOPMENT/GUIDES/EVENT_HANDLER_DEBUGGING_GUIDE.md) | Delegation גלובלי, מניעת כפילויות, ניטור האזנות, כלי debugging מתקדמים (v2.0.0), ניטור ביצועים, event tracking, error reporting |
 
 ### 🔵 מערכות CRUD ונתונים
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |

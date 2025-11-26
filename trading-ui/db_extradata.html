@@ -92,7 +92,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="constraintsContainer">
-                            <table class="table" id="constraintsTable">
+                            <table class="table" id="constraintsTable" data-table-type="constraints">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -115,7 +115,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="currenciesContainer">
-                            <table class="table" id="currenciesTable">
+                            <table class="table" id="currenciesTable" data-table-type="currencies">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -138,7 +138,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="preferenceGroupsContainer">
-                            <table class="table" id="preferenceGroupsTable">
+                            <table class="table" id="preferenceGroupsTable" data-table-type="preference_groups">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -161,7 +161,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="systemSettingGroupsContainer">
-                            <table class="table" id="systemSettingGroupsTable">
+                            <table class="table" id="systemSettingGroupsTable" data-table-type="system_setting_groups">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -184,7 +184,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="externalDataProvidersContainer">
-                            <table class="table" id="externalDataProvidersTable">
+                            <table class="table" id="externalDataProvidersTable" data-table-type="external_data_providers">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -207,7 +207,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="quotesLastContainer">
-                            <table class="table" id="quotesLastTable">
+                            <table class="table" id="quotesLastTable" data-table-type="quotes_last">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -230,7 +230,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="planConditionsContainer">
-                            <table class="table" id="planConditionsTable">
+                            <table class="table" id="planConditionsTable" data-table-type="plan_conditions">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -253,7 +253,7 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="userPreferencesContainer">
-                            <table class="table" id="userPreferencesTable">
+                            <table class="table" id="userPreferencesTable" data-table-type="user_preferences">
                                 <thead><tr><th>Loading...</th></tr></thead>
                                 <tbody><tr><td>Loading data...</td></tr></tbody>
                             </table>
@@ -449,7 +449,22 @@
     <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+
+<!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [36] Page-specific: db_extradata -->

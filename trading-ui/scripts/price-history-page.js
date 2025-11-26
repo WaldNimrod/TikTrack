@@ -162,7 +162,12 @@
                 const symbol = e.target.value;
                 // Convert to TradingView format (e.g., AAPL -> NASDAQ:AAPL)
                 const tvSymbol = symbol.includes(':') ? symbol : `NASDAQ:${symbol}`;
-                tickerSelect.value = tvSymbol;
+                // Use DataCollectionService to set value if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(tickerSelect.id, tvSymbol, 'text');
+                } else {
+                  tickerSelect.value = tvSymbol;
+                }
                 updateTradingViewWidgetSymbol(tvSymbol);
             });
         }

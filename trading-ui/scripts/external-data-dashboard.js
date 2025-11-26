@@ -153,7 +153,21 @@
    * @param {*} value - Value to format
    * @returns {string} Formatted number or NOT_AVAILABLE_TEXT
    */
+  /**
+   * Format number with commas
+   * @deprecated Use window.formatNumberWithCommas() from translation-utils.js instead
+   * This function is kept for backward compatibility but should use the centralized Translation Utilities
+   */
   function formatNumber(value) {
+    // Use Translation Utilities if available
+    if (window.formatNumberWithCommas && typeof window.formatNumberWithCommas === 'function') {
+      if (value === null || value === undefined || Number.isNaN(Number(value))) {
+        return NOT_AVAILABLE_TEXT;
+      }
+      return window.formatNumberWithCommas(value, { maximumFractionDigits: 0 });
+    }
+    
+    // Fallback to local implementation
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
       return NOT_AVAILABLE_TEXT;
     }
@@ -1754,9 +1768,16 @@
       const warmElement = getElement('warm-cache-ttl');
       const maxElement = getElement('max-requests-hour');
 
-      if (hotElement) hotElement.value = '';
-      if (warmElement) warmElement.value = '';
-      if (maxElement) maxElement.value = '';
+      // Use DataCollectionService to clear fields if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        if (hotElement) window.DataCollectionService.setValue(hotElement.id, '', 'text');
+        if (warmElement) window.DataCollectionService.setValue(warmElement.id, '', 'text');
+        if (maxElement) window.DataCollectionService.setValue(maxElement.id, '', 'text');
+      } else {
+        if (hotElement) hotElement.value = '';
+        if (warmElement) warmElement.value = '';
+        if (maxElement) maxElement.value = '';
+      }
 
       notification.info('הגדרות אופסו', 'ניתן להזין ערכים חדשים ולשמור');
   }
@@ -2131,6 +2152,8 @@
       tests.push(await this.testCacheOperations());
       tests.push(await this.testDataValidation());
 
+      // Note: This is a test results summary, not a standard summary element
+      // Using filter for counting is acceptable here as it's specific to test results structure
       const passed = tests.filter((test) => test.status === 'passed').length;
       const summary = `בדיקת פונקציות ספציפיות: ${passed}/${tests.length} עברו`;
       if (passed === tests.length) {

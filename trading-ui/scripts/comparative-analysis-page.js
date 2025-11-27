@@ -2572,8 +2572,14 @@ function toggleComparisonParameter(paramType) {
                 withoutPlan.disabled = !checkbox.checked;
                 // If enabled, select both options by default
                 if (checkbox.checked) {
-                    withPlan.checked = true;
-                    withoutPlan.checked = true;
+                    // Use DefaultValueSetter for logical defaults
+                    if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setLogicalDefault === 'function') {
+                        window.DefaultValueSetter.setLogicalDefault(withPlan.id, true);
+                        window.DefaultValueSetter.setLogicalDefault(withoutPlan.id, true);
+                    } else {
+                        withPlan.checked = true;
+                        withoutPlan.checked = true;
+                    }
                 }
             }
             break;

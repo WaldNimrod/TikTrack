@@ -4346,8 +4346,15 @@ class ModalManagerV2 {
                     // Handle 'today' special value for datetime-local fields
                     if (field.defaultValue !== undefined && field.defaultValue !== null) {
                         if (field.type === 'datetime-local' && field.defaultValue === 'today') {
-                            const today = new Date();
-                            fieldElement.value = today.toISOString().slice(0, 16);
+                            // Use DefaultValueSetter if available
+                            if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDateTime === 'function') {
+                                window.DefaultValueSetter.setCurrentDateTime(fieldElement.id);
+                            } else {
+                                // Fallback if DefaultValueSetter is not available
+                                const today = new Date();
+                                today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+                                fieldElement.value = today.toISOString().slice(0, 16);
+                            }
                         } else {
                             fieldElement.value = field.defaultValue;
                         }
@@ -4390,8 +4397,15 @@ class ModalManagerV2 {
                 
                 // Apply defaultTime if field is date
                 if (field.type === 'date' && field.defaultTime === 'now') {
-                    const today = new Date();
-                    fieldElement.value = today.toISOString().slice(0, 10);
+                    // Use DefaultValueSetter if available
+                    if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+                        window.DefaultValueSetter.setCurrentDate(fieldElement.id);
+                    } else {
+                        // Fallback if DefaultValueSetter is not available
+                        const today = new Date();
+                        today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+                        fieldElement.value = today.toISOString().slice(0, 10);
+                    }
                     console.log(`Applied default date for ${field.id}`);
                     continue;
                 }
@@ -4458,7 +4472,13 @@ class ModalManagerV2 {
         if (expiryInput && !expiryInput.value) {
             const expiryDate = new Date(now);
             expiryDate.setFullYear(expiryDate.getFullYear() + 1);
-            expiryInput.value = expiryDate.toISOString().slice(0, 10);
+            // Use DefaultValueSetter if available
+            if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+                window.DefaultValueSetter.setCurrentDate(expiryInput.id);
+            } else {
+                // Fallback if DefaultValueSetter is not available
+                expiryInput.value = expiryDate.toISOString().slice(0, 10);
+            }
         }
     }
 

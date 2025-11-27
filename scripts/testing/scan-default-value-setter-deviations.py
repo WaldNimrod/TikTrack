@@ -56,9 +56,9 @@ def scan_date_settings(content: str, file_path: Path) -> List[Dict]:
         (r'\.value\s*=\s*(?:new\s+Date\(\)|today|now)', 'direct_date_assignment'),
         # new Date() usage in value assignment context
         (r'\.value\s*=\s*(?:.*?new\s+Date\(\)|.*?toISOString\(\)|.*?getFullYear\(\))', 'date_calculation'),
-        # Date formatting: toISOString, getFullYear, etc.
+        # Date formatting: toISOString, getFullYear, etc. (only if setting form field value)
         (r'(?:toISOString\(\)|getFullYear\(\)|getMonth\(\)|getDate\(\)|getHours\(\)|getMinutes\(\))', 'date_formatting'),
-        # ISO string slicing
+        # ISO string slicing (only if setting form field value)
         (r'\.slice\(0,\s*(?:10|16)\)', 'date_slicing'),
     ]
     
@@ -72,21 +72,91 @@ def scan_date_settings(content: str, file_path: Path) -> List[Dict]:
         'assignDefaultDateValue'  # ModalManagerV2 uses DefaultValueSetter
     ]
     
+    # False positive patterns - exclude these contexts
+    false_positive_patterns = [
+        r'Logger\.(?:info|warn|error|debug)',  # Logging
+        r'console\.(?:log|info|warn|error|debug)',  # Console logging
+        r'log\.(?:push|info|warn|error)',  # Log arrays
+        r'\.download\s*=',  # File downloads
+        r'setAttribute\([\'"]download',  # Download attributes
+        r'filename|\.json|\.csv|\.html|\.md',  # File names
+        r'timestamp\s*:',  # Timestamps in objects
+        r'dateRangeStart|dateRangeEnd',  # Date range for display
+        r'utc\s*:|iso\s*:',  # UTC/ISO in objects (not form fields)
+        r'startOfToday|startOfTomorrow|weekAgo|lastYear',  # Date calculations for filters/display
+        r'getElementById\([\'"]recordFilter',  # Filter checkboxes (not form defaults)
+        r'getElementById\([\'"]compareBy',  # Comparison checkboxes
+        r'formatDate|formatDateTime|renderDate',  # Date formatting functions
+        r'toLocaleDateString|toLocaleString',  # Locale formatting
+        r'FieldRendererService|dateUtils',  # Using central systems
+        r'const\s+timestamp\s*=',  # Timestamp variables
+        r'\.dataset\.',  # Dataset attributes
+        r'textContent|innerHTML|innerText',  # Display content (not form values)
+        r'customDateFrom|customDateTo',  # Filter date fields (not form defaults)
+    ]
+    
     for line_num, line in enumerate(lines, 1):
         # Skip if already using DefaultValueSetter
         if any(exclude in line for exclude in exclude_contexts):
             continue
         
+        # Skip false positives
+        if any(re.search(fp_pattern, line, re.IGNORECASE) for fp_pattern in false_positive_patterns):
+            continue
+        
+        # Skip fallback code (code that comes after DefaultValueSetter check)
+        # Check previous 15 lines for DefaultValueSetter checks followed by else/fallback
+        if line_num > 1:
+            prev_lines = lines[max(0, line_num-15):line_num-1]
+            prev_context = '\n'.join(prev_lines)
+            # Check if there's a DefaultValueSetter check with else/fallback
+            if re.search(r'window\.DefaultValueSetter.*?else\s*\{|DefaultValueSetter\.set.*?else\s*\{|Fallback.*?DefaultValueSetter|//\s*Fallback', prev_context, re.IGNORECASE | re.DOTALL):
+                # This is fallback code - skip it
+                continue
+        
         for pattern, deviation_type in patterns:
             matches = re.finditer(pattern, line, re.IGNORECASE)
             for match in matches:
-                # Check context - make sure it's actually setting a date value
+                # Check context - make sure it's actually setting a date value in a form field
                 context_start = max(0, match.start() - 100)
                 context_end = min(len(line), match.end() + 100)
                 context = line[context_start:context_end]
                 
-                # More specific check: should be related to date input setting
-                if any(keyword in context.lower() for keyword in ['date', 'time', 'value', 'input']):
+                # Must be setting a form field value (element.value = ... or getElementById(...).value = ...)
+                # AND must be in a form context (showAddModal, resetForm, etc.) or explicitly setting a form field
+                is_form_field_setting = (
+                    '.value' in context or 
+                    'getElementById' in context or 
+                    'querySelector' in context
+                )
+                
+                # Must be in a form context (not just any .value assignment)
+                context_lower = context.lower()
+                is_form_context = any(
+                    keyword in context_lower 
+                    for keyword in ['showadd', 'resetform', 'cleatform', 'form', 'modal', 'input', 'field']
+                )
+                
+                # Skip if it's in a clear/reset/deselect context
+                is_reset_or_clear = any(
+                    keyword in context_lower 
+                    for keyword in ['clear all', 'reset all', 'deselect', 'uncheck all', 'selectallcheckbox']
+                )
+                
+                # Must NOT be in logging, download, display, reset, or populateForm context
+                is_not_false_positive = not any(
+                    fp_keyword in context_lower 
+                    for fp_keyword in ['logger', 'console', 'log.push', 'download', 'filename', 'timestamp', 'daterangestart', 'daterangeend', 'formatdate', 'renderdate', 'textcontent', 'innerhtml', 'dataset', 'customdate', 'clear all', 'reset all', 'populateform', 'populate.*form', 'fillform', 'load.*preferences']
+                )
+                
+                # Skip if it's in a populateForm context (loading existing values, not defaults)
+                if line_num > 1:
+                    prev_lines = lines[max(0, line_num-50):line_num-1]
+                    prev_context = '\n'.join(prev_lines)
+                    if re.search(r'populateForm|populate.*form|populateAllFormFields|load.*preferences|fillForm|_populateAllFormFields|Populating.*form.*fields|fill.*form.*with.*preferences|async\s+_populateAllFormFields', prev_context, re.IGNORECASE):
+                        continue
+                
+                if is_form_field_setting and is_form_context and is_not_false_positive:
                     deviations.append({
                         'type': deviation_type,
                         'line': line_num,
@@ -119,20 +189,41 @@ def scan_preference_loading(content: str, file_path: Path) -> List[Dict]:
         'setFormDefaults'
     ]
     
+    # False positive patterns - exclude preference loading for display, filters, etc.
+    false_positive_patterns = [
+        r'defaultSearchFilter|defaultDateRangeFilter|defaultStatusFilter|defaultTypeFilter',  # Filter defaults (not form defaults)
+        r'currentPreferences\?\.',  # Reading preferences for display
+        r'getPreferenceFromMemory',  # Already using central system
+        r'PreferencesCore\.get',  # Using PreferencesCore (central system)
+    ]
+    
     for line_num, line in enumerate(lines, 1):
         if any(exclude in line for exclude in exclude_contexts):
             continue
         
+        # Skip false positives
+        if any(re.search(fp_pattern, line, re.IGNORECASE) for fp_pattern in false_positive_patterns):
+            continue
+        
         for pattern, deviation_type in patterns:
             if re.search(pattern, line, re.IGNORECASE):
-                deviations.append({
-                    'type': deviation_type,
-                    'line': line_num,
-                    'code': line.strip(),
-                    'match': re.search(pattern, line, re.IGNORECASE).group(),
-                    'severity': 'HIGH',
-                    'description': f'טעינת העדפות מקומית במקום DefaultValueSetter.setPreferenceValue'
-                })
+                # Must be setting a form field value (not just reading for display)
+                is_form_field_setting = (
+                    '.value' in line or 
+                    'getElementById' in line or 
+                    'querySelector' in line or
+                    'setValue' in line
+                )
+                
+                if is_form_field_setting:
+                    deviations.append({
+                        'type': deviation_type,
+                        'line': line_num,
+                        'code': line.strip(),
+                        'match': re.search(pattern, line, re.IGNORECASE).group(),
+                        'severity': 'HIGH',
+                        'description': f'טעינת העדפות מקומית במקום DefaultValueSetter.setPreferenceValue'
+                    })
     
     return deviations
 
@@ -161,8 +252,20 @@ def scan_logical_defaults(content: str, file_path: Path) -> List[Dict]:
         'setFormDefaults'
     ]
     
+    # False positive patterns - exclude filter checkboxes, comparison checkboxes, etc.
+    false_positive_patterns = [
+        r'recordFilter',  # Filter checkboxes
+        r'compareBy',  # Comparison checkboxes
+        r'filter.*checked',  # Filter-related
+        r'resetFilter|clearFilter',  # Filter reset
+    ]
+    
     for line_num, line in enumerate(lines, 1):
         if any(exclude in line for exclude in exclude_contexts):
+            continue
+        
+        # Skip false positives
+        if any(re.search(fp_pattern, line, re.IGNORECASE) for fp_pattern in false_positive_patterns):
             continue
         
         # Look for element.value = 'logical_value' or element.checked = true/false
@@ -171,7 +274,46 @@ def scan_logical_defaults(content: str, file_path: Path) -> List[Dict]:
             if re.search(r'[=!]==', line):
                 continue
             
+            # Skip fallback code (code that comes after DefaultValueSetter check)
+            if line_num > 1:
+                prev_lines = lines[max(0, line_num-15):line_num-1]
+                prev_context = '\n'.join(prev_lines)
+                # Check if there's a DefaultValueSetter check with else/fallback
+                if re.search(r'window\.DefaultValueSetter.*?else\s*\{|DefaultValueSetter\.set.*?else\s*\{|Fallback.*?DefaultValueSetter|//\s*Fallback', prev_context, re.IGNORECASE | re.DOTALL):
+                    # This is fallback code - skip it
+                    continue
+            
+            # Must be in a form context (showAddModal, resetForm, etc.) or setting a form field
             context = line.strip()
+            is_form_context = any(
+                keyword in context.lower() 
+                for keyword in ['showadd', 'resetform', 'cleatform', 'getelementbyid', 'form']
+            )
+            
+            # Skip if it's clearly a filter, comparison checkbox, or reset/clear function
+            context_lower = context.lower()
+            is_reset_or_clear = any(
+                keyword in context_lower 
+                for keyword in ['clear all', 'reset all', 'selectall', 'uncheck all', 'deselect', 'clear.*selections', 'reset.*form']
+            )
+            
+            if not is_form_context and (is_reset_or_clear or 'filter' in context_lower or 'compare' in context_lower):
+                continue
+            
+            # Skip if it's in a clear/reset function context or populateForm context
+            if line_num > 1:
+                prev_lines = lines[max(0, line_num-50):line_num-1]
+                prev_context = '\n'.join(prev_lines)
+                # Check for clear/reset functions
+                if re.search(r'(?:clear|reset|deselect).*?\(|function\s+\w*(?:clear|reset|deselect)|//\s*Clear\s+(?:all\s+)?selections', prev_context, re.IGNORECASE):
+                    continue
+                # Check for populateForm/populateAllFormFields (loading existing values, not setting defaults)
+                if re.search(r'populateForm|populate.*form|populateAllFormFields|load.*preferences|fillForm|_populateAllFormFields|Populating.*form.*fields|fill.*form.*with.*preferences', prev_context, re.IGNORECASE):
+                    continue
+                # Check if this is inside a populateForm/populateAllFormFields function
+                if re.search(r'async\s+_populateAllFormFields|function.*populate.*form|Populate all form fields', prev_context, re.IGNORECASE):
+                    continue
+            
             if len(context) > 200:
                 context = context[:200] + '...'
             

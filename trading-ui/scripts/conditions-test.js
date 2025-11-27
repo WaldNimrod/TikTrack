@@ -1324,7 +1324,15 @@ class ConditionsUIManager {
                 document.getElementById('parametersContainer').innerHTML = '';
                 document.getElementById('logicalOperator').value = 'NONE';
                 document.getElementById('conditionGroup').value = 0;
-                document.getElementById('isActive').checked = true;
+                // Use DefaultValueSetter for logical default
+                const isActiveField = document.getElementById('isActive');
+                if (isActiveField) {
+                    if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setLogicalDefault === 'function') {
+                        window.DefaultValueSetter.setLogicalDefault(isActiveField.id, true);
+                    } else {
+                        isActiveField.checked = true;
+                    }
+                }
             }
         }
     }

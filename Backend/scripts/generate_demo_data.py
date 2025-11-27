@@ -1,0 +1,1287 @@
+#!/usr/bin/env python3
+"""
+TikTrack Demo Data Generation Script
+====================================
+
+Generates comprehensive demo data for the TikTrack system to enable impressive
+demonstrations of all system capabilities, including full and correct links between all entities.
+
+This script creates realistic demo data with proper relationships, date distributions,
+and logical connections between all entities in the system.
+
+Usage:
+    python3 Backend/scripts/generate_demo_data.py [--dry-run] [--verbose]
+
+Options:
+    --dry-run: Validate schema only, don't create data
+    --verbose: Show detailed progress information
+
+Author: TikTrack Development Team
+Version: 1.0.0
+Date: January 2025
+
+Documentation:
+    See documentation/05-REPORTS/DEMO_DATA_GENERATION_GUIDE.md for full guide
+"""
+
+import sys
+import os
+import random
+import argparse
+from datetime import datetime, timedelta, date
+from typing import Dict, List, Optional, Tuple, Any
+from decimal import Decimal
+from sqlalchemy import create_engine, inspect, text
+from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.pool import QueuePool
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+
+# Add Backend to path for imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from config.settings import DATABASE_URL, USING_SQLITE
+from models.ticker import Ticker
+from models.trading_account import TradingAccount
+from models.trade_plan import TradePlan
+from models.trade import Trade
+from models.execution import Execution
+from models.cash_flow import CashFlow
+from models.alert import Alert
+from models.note import Note
+from models.currency import Currency
+from models.user import User
+from models.note_relation_type import NoteRelationType
+
+# ============================================================================
+# Configuration
+# ============================================================================
+
+DEMO_CONFIG = {
+    'trading_accounts': {
+        'count': 3,
+        'primary_account_activity_percent': 70,
+        'primary_account_swing_only': True
+    },
+    'tickers': {
+        'count': 50,
+        'usd_percent': 90,
+        'other_currencies': ['ILS', 'EUR']
+    },
+    'trade_plans': {
+        'count': 120,
+        'swing_percent': 50,
+        'long_percent': 90
+    },
+    'trades': {
+        'count': 80,
+        'from_plans_percent': 70  # 70% מהטריידים מתוכניות
+    },
+    'time_distribution': {
+        'last_6_months_percent': 40,
+        'last_3_months_of_6_percent': 70,  # 70% מתוך ה-40%
+        'total_years_back': 2
+    }
+}
+
+# Sample ticker symbols and names
+SAMPLE_TICKERS = [
+    # Tech Stocks (USD)
+    ('AAPL', 'Apple Inc.', 'stock', 'USD'),
+    ('MSFT', 'Microsoft Corporation', 'stock', 'USD'),
+    ('GOOGL', 'Alphabet Inc.', 'stock', 'USD'),
+    ('AMZN', 'Amazon.com Inc.', 'stock', 'USD'),
+    ('TSLA', 'Tesla Inc.', 'stock', 'USD'),
+    ('META', 'Meta Platforms Inc.', 'stock', 'USD'),
+    ('NVDA', 'NVIDIA Corporation', 'stock', 'USD'),
+    ('NFLX', 'Netflix Inc.', 'stock', 'USD'),
+    ('AMD', 'Advanced Micro Devices', 'stock', 'USD'),
+    ('INTC', 'Intel Corporation', 'stock', 'USD'),
+    ('ORCL', 'Oracle Corporation', 'stock', 'USD'),
+    ('CRM', 'Salesforce Inc.', 'stock', 'USD'),
+    ('ADBE', 'Adobe Inc.', 'stock', 'USD'),
+    ('PYPL', 'PayPal Holdings Inc.', 'stock', 'USD'),
+    ('IBM', 'International Business Machines', 'stock', 'USD'),
+    
+    # Finance (USD)
+    ('JPM', 'JPMorgan Chase & Co.', 'stock', 'USD'),
+    ('BAC', 'Bank of America Corp.', 'stock', 'USD'),
+    ('WFC', 'Wells Fargo & Company', 'stock', 'USD'),
+    ('GS', 'Goldman Sachs Group Inc.', 'stock', 'USD'),
+    ('MS', 'Morgan Stanley', 'stock', 'USD'),
+    
+    # Consumer (USD)
+    ('WMT', 'Walmart Inc.', 'stock', 'USD'),
+    ('HD', 'Home Depot Inc.', 'stock', 'USD'),
+    ('DIS', 'Walt Disney Company', 'stock', 'USD'),
+    ('NKE', 'Nike Inc.', 'stock', 'USD'),
+    ('SBUX', 'Starbucks Corporation', 'stock', 'USD'),
+    
+    # ETFs (USD)
+    ('SPY', 'SPDR S&P 500 ETF Trust', 'etf', 'USD'),
+    ('QQQ', 'Invesco QQQ Trust', 'etf', 'USD'),
+    ('VTI', 'Vanguard Total Stock Market ETF', 'etf', 'USD'),
+    ('VOO', 'Vanguard S&P 500 ETF', 'etf', 'USD'),
+    ('IWM', 'iShares Russell 2000 ETF', 'etf', 'USD'),
+    ('DIA', 'SPDR Dow Jones Industrial Average ETF', 'etf', 'USD'),
+    ('GLD', 'SPDR Gold Trust', 'etf', 'USD'),
+    ('TLT', 'iShares 20+ Year Treasury Bond ETF', 'etf', 'USD'),
+    
+    # Crypto (USD)
+    ('BTC', 'Bitcoin', 'crypto', 'USD'),
+    ('ETH', 'Ethereum', 'crypto', 'USD'),
+    ('BNB', 'Binance Coin', 'crypto', 'USD'),
+    ('ADA', 'Cardano', 'crypto', 'USD'),
+    
+    # Israeli stocks (ILS)
+    ('TEVA', 'Teva Pharmaceutical Industries', 'stock', 'ILS'),
+    ('BABA', 'Alibaba Group Holding', 'stock', 'ILS'),
+    ('WIX', 'Wix.com Ltd.', 'stock', 'ILS'),
+    ('NICE', 'NICE Ltd.', 'stock', 'ILS'),
+    
+    # European stocks (EUR)
+    ('ASML', 'ASML Holding N.V.', 'stock', 'EUR'),
+    ('SAP', 'SAP SE', 'stock', 'EUR'),
+    ('SAN', 'Banco Santander S.A.', 'stock', 'EUR'),
+    ('BMW', 'Bayerische Motoren Werke AG', 'stock', 'EUR'),
+]
+
+# Sample cash flow types
+CASH_FLOW_TYPES = [
+    'deposit',
+    'withdrawal',
+    'fee',
+    'dividend',
+    'interest',
+    'transfer_in',
+    'transfer_out'
+]
+
+# Alert related types
+ALERT_RELATED_TYPES = {
+    'trading_account': 1,
+    'trade': 2,
+    'trade_plan': 3,
+    'ticker': 4
+}
+
+# Note related types (same as alerts)
+NOTE_RELATED_TYPES = {
+    'trading_account': 1,
+    'trade': 2,
+    'trade_plan': 3,
+    'ticker': 4
+}
+
+# Investment types
+INVESTMENT_TYPES = ['swing', 'investment', 'passive', 'day_trading', 'scalping']
+
+# Trade sides
+TRADE_SIDES = ['Long', 'Short']
+
+# Trade statuses
+TRADE_STATUSES = ['open', 'closed', 'cancelled']
+
+# Execution actions
+EXECUTION_ACTIONS = ['buy', 'sell', 'short', 'cover']
+
+# ============================================================================
+# Exception Classes
+# ============================================================================
+
+class SchemaValidationError(Exception):
+    """שגיאה במבנה בסיס הנתונים"""
+    
+    def __init__(self, table_name: str, missing_field: Optional[str] = None, 
+                 error_type: Optional[str] = None, details: Optional[str] = None):
+        self.table_name = table_name
+        self.missing_field = missing_field
+        self.error_type = error_type
+        self.details = details
+        
+        # Build clear Hebrew error message
+        if error_type == 'missing_table':
+            msg = f"❌ טבלה חסרה: '{table_name}' לא נמצאה בבסיס הנתונים"
+            msg += f"\n📍 מיקום: בדיקת מבנה DB לפני יצירת נתוני דוגמה"
+            msg += f"\n💡 פתרון: ודא שהטבלה קיימת ורוץ את migration המתאים"
+        elif error_type == 'missing_field':
+            msg = f"❌ שדה חסר: '{missing_field}' לא נמצא בטבלה '{table_name}'"
+            msg += f"\n📍 מיקום: טבלה: {table_name}, שדה: {missing_field}"
+            msg += f"\n💡 פתרון: בדוק את מודל {table_name} וודא שהשדה קיים"
+        elif error_type == 'foreign_key':
+            msg = f"❌ בעיית Foreign Key: בטבלה '{table_name}'"
+            msg += f"\n📍 פרטים: {details or 'Foreign key constraint failed'}"
+            msg += f"\n💡 פתרון: ודא שהטבלה המקושרת קיימת ומכילה את הנתונים הנדרשים"
+        else:
+            msg = f"❌ שגיאת אימות מבנה: '{table_name}'"
+            if details:
+                msg += f"\n📍 פרטים: {details}"
+        
+        super().__init__(msg)
+
+
+class DataGenerationError(Exception):
+    """שגיאה ביצירת נתוני דוגמה"""
+    
+    def __init__(self, entity_type: str, reason: str, details: Optional[str] = None):
+        self.entity_type = entity_type
+        self.reason = reason
+        self.details = details
+        
+        msg = f"❌ שגיאה ביצירת {entity_type}: {reason}"
+        if details:
+            msg += f"\n📍 פרטים: {details}"
+        msg += f"\n💡 פתרון: בדוק את הקונפיגורציה והנתונים הקיימים"
+        
+        super().__init__(msg)
+
+
+# ============================================================================
+# Database Validator
+# ============================================================================
+
+class DatabaseValidator:
+    """בודק את מבנה בסיס הנתונים לפני יצירת נתוני דוגמה"""
+    
+    REQUIRED_TABLES = [
+        'users',
+        'currencies',
+        'tickers',
+        'trading_accounts',
+        'trade_plans',
+        'trades',
+        'executions',
+        'cash_flows',
+        'alerts',
+        'notes',
+        'note_relation_types'
+    ]
+    
+    REQUIRED_FIELDS = {
+        'tickers': ['id', 'symbol', 'name', 'type', 'currency_id', 'status', 'created_at'],
+        'trading_accounts': ['id', 'name', 'currency_id', 'status', 'created_at'],
+        'trade_plans': ['id', 'trading_account_id', 'ticker_id', 'investment_type', 
+                       'side', 'status', 'planned_amount', 'entry_price', 'created_at'],
+        'trades': ['id', 'trading_account_id', 'ticker_id', 'status', 'investment_type',
+                  'side', 'created_at'],
+        'executions': ['id', 'ticker_id', 'action', 'date', 'quantity', 'price', 'created_at'],
+        'cash_flows': ['id', 'trading_account_id', 'type', 'amount', 'date', 'created_at'],
+        'alerts': ['id', 'related_type_id', 'status', 'created_at'],
+        'notes': ['id', 'content', 'related_type_id', 'related_id', 'created_at'],
+        'currencies': ['id', 'symbol', 'name', 'usd_rate'],
+        'users': ['id', 'username', 'is_active']
+    }
+    
+    def __init__(self, db_session: Session):
+        self.db = db_session
+        self.inspector = inspect(db_session.bind)
+    
+    def validate(self) -> None:
+        """בודק את כל הדרישות"""
+        print("🔍 בודק מבנה בסיס הנתונים...")
+        
+        try:
+            # Check tables exist
+            self._check_tables_exist()
+            
+            # Check required fields
+            self._check_required_fields()
+            
+            # Check required data
+            self._check_required_data()
+            
+            print("✅ מבנה בסיס הנתונים תקין")
+            
+        except SchemaValidationError:
+            raise
+        except Exception as e:
+            raise SchemaValidationError(
+                'unknown',
+                error_type='validation_error',
+                details=f"שגיאה לא צפויה באימות: {str(e)}"
+            )
+    
+    def _check_tables_exist(self) -> None:
+        """בודק שכל הטבלאות הנדרשות קיימות"""
+        existing_tables = self.inspector.get_table_names()
+        
+        for table in self.REQUIRED_TABLES:
+            if table not in existing_tables:
+                raise SchemaValidationError(
+                    table,
+                    error_type='missing_table',
+                    details=f"הטבלה {table} לא נמצאה. הטבלאות הקיימות: {', '.join(existing_tables[:10])}"
+                )
+    
+    def _check_required_fields(self) -> None:
+        """בודק שכל השדות הנדרשים קיימים"""
+        for table_name, required_fields in self.REQUIRED_FIELDS.items():
+            try:
+                columns = [col['name'] for col in self.inspector.get_columns(table_name)]
+                
+                for field in required_fields:
+                    if field not in columns:
+                        raise SchemaValidationError(
+                            table_name,
+                            missing_field=field,
+                            error_type='missing_field',
+                            details=f"השדה {field} חסר. השדות הקיימים: {', '.join(columns[:10])}"
+                        )
+            except Exception as e:
+                if isinstance(e, SchemaValidationError):
+                    raise
+                raise SchemaValidationError(
+                    table_name,
+                    error_type='validation_error',
+                    details=f"שגיאה בבדיקת שדות: {str(e)}"
+                )
+    
+    def _check_required_data(self) -> None:
+        """בודק שקיימים נתוני בסיס נדרשים"""
+        # Check for at least one user (any user - no full user system yet)
+        user_count = self.db.query(User).count()
+        if user_count == 0:
+            raise SchemaValidationError(
+                'users',
+                error_type='missing_data',
+                details="לא נמצא משתמש במערכת. יש ליצור משתמש ידנית בבסיס הנתונים לפני יצירת נתוני דוגמה"
+            )
+        
+        # Check for at least USD currency
+        usd_currency = self.db.query(Currency).filter(Currency.symbol == 'USD').first()
+        if not usd_currency:
+            raise SchemaValidationError(
+                'currencies',
+                error_type='missing_data',
+                details="לא נמצא מטבע USD. יש לוודא שמטבע USD קיים במערכת"
+            )
+        
+        # Check for SPY ticker (should exist after phase 1)
+        spy_ticker = self.db.query(Ticker).filter(Ticker.symbol == 'SPY').first()
+        if not spy_ticker:
+            raise SchemaValidationError(
+                'tickers',
+                error_type='missing_data',
+                details="לא נמצא טיקר SPY. ודא ששלב 1 (ניקוי נתונים) הושלם בהצלחה"
+            )
+
+
+# ============================================================================
+# Date Distribution Helper
+# ============================================================================
+
+class DateDistributionGenerator:
+    """מייצר תאריכים לפי הדרישות של פיזור נתונים"""
+    
+    def __init__(self):
+        self.now = datetime.now()
+        self.six_months_ago = self.now - timedelta(days=180)
+        self.three_months_ago = self.now - timedelta(days=90)
+        self.two_years_ago = self.now - timedelta(days=730)
+    
+    def generate_date(self, distribution_type: str = 'random') -> datetime:
+        """
+        יוצר תאריך לפי הפיזור הנדרש
+        
+        Args:
+            distribution_type: 'random' (40% חצי שנה), 'recent' (70% מתוך החצי שנה = 3 חודשים)
+        
+        Returns:
+            datetime: תאריך שנוצר
+        """
+        rand = random.random()
+        
+        if distribution_type == 'recent':
+            # 70% בשלושת החודשים האחרונים, 30% בשלושת החודשים לפני
+            if rand < 0.7:
+                # שלושת החודשים האחרונים
+                days_back = random.randint(0, 90)
+            else:
+                # שלושת החודשים לפני (90-180 ימים)
+                days_back = random.randint(90, 180)
+            return self.now - timedelta(days=days_back)
+        
+        else:  # random - 40% בחצי שנה, 60% בשנה וחצי הקודמת
+            if rand < 0.4:
+                # 40% בחצי שנה האחרונה
+                days_back = random.randint(0, 180)
+            else:
+                # 60% בשנה וחצי הקודמת (180-730 ימים)
+                days_back = random.randint(180, 730)
+            return self.now - timedelta(days=days_back)
+    
+    def generate_date_in_range(self, start_date: datetime, end_date: datetime) -> datetime:
+        """יוצר תאריך בטווח מסוים"""
+        delta = end_date - start_date
+        days = random.randint(0, delta.days)
+        return start_date + timedelta(days=days)
+
+
+# ============================================================================
+# Data Relationship Manager
+# ============================================================================
+
+class DataRelationshipManager:
+    """מנהל את הקשרים בין ישויות שונות"""
+    
+    def __init__(self, db_session: Session):
+        self.db = db_session
+        self.tickers: List[Ticker] = []
+        self.accounts: List[TradingAccount] = []
+        self.trade_plans: List[TradePlan] = []
+        self.trades: List[Trade] = []
+    
+    def get_random_ticker(self, currency_id: Optional[int] = None) -> Ticker:
+        """מחזיר טיקר אקראי (או לפי מטבע)"""
+        available = self.tickers
+        if currency_id:
+            available = [t for t in self.tickers if t.currency_id == currency_id]
+        if not available:
+            available = self.tickers
+        
+        return random.choice(available) if available else None
+    
+    def get_random_account(self, currency_id: Optional[int] = None) -> TradingAccount:
+        """מחזיר חשבון אקראי (או לפי מטבע)"""
+        available = self.accounts
+        if currency_id:
+            available = [a for a in self.accounts if a.currency_id == currency_id]
+        if not available:
+            available = self.accounts
+        
+        return random.choice(available) if available else None
+    
+    def get_primary_account(self) -> TradingAccount:
+        """מחזיר את החשבון הראשי (הראשון)"""
+        return self.accounts[0] if self.accounts else None
+
+
+# ============================================================================
+# Demo Data Generator
+# ============================================================================
+
+class DemoDataGenerator:
+    """יוצר נתוני דוגמה מלאים למערכת"""
+    
+    def __init__(self, db_session: Session, config: Dict[str, Any], dry_run: bool = False):
+        self.db = db_session
+        self.config = config
+        self.dry_run = dry_run
+        self.date_gen = DateDistributionGenerator()
+        self.relationship_manager = DataRelationshipManager(db_session)
+        self.created_count = {
+            'tickers': 0,
+            'accounts': 0,
+            'trade_plans': 0,
+            'trades': 0,
+            'executions': 0,
+            'cash_flows': 0,
+            'alerts': 0,
+            'notes': 0
+        }
+        
+        # Cache for lookup
+        self.currency_cache: Dict[str, Currency] = {}
+        self.user_cache: Optional[User] = None
+        self.note_relation_types_cache: Dict[str, int] = {}
+    
+    def generate_all(self) -> Dict[str, int]:
+        """יוצר את כל נתוני הדוגמה"""
+        if self.dry_run:
+            print("🔍 DRY RUN - רק אימות, ללא יצירת נתונים")
+            return self.created_count
+        
+        print("🚀 מתחיל ליצור נתוני דוגמה...")
+        
+        try:
+            # Load caches
+            self._load_caches()
+            
+            # Create in order (respecting dependencies)
+            self._create_tickers()
+            self._create_trading_accounts()
+            self._create_trade_plans()
+            self._create_trades()
+            self._create_executions()
+            self._create_cash_flows()
+            self._create_alerts()
+            self._create_notes()
+            
+            # Commit all
+            self.db.commit()
+            
+            print(f"\n✅ יצירת נתוני דוגמה הושלמה בהצלחה!")
+            print(f"📊 סיכום:")
+            for entity, count in self.created_count.items():
+                print(f"   - {entity}: {count}")
+            
+            return self.created_count
+            
+        except Exception as e:
+            self.db.rollback()
+            print(f"\n❌ שגיאה ביצירת נתוני דוגמה: {str(e)}")
+            raise
+    
+    def _load_caches(self) -> None:
+        """טוען נתונים נדרשים למטמון"""
+        # Load currencies
+        currencies = self.db.query(Currency).all()
+        for currency in currencies:
+            self.currency_cache[currency.symbol] = currency
+        
+        # Load user (any user - no full user system yet)
+        self.user_cache = self.db.query(User).first()
+        if not self.user_cache:
+            raise DataGenerationError('users', "לא נמצא משתמש במערכת. יש ליצור משתמש ידנית בבסיס הנתונים")
+        
+        # Load note relation types
+        note_types = self.db.query(NoteRelationType).all()
+        for nt in note_types:
+            self.note_relation_types_cache[nt.note_relation_type] = nt.id
+    
+    def _create_tickers(self) -> None:
+        """יוצר טיקרים"""
+        print(f"\n📈 יוצר {self.config['tickers']['count']} טיקרים...")
+        
+        count = self.config['tickers']['count']
+        usd_percent = self.config['tickers']['usd_percent']
+        usd_count = int(count * usd_percent / 100)
+        
+        # Get USD currency
+        usd_currency = self.currency_cache.get('USD')
+        if not usd_currency:
+            raise DataGenerationError('tickers', "מטבע USD לא נמצא")
+        
+        # Get other currencies
+        other_currencies = {}
+        for symbol in self.config['tickers']['other_currencies']:
+            currency = self.currency_cache.get(symbol)
+            if currency:
+                other_currencies[symbol] = currency
+        
+        # Get existing ticker symbols to avoid duplicates
+        existing_symbols = {t.symbol for t in self.db.query(Ticker.symbol).all()}
+        
+        # Shuffle sample tickers and filter out existing ones (especially SPY)
+        available_tickers = [t for t in SAMPLE_TICKERS if t[0] not in existing_symbols]
+        random.shuffle(available_tickers)
+        
+        created = 0
+        
+        # Create USD tickers
+        for i in range(min(usd_count, len(available_tickers))):
+            symbol, name, ticker_type, currency = available_tickers[i]
+            if currency == 'USD':
+                ticker = Ticker(
+                    symbol=symbol,
+                    name=name,
+                    type=ticker_type,
+                    currency_id=usd_currency.id,
+                    status='open',
+                    active_trades=False
+                )
+                self.db.add(ticker)
+                created += 1
+        
+        # Fill remaining USD tickers with random data
+        for i in range(usd_count - created):
+            symbol = f"DEMO{i+1}"
+            ticker = Ticker(
+                symbol=symbol,
+                name=f"Demo Stock {i+1}",
+                type=random.choice(['stock', 'etf']),
+                currency_id=usd_currency.id,
+                status='open',
+                active_trades=False
+            )
+            self.db.add(ticker)
+            created += 1
+        
+        # Create other currency tickers
+        other_count = count - usd_count
+        for i in range(other_count):
+            if not other_currencies:
+                # Fallback to USD if no other currencies
+                currency = usd_currency
+            else:
+                currency_symbol = random.choice(list(other_currencies.keys()))
+                currency = other_currencies[currency_symbol]
+            
+            # Find ticker from samples with matching currency (already filtered for existing)
+            matching_ticker = None
+            for sym, name, typ, curr in available_tickers:
+                if curr == currency.symbol:
+                    matching_ticker = (sym, name, typ, curr)
+                    available_tickers.remove((sym, name, typ, curr))  # Remove to avoid duplicates
+                    break
+            
+            if matching_ticker:
+                symbol, name, ticker_type, _ = matching_ticker
+            else:
+                symbol = f"DEMO{currency.symbol}{i+1}"
+                name = f"Demo {currency.symbol} Stock {i+1}"
+                ticker_type = 'stock'
+            
+            ticker = Ticker(
+                symbol=symbol,
+                name=name,
+                type=ticker_type,
+                currency_id=currency.id,
+                status='open',
+                active_trades=False
+            )
+            self.db.add(ticker)
+            created += 1
+        
+        self.db.flush()  # Flush to get IDs
+        
+        # Reload for relationship manager
+        self.relationship_manager.tickers = self.db.query(Ticker).filter(
+            Ticker.symbol != 'SPY'  # Exclude SPY that should already exist
+        ).all()
+        
+        # Add SPY if exists
+        spy = self.db.query(Ticker).filter(Ticker.symbol == 'SPY').first()
+        if spy and spy not in self.relationship_manager.tickers:
+            self.relationship_manager.tickers.append(spy)
+        
+        self.created_count['tickers'] = created
+        print(f"   ✅ נוצרו {created} טיקרים")
+    
+    def _create_trading_accounts(self) -> None:
+        """יוצר חשבונות מסחר"""
+        print(f"\n💼 יוצר {self.config['trading_accounts']['count']} חשבונות מסחר...")
+        
+        usd_currency = self.currency_cache.get('USD')
+        if not usd_currency:
+            raise DataGenerationError('trading_accounts', "מטבע USD לא נמצא")
+        
+        # Get other currency (ILS or EUR)
+        other_currency = None
+        for symbol in ['ILS', 'EUR']:
+            if symbol in self.currency_cache:
+                other_currency = self.currency_cache[symbol]
+                break
+        
+        if not other_currency:
+            other_currency = usd_currency  # Fallback
+        
+        # Account 1: Primary (70% activity, all swing)
+        account1 = TradingAccount(
+            name="חשבון מסחר ראשי",
+            currency_id=usd_currency.id,
+            status='open',
+            opening_balance=100000.0,
+            cash_balance=50000.0,
+            total_value=150000.0
+        )
+        self.db.add(account1)
+        
+        # Account 2: Pension (long-term investments)
+        account2 = TradingAccount(
+            name="חשבון פנסיוני",
+            currency_id=usd_currency.id,
+            status='open',
+            opening_balance=500000.0,
+            cash_balance=450000.0,
+            total_value=600000.0
+        )
+        self.db.add(account2)
+        
+        # Account 3: Other currency (long-term investments)
+        account3 = TradingAccount(
+            name=f"חשבון מסחר {other_currency.symbol}",
+            currency_id=other_currency.id,
+            status='open',
+            opening_balance=200000.0,
+            cash_balance=180000.0,
+            total_value=220000.0
+        )
+        self.db.add(account3)
+        
+        self.db.flush()
+        
+        self.relationship_manager.accounts = [account1, account2, account3]
+        self.created_count['accounts'] = 3
+        print(f"   ✅ נוצרו 3 חשבונות מסחר")
+    
+    def _create_trade_plans(self) -> None:
+        """יוצר תוכניות טרייד"""
+        print(f"\n📋 יוצר {self.config['trade_plans']['count']} תוכניות טרייד...")
+        
+        count = self.config['trade_plans']['count']
+        swing_percent = self.config['trade_plans']['swing_percent']
+        long_percent = self.config['trade_plans']['long_percent']
+        
+        swing_count = int(count * swing_percent / 100)
+        long_count = int(count * long_percent / 100)
+        
+        # Primary account gets all swing plans
+        primary_account = self.relationship_manager.get_primary_account()
+        other_accounts = [acc for acc in self.relationship_manager.accounts if acc.id != primary_account.id]
+        
+        created = 0
+        
+        for i in range(count):
+            # Determine investment type
+            if created < swing_count:
+                investment_type = 'swing'
+                account = primary_account  # All swing in primary
+            else:
+                investment_type = random.choice(['investment', 'passive'])
+                account = random.choice(other_accounts) if other_accounts else primary_account
+            
+            # Determine side
+            side = 'Long' if created < long_count else 'Short'
+            
+            # Get ticker from account's currency
+            ticker = self.relationship_manager.get_random_ticker(account.currency_id)
+            if not ticker:
+                ticker = self.relationship_manager.get_random_ticker()
+            
+            # Generate date (40% in last 6 months)
+            plan_date = self.date_gen.generate_date('random')
+            
+            # Generate realistic entry price (50-500 range)
+            entry_price = round(random.uniform(50, 500), 2)
+            planned_amount = round(random.uniform(5000, 50000), 2)
+            
+            # Calculate stop and target (5-10% stop, 10-30% target)
+            stop_percentage = round(random.uniform(5, 10), 2)
+            target_percentage = round(random.uniform(10, 30), 2)
+            stop_price = round(entry_price * (1 - stop_percentage / 100), 2)
+            target_price = round(entry_price * (1 + target_percentage / 100), 2)
+            
+            # Status (mostly open, some cancelled)
+            status = 'open' if random.random() > 0.15 else 'cancelled'
+            cancelled_at = self.date_gen.generate_date_in_range(
+                plan_date,
+                self.date_gen.now
+            ) if status == 'cancelled' else None
+            
+            trade_plan = TradePlan(
+                trading_account_id=account.id,
+                ticker_id=ticker.id,
+                investment_type=investment_type,
+                side=side,
+                status=status,
+                planned_amount=planned_amount,
+                entry_price=entry_price,
+                stop_price=stop_price,
+                target_price=target_price,
+                stop_percentage=stop_percentage,
+                target_percentage=target_percentage,
+                cancelled_at=cancelled_at,
+                cancel_reason="תוכנית בוטלה" if cancelled_at else None,
+                reasons=f"תוכנית {investment_type} עבור {ticker.symbol}",
+                notes=f"תוכנית מסחר מסוג {investment_type}"
+            )
+            
+            # Set created_at manually to match the plan date
+            trade_plan.created_at = plan_date
+            
+            self.db.add(trade_plan)
+            created += 1
+        
+        self.db.flush()
+        
+        self.relationship_manager.trade_plans = self.db.query(TradePlan).all()
+        self.created_count['trade_plans'] = created
+        print(f"   ✅ נוצרו {created} תוכניות טרייד")
+    
+    def _create_trades(self) -> None:
+        """יוצר טריידים"""
+        print(f"\n💹 יוצר {self.config['trades']['count']} טריידים...")
+        
+        count = self.config['trades']['count']
+        from_plans_percent = self.config['trades']['from_plans_percent']
+        
+        from_plans_count = int(count * from_plans_percent / 100)
+        independent_count = count - from_plans_count
+        
+        created = 0
+        
+        # Trades from plans
+        available_plans = [p for p in self.relationship_manager.trade_plans if p.status == 'open']
+        random.shuffle(available_plans)
+        
+        for i in range(min(from_plans_count, len(available_plans))):
+            plan = available_plans[i]
+            
+            # Trade date after plan date
+            trade_date = self.date_gen.generate_date_in_range(
+                plan.created_at,
+                self.date_gen.now
+            )
+            
+            # Status
+            status = 'open' if random.random() > 0.6 else 'closed'
+            closed_at = self.date_gen.generate_date_in_range(
+                trade_date,
+                self.date_gen.now
+            ) if status == 'closed' else None
+            
+            # Calculate P/L if closed
+            total_pl = None
+            if status == 'closed':
+                # Random P/L between -20% to +40%
+                pl_percent = random.uniform(-20, 40)
+                total_pl = round(plan.planned_amount * pl_percent / 100, 2)
+            
+            trade = Trade(
+                trading_account_id=plan.trading_account_id,
+                ticker_id=plan.ticker_id,
+                trade_plan_id=plan.id,
+                status=status,
+                investment_type=plan.investment_type,
+                side=plan.side,
+                planned_quantity=round(plan.planned_amount / plan.entry_price, 2),
+                planned_amount=plan.planned_amount,
+                entry_price=plan.entry_price,
+                closed_at=closed_at,
+                total_pl=total_pl,
+                notes=f"טרייד מתוכנית {plan.id}"
+            )
+            
+            trade.created_at = trade_date
+            
+            self.db.add(trade)
+            created += 1
+        
+        # Independent trades
+        for i in range(independent_count):
+            account = random.choice(self.relationship_manager.accounts)
+            ticker = self.relationship_manager.get_random_ticker(account.currency_id)
+            if not ticker:
+                ticker = self.relationship_manager.get_random_ticker()
+            
+            trade_date = self.date_gen.generate_date('random')
+            
+            status = 'open' if random.random() > 0.5 else 'closed'
+            investment_type = random.choice(INVESTMENT_TYPES)
+            side = random.choice(TRADE_SIDES)
+            
+            entry_price = round(random.uniform(50, 500), 2)
+            planned_amount = round(random.uniform(5000, 50000), 2)
+            planned_quantity = round(planned_amount / entry_price, 2)
+            
+            closed_at = None
+            total_pl = None
+            if status == 'closed':
+                closed_at = self.date_gen.generate_date_in_range(trade_date, self.date_gen.now)
+                pl_percent = random.uniform(-20, 40)
+                total_pl = round(planned_amount * pl_percent / 100, 2)
+            
+            trade = Trade(
+                trading_account_id=account.id,
+                ticker_id=ticker.id,
+                trade_plan_id=None,
+                status=status,
+                investment_type=investment_type,
+                side=side,
+                planned_quantity=planned_quantity,
+                planned_amount=planned_amount,
+                entry_price=entry_price,
+                closed_at=closed_at,
+                total_pl=total_pl,
+                notes="טרייד עצמאי"
+            )
+            
+            trade.created_at = trade_date
+            
+            self.db.add(trade)
+            created += 1
+        
+        self.db.flush()
+        
+        self.relationship_manager.trades = self.db.query(Trade).all()
+        self.created_count['trades'] = created
+        print(f"   ✅ נוצרו {created} טריידים")
+    
+    def _create_executions(self) -> None:
+        """יוצר ביצועים לכל טרייד"""
+        print(f"\n📊 יוצר ביצועים...")
+        
+        created = 0
+        
+        for trade in self.relationship_manager.trades:
+            # Each trade needs at least 2 executions (open + close)
+            # For open trades, just opening execution
+            
+            # Opening execution
+            if trade.side == 'Long':
+                open_action = 'buy'
+            else:  # Short
+                open_action = 'short'
+            
+            open_execution = Execution(
+                ticker_id=trade.ticker_id,
+                trading_account_id=trade.trading_account_id,
+                trade_id=trade.id,
+                action=open_action,
+                date=trade.created_at,
+                quantity=trade.planned_quantity,
+                price=trade.entry_price,
+                fee=round(random.uniform(0, 50), 2),
+                source='manual',
+                notes=f"פתיחת טרייד {trade.id}"
+            )
+            self.db.add(open_execution)
+            created += 1
+            
+            # Closing execution (if trade is closed)
+            if trade.status == 'closed' and trade.closed_at:
+                if trade.side == 'Long':
+                    close_action = 'sell'
+                else:  # Short
+                    close_action = 'cover'
+                
+                # Calculate closing price based on P/L
+                if trade.total_pl:
+                    closing_price = trade.entry_price * (1 + (trade.total_pl / trade.planned_amount))
+                else:
+                    closing_price = trade.entry_price * random.uniform(0.8, 1.4)
+                closing_price = round(closing_price, 2)
+                
+                realized_pl = int(trade.total_pl) if trade.total_pl else None
+                
+                close_execution = Execution(
+                    ticker_id=trade.ticker_id,
+                    trading_account_id=trade.trading_account_id,
+                    trade_id=trade.id,
+                    action=close_action,
+                    date=trade.closed_at,
+                    quantity=trade.planned_quantity,
+                    price=closing_price,
+                    fee=round(random.uniform(0, 50), 2),
+                    realized_pl=realized_pl,
+                    source='manual',
+                    notes=f"סגירת טרייד {trade.id}"
+                )
+                self.db.add(close_execution)
+                created += 1
+            
+            # Sometimes add partial executions for open trades
+            if trade.status == 'open' and random.random() > 0.7:
+                # Add partial execution
+                partial_date = self.date_gen.generate_date_in_range(
+                    trade.created_at,
+                    self.date_gen.now
+                )
+                
+                partial_execution = Execution(
+                    ticker_id=trade.ticker_id,
+                    trading_account_id=trade.trading_account_id,
+                    trade_id=trade.id,
+                    action=open_action,
+                    date=partial_date,
+                    quantity=round(trade.planned_quantity * random.uniform(0.2, 0.5), 2),
+                    price=round(trade.entry_price * random.uniform(0.95, 1.05), 2),
+                    fee=round(random.uniform(0, 30), 2),
+                    source='manual',
+                    notes=f"ביצוע חלקי לטרייד {trade.id}"
+                )
+                self.db.add(partial_execution)
+                created += 1
+        
+        self.created_count['executions'] = created
+        print(f"   ✅ נוצרו {created} ביצועים")
+    
+    def _create_cash_flows(self) -> None:
+        """יוצר תזרימי מזומן"""
+        print(f"\n💰 יוצר תזרימי מזומן...")
+        
+        created = 0
+        
+        for account in self.relationship_manager.accounts:
+            # Initial deposit
+            deposit = CashFlow(
+                trading_account_id=account.id,
+                type='deposit',
+                amount=account.opening_balance or 100000,
+                date=self.date_gen.two_years_ago,
+                currency_id=account.currency_id,
+                usd_rate=1.0,
+                source='manual',
+                description=f"הפקדה ראשונית לחשבון {account.name}"
+            )
+            self.db.add(deposit)
+            created += 1
+            
+            # Random deposits and withdrawals over time
+            for _ in range(random.randint(3, 8)):
+                flow_type = random.choice(['deposit', 'withdrawal'])
+                flow_date = self.date_gen.generate_date('random')
+                amount = round(random.uniform(1000, 20000), 2)
+                
+                cash_flow = CashFlow(
+                    trading_account_id=account.id,
+                    type=flow_type,
+                    amount=amount if flow_type == 'deposit' else -amount,
+                    date=flow_date,
+                    currency_id=account.currency_id,
+                    usd_rate=1.0,
+                    source='manual',
+                    description=f"{'הפקדה' if flow_type == 'deposit' else 'משיכה'}"
+                )
+                self.db.add(cash_flow)
+                created += 1
+            
+            # Dividends from closed trades
+            closed_trades = [t for t in self.relationship_manager.trades 
+                           if t.trading_account_id == account.id and t.status == 'closed']
+            
+            for trade in random.sample(closed_trades, min(len(closed_trades), random.randint(0, 5))):
+                if trade.closed_at:
+                    dividend_date = self.date_gen.generate_date_in_range(
+                        trade.closed_at,
+                        self.date_gen.now
+                    )
+                    
+                    dividend = CashFlow(
+                        trading_account_id=account.id,
+                        type='dividend',
+                        amount=round(random.uniform(100, 1000), 2),
+                        date=dividend_date,
+                        currency_id=account.currency_id,
+                        usd_rate=1.0,
+                        trade_id=trade.id,
+                        source='manual',
+                        description=f"דיבידנד מטרייד {trade.id}"
+                    )
+                    self.db.add(dividend)
+                    created += 1
+            
+            # Fees
+            for _ in range(random.randint(2, 5)):
+                fee_date = self.date_gen.generate_date('random')
+                
+                fee = CashFlow(
+                    trading_account_id=account.id,
+                    type='fee',
+                    amount=-round(random.uniform(5, 50), 2),
+                    date=fee_date,
+                    currency_id=account.currency_id,
+                    usd_rate=1.0,
+                    source='manual',
+                    description="עמלת מסחר"
+                )
+                self.db.add(fee)
+                created += 1
+        
+        self.created_count['cash_flows'] = created
+        print(f"   ✅ נוצרו {created} תזרימי מזומן")
+    
+    def _create_alerts(self) -> None:
+        """יוצר התראות"""
+        print(f"\n🔔 יוצר התראות...")
+        
+        created = 0
+        
+        # Alerts on tickers
+        for ticker in random.sample(
+            self.relationship_manager.tickers,
+            min(len(self.relationship_manager.tickers), 10)
+        ):
+            alert = Alert(
+                ticker_id=ticker.id,
+                message=f"התראה על {ticker.symbol}",
+                status='open',
+                is_triggered='false',
+                related_type_id=ALERT_RELATED_TYPES['ticker'],
+                related_id=ticker.id,
+                condition_attribute='price',
+                condition_operator='more_than',
+                condition_number=str(round(random.uniform(100, 500), 2)),
+                triggered_at=None
+            )
+            self.db.add(alert)
+            created += 1
+        
+        # Alerts on trades
+        for trade in random.sample(
+            self.relationship_manager.trades,
+            min(len(self.relationship_manager.trades), 15)
+        ):
+            alert = Alert(
+                ticker_id=trade.ticker_id,
+                message=f"התראה על טרייד {trade.id}",
+                status='open' if random.random() > 0.3 else 'closed',
+                is_triggered='true' if random.random() > 0.5 else 'false',
+                related_type_id=ALERT_RELATED_TYPES['trade'],
+                related_id=trade.id,
+                condition_attribute='price',
+                condition_operator='more_than',
+                condition_number=str(round(random.uniform(100, 500), 2)),
+                triggered_at=self.date_gen.generate_date('random') if random.random() > 0.5 else None
+            )
+            self.db.add(alert)
+            created += 1
+        
+        # Alerts on trade plans
+        for plan in random.sample(
+            self.relationship_manager.trade_plans,
+            min(len(self.relationship_manager.trade_plans), 10)
+        ):
+            alert = Alert(
+                ticker_id=plan.ticker_id,
+                message=f"התראה על תוכנית {plan.id}",
+                status='open',
+                is_triggered='false',
+                related_type_id=ALERT_RELATED_TYPES['trade_plan'],
+                related_id=plan.id,
+                condition_attribute='price',
+                condition_operator='more_than',
+                condition_number=str(round(plan.entry_price * 1.1, 2))
+            )
+            self.db.add(alert)
+            created += 1
+        
+        self.created_count['alerts'] = created
+        print(f"   ✅ נוצרו {created} התראות")
+    
+    def _create_notes(self) -> None:
+        """יוצר הערות"""
+        print(f"\n📝 יוצר הערות...")
+        
+        created = 0
+        
+        # Notes on tickers
+        for ticker in random.sample(
+            self.relationship_manager.tickers,
+            min(len(self.relationship_manager.tickers), 8)
+        ):
+            note = Note(
+                content=f"הערה על {ticker.symbol}: {ticker.name}",
+                related_type_id=NOTE_RELATED_TYPES['ticker'],
+                related_id=ticker.id
+            )
+            self.db.add(note)
+            created += 1
+        
+        # Notes on trades
+        for trade in random.sample(
+            self.relationship_manager.trades,
+            min(len(self.relationship_manager.trades), 12)
+        ):
+            note = Note(
+                content=f"הערה על טרייד {trade.id}: {trade.investment_type} {trade.side}",
+                related_type_id=NOTE_RELATED_TYPES['trade'],
+                related_id=trade.id
+            )
+            self.db.add(note)
+            created += 1
+        
+        # Notes on trade plans
+        for plan in random.sample(
+            self.relationship_manager.trade_plans,
+            min(len(self.relationship_manager.trade_plans), 10)
+        ):
+            note = Note(
+                content=f"הערה על תוכנית {plan.id}: תוכנית {plan.investment_type}",
+                related_type_id=NOTE_RELATED_TYPES['trade_plan'],
+                related_id=plan.id
+            )
+            self.db.add(note)
+            created += 1
+        
+        # Notes on accounts
+        for account in self.relationship_manager.accounts:
+            note = Note(
+                content=f"הערה על חשבון {account.name}",
+                related_type_id=NOTE_RELATED_TYPES['trading_account'],
+                related_id=account.id
+            )
+            self.db.add(note)
+            created += 1
+        
+        self.created_count['notes'] = created
+        print(f"   ✅ נוצרו {created} הערות")
+
+
+# ============================================================================
+# Main Entry Point
+# ============================================================================
+
+def _build_engine_kwargs():
+    """בונה פרמטרים ל-engine"""
+    kwargs = {
+        "poolclass": QueuePool,
+        "pool_size": 10,
+        "max_overflow": 20,
+        "pool_timeout": 60,
+        "pool_recycle": 3600,
+        "pool_pre_ping": True,
+        "echo": False,
+    }
+    if USING_SQLITE:
+        kwargs["connect_args"] = {"check_same_thread": False}
+    return kwargs
+
+
+def main():
+    """Entry point"""
+    parser = argparse.ArgumentParser(
+        description='Generate demo data for TikTrack system',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__
+    )
+    parser.add_argument(
+        '--dry-run',
+        action='store_true',
+        help='Validate schema only, do not create data'
+    )
+    parser.add_argument(
+        '--verbose',
+        action='store_true',
+        help='Show detailed progress information'
+    )
+    
+    args = parser.parse_args()
+    
+    print("=" * 70)
+    print("🎨 TikTrack - יצירת נתוני דוגמה")
+    print("=" * 70)
+    print()
+    
+    # Create database connection
+    engine = create_engine(DATABASE_URL, **_build_engine_kwargs())
+    Session = sessionmaker(bind=engine)
+    db = Session()
+    
+    try:
+        # Validate schema
+        validator = DatabaseValidator(db)
+        validator.validate()
+        
+        if args.dry_run:
+            print("\n✅ אימות הצליח - מבנה DB תקין")
+            return
+        
+        # Generate data
+        generator = DemoDataGenerator(db, DEMO_CONFIG, dry_run=args.dry_run)
+        results = generator.generate_all()
+        
+        print("\n" + "=" * 70)
+        print("✅ יצירת נתוני דוגמה הושלמה בהצלחה!")
+        print("=" * 70)
+        
+    except SchemaValidationError as e:
+        print(f"\n❌ שגיאת אימות מבנה:")
+        print(str(e))
+        sys.exit(1)
+    except DataGenerationError as e:
+        print(f"\n❌ שגיאת יצירת נתונים:")
+        print(str(e))
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n❌ שגיאה לא צפויה: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+    finally:
+        db.close()
+
+
+if __name__ == '__main__':
+    main()
+

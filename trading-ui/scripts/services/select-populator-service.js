@@ -610,6 +610,41 @@ class SelectPopulatorService {
         }
     }
 
+    /**
+     * מילוי select box עם נתונים קיימים (לא מ-API)
+     * פונקציה ציבורית למילוי select עם נתונים שכבר נטענו
+     * 
+     * @param {string|HTMLElement} selectIdOrElement - ID של ה-select element או האלמנט עצמו
+     * @param {Array} items - מערך של אובייקטים
+     * @param {Object} config - הגדרות: { valueField, textField, includeEmpty, emptyText, defaultValue }
+     * @returns {void}
+     * 
+     * @example
+     * SelectPopulatorService.populateSelectWithData('mySelect', dataArray, {
+     *   valueField: 'id',
+     *   textField: 'name',
+     *   includeEmpty: true,
+     *   emptyText: 'בחר...'
+     * });
+     */
+    static populateSelectWithData(selectIdOrElement, items, config = {}) {
+        const select = typeof selectIdOrElement === 'string' 
+            ? document.getElementById(selectIdOrElement)
+            : selectIdOrElement;
+        if (!select) {
+            console.warn(`⚠️ Select ${selectIdOrElement} לא נמצא`);
+            return;
+        }
+        
+        this._populateSelect(select, items, {
+            valueField: config.valueField || 'id',
+            textField: config.textField || 'name',
+            includeEmpty: config.includeEmpty !== false,
+            emptyText: config.emptyText || 'בחר...',
+            defaultValue: config.defaultValue
+        });
+    }
+
     // ===== PRIVATE HELPER METHOD =====
 
     /**

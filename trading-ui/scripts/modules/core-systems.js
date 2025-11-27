@@ -741,7 +741,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         HeaderSystem: {
           available: typeof window.HeaderSystem !== 'undefined' && window.HeaderSystem !== null,
           initialized: true, // HeaderSystem doesn't have explicit initialized flag
-          optional: false,
+          optional: true, // HeaderSystem is optional - page can work without it
         },
         toggleSection: {
           available: typeof window.toggleSection === 'function',

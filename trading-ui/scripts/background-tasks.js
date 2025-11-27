@@ -111,7 +111,13 @@ const utils = {
 
     if (show) {
       // Use IconSystem to render loader icon
-      let loaderIcon = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin me-1">';
+      // Use IconSystem if available
+      let loaderIcon = '';
+      if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+        loaderIcon = await window.IconSystem.renderIcon('tabler', 'loader', { size: '16', alt: 'loading', class: 'icon fa-spin me-1' });
+      } else {
+        loaderIcon = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin me-1">';
+      }
       if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
         try {
           loaderIcon = await window.IconSystem.renderIcon('button', 'loader', {
@@ -134,7 +140,13 @@ const utils = {
         element.innerHTML = '▶️ הפעל Scheduler';
       } else if (elementId.includes('stop-scheduler')) {
         // Use IconSystem to render stop icon
-        let stopIcon = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1">';
+        // Use IconSystem if available
+        let stopIcon = '';
+        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+          stopIcon = await window.IconSystem.renderIcon('tabler', 'player-stop', { size: '16', alt: 'stop', class: 'icon me-1' });
+        } else {
+          stopIcon = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1">';
+        }
         if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
           try {
             stopIcon = await window.IconSystem.renderIcon('button', 'stop', {
@@ -149,7 +161,13 @@ const utils = {
         element.innerHTML = stopIcon + ' עצור Scheduler';
       } else if (elementId.includes('refresh-')) {
         // Use IconSystem to render refresh icon
-        let refreshIcon = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1">';
+        // Use IconSystem if available
+        let refreshIcon = '';
+        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+          refreshIcon = await window.IconSystem.renderIcon('tabler', 'refresh', { size: '16', alt: 'refresh', class: 'icon me-1' });
+        } else {
+          refreshIcon = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1">';
+        }
         if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
           try {
             refreshIcon = await window.IconSystem.renderIcon('button', 'refresh', {

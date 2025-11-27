@@ -222,6 +222,55 @@
     margin: 0.5rem 0;
 }
 
+/* ===== Dropdown Submenu (Level 3) ===== */
+#unified-header .dropdown-submenu {
+    position: relative;
+}
+
+#unified-header .dropdown-submenu > .tiktrack-dropdown-item {
+    padding-right: 0.5rem;
+}
+
+/* Level 3 Submenu - רמה 3 של התפריט */
+#unified-header .level3-submenu {
+    position: absolute;
+    top: 0;
+    right: calc(100% + 3px); /* ב-RTL התפריט מופיע משמאל (ימין במסך) */
+    left: auto;
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    padding: 0.5rem 0;
+    display: none;
+    z-index: 952; /* מעל תפריט רמה 2 */
+    list-style: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px); /* ב-RTL תזוזה ימינה */
+    transition: all 0.3s ease;
+}
+
+#unified-header .dropdown-submenu:hover .level3-submenu {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+#unified-header .level3-submenu li {
+    list-style: none;
+}
+
+#unified-header .level3-submenu .tiktrack-dropdown-item {
+    padding: 0.5rem 1rem;
+}
+
+#unified-header .level3-submenu .separator {
+    margin: 0.5rem 0;
+}
+
 /* ===== Filter Toggle Button ===== */
 #unified-header .filter-toggle-section {
     display: flex;

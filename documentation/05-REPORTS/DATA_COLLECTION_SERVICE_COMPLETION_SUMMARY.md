@@ -165,3 +165,6 @@ if (typeof window.DataCollectionService !== 'undefined' && window.DataCollection
 **סטטוס:** ⏳ **תיקונים ראשוניים הושלמו** - ~6.5% מהושלם, עבודה נוספת נדרשת
 
 
+
+
+

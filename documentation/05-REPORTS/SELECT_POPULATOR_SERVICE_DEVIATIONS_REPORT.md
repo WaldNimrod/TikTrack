@@ -12,13 +12,13 @@
 - **סה"כ עמודים נסרקו:** 36
 - **עמודים המשתמשים במערכת:** 5
 - **עמודים עם בעיות:** 16
-- **סה"כ בעיות נמצאו:** 137
+- **סה"כ בעיות נמצאו:** 138
 
 ### פילוח בעיות לפי סוג:
 
 - **טיפול ידני במילוי select:** 48
 - **קריאות fetch ישירות:** 68
-- **פונקציות מקומיות:** 21
+- **פונקציות מקומיות:** 22
 - **חסר טעינת המערכת:** 31
 
 ---
@@ -51,22 +51,22 @@
 
 #### סטיות שנמצאו:
 
-1. **שורה 2060:** טיפול ידני במילוי select במקום SelectPopulatorService
+1. **שורה 2075:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';`
 
-2. **שורה 2060:** טיפול ידני במילוי select במקום SelectPopulatorService
+2. **שורה 2075:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';`
 
-3. **שורה 2074:** טיפול ידני במילוי select במקום SelectPopulatorService
+3. **שורה 2089:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.appendChild(option);`
 
-4. **שורה 2068:** טיפול ידני במילוי select במקום SelectPopulatorService
+4. **שורה 2083:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
@@ -86,32 +86,32 @@
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/tickers/`);`
 
-8. **שורה 777:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+8. **שורה 784:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch('/api/tickers/');`
 
-9. **שורה 1199:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+9. **שורה 1207:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/trade-plans/${planId}`);`
 
-10. **שורה 1362:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+10. **שורה 1370:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/trades/${tradeId}`);`
 
-11. **שורה 1362:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+11. **שורה 1370:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/trades/${tradeId}`);`
 
-12. **שורה 1362:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+12. **שורה 1370:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/trades/${tradeId}`);`
 
-13. **שורה 1362:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+13. **שורה 1370:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/trades/${tradeId}`);`
@@ -126,12 +126,12 @@
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/tickers/`);`
 
-16. **שורה 1199:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+16. **שורה 1207:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/trade-plans/${planId}`);`
 
-17. **שורה 1199:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+17. **שורה 1207:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/trade-plans/${planId}`);`
@@ -141,7 +141,7 @@
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/tickers/`);`
 
-19. **שורה 1362:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+19. **שורה 1370:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/trades/${tradeId}`);`
@@ -151,12 +151,12 @@
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `let response = await fetch('/api/trades/', { cache: 'no-store' });`
 
-21. **שורה 2037:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+21. **שורה 2045:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `* @function populateSelect`
 
-22. **שורה 2044:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+22. **שורה 2052:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `function populateSelect(selectId, data, field, prefix = '') {`
@@ -185,17 +185,17 @@
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/tickers/`);`
 
-3. **שורה 767:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+3. **שורה 841:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/trade-plans/${tradePlanId}`, {`
 
-4. **שורה 767:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+4. **שורה 841:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/trade-plans/${tradePlanId}`, {`
 
-5. **שורה 767:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+5. **שורה 841:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/trade-plans/${tradePlanId}`, {`
@@ -214,57 +214,62 @@
 
 #### סטיות שנמצאו:
 
-1. **שורה 1263:** טיפול ידני במילוי select במקום SelectPopulatorService
+1. **שורה 1290:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';`
 
-2. **שורה 1271:** טיפול ידני במילוי select במקום SelectPopulatorService
+2. **שורה 1298:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.appendChild(option);`
 
-3. **שורה 1271:** טיפול ידני במילוי select במקום SelectPopulatorService
+3. **שורה 1298:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.appendChild(option);`
 
-4. **שורה 1267:** טיפול ידני במילוי select במקום SelectPopulatorService
+4. **שורה 1294:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
 
-5. **שורה 1267:** טיפול ידני במילוי select במקום SelectPopulatorService
+5. **שורה 1294:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
 
-6. **שורה 1267:** טיפול ידני במילוי select במקום SelectPopulatorService
+6. **שורה 1294:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
 
-7. **שורה 1267:** טיפול ידני במילוי select במקום SelectPopulatorService
+7. **שורה 1294:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
 
-8. **שורה 3600:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+8. **שורה 3657:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch('/api/trade-plans');`
 
-9. **שורה 3647:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+9. **שורה 3704:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch('/api/trades');`
 
-10. **שורה 4060:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+10. **שורה 4175:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/tickers/`);`
 
-11. **שורה 1246:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+11. **שורה 1260:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+   - **סוג:** localFunction
+   - **חומרה:** 🟡 בינונית
+   - **קוד:** `* @function populateSelect`
+
+12. **שורה 1267:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `function populateSelect(selectId, data, field, prefix = '') {`
@@ -387,7 +392,7 @@
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/trading-accounts/?_t=${Date.now()}`, {`
 
-4. **שורה 1376:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+4. **שורה 1317:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const tradesResponse = await fetch(`/api/trades/?trading_account_id=${tradingAccountId}&status=open`...`
@@ -417,7 +422,7 @@
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/trading-accounts/?_t=${Date.now()}`, {`
 
-10. **שורה 2174:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+10. **שורה 2115:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `response = await fetch('/api/trading-accounts/' + tradingAccountId, {`
@@ -441,52 +446,52 @@
 
 #### סטיות שנמצאו:
 
-1. **שורה 2224:** טיפול ידני במילוי select במקום SelectPopulatorService
+1. **שורה 2326:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
 
-2. **שורה 2224:** טיפול ידני במילוי select במקום SelectPopulatorService
+2. **שורה 2326:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
 
-3. **שורה 2134:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+3. **שורה 2199:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const tradesResponse = await fetch('/api/trades/');`
 
-4. **שורה 2500:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+4. **שורה 2603:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch(`/api/tickers/`);`
 
-5. **שורה 2134:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+5. **שורה 2199:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const tradesResponse = await fetch('/api/trades/');`
 
-6. **שורה 2134:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+6. **שורה 2199:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const tradesResponse = await fetch('/api/trades/');`
 
-7. **שורה 3511:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+7. **שורה 3656:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const tickersResponse = await fetch('/api/tickers/');`
 
-8. **שורה 2134:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+8. **שורה 2199:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const tradesResponse = await fetch('/api/trades/');`
 
-9. **שורה 3511:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+9. **שורה 3656:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const tickersResponse = await fetch('/api/tickers/');`
 
-10. **שורה 2134:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+10. **שורה 2199:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const tradesResponse = await fetch('/api/trades/');`
@@ -505,27 +510,27 @@
 
 #### סטיות שנמצאו:
 
-1. **שורה 3125:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+1. **שורה 3140:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const accountResponse = await fetch(`/api/trading-accounts/${exchangeData.trading_account_id}`);`
 
-2. **שורה 1268:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+2. **שורה 1278:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `async function loadAccountsForCashFlow(selectId, useDefaultFromPreferences = false) {`
 
-3. **שורה 1300:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+3. **שורה 1310:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `async function loadCurrenciesForCashFlow(selectId, useDefaultFromPreferences = false) {`
 
-4. **שורה 1268:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+4. **שורה 1278:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `async function loadAccountsForCashFlow(selectId, useDefaultFromPreferences = false) {`
 
-5. **שורה 1300:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+5. **שורה 1310:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `async function loadCurrenciesForCashFlow(selectId, useDefaultFromPreferences = false) {`
@@ -544,82 +549,82 @@
 
 #### סטיות שנמצאו:
 
-1. **שורה 1112:** טיפול ידני במילוי select במקום SelectPopulatorService
+1. **שורה 1184:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';`
 
-2. **שורה 1174:** טיפול ידני במילוי select במקום SelectPopulatorService
+2. **שורה 1246:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.appendChild(option);`
 
-3. **שורה 1115:** טיפול ידני במילוי select במקום SelectPopulatorService
+3. **שורה 1187:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
 
-4. **שורה 477:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+4. **שורה 113:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch('/api/trading-accounts/');`
 
-5. **שורה 485:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+5. **שורה 121:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch('/api/trades/');`
 
-6. **שורה 506:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+6. **שורה 142:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch('/api/trade-plans/');`
 
-7. **שורה 526:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+7. **שורה 162:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch('/api/tickers/');`
 
-8. **שורה 477:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+8. **שורה 113:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch('/api/trading-accounts/');`
 
-9. **שורה 485:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+9. **שורה 121:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch('/api/trades/');`
 
-10. **שורה 506:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+10. **שורה 142:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch('/api/trade-plans/');`
 
-11. **שורה 526:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+11. **שורה 162:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch('/api/tickers/');`
 
-12. **שורה 1103:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+12. **שורה 1175:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `function populateSelect(selectId, data, field, prefix = '') {`
 
-13. **שורה 1288:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+13. **שורה 1360:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `async function populateEditSelectByType(relationType, selectedId) {`
 
-14. **שורה 1357:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+14. **שורה 1429:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `async function populateEditSelectByTypeFallback(relationType, selectedId) {`
 
-15. **שורה 1288:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+15. **שורה 1360:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `async function populateEditSelectByType(relationType, selectedId) {`
 
-16. **שורה 1357:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+16. **שורה 1429:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `async function populateEditSelectByTypeFallback(relationType, selectedId) {`
@@ -652,12 +657,12 @@
 
 #### סטיות שנמצאו:
 
-1. **שורה 648:** טיפול ידני במילוי select במקום SelectPopulatorService
+1. **שורה 668:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
 
-2. **שורה 648:** טיפול ידני במילוי select במקום SelectPopulatorService
+2. **שורה 668:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
@@ -779,7 +784,7 @@
 
 #### סטיות שנמצאו:
 
-1. **שורה 946:** טיפול ידני במילוי select במקום SelectPopulatorService
+1. **שורה 1014:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
@@ -882,27 +887,27 @@
 
 #### סטיות שנמצאו:
 
-1. **שורה 244:** טיפול ידני במילוי select במקום SelectPopulatorService
+1. **שורה 264:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
 
-2. **שורה 132:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
+2. **שורה 152:** קריאת fetch ישירה למילוי select במקום SelectPopulatorService
    - **סוג:** directFetch
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const response = await fetch('/api/trading-accounts/');`
 
-3. **שורה 959:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+3. **שורה 1031:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `async function loadTrades(dateRange, selectedAccounts, investmentType) {`
 
-4. **שורה 959:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+4. **שורה 1031:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `async function loadTrades(dateRange, selectedAccounts, investmentType) {`
 
-5. **שורה 239:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+5. **שורה 259:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `function loadInvestmentTypes() {`
@@ -969,77 +974,77 @@
 
 #### סטיות שנמצאו:
 
-1. **שורה 2734:** טיפול ידני במילוי select במקום SelectPopulatorService
+1. **שורה 2754:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = accounts.map(acc =>`
 
-2. **שורה 2734:** טיפול ידני במילוי select במקום SelectPopulatorService
+2. **שורה 2754:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = accounts.map(acc =>`
 
-3. **שורה 2734:** טיפול ידני במילוי select במקום SelectPopulatorService
+3. **שורה 2754:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = accounts.map(acc =>`
 
-4. **שורה 2734:** טיפול ידני במילוי select במקום SelectPopulatorService
+4. **שורה 2754:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = accounts.map(acc =>`
 
-5. **שורה 2734:** טיפול ידני במילוי select במקום SelectPopulatorService
+5. **שורה 2754:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = accounts.map(acc =>`
 
-6. **שורה 2734:** טיפול ידני במילוי select במקום SelectPopulatorService
+6. **שורה 2754:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = accounts.map(acc =>`
 
-7. **שורה 2734:** טיפול ידני במילוי select במקום SelectPopulatorService
+7. **שורה 2754:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = accounts.map(acc =>`
 
-8. **שורה 2734:** טיפול ידני במילוי select במקום SelectPopulatorService
+8. **שורה 2754:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = accounts.map(acc =>`
 
-9. **שורה 2734:** טיפול ידני במילוי select במקום SelectPopulatorService
+9. **שורה 2754:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = accounts.map(acc =>`
 
-10. **שורה 2734:** טיפול ידני במילוי select במקום SelectPopulatorService
+10. **שורה 2754:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = accounts.map(acc =>`
 
-11. **שורה 2734:** טיפול ידני במילוי select במקום SelectPopulatorService
+11. **שורה 2754:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = accounts.map(acc =>`
 
-12. **שורה 2734:** טיפול ידני במילוי select במקום SelectPopulatorService
+12. **שורה 2754:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = accounts.map(acc =>`
 
-13. **שורה 2734:** טיפול ידני במילוי select במקום SelectPopulatorService
+13. **שורה 2754:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = accounts.map(acc =>`
 
-14. **שורה 2726:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+14. **שורה 2746:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `async function loadTradingAccounts() {`
 
-15. **שורה 2859:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+15. **שורה 2879:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `async function loadTickers() {`
@@ -1072,62 +1077,62 @@
 
 #### סטיות שנמצאו:
 
-1. **שורה 2514:** טיפול ידני במילוי select במקום SelectPopulatorService
+1. **שורה 2542:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = '';`
 
-2. **שורה 2514:** טיפול ידני במילוי select במקום SelectPopulatorService
+2. **שורה 2542:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = '';`
 
-3. **שורה 2514:** טיפול ידני במילוי select במקום SelectPopulatorService
+3. **שורה 2542:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.innerHTML = '';`
 
-4. **שורה 2516:** טיפול ידני במילוי select במקום SelectPopulatorService
+4. **שורה 2544:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.appendChild(firstOption);`
 
-5. **שורה 2516:** טיפול ידני במילוי select במקום SelectPopulatorService
+5. **שורה 2544:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.appendChild(firstOption);`
 
-6. **שורה 2516:** טיפול ידני במילוי select במקום SelectPopulatorService
+6. **שורה 2544:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.appendChild(firstOption);`
 
-7. **שורה 2516:** טיפול ידני במילוי select במקום SelectPopulatorService
+7. **שורה 2544:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `select.appendChild(firstOption);`
 
-8. **שורה 2520:** טיפול ידני במילוי select במקום SelectPopulatorService
+8. **שורה 2548:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
 
-9. **שורה 2520:** טיפול ידני במילוי select במקום SelectPopulatorService
+9. **שורה 2548:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
 
-10. **שורה 2520:** טיפול ידני במילוי select במקום SelectPopulatorService
+10. **שורה 2548:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
 
-11. **שורה 2520:** טיפול ידני במילוי select במקום SelectPopulatorService
+11. **שורה 2548:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
 
-12. **שורה 2520:** טיפול ידני במילוי select במקום SelectPopulatorService
+12. **שורה 2548:** טיפול ידני במילוי select במקום SelectPopulatorService
    - **סוג:** manualPopulation
    - **חומרה:** 🔴 גבוהה
    - **קוד:** `const option = document.createElement('option');`
@@ -1188,12 +1193,12 @@
 
 #### סטיות שנמצאו:
 
-1. **שורה 480:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+1. **שורה 511:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `async function loadLastSelectedDates() {`
 
-2. **שורה 480:** פונקציה מקומית למילוי select במקום SelectPopulatorService
+2. **שורה 511:** פונקציה מקומית למילוי select במקום SelectPopulatorService
    - **סוג:** localFunction
    - **חומרה:** 🟡 בינונית
    - **קוד:** `async function loadLastSelectedDates() {`

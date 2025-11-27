@@ -1,0 +1,1554 @@
+{
+  "startTime": "2025-11-27T14:57:50.606632",
+  "endTime": "2025-11-27T14:58:09.393740",
+  "pages": [
+    {
+      "pageName": "index",
+      "pagePath": "index.html",
+      "category": "central",
+      "priority": 1,
+      "timestamp": "2025-11-27T14:57:50.606666",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/index.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "trades",
+      "pagePath": "trades.html",
+      "category": "central",
+      "priority": 1,
+      "timestamp": "2025-11-27T14:57:51.130962",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/trades.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "trade_plans",
+      "pagePath": "trade_plans.html",
+      "category": "central",
+      "priority": 1,
+      "timestamp": "2025-11-27T14:57:51.655737",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/trade_plans.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "alerts",
+      "pagePath": "alerts.html",
+      "category": "central",
+      "priority": 1,
+      "timestamp": "2025-11-27T14:57:52.182422",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/alerts.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "tickers",
+      "pagePath": "tickers.html",
+      "category": "central",
+      "priority": 1,
+      "timestamp": "2025-11-27T14:57:52.705302",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/tickers.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "trading_accounts",
+      "pagePath": "trading_accounts.html",
+      "category": "central",
+      "priority": 1,
+      "timestamp": "2025-11-27T14:57:53.220102",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/trading_accounts.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "executions",
+      "pagePath": "executions.html",
+      "category": "central",
+      "priority": 1,
+      "timestamp": "2025-11-27T14:57:53.746369",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/executions.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 1,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": [
+              "1 <style> tags found"
+            ]
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 1,
+        "failedSteps": 1,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "cash_flows",
+      "pagePath": "cash_flows.html",
+      "category": "central",
+      "priority": 1,
+      "timestamp": "2025-11-27T14:57:54.269022",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/cash_flows.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "details": {
+            "inlineStylesCount": 2,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": [
+              "2 inline style attributes found"
+            ]
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 1,
+        "failedSteps": 1,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "notes",
+      "pagePath": "notes.html",
+      "category": "central",
+      "priority": 1,
+      "timestamp": "2025-11-27T14:57:54.791909",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/notes.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "preferences",
+      "pagePath": "preferences.html",
+      "category": "central",
+      "priority": 1,
+      "timestamp": "2025-11-27T14:57:55.313983",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/preferences.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "research",
+      "pagePath": "research.html",
+      "category": "central",
+      "priority": 2,
+      "timestamp": "2025-11-27T14:57:55.832027",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/research.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "external-data-dashboard",
+      "pagePath": "external-data-dashboard.html",
+      "category": "secondary",
+      "priority": 2,
+      "timestamp": "2025-11-27T14:57:56.357477",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/external-data-dashboard.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "chart-management",
+      "pagePath": "chart-management.html",
+      "category": "secondary",
+      "priority": 2,
+      "timestamp": "2025-11-27T14:57:56.870559",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/chart-management.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "db_display",
+      "pagePath": "db_display.html",
+      "category": "technical",
+      "priority": 3,
+      "timestamp": "2025-11-27T14:57:57.392574",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/db_display.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "db_extradata",
+      "pagePath": "db_extradata.html",
+      "category": "technical",
+      "priority": 3,
+      "timestamp": "2025-11-27T14:57:57.912865",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/db_extradata.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "details": {
+            "inlineStylesCount": 2,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": [
+              "2 inline style attributes found"
+            ]
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 1,
+        "failedSteps": 1,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "constraints",
+      "pagePath": "constraints.html",
+      "category": "technical",
+      "priority": 3,
+      "timestamp": "2025-11-27T14:57:58.428188",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/constraints.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "background-tasks",
+      "pagePath": "background-tasks.html",
+      "category": "technical",
+      "priority": 3,
+      "timestamp": "2025-11-27T14:57:58.947929",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/background-tasks.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "server-monitor",
+      "pagePath": "server-monitor.html",
+      "category": "technical",
+      "priority": 3,
+      "timestamp": "2025-11-27T14:57:59.470104",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/server-monitor.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "system-management",
+      "pagePath": "system-management.html",
+      "category": "technical",
+      "priority": 3,
+      "timestamp": "2025-11-27T14:57:59.989454",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/system-management.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "cache-test",
+      "pagePath": "cache-test.html",
+      "category": "technical",
+      "priority": 3,
+      "timestamp": "2025-11-27T14:58:00.516419",
+      "steps": {
+        "browserLoad": {
+          "passed": false,
+          "statusCode": 404,
+          "details": {
+            "url": "http://127.0.0.1:8080/cache-test.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "error": "File not found: trading-ui/cache-test.html"
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 0,
+        "failedSteps": 2,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "notifications-center",
+      "pagePath": "notifications-center.html",
+      "category": "technical",
+      "priority": 3,
+      "timestamp": "2025-11-27T14:58:01.041928",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/notifications-center.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "details": {
+            "inlineStylesCount": 2,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": [
+              "2 inline style attributes found"
+            ]
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 1,
+        "failedSteps": 1,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "css-management",
+      "pagePath": "css-management.html",
+      "category": "technical",
+      "priority": 3,
+      "timestamp": "2025-11-27T14:58:01.566297",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/css-management.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "dynamic-colors-display",
+      "pagePath": "dynamic-colors-display.html",
+      "category": "technical",
+      "priority": 3,
+      "timestamp": "2025-11-27T14:58:02.087184",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/dynamic-colors-display.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": true,
+          "details": {
+            "inlineStylesCount": 0,
+            "styleTagsCount": 0,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": []
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 2,
+        "failedSteps": 0,
+        "totalSteps": 2,
+        "status": "passed"
+      }
+    },
+    {
+      "pageName": "designs",
+      "pagePath": "designs.html",
+      "category": "technical",
+      "priority": 3,
+      "timestamp": "2025-11-27T14:58:02.608396",
+      "steps": {
+        "browserLoad": {
+          "passed": true,
+          "statusCode": 200,
+          "details": {
+            "url": "http://127.0.0.1:8080/designs.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "details": {
+            "inlineStylesCount": 32,
+            "styleTagsCount": 1,
+            "bootstrapFound": true,
+            "itcssFound": true,
+            "hasImportant": false,
+            "issues": [
+              "32 inline style attributes found",
+              "1 <style> tags found"
+            ]
+          }
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 1,
+        "failedSteps": 1,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "tradingview-test-page",
+      "pagePath": "tradingview-test-page.html",
+      "category": "technical",
+      "priority": 3,
+      "timestamp": "2025-11-27T14:58:03.136136",
+      "steps": {
+        "browserLoad": {
+          "passed": false,
+          "statusCode": 404,
+          "details": {
+            "url": "http://127.0.0.1:8080/tradingview-test-page.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "error": "File not found: trading-ui/tradingview-test-page.html"
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 0,
+        "failedSteps": 2,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "portfolio-state-page",
+      "pagePath": "portfolio-state-page.html",
+      "category": "mockup",
+      "priority": 4,
+      "timestamp": "2025-11-27T14:58:03.661795",
+      "steps": {
+        "browserLoad": {
+          "passed": false,
+          "statusCode": 404,
+          "details": {
+            "url": "http://127.0.0.1:8080/portfolio-state-page.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "error": "File not found: trading-ui/portfolio-state-page.html"
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 0,
+        "failedSteps": 2,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "trade-history-page",
+      "pagePath": "trade-history-page.html",
+      "category": "mockup",
+      "priority": 4,
+      "timestamp": "2025-11-27T14:58:04.175724",
+      "steps": {
+        "browserLoad": {
+          "passed": false,
+          "statusCode": 404,
+          "details": {
+            "url": "http://127.0.0.1:8080/trade-history-page.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "error": "File not found: trading-ui/trade-history-page.html"
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 0,
+        "failedSteps": 2,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "price-history-page",
+      "pagePath": "price-history-page.html",
+      "category": "mockup",
+      "priority": 4,
+      "timestamp": "2025-11-27T14:58:04.695061",
+      "steps": {
+        "browserLoad": {
+          "passed": false,
+          "statusCode": 404,
+          "details": {
+            "url": "http://127.0.0.1:8080/price-history-page.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "error": "File not found: trading-ui/price-history-page.html"
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 0,
+        "failedSteps": 2,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "comparative-analysis-page",
+      "pagePath": "comparative-analysis-page.html",
+      "category": "mockup",
+      "priority": 4,
+      "timestamp": "2025-11-27T14:58:05.217156",
+      "steps": {
+        "browserLoad": {
+          "passed": false,
+          "statusCode": 404,
+          "details": {
+            "url": "http://127.0.0.1:8080/comparative-analysis-page.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "error": "File not found: trading-ui/comparative-analysis-page.html"
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 0,
+        "failedSteps": 2,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "trading-journal-page",
+      "pagePath": "trading-journal-page.html",
+      "category": "mockup",
+      "priority": 4,
+      "timestamp": "2025-11-27T14:58:05.739985",
+      "steps": {
+        "browserLoad": {
+          "passed": false,
+          "statusCode": 404,
+          "details": {
+            "url": "http://127.0.0.1:8080/trading-journal-page.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "error": "File not found: trading-ui/trading-journal-page.html"
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 0,
+        "failedSteps": 2,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "strategy-analysis-page",
+      "pagePath": "strategy-analysis-page.html",
+      "category": "mockup",
+      "priority": 4,
+      "timestamp": "2025-11-27T14:58:06.264012",
+      "steps": {
+        "browserLoad": {
+          "passed": false,
+          "statusCode": 404,
+          "details": {
+            "url": "http://127.0.0.1:8080/strategy-analysis-page.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "error": "File not found: trading-ui/strategy-analysis-page.html"
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 0,
+        "failedSteps": 2,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "economic-calendar-page",
+      "pagePath": "economic-calendar-page.html",
+      "category": "mockup",
+      "priority": 4,
+      "timestamp": "2025-11-27T14:58:06.785092",
+      "steps": {
+        "browserLoad": {
+          "passed": false,
+          "statusCode": 404,
+          "details": {
+            "url": "http://127.0.0.1:8080/economic-calendar-page.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "error": "File not found: trading-ui/economic-calendar-page.html"
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 0,
+        "failedSteps": 2,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "history-widget",
+      "pagePath": "history-widget.html",
+      "category": "mockup",
+      "priority": 4,
+      "timestamp": "2025-11-27T14:58:07.309478",
+      "steps": {
+        "browserLoad": {
+          "passed": false,
+          "statusCode": 404,
+          "details": {
+            "url": "http://127.0.0.1:8080/history-widget.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "error": "File not found: trading-ui/history-widget.html"
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 0,
+        "failedSteps": 2,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "emotional-tracking-widget",
+      "pagePath": "emotional-tracking-widget.html",
+      "category": "mockup",
+      "priority": 4,
+      "timestamp": "2025-11-27T14:58:07.830748",
+      "steps": {
+        "browserLoad": {
+          "passed": false,
+          "statusCode": 404,
+          "details": {
+            "url": "http://127.0.0.1:8080/emotional-tracking-widget.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "error": "File not found: trading-ui/emotional-tracking-widget.html"
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 0,
+        "failedSteps": 2,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "date-comparison-modal",
+      "pagePath": "date-comparison-modal.html",
+      "category": "mockup",
+      "priority": 4,
+      "timestamp": "2025-11-27T14:58:08.347418",
+      "steps": {
+        "browserLoad": {
+          "passed": false,
+          "statusCode": 404,
+          "details": {
+            "url": "http://127.0.0.1:8080/date-comparison-modal.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "error": "File not found: trading-ui/date-comparison-modal.html"
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 0,
+        "failedSteps": 2,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    },
+    {
+      "pageName": "tradingview-test-page-mockup",
+      "pagePath": "tradingview-test-page.html",
+      "category": "mockup",
+      "priority": 4,
+      "timestamp": "2025-11-27T14:58:08.869457",
+      "steps": {
+        "browserLoad": {
+          "passed": false,
+          "statusCode": 404,
+          "details": {
+            "url": "http://127.0.0.1:8080/tradingview-test-page.html"
+          }
+        },
+        "codeLoading": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "itcss": {
+          "passed": false,
+          "error": "File not found: trading-ui/tradingview-test-page.html"
+        },
+        "console": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        },
+        "crudE2E": {
+          "passed": null,
+          "note": "Requires browser automation - will be tested manually"
+        }
+      },
+      "summary": {
+        "passedSteps": 0,
+        "failedSteps": 2,
+        "totalSteps": 2,
+        "status": "failed"
+      }
+    }
+  ],
+  "summary": {
+    "totalPages": 36,
+    "completedPages": 36,
+    "passedPages": 18,
+    "failedPages": 18,
+    "skippedPages": 0,
+    "successRate": 50.0
+  }
+}

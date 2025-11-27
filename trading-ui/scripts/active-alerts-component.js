@@ -826,57 +826,54 @@ class ActiveAlertsComponent extends HTMLElement {
     const headerLine = document.createElement('div');
     headerLine.className = 'active-alerts__fallback-primary';
 
-    const iconPath = this.getIconPath(relatedType);
     const entityLabel = this.getEntityLabel(relatedType);
 
-    if (iconPath) {
-      // Use IconSystem to render icon
-      if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
-        try {
-          // Extract entity type from path or use relatedType
-          const entityTypeMap = {
-            'trading_accounts.svg': 'account',
-            'trades.svg': 'trade',
-            'trade_plans.svg': 'trade_plan',
-            'tickers.svg': 'ticker',
-            'alerts.svg': 'alert'
-          };
-          const iconFileName = iconPath.split('/').pop();
-          const entityType = entityTypeMap[iconFileName] || relatedType;
-          
-          const iconHTML = await window.IconSystem.renderIcon('entity', entityType, {
-            size: '20',
-            alt: entityLabel,
-            class: 'active-alerts__symbol-icon'
-          });
-          
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = iconHTML;
-          const icon = tempDiv.firstElementChild;
-          if (icon) {
-            headerLine.appendChild(icon);
-          } else {
-            // Fallback to img tag if icon not found
-            const fallbackIcon = document.createElement('img');
-            fallbackIcon.className = 'active-alerts__symbol-icon';
-            fallbackIcon.src = iconPath;
-            fallbackIcon.alt = entityLabel;
-            fallbackIcon.width = 20;
-            fallbackIcon.height = 20;
-            headerLine.appendChild(fallbackIcon);
-          }
-        } catch (error) {
-          // Fallback to img tag
-          const icon = document.createElement('img');
-          icon.className = 'active-alerts__symbol-icon';
-          icon.src = iconPath;
-          icon.alt = entityLabel;
-          icon.width = 20;
-          icon.height = 20;
+    // Use IconSystem directly (new icon system)
+    if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+      try {
+        // Normalize entity type for IconSystem
+        const entityTypeMap = {
+          'trading_account': 'account',
+          'trading_accounts': 'account',
+          'trade': 'trade',
+          'trades': 'trade',
+          'trade_plan': 'trade_plan',
+          'trade_plans': 'trade_plan',
+          'ticker': 'ticker',
+          'tickers': 'ticker',
+          'alert': 'alert',
+          'alerts': 'alert',
+          'execution': 'execution',
+          'executions': 'execution',
+          'cash_flow': 'cash_flow',
+          'cash_flows': 'cash_flow',
+          'note': 'note',
+          'notes': 'note'
+        };
+        const normalizedEntityType = entityTypeMap[relatedType] || relatedType;
+        
+        const iconHTML = await window.IconSystem.renderIcon('entity', normalizedEntityType, {
+          size: '20',
+          alt: entityLabel,
+          class: 'active-alerts__symbol-icon'
+        });
+        
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = iconHTML;
+        const icon = tempDiv.firstElementChild;
+        if (icon) {
           headerLine.appendChild(icon);
+        } else {
+          // Fallback to basic icon if renderIcon returns empty
+          this.log('warn', 'IconSystem.renderIcon returned empty HTML', { relatedType, normalizedEntityType });
         }
-      } else {
-        // Fallback if IconSystem not available
+      } catch (error) {
+        this.log('warn', 'Failed to render icon via IconSystem', { relatedType, error: error?.message });
+      }
+    } else {
+      // Fallback if IconSystem not available - use old method
+      const iconPath = this.getIconPathSync(relatedType);
+      if (iconPath) {
         const icon = document.createElement('img');
         icon.className = 'active-alerts__symbol-icon';
         icon.src = iconPath;
@@ -1171,21 +1168,28 @@ class ActiveAlertsComponent extends HTMLElement {
     return fallback[relatedType] || 'פריט';
   }
 
-  getIconPath(relatedType) {
-    if (window.LinkedItemsService && typeof window.LinkedItemsService.getLinkedItemIcon === 'function') {
-      try {
-        return window.LinkedItemsService.getLinkedItemIcon(relatedType);
-      } catch (error) {
-        this.log('warn', 'Failed to resolve icon via LinkedItemsService', { relatedType, error: error?.message });
-      }
-    }
-
+  /**
+   * Get icon path synchronously (fallback only - use IconSystem instead)
+   * @deprecated Use IconSystem.renderIcon() instead
+   */
+  getIconPathSync(relatedType) {
     const iconMap = {
       trading_account: 'images/icons/trading_accounts.svg',
+      trading_accounts: 'images/icons/trading_accounts.svg',
       trade: 'images/icons/trades.svg',
+      trades: 'images/icons/trades.svg',
       trade_plan: 'images/icons/trade_plans.svg',
+      trade_plans: 'images/icons/trade_plans.svg',
       ticker: 'images/icons/tickers.svg',
+      tickers: 'images/icons/tickers.svg',
       alert: 'images/icons/alerts.svg',
+      alerts: 'images/icons/alerts.svg',
+      execution: 'images/icons/executions.svg',
+      executions: 'images/icons/executions.svg',
+      cash_flow: 'images/icons/cash_flows.svg',
+      cash_flows: 'images/icons/cash_flows.svg',
+      note: 'images/icons/notes.svg',
+      notes: 'images/icons/notes.svg',
       default: 'images/icons/alerts.svg',
     };
 

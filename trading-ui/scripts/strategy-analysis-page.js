@@ -2037,7 +2037,13 @@ async function initStrategyPerformanceChart() {
         if (container) {
             const loading = container.querySelector('.chart-loading');
             if (loading) {
-                let alertIcon = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">';
+                // Use IconSystem if available
+                let alertIcon = '';
+                if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+                  alertIcon = await window.IconSystem.renderIcon('tabler', 'alert-triangle', { size: '16', alt: 'alert-triangle', class: 'icon' });
+                } else {
+                  alertIcon = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">';
+                }
                 if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
                     try {
                         alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert-triangle', class: 'icon' });
@@ -2244,7 +2250,13 @@ async function updateStrategyInsights(filters) {
         const bestSuccessRate = document.getElementById('best-success-rate-insight');
         const recommendation = document.getElementById('recommendation-insight');
         
-        let noteIcon = '<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">';
+        // Use IconSystem if available
+        let noteIcon = '';
+        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+          noteIcon = await window.IconSystem.renderIcon('tabler', 'note', { size: '16', alt: 'icon', class: 'icon' });
+        } else {
+          noteIcon = '<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">';
+        }
         let alertIcon = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">';
         if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
             try {
@@ -2281,14 +2293,18 @@ async function updateStrategyInsights(filters) {
     
     if (bestStrategyEl) {
         bestStrategyEl.innerHTML = `
-            <img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">
+            ${window.IconSystem && typeof window.IconSystem.renderIcon === 'function' 
+              ? await window.IconSystem.renderIcon('tabler', 'note', { size: '16', alt: 'icon', class: 'icon' })
+              : '<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">'}
             <strong>אסטרטגיה הטובה ביותר:</strong> ${bestStrategy.name || 'לא זמין'} עם P/L כולל של ${formatCurrency(bestStrategy.totalPL)}
         `;
     }
     
     if (bestSuccessRateEl) {
         bestSuccessRateEl.innerHTML = `
-            <img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="info-circle" class="icon">
+            ${window.IconSystem && typeof window.IconSystem.renderIcon === 'function' 
+              ? await window.IconSystem.renderIcon('tabler', 'info-circle', { size: '16', alt: 'info-circle', class: 'icon' })
+              : '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon">'}
             <strong>אחוז הצלחה הגבוה ביותר:</strong> ${bestSuccessRateStrategy.name || 'לא זמין'} עם ${bestSuccessRateStrategy.successRate}%
         `;
     }
@@ -2298,7 +2314,9 @@ async function updateStrategyInsights(filters) {
             ? `שקול להגדיל את השימוש ב-${bestStrategy.name || 'אסטרטגיה זו'} בגלל ה-P/L הגבוה (${formatCurrency(bestStrategy.totalPL)})`
             : 'אין המלצות זמינות כרגע';
         recommendationEl.innerHTML = `
-            <img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">
+            ${window.IconSystem && typeof window.IconSystem.renderIcon === 'function' 
+              ? await window.IconSystem.renderIcon('tabler', 'alert-triangle', { size: '16', alt: 'alert-triangle', class: 'icon' })
+              : '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">'}
             <strong>המלצה:</strong> ${recommendationText}
         `;
     }

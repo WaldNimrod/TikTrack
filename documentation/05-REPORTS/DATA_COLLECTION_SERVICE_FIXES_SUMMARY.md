@@ -120,3 +120,6 @@ if (typeof window.DataCollectionService !== 'undefined' && window.DataCollection
 3. עדכון המטריצה במסמך העבודה המרכזי
 4. יצירת דוח סופי
 
+
+
+

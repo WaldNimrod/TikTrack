@@ -1545,6 +1545,64 @@ const PACKAGE_MANIFEST = {
     initTime: '~20ms'
   },
 
+  // 20. WATCH LISTS PACKAGE - Watch Lists management system
+  'watch-lists': {
+    id: 'watch-lists',
+    name: 'Watch Lists Package',
+    description: 'Watch lists management system (UI layer only - mockup mode)',
+    version: '1.0.0',
+    critical: false,
+    loadOrder: 20,
+    dependencies: ['base', 'services', 'ui-advanced', 'crud', 'entity-services'],
+    scripts: [
+      {
+        file: 'services/watch-lists-data.js',
+        globalCheck: 'window.WatchListsDataService',
+        description: 'Watch lists data service (mockup mode)',
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'services/watch-lists-ui-service.js',
+        globalCheck: 'window.WatchListsUIService',
+        description: 'Watch lists UI service',
+        required: true,
+        loadOrder: 2
+      },
+      {
+        file: 'watch-lists-page.js',
+        globalCheck: 'window.WatchListsPage',
+        description: 'Watch lists main page',
+        required: true,
+        loadOrder: 3
+      },
+      {
+        file: 'watch-list-modal.js',
+        globalCheck: 'window.WatchListModal',
+        description: 'Watch list modal (Add/Edit)',
+        required: false,
+        loadOrder: 4
+      },
+      {
+        file: 'add-ticker-modal.js',
+        globalCheck: 'window.AddTickerModal',
+        description: 'Add ticker modal',
+        required: false,
+        loadOrder: 5
+      },
+      {
+        file: 'flag-quick-action.js',
+        globalCheck: 'window.FlagQuickAction',
+        description: 'Flag quick action palette',
+        required: false,
+        loadOrder: 6
+      }
+    ],
+    estimatedSize: '~50KB',
+    initTime: '~100ms',
+    notes: 'Mockup mode - UI layer only, no API calls'
+  },
+
   // 21. INIT PACKAGE - Initialization
   'init-system': {
     id: 'init-system',
@@ -1552,8 +1610,8 @@ const PACKAGE_MANIFEST = {
     description: 'Initialization and monitoring systems',
     version: '2.0.0',
     critical: false,
-    loadOrder: 22, // Changed from 20 to 22 to load after all other packages (dashboard-widgets 19.5, tradingview-charts 19, tradingview-widgets 21)
-    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'advanced-notifications', 'entity-details', 'info-summary', 'dashboard-widgets', 'tradingview-widgets', 'tradingview-charts'],
+    loadOrder: 22, // Changed from 20 to 22 to load after all other packages (dashboard-widgets 19.5, tradingview-charts 19, tradingview-widgets 21, watch-lists 20)
+    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'advanced-notifications', 'entity-details', 'info-summary', 'dashboard-widgets', 'tradingview-widgets', 'tradingview-charts', 'watch-lists'],
     scripts: [
       {
         file: 'init-system/package-manifest.js',

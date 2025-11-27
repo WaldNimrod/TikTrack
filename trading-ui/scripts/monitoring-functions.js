@@ -688,6 +688,15 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
  * Run detailed page scan with HTML+DOM comparison
  */
 async function runDetailedPageScan(pageName, pageConfig) {
+    // Validate pageName is a string, not a Promise
+    if (typeof pageName !== 'string') {
+        const error = new Error(`runDetailedPageScan: pageName must be a string, got ${typeof pageName}. If you have a Promise, await it first.`);
+        console.error('❌ runDetailedPageScan invalid pageName type:', error);
+        if (window.Logger?.error) {
+            window.Logger.error('❌ runDetailedPageScan invalid pageName type', error, { page: 'monitoring', pageNameType: typeof pageName });
+        }
+        throw error;
+    }
     
     // Check if we're on the correct page
     const path = window.location.pathname;
@@ -852,6 +861,16 @@ async function runDetailedPageScan(pageName, pageConfig) {
  */
 async function parseHTMLFile(pageName) {
     try {
+        // Validate pageName is a string, not a Promise
+        if (typeof pageName !== 'string') {
+            const error = new Error(`parseHTMLFile: pageName must be a string, got ${typeof pageName}. If you have a Promise, await it first.`);
+            console.error('❌ parseHTMLFile invalid pageName type:', error);
+            if (window.Logger?.error) {
+                window.Logger.error('❌ parseHTMLFile invalid pageName type', error, { page: 'monitoring', pageNameType: typeof pageName });
+            }
+            throw error;
+        }
+        
         // Get page config to determine if it's a mockup page
         const pageConfig = window.PAGE_CONFIGS?.[pageName];
         const currentPath = window.location.pathname;

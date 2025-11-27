@@ -2282,40 +2282,78 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
       : document.getElementById('editExecutionTradeId');
 
     if (tradeSelect) {
-      tradeSelect.innerHTML = '<option value="">בחר טרייד...</option>';
+      // Use SelectPopulatorService.populateSelectWithData if available (for existing data, not from API)
+      if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateSelectWithData === 'function') {
+        window.SelectPopulatorService.populateSelectWithData(tradeSelect, filteredTrades, {
+          valueField: 'id',
+          textField: (trade) => {
+            const statusText = trade.status === 'active' ? 'פעיל' :
+              trade.status === 'closed' ? 'סגור' :
+                trade.status === 'cancelled' ? 'בוטל' : trade.status;
 
-      // הוספת טריידים
-      filteredTrades.forEach(trade => {
-        const option = document.createElement('option');
-        option.value = trade.id; // מספר ישיר
-        const statusText = trade.status === 'active' ? 'פעיל' :
-          trade.status === 'closed' ? 'סגור' :
-            trade.status === 'cancelled' ? 'בוטל' : trade.status;
-
-        // עיבוד תאריך היצירה
-        let creationDate = 'תאריך לא ידוע';
-        if (trade.created_at) {
-          try {
-            // Use FieldRendererService or dateUtils for consistent date formatting
-            if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-              creationDate = window.FieldRendererService.renderDate(trade.created_at, false);
-            } else if (window.formatDate) {
-              const date = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(trade.created_at) : new Date(trade.created_at);
-              creationDate = window.formatDate(date);
-            } else if (window.dateUtils?.formatDate) {
-              creationDate = window.dateUtils.formatDate(trade.created_at, { includeTime: false });
-            } else {
-              const date = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(trade.created_at) : new Date(trade.created_at);
-              creationDate = date.toLocaleDateString('he-IL');
+            // עיבוד תאריך היצירה
+            let creationDate = 'תאריך לא ידוע';
+            if (trade.created_at) {
+              try {
+                // Use FieldRendererService or dateUtils for consistent date formatting
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                  creationDate = window.FieldRendererService.renderDate(trade.created_at, false);
+                } else if (window.formatDate) {
+                  const date = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(trade.created_at) : new Date(trade.created_at);
+                  creationDate = window.formatDate(date);
+                } else if (window.dateUtils?.formatDate) {
+                  creationDate = window.dateUtils.formatDate(trade.created_at, { includeTime: false });
+                } else {
+                  const date = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(trade.created_at) : new Date(trade.created_at);
+                  creationDate = date.toLocaleDateString('he-IL');
+                }
+              } catch {
+                // // window.Logger.warn('⚠️ לא ניתן לעבד תאריך יצירה:', trade.created_at, { page: "executions" });
+              }
             }
-          } catch {
-            // // window.Logger.warn('⚠️ לא ניתן לעבד תאריך יצירה:', trade.created_at, { page: "executions" });
-          }
-        }
 
-        option.textContent = `טרייד: ${trade.side} ${trade.investment_type} - ${creationDate} (${statusText})`;
-        tradeSelect.appendChild(option);
-      });
+            return `טרייד: ${trade.side} ${trade.investment_type} - ${creationDate} (${statusText})`;
+          },
+          includeEmpty: true,
+          emptyText: 'בחר טרייד...'
+        });
+      } else {
+        // Fallback to local implementation
+        tradeSelect.innerHTML = '<option value="">בחר טרייד...</option>';
+
+        // הוספת טריידים
+        filteredTrades.forEach(trade => {
+          const option = document.createElement('option');
+          option.value = trade.id; // מספר ישיר
+          const statusText = trade.status === 'active' ? 'פעיל' :
+            trade.status === 'closed' ? 'סגור' :
+              trade.status === 'cancelled' ? 'בוטל' : trade.status;
+
+          // עיבוד תאריך היצירה
+          let creationDate = 'תאריך לא ידוע';
+          if (trade.created_at) {
+            try {
+              // Use FieldRendererService or dateUtils for consistent date formatting
+              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                creationDate = window.FieldRendererService.renderDate(trade.created_at, false);
+              } else if (window.formatDate) {
+                const date = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(trade.created_at) : new Date(trade.created_at);
+                creationDate = window.formatDate(date);
+              } else if (window.dateUtils?.formatDate) {
+                creationDate = window.dateUtils.formatDate(trade.created_at, { includeTime: false });
+              } else {
+                const date = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(trade.created_at) : new Date(trade.created_at);
+                creationDate = date.toLocaleDateString('he-IL');
+              }
+            } catch {
+              // // window.Logger.warn('⚠️ לא ניתן לעבד תאריך יצירה:', trade.created_at, { page: "executions" });
+            }
+          }
+
+          option.textContent = `טרייד: ${trade.side} ${trade.investment_type} - ${creationDate} (${statusText})`;
+          tradeSelect.appendChild(option);
+        });
+      }
 
       // הפעלת השדה
       tradeSelect.disabled = false;

@@ -1702,23 +1702,74 @@ function loadTableActionButtons(tableId, entityType, config = {}) {
     // מיזוג עם הגדרות מותאמות אישית
     const finalConfig = { ...defaultConfig, ...config };
 
-    // יצירת הכפתורים
-    const buttonsHtml = generateActionButtons(
-      entityId,
-      entityType,
-      status,
-      finalConfig.detailsFunction,
-      finalConfig.linkedFunction,
-      finalConfig.editFunction,
-      finalConfig.cancelFunction,
-      finalConfig.restoreFunction,
-      finalConfig.deleteFunction,
-      finalConfig.showDetails,
-      finalConfig.showLinked,
-      finalConfig.showEdit,
-      finalConfig.showCancel,
-      finalConfig.showDelete
-    );
+    // יצירת הכפתורים באמצעות Actions Menu Toolkit המרכזי
+    const buttons = [];
+    
+    if (finalConfig.showDetails) {
+      buttons.push({
+        type: 'VIEW',
+        onclick: `${finalConfig.detailsFunction}('${entityType}', ${entityId})`,
+        title: 'פרטים'
+      });
+    }
+    
+    if (finalConfig.showLinked) {
+      buttons.push({
+        type: 'LINK',
+        onclick: `${finalConfig.linkedFunction}('${entityType}', ${entityId})`,
+        title: 'אובייקטים מקושרים'
+      });
+    }
+    
+    if (finalConfig.showEdit) {
+      buttons.push({
+        type: 'EDIT',
+        onclick: `${finalConfig.editFunction}('${entityType}', ${entityId})`,
+        title: 'ערוך'
+      });
+    }
+    
+    if (finalConfig.showCancel) {
+      const isCancelled = status === 'בוטל' || status === 'סגור';
+      buttons.push({
+        type: isCancelled ? 'REACTIVATE' : 'CANCEL',
+        onclick: `${isCancelled ? finalConfig.restoreFunction : finalConfig.cancelFunction}('${entityType}', ${entityId})`,
+        title: isCancelled ? 'שיחזר' : 'בטל'
+      });
+    }
+    
+    if (finalConfig.showDelete) {
+      buttons.push({
+        type: 'DELETE',
+        onclick: `${finalConfig.deleteFunction}('${entityType}', ${entityId})`,
+        title: 'מחק'
+      });
+    }
+    
+    // Use centralized Actions Menu Toolkit
+    let buttonsHtml = '';
+    if (typeof window.createActionsMenu === 'function') {
+      buttonsHtml = window.createActionsMenu(buttons);
+    } else {
+      // Fallback to deprecated generateActionButtons if createActionsMenu is not available
+      console.warn('⚠️ [loadTableActionButtons] window.createActionsMenu not available, using deprecated generateActionButtons');
+      buttonsHtml = generateActionButtons(
+        entityId,
+        entityType,
+        status,
+        finalConfig.detailsFunction,
+        finalConfig.linkedFunction,
+        finalConfig.editFunction,
+        finalConfig.cancelFunction,
+        finalConfig.restoreFunction,
+        finalConfig.deleteFunction,
+        finalConfig.showDetails,
+        finalConfig.showLinked,
+        finalConfig.showEdit,
+        finalConfig.showCancel,
+        finalConfig.showDelete
+      );
+    }
 
     // בדיקה אם כבר יש כפתורים - למנוע כפילות
     if (actionsCell.querySelector('.actions-menu-wrapper')) {
@@ -2136,6 +2187,15 @@ function isScriptInDOM(normalizedKey) {
 function loadScriptOnce(src, options = {}) {
   if (!src) {
     return Promise.reject(new Error('loadScriptOnce: src is required'));
+  }
+  
+  // Validate src is a string, not a Promise or other object
+  if (typeof src !== 'string') {
+    const error = new Error(`loadScriptOnce: src must be a string, got ${typeof src}. If you have a Promise, await it first.`);
+    if (window.Logger?.error) {
+      window.Logger.error('❌ loadScriptOnce invalid src type', error, { page: 'ui-utils', loader: 'loadScriptOnce', srcType: typeof src });
+    }
+    return Promise.reject(error);
   }
 
   const {

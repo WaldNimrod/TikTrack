@@ -643,45 +643,84 @@
 
     /**
      * Create Quick Links Actions Menu with icons and text
+     * Uses centralized Actions Menu Toolkit (window.createActionsMenu)
+     * 
+     * @param {Array} buttons - Array of button objects with icon, text, title, onclick
+     * @returns {Promise<string>} HTML string for actions menu
      */
     async function createQuickLinksActionsMenu(buttons) {
         if (!buttons || buttons.length === 0) {
             return '';
         }
         
-        const menuButtonsPromises = buttons.map(async (button) => {
-            const iconPath = button.icon || '../../images/icons/tabler/eye.svg';
-            const text = button.text || '';
-            const title = button.title || '';
-            const onclick = button.onclick || '';
-            
-            let iconHtml = `<img src="${iconPath}" width="16" height="16" alt="${text}" class="icon me-1">`;
-            if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
-                try {
-                    const iconName = iconPath.split('/').pop().replace('.svg', '');
-                    iconHtml = await window.IconSystem.renderIcon('button', iconName, { size: '16', alt: text, class: 'icon me-1' });
-                } catch (error) {
-                    // Fallback already set
+        // Use centralized Actions Menu Toolkit
+        if (typeof window.createActionsMenu === 'function') {
+            // Convert buttons to format expected by createActionsMenu
+            const formattedButtons = await Promise.all(buttons.map(async (button) => {
+                const iconPath = button.icon || '../../images/icons/tabler/eye.svg';
+                const text = button.text || '';
+                const title = button.title || 'קישור מהיר';
+                const onclick = button.onclick || '';
+                
+                // Get icon HTML (async for IconSystem)
+                let iconHtml = `<img src="${iconPath}" width="16" height="16" alt="${text}" class="icon me-1">`;
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        const iconName = iconPath.split('/').pop().replace('.svg', '');
+                        iconHtml = await window.IconSystem.renderIcon('button', iconName, { size: '16', alt: text, class: 'icon me-1' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
                 }
-            }
+                
+                // Store icon and text for later use
+                return {
+                    type: 'LINK',
+                    onclick: onclick,
+                    title: title,
+                    _iconHtml: iconHtml, // Store custom icon HTML
+                    _text: text // Store text
+                };
+            }));
             
-            return `<button class="btn actions-menu-item" data-variant="small" data-button-type="LINK" data-onclick='${onclick}' title="${title}" style="margin-right: 4px;">
-                ${iconHtml} ${text}
-            </button>`;
-        });
-        const menuButtons = (await Promise.all(menuButtonsPromises)).join('');
+            // Use createActionsMenu to create the menu structure
+            const menuHtml = window.createActionsMenu(formattedButtons);
+            
+            if (menuHtml) {
+                // Parse and modify the HTML to add text to buttons
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = menuHtml;
+                
+                const menuButtons = tempDiv.querySelectorAll('.actions-menu-item');
+                formattedButtons.forEach((button, index) => {
+                    if (menuButtons[index] && button._iconHtml && button._text) {
+                        // Replace icon with icon + text
+                        menuButtons[index].innerHTML = `${button._iconHtml} ${button._text}`;
+                    }
+                });
+                
+                // Add ID to wrapper for positioning
+                const wrapper = tempDiv.querySelector('.actions-menu-wrapper');
+                if (wrapper) {
+                    wrapper.id = 'quickLinksActionsMenuWrapper';
+                    const popup = wrapper.querySelector('.actions-menu-popup');
+                    if (popup) {
+                        popup.id = 'quickLinksActionsMenuPopup';
+                    }
+                    // Update tooltip for trigger button
+                    const trigger = wrapper.querySelector('.actions-trigger');
+                    if (trigger) {
+                        trigger.setAttribute('data-tooltip', 'קישורים מהירים');
+                    }
+                }
+                
+                return tempDiv.innerHTML;
+            }
+        }
         
-        // Get menu trigger icon - using ⋮ (three dots) if icon not available
-        const menuIcon = '<span style="font-size: 18px; line-height: 1;">⋮</span>';
-        
-        return `
-            <div class="actions-menu-wrapper" id="quickLinksActionsMenuWrapper">
-                <button class="btn actions-trigger" data-tooltip="קישורים מהירים" data-tooltip-placement="top" data-tooltip-trigger="hover">${menuIcon}</button>
-                <div class="actions-menu-popup" id="quickLinksActionsMenuPopup">
-                    ${menuButtons}
-                </div>
-            </div>
-        `;
+        // Fallback if createActionsMenu is not available
+        console.warn('⚠️ [createQuickLinksActionsMenu] window.createActionsMenu not available, using fallback');
+        return '';
     }
     
     /**

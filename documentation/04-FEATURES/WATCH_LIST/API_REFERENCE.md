@@ -619,3 +619,6 @@ MAX_TICKERS_PER_LIST = 50      # TODO: Move to admin settings
 
 **סיכום:** API תומך בכל הפעולות הנדרשות עם validation מלא, error handling, ותמיכה מלאה בטיקרים חיצוניים עם אינטגרציה למערכת הנתונים החיצוניים.
 
+
+
+

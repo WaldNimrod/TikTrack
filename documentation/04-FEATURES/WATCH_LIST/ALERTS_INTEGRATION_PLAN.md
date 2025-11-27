@@ -95,3 +95,6 @@ function createAlertFromItem(itemId) {
 
 **סטטוס:** תכנון עתידי - לא בשלב ראשון של המימוש.
 
+
+
+

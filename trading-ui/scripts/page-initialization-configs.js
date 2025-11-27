@@ -2895,6 +2895,147 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         },
       ],
     },
+
+    // Watch Lists Pages
+    'watch-lists-page': {
+      name: 'Watch Lists Page',
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'crud',
+        'entity-services',
+        'watch-lists'
+      ],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.WatchListsDataService',
+        'window.WatchListsUIService',
+        'window.WatchListsPage',
+        'window.HeaderSystem',
+        'window.UnifiedTableSystem'
+      ],
+      pageSpecificScripts: ['scripts/watch-lists-page.js'],
+      description: 'עמוד ניהול רשימות צפייה - מוקאפ',
+      lastModified: '2025-11-26',
+      pageType: 'mockup',
+      cacheStrategy: 'standard',
+      requiresFilters: true,
+      requiresValidation: false,
+      requiresTables: true,
+      sectionsDefaultState: 'open',
+      sectionDefaultStates: {
+        'top': 'open',
+        'watch-lists': 'open',
+        'active-list': 'open',
+        'flagged': 'closed'
+      },
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📊 Initializing Watch Lists Page...', {
+            page: 'page-initialization-configs',
+          });
+
+          // Wait for WatchListsPage to be available
+          if (window.WatchListsPage && typeof window.WatchListsPage.init === 'function') {
+            await window.WatchListsPage.init();
+          }
+        },
+      ],
+    },
+
+    'watch-list-modal': {
+      name: 'Watch List Modal',
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'watch-lists'
+      ],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.ModalManagerV2',
+        'window.WatchListModal',
+        'window.DefaultValueSetter'
+      ],
+      pageSpecificScripts: ['scripts/watch-list-modal.js'],
+      description: 'מודל Add/Edit Watch List - מוקאפ',
+      lastModified: '2025-11-26',
+      pageType: 'mockup',
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📊 Initializing Watch List Modal...', {
+            page: 'page-initialization-configs',
+          });
+
+          if (window.WatchListModal && typeof window.WatchListModal.init === 'function') {
+            window.WatchListModal.init();
+          }
+        },
+      ],
+    },
+
+    'add-ticker-modal': {
+      name: 'Add Ticker Modal',
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'watch-lists'
+      ],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.ModalManagerV2',
+        'window.AddTickerModal',
+        'window.SelectPopulatorService'
+      ],
+      pageSpecificScripts: ['scripts/add-ticker-modal.js'],
+      description: 'מודל הוספת טיקר - מוקאפ',
+      lastModified: '2025-11-26',
+      pageType: 'mockup',
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📊 Initializing Add Ticker Modal...', {
+            page: 'page-initialization-configs',
+          });
+
+          if (window.AddTickerModal && typeof window.AddTickerModal.init === 'function') {
+            window.AddTickerModal.init();
+          }
+        },
+      ],
+    },
+
+    'flag-quick-action': {
+      name: 'Flag Quick Action',
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'watch-lists'
+      ],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.FlagQuickAction',
+        'window.WatchListsUIService'
+      ],
+      pageSpecificScripts: ['scripts/flag-quick-action.js'],
+      description: 'Quick Action - פלטת דגלים - מוקאפ',
+      lastModified: '2025-11-26',
+      pageType: 'mockup',
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📊 Initializing Flag Quick Action...', {
+            page: 'page-initialization-configs',
+          });
+
+          if (window.FlagQuickAction && typeof window.FlagQuickAction.init === 'function') {
+            window.FlagQuickAction.init();
+          }
+        },
+      ],
+    },
   };
 
   // ===== GLOBAL EXPORT =====

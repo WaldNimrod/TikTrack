@@ -1252,17 +1252,35 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
  * @param {string} prefix - Optional prefix for option text (triggers custom formatting)
  * @returns {void}
  */
+/**
+ * Populate select element with data
+ * Uses SelectPopulatorService.populateSelectWithData if available (for existing data)
+ * Falls back to local implementation if service not available
+ * 
+ * @function populateSelect
+ * @param {string} selectId - ID of the select element
+ * @param {Array} data - Array of data objects
+ * @param {string} field - Field name to use as value
+ * @param {string} prefix - Optional prefix for option text
+ * @returns {void}
+ */
 function populateSelect(selectId, data, field, prefix = '') {
   try {
-    // Use global populateSelect from select-populator-service.js if available and no custom prefix
-    // Custom prefix requires local implementation for proper formatting
-    if (!prefix && window.populateSelect && typeof window.populateSelect === 'function' && 
-        window.populateSelect.toString().includes('select-populator-service')) {
-      window.populateSelect(selectId, data, field, prefix);
+    // Use SelectPopulatorService.populateSelectWithData if available (for existing data, not from API)
+    if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateSelectWithData === 'function') {
+      window.SelectPopulatorService.populateSelectWithData(selectId, data, {
+        valueField: field,
+        textField: (item) => {
+          const value = item[field] || item.id || item.name || '';
+          return prefix ? `${prefix}: ${value}` : value;
+        },
+        includeEmpty: true,
+        emptyText: 'בחר אובייקט לשיוך...'
+      });
       return;
     }
 
-    // Local implementation for custom formatting
+    // Fallback to local implementation
     const select = document.getElementById(selectId);
     if (!select) {
       window.Logger?.debug('Select element not found', { selectId, page: "alerts" });
@@ -1455,7 +1473,13 @@ function toggleConditionFields(enable, mode = 'add') {
           field.classList.remove('disabled-field');
         } else {
           field.classList.add('disabled-field');
-          field.value = '';
+          // Use DataCollectionService if available
+          if (window.DataCollectionService && typeof window.DataCollectionService.setValue === 'function') {
+            window.DataCollectionService.setValue(field.id, '', 'text');
+          } else {
+            // Fallback to direct assignment
+            field.value = '';
+          }
         }
       }
     });
@@ -1876,8 +1900,16 @@ window.testAlertPayload = async function() {
   }
   
   // Collect data exactly as saveAlert does
-  const relatedType = form.querySelector('#alertRelatedType')?.value || '';
-  const relatedId = form.querySelector('#alertRelatedObject')?.value || '';
+  // Use DataCollectionService if available
+  let relatedType, relatedId;
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+    relatedType = window.DataCollectionService.getValue('alertRelatedType', 'text', '');
+    relatedId = window.DataCollectionService.getValue('alertRelatedObject', 'text', '');
+  } else {
+    // Fallback if DataCollectionService is not available
+    relatedType = form.querySelector('#alertRelatedType')?.value || '';
+    relatedId = form.querySelector('#alertRelatedObject')?.value || '';
+  }
   
   const alertTypeField = form.querySelector('#alertType');
   const alertConditionField = form.querySelector('#alertCondition');
@@ -1911,16 +1943,23 @@ window.testAlertPayload = async function() {
     message = form.querySelector('#alertName')?.value || '';
   }
   
-  // Get status
-  const statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
-  const statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
-  const isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
+  // Get status - Use DataCollectionService if available
+  let statusCombined, statusHidden, isTriggeredHidden, expiryDate;
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+    statusCombined = window.DataCollectionService.getValue('alertStatusCombined', 'text', 'new');
+    statusHidden = window.DataCollectionService.getValue('alertStatus_hidden', 'text', 'open');
+    isTriggeredHidden = window.DataCollectionService.getValue('alertIsTriggered_hidden', 'text', 'false');
+    expiryDate = window.DataCollectionService.getValue('alertExpiryDate', 'dateOnly', null);
+  } else {
+    // Fallback if DataCollectionService is not available
+    statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
+    statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
+    isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
+    expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
+  }
   
   const status = statusHidden;
   const isTriggered = isTriggeredHidden;
-  
-  // Get expiry_date
-  const expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
   
   // Build payload exactly as saveAlert does
   const finalConditionAttribute = (conditionAttribute && conditionAttribute.trim() !== '') ? conditionAttribute : 'price';
@@ -2107,16 +2146,23 @@ async function saveAlert() {
       message = form.querySelector('#alertName')?.value || '';
     }
     
-    // Get combined status and parse to status + is_triggered
-    const statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
-    const statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
-    const isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
+    // Get combined status and parse to status + is_triggered - Use DataCollectionService if available
+    let statusCombined, statusHidden, isTriggeredHidden;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      statusCombined = window.DataCollectionService.getValue('alertStatusCombined', 'text', 'new');
+      statusHidden = window.DataCollectionService.getValue('alertStatus_hidden', 'text', 'open');
+      isTriggeredHidden = window.DataCollectionService.getValue('alertIsTriggered_hidden', 'text', 'false');
+      expiryDate = window.DataCollectionService.getValue('alertExpiryDate', 'dateOnly', null);
+    } else {
+      // Fallback if DataCollectionService is not available
+      statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
+      statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
+      isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
+      expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
+    }
     
     status = statusHidden;
     isTriggered = isTriggeredHidden;
-    
-    // Get expiry_date
-    expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
     if (expiryDate === '') expiryDate = null;
 
     const tagsSelect = form.querySelector('#alertTags');
@@ -2585,8 +2631,15 @@ function updateStatusAndTriggered() {
     window.DataCollectionService.setValue(triggeredHidden.id, mappedValues.triggered, 'text');
   } else {
     // Fallback if DataCollectionService is not available
-    statusHidden.value = mappedValues.status;
-    triggeredHidden.value = mappedValues.triggered;
+    // Use DataCollectionService if available
+    if (window.DataCollectionService && typeof window.DataCollectionService.setValue === 'function') {
+      window.DataCollectionService.setValue('editAlertStatus', mappedValues.status, 'text');
+      window.DataCollectionService.setValue('editAlertTriggered', mappedValues.triggered, 'text');
+    } else {
+      // Fallback to direct assignment
+      statusHidden.value = mappedValues.status;
+      triggeredHidden.value = mappedValues.triggered;
+    }
   }
 }
 

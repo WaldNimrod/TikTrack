@@ -12,6 +12,15 @@ class TradePlanService:
     def get_all(db: Session) -> List[TradePlan]:
         """Get all trade plans"""
         logger.info("Loading trade plans with joinedload for ticker and account")
+        
+        # Ensure transaction is in clean state before query
+        try:
+            from sqlalchemy import text
+            db.execute(text("SELECT 1"))
+        except Exception as tx_error:
+            logger.warning(f"Transaction aborted detected, rolling back: {str(tx_error)}")
+            db.rollback()
+        
         plans = db.query(TradePlan).options(
             joinedload(TradePlan.ticker),
             joinedload(TradePlan.account)
@@ -33,7 +42,7 @@ class TradePlanService:
     @staticmethod
     def get_by_account(db: Session, trading_account_id: int) -> List[TradePlan]:
         """Get trade plans by account"""
-        return db.query(TradePlan).filter(TradePlan.trading_trading_account_id == trading_account_id).all()
+        return db.query(TradePlan).filter(TradePlan.trading_account_id == trading_account_id).all()
     
     @staticmethod
     def get_by_ticker(db: Session, ticker_id: int) -> List[TradePlan]:
@@ -309,7 +318,7 @@ class TradePlanService:
         """Get trade plan summary"""
         query = db.query(TradePlan)
         if trading_account_id:
-            query = query.filter(TradePlan.trading_trading_account_id == trading_account_id)
+            query = query.filter(TradePlan.trading_account_id == trading_account_id)
         
         plans = query.all()
         
@@ -343,7 +352,7 @@ class TradePlanService:
         query = db.query(TradePlan)
         
         if 'trading_account_id' in conditions:
-            query = query.filter(TradePlan.trading_trading_account_id == conditions['trading_account_id'])
+            query = query.filter(TradePlan.trading_account_id == conditions['trading_account_id'])
         
         if 'ticker_id' in conditions:
             query = query.filter(TradePlan.ticker_id == conditions['ticker_id'])

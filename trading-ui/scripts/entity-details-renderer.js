@@ -2916,17 +2916,30 @@ class EntityDetailsRenderer {
         return '<span class="badge bg-light text-muted">-</span>';
     }
 
+    /**
+     * Get entity icon path synchronously (fallback only - use IconSystem for async)
+     * @deprecated Use IconSystem.getEntityIcon() for async or IconSystem.renderIcon() for HTML
+     */
     getEntityIcon(entityType) {
         if (!entityType) {
             return '/trading-ui/images/icons/link.svg';
         }
 
-        if (!window.LinkedItemsService || !window.LinkedItemsService.getLinkedItemIcon) {
-            console.warn('⚠️ [getEntityIcon] LinkedItemsService.getLinkedItemIcon is not available, using fallback');
-            return '/trading-ui/images/icons/link.svg';
-        }
+        // Use sync fallback mapping (IconSystem is async)
+        const iconMappings = {
+            ticker: '/trading-ui/images/icons/entities/tickers.svg',
+            trade: '/trading-ui/images/icons/entities/trades.svg',
+            trade_plan: '/trading-ui/images/icons/entities/trade_plans.svg',
+            execution: '/trading-ui/images/icons/entities/executions.svg',
+            trading_account: '/trading-ui/images/icons/entities/trading_accounts.svg',
+            account: '/trading-ui/images/icons/entities/trading_accounts.svg',
+            alert: '/trading-ui/images/icons/entities/alerts.svg',
+            cash_flow: '/trading-ui/images/icons/entities/cash_flows.svg',
+            note: '/trading-ui/images/icons/entities/notes.svg',
+            position: '/trading-ui/images/icons/entities/trades.svg'
+        };
 
-        return window.LinkedItemsService.getLinkedItemIcon(entityType);
+        return iconMappings[entityType] || '/trading-ui/images/icons/entities/home.svg';
     }
     
     /**
@@ -4442,15 +4455,23 @@ class EntityDetailsRenderer {
      * @returns {string} HTML for filter button
      */
     _generateFilterButton(entityType, tableId) {
-        if (!window.LinkedItemsService || !window.LinkedItemsService.getLinkedItemIcon || !window.LinkedItemsService.getEntityLabel) {
-            console.error('❌ [_generateFilterButton] LinkedItemsService is not available');
-            if (window.Logger) {
-                window.Logger.error('LinkedItemsService is not available', { page: 'entity-details-renderer' });
-            }
-            return '';
-        }
-        const iconPath = window.LinkedItemsService.getLinkedItemIcon(entityType);
-        const entityLabel = window.LinkedItemsService.getEntityLabel(entityType);
+        // Get entity label synchronously
+        const entityLabel = window.LinkedItemsService?.getEntityLabel?.(entityType) || entityType;
+        
+        // Use sync fallback for icon path (IconSystem is async, so we use fallback mapping)
+        const iconMappings = {
+            ticker: '/trading-ui/images/icons/entities/tickers.svg',
+            trade: '/trading-ui/images/icons/entities/trades.svg',
+            trade_plan: '/trading-ui/images/icons/entities/trade_plans.svg',
+            execution: '/trading-ui/images/icons/entities/executions.svg',
+            trading_account: '/trading-ui/images/icons/entities/trading_accounts.svg',
+            account: '/trading-ui/images/icons/entities/trading_accounts.svg',
+            alert: '/trading-ui/images/icons/entities/alerts.svg',
+            cash_flow: '/trading-ui/images/icons/entities/cash_flows.svg',
+            note: '/trading-ui/images/icons/entities/notes.svg',
+            position: '/trading-ui/images/icons/entities/trades.svg'
+        };
+        const iconPath = iconMappings[entityType] || '/trading-ui/images/icons/entities/home.svg';
         
         // Create clear and descriptive tooltip text
         const tooltipText = `סינון לפי ${entityLabel}`;

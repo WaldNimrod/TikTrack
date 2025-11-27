@@ -810,7 +810,7 @@ class HeaderSystem {
     window.Logger?.info?.('🔧 HeaderSystem.init() called', { page: 'header-system' });
 
     try {
-      await HeaderSystem.createHeader();
+      HeaderSystem.createHeader();
       this.setupEventListeners();
       this.menuManager.init();
       this.filterManager.init();
@@ -927,7 +927,27 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/test-header-only">🧪 בדיקת ראש הדף</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
+                        <li class="dropdown-submenu">
+                          <a class="tiktrack-dropdown-item" href="#">📐 מוקאפים <span class="tiktrack-dropdown-arrow" style="font-size: 0.7rem;">◀</span></a>
+                          <ul class="level3-submenu">
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/comparative-analysis-page.html">📊 ניתוח השוואתי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/date-comparison-modal.html">📅 השוואת תאריכים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/economic-calendar-page.html">📆 לוח כלכלי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/emotional-tracking-widget.html">😊 תיעוד רגשי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/history-widget.html">📜 ווידג'ט היסטוריה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/portfolio-state-page.html">💼 מצב תיק היסטורי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/price-history-page.html">💰 היסטוריית מחירים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/strategy-analysis-page.html">🎯 ניתוח אסטרטגיות</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trade-history-page.html">📈 היסטוריית טרייד</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trading-journal-page.html">📓 יומן מסחר</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
+                            <li class="separator"></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/add-ticker-modal.html">➕ הוספת טיקר</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/flag-quick-action.html">🚩 פעולה מהירה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch-list-modal.html">👁️ רשימת מעקב</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch-lists-page.html">📋 רשימות מעקב</a></li>
+                          </ul>
+                        </li>
                         <li><a class="tiktrack-dropdown-item" href="/chart-management">📊 ניהול גרפים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/dynamic-colors-display">🌈 תצוגת צבעים דינמית</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/designs">🎭 עיצובים</a></li>

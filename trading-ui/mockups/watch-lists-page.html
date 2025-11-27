@@ -71,132 +71,7 @@
     <link rel="stylesheet" href="../styles-new/09-utilities/_utilities.css?v=0da3519a_20251102_104906">
 
     <!-- Watch Lists Page Specific Styles -->
-    <style>
-        .watch-list-card {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            transition: all 0.2s;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        .watch-list-card:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-        .watch-list-card-header {
-            padding: 1rem;
-            border-bottom: 1px solid #dee2e6;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 8px 8px 0 0;
-        }
-        .watch-list-card-icon {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .watch-list-card-body {
-            padding: 1rem;
-            flex-grow: 1;
-        }
-        .watch-list-card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        .watch-list-card-stats {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        .stat-icon {
-            width: 14px;
-            height: 14px;
-        }
-        .watch-list-card-footer {
-            padding: 1rem;
-            border-top: 1px solid #dee2e6;
-        }
-        .drag-handle {
-            cursor: move;
-            color: #6c757d;
-            font-size: 1.2rem;
-            padding: 0.25rem;
-        }
-        .drag-handle:hover {
-            color: #495057;
-        }
-        .flag-palette-popup {
-            position: absolute;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1050;
-        }
-        .flag-palette-header {
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-            font-size: 0.9rem;
-        }
-        .flag-palette-colors {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
-        }
-        .flag-color-btn {
-            width: 40px;
-            height: 40px;
-            border: 2px solid #dee2e6;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .flag-color-btn:hover {
-            transform: scale(1.1);
-            border-color: #495057;
-        }
-        .view-container {
-            min-height: 200px;
-        }
-        .view-container[style*="display: none"] {
-            display: none !important;
-        }
-        .btn-view-mode.active {
-            background-color: #26baac;
-            color: white;
-            border-color: #26baac;
-        }
-        .watch-list-item-card {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 1rem;
-            transition: all 0.2s;
-        }
-        .watch-list-item-card:hover {
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .compact-list-item {
-            padding: 0.75rem;
-            border-bottom: 1px solid #f0f0f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .compact-list-item:hover {
-            background-color: #f8f9fa;
-        }
-    </style>
+    <link rel="stylesheet" href="../styles-new/06-components/_watch-lists.css?v=1.0.0">
 </head>
 <body class="watch-lists-page">
     <!-- 
@@ -333,9 +208,9 @@
                                         <!-- Watch List Card 1 -->
                                         <div class="col-md-4 col-sm-6" data-watch-list-id="1" draggable="true">
                                             <div class="watch-list-card">
-                                                <div class="watch-list-card-header" style="background-color: rgba(38, 186, 172, 0.1);">
+                                                <div class="watch-list-card-header" data-bg-color="rgba(38, 186, 172, 0.1)">
                                                     <div class="watch-list-card-icon">
-                                                        <img src="../images/icons/tabler/chart-line.svg" width="24" height="24" alt="chart-line" class="icon" style="color: #26baac;">
+                                                        <img src="../images/icons/tabler/chart-line.svg" width="24" height="24" alt="chart-line" class="icon" data-icon-color="#26baac">
                                                     </div>
                                                     <div class="watch-list-card-actions">
                                                         <button type="button"
@@ -374,9 +249,9 @@
                                         <!-- Watch List Card 2 -->
                                         <div class="col-md-4 col-sm-6" data-watch-list-id="2" draggable="true">
                                             <div class="watch-list-card">
-                                                <div class="watch-list-card-header" style="background-color: rgba(252, 90, 6, 0.1);">
+                                                <div class="watch-list-card-header" data-bg-color="rgba(252, 90, 6, 0.1)">
                                                     <div class="watch-list-card-icon">
-                                                        <img src="../images/icons/tabler/flame.svg" width="24" height="24" alt="flame" class="icon" style="color: #fc5a06;">
+                                                        <img src="../images/icons/tabler/flame.svg" width="24" height="24" alt="flame" class="icon" data-icon-color="#fc5a06">
                                                     </div>
                                                     <div class="watch-list-card-actions">
                                                         <button type="button"
@@ -415,9 +290,9 @@
                                         <!-- Watch List Card 3 -->
                                         <div class="col-md-4 col-sm-6" data-watch-list-id="3" draggable="true">
                                             <div class="watch-list-card">
-                                                <div class="watch-list-card-header" style="background-color: rgba(40, 167, 69, 0.1);">
+                                                <div class="watch-list-card-header" data-bg-color="rgba(40, 167, 69, 0.1)">
                                                     <div class="watch-list-card-icon">
-                                                        <img src="../images/icons/tabler/coins.svg" width="24" height="24" alt="coins" class="icon" style="color: #28a745;">
+                                                        <img src="../images/icons/tabler/coins.svg" width="24" height="24" alt="coins" class="icon" data-icon-color="#28a745">
                                                     </div>
                                                     <div class="watch-list-card-actions">
                                                         <button type="button"
@@ -509,14 +384,14 @@
                                             <table class="table table-striped align-middle" id="watchListItemsTable" data-table-type="watch_list_items">
                                                 <thead class="table-light">
                                                     <tr>
-                                                        <th class="drag-handle-column" style="width: 40px;"></th>
+                                                        <th class="drag-handle-column"></th>
                                                         <th class="sortable-header">Symbol</th>
                                                         <th class="sortable-header">Name</th>
                                                         <th class="sortable-header">Price</th>
                                                         <th class="sortable-header">Change</th>
                                                         <th class="sortable-header">Change %</th>
-                                                        <th style="width: 80px;">Flag</th>
-                                                        <th style="width: 120px;">Actions</th>
+                                                        <th class="flag-column">Flag</th>
+                                                        <th class="actions-column">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="watchListItemsTableBody">
@@ -534,11 +409,10 @@
                                                         <td>
                                                             <button type="button"
                                                                     class="btn btn-sm btn-flag"
-                                                                    style="border: none; background: none; padding: 0.25rem;"
                                                                     data-flag-color="#26baac"
                                                                     data-onclick="window.WatchListsPage?.showFlagPalette(1)"
                                                                     title="שינוי דגל">
-                                                                <img src="../images/icons/tabler/flag-filled.svg" width="16" height="16" alt="flag" class="icon" style="color: #26baac;">
+                                                                <img src="../images/icons/tabler/flag-filled.svg" width="16" height="16" alt="flag" class="icon" data-icon-color="#26baac">
                                                             </button>
                                                         </td>
                                                         <td>
@@ -572,11 +446,10 @@
                                                         <td>
                                                             <button type="button"
                                                                     class="btn btn-sm btn-flag"
-                                                                    style="border: none; background: none; padding: 0.25rem;"
                                                                     data-flag-color="#fc5a06"
                                                                     data-onclick="window.WatchListsPage?.showFlagPalette(2)"
                                                                     title="שינוי דגל">
-                                                                <img src="../images/icons/tabler/flag-filled.svg" width="16" height="16" alt="flag" class="icon" style="color: #fc5a06;">
+                                                                <img src="../images/icons/tabler/flag-filled.svg" width="16" height="16" alt="flag" class="icon" data-icon-color="#fc5a06">
                                                             </button>
                                                         </td>
                                                         <td>
@@ -611,10 +484,9 @@
                                                         <td>
                                                             <button type="button"
                                                                     class="btn btn-sm btn-flag"
-                                                                    style="border: none; background: none; padding: 0.25rem;"
                                                                     data-onclick="window.WatchListsPage?.showFlagPalette(3)"
                                                                     title="שינוי דגל">
-                                                                <img src="../images/icons/tabler/flag.svg" width="16" height="16" alt="flag" class="icon text-muted">
+                                                                <img src="../images/icons/tabler/flag.svg" width="16" height="16" alt="flag" class="icon text-muted" data-icon-color="muted">
                                                             </button>
                                                         </td>
                                                         <td>
@@ -648,10 +520,9 @@
                                                         <td>
                                                             <button type="button"
                                                                     class="btn btn-sm btn-flag"
-                                                                    style="border: none; background: none; padding: 0.25rem;"
                                                                     data-onclick="window.WatchListsPage?.showFlagPalette(4)"
                                                                     title="שינוי דגל">
-                                                                <img src="../images/icons/tabler/flag.svg" width="16" height="16" alt="flag" class="icon text-muted">
+                                                                <img src="../images/icons/tabler/flag.svg" width="16" height="16" alt="flag" class="icon text-muted" data-icon-color="muted">
                                                             </button>
                                                         </td>
                                                         <td>
@@ -677,7 +548,7 @@
                                     </div>
 
                                     <!-- Cards View -->
-                                    <div id="cardsView" class="view-container" style="display: none;">
+                                    <div id="cardsView" class="view-container d-none">
                                         <div class="row g-3" id="watchListItemsCards">
                                             <div class="col-md-3 col-sm-6" data-item-id="1">
                                                 <div class="watch-list-item-card">
@@ -688,10 +559,9 @@
                                                         </div>
                                                         <button type="button"
                                                                 class="btn btn-sm btn-flag"
-                                                                style="border: none; background: none; padding: 0;"
                                                                 data-flag-color="#26baac"
                                                                 data-onclick="window.WatchListsPage?.showFlagPalette(1)">
-                                                            <img src="../images/icons/tabler/flag-filled.svg" width="16" height="16" alt="flag" class="icon" style="color: #26baac;">
+                                                            <img src="../images/icons/tabler/flag-filled.svg" width="16" height="16" alt="flag" class="icon" data-icon-color="#26baac">
                                                         </button>
                                                     </div>
                                                     <div class="mt-2">
@@ -709,10 +579,9 @@
                                                         </div>
                                                         <button type="button"
                                                                 class="btn btn-sm btn-flag"
-                                                                style="border: none; background: none; padding: 0;"
                                                                 data-flag-color="#fc5a06"
                                                                 data-onclick="window.WatchListsPage?.showFlagPalette(2)">
-                                                            <img src="../images/icons/tabler/flag-filled.svg" width="16" height="16" alt="flag" class="icon" style="color: #fc5a06;">
+                                                            <img src="../images/icons/tabler/flag-filled.svg" width="16" height="16" alt="flag" class="icon" data-icon-color="#fc5a06">
                                                         </button>
                                                     </div>
                                                     <div class="mt-2">
@@ -727,15 +596,14 @@
                                                         <div>
                                                             <h6 class="mb-0">
                                                                 <strong>TSLA</strong>
-                                                                <span class="badge bg-secondary ms-1" style="font-size: 0.7rem;">חיצוני</span>
+                                                                <span class="badge bg-secondary ms-1 badge-sm">חיצוני</span>
                                                             </h6>
                                                             <small class="text-muted">Tesla Inc.</small>
                                                         </div>
                                                         <button type="button"
                                                                 class="btn btn-sm btn-flag"
-                                                                style="border: none; background: none; padding: 0;"
                                                                 data-onclick="window.WatchListsPage?.showFlagPalette(3)">
-                                                            <img src="../images/icons/tabler/flag.svg" width="16" height="16" alt="flag" class="icon text-muted">
+                                                            <img src="../images/icons/tabler/flag.svg" width="16" height="16" alt="flag" class="icon text-muted" data-icon-color="muted">
                                                         </button>
                                                     </div>
                                                     <div class="mt-2">
@@ -753,9 +621,8 @@
                                                         </div>
                                                         <button type="button"
                                                                 class="btn btn-sm btn-flag"
-                                                                style="border: none; background: none; padding: 0;"
                                                                 data-onclick="window.WatchListsPage?.showFlagPalette(4)">
-                                                            <img src="../images/icons/tabler/flag.svg" width="16" height="16" alt="flag" class="icon text-muted">
+                                                            <img src="../images/icons/tabler/flag.svg" width="16" height="16" alt="flag" class="icon text-muted" data-icon-color="muted">
                                                         </button>
                                                     </div>
                                                     <div class="mt-2">
@@ -768,7 +635,7 @@
                                     </div>
 
                                     <!-- Compact View -->
-                                    <div id="compactView" class="view-container" style="display: none;">
+                                    <div id="compactView" class="view-container d-none">
                                         <div class="list-group" id="watchListItemsCompact">
                                             <div class="compact-list-item" data-item-id="1">
                                                 <div class="d-flex align-items-center gap-3">
@@ -780,10 +647,9 @@
                                                 </div>
                                                 <button type="button"
                                                         class="btn btn-sm btn-flag"
-                                                        style="border: none; background: none; padding: 0;"
                                                         data-flag-color="#26baac"
                                                         data-onclick="window.WatchListsPage?.showFlagPalette(1)">
-                                                    <img src="../images/icons/tabler/flag-filled.svg" width="14" height="14" alt="flag" class="icon" style="color: #26baac;">
+                                                    <img src="../images/icons/tabler/flag-filled.svg" width="14" height="14" alt="flag" class="icon" data-icon-color="#26baac">
                                                 </button>
                                             </div>
                                             <div class="compact-list-item" data-item-id="2">
@@ -796,24 +662,22 @@
                                                 </div>
                                                 <button type="button"
                                                         class="btn btn-sm btn-flag"
-                                                        style="border: none; background: none; padding: 0;"
                                                         data-flag-color="#fc5a06"
                                                         data-onclick="window.WatchListsPage?.showFlagPalette(2)">
-                                                    <img src="../images/icons/tabler/flag-filled.svg" width="14" height="14" alt="flag" class="icon" style="color: #fc5a06;">
+                                                    <img src="../images/icons/tabler/flag-filled.svg" width="14" height="14" alt="flag" class="icon" data-icon-color="#fc5a06">
                                                 </button>
                                             </div>
                                             <div class="compact-list-item" data-item-id="3">
                                                 <div class="d-flex align-items-center gap-3">
                                                     <span class="drag-handle">≡</span>
                                                     <strong>TSLA</strong>
-                                                    <span class="badge bg-secondary" style="font-size: 0.7rem;">חיצוני</span>
+                                                    <span class="badge bg-secondary badge-sm">חיצוני</span>
                                                     <span class="text-muted">Tesla Inc.</span>
                                                     <span>$245.80</span>
                                                     <span class="text-danger">-0.85%</span>
                                                 </div>
                                                 <button type="button"
                                                         class="btn btn-sm btn-flag"
-                                                        style="border: none; background: none; padding: 0;"
                                                         data-onclick="window.WatchListsPage?.showFlagPalette(3)">
                                                     <img src="../images/icons/tabler/flag.svg" width="14" height="14" alt="flag" class="icon text-muted">
                                                 </button>
@@ -828,7 +692,6 @@
                                                 </div>
                                                 <button type="button"
                                                         class="btn btn-sm btn-flag"
-                                                        style="border: none; background: none; padding: 0;"
                                                         data-onclick="window.WatchListsPage?.showFlagPalette(4)">
                                                     <img src="../images/icons/tabler/flag.svg" width="14" height="14" alt="flag" class="icon text-muted">
                                                 </button>
@@ -850,21 +713,21 @@
                                         <div class="btn-group me-2" role="group">
                                             <button type="button"
                                                     class="btn btn-sm"
-                                                    style="background-color: #26baac; border-color: #26baac; color: white;"
+                                                    class="btn-flag-filter"
                                                     data-flag-color="#26baac"
                                                     data-onclick="window.WatchListsPage?.filterByFlag('#26baac')"
                                                     title="דגל Trade">
                                             </button>
                                             <button type="button"
                                                     class="btn btn-sm"
-                                                    style="background-color: #fc5a06; border-color: #fc5a06; color: white;"
+                                                    class="btn-flag-filter"
                                                     data-flag-color="#fc5a06"
                                                     data-onclick="window.WatchListsPage?.filterByFlag('#fc5a06')"
                                                     title="דגל Alert">
                                             </button>
                                             <button type="button"
                                                     class="btn btn-sm"
-                                                    style="background-color: #28a745; border-color: #28a745; color: white;"
+                                                    class="btn-flag-filter"
                                                     data-flag-color="#28a745"
                                                     data-onclick="window.WatchListsPage?.filterByFlag('#28a745')"
                                                     title="דגל Account">
@@ -902,7 +765,7 @@
                                                     <td>$150.25</td>
                                                     <td class="text-success">+1.42%</td>
                                                     <td>
-                                                        <img src="../images/icons/tabler/flag-filled.svg" width="14" height="14" alt="flag" class="icon" style="color: #26baac;">
+                                                        <img src="../images/icons/tabler/flag-filled.svg" width="14" height="14" alt="flag" class="icon" data-icon-color="#26baac">
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -912,7 +775,7 @@
                                                     <td>$110.50</td>
                                                     <td class="text-success">+0.75%</td>
                                                     <td>
-                                                        <img src="../images/icons/tabler/flag-filled.svg" width="14" height="14" alt="flag" class="icon" style="color: #26baac;">
+                                                        <img src="../images/icons/tabler/flag-filled.svg" width="14" height="14" alt="flag" class="icon" data-icon-color="#26baac">
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -933,8 +796,19 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Note: Full script loading will be added when implementing the actual page -->
-    <!-- For mockup purposes, scripts are not loaded -->
+    <!-- Core Systems (Must load first) -->
+    <script src="../scripts/logger-service.js?v=1.0.0"></script>
+    <script src="../scripts/button-icons.js?v=1.0.0"></script>
+
+    <!-- Package Manifest & Configs -->
+    <script src="../scripts/init-system/package-manifest.js?v=1.0.0"></script>
+    <script src="../scripts/page-initialization-configs.js?v=1.0.0"></script>
+
+    <!-- Unified Initialization System -->
+    <script src="../scripts/unified-app-initializer.js?v=1.0.0"></script>
+
+    <!-- Page-specific script -->
+    <script src="../scripts/watch-lists-page.js?v=1.0.0" defer></script>
 
 </body>
 </html>

@@ -17,6 +17,14 @@ class TradeService:
         
         logger.info("Loading trades with joinedload for account and ticker")
         
+        # Ensure transaction is in clean state before query
+        try:
+            from sqlalchemy import text
+            db.execute(text("SELECT 1"))
+        except Exception as tx_error:
+            logger.warning(f"Transaction aborted detected, rolling back: {str(tx_error)}")
+            db.rollback()
+        
         trades = db.query(Trade).options(
             joinedload(Trade.account),
             joinedload(Trade.ticker),

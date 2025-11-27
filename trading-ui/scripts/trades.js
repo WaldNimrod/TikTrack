@@ -1147,6 +1147,7 @@ async function updateTradesTable(trades) {
             }
             const result = window.createActionsMenu([
               { type: 'VIEW', onclick: `window.showEntityDetails('trade', ${trade.id}, { mode: 'view' })`, title: 'צפה בפרטים' },
+              { type: 'LINK', onclick: `viewLinkedItemsForTrade(${trade.id})`, title: 'פריטים מקושרים' },
               { type: 'EDIT', onclick: `editTradeRecord('${trade.id}')`, title: 'ערוך' },
               { type: 'CANCEL', onclick: `cancelTradeRecord('${trade.id}')`, title: 'בטל' },
               { type: 'DELETE', onclick: `deleteTradeRecord('${trade.id}')`, title: 'מחק' }
@@ -2038,7 +2039,7 @@ window.updateRadioButtons = updateRadioButtons;
 
 /**
  * Populate select element with data
- * Uses global populateSelect from select-populator-service.js if available
+ * Uses SelectPopulatorService.populateSelectWithData if available (for existing data)
  * Falls back to local implementation if service not available
  * 
  * @function populateSelect
@@ -2050,10 +2051,17 @@ window.updateRadioButtons = updateRadioButtons;
  */
 function populateSelect(selectId, data, field, prefix = '') {
   try {
-    // Use global populateSelect from select-populator-service.js if available
-    if (window.populateSelect && typeof window.populateSelect === 'function' && 
-        window.populateSelect.toString().includes('select-populator-service')) {
-      window.populateSelect(selectId, data, field, prefix);
+    // Use SelectPopulatorService.populateSelectWithData if available (for existing data, not from API)
+    if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateSelectWithData === 'function') {
+      window.SelectPopulatorService.populateSelectWithData(selectId, data, {
+        valueField: field,
+        textField: (item) => {
+          const value = item[field] || item.id || item.name || '';
+          return prefix ? `${prefix}: ${value}` : value;
+        },
+        includeEmpty: true,
+        emptyText: 'בחר אובייקט לשיוך...'
+      });
       return;
     }
 

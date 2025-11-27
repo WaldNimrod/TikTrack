@@ -435,3 +435,6 @@ function handleWatchListError(error, operation) {
 
 **סיכום:** שני השירותים מספקים API מלא לניהול Watch Lists ב-Frontend עם אינטגרציה מלאה לכל המערכות הקיימות.
 
+
+
+

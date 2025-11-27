@@ -697,27 +697,82 @@ class MenuManager {
       // Handle level 3 submenu hover
       const submenus = menu.querySelectorAll('.level3-submenu');
       submenus.forEach(submenu => {
-        // Position submenu to prevent overflow
-        const positionSubmenu = () => {
-          // Check if submenu is visible using computed style
-          const computedStyle = window.getComputedStyle(submenu);
-          if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden' || computedStyle.opacity === '0') {
+        let isPositioning = false;
+        let lastPosition = null;
+        let positionTimeout = null;
+        
+        // Position submenu to prevent overflow with debouncing
+        const positionSubmenu = (source = 'unknown') => {
+          // Prevent concurrent positioning calls
+          if (isPositioning) {
+            window.Logger?.debug?.('⏸️ Submenu positioning already in progress, skipping', { source, submenu: submenu.id || 'unnamed' });
             return;
           }
           
+          // Check if submenu is visible using computed style
+          const computedStyle = window.getComputedStyle(submenu);
+          if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden' || computedStyle.opacity === '0') {
+            window.Logger?.debug?.('👻 Submenu not visible, skipping position check', { source });
+            return;
+          }
+          
+          isPositioning = true;
+          window.Logger?.debug?.('🔍 Checking submenu position', { source, submenu: submenu.id || 'unnamed' });
+          
           // Wait for submenu to be fully rendered
           setTimeout(() => {
-            const submenuRect = submenu.getBoundingClientRect();
-            const viewportHeight = window.innerHeight;
-            const bottomSpace = viewportHeight - submenuRect.bottom;
-            
-            // אם התפריט גולש החוצה - ממקמים אותו מלמטה
-            if (bottomSpace < 10) {
-              submenu.classList.add('bottom-aligned');
-            } else {
-              submenu.classList.remove('bottom-aligned');
+            try {
+              const submenuRect = submenu.getBoundingClientRect();
+              const viewportHeight = window.innerHeight;
+              const bottomSpace = viewportHeight - submenuRect.bottom;
+              const needsBottomAlign = bottomSpace < 10;
+              
+              // Check if position has actually changed
+              const currentPosition = needsBottomAlign ? 'bottom' : 'top';
+              
+              if (lastPosition === currentPosition) {
+                window.Logger?.debug?.('✅ Submenu position unchanged, skipping update', { 
+                  position: currentPosition, 
+                  bottomSpace: bottomSpace.toFixed(1) 
+                });
+                isPositioning = false;
+                return;
+              }
+              
+              window.Logger?.info?.('📍 Updating submenu position', { 
+                from: lastPosition || 'initial',
+                to: currentPosition,
+                bottomSpace: bottomSpace.toFixed(1),
+                viewportHeight,
+                submenuBottom: submenuRect.bottom.toFixed(1)
+              });
+              
+              // Update position
+              if (needsBottomAlign) {
+                submenu.classList.add('bottom-aligned');
+                window.Logger?.debug?.('⬇️ Added bottom-aligned class');
+              } else {
+                submenu.classList.remove('bottom-aligned');
+                window.Logger?.debug?.('⬆️ Removed bottom-aligned class');
+              }
+              
+              lastPosition = currentPosition;
+            } catch (error) {
+              window.Logger?.error?.('❌ Error positioning submenu', { error: error.message });
+            } finally {
+              isPositioning = false;
             }
           }, 10);
+        };
+
+        // Debounced version for resize and observer
+        const debouncedPositionSubmenu = (source) => {
+          if (positionTimeout) {
+            clearTimeout(positionTimeout);
+          }
+          positionTimeout = setTimeout(() => {
+            positionSubmenu(source);
+          }, 100);
         };
 
         // Check position on hover - using MutationObserver to detect CSS changes
@@ -725,32 +780,58 @@ class MenuManager {
         if (parentSubmenu) {
           // Check position when parent is hovered
           parentSubmenu.addEventListener('mouseenter', () => {
-            setTimeout(positionSubmenu, 100);
+            lastPosition = null; // Reset position cache on new hover
+            setTimeout(() => positionSubmenu('mouseenter'), 100);
           });
           
           // Use MutationObserver to detect when submenu becomes visible
-          const observer = new MutationObserver(() => {
+          // But ignore changes we made ourselves (class changes)
+          let isOurChange = false;
+          const observer = new MutationObserver((mutations) => {
+            // Ignore if we're the ones making the change
+            if (isOurChange) {
+              isOurChange = false;
+              return;
+            }
+            
+            // Check if submenu became visible
             const computedStyle = window.getComputedStyle(submenu);
             if (computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden' && computedStyle.opacity !== '0') {
-              positionSubmenu();
+              debouncedPositionSubmenu('mutation-observer');
             }
           });
           
           observer.observe(submenu, {
             attributes: true,
-            attributeFilter: ['style', 'class']
+            attributeFilter: ['style', 'class'],
+            attributeOldValue: true
           });
           
-          // Also observe parent for hover state changes
-          observer.observe(parentSubmenu, {
-            attributes: true,
-            attributeFilter: ['class']
-          });
+          // Store observer for cleanup if needed
+          submenu._positionObserver = observer;
+          
+          // Intercept class changes to mark them as ours
+          const originalClassListAdd = submenu.classList.add.bind(submenu.classList);
+          const originalClassListRemove = submenu.classList.remove.bind(submenu.classList);
+          
+          submenu.classList.add = function(...args) {
+            if (args.includes('bottom-aligned')) {
+              isOurChange = true;
+            }
+            return originalClassListAdd(...args);
+          };
+          
+          submenu.classList.remove = function(...args) {
+            if (args.includes('bottom-aligned')) {
+              isOurChange = true;
+            }
+            return originalClassListRemove(...args);
+          };
         }
 
         submenu.addEventListener('mouseenter', () => {
           clearTimeouts();
-          positionSubmenu();
+          debouncedPositionSubmenu('submenu-mouseenter');
         });
 
         submenu.addEventListener('mouseleave', () => {
@@ -762,12 +843,17 @@ class MenuManager {
           }, 500);
         });
 
-        // Check position on window resize
+        // Check position on window resize (debounced)
+        let resizeTimeout;
         window.addEventListener('resize', () => {
-          const computedStyle = window.getComputedStyle(submenu);
-          if (computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden' && computedStyle.opacity !== '0') {
-            positionSubmenu();
-          }
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(() => {
+            const computedStyle = window.getComputedStyle(submenu);
+            if (computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden' && computedStyle.opacity !== '0') {
+              lastPosition = null; // Reset on resize
+              debouncedPositionSubmenu('window-resize');
+            }
+          }, 150);
         });
       });
     });

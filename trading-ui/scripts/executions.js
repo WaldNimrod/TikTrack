@@ -2655,8 +2655,7 @@ async function loadExecutionTickerInfo(tickerId) {
         }
       }
     } catch (error) {
-        window.Logger.warn('⚠️ Could not load default commission from preferences:', error, { page: "executions" });
-      }
+      window.Logger.warn('⚠️ Could not load default commission from preferences:', error, { page: "executions" });
     }
     
   } catch (error) {

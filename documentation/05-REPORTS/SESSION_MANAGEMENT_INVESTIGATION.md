@@ -2,7 +2,7 @@
 
 **תאריך:** 27 בנובמבר 2025  
 **בעיה:** Query דרך השרת מחזיר רק 1 רשומה במקום 120  
-**סטטוס:** בחקירה
+**סטטוס:** בחקירה פעילה
 
 ---
 
@@ -12,103 +12,162 @@
 - ✅ יש **120 תוכניות** ב-DB (`Backend/db/tiktrack.db`)
 - ✅ דרך **Flask context ישירות** יש 120
 - ❌ דרך **השרת בפועל** רק **1** מוחזר
-- ❌ הלוגים מראים: "Total trade plans in DB (count): 1"
+- ⚠️ אפילו לאחר תיקון הקוד, השרת מחזיר 1
 
 ### ההשערה
-בעיית **session/transaction reuse** שגורמת ל-stale data או transaction aborted state
+בעיית **session/transaction reuse** או **connection pooling** שגורמת ל-stale data או connection ל-DB אחר
 
 ---
 
-## שלב 1: מיפוי מלא של Session Lifecycle
+## ממצאים קריטיים
 
-### 1.1 בדיקת Session Creation
+### ממצא #1: קוד ישן רץ בשרת - **נפתר**
 
-**שאלה:** איך נוצר session?
-**קובץ:** `Backend/config/database.py`
+**תאריך:** 27 בנובמבר 2025 17:35
 
-```python
-def get_db() -> Generator[Session, None, None]:
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-```
+**הבעיה:**
+- השרת רץ על קוד ישן (התחיל ב-17:22, הקוד עודכן ב-17:34)
+- הלוגים הראו הודעות מהקוד הישן
 
-**ממצאים:**
-- Session נוצר חדש בכל קריאה ל-`get_db()`
-- Session נסגר ב-`finally`
+**הפתרון:**
+- ✅ הרגנו את כל ה-processes הישנים
+- ✅ הפעלנו שרת חדש עם הקוד המעודכן
 
-**בדיקה:**
-- [ ] האם session באמת נסגר?
-- [ ] האם יש session reuse?
-- [ ] האם יש connection pooling שמשפיע?
+**תוצאה:**
+- ✅ השרת כעת רץ על הקוד החדש (מראה "Direct SQL COUNT")
+- ❌ אבל עדיין מחזיר רק 1 רשומה!
 
-### 1.2 בדיקת Connection Pooling
+### ממצא #2: השאילתה SQL מחזירה 1 דרך השרת
 
-**שאלה:** איך עובד connection pooling?
-**קובץ:** `Backend/config/database.py`
+**תאריך:** 27 בנובמבר 2025 17:37
 
-```python
-engine = create_engine(DATABASE_URL, **_build_engine_kwargs())
-```
+**הבעיה:**
+- הלוגים מראים: `"Direct SQL COUNT: 1 plans in database"`
+- זה אומר שהשאילתה SQL **עצמה** מחזירה רק 1
+- אבל בדיקה ישירה ב-DB מראה 120
 
-**ממצאים:**
-- `pool_size`: 10
-- `max_overflow`: 20
-- `pool_recycle`: 3600
-- `pool_pre_ping`: True
+**השערות:**
+1. השרת מחובר ל-DB אחר
+2. יש בעיית connection pooling עם stale connection
+3. יש transaction isolation שגורם לראות נתונים ישנים
 
-**בדיקה:**
-- [ ] כמה connections פעילים?
+---
+
+## שלב 1: בדיקות שנערכו
+
+### 1.1 בדיקת ישירה ב-DB
+- ✅ יש 120 תוכניות ב-`Backend/db/tiktrack.db`
+- ✅ בדיקה ישירה דרך SQLite מראה 120
+
+### 1.2 בדיקת דרך Flask Context
+- ✅ דרך Flask context ישירות יש 120
+- ✅ דרך Service בסימולציה יש 120
+
+### 1.3 בדיקת דרך השרת
+- ❌ דרך השרת רק 1
+- ❌ השאילתה SQL דרך השרת מחזירה 1
+
+---
+
+## שלב 2: בדיקות נדרשות
+
+### 2.1 בדיקת DATABASE_URL
+- [ ] מה ה-DATABASE_URL של השרת?
+- [ ] האם השרת מחובר ל-DB הנכון?
+- [ ] האם יש כמה DB files?
+
+### 2.2 בדיקת Connection Pooling
+- [ ] מה ה-path של ה-DB דרך connection pool?
 - [ ] האם יש stale connections?
 - [ ] האם pool_pre_ping עובד?
 
-### 1.3 בדיקת Transaction States
-
-**שאלה:** מה המצב של transactions?
-**קובץ:** `Backend/routes/api/base_entity_decorators.py`
-
-**ממצאים:**
-- יש rollback check ב-`handle_database_session`
-- יש rollback check ב-services
-
-**בדיקה:**
-- [ ] מה המצב של transaction לפני query?
-- [ ] האם יש transaction aborted?
-- [ ] האם rollback באמת עובד?
+### 2.3 בדיקת Transaction Isolation
+- [ ] מה ה-isolation level?
+- [ ] האם יש uncommitted transactions?
+- [ ] האם יש transaction aborted state?
 
 ---
 
-## שלב 2: ניטור בזמן אמת
+## שלב 3: ניטור בזמן אמת
 
-### 2.1 Session Tracking
+### 3.1 Session Tracking
+- [ ] Tracking של session identity
+- [ ] Tracking של connection identity
+- [ ] Tracking של query results
 
-### 2.2 Transaction State Tracking
-
-### 2.3 Query Execution Tracking
-
----
-
-## שלב 3: בדיקות ממוקדות
-
-### 3.1 בדיקת Session Identity
-
-### 3.2 בדיקת Transaction Isolation
-
-### 3.3 בדיקת Stale Data
+### 3.2 Connection Tracking
+- [ ] Tracking של database path
+- [ ] Tracking של connection reuse
+- [ ] Tracking של pool state
 
 ---
 
-## שלב 4: מסקנות והמלצות
+## שלב 4: מסקנות זמניות
 
-### 4.1 גורם שורש זוהה
-
-### 4.2 פתרון מוצע
-
-### 4.3 צעדי מניעה
+1. ✅ ב-DB יש 120 תוכניות (אומת)
+2. ✅ דרך Flask ישירות יש 120
+3. ❌ דרך השרת רק 1
+4. ❌ השאילתה SQL דרך השרת מחזירה 1
+5. ⚠️ **השערה:** השרת מחובר ל-DB אחר או יש בעיית connection
 
 ---
 
-**עודכן:** 27 בנובמבר 2025 - בתחילת החקירה
+## צעדים הבאים
 
+### מיידי
+1. ✅ בדיקת DATABASE_URL של השרת
+2. ✅ בדיקת כל ה-DB files
+3. 🔄 בדיקת database path דרך connection pool
+
+### קצר טווח
+1. הוספת logging מפורט ל-connection creation
+2. הוספת tracking ל-database path בכל query
+3. בדיקת connection pool state
+
+### ארוך טווח
+1. שיפור session management
+2. הוספת connection validation
+3. הוספת monitoring ל-DB connections
+
+---
+
+---
+
+## ממצא קריטי - דרך Flask ישירות יש 120!
+
+**תאריך:** 27 בנובמבר 2025 17:42
+
+**הממצא:**
+- ✅ דרך Flask context ישירות יש 120 תוכניות
+- ✅ השרת מחובר ל-DB הנכון (`Backend/db/tiktrack.db`)
+- ❌ דרך השרת בפועל רק 1 תוכנית
+
+**מסקנה:**
+הבעיה היא **רק כשהשרת רץ בפועל**, לא בקוד עצמו. זה מצביע על:
+- בעיית session reuse בשרת
+- בעיית transaction isolation
+- בעיית query caching או stale data
+
+---
+
+## סיכום הממצאים
+
+### מה שכן עובד:
+1. ✅ יש 120 תוכניות ב-DB
+2. ✅ דרך Flask context ישירות יש 120
+3. ✅ השרת מחובר ל-DB הנכון
+4. ✅ הקוד מעודכן ורץ
+
+### מה שלא עובד:
+1. ❌ דרך השרת רק 1 תוכנית
+2. ❌ השאילתה SQL דרך השרת מחזירה 1
+
+### השערות לבדיקה:
+1. **Session reuse** - session שומר stale data
+2. **Transaction isolation** - transaction רואה נתונים ישנים
+3. **Query caching** - query results cached
+4. **Connection pooling** - stale connection
+
+---
+
+**עודכן:** 27 בנובמבר 2025 17:42 - דרך Flask ישירות יש 120, דרך השרת רק 1

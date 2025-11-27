@@ -722,36 +722,75 @@ class MenuManager {
           // Wait for submenu to be fully rendered
           setTimeout(() => {
             try {
+              // Get current state BEFORE making any changes
+              const hasBottomAligned = submenu.classList.contains('bottom-aligned');
               const submenuRect = submenu.getBoundingClientRect();
               const viewportHeight = window.innerHeight;
-              const bottomSpace = viewportHeight - submenuRect.bottom;
-              const needsBottomAlign = bottomSpace < 10;
+              
+              // Calculate position based on CURRENT state (before change)
+              // If already bottom-aligned, we need to check what it would be in top position
+              // If in top position, check current bottom space
+              let bottomSpace;
+              let needsBottomAlign;
+              
+              if (hasBottomAligned) {
+                // Currently bottom-aligned - check what it would be in top position
+                // We need to temporarily remove the class to measure
+                submenu.classList.remove('bottom-aligned');
+                // Force reflow
+                void submenu.offsetHeight;
+                const topRect = submenu.getBoundingClientRect();
+                bottomSpace = viewportHeight - topRect.bottom;
+                // Restore original state
+                submenu.classList.add('bottom-aligned');
+                void submenu.offsetHeight;
+                
+                // If in top position it would overflow, keep bottom-aligned
+                needsBottomAlign = bottomSpace < 10;
+                window.Logger?.debug?.('🔍 Currently bottom-aligned, checking top position', {
+                  topPositionBottom: topRect.bottom.toFixed(1),
+                  topPositionBottomSpace: bottomSpace.toFixed(1)
+                });
+              } else {
+                // Currently in top position - check current bottom space
+                bottomSpace = viewportHeight - submenuRect.bottom;
+                needsBottomAlign = bottomSpace < 10;
+                window.Logger?.debug?.('🔍 Currently in top position', {
+                  currentBottom: submenuRect.bottom.toFixed(1),
+                  bottomSpace: bottomSpace.toFixed(1)
+                });
+              }
               
               // Check if position has actually changed
               const currentPosition = needsBottomAlign ? 'bottom' : 'top';
+              const wasBottomAligned = hasBottomAligned;
               
-              if (lastPosition === currentPosition) {
+              if (lastPosition === currentPosition && wasBottomAligned === needsBottomAlign) {
                 window.Logger?.debug?.('✅ Submenu position unchanged, skipping update', { 
                   position: currentPosition, 
-                  bottomSpace: bottomSpace.toFixed(1) 
+                  bottomSpace: bottomSpace.toFixed(1),
+                  wasBottomAligned,
+                  needsBottomAlign
                 });
                 isPositioning = false;
                 return;
               }
               
               window.Logger?.info?.('📍 Updating submenu position', { 
-                from: lastPosition || 'initial',
+                from: lastPosition || (wasBottomAligned ? 'bottom' : 'top'),
                 to: currentPosition,
                 bottomSpace: bottomSpace.toFixed(1),
                 viewportHeight,
-                submenuBottom: submenuRect.bottom.toFixed(1)
+                currentBottom: submenuRect.bottom.toFixed(1),
+                wasBottomAligned,
+                needsBottomAlign
               });
               
               // Update position
-              if (needsBottomAlign) {
+              if (needsBottomAlign && !wasBottomAligned) {
                 submenu.classList.add('bottom-aligned');
                 window.Logger?.debug?.('⬇️ Added bottom-aligned class');
-              } else {
+              } else if (!needsBottomAlign && wasBottomAligned) {
                 submenu.classList.remove('bottom-aligned');
                 window.Logger?.debug?.('⬆️ Removed bottom-aligned class');
               }

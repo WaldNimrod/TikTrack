@@ -19,7 +19,7 @@ from sqlalchemy.pool import QueuePool
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from config.settings import DATABASE_URL, USING_SQLITE
+from config.settings import DATABASE_URL
 from models.cash_flow import CashFlow
 from models.currency import Currency
 
@@ -33,8 +33,7 @@ def _build_engine_kwargs():
         "pool_pre_ping": True,
         "echo": False,
     }
-    if USING_SQLITE:
-        kwargs["connect_args"] = {"check_same_thread": False}
+    # PostgreSQL only - no SQLite support
     return kwargs
 
 def analyze_classification_logic():

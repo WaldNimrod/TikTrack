@@ -1359,8 +1359,6 @@ class YahooFinanceAdapter:
             
             from models.quotes_last import QuotesLast
             from sqlalchemy.dialects.postgresql import insert
-            from config.settings import USING_SQLITE
-
             asof_utc = quote.asof_utc
             if asof_utc is None:
                 asof_utc = datetime.now(timezone.utc)
@@ -1387,29 +1385,13 @@ class YahooFinanceAdapter:
                 "quality_score": 1.0,
             }
 
-            # Use upsert logic - compatible with both SQLite and PostgreSQL
-            if USING_SQLITE:
-                # SQLite: Use INSERT OR REPLACE
-                existing = self.db_session.query(QuotesLast).filter(
-                    QuotesLast.ticker_id == ticker_id
-                ).first()
-                
-                if existing:
-                    # Update existing record
-                    for key, value in quote_data.items():
-                        setattr(existing, key, value)
-                else:
-                    # Create new record
-                    new_quote = QuotesLast(**quote_data)
-                    self.db_session.add(new_quote)
-            else:
-                # PostgreSQL: Use ON CONFLICT
-                stmt = insert(QuotesLast).values(**quote_data)
-                stmt = stmt.on_conflict_do_update(
-                    index_elements=['ticker_id'],
-                    set_=quote_data
-                )
-                self.db_session.execute(stmt)
+            # PostgreSQL: Use ON CONFLICT for upsert
+            stmt = insert(QuotesLast).values(**quote_data)
+            stmt = stmt.on_conflict_do_update(
+                index_elements=['ticker_id'],
+                set_=quote_data
+            )
+            self.db_session.execute(stmt)
             
             self.db_session.commit()
             logger.debug(f"✅ Updated quotes_last for ticker {ticker_id}")

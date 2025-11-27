@@ -37,139 +37,48 @@ def column_exists_postgres(engine, table: str, column: str) -> bool:
 
 
 def add_open_price_fields():
-    """Add open price fields to market_data_quotes table."""
+    """Add open price fields to market_data_quotes table (PostgreSQL only)."""
     
-    if USE_SQLALCHEMY:
-        # Check if using SQLite or PostgreSQL
-        is_sqlite = USING_SQLITE if 'USING_SQLITE' in globals() else DATABASE_URL.startswith('sqlite')
-        engine = create_engine(DATABASE_URL)
-        
-        if is_sqlite:
-            print(f"➡️  Using database: SQLite")
-            db_path = DATABASE_URL.replace('sqlite:///', '')
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            
-            try:
-                table = 'market_data_quotes'
-                
-                # Check and add open_price column
-                if column_exists_sqlite(cursor, table, 'open_price'):
-                    print("✅ Column 'open_price' already exists - skipping.")
-                else:
-                    print("➕ Adding 'open_price' column (FLOAT NULL)...")
-                    cursor.execute("ALTER TABLE market_data_quotes ADD COLUMN open_price FLOAT NULL;")
-                    print("✅ Column 'open_price' added successfully.")
-                
-                # Check and add change_pct_from_open column
-                if column_exists_sqlite(cursor, table, 'change_pct_from_open'):
-                    print("✅ Column 'change_pct_from_open' already exists - skipping.")
-                else:
-                    print("➕ Adding 'change_pct_from_open' column (FLOAT NULL)...")
-                    cursor.execute("ALTER TABLE market_data_quotes ADD COLUMN change_pct_from_open FLOAT NULL;")
-                    print("✅ Column 'change_pct_from_open' added successfully.")
-                
-                # Check and add change_amount_from_open column
-                if column_exists_sqlite(cursor, table, 'change_amount_from_open'):
-                    print("✅ Column 'change_amount_from_open' already exists - skipping.")
-                else:
-                    print("➕ Adding 'change_amount_from_open' column (FLOAT NULL)...")
-                    cursor.execute("ALTER TABLE market_data_quotes ADD COLUMN change_amount_from_open FLOAT NULL;")
-                    print("✅ Column 'change_amount_from_open' added successfully.")
-                
-                conn.commit()
-                print("🎉 Migration completed successfully.")
-                conn.close()
-                
-            except Exception as error:
-                conn.rollback()
-                conn.close()
-                print(f"❌ Database error: {error}")
-                raise
-        else:
-            # PostgreSQL path
-            print(f"➡️  Using database: PostgreSQL")
-            
-            with engine.connect() as conn:
-                trans = conn.begin()
-                try:
-                    table = 'market_data_quotes'
-                    
-                    # Check and add open_price column
-                    if column_exists_postgres(engine, table, 'open_price'):
-                        print("✅ Column 'open_price' already exists - skipping.")
-                    else:
-                        print("➕ Adding 'open_price' column (FLOAT NULL)...")
-                        conn.execute(text("ALTER TABLE market_data_quotes ADD COLUMN open_price FLOAT NULL;"))
-                        print("✅ Column 'open_price' added successfully.")
-                    
-                    # Check and add change_pct_from_open column
-                    if column_exists_postgres(engine, table, 'change_pct_from_open'):
-                        print("✅ Column 'change_pct_from_open' already exists - skipping.")
-                    else:
-                        print("➕ Adding 'change_pct_from_open' column (FLOAT NULL)...")
-                        conn.execute(text("ALTER TABLE market_data_quotes ADD COLUMN change_pct_from_open FLOAT NULL;"))
-                        print("✅ Column 'change_pct_from_open' added successfully.")
-                    
-                    # Check and add change_amount_from_open column
-                    if column_exists_postgres(engine, table, 'change_amount_from_open'):
-                        print("✅ Column 'change_amount_from_open' already exists - skipping.")
-                    else:
-                        print("➕ Adding 'change_amount_from_open' column (FLOAT NULL)...")
-                        conn.execute(text("ALTER TABLE market_data_quotes ADD COLUMN change_amount_from_open FLOAT NULL;"))
-                        print("✅ Column 'change_amount_from_open' added successfully.")
-                    
-                    trans.commit()
-                    print("🎉 Migration completed successfully.")
-                    
-                except Exception as error:
-                    trans.rollback()
-                    print(f"❌ Database error: {error}")
-                    raise
-    else:
-        # SQLite path (fallback)
-        db_path = get_db_path()
-        print(f"➡️  Using database: {db_path}")
-        
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
-        
+    # PostgreSQL only - SQLite is no longer supported
+    print(f"➡️  Using database: PostgreSQL")
+    engine = create_engine(DATABASE_URL)
+    
+    with engine.connect() as conn:
+        trans = conn.begin()
         try:
             table = 'market_data_quotes'
             
             # Check and add open_price column
-            if column_exists_sqlite(cursor, table, 'open_price'):
+            if column_exists_postgres(engine, table, 'open_price'):
                 print("✅ Column 'open_price' already exists - skipping.")
             else:
                 print("➕ Adding 'open_price' column (FLOAT NULL)...")
-                cursor.execute("ALTER TABLE market_data_quotes ADD COLUMN open_price FLOAT NULL;")
+                conn.execute(text("ALTER TABLE market_data_quotes ADD COLUMN open_price FLOAT NULL;"))
                 print("✅ Column 'open_price' added successfully.")
             
             # Check and add change_pct_from_open column
-            if column_exists_sqlite(cursor, table, 'change_pct_from_open'):
+            if column_exists_postgres(engine, table, 'change_pct_from_open'):
                 print("✅ Column 'change_pct_from_open' already exists - skipping.")
             else:
                 print("➕ Adding 'change_pct_from_open' column (FLOAT NULL)...")
-                cursor.execute("ALTER TABLE market_data_quotes ADD COLUMN change_pct_from_open FLOAT NULL;")
+                conn.execute(text("ALTER TABLE market_data_quotes ADD COLUMN change_pct_from_open FLOAT NULL;"))
                 print("✅ Column 'change_pct_from_open' added successfully.")
             
             # Check and add change_amount_from_open column
-            if column_exists_sqlite(cursor, table, 'change_amount_from_open'):
+            if column_exists_postgres(engine, table, 'change_amount_from_open'):
                 print("✅ Column 'change_amount_from_open' already exists - skipping.")
             else:
                 print("➕ Adding 'change_amount_from_open' column (FLOAT NULL)...")
-                cursor.execute("ALTER TABLE market_data_quotes ADD COLUMN change_amount_from_open FLOAT NULL;")
+                conn.execute(text("ALTER TABLE market_data_quotes ADD COLUMN change_amount_from_open FLOAT NULL;"))
                 print("✅ Column 'change_amount_from_open' added successfully.")
             
-            conn.commit()
+            trans.commit()
             print("🎉 Migration completed successfully.")
             
-        except sqlite3.Error as error:
-            print(f"❌ SQLite error: {error}")
-            conn.rollback()
+        except Exception as error:
+            trans.rollback()
+            print(f"❌ Database error: {error}")
             raise
-        finally:
-            conn.close()
 
 
 if __name__ == "__main__":

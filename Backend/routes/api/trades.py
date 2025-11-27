@@ -138,10 +138,8 @@ def get_trades():
         except Exception as _e:
             raw_count = None
         logger.info(
-            "Trades API debug: DATABASE_URL=%s, USING_SQLITE=%s, DB_PATH=%s, trades_count=%s",
+            "Trades API debug: DATABASE_URL=%s, trades_count=%s",
             getattr(settings, "DATABASE_URL", None),
-            getattr(settings, "USING_SQLITE", None),
-            getattr(settings, "DB_PATH", None),
             raw_count,
         )
         normalizer = _get_date_normalizer()

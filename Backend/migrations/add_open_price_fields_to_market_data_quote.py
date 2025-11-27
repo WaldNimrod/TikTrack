@@ -17,33 +17,12 @@ Date: January 2025
 import os
 import sys
 from datetime import datetime
-import sqlite3
 
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-try:
-    from sqlalchemy import create_engine, text
-    from config.settings import DATABASE_URL, USING_SQLITE
-    USE_SQLALCHEMY = True
-except ImportError:
-    USE_SQLALCHEMY = False
-    USING_SQLITE = True
-    # Fallback to direct database connection
-    DB_RELATIVE_PATH = os.path.join('..', 'db', 'tiktrack.db')
-
-
-def get_db_path() -> str:
-    """Return absolute path to the SQLite database file (if using SQLite)."""
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(current_dir, DB_RELATIVE_PATH)
-
-
-def column_exists_sqlite(cursor, table: str, column: str) -> bool:
-    """Check whether a specific column exists in a table (SQLite)."""
-    cursor.execute(f"PRAGMA table_info({table});")
-    columns = cursor.fetchall()
-    return any(col[1] == column for col in columns)
+from sqlalchemy import create_engine, text
+from config.settings import DATABASE_URL
 
 
 def column_exists_postgres(engine, table: str, column: str) -> bool:

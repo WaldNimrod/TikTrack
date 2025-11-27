@@ -3,14 +3,15 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import QueuePool
 from typing import Dict, Generator
 
-from .settings import DATABASE_URL, USING_SQLITE
+from .settings import DATABASE_URL
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 def _build_engine_kwargs() -> Dict:
-    kwargs: Dict = {
+    """Build SQLAlchemy engine kwargs for PostgreSQL"""
+    return {
         "poolclass": QueuePool,
         "pool_size": 10,
         "max_overflow": 20,
@@ -19,10 +20,6 @@ def _build_engine_kwargs() -> Dict:
         "pool_pre_ping": True,
         "echo": False,
     }
-
-    if USING_SQLITE:
-        kwargs["connect_args"] = {"check_same_thread": False}
-    return kwargs
 
 
 engine = create_engine(DATABASE_URL, **_build_engine_kwargs())
@@ -44,7 +41,7 @@ def init_db() -> None:
     """יצירת כל הטבלאות"""
     from models.base import Base
     from models import ticker, trade, trading_account, trade_plan, alert, cash_flow, note, execution, currency, note_relation_type, user, preferences
-    # SQLite and PostgreSQL do not allow subqueries in CHECK constraints; strip problematic ones
+    # PostgreSQL does not allow subqueries in CHECK constraints; strip problematic ones
     # These constraints will be implemented as triggers instead
     try:
         from sqlalchemy import CheckConstraint

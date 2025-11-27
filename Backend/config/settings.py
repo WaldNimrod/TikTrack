@@ -9,31 +9,47 @@ IS_PRODUCTION = ENVIRONMENT == "production"
 BASE_DIR = Path(__file__).parent.parent
 UI_DIR = BASE_DIR.parent / "trading-ui"
 
-# SQLite information (development default)
+# Legacy DB_PATH constant for backwards compatibility (deprecated - not used with PostgreSQL)
 DB_DIR = BASE_DIR / "db"
-# Standardize on tiktrack.db (legacy simpleTrade_new.db kept only for archives/migrations)
-STANDARD_DB_FILENAME = "tiktrack.db"
-STANDARD_DB_PATH = DB_DIR / STANDARD_DB_FILENAME
-# Backwards compatibility constant used by legacy imports (app.py, tests, scripts)
-DB_PATH = STANDARD_DB_PATH
+DB_PATH = DB_DIR / "tiktrack.db"  # Deprecated - kept for backward compatibility only
 
-# Database source selection
+# PostgreSQL database configuration (required - no SQLite support)
 POSTGRES_HOST = os.getenv("POSTGRES_HOST")
 POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
-POSTGRES_DB = os.getenv("POSTGRES_DB", "tiktrack_dev")
-POSTGRES_USER = os.getenv("POSTGRES_USER", "tiktrack")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "tiktrack_dev_password")
+POSTGRES_DB = os.getenv("POSTGRES_DB", "TikTrack-db-development")
+POSTGRES_USER = os.getenv("POSTGRES_USER", "TikTrakDBAdmin")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "BigMeZoo1974!?")
 
+# Build PostgreSQL DATABASE_URL (required - no SQLite fallback)
 if POSTGRES_HOST:
     DEFAULT_DATABASE_URL = (
         f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}"
         f"@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
     )
 else:
-    DEFAULT_DATABASE_URL = f"sqlite:///{STANDARD_DB_PATH}"
+    # PostgreSQL is required - no fallback to SQLite
+    # This will raise an error when DATABASE_URL is accessed if POSTGRES_HOST is not set
+    DEFAULT_DATABASE_URL = None
 
 DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
-USING_SQLITE = DATABASE_URL.startswith("sqlite")
+
+# Validate DATABASE_URL - PostgreSQL is required
+if not DATABASE_URL:
+    raise ValueError(
+        "DATABASE_URL is not configured. "
+        "POSTGRES_HOST environment variable is required. "
+        "SQLite is no longer supported. "
+        "Please set PostgreSQL environment variables or use start_server.sh which sets them automatically."
+    )
+
+if not DATABASE_URL.startswith("postgresql"):
+    raise ValueError(
+        f"Invalid DATABASE_URL: {DATABASE_URL}. "
+        "Only PostgreSQL is supported. SQLite is no longer supported."
+    )
+
+# Legacy constant for backwards compatibility (always False)
+USING_SQLITE = False
 
 # Flask settings
 DEBUG = False

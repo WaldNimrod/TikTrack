@@ -39,7 +39,7 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 # Add Backend to path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from config.settings import DATABASE_URL, USING_SQLITE
+from config.settings import DATABASE_URL
 from models.ticker import Ticker
 from models.trading_account import TradingAccount
 from models.trade_plan import TradePlan
@@ -1213,8 +1213,7 @@ def _build_engine_kwargs():
         "pool_pre_ping": True,
         "echo": False,
     }
-    if USING_SQLITE:
-        kwargs["connect_args"] = {"check_same_thread": False}
+    # PostgreSQL only - no SQLite support
     return kwargs
 
 

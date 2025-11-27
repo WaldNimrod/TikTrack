@@ -170,4 +170,31 @@
 
 ---
 
-**עודכן:** 27 בנובמבר 2025 17:42 - דרך Flask ישירות יש 120, דרך השרת רק 1
+---
+
+## ממצא קריטי - זוהה שורש הבעיה!
+
+**תאריך:** 27 בנובמבר 2025 17:45
+
+**הממצא:**
+- ✅ השרת התחבר ל-**SQLite** (`Backend/db/tiktrack.db`) במקום PostgreSQL!
+- ✅ ב-SQLite יש רק **1 תוכנית**
+- ✅ ב-PostgreSQL יש **120 תוכניות**
+
+**הסיבה:**
+- `Backend/config/settings.py` היה מגדיר fallback ל-SQLite אם אין `POSTGRES_HOST`
+- השרת רץ ללא `POSTGRES_HOST` מוגדר
+- לכן התחבר ל-SQLite במקום PostgreSQL
+
+**התיקון:**
+- ✅ הסרת כל תמיכה ב-SQLite מ-`settings.py`
+- ✅ PostgreSQL הוא כעת **חובה** - אין fallback
+- ✅ עדכון `database.py` להסרת תמיכה ב-SQLite
+
+**תוצאה:**
+- ✅ השרת כעת **חייב** להתחבר ל-PostgreSQL
+- ✅ לא יכול יותר להתחבר ל-SQLite
+
+---
+
+**עודכן:** 27 בנובמבר 2025 17:45 - **זוהה שורש הבעיה - SQLite fallback!**

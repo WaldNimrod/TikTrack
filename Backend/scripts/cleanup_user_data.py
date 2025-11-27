@@ -51,7 +51,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
-from config.settings import DATABASE_URL, USING_SQLITE
+from config.settings import DATABASE_URL
 from models.ticker import Ticker
 from models.user import User
 from models.preferences import PreferenceProfile
@@ -694,10 +694,8 @@ class UserDataCleanup:
     def _count_table(self, table_name: str, table_exists: bool = False) -> int:
         """סופר רשומות בטבלה"""
         try:
-            if USING_SQLITE:
-                result = self.db.execute(text(f"SELECT COUNT(*) FROM {table_name}"))
-            else:
-                result = self.db.execute(text(f'SELECT COUNT(*) FROM "{table_name}"'))
+            # PostgreSQL uses quoted table names
+            result = self.db.execute(text(f'SELECT COUNT(*) FROM "{table_name}"'))
             return result.scalar() or 0
         except Exception as e:
             if table_exists:
@@ -724,8 +722,8 @@ class UserDataCleanup:
 # ============================================================================
 
 def _build_engine_kwargs():
-    """בונה פרמטרים ל-engine"""
-    kwargs = {
+    """בונה פרמטרים ל-engine עבור PostgreSQL"""
+    return {
         "poolclass": QueuePool,
         "pool_size": 10,
         "max_overflow": 20,
@@ -734,9 +732,6 @@ def _build_engine_kwargs():
         "pool_pre_ping": True,
         "echo": False,
     }
-    if USING_SQLITE:
-        kwargs["connect_args"] = {"check_same_thread": False}
-    return kwargs
 
 
 def main():

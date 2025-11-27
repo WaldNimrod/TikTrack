@@ -1074,14 +1074,6 @@ function renderNotesTableRows(notes, additionalData = {}) {
         }
     }).join('');
 }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בעדכון טבלת הערות:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בעדכון טבלת הערות', error.message);
-    }
-  }
-}
 
 // פונקציה לעדכון סיכום הערות
 /**
@@ -2556,7 +2548,7 @@ function getTypeDisplayName(type) {
  * @returns {void}
  * @since 2.1.0 - Updated to use ModalManagerV2 for modal management when available
  */
-function viewNote(noteId) {
+async function viewNote(noteId) {
   try {
     // צפייה בפרטי הערה באמצעות מודל פרטי ישות הגלובלי
     if (typeof window.showEntityDetails === 'function') {

@@ -34,24 +34,34 @@ class TradePlanService:
         # Clear any stale data in session
         db.expire_all()
         
-        # Main query - try without joinedload first to see if that's the issue
+        # Main query with joinedload - use fresh query
+        # First do a direct SQL count to verify data exists
+        from sqlalchemy import text
         try:
-            # Simple query first
-            simple_count = db.query(TradePlan).count()
-            logger.info(f"Simple count query returned: {simple_count} plans")
-            
-            # Now with joinedload
-            plans = db.query(TradePlan).options(
-                joinedload(TradePlan.ticker),
-                joinedload(TradePlan.account)
-            ).all()
-            logger.info(f"Loaded {len(plans)} trade plans with joinedload")
-        except Exception as query_error:
-            logger.error(f"Query failed: {str(query_error)}")
-            # Try again after rollback
-            db.rollback()
-            plans = db.query(TradePlan).all()
-            logger.info(f"Loaded {len(plans)} trade plans without joinedload (fallback)")
+            sql_count = db.execute(text("SELECT COUNT(*) FROM trade_plans")).scalar()
+            logger.info(f"Direct SQL COUNT: {sql_count} plans in database")
+        except Exception as sql_error:
+            logger.error(f"Direct SQL count failed: {str(sql_error)}")
+            sql_count = None
+        
+        # Now use ORM query
+        plans = db.query(TradePlan).options(
+            joinedload(TradePlan.ticker),
+            joinedload(TradePlan.account)
+        ).all()
+        logger.info(f"Loaded {len(plans)} trade plans with joinedload")
+        
+        # Verify count matches
+        if sql_count is not None and len(plans) != sql_count:
+            logger.warning(f"⚠️ Mismatch: SQL count={sql_count}, ORM count={len(plans)}")
+            # Force reload without joinedload as fallback
+            db.expire_all()
+            plans_fallback = db.query(TradePlan).all()
+            logger.info(f"Reloaded {len(plans_fallback)} trade plans without joinedload")
+            if len(plans_fallback) == sql_count:
+                # Use fallback result
+                plans = plans_fallback
+                logger.info(f"Using fallback result with {len(plans)} plans")
         if plans:
             logger.info(f"First plan ticker: {plans[0].ticker}")
             logger.info(f"First plan account: {plans[0].account}")

@@ -263,11 +263,13 @@
     top: 0;
     right: 100%; /* ב-RTL התפריט מופיע משמאל (ימין במסך) - צמוד ללא רווח */
     left: auto;
+    bottom: auto;
     background: white;
     border: 1px solid #e5e5e5;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     min-width: 180px;
+    max-height: calc(100vh - 20px); /* מקסימום גובה - לא יותר מגובה המסך */
     padding: 0.5rem 0;
     display: none;
     z-index: 952; /* מעל תפריט רמה 2 */
@@ -276,6 +278,14 @@
     visibility: hidden;
     transform: translateX(10px); /* ב-RTL תזוזה שמאלה (ימינה במסך) */
     transition: all 0.3s ease;
+    overflow-y: auto; /* גלילה אם התוכן ארוך */
+    overflow-x: hidden;
+}
+
+/* אם התפריט מתחיל נמוך מדי - ממקמים אותו מלמטה */
+#unified-header .level3-submenu.bottom-aligned {
+    top: auto;
+    bottom: 0;
 }
 
 #unified-header .dropdown-submenu:hover .level3-submenu {

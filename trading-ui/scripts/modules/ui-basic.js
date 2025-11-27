@@ -762,7 +762,7 @@ window.toggleSection = async function (sectionId) {
       if (accordionMode) {
         // Close all other sections first
         const allContentSections = document.querySelectorAll('.content-section');
-        allContentSections.forEach(otherSection => {
+        for (const otherSection of allContentSections) {
           if (otherSection !== section) {
             const otherSectionBody = otherSection.querySelector('.section-body');
             const otherIcon = otherSection.querySelector('.section-toggle-icon');
@@ -783,7 +783,7 @@ window.toggleSection = async function (sectionId) {
               }
             }
           }
-        });
+        }
       }
       
       // Remove d-flex/d-block classes that might interfere and set display

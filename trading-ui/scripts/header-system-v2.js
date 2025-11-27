@@ -697,8 +697,60 @@ class MenuManager {
       // Handle level 3 submenu hover
       const submenus = menu.querySelectorAll('.level3-submenu');
       submenus.forEach(submenu => {
+        // Position submenu to prevent overflow
+        const positionSubmenu = () => {
+          // Check if submenu is visible using computed style
+          const computedStyle = window.getComputedStyle(submenu);
+          if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden' || computedStyle.opacity === '0') {
+            return;
+          }
+          
+          // Wait for submenu to be fully rendered
+          setTimeout(() => {
+            const submenuRect = submenu.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            const bottomSpace = viewportHeight - submenuRect.bottom;
+            
+            // אם התפריט גולש החוצה - ממקמים אותו מלמטה
+            if (bottomSpace < 10) {
+              submenu.classList.add('bottom-aligned');
+            } else {
+              submenu.classList.remove('bottom-aligned');
+            }
+          }, 10);
+        };
+
+        // Check position on hover - using MutationObserver to detect CSS changes
+        const parentSubmenu = submenu.closest('.dropdown-submenu');
+        if (parentSubmenu) {
+          // Check position when parent is hovered
+          parentSubmenu.addEventListener('mouseenter', () => {
+            setTimeout(positionSubmenu, 100);
+          });
+          
+          // Use MutationObserver to detect when submenu becomes visible
+          const observer = new MutationObserver(() => {
+            const computedStyle = window.getComputedStyle(submenu);
+            if (computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden' && computedStyle.opacity !== '0') {
+              positionSubmenu();
+            }
+          });
+          
+          observer.observe(submenu, {
+            attributes: true,
+            attributeFilter: ['style', 'class']
+          });
+          
+          // Also observe parent for hover state changes
+          observer.observe(parentSubmenu, {
+            attributes: true,
+            attributeFilter: ['class']
+          });
+        }
+
         submenu.addEventListener('mouseenter', () => {
           clearTimeouts();
+          positionSubmenu();
         });
 
         submenu.addEventListener('mouseleave', () => {
@@ -708,6 +760,14 @@ class MenuManager {
               this.closeMenu(menu.id);
             }
           }, 500);
+        });
+
+        // Check position on window resize
+        window.addEventListener('resize', () => {
+          const computedStyle = window.getComputedStyle(submenu);
+          if (computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden' && computedStyle.opacity !== '0') {
+            positionSubmenu();
+          }
         });
       });
     });

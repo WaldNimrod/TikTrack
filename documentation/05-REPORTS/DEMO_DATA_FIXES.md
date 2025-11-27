@@ -154,31 +154,44 @@ except Exception as tx_error:
 
 ## בעיות שלא נפתרו
 
-### בעיה #1: Query מחזיר רק 1 רשומה במקום 120
+### בעיה #1: Query מחזיר רק 1 רשומה במקום 120 - **CRITICAL**
 
 #### מיקום
 - **Service:** `Backend/services/trade_plan_service.py:get_all()`
 - **API:** `/api/trade-plans/`
 
 #### תיאור
-- השאילתה `db.query(TradePlan).count()` מחזירה רק 1 במקום 120
-- דרך Flask context ישירות, יש 120 תוכניות
+- **ב-DB יש 120 תוכניות** (אומת ב-SQLite ישירה)
+- דרך Flask context ישירות יש 120 תוכניות
 - דרך service דרך Flask API, רק 1 מוחזר
+- הלוגים מראים: "Total trade plans in DB (count): 1"
+- השאילתה `db.query(TradePlan).count()` דרך השרת מחזירה רק 1
 
 #### ניסיונות תיקון
 1. ✅ הוספת rollback check - לא פתר
 2. ✅ הוספת expire_all() - לא פתר
 3. ✅ בדיקת transaction state - לא פתר
+4. ✅ הוספת Direct SQL COUNT - לא פתר
+5. ✅ בדיקת views/triggers - לא נמצאו
+6. ✅ בדיקת multiple DB files - רק אחד עם 120
 
 #### סיבה משוערת
-- בעיית session/transaction isolation
-- בעיית connection pooling
-- בעיית view/trigger שמגביל תוצאות
+- **בעיית session/transaction reuse** - session שומר stale data
+- **בעיית connection pooling** - connection רואה נתונים ישנים
+- **בעיית transaction isolation** - transaction aborted state משפיע על שאילתות
+
+#### ממצאים
+- יש 120 תוכניות ב-`Backend/db/tiktrack.db` (אומת)
+- דרך Flask context ישירות יש 120
+- דרך השרת בפועל רק 1
+- אין views או triggers שמגבילים תוצאות
 
 #### שלבים הבאים
-- בדיקת session isolation level
-- בדיקת connection pooling
-- בדיקת views/triggers ב-DB
+- ✅ בדיקת session isolation level
+- ✅ בדיקת connection pooling
+- ✅ בדיקת views/triggers ב-DB
+- 🔄 **נדרש:** בדיקת session reuse/stale data ב-session lifecycle
+- 🔄 **נדרש:** בדיקת transaction aborted state impact על query results
 
 ---
 

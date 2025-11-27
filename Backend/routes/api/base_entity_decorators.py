@@ -151,9 +151,9 @@ def handle_database_session(auto_commit: bool = True, auto_close: bool = True):
                 g.db = db  # Store in Flask g for access in function
                 logging.info(f"✅ HANDLE_DB_SESSION: Got database session")
                 
-                # Ensure transaction is in clean state (rollback if aborted)
+                # CRITICAL: Always start with a clean transaction state
+                # Rollback any existing aborted transaction from previous operations
                 try:
-                    # Check if transaction is in aborted state by attempting a simple query
                     from sqlalchemy import text
                     db.execute(text("SELECT 1"))
                 except Exception as tx_check_error:
@@ -164,6 +164,9 @@ def handle_database_session(auto_commit: bool = True, auto_close: bool = True):
                         logging.info(f"✅ HANDLE_DB_SESSION: Rollback successful, starting fresh transaction")
                     except Exception as rollback_error:
                         logging.error(f"❌ HANDLE_DB_SESSION: Rollback failed: {str(rollback_error)}")
+                else:
+                    # Transaction is OK, but clear any stale state
+                    db.expire_all()
                 
                 # Call the function
                 logging.info(f"🟢 HANDLE_DB_SESSION: Calling {func.__name__}")

@@ -725,26 +725,64 @@ class MenuManager {
         }, 150);
       });
 
-      item.addEventListener('mouseleave', () => {
+      item.addEventListener('mouseleave', (e) => {
         clearTimeouts();
+        // Check if mouse is moving to menu or submenu
+        const relatedTarget = e.relatedTarget;
+        const submenu = menu.querySelector('.level3-submenu');
+        
+        // Don't close if moving to menu or submenu
+        if (menu.contains(relatedTarget) || (submenu && submenu.contains(relatedTarget))) {
+          return;
+        }
+        
         closeTimeout = setTimeout(() => {
           if (!item.matches(':hover') && !menu.matches(':hover')) {
-            this.closeMenu(menu.id);
+            const activeSubmenu = menu.querySelector('.level3-submenu:not([style*="display: none"])');
+            if (!activeSubmenu || !activeSubmenu.matches(':hover')) {
+              this.closeMenu(menu.id);
+            }
           }
-        }, 200);
+        }, 500);
       });
 
       menu.addEventListener('mouseenter', () => {
         clearTimeouts();
       });
 
-      menu.addEventListener('mouseleave', () => {
+      menu.addEventListener('mouseleave', (e) => {
         clearTimeouts();
+        // Check if mouse is moving to level 3 submenu
+        const submenu = menu.querySelector('.level3-submenu');
+        const relatedTarget = e.relatedTarget;
+        
+        // Don't close if moving to submenu or its parent
+        if (submenu && (submenu.contains(relatedTarget) || menu.querySelector('.dropdown-submenu')?.contains(relatedTarget))) {
+          return;
+        }
+        
         closeTimeout = setTimeout(() => {
           if (!item.matches(':hover') && !menu.matches(':hover')) {
             this.closeMenu(menu.id);
           }
-        }, 200);
+        }, 500);
+      });
+
+      // Handle level 3 submenu hover
+      const submenus = menu.querySelectorAll('.level3-submenu');
+      submenus.forEach(submenu => {
+        submenu.addEventListener('mouseenter', () => {
+          clearTimeouts();
+        });
+
+        submenu.addEventListener('mouseleave', () => {
+          clearTimeouts();
+          closeTimeout = setTimeout(() => {
+            if (!item.matches(':hover') && !menu.matches(':hover') && !submenu.matches(':hover')) {
+              this.closeMenu(menu.id);
+            }
+          }, 500);
+        });
       });
     });
   }

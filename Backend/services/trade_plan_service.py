@@ -13,19 +13,45 @@ class TradePlanService:
         """Get all trade plans"""
         logger.info("Loading trade plans with joinedload for ticker and account")
         
-        # Ensure transaction is in clean state before query
+        # CRITICAL: Ensure clean transaction state - rollback any aborted transactions
         try:
             from sqlalchemy import text
+            # Test query to check transaction state
             db.execute(text("SELECT 1"))
         except Exception as tx_error:
-            logger.warning(f"Transaction aborted detected, rolling back: {str(tx_error)}")
-            db.rollback()
+            error_msg = str(tx_error)
+            if "aborted" in error_msg.lower() or "InFailedSqlTransaction" in error_msg:
+                logger.warning(f"Transaction aborted detected in get_all(), rolling back: {error_msg}")
+                try:
+                    db.rollback()
+                    logger.info("Rollback successful, transaction is now clean")
+                except Exception as rollback_error:
+                    logger.error(f"Rollback failed: {str(rollback_error)}")
+                    # Force new connection by closing and reopening
+                    db.close()
+                    db = db.session_factory() if hasattr(db, 'session_factory') else db
         
-        plans = db.query(TradePlan).options(
-            joinedload(TradePlan.ticker),
-            joinedload(TradePlan.account)
-        ).all()
-        logger.info(f"Loaded {len(plans)} trade plans")
+        # Clear any stale data in session
+        db.expire_all()
+        
+        # Main query - try without joinedload first to see if that's the issue
+        try:
+            # Simple query first
+            simple_count = db.query(TradePlan).count()
+            logger.info(f"Simple count query returned: {simple_count} plans")
+            
+            # Now with joinedload
+            plans = db.query(TradePlan).options(
+                joinedload(TradePlan.ticker),
+                joinedload(TradePlan.account)
+            ).all()
+            logger.info(f"Loaded {len(plans)} trade plans with joinedload")
+        except Exception as query_error:
+            logger.error(f"Query failed: {str(query_error)}")
+            # Try again after rollback
+            db.rollback()
+            plans = db.query(TradePlan).all()
+            logger.info(f"Loaded {len(plans)} trade plans without joinedload (fallback)")
         if plans:
             logger.info(f"First plan ticker: {plans[0].ticker}")
             logger.info(f"First plan account: {plans[0].account}")

@@ -231,11 +231,37 @@
     padding-right: 0.5rem;
 }
 
+/* יצירת "גשר" בין תפריט רמה 2 לתפריט רמה 3 - מונע סגירה במעבר */
+#unified-header .dropdown-submenu::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -5px; /* מכסה אזור קטן - התפריטים צמודים */
+    width: 10px;
+    height: 100%;
+    background: transparent;
+    z-index: 953; /* מעל תפריט רמה 2, מתחת לתפריט רמה 3 */
+    pointer-events: auto;
+}
+
+/* גשר גם בתפריט רמה 3 - מונע סגירה כשחוזרים */
+#unified-header .level3-submenu::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -5px; /* ב-RTL - מצד שמאל (ימין במסך) */
+    width: 10px;
+    height: 100%;
+    background: transparent;
+    z-index: -1;
+    pointer-events: auto;
+}
+
 /* Level 3 Submenu - רמה 3 של התפריט */
 #unified-header .level3-submenu {
     position: absolute;
     top: 0;
-    right: calc(100% + 3px); /* ב-RTL התפריט מופיע משמאל (ימין במסך) */
+    right: 100%; /* ב-RTL התפריט מופיע משמאל (ימין במסך) - צמוד ללא רווח */
     left: auto;
     background: white;
     border: 1px solid #e5e5e5;
@@ -248,7 +274,7 @@
     list-style: none;
     opacity: 0;
     visibility: hidden;
-    transform: translateX(-10px); /* ב-RTL תזוזה ימינה */
+    transform: translateX(10px); /* ב-RTL תזוזה שמאלה (ימינה במסך) */
     transition: all 0.3s ease;
 }
 

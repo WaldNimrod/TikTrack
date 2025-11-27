@@ -8,11 +8,15 @@
     <meta name="author" content="TikTrack">
     <title>רשימות צפייה - TikTrack</title>
 
-    <!-- Google Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@300;400;500;600;700&display=swap">
-
+    <!-- Preconnect to CDN for faster loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
     <!-- Bootstrap CSS (חובה ראשון) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906">
+    
+    <!-- TikTrack ITCSS Master Styles -->
+    <link rel="stylesheet" href="../styles-new/master.css?v=1.0.0">
 
     <!-- LOCK: DO NOT MODIFY - ITCSS Loading Order -->
     <!-- ITCSS Layer 1: Settings -->
@@ -72,8 +76,39 @@
 
     <!-- Watch Lists Page Specific Styles -->
     <link rel="stylesheet" href="../styles-new/06-components/_watch-lists.css?v=1.0.0">
+    
+    <!-- Header System (Must load early) -->
+    <script src="../scripts/header-system.js" defer></script>
+    <script>
+        // Auto-initialize HeaderSystem when DOM is ready
+        (function() {
+            function initHeader() {
+                if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+                    try {
+                        window.HeaderSystem.initialize();
+                    } catch (error) {
+                        if (window.console && window.console.error) {
+                            window.console.error('Error initializing HeaderSystem:', error);
+                        }
+                    }
+                } else {
+                    setTimeout(initHeader, 100);
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initHeader);
+            } else {
+                setTimeout(initHeader, 100);
+            }
+        })();
+    </script>
 </head>
 <body class="watch-lists-page">
+    <!-- Notification container -->
+    <div class="notification-container" id="notificationContainer"></div>
+    
+
     <!-- 
         TikTrack Watch Lists Page - Mockup
         גרסה: 1.0.0
@@ -85,44 +120,23 @@
     <div class="container-fluid page-container">
         <header class="row g-0">
             <div class="col-12">
-                <div id="unified-header"></div>
-            </div>
+                </div>
         </header>
 
-        <!-- Mockups Navigation -->
-        <div class="mockups-navigation">
-            <div class="container-fluid">
-                <div class="row align-items-center">
-                    <div class="col-md-12">
-                        <div class="mockups-navigation-content">
-                            <span class="mockups-navigation-label">
-                                <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
-                            </span>
-                            <a href="watch-lists-page.html" class="mockups-navigation-link active">רשימות צפייה</a>
-                            <a href="watch-list-modal.html" class="mockups-navigation-link">מודל רשימה</a>
-                            <a href="add-ticker-modal.html" class="mockups-navigation-link">הוספת טיקר</a>
-                            <a href="flag-quick-action.html" class="mockups-navigation-link">דגלים</a>
-                            <span class="mockups-navigation-separator">|</span>
-                            <a href="daily-snapshots/trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
-                            <a href="daily-snapshots/portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
-                            <a href="daily-snapshots/price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
-                            <a href="daily-snapshots/comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
-                            <a href="daily-snapshots/trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
-                            <a href="daily-snapshots/strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
-                            <a href="daily-snapshots/economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
-                            <a href="daily-snapshots/history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
-                            <a href="daily-snapshots/emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
-                            <a href="daily-snapshots/date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                        </div>
-                    </div>
-                </div>
+        
             </div>
         </div>
 
         <main class="row g-0">
             <div class="col-12">
-                <div class="background-wrapper">
+                    <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+<div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
+        <div id="unified-header"></div>
+
+        <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
                     <div class="page-body">
+            <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
                         <div class="main-content">
                             <!-- Top Section -->
                             <div class="top-section" id="watch-lists-top" data-section="top">

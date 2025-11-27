@@ -1,0 +1,240 @@
+/**
+ * Mockups Common Styles - TikTrack
+ * סגנונות משותפים לעמודי מוקאפ
+ * 
+ * @version 1.0.0
+ * @lastUpdated November 2025
+ * @author TikTrack Development Team
+ * 
+ * This file contains styles extracted from inline <style> tags in mockup pages
+ * All styles follow ITCSS methodology and use CSS variables
+ */
+
+/* ==========================================================================
+   Visual Heatmap Styles (from comparative-analysis-page)
+   ========================================================================== */
+
+.visual-heatmap-container {
+    margin: var(--spacing-lg, 20px) 0;
+}
+
+.visual-heatmap-title {
+    font-size: 1.125rem; /* 18px */
+    font-weight: 600;
+    margin-bottom: var(--spacing-md, 15px);
+    color: var(--color-text-primary, #212529);
+}
+
+.visual-heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--spacing-sm, 12px);
+    margin-bottom: var(--spacing-lg, 20px);
+}
+
+.visual-heatmap-controls {
+    margin-bottom: var(--spacing-lg, 20px);
+}
+
+.visual-heatmap-controls .control-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs, 8px);
+}
+
+.visual-heatmap-controls .control-group label {
+    font-size: 0.875rem; /* 14px */
+    color: var(--color-text-secondary, #495057);
+}
+
+.heatmap-cell {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--apple-radius-small, 6px);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-xs, 10px);
+    text-align: center;
+    box-shadow: var(--apple-shadow-light, 0 2px 4px rgba(0,0,0,0.1));
+}
+
+.heatmap-cell:hover {
+    transform: scale(1.05);
+    border-color: var(--logo-orange, #26baac);
+    box-shadow: var(--apple-shadow-medium, 0 4px 8px rgba(0,0,0,0.15));
+    z-index: 10;
+}
+
+.heatmap-cell-label {
+    font-size: 0.75rem; /* 12px */
+    font-weight: 600;
+    color: var(--color-text-primary, #212529);
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+.heatmap-cell-value {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 700;
+    color: var(--color-text-primary, #212529);
+}
+
+.heatmap-cell-percent {
+    font-size: 0.6875rem; /* 11px */
+    color: var(--color-text-tertiary, #6c757d);
+    margin-top: 2px;
+}
+
+.visual-heatmap-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs, 10px);
+    padding: var(--spacing-md, 15px);
+    background: var(--apple-bg-secondary, #f8f9fa);
+    border-radius: var(--apple-radius-small, 6px);
+}
+
+.visual-heatmap-legend .legend-section {
+    flex: 1;
+    min-width: 200px;
+}
+
+.visual-heatmap-legend .legend-title {
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs, 8px);
+    color: var(--color-text-primary, #212529);
+}
+
+.visual-heatmap-legend .legend-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs, 8px);
+}
+
+.visual-heatmap-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem; /* 12px */
+}
+
+.visual-heatmap-legend .legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Heatmap Tooltip */
+.heatmap-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: var(--spacing-xs, 10px) var(--spacing-md, 15px);
+    border-radius: var(--apple-radius-small, 6px);
+    font-size: 0.75rem; /* 12px */
+    pointer-events: none;
+    z-index: 1000;
+    display: none;
+    white-space: nowrap;
+    box-shadow: var(--apple-shadow-heavy, 0 4px 12px rgba(0,0,0,0.3));
+}
+
+.heatmap-tooltip.show {
+    display: block;
+}
+
+/* Heatmap color classes - Positive values (GREEN only) */
+.heatmap-excellent {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.heatmap-very-good {
+    background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
+}
+
+.heatmap-good {
+    background: linear-gradient(135deg, #17a2b8 0%, #26baac 100%);
+}
+
+.heatmap-average {
+    background: linear-gradient(135deg, #26baac 0%, #6cba9d 100%);
+}
+
+.heatmap-below-avg {
+    background: linear-gradient(135deg, #6cba9d 0%, #a0d4b8 100%);
+}
+
+.heatmap-poor {
+    background: linear-gradient(135deg, #a0d4b8 0%, #c8e6d3 100%);
+}
+
+.heatmap-very-poor {
+    background: linear-gradient(135deg, #c8e6d3 0%, #e8f5ed 100%);
+}
+
+/* Heatmap color classes - Negative values (RED only) */
+.heatmap-negative-excellent {
+    background: linear-gradient(135deg, #a71e2a 0%, #c82333 100%);
+}
+
+.heatmap-negative-very-poor {
+    background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
+}
+
+.heatmap-negative-poor {
+    background: linear-gradient(135deg, #dc3545 0%, #e85d6a 100%);
+}
+
+.heatmap-negative-average {
+    background: linear-gradient(135deg, #e85d6a 0%, #f28b95 100%);
+}
+
+.heatmap-negative-below-avg {
+    background: linear-gradient(135deg, #f28b95 0%, #f6b3ba 100%);
+}
+
+.heatmap-negative-good {
+    background: linear-gradient(135deg, #f6b3ba 0%, #fad5d9 100%);
+}
+
+.heatmap-negative-very-good {
+    background: linear-gradient(135deg, #fad5d9 0%, #fce8ea 100%);
+}
+
+/* ==========================================================================
+   Common Inline Style Replacements
+   ========================================================================== */
+
+/* Display utilities - replace style="display: none;" */
+.mockup-hidden {
+    display: none;
+}
+
+.mockup-inline-block {
+    display: inline-block;
+}
+
+.mockup-auto-width {
+    width: auto;
+}
+
+/* Specific style replacements */
+.mockup-chart-container {
+    height: 600px;
+    width: 100%;
+}
+
+.mockup-min-width-150 {
+    min-width: 150px;
+}
+
+.mockup-high-z-index {
+    z-index: 1000000002;
+}
+

@@ -26,6 +26,30 @@
     
     <!-- Header System -->
     <script src="../../scripts/header-system.js" defer></script>
+    <script>
+        // Auto-initialize HeaderSystem when DOM is ready
+        (function() {
+            function initHeader() {
+                if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+                    try {
+                        window.HeaderSystem.initialize();
+                    } catch (error) {
+                        if (window.console && window.console.error) {
+                            window.console.error('Error initializing HeaderSystem:', error);
+                        }
+                    }
+                } else {
+                    setTimeout(initHeader, 100);
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initHeader);
+            } else {
+                setTimeout(initHeader, 100);
+            }
+        })();
+    </script>
     
     <!-- Preferences System -->
     <script src="../../scripts/services/preferences-data.js" defer></script>
@@ -74,42 +98,23 @@
     <script src="../../scripts/entity-details-renderer.js" defer></script>
 </head>
 <body class="price-history-page">
-    <!-- Header System -->
-    <div id="unified-header"></div>
+    <!-- Notification container -->
+    <div class="notification-container" id="notificationContainer"></div>
     
-    <!-- Mockups Navigation -->
-    <div class="mockups-navigation">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-12">
-                    <div class="mockups-navigation-content">
-                        <span class="mockups-navigation-label">
-                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
-                        </span>
-                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
-                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
-                        <a href="price-history-page.html" class="mockups-navigation-link active">היסטוריית מחירים</a>
-                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
-                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
-                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
-                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
-                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
-                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
-                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                        <span class="mockups-navigation-separator">|</span>
-                        <a href="../watch-lists-page.html" class="mockups-navigation-link">רשימות צפייה</a>
-                        <a href="../watch-list-modal.html" class="mockups-navigation-link">מודל רשימה</a>
-                        <a href="../add-ticker-modal.html" class="mockups-navigation-link">הוספת טיקר</a>
-                        <a href="../flag-quick-action.html" class="mockups-navigation-link">דגלים</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+    <!-- Header System -->
+    </div>
     </div>
     
     <!-- Page Content -->
-    <div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+<div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
+        <div id="unified-header"></div>
+
+        <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
         <div class="page-body">
+            <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
             <div class="main-content">
                 <!-- Header Section -->
                 <div class="top-section"  data-section="price_history_page_top_section">
@@ -230,7 +235,7 @@
                             </select>
                         </div>
                         <!-- TradingView Widget Container -->
-                        <div id="tradingview_widget_chart" style="height: 600px; width: 100%;"></div>
+                        <div id="tradingview_widget_chart" ></div>
                     </div>
                 </div>
                 

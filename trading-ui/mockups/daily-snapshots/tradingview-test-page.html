@@ -16,13 +16,19 @@
     
 </head>
 <body>
-    <!-- Header System - Created automatically by header-system.js -->
-    <div id="unified-header"></div>
+    <!-- Notification container -->
+    <div class="notification-container" id="notificationContainer"></div>
     
+
+    <!-- Header System - Created automatically by header-system.js -->
     <!-- Page Content -->
-    <div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+<div class="background-wrapper">
         <div class="page-body">
-            <div class="main-content">
+            <div class="main-cont
+        <div id="unified-header"></div>
+
+ent">
     <div class="container-fluid mt-4">
         <div class="row">
             <div class="col-12">
@@ -165,6 +171,30 @@
     
     <!-- Header System (defer) -->
     <script src="../../scripts/header-system.js" defer></script>
+    <script>
+        // Auto-initialize HeaderSystem when DOM is ready
+        (function() {
+            function initHeader() {
+                if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+                    try {
+                        window.HeaderSystem.initialize();
+                    } catch (error) {
+                        if (window.console && window.console.error) {
+                            window.console.error('Error initializing HeaderSystem:', error);
+                        }
+                    }
+                } else {
+                    setTimeout(initHeader, 100);
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initHeader);
+            } else {
+                setTimeout(initHeader, 100);
+            }
+        })();
+    </script>
     
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>

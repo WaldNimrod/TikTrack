@@ -16,200 +16,7 @@
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../../styles-new/master.css">
     
-    <!-- Visual Heatmap Styles -->
-    <style>
-        .visual-heatmap-container {
-            margin: 20px 0;
-        }
-        
-        .visual-heatmap-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #212529;
-        }
-        
-        .visual-heatmap-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .visual-heatmap-controls {
-            margin-bottom: 20px;
-        }
-        
-        .visual-heatmap-controls .control-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .visual-heatmap-controls .control-group label {
-            font-size: 14px;
-            color: #495057;
-        }
-        
-        .heatmap-cell {
-            position: relative;
-            aspect-ratio: 1;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 2px solid transparent;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .heatmap-cell:hover {
-            transform: scale(1.05);
-            border-color: #26baac;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-            z-index: 10;
-        }
-        
-        .heatmap-cell-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #212529;
-            margin-bottom: 4px;
-            line-height: 1.2;
-        }
-        
-        .heatmap-cell-value {
-            font-size: 14px;
-            font-weight: 700;
-            color: #212529;
-        }
-        
-        .heatmap-cell-percent {
-            font-size: 11px;
-            color: #6c757d;
-            margin-top: 2px;
-        }
-        
-        .visual-heatmap-legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 6px;
-        }
-        
-        .visual-heatmap-legend .legend-section {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .visual-heatmap-legend .legend-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #212529;
-        }
-        
-        .visual-heatmap-legend .legend-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        
-        .visual-heatmap-legend .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-        }
-        
-        .visual-heatmap-legend .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-        
-        .tooltip {
-            position: absolute;
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-size: 12px;
-            pointer-events: none;
-            z-index: 1000;
-            display: none;
-            white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        
-        .tooltip.show {
-            display: block;
-        }
-        
-        /* Heatmap color classes - Positive values (GREEN only) */
-        .heatmap-excellent {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-        
-        .heatmap-very-good {
-            background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
-        }
-        
-        .heatmap-good {
-            background: linear-gradient(135deg, #17a2b8 0%, #26baac 100%);
-        }
-        
-        .heatmap-average {
-            background: linear-gradient(135deg, #26baac 0%, #6cba9d 100%);
-        }
-        
-        .heatmap-below-avg {
-            background: linear-gradient(135deg, #6cba9d 0%, #a0d4b8 100%);
-        }
-        
-        .heatmap-poor {
-            background: linear-gradient(135deg, #a0d4b8 0%, #c8e6d3 100%);
-        }
-        
-        .heatmap-very-poor {
-            background: linear-gradient(135deg, #c8e6d3 0%, #e8f5ed 100%);
-        }
-        
-        /* Heatmap color classes - Negative values (RED only) */
-        .heatmap-negative-excellent {
-            background: linear-gradient(135deg, #a71e2a 0%, #c82333 100%);
-        }
-        
-        .heatmap-negative-very-poor {
-            background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
-        }
-        
-        .heatmap-negative-poor {
-            background: linear-gradient(135deg, #dc3545 0%, #e85d6a 100%);
-        }
-        
-        .heatmap-negative-average {
-            background: linear-gradient(135deg, #e85d6a 0%, #f28b95 100%);
-        }
-        
-        .heatmap-negative-below-avg {
-            background: linear-gradient(135deg, #f28b95 0%, #f6b3ba 100%);
-        }
-        
-        .heatmap-negative-good {
-            background: linear-gradient(135deg, #f6b3ba 0%, #fad5d9 100%);
-        }
-        
-        .heatmap-negative-very-good {
-            background: linear-gradient(135deg, #fad5d9 0%, #fce8ea 100%);
-        }
-    </style>
+    <!-- Visual Heatmap Styles - Now in _mockups-common.css (loaded via master.css) -->
     
     <!-- External Libraries -->
     <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
@@ -224,8 +31,32 @@
     <!-- Bootstrap JS for Modal and Tooltip -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Header System -->
+    <!-- Header System (Must load early) -->
     <script src="../../scripts/header-system.js" defer></script>
+    <script>
+        // Auto-initialize HeaderSystem when DOM is ready
+        (function() {
+            function initHeader() {
+                if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+                    try {
+                        window.HeaderSystem.initialize();
+                    } catch (error) {
+                        if (window.console && window.console.error) {
+                            window.console.error('Error initializing HeaderSystem:', error);
+                        }
+                    }
+                } else {
+                    setTimeout(initHeader, 100);
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initHeader);
+            } else {
+                setTimeout(initHeader, 100);
+            }
+        })();
+    </script>
     
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
@@ -278,42 +109,17 @@
 <script src="../../scripts/entity-details-modal.js" defer></script>
 </head>
 <body class="comparative-analysis-page">
-    <!-- Header System -->
-    <div id="unified-header"></div>
+    <!-- Notification container -->
+    <div class="notification-container" id="notificationContainer"></div>
     
-    <!-- Mockups Navigation -->
-    <div class="mockups-navigation">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-12">
-                    <div class="mockups-navigation-content">
-                        <span class="mockups-navigation-label">
-                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
-                        </span>
-                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
-                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
-                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
-                        <a href="comparative-analysis-page.html" class="mockups-navigation-link active">ניתוח השוואתי</a>
-                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
-                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
-                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
-                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
-                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
-                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                        <span class="mockups-navigation-separator">|</span>
-                        <a href="../watch-lists-page.html" class="mockups-navigation-link">רשימות צפייה</a>
-                        <a href="../watch-list-modal.html" class="mockups-navigation-link">מודל רשימה</a>
-                        <a href="../add-ticker-modal.html" class="mockups-navigation-link">הוספת טיקר</a>
-                        <a href="../flag-quick-action.html" class="mockups-navigation-link">דגלים</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Page Content -->
+    <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
     <div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
+        <div id="unified-header"></div>
+
+        <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
         <div class="page-body">
+            <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
             <div class="main-content">
                 <!-- Header Section -->
                 <div class="top-section"  data-section="comparative_analysis_page_top_section">
@@ -755,7 +561,7 @@
                         <div class="visual-heatmap-controls mb-3">
                             <div class="control-group">
                                 <label for="visualHeatmapSortBy">מיון לפי:</label>
-                                <select id="visualHeatmapSortBy" class="form-select form-select-sm" style="width: auto; display: inline-block;">
+                                <select id="visualHeatmapSortBy" class="form-select form-select-sm mockup-inline-block mockup-auto-width">
                                     <option value="totalPL">P/L כולל</option>
                                     <option value="successRate">אחוז הצלחה</option>
                                     <option value="trades">מספר טריידים</option>
@@ -889,14 +695,6 @@
     
     <!-- Page-specific script -->
     <script src="../../scripts/comparative-analysis-page.js" defer></script>
-    
-    
-    <!-- Initialize Preferences System and Dynamic Colors -->
-    </script>
-    
-    <!-- Notification System Containers -->
-    <div class="notification-container" id="notification-container"></div>
-    <div id="toast-container"></div>
 </body>
 </html>
 

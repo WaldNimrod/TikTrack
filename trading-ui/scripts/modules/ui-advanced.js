@@ -19,6 +19,57 @@
 // ===== ENTITY TYPE DEFINITIONS =====
 // הגדרות סוגי ישויות במערכת
 
+// Save original getStatusColor from color-scheme-system.js before defining local function
+// This prevents circular reference when local function checks window.getStatusColor
+// IMPORTANT: Save these BEFORE color-scheme-system.js loads, or immediately after it loads
+let _originalGetStatusColor = null;
+let _originalGetStatusBackgroundColor = null;
+let _originalGetStatusTextColor = null;
+let _originalGetStatusBorderColor = null;
+
+// Save original functions from color-scheme-system.js if they exist
+// This must run immediately when this script loads (color-scheme-system.js loads before this)
+// CRITICAL: Save the original functions BEFORE they get overwritten by this script's local functions
+(function() {
+  if (typeof window.getStatusColor === 'function') {
+    const fnStr = window.getStatusColor.toString();
+    // Only save if it's from color-scheme-system.js
+    // The function from color-scheme-system.js is simple: return STATUS_COLORS[status] || STATUS_COLORS.active;
+    // It does NOT contain 'window.getStatusColor' check or '_originalGetStatusColor'
+    if (fnStr.includes('STATUS_COLORS[status]') && 
+        !fnStr.includes('window.getStatusColor') && 
+        !fnStr.includes('_originalGetStatusColor') &&
+        fnStr.length < 100) { // Simple function, not a wrapper
+      _originalGetStatusColor = window.getStatusColor;
+    }
+  }
+  if (typeof window.getStatusBackgroundColor === 'function') {
+    const fnStr = window.getStatusBackgroundColor.toString();
+    // color-scheme-system.js version is simple and uses getStatusColor
+    if (fnStr.includes('getStatusColor') && 
+        !fnStr.includes('window.getStatusBackgroundColor') && 
+        !fnStr.includes('_originalGetStatusBackgroundColor')) {
+      _originalGetStatusBackgroundColor = window.getStatusBackgroundColor;
+    }
+  }
+  if (typeof window.getStatusTextColor === 'function') {
+    const fnStr = window.getStatusTextColor.toString();
+    if (fnStr.includes('getStatusColor') && 
+        !fnStr.includes('window.getStatusTextColor') && 
+        !fnStr.includes('_originalGetStatusTextColor')) {
+      _originalGetStatusTextColor = window.getStatusTextColor;
+    }
+  }
+  if (typeof window.getStatusBorderColor === 'function') {
+    const fnStr = window.getStatusBorderColor.toString();
+    if (fnStr.includes('getStatusColor') && 
+        !fnStr.includes('window.getStatusBorderColor') && 
+        !fnStr.includes('_originalGetStatusBorderColor')) {
+      _originalGetStatusBorderColor = window.getStatusBorderColor;
+    }
+  }
+})();
+
 /**
  * סוגי ישויות תקפים במערכת
  * Valid entity types in the system
@@ -384,13 +435,25 @@ function getEntityColor(entityType) {
  * @param {string} status - סטטוס
  * @param {string} intensity - עוצמה (light, medium, dark, border)
  * @returns {string} - קוד צבע
+ * 
+ * NOTE: This function is DEPRECATED - use window.getStatusColor from color-scheme-system.js directly
+ * This wrapper uses the saved original function to avoid circular reference
  */
 function getStatusColor(status, intensity = 'medium') {
-  // Use centralized Color Scheme System if available
-  if (typeof window.getStatusColor === 'function') {
-    return window.getStatusColor(status, intensity);
+  // Use saved original function from color-scheme-system.js (saved before this script loads)
+  if (_originalGetStatusColor && typeof _originalGetStatusColor === 'function') {
+    return _originalGetStatusColor(status, intensity);
   }
-  // Fallback to local implementation (should not happen in production)
+  // Fallback: use window.getStatusColor if it exists and is NOT this function
+  if (typeof window.getStatusColor === 'function') {
+    // Check if window.getStatusColor is the original from color-scheme-system.js
+    // (it should contain STATUS_COLORS[status] but NOT window.getStatusColor check)
+    const fnStr = window.getStatusColor.toString();
+    if (fnStr.includes('STATUS_COLORS[status]') && !fnStr.includes('_originalGetStatusColor')) {
+      return window.getStatusColor(status, intensity);
+    }
+  }
+  // Final fallback to local implementation (should not happen in production)
   if (!status) {
     return STATUS_COLORS['closed']?.[intensity] || '';
   }
@@ -407,8 +470,9 @@ function getStatusColor(status, intensity = 'medium') {
  */
 function getStatusBackgroundColor(status) {
   // Use centralized Color Scheme System if available
-  if (typeof window.getStatusBackgroundColor === 'function') {
-    return window.getStatusBackgroundColor(status);
+  // IMPORTANT: Use saved original function to avoid circular reference
+  if (_originalGetStatusBackgroundColor) {
+    return _originalGetStatusBackgroundColor(status);
   }
   // Fallback to local implementation (should not happen in production)
   return getStatusColor(status, 'light');
@@ -423,8 +487,9 @@ function getStatusBackgroundColor(status) {
  */
 function getStatusTextColor(status) {
   // Use centralized Color Scheme System if available
-  if (typeof window.getStatusTextColor === 'function') {
-    return window.getStatusTextColor(status);
+  // IMPORTANT: Use saved original function to avoid circular reference
+  if (_originalGetStatusTextColor) {
+    return _originalGetStatusTextColor(status);
   }
   // Fallback to local implementation (should not happen in production)
   return getStatusColor(status, 'medium');
@@ -439,8 +504,9 @@ function getStatusTextColor(status) {
  */
 function getStatusBorderColor(status) {
   // Use centralized Color Scheme System if available
-  if (typeof window.getStatusBorderColor === 'function') {
-    return window.getStatusBorderColor(status);
+  // IMPORTANT: Use saved original function to avoid circular reference
+  if (_originalGetStatusBorderColor) {
+    return _originalGetStatusBorderColor(status);
   }
   // Fallback to local implementation (should not happen in production)
   return getStatusColor(status, 'border');

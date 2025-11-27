@@ -299,6 +299,12 @@
     <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
     <!-- [8] Load Order: 8 -->
     <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <!-- [8.5] Load Order: 8.5 -->
+    <script src="scripts/icon-mappings.js?v=1.0.0"></script> <!-- מיפוי איקונים מרכזי -->
+    <!-- [8.6] Load Order: 8.6 -->
+    <script src="scripts/icon-system.js?v=1.0.0"></script> <!-- מערכת איקונים מרכזית -->
+    <!-- [8.7] Load Order: 8.7 -->
+    <script src="scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- עזר החלפת איקונים -->
     <!-- [9] Load Order: 9 -->
     <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
     <!-- [10] Load Order: 10 -->
@@ -481,29 +487,53 @@
     <script src="scripts/validation-utils.js?v=1.0.0"></script> <!-- כלי ולידציה -->
 
     <!-- =============================================================== -->
+    <!-- ===== PACKAGE 7.5/11: CONDITIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 7 | Description: מערכת תנאים -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [66.5] Load Order: 66.5 -->
+    <script src="scripts/conditions/conditions-translations.js?v=1.0.0"></script> <!-- תרגומי תנאים -->
+    <!-- [66.6] Load Order: 66.6 -->
+    <script src="scripts/conditions/conditions-validator.js?v=1.0.0"></script> <!-- ולידטור תנאים -->
+    <!-- [66.7] Load Order: 66.7 -->
+    <script src="scripts/conditions/conditions-form-generator.js?v=1.0.0"></script> <!-- מחולל טפסי תנאים -->
+    <!-- [66.8] Load Order: 66.8 -->
+    <script src="scripts/conditions/conditions-crud-manager.js?v=1.0.0"></script> <!-- מנהל CRUD תנאים -->
+    <!-- [66.9] Load Order: 66.9 -->
+    <script src="scripts/conditions/conditions-initializer.js?v=1.0.0"></script> <!-- מאתחל תנאים -->
+    <!-- [67] Load Order: 67 -->
+    <script src="scripts/modal-configs/conditions-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תנאים -->
+    <!-- [67.1] Load Order: 67.1 -->
+    <script src="scripts/conditions/conditions-ui-manager.js?v=1.0.0"></script> <!-- מנהל ממשק תנאים -->
+    <!-- [67.2] Load Order: 67.2 -->
+    <script src="scripts/conditions/conditions-modal-controller.js?v=1.0.0"></script> <!-- בקר מודל תנאים -->
+
+    <!-- =============================================================== -->
     <!-- ===== PACKAGE 8/11: ENTITY SERVICES PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 10 | Description: שירותי ישויות -->
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [67] Load Order: 67 -->
-    <script src="scripts/account-service.js?v=1.0.0"></script> <!-- שירות חשבונות -->
-    <!-- [68] Load Order: 68 -->
-    <script src="scripts/alert-service.js?v=1.0.0"></script> <!-- שירות התראות -->
-    <!-- [69] Load Order: 69 -->
-    <script src="scripts/ticker-service.js?v=1.0.0"></script> <!-- שירות טיקרים -->
-    <!-- [70] Load Order: 70 -->
-    <script src="scripts/trade-plan-service.js?v=1.0.0"></script> <!-- שירות תכניות מסחר -->
-    <!-- [71] Load Order: 71 -->
-    <script src="scripts/condition-translator.js?v=1.0.0"></script> <!-- מתרגם תנאים -->
-    <!-- [72] Load Order: 72 -->
-    <script src="scripts/constraints.js?v=1.0.0"></script> <!-- מערכת אילוצים -->
-    <!-- [73] Load Order: 73 -->
-    <script src="scripts/services/linked-items-service.js?v=1.0.0"></script> <!-- שירות לוגיקה משותפת לפריטים מקושרים -->
-    <!-- [74] Load Order: 74 -->
-    <script src="scripts/linked-items.js?v=1.0.0"></script> <!-- פריטים מקושרים -->
     <!-- [75] Load Order: 75 -->
+    <script src="scripts/account-service.js?v=1.0.0"></script> <!-- שירות חשבונות -->
+    <!-- [76] Load Order: 76 -->
+    <script src="scripts/alert-service.js?v=1.0.0"></script> <!-- שירות התראות -->
+    <!-- [77] Load Order: 77 -->
+    <script src="scripts/ticker-service.js?v=1.0.0"></script> <!-- שירות טיקרים -->
+    <!-- [78] Load Order: 78 -->
+    <script src="scripts/trade-plan-service.js?v=1.0.0"></script> <!-- שירות תכניות מסחר -->
+    <!-- [79] Load Order: 79 -->
+    <script src="scripts/condition-translator.js?v=1.0.0"></script> <!-- מתרגם תנאים -->
+    <!-- [80] Load Order: 80 -->
+    <script src="scripts/constraints.js?v=1.0.0"></script> <!-- מערכת אילוצים -->
+    <!-- [81] Load Order: 81 -->
+    <script src="scripts/services/linked-items-service.js?v=1.0.0"></script> <!-- שירות לוגיקה משותפת לפריטים מקושרים -->
+    <!-- [82] Load Order: 82 -->
+    <script src="scripts/linked-items.js?v=1.0.0"></script> <!-- פריטים מקושרים -->
+    <!-- [83] Load Order: 83 -->
     <script src="scripts/related-object-filters.js?v=1.0.0"></script> <!-- פילטרים של אובייקטים קשורים -->
 
     <!-- =============================================================== -->
@@ -527,9 +557,9 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [79] Load Order: 79 -->
+    <!-- [87] Load Order: 87 -->
     <script src="scripts/info-summary-system.js?v=1.0.0"></script> <!-- מערכת סיכום נתונים ליבה -->
-    <!-- [80] Load Order: 80 -->
+    <!-- [88] Load Order: 88 -->
     <script src="scripts/info-summary-configs.js?v=1.0.0"></script> <!-- תצורות עמודים לסיכום נתונים -->
 
     <!-- =============================================================== -->
@@ -539,31 +569,31 @@
     <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [81] Load Order: 81 -->
+    <!-- [89] Load Order: 89 -->
     <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
-    <!-- [82] Load Order: 82 -->
+    <!-- [90] Load Order: 90 -->
     <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
-    <!-- [83] Load Order: 83 -->
+    <!-- [91] Load Order: 91 -->
     <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
-    <!-- [84] Load Order: 84 -->
+    <!-- [92] Load Order: 92 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
-    <!-- [85] Load Order: 85 -->
+    <!-- [93] Load Order: 93 -->
     <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
-    <!-- [86] Page-specific: alerts -->
+    <!-- [94] Page-specific: alerts -->
     <script src="scripts/alerts.js?v=1.0.0"></script> <!-- Page-specific script for alerts -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 86 | Unique Scripts Loaded: 86 -->
+    <!-- 📊 Total Scripts Processed: 94 | Unique Scripts Loaded: 94 -->
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("alerts") -->
 
-    <!-- CRUD Response Handler E2E Test Script (Development Only) -->
-    <script src="scripts/crud-response-handler-e2e-test.js?v=1.0.0"></script>
+    <!-- CRUD Response Handler E2E Test Script (Development Only) - Remove from production -->
+    <!-- <script src="scripts/crud-response-handler-e2e-test.js?v=1.0.0"></script> -->
 </body>
 </html>

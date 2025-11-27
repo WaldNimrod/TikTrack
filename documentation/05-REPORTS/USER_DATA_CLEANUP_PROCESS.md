@@ -60,7 +60,7 @@
 
 #### 1. יצירת בסיס נתונים חדש לשיכפול
 
-**PostgreSQL:**
+**PostgreSQL (בלבד):**
 ```bash
 # צור database חדש
 docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -c \
@@ -71,24 +71,19 @@ docker exec tiktrack-postgres-dev pg_dump -U TikTrakDBAdmin -d TikTrack-db-devel
   docker exec -i tiktrack-postgres-dev psql -U TikTrakDBAdmin -d TikTrack-db-cleanup-test
 ```
 
-**SQLite:**
+**או שימוש בסקריפט:**
 ```bash
-# העתק את הקובץ
-cp Backend/db/tiktrack.db Backend/db/tiktrack_cleanup_test.db
+python3 Backend/scripts/clone_database_for_cleanup.py
 ```
 
 #### 2. הגדרת בסיס הנתונים לשיכפול
 
 **PostgreSQL:**
 ```bash
-# הגדר את ה-DATABASE_URL לשיכפול
+# הגדר את ה-POSTGRES_DB לשיכפול
 export POSTGRES_DB=TikTrack-db-cleanup-test
-```
 
-**SQLite:**
-```bash
-# הגדר את ה-DATABASE_URL לשיכפול
-export DATABASE_URL=sqlite:///Backend/db/tiktrack_cleanup_test.db
+# הסקריפט clone_database_for_cleanup.py מגדיר את זה אוטומטית
 ```
 
 #### 3. אימות השיכפול
@@ -108,7 +103,7 @@ export DATABASE_URL=sqlite:///Backend/db/tiktrack_cleanup_test.db
 **פעולה:** מחיקת כל הרשומות **חוץ מ-SPY**
 
 ```sql
--- שמירת SPY לפני המחיקה
+-- שמירת SPY לפני המחיקה (PostgreSQL TEMP TABLE)
 CREATE TEMP TABLE spy_ticker_backup AS 
 SELECT * FROM tickers WHERE symbol = 'SPY';
 
@@ -120,11 +115,11 @@ SELECT COUNT(*) FROM tickers; -- צריך להחזיר 1
 SELECT symbol FROM tickers; -- צריך להחזיר 'SPY'
 ```
 
-**הערות:**
-- Foreign Keys עם CASCADE ימחקו אוטומטית:
-  - `ticker_provider_symbols` (CASCADE)
-  - `market_data_quotes` (אם יש FK)
-  - `quotes_last` (אם יש FK)
+**הערות PostgreSQL:**
+- `CREATE TEMP TABLE` עובד ב-PostgreSQL כפי שהוא
+- Foreign Keys עם `ON DELETE CASCADE` ימחקו אוטומטית את הרשומות המקושרות
+- רק `ticker_provider_symbols` יש לו CASCADE מ-`tickers`
+- טבלאות אחרות (`market_data_quotes`, `quotes_last`, `intraday_data_slots`) צריכות ניקוי ידני לפני מחיקת טיקרים (אין CASCADE)
 
 #### 1.2 `market_data_quotes` - ציטוטי נתוני שוק
 **פעולה:** מחיקת כל הרשומות
@@ -436,14 +431,15 @@ DELETE FROM import_sessions;
 #### מבנה הטבלה
 
 ```sql
+-- מבנה טבלת ticker_provider_symbols ב-PostgreSQL
 CREATE TABLE ticker_provider_symbols (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,  -- או SERIAL ב-PostgreSQL
+    id SERIAL PRIMARY KEY,
     ticker_id INTEGER NOT NULL,
     provider_id INTEGER NOT NULL,
     provider_symbol VARCHAR(50) NOT NULL,
     is_primary BOOLEAN DEFAULT FALSE NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,  -- או TIMESTAMP WITH TIME ZONE ב-PostgreSQL
-    updated_at DATETIME,  -- או TIMESTAMP WITH TIME ZONE ב-PostgreSQL
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE,
     
     CONSTRAINT uq_ticker_provider_symbols_ticker_provider 
         UNIQUE (ticker_id, provider_id),
@@ -459,17 +455,22 @@ CREATE INDEX idx_ticker_provider_symbols_provider_id ON ticker_provider_symbols(
 CREATE INDEX idx_ticker_provider_symbols_provider_symbol ON ticker_provider_symbols(provider_symbol);
 ```
 
+**הערות PostgreSQL:**
+- `SERIAL` במקום `INTEGER PRIMARY KEY AUTOINCREMENT`
+- `TIMESTAMP WITH TIME ZONE` במקום `DATETIME`
+- Foreign Keys עם `ON DELETE CASCADE` עובדים ב-PostgreSQL
+
 #### שדות הטבלה
 
 | שם שדה | טיפוס | אילוצים | תיאור |
 |---------|-------|---------|-------|
-| `id` | INTEGER/SERIAL | PRIMARY KEY, AUTO_INCREMENT | מזהה ייחודי |
+| `id` | SERIAL | PRIMARY KEY | מזהה ייחודי (PostgreSQL) |
 | `ticker_id` | INTEGER | NOT NULL, FK → tickers.id (CASCADE) | מזהה טיקר |
 | `provider_id` | INTEGER | NOT NULL, FK → external_data_providers.id | מזהה ספק נתונים |
 | `provider_symbol` | VARCHAR(50) | NOT NULL | סמל בפורמט של הספק (למשל: '500X.MI') |
 | `is_primary` | BOOLEAN | NOT NULL, DEFAULT FALSE | האם זה המיפוי הראשי לספק זה |
-| `created_at` | DATETIME/TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | תאריך יצירה |
-| `updated_at` | DATETIME/TIMESTAMP | NULL | תאריך עדכון אחרון |
+| `created_at` | TIMESTAMP WITH TIME ZONE | DEFAULT CURRENT_TIMESTAMP | תאריך יצירה (PostgreSQL) |
+| `updated_at` | TIMESTAMP WITH TIME ZONE | NULL | תאריך עדכון אחרון (PostgreSQL) |
 
 #### 3 רשומות דוגמה
 

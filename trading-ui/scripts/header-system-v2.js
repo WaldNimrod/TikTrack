@@ -669,7 +669,7 @@ class MenuManager {
               this.closeMenu(menu.id);
             }
           }
-        }, 500);
+        }, 800);
       });
 
       menu.addEventListener('mouseenter', () => {
@@ -691,7 +691,7 @@ class MenuManager {
           if (!item.matches(':hover') && !menu.matches(':hover')) {
             this.closeMenu(menu.id);
           }
-        }, 500);
+        }, 800);
       });
 
       // Handle level 3 submenu hover
@@ -879,7 +879,7 @@ class MenuManager {
             if (!item.matches(':hover') && !menu.matches(':hover') && !submenu.matches(':hover')) {
               this.closeMenu(menu.id);
             }
-          }, 500);
+          }, 800);
         });
 
         // Check position on window resize (debounced)

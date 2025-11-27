@@ -386,13 +386,15 @@ function getEntityColor(entityType) {
  * @returns {string} - קוד צבע
  */
 function getStatusColor(status, intensity = 'medium') {
+  // Use centralized Color Scheme System if available
+  if (typeof window.getStatusColor === 'function') {
+    return window.getStatusColor(status, intensity);
+  }
+  // Fallback to local implementation (should not happen in production)
   if (!status) {
-    // רק מהעדפות - בלי fallbacks קבועים!
     return STATUS_COLORS['closed']?.[intensity] || '';
   }
-
   const normalizedStatus = status.toLowerCase().trim();
-  // רק מהעדפות - בלי fallbacks קבועים!
   return STATUS_COLORS[normalizedStatus]?.[intensity] || STATUS_COLORS['closed']?.[intensity] || '';
 }
 
@@ -404,6 +406,11 @@ function getStatusColor(status, intensity = 'medium') {
  * @returns {string} - קוד צבע רקע
  */
 function getStatusBackgroundColor(status) {
+  // Use centralized Color Scheme System if available
+  if (typeof window.getStatusBackgroundColor === 'function') {
+    return window.getStatusBackgroundColor(status);
+  }
+  // Fallback to local implementation (should not happen in production)
   return getStatusColor(status, 'light');
 }
 
@@ -415,6 +422,11 @@ function getStatusBackgroundColor(status) {
  * @returns {string} - קוד צבע טקסט
  */
 function getStatusTextColor(status) {
+  // Use centralized Color Scheme System if available
+  if (typeof window.getStatusTextColor === 'function') {
+    return window.getStatusTextColor(status);
+  }
+  // Fallback to local implementation (should not happen in production)
   return getStatusColor(status, 'medium');
 }
 
@@ -426,6 +438,11 @@ function getStatusTextColor(status) {
  * @returns {string} - קוד צבע גבול
  */
 function getStatusBorderColor(status) {
+  // Use centralized Color Scheme System if available
+  if (typeof window.getStatusBorderColor === 'function') {
+    return window.getStatusBorderColor(status);
+  }
+  // Fallback to local implementation (should not happen in production)
   return getStatusColor(status, 'border');
 }
 
@@ -437,13 +454,15 @@ function getStatusBorderColor(status) {
  * @returns {string} קוד הצבע
  */
 function getEntityBackgroundColor(entityType) {
+  // Use centralized Color Scheme System if available
+  if (typeof window.getEntityBackgroundColor === 'function') {
+    return window.getEntityBackgroundColor(entityType);
+  }
+  // Fallback to local implementation (should not happen in production)
   if (!entityType) {
-    // רק מהעדפות - בלי fallbacks קבועים!
     return '';
   }
-
   const normalizedType = entityType.toLowerCase().trim();
-  // רק מהעדפות - בלי fallbacks קבועים!
   return ENTITY_BACKGROUND_COLORS[normalizedType] || '';
 }
 
@@ -455,13 +474,15 @@ function getEntityBackgroundColor(entityType) {
  * @returns {string} קוד הצבע
  */
 function getEntityTextColor(entityType) {
+  // Use centralized Color Scheme System if available
+  if (typeof window.getEntityTextColor === 'function') {
+    return window.getEntityTextColor(entityType);
+  }
+  // Fallback to local implementation (should not happen in production)
   if (!entityType) {
-    // רק מהעדפות - בלי fallbacks קבועים!
     return '';
   }
-
   const normalizedType = entityType.toLowerCase().trim();
-  // רק מהעדפות - בלי fallbacks קבועים!
   return ENTITY_TEXT_COLORS[normalizedType] || '';
 }
 

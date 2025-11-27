@@ -336,7 +336,11 @@ class EntityDetailsRenderer {
      * @returns {string} - HTML מרונדר
      * @public
      */
-    renderMarketData(tickerData, tickerColor = '#019193') {
+    renderMarketData(tickerData, tickerColor = null) {
+        // Use centralized Color Scheme System if color not provided
+        if (!tickerColor && typeof window.getEntityColor === 'function') {
+            tickerColor = window.getEntityColor('ticker') || '';
+        }
         const price = tickerData.current_price || tickerData.price || 0;
         const change = tickerData.daily_change || tickerData.change_amount || 0;
         const changePercent = tickerData.daily_change_percent || tickerData.change_percent || 0;
@@ -1874,14 +1878,16 @@ class EntityDetailsRenderer {
         }
 
         const FieldRenderer = window.FieldRendererService || null;
-        const entityColor = (window.getEntityColor && typeof window.getEntityColor === 'function' ? window.getEntityColor('position') : null)
-            || this.entityColors.position
-            || this.entityColors.trade
-            || '#0d6efd';
-        const backgroundColor = (window.getEntityBackgroundColor && typeof window.getEntityBackgroundColor === 'function' ? window.getEntityBackgroundColor('position') : null)
-            || 'rgba(13, 110, 253, 0.12)';
-        const borderColor = (window.getEntityBorderColor && typeof window.getEntityBorderColor === 'function' ? window.getEntityBorderColor('position') : null)
-            || 'rgba(13, 110, 253, 0.35)';
+        // Use centralized Color Scheme System - no hardcoded fallbacks
+        const entityColor = (window.getEntityColor && typeof window.getEntityColor === 'function') 
+            ? window.getEntityColor('position') 
+            : (this.entityColors.position || this.entityColors.trade || '');
+        const backgroundColor = (window.getEntityBackgroundColor && typeof window.getEntityBackgroundColor === 'function')
+            ? window.getEntityBackgroundColor('position')
+            : '';
+        const borderColor = (window.getEntityBorderColor && typeof window.getEntityBorderColor === 'function')
+            ? window.getEntityBorderColor('position')
+            : '';
         const currencySymbol = positionData.currency_symbol
             || positionData.base_currency_symbol
             || positionData.account_currency_symbol
@@ -5377,7 +5383,9 @@ class EntityDetailsRenderer {
      * @public
      */
     renderBasicInfo(entityData, entityType, entityColor = null) {
-        const color = entityColor || this.entityColors[entityType] || '#6c757d';
+        // Use centralized Color Scheme System - no hardcoded fallbacks
+        const color = entityColor || this.entityColors[entityType] || 
+            (typeof window.getEntityColor === 'function' ? window.getEntityColor(entityType) : '');
         
         // Common basic fields
         const id = entityData.id || entityData.entity_id || '-';
@@ -5840,7 +5848,9 @@ class EntityDetailsRenderer {
      * @public
      */
     renderAdditionalInfo(entityData, entityType, entityColor = null) {
-        const color = entityColor || this.entityColors[entityType] || '#6c757d';
+        // Use centralized Color Scheme System - no hardcoded fallbacks
+        const color = entityColor || this.entityColors[entityType] || 
+            (typeof window.getEntityColor === 'function' ? window.getEntityColor(entityType) : '');
         
         let html = `
             <div class="additional-info">

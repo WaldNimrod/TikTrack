@@ -339,12 +339,17 @@ function selectDateRangeOption(dateRange) {
                 }
             }
             if (toInput && !toInput.value) {
-                // Use DataCollectionService to set value if available
-                const todayStr = today.toISOString().split('T')[0];
-                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
-                  window.DataCollectionService.setValue(toInput.id, todayStr, 'dateOnly');
+                // Use DefaultValueSetter for current date
+                if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+                    window.DefaultValueSetter.setCurrentDate(toInput.id);
                 } else {
-                  toInput.value = todayStr;
+                    // Fallback if DefaultValueSetter is not available
+                    const todayStr = today.toISOString().split('T')[0];
+                    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                        window.DataCollectionService.setValue(toInput.id, todayStr, 'dateOnly');
+                    } else {
+                        toInput.value = todayStr;
+                    }
                 }
             }
         }
@@ -1628,16 +1633,24 @@ async function initPortfolioPerformanceChart() {
             crosshair: {
                 mode: 1, // Normal mode - shows crosshair with tooltip
                 vertLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 },
                 horzLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 }
             }
         });
@@ -1840,16 +1853,24 @@ async function initPortfolioValueChart() {
             crosshair: {
                 mode: 1, // Normal mode - shows crosshair with tooltip
                 vertLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 },
                 horzLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 }
             }
         });
@@ -2084,16 +2105,24 @@ async function initPLTrendChart() {
             crosshair: {
                 mode: 1, // Normal mode - shows crosshair with tooltip
                 vertLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 },
                 horzLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 }
             }
         });

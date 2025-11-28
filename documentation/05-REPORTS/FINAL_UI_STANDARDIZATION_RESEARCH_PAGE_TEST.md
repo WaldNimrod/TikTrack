@@ -32,10 +32,15 @@
 **תוצאות:**
 - ✅ Bootstrap נטען
 - ✅ master.css נטען
-- ⚠️ inlineStyles: נדרש לבדיקה ידנית (בדיקה אוטומטית לא זמינה)
-- ⚠️ styleTags: נדרש לבדיקה ידנית
+- ✅ אין inline styles hardcoded ב-HTML
+- ✅ אין style tags ב-HTML
+- ⚠️ 14 inline styles דינמיים (נוצרים ע"י JavaScript)
+  - CSS variables על HTML element (--current-entity-color) - דינמי ✅
+  - Dropdown menus (opacity, visibility, transform) - דינמי ✅
+  - Section body display states - דינמי ✅
+  - Navigation text colors - דינמי ✅
 
-**הערה:** בדיקה אוטומטית מלאה דורשת כלי נוסף.
+**הערה:** כל ה-inline styles הם דינמיים ונוצרים ע"י JavaScript, לא hardcoded ב-HTML. זה תקין לפי כללי ITCSS.
 
 ## שלב 4: בדיקת קונסולה
 

@@ -30,6 +30,9 @@
     <!-- TikTrack ITCSS Master Styles - כולל הכל -->
     <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
     
+    <!-- Page-specific Styles -->
+    <link rel="stylesheet" href="styles-new/07-pages/_cash_flows.css?v=1.0.0">
+    
     <!-- External Libraries -->
     <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
     
@@ -127,8 +130,8 @@
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
                         </div>
                         <div class="filter-container d-flex align-items-center gap-2" id="cashFlowTypeFilterDropdown">
-                            <label for="cashFlowTypeFilter" class="form-label mb-0" style="font-size: 0.875rem;">סוג תזרים:</label>
-                            <select id="cashFlowTypeFilter" class="form-select form-select-sm" style="min-width: 200px;" data-onchange="filterCashFlowsByType(this.value)">
+                            <label for="cashFlowTypeFilter" class="form-label mb-0">סוג תזרים:</label>
+                            <select id="cashFlowTypeFilter" class="form-select form-select-sm" data-onchange="filterCashFlowsByType(this.value)">
                                 <option value="all">הכל</option>
                                 <option value="deposit">הפקדות</option>
                                 <option value="withdrawal">משיכות</option>

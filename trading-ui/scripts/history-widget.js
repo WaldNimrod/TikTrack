@@ -784,7 +784,7 @@
      * Setup Quick Links
      * Creates actions menu for quick links (like table action menus)
      */
-    function setupQuickLinks() {
+    async function setupQuickLinks() {
         try {
             const container = document.getElementById('quickLinksActionsMenuContainer');
             if (!container) {

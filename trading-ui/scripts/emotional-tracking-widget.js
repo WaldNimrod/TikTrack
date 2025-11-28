@@ -510,7 +510,7 @@
                     });
                 }
             });
-        });
+        }
 
         // Setup save button
         const saveButton = document.querySelector('#saveEmotionButton');

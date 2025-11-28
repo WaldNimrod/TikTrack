@@ -193,6 +193,37 @@ class ProcessRunner:
         
         return success
     
+    def run_phase2_load_market_data(self) -> bool:
+        """מריץ טעינת נתוני שוק לאחר יצירת נתוני הדוגמה"""
+        print("\n" + "=" * 70)
+        print("📊 שלב 2.5: טעינת נתוני שוק לטיקרים")
+        print("=" * 70)
+        
+        if self.skip_phase2:
+            print("⏭️  מדלגים על טעינת נתוני שוק (--skip-phase2)")
+            return True
+        
+        script_path = os.path.join(
+            os.path.dirname(__file__),
+            'load_market_data_for_tickers.py'
+        )
+        
+        args = []
+        if self.dry_run:
+            args.append('--dry-run')
+        if self.verbose:
+            args.append('--verbose')
+        
+        success = self.run_script(script_path, args)
+        
+        if success:
+            print("\n✅ טעינת נתוני שוק הושלמה בהצלחה")
+        else:
+            print("\n⚠️  טעינת נתוני שוק נכשלה - אפשר להמשיך")
+            # Don't fail the entire process if market data loading fails
+        
+        return True  # Always return True to not block the process
+    
     def run_phase2_verification(self) -> bool:
         """בודק את תוצאות שלב 2"""
         print("\n" + "=" * 70)
@@ -277,6 +308,11 @@ class ProcessRunner:
             if not self.run_phase2_demo_data():
                 print("\n❌ תהליך נכשל בשלב 2 (יצירת דוגמה)")
                 return False
+            
+            # Load market data for all tickers
+            if not self.run_phase2_load_market_data():
+                print("\n⚠️  תהליך נכשל בטעינת נתוני שוק - אבל ממשיך")
+                # Don't fail on market data loading, just warn
             
             if not self.run_phase2_verification():
                 print("\n⚠️  יש אזהרות באימות שלב 2, אבל התהליך הושלם")

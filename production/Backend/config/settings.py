@@ -12,7 +12,7 @@ UI_DIR = BASE_DIR.parent / "trading-ui"
 # PostgreSQL database configuration (production uses PostgreSQL only)
 POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
 POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
-POSTGRES_DB = os.getenv("POSTGRES_DB", "TikTrack-db-prodution")  # Note: typo in actual DB name
+POSTGRES_DB = os.getenv("POSTGRES_DB", "TikTrack-db-production")
 POSTGRES_USER = os.getenv("POSTGRES_USER", "TikTrakDBAdmin")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "BigMeZoo1974!?")
 

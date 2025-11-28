@@ -53,7 +53,7 @@ git push origin production
 
 - **תקייה נפרדת:** `production/Backend/` - רק קבצים פעילים
 - **Git Branch נפרד:** `production` - קוד נקי ללא tests/migrations
-- **בסיס נתונים נפרד:** PostgreSQL (`TikTrack-db-prodution`) - רק נתוני עזר והעדפות
+- **בסיס נתונים נפרד:** PostgreSQL (`TikTrack-db-production`) - רק נתוני עזר והעדפות
 - **פורט נפרד:** 5001 (פיתוח: 8080)
 - **לוגים נפרדים:** `production/Backend/logs/`
 
@@ -212,7 +212,7 @@ python3 scripts/create_production_db.py
 
 הסקריפט:
 1. קורא מ-PostgreSQL פיתוח (`TikTrack-db-development`)
-2. יוצר PostgreSQL פרודקשן (`TikTrack-db-prodution`)
+2. יוצר PostgreSQL פרודקשן (`TikTrack-db-production`)
 3. מעתיק את כל מבנה הטבלאות
 4. מעתיק נתוני עזר והעדפות
 5. מעתיק רק חשבון מסחר אחד (ברירת מחדל)
@@ -265,14 +265,14 @@ cd production
 - כל הקוד כולל tests, migrations, וכו'
 - עבודה יומיומית
 - פורט: 8080
-- DB: PostgreSQL (`TikTrack-db-prodution`)
+- DB: PostgreSQL (`TikTrack-db-production`)
 
 ### production (production)
 - רק קבצים פעילים מ-`production/Backend/`
 - קוד נקי ללא tests/migrations
 - עדכון רק דרך sync script
 - פורט: 5001
-- DB: PostgreSQL (`TikTrack-db-prodution`)
+- DB: PostgreSQL (`TikTrack-db-production`)
 
 ## הפרדה בין הסביבות
 
@@ -281,7 +281,7 @@ cd production
 | **תקייה** | `Backend/` | `production/Backend/` |
 | **Git Branch** | `main` | `production` |
 | **פורט** | 8080 | 5001 |
-| **DB** | PostgreSQL (`TikTrack-db-development`) | PostgreSQL (`TikTrack-db-prodution`) |
+| **DB** | PostgreSQL (`TikTrack-db-development`) | PostgreSQL (`TikTrack-db-production`) |
 | **לוגים** | `Backend/logs/` | `production/Backend/logs/` |
 | **קבצים** | כל הקבצים | רק פעילים (~145) |
 | **Tests** | ✅ יש | ❌ אין |

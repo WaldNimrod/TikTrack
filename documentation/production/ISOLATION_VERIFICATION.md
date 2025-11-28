@@ -17,7 +17,7 @@
 
 2. **בסיס נתונים נפרד**
    - פיתוח: PostgreSQL (`TikTrack-db-development`)
-   - פרודקשן: PostgreSQL (`TikTrack-db-prodution`)
+   - פרודקשן: PostgreSQL (`TikTrack-db-production`)
    - אין שיתוף נתונים
 
 3. **פורט נפרד**
@@ -82,7 +82,7 @@ python3 -c "from config.settings import DB_PATH, PORT, IS_PRODUCTION; print(f'DB
 
 **תוצאה צפויה:**
 ```
-DB: PostgreSQL (TikTrack-db-prodution)
+DB: PostgreSQL (TikTrack-db-production)
 Port: 5001
 Production: True
 ```

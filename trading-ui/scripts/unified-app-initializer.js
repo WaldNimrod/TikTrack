@@ -1713,6 +1713,7 @@ window.addEventListener('error', event => {
     event.error &&
     event.error.name === 'SyntaxError' &&
     event.message &&
+    typeof event.message === 'string' &&
     event.message.includes('Unexpected end of input')
   ) {
     window.Logger.info('🔧 ===== IGNORING SYNTAX ERROR =====', { page: 'unified-app-initializer' });

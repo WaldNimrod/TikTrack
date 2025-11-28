@@ -522,11 +522,45 @@ async function saveFilterState() {
         const filters = getFilterValues();
         // Use PageStateManager if available
         if (window.PageStateManager) {
-            await window.PageStateManager.savePageState('comparative-analysis-page', {
-                filters: filters
-            });
+            try {
+                await window.PageStateManager.savePageState('comparative-analysis-page', {
+                    filters: filters
+                });
+            } catch (pageStateError) {
+                // Fallback to PreferencesCore if PageStateManager fails
+                if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
+                    try {
+                        await window.PreferencesCore.savePreference(PREF_FILTERS, filters);
+                    } catch (prefError) {
+                        // Final fallback to localStorage
+                        if (window.Logger) {
+                            window.Logger.warn('Preference save failed, using localStorage fallback', { 
+                                page: 'comparative-analysis-page', 
+                                preference: PREF_FILTERS,
+                                error: prefError 
+                            });
+                        }
+                        localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+                    }
+                } else {
+                    // Fallback to localStorage
+                    localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+                }
+            }
         } else if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
-            await window.PreferencesCore.savePreference(PREF_FILTERS, filters);
+            try {
+                await window.PreferencesCore.savePreference(PREF_FILTERS, filters);
+            } catch (prefError) {
+                // If preference doesn't exist in database, fallback to localStorage
+                if (window.Logger) {
+                    window.Logger.warn('Preference not found in database, using localStorage fallback', { 
+                        page: 'comparative-analysis-page', 
+                        preference: PREF_FILTERS,
+                        error: prefError 
+                    });
+                }
+                localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+            }
         } else {
             // Fallback to localStorage
             localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
@@ -534,6 +568,16 @@ async function saveFilterState() {
     } catch (error) {
         if (window.Logger) {
             window.Logger.warn('Failed to save filter state', { page: 'comparative-analysis-page', error });
+        }
+        // Final fallback: always try localStorage
+        try {
+            const filters = getFilterValues();
+            localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+        } catch (e) {
+            // Ignore localStorage errors
+            if (window.Logger) {
+                window.Logger.error('❌ Error saving preference comparative-analysis-filters:', e, { page: 'comparative-analysis-page' });
+            }
         }
     }
 }

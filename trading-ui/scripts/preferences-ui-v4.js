@@ -390,6 +390,28 @@
 
         const value = window.currentPreferences[key];
         
+        // CRITICAL: Check if field was modified by user before overwriting
+        // If field has focus or was recently modified, preserve user's input
+        const fieldHasFocus = document.activeElement === input;
+        const fieldWasModified = input.dataset.userModified === 'true' || 
+                                 (input.value !== '' && input.value !== value && value !== undefined && value !== null);
+        
+        // Skip population if field is currently being edited or was modified by user
+        if (fieldHasFocus || (fieldWasModified && !input.dataset.allowRepopulate)) {
+          window.Logger?.debug?.('⏭️ Skipping field population - user is editing or field was modified', {
+            page: 'preferences-ui-v4',
+            fieldId: input.id,
+            fieldName: input.name,
+            currentValue: input.value,
+            cachedValue: value,
+            hasFocus: fieldHasFocus,
+            wasModified: fieldWasModified
+          });
+          skippedCount++;
+          skippedKeys.push(key);
+          return; // Continue to next field
+        }
+        
         // Skip if no value found
         if (value === undefined || value === null) {
           skippedCount++;

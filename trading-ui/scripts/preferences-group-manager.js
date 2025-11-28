@@ -48,6 +48,9 @@ class PreferencesGroupManager {
       'section7': 'chart_settings_unified',
       'section8': 'ui_settings',
     };
+    
+    // Initialize user modification tracking for preference fields
+    this._initializeUserModificationTracking();
     this.currentUserId = 1;
     this.currentProfileId = null;
     // מיפוי שמות מפתח קנוניים ↔ מזהי שדות/שמות ישנים ב-DOM
@@ -155,10 +158,50 @@ class PreferencesGroupManager {
   }
 
   /**
-     * בניית מיפוי הפוך לזיהוי מהיר של קלטי UI והשלכתם למפתח הקנוני
-     * @param {Object} aliases - map of canonicalKey -> string[]
-     * @returns {Object} reverse map uiName/id -> canonicalKey
-     */
+   * Initialize event listeners to track user modifications to preference fields
+   * This prevents populateGroupFields from overwriting user input
+   */
+  _initializeUserModificationTracking() {
+    // Use event delegation on the preferences form
+    const form = document.getElementById('preferencesForm');
+    if (!form) {
+      // Form might not exist yet, try again later
+      setTimeout(() => this._initializeUserModificationTracking(), 500);
+      return;
+    }
+
+    // Mark fields as user-modified when user types or changes them
+    const markAsUserModified = (event) => {
+      const field = event.target;
+      if (field && (field.tagName === 'INPUT' || field.tagName === 'SELECT' || field.tagName === 'TEXTAREA')) {
+        // Only mark if field is in a preferences section
+        const section = field.closest('[id^="section"]');
+        if (section && Object.keys(this.groupsMap).includes(section.id)) {
+          field.dataset.userModified = 'true';
+          window.Logger?.debug?.('✅ Marked field as user-modified', {
+            page: 'preferences-group-manager',
+            fieldId: field.id,
+            fieldName: field.name,
+            value: field.value
+          });
+        }
+      }
+    };
+
+    // Add event listeners using delegation
+    form.addEventListener('input', markAsUserModified, true);
+    form.addEventListener('change', markAsUserModified, true);
+    
+    window.Logger?.debug?.('✅ Initialized user modification tracking for preference fields', {
+      page: 'preferences-group-manager'
+    });
+  }
+
+  /**
+   * בניית מיפוי הפוך לזיהוי מהיר של קלטי UI והשלכתם למפתח הקנוני
+   * @param {Object} aliases - map of canonicalKey -> string[]
+   * @returns {Object} reverse map uiName/id -> canonicalKey
+   */
   _buildReverseAliases(aliases) {
     const reverse = {};
     Object.keys(aliases).forEach(canonical => {
@@ -343,6 +386,36 @@ class PreferencesGroupManager {
 
       const field = section.querySelector(selectorParts.join(', '));
       if (field) {
+        // CRITICAL: Check if field was modified by user before overwriting
+        // If field has focus or was recently modified, preserve user's input
+        const fieldHasFocus = document.activeElement === field;
+        const cachedValue = normalizedPreferences[rawKey];
+        const currentValue = field.type === 'checkbox' ? field.checked : field.value;
+        
+        // Check if value actually differs from cached value
+        const valueDiffers = field.type === 'checkbox' 
+          ? (currentValue !== (cachedValue === 'true' || cachedValue === true))
+          : (currentValue !== '' && currentValue !== cachedValue && cachedValue !== undefined && cachedValue !== null);
+        
+        const fieldWasModified = field.dataset.userModified === 'true' || valueDiffers;
+        
+        // Skip population if field is currently being edited or was modified by user
+        // UNLESS explicitly allowed to repopulate (e.g., after save)
+        if (fieldHasFocus || (fieldWasModified && !field.dataset.allowRepopulate)) {
+          window.Logger?.debug?.('⏭️ Skipping field population - user is editing or field was modified', {
+            page: 'preferences-group-manager',
+            fieldId: field.id,
+            fieldName: field.name,
+            currentValue: currentValue,
+            cachedValue: cachedValue,
+            hasFocus: fieldHasFocus,
+            wasModified: fieldWasModified,
+            valueDiffers: valueDiffers
+          });
+          // Don't increment populatedCount for skipped fields
+          return; // Continue to next field
+        }
+        
         if (field.type === 'checkbox') {
           const v = normalizedPreferences[rawKey];
           field.checked = v === 'true' || v === true;
@@ -350,6 +423,14 @@ class PreferencesGroupManager {
           const sourceValue = normalizedPreferences[rawKey];
           const normalizedValue = this.normalizePreferenceValue(canonicalKey, sourceValue, 'toEnglish');
           const previousValue = field.value;
+          
+          // Only update if value actually changed
+          if (field.value === normalizedValue || field.value === sourceValue) {
+            // Value already matches, no need to update
+            populatedCount++;
+            return; // Continue to next field
+          }
+          
           // Use DataCollectionService to set value if available
           if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
             window.DataCollectionService.setValue(field.id, normalizedValue, 'text');
@@ -359,7 +440,11 @@ class PreferencesGroupManager {
               if (currentValue !== normalizedValue && sourceValue !== undefined && sourceValue !== null) {
                 window.DataCollectionService.setValue(field.id, sourceValue, 'text');
               } else if (currentValue === '' && previousValue !== '') {
-                window.DataCollectionService.setValue(field.id, previousValue, 'text');
+                // Only restore previous value if it's not empty and current is empty
+                // But don't restore if user was editing
+                if (!fieldHasFocus && !fieldWasModified) {
+                  window.DataCollectionService.setValue(field.id, previousValue, 'text');
+                }
               }
             }
           } else {
@@ -369,10 +454,14 @@ class PreferencesGroupManager {
               field.value = sourceValue;
             }
             // If still empty and there was a previous value, restore it to avoid blank selection
-            if (field.value === '' && previousValue !== '') {
+            // BUT: Only if user is not currently editing
+            if (field.value === '' && previousValue !== '' && !fieldHasFocus && !fieldWasModified) {
               field.value = previousValue;
             }
           }
+          
+          // Clear user modification flag after successful population
+          delete field.dataset.userModified;
         }
         populatedCount++;
       } else {
@@ -708,9 +797,28 @@ class PreferencesGroupManager {
       }
 
       // Re-populate UI fields with refreshed values
+      // CRITICAL: Mark fields as allowRepopulate to override user modification check
+      // This is safe because we just saved the values, so refreshing from server is expected
       const sectionId = Object.keys(this.groupsMap).find(id => this.groupsMap[id] === groupName);
       if (sectionId) {
-        this.populateGroupFields(sectionId, refreshedGroup);
+        const section = document.getElementById(sectionId);
+        if (section) {
+          // Mark all fields in this section as allowRepopulate temporarily
+          const fields = section.querySelectorAll('input, select, textarea');
+          fields.forEach(field => {
+            field.dataset.allowRepopulate = 'true';
+          });
+          
+          // Populate fields
+          this.populateGroupFields(sectionId, refreshedGroup);
+          
+          // Clear allowRepopulate flag after population
+          fields.forEach(field => {
+            delete field.dataset.allowRepopulate;
+            // Also clear userModified flag since we just refreshed from server
+            delete field.dataset.userModified;
+          });
+        }
       }
 
       if (groupName === 'basic_settings' && typeof window.loadAccountsForPreferences === 'function') {

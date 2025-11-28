@@ -402,7 +402,10 @@ class InfoSummarySystem {
   renderInfoSummary(containerId, stats, config) {
     const container = document.getElementById(containerId);
     if (!container) {
-      console.error(`Container '${containerId}' not found`);
+      // Silent fail - container might be optional for some pages
+      if (window.Logger) {
+        window.Logger.debug(`Container '${containerId}' not found - skipping render`, { containerId });
+      }
       return;
     }
     

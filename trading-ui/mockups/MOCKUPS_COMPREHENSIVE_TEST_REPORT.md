@@ -1,11 +1,11 @@
 # דוח בדיקות מקיף - עמודי מוקאפ
 # Comprehensive Mockups Testing Report
 
-**תאריך בדיקה:** 28.11.2025, 23:51:28  
+**תאריך בדיקה:** 29.11.2025, 0:18:10  
 **סה"כ עמודים:** 12  
-**עמודים שעברו:** 5 ✅  
-**עמודים נכשלו:** 7 ❌  
-**שיעור הצלחה:** 42%
+**עמודים שעברו:** 7 ✅  
+**עמודים נכשלו:** 5 ❌  
+**שיעור הצלחה:** 58%
 
 ---
 
@@ -14,7 +14,7 @@
 ### סטטיסטיקות:
 - **שגיאות קונסולה:** 6
 - **אזהרות קונסולה:** 0
-- **שגיאות JavaScript:** 8
+- **שגיאות JavaScript:** 0
 - **אזהרות:** 0
 
 ---
@@ -40,8 +40,8 @@
 - שבורים: 10
 
 **❌ שגיאות קונסולה:** 2
-- [11:50:49 PM] ERROR: ❌ Error saving preference comparative-analysis-comparison-params: JSHandle@erro...
-- [11:50:49 PM] ERROR: ❌ Error saving preference comparative-analysis-filters: JSHandle@error...
+- [12:17:31 AM] ERROR: ❌ Error saving preference comparative-analysis-comparison-params: JSHandle@erro...
+- [12:17:31 AM] ERROR: ❌ Error saving preference comparative-analysis-filters: JSHandle@error...
 
 ---
 
@@ -88,7 +88,7 @@
 
 ---
 
-### ❌ emotional-tracking-widget
+### ✅ emotional-tracking-widget
 
 **נתיב:** `/mockups/daily-snapshots/emotional-tracking-widget.html`
 
@@ -106,13 +106,9 @@
 - עובדים: 0
 - שבורים: 3
 
-**❌ שגיאות:**
-- **JavaScript Error:** Unexpected token ')'
-- **Page Load Error:** e.includes is not a function
-
 ---
 
-### ❌ history-widget
+### ✅ history-widget
 
 **נתיב:** `/mockups/daily-snapshots/history-widget.html`
 
@@ -121,7 +117,7 @@
 - תפריט עובד: ✅
 
 **כפתורים:**
-- סה"כ: 21
+- סה"כ: 26
 - עובדים: 0
 - שבורים: 10
 
@@ -129,10 +125,6 @@
 - סה"כ: 1
 - עובדים: 0
 - שבורים: 1
-
-**❌ שגיאות:**
-- **JavaScript Error:** await is only valid in async functions and the top level bodies of modules
-- **Page Load Error:** e.includes is not a function
 
 ---
 
@@ -145,7 +137,7 @@
 - תפריט עובד: ✅
 
 **כפתורים:**
-- סה"כ: 38
+- סה"כ: 58
 - עובדים: 0
 - שבורים: 10
 
@@ -154,9 +146,8 @@
 - עובדים: 0
 - שבורים: 5
 
-**❌ שגיאות:**
-- **JavaScript Error:** Identifier 'errorMsg' has already been declared
-- **Page Load Error:** e.includes is not a function
+**❌ שגיאות קונסולה:** 1
+- Container 'portfolio-state-summary' not found...
 
 ---
 
@@ -221,13 +212,8 @@
 - עובדים: 0
 - שבורים: 6
 
-**❌ שגיאות:**
-- **JavaScript Error:** missing ) after argument list
-- **Page Load Error:** e.includes is not a function
-
-**❌ שגיאות קונסולה:** 2
-- [11:51:15 PM] ERROR: ❌ Global Error: JSHandle@error...
-- [11:51:15 PM] ERROR: ❌ Error details: JSHandle@object...
+**❌ שגיאות קונסולה:** 1
+- [12:18:00 AM] ERROR: Error getting linked items for trade 123: JSHandle@error...
 
 ---
 

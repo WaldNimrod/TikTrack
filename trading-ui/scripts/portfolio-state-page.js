@@ -1331,31 +1331,34 @@ function updateTradesTable() {
     
     tbody.innerHTML = filteredTrades.map(trade => renderTradeRow(trade)).join('');
     
-    // Update summary using InfoSummarySystem
-    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS['portfolio-state-page']) {
-        const config = window.INFO_SUMMARY_CONFIGS['portfolio-state-page'];
-        window.InfoSummarySystem.calculateAndRender(filteredTrades, config).catch(err => {
-            window.Logger?.warn('Failed to update portfolio state summary via InfoSummarySystem', { error: err, page: 'portfolio-state-page' });
-        });
-    } else {
-        // Fallback: Update trades-summary element directly
-        const totalPL = filteredTrades.reduce((sum, t) => sum + (t.position_pl_value || 0), 0);
-        const summaryElement = document.getElementById('trades-summary');
-        if (summaryElement) {
-            const renderNumericValue = (value, suffix = '%', showSign = true) => {
-                if (window.FieldRendererService?.renderNumericValue) {
-                    return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
+                // Update summary using InfoSummarySystem (only if container exists)
+                if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS['portfolio-state-page']) {
+                    const config = window.INFO_SUMMARY_CONFIGS['portfolio-state-page'];
+                    const container = document.getElementById(config.containerId);
+                    if (container) {
+                        window.InfoSummarySystem.calculateAndRender(filteredTrades, config).catch(err => {
+                            window.Logger?.warn('Failed to update portfolio state summary via InfoSummarySystem', { error: err, page: 'portfolio-state-page' });
+                        });
+                    }
                 }
-                const sign = showSign && value >= 0 ? '+' : '';
-                const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
-                return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
-            };
-            summaryElement.innerHTML = `
-                <strong>סה"כ טריידים: ${filteredTrades.length}</strong> | 
-                <strong>סה"כ P/L: ${renderNumericValue(totalPL, '$')}</strong>
-            `;
-        }
-    }
+                
+                // Always update trades-summary element (fallback or primary)
+                const totalPL = filteredTrades.reduce((sum, t) => sum + (t.position_pl_value || 0), 0);
+                const summaryElement = document.getElementById('trades-summary');
+                if (summaryElement) {
+                    const renderNumericValue = (value, suffix = '%', showSign = true) => {
+                        if (window.FieldRendererService?.renderNumericValue) {
+                            return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
+                        }
+                        const sign = showSign && value >= 0 ? '+' : '';
+                        const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
+                        return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
+                    };
+                    summaryElement.innerHTML = `
+                        <strong>סה"כ טריידים: ${filteredTrades.length}</strong> | 
+                        <strong>סה"כ P/L: ${renderNumericValue(totalPL, '$')}</strong>
+                    `;
+                }
     
     // Note: Action buttons are now created directly in renderTradeRow() using createActionsMenu()
     // No need for loadTableActionButtons() anymore
@@ -3145,30 +3148,33 @@ async function waitForScripts() {
                 
                 tbody.innerHTML = filteredTrades.map(trade => renderTradeRow(trade)).join('');
                 
-                // Update summary using InfoSummarySystem
+                // Update summary using InfoSummarySystem (only if container exists)
                 if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS['portfolio-state-page']) {
                     const config = window.INFO_SUMMARY_CONFIGS['portfolio-state-page'];
-                    window.InfoSummarySystem.calculateAndRender(filteredTrades, config).catch(err => {
-                        window.Logger?.warn('Failed to update portfolio state summary via InfoSummarySystem', { error: err, page: 'portfolio-state-page' });
-                    });
-                } else {
-                    // Fallback: Update trades-summary element directly
-                    const totalPL = filteredTrades.reduce((sum, t) => sum + (t.position_pl_value || 0), 0);
-                    const summaryElement = document.getElementById('trades-summary');
-                    if (summaryElement) {
-                        const renderNumericValue = (value, suffix = '%', showSign = true) => {
-                            if (window.FieldRendererService?.renderNumericValue) {
-                                return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
-                            }
-                            const sign = showSign && value >= 0 ? '+' : '';
-                            const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
-                            return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
-                        };
-                        summaryElement.innerHTML = `
-                            <strong>סה"כ טריידים: ${filteredTrades.length}</strong> | 
-                            <strong>סה"כ P/L: ${renderNumericValue(totalPL, '$')}</strong>
-                        `;
+                    const container = document.getElementById(config.containerId);
+                    if (container) {
+                        window.InfoSummarySystem.calculateAndRender(filteredTrades, config).catch(err => {
+                            window.Logger?.warn('Failed to update portfolio state summary via InfoSummarySystem', { error: err, page: 'portfolio-state-page' });
+                        });
                     }
+                }
+                
+                // Always update trades-summary element (fallback or primary)
+                const totalPL = filteredTrades.reduce((sum, t) => sum + (t.position_pl_value || 0), 0);
+                const summaryElement = document.getElementById('trades-summary');
+                if (summaryElement) {
+                    const renderNumericValue = (value, suffix = '%', showSign = true) => {
+                        if (window.FieldRendererService?.renderNumericValue) {
+                            return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
+                        }
+                        const sign = showSign && value >= 0 ? '+' : '';
+                        const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
+                        return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
+                    };
+                    summaryElement.innerHTML = `
+                        <strong>סה"כ טריידים: ${filteredTrades.length}</strong> | 
+                        <strong>סה"כ P/L: ${renderNumericValue(totalPL, '$')}</strong>
+                    `;
                 }
                 
                 // Note: Action buttons are now created directly in renderTradeRow() using createActionsMenu()

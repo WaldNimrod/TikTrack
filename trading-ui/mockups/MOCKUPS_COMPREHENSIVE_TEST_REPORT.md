@@ -1,7 +1,7 @@
 # דוח בדיקות מקיף - עמודי מוקאפ
 # Comprehensive Mockups Testing Report
 
-**תאריך בדיקה:** 28.11.2025, 23:16:48  
+**תאריך בדיקה:** 28.11.2025, 23:51:28  
 **סה"כ עמודים:** 12  
 **עמודים שעברו:** 5 ✅  
 **עמודים נכשלו:** 7 ❌  
@@ -12,7 +12,7 @@
 ## סיכום כללי
 
 ### סטטיסטיקות:
-- **שגיאות קונסולה:** 8
+- **שגיאות קונסולה:** 6
 - **אזהרות קונסולה:** 0
 - **שגיאות JavaScript:** 8
 - **אזהרות:** 0
@@ -40,8 +40,8 @@
 - שבורים: 10
 
 **❌ שגיאות קונסולה:** 2
-- [11:16:09 PM] ERROR: ❌ Error saving preference comparative-analysis-comparison-params: JSHandle@erro...
-- [11:16:10 PM] ERROR: ❌ Error saving preference comparative-analysis-filters: JSHandle@error...
+- [11:50:49 PM] ERROR: ❌ Error saving preference comparative-analysis-comparison-params: JSHandle@erro...
+- [11:50:49 PM] ERROR: ❌ Error saving preference comparative-analysis-filters: JSHandle@error...
 
 ---
 
@@ -155,12 +155,8 @@
 - שבורים: 5
 
 **❌ שגיאות:**
-- **JavaScript Error:** Unexpected token 'catch'
+- **JavaScript Error:** Identifier 'errorMsg' has already been declared
 - **Page Load Error:** e.includes is not a function
-
-**❌ שגיאות קונסולה:** 2
-- Failed to load resource: the server responded with a status of 404 (NOT FOUND)...
-- Failed to load resource: the server responded with a status of 404 (NOT FOUND)...
 
 ---
 
@@ -230,8 +226,8 @@
 - **Page Load Error:** e.includes is not a function
 
 **❌ שגיאות קונסולה:** 2
-- [11:16:35 PM] ERROR: ❌ Global Error: JSHandle@error...
-- [11:16:35 PM] ERROR: ❌ Error details: JSHandle@object...
+- [11:51:15 PM] ERROR: ❌ Global Error: JSHandle@error...
+- [11:51:15 PM] ERROR: ❌ Error details: JSHandle@object...
 
 ---
 

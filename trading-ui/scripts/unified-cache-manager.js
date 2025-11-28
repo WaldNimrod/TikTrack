@@ -3255,7 +3255,63 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
         }
         
         console.log(`✅ DEBUG: Successfully removed ${removedCount} key entries from localStorage`);
-        console.log('✅ DEBUG: Cache cleared successfully - preferences will be reloaded by caller');
+        
+        // CRITICAL: After clearing cache, reload preferences from server
+        // This ensures the UI shows the latest saved values
+        // Note: If refreshGroupState is called after this (e.g., in saveGroup), it will handle reloading
+        // But we still reload here to ensure data is fresh even if refreshGroupState is not called
+        
+        // Only reload if we have specific preference names or no group name
+        // (If groupName is provided and refreshGroupState will be called, we can skip to avoid duplication)
+        const shouldReload = !groupName || (preferenceNames.length > 0 && preferenceNames.length <= 5);
+        
+        if (shouldReload) {
+            console.log('✅ DEBUG: Cache cleared - reloading preferences from server');
+            
+            if (window.PreferencesGroupManager && typeof window.PreferencesGroupManager.loadGroupData === 'function') {
+                // If we have a specific group, reload only that group
+                if (groupName) {
+                    const sectionId = Object.keys(window.PreferencesGroupManager.groupsMap || {}).find(
+                        key => window.PreferencesGroupManager.groupsMap[key] === groupName
+                    );
+                    if (sectionId) {
+                        await window.PreferencesGroupManager.loadGroupData(sectionId, groupName);
+                        console.log(`✅ DEBUG: Reloaded group ${groupName} from server`);
+                    }
+                } else {
+                    // Reload all preference groups
+                    const groupsToReload = Object.values(window.PreferencesGroupManager.groupsMap || {});
+                    for (const group of groupsToReload) {
+                        const sectionId = Object.keys(window.PreferencesGroupManager.groupsMap || {}).find(
+                            key => window.PreferencesGroupManager.groupsMap[key] === group
+                        );
+                        if (sectionId) {
+                            await window.PreferencesGroupManager.loadGroupData(sectionId, group);
+                        }
+                    }
+                    console.log(`✅ DEBUG: Reloaded ${groupsToReload.length} preference groups from server`);
+                }
+            } else if (window.PreferencesCore && typeof window.PreferencesCore.getAllPreferences === 'function') {
+                // Fallback: reload all preferences via PreferencesCore
+                const userId = opts.userId ?? window.PreferencesCore.currentUserId ?? 1;
+                const profileId = profileIdList.length > 0 ? profileIdList[0] : window.PreferencesCore.currentProfileId;
+                await window.PreferencesCore.getAllPreferences(userId, profileId, [], true); // forceRefresh = true
+                console.log(`✅ DEBUG: Reloaded all preferences via PreferencesCore`);
+            } else if (window.PreferencesUI && typeof window.PreferencesUI.loadAllPreferences === 'function') {
+                // Fallback: reload all preferences via PreferencesUI
+                const userId = opts.userId ?? window.PreferencesUI.currentUserId ?? 1;
+                const profileId = profileIdList.length > 0 ? profileIdList[0] : window.PreferencesUI.currentProfileId;
+                await window.PreferencesUI.loadAllPreferences(userId, profileId);
+                console.log(`✅ DEBUG: Reloaded all preferences via PreferencesUI`);
+            } else {
+                console.warn('⚠️ DEBUG: No preference reload method available - cache cleared but data not reloaded');
+                window.Logger?.warn('⚠️ Cache cleared but preferences not reloaded - no reload method available', { 
+                    page: "unified-cache-manager" 
+                });
+            }
+        } else {
+            console.log('✅ DEBUG: Cache cleared - refreshGroupState will handle reloading');
+        }
         
     } catch (error) {
         console.error('❌ DEBUG: Error in refreshUserPreferences:', error);

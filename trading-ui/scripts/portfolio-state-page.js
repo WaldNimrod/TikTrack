@@ -1973,18 +1973,12 @@ async function initPortfolioValueChart() {
         setupChartSynchronization();
         
     } catch (error) {
+        const errorMsg = `שגיאה ביצירת גרף שווי תיק: ${error.message || 'שגיאה לא ידועה'}`;
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה ביצירת גרף', errorMsg);
+        }
         if (window.Logger) {
-            const errorMsg = `שגיאה ביצירת גרף שווי תיק: ${error.message || 'שגיאה לא ידועה'}`;
-            if (window.NotificationSystem) {
-                window.NotificationSystem.showError('שגיאה ביצירת גרף', errorMsg);
-            }
-            const errorMsg = `שגיאה ביצירת גרף שווי תיק: ${error.message || 'שגיאה לא ידועה'}`;
-            if (window.NotificationSystem) {
-                window.NotificationSystem.showError('שגיאה ביצירת גרף', errorMsg);
-            }
-            if (window.Logger) {
-                window.Logger.error('Error creating portfolio value chart', { page: 'portfolio-state-page', error });
-            }
+            window.Logger.error('Error creating portfolio value chart', { page: 'portfolio-state-page', error });
         }
         portfolioValueChart = null;
     }

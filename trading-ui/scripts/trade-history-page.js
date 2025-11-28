@@ -1159,15 +1159,16 @@
                     </div>
                 </div>
             `;
-        }).join('');
+        }));
 
+        timelineEl.innerHTML = stepsHTML.join('');
         timelineEl.classList.remove('loading');
     }
 
     /**
      * Render plan vs execution comparison table
      */
-    function renderPlanVsExecution(comparisonData) {
+    async function renderPlanVsExecution(comparisonData) {
         if (!comparisonData || !Array.isArray(comparisonData)) return;
 
         // Store data for table system
@@ -1328,7 +1329,7 @@
     /**
      * Update plan vs execution table with data
      */
-    function updatePlanVsExecutionTable(comparisonData) {
+    async function updatePlanVsExecutionTable(comparisonData) {
         if (!comparisonData || !Array.isArray(comparisonData)) return;
 
         const tbodyEl = document.getElementById('planVsExecutionTableBody');
@@ -1415,7 +1416,9 @@
                     </td>
                 </tr>
             `;
-        }).join('');
+        }));
+
+        tbodyEl.innerHTML = rowsHTML.join('');
     }
 
     /**

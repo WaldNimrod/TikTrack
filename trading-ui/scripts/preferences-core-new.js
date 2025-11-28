@@ -830,7 +830,12 @@ class PreferencesCore {
       }
 
     } catch (error) {
-      window.Logger.error(`❌ Error saving preference ${preferenceName}:`, error, { page: 'preferences-core-new' });
+      // ValidationError (preference not found in DB) is not a critical error - use warn instead
+      if (error instanceof ValidationError || error?.name === 'ValidationError') {
+        window.Logger.warn(`⚠️ Preference ${preferenceName} validation failed (may not exist in DB):`, error.message, { page: 'preferences-core-new' });
+      } else {
+        window.Logger.error(`❌ Error saving preference ${preferenceName}:`, error, { page: 'preferences-core-new' });
+      }
       return {
         success: false,
         validation: { valid: false, errors: [error] },

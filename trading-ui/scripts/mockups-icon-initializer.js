@@ -54,9 +54,10 @@
             try {
                 // Determine icon type (default to 'button' for Tabler icons)
                 // If icon name contains entity types, use 'entity'
-                // Special case: 'notebook' is a Tabler icon, not an entity icon
+                // Special cases: Tabler icons that contain entity type names but are not entity icons
+                const tablerIconExceptions = ['notebook', 'alert-circle', 'alert-triangle', 'alert-circle-filled', 'alert-triangle-filled'];
                 const entityTypes = ['trade', 'execution', 'ticker', 'account', 'note', 'cash_flow', 'trade_plan', 'alert'];
-                const isEntityIcon = entityTypes.some(type => iconName.includes(type)) && iconName !== 'notebook';
+                const isEntityIcon = entityTypes.some(type => iconName.includes(type)) && !tablerIconExceptions.includes(iconName);
                 const iconType = isEntityIcon ? 'entity' : 'button';
 
                 // Render icon using IconSystem

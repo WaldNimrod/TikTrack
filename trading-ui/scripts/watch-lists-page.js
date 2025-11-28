@@ -197,7 +197,20 @@
 
             window.Logger?.debug?.('✅ Mockup data loaded', PAGE_LOG_CONTEXT);
         } catch (error) {
-            window.Logger?.error?.('❌ Error loading mockup data', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+            // In mockup mode, data loading errors are expected - use warn instead of error
+            window.Logger?.warn?.('⚠️ Error loading mockup data (non-critical in mockup mode)', { 
+                ...PAGE_LOG_CONTEXT, 
+                error: error?.message || error 
+            });
+            // Try fallback to mockup data directly
+            try {
+                if (window.WatchListsDataService?.getMockupWatchLists) {
+                    watchListsData = window.WatchListsDataService.getMockupWatchLists();
+                    calculateSummaryStats();
+                }
+            } catch (fallbackError) {
+                // Silent fallback - mockup data may not be critical
+            }
         }
     }
 
@@ -680,19 +693,19 @@
      * Apply data attributes (data-bg-color, data-icon-color)
      */
     function applyDataAttributes() {
-        // Apply background colors from data-bg-color
+        // Apply background colors from data-bg-color using CSS variables
         document.querySelectorAll('[data-bg-color]').forEach(el => {
             const bgColor = el.getAttribute('data-bg-color');
             if (bgColor) {
-                el.style.backgroundColor = bgColor;
+                el.style.setProperty('--dynamic-bg-color', bgColor);
             }
         });
 
-        // Apply icon colors from data-icon-color
+        // Apply icon colors from data-icon-color using CSS variables
         document.querySelectorAll('[data-icon-color]').forEach(el => {
             const iconColor = el.getAttribute('data-icon-color');
             if (iconColor && iconColor !== 'muted') {
-                el.style.color = iconColor;
+                el.style.setProperty('--dynamic-icon-color', iconColor);
             }
         });
 

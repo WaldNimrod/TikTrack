@@ -43,7 +43,7 @@ function initializeSeriesControls() {
                        ${isChecked ? 'checked' : ''}
                        data-onchange="toggleSeries('${series.key}', this.checked)">
                 <label for="series-${series.key}" class="series-checkbox-label">
-                    <div class="series-color-indicator" style="background-color: ${color};"></div>
+                    <div class="series-color-indicator" ${color ? `style="--series-color: ${color};"` : ''}></div>
                     <span class="form-label-small">${series.label}</span>
                 </label>
             </div>
@@ -530,16 +530,13 @@ async function saveFilterState() {
                 // Fallback to PreferencesCore if PageStateManager fails
                 if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
                     try {
-                        await window.PreferencesCore.savePreference(PREF_FILTERS, filters);
+                        const result = await window.PreferencesCore.savePreference(PREF_FILTERS, filters);
+                        // Check if save was successful - if not, fallback to localStorage
+                        if (!result || (result.success === false)) {
+                            localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+                        }
                     } catch (prefError) {
                         // Final fallback to localStorage
-                        if (window.Logger) {
-                            window.Logger.warn('Preference save failed, using localStorage fallback', { 
-                                page: 'comparative-analysis-page', 
-                                preference: PREF_FILTERS,
-                                error: prefError 
-                            });
-                        }
                         localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
                     }
                 } else {
@@ -549,11 +546,22 @@ async function saveFilterState() {
             }
         } else if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
             try {
-                await window.PreferencesCore.savePreference(PREF_FILTERS, filters);
+                const result = await window.PreferencesCore.savePreference(PREF_FILTERS, filters);
+                // Check if save was successful
+                if (!result || (result.success === false)) {
+                    // Save failed, fallback to localStorage
+                    if (window.Logger) {
+                        window.Logger.warn('Preference save failed, using localStorage fallback', { 
+                            page: 'comparative-analysis-page', 
+                            preference: PREF_FILTERS
+                        });
+                    }
+                    localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+                }
             } catch (prefError) {
                 // If preference doesn't exist in database, fallback to localStorage
                 if (window.Logger) {
-                    window.Logger.warn('Preference not found in database, using localStorage fallback', { 
+                    window.Logger.warn('Preference save error, using localStorage fallback', { 
                         page: 'comparative-analysis-page', 
                         preference: PREF_FILTERS,
                         error: prefError 
@@ -2071,7 +2079,7 @@ function updateChartLegend() {
                 : '';
         legendItems.push(`
                 <div class="series-checkbox-container">
-                    <div class="series-legend-color" style="background-color: ${color};"></div>
+                    <div class="series-legend-color" ${color ? `style="--series-color: ${color};"` : ''}></div>
                     <span class="form-label-small"><strong>${seriesConfig.label}</strong></span>
             </div>
         `);
@@ -3050,11 +3058,22 @@ async function saveComparisonParameterState() {
         const params = getComparisonParameterValues();
         if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
             try {
-                await window.PreferencesCore.savePreference(PREF_COMPARISON_PARAMS, params);
+                const result = await window.PreferencesCore.savePreference(PREF_COMPARISON_PARAMS, params);
+                // Check if save was successful
+                if (!result || (result.success === false)) {
+                    // Save failed, fallback to localStorage
+                    if (window.Logger) {
+                        window.Logger.warn('Preference save failed, using localStorage fallback', { 
+                            page: 'comparative-analysis-page', 
+                            preference: PREF_COMPARISON_PARAMS
+                        });
+                    }
+                    localStorage.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
+                }
             } catch (prefError) {
                 // If preference doesn't exist in database, fallback to localStorage
                 if (window.Logger) {
-                    window.Logger.warn('Preference not found in database, using localStorage fallback', { 
+                    window.Logger.warn('Preference save error, using localStorage fallback', { 
                         page: 'comparative-analysis-page', 
                         preference: PREF_COMPARISON_PARAMS,
                         error: prefError 

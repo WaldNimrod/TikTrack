@@ -1287,6 +1287,8 @@
     border-radius: 2px;
     border: 1px solid color-mix(in srgb, var(--text-color, var(--color-text-primary, black)) 10%, transparent);
     flex-shrink: 0;
+    /* Dynamic color support via CSS variable */
+    background-color: var(--series-color, transparent);
 }
 
 .series-legend-color {
@@ -1294,6 +1296,8 @@
     height: 16px;
     border-radius: 2px;
     flex-shrink: 0;
+    /* Dynamic color support via CSS variable */
+    background-color: var(--series-color, transparent);
 }
 
 /* Clickable card */

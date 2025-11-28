@@ -84,11 +84,13 @@ DEMO_CONFIG = {
 }
 
 # Sample ticker symbols and names
+# NOTE: Only use major, liquid tickers with available market data
+# Exception: TIPU and 500X are kept even without data (as per requirements)
 SAMPLE_TICKERS = [
-    # Tech Stocks (USD)
+    # Tech Stocks (USD) - Major companies
     ('AAPL', 'Apple Inc.', 'stock', 'USD'),
     ('MSFT', 'Microsoft Corporation', 'stock', 'USD'),
-    ('GOOGL', 'Alphabet Inc.', 'stock', 'USD'),
+    ('GOOGL', 'Alphabet Inc. Class A', 'stock', 'USD'),
     ('AMZN', 'Amazon.com Inc.', 'stock', 'USD'),
     ('TSLA', 'Tesla Inc.', 'stock', 'USD'),
     ('META', 'Meta Platforms Inc.', 'stock', 'USD'),
@@ -99,24 +101,42 @@ SAMPLE_TICKERS = [
     ('ORCL', 'Oracle Corporation', 'stock', 'USD'),
     ('CRM', 'Salesforce Inc.', 'stock', 'USD'),
     ('ADBE', 'Adobe Inc.', 'stock', 'USD'),
-    ('PYPL', 'PayPal Holdings Inc.', 'stock', 'USD'),
     ('IBM', 'International Business Machines', 'stock', 'USD'),
+    ('AVGO', 'Broadcom Inc.', 'stock', 'USD'),
+    ('QCOM', 'Qualcomm Incorporated', 'stock', 'USD'),
+    ('TXN', 'Texas Instruments Incorporated', 'stock', 'USD'),
+    ('MU', 'Micron Technology Inc.', 'stock', 'USD'),
     
-    # Finance (USD)
+    # Finance (USD) - Major banks and financial services
     ('JPM', 'JPMorgan Chase & Co.', 'stock', 'USD'),
     ('BAC', 'Bank of America Corp.', 'stock', 'USD'),
     ('WFC', 'Wells Fargo & Company', 'stock', 'USD'),
     ('GS', 'Goldman Sachs Group Inc.', 'stock', 'USD'),
     ('MS', 'Morgan Stanley', 'stock', 'USD'),
+    ('V', 'Visa Inc.', 'stock', 'USD'),
+    ('MA', 'Mastercard Incorporated', 'stock', 'USD'),
+    ('AXP', 'American Express Company', 'stock', 'USD'),
+    ('C', 'Citigroup Inc.', 'stock', 'USD'),
     
-    # Consumer (USD)
+    # Consumer & Retail (USD) - Major companies
     ('WMT', 'Walmart Inc.', 'stock', 'USD'),
     ('HD', 'Home Depot Inc.', 'stock', 'USD'),
     ('DIS', 'Walt Disney Company', 'stock', 'USD'),
     ('NKE', 'Nike Inc.', 'stock', 'USD'),
     ('SBUX', 'Starbucks Corporation', 'stock', 'USD'),
+    ('MCD', 'McDonald\'s Corporation', 'stock', 'USD'),
+    ('COST', 'Costco Wholesale Corporation', 'stock', 'USD'),
+    ('TGT', 'Target Corporation', 'stock', 'USD'),
+    ('LOW', 'Lowe\'s Companies Inc.', 'stock', 'USD'),
     
-    # ETFs (USD)
+    # Healthcare (USD)
+    ('JNJ', 'Johnson & Johnson', 'stock', 'USD'),
+    ('UNH', 'UnitedHealth Group Incorporated', 'stock', 'USD'),
+    ('PFE', 'Pfizer Inc.', 'stock', 'USD'),
+    ('ABBV', 'AbbVie Inc.', 'stock', 'USD'),
+    ('TMO', 'Thermo Fisher Scientific Inc.', 'stock', 'USD'),
+    
+    # ETFs (USD) - Major, liquid ETFs
     ('SPY', 'SPDR S&P 500 ETF Trust', 'etf', 'USD'),
     ('QQQ', 'Invesco QQQ Trust', 'etf', 'USD'),
     ('VTI', 'Vanguard Total Stock Market ETF', 'etf', 'USD'),
@@ -125,24 +145,27 @@ SAMPLE_TICKERS = [
     ('DIA', 'SPDR Dow Jones Industrial Average ETF', 'etf', 'USD'),
     ('GLD', 'SPDR Gold Trust', 'etf', 'USD'),
     ('TLT', 'iShares 20+ Year Treasury Bond ETF', 'etf', 'USD'),
+    ('IVV', 'iShares Core S&P 500 ETF', 'etf', 'USD'),
+    ('IJH', 'iShares Core S&P Mid-Cap ETF', 'etf', 'USD'),
     
-    # Crypto (USD)
+    # Crypto (USD) - Major cryptocurrencies
     ('BTC', 'Bitcoin', 'crypto', 'USD'),
     ('ETH', 'Ethereum', 'crypto', 'USD'),
-    ('BNB', 'Binance Coin', 'crypto', 'USD'),
-    ('ADA', 'Cardano', 'crypto', 'USD'),
     
-    # Israeli stocks (ILS)
-    ('TEVA', 'Teva Pharmaceutical Industries', 'stock', 'ILS'),
-    ('BABA', 'Alibaba Group Holding', 'stock', 'ILS'),
+    # Israeli stocks (ILS) - Major Israeli companies
+    ('TEVA', 'Teva Pharmaceutical Industries Ltd.', 'stock', 'ILS'),
     ('WIX', 'Wix.com Ltd.', 'stock', 'ILS'),
     ('NICE', 'NICE Ltd.', 'stock', 'ILS'),
+    ('CHKP', 'Check Point Software Technologies Ltd.', 'stock', 'ILS'),
     
-    # European stocks (EUR)
+    # European stocks (EUR) - Major European companies
     ('ASML', 'ASML Holding N.V.', 'stock', 'EUR'),
     ('SAP', 'SAP SE', 'stock', 'EUR'),
     ('SAN', 'Banco Santander S.A.', 'stock', 'EUR'),
     ('BMW', 'Bayerische Motoren Werke AG', 'stock', 'EUR'),
+    ('SIE', 'Siemens AG', 'stock', 'EUR'),
+    ('UL', 'Unilever PLC', 'stock', 'EUR'),
+    ('NOVN', 'Novartis AG', 'stock', 'EUR'),
 ]
 
 # Sample cash flow types
@@ -1153,112 +1176,219 @@ class DemoDataGenerator:
         print(f"   ✅ נוצרו {created} תזרימי מזומן")
     
     def _create_alerts(self) -> None:
-        """יוצר התראות"""
+        """יוצר התראות מרשימות ומפורטות"""
         print(f"\n🔔 יוצר התראות...")
         
         created = 0
         
-        # Alerts on tickers
-        for ticker in random.sample(
-            self.relationship_manager.tickers,
-            min(len(self.relationship_manager.tickers), 10)
-        ):
+        # Realistic alert messages templates
+        price_alert_messages = [
+            "{symbol} הגיע למחיר {price} - אופציה ליציאה",
+            "מחיר {symbol} עלה מעל {price} - סימן חיובי",
+            "{symbol} חוצה את קו ההתנגדות {price} - הזדמנות",
+            "מחיר {symbol} מתקרב ל-{price} - מומלץ לבדוק",
+            "{symbol} עובר את {price} - פוטנציאל לרווח",
+        ]
+        
+        stop_loss_messages = [
+            "{symbol} הגיע ל-stop loss של {price} - סגירה מומלצת",
+            "מחיר {symbol} ירד מתחת ל-{price} - נקודת יציאה",
+        ]
+        
+        take_profit_messages = [
+            "{symbol} הגיע ל-target של {price} - רווח הושג",
+            "מחיר {symbol} עלה ל-{price} - אפשר לקחת רווח",
+        ]
+        
+        # Alerts on tickers (price alerts)
+        ticker_sample_size = min(len(self.relationship_manager.tickers), 15)
+        for ticker in random.sample(self.relationship_manager.tickers, ticker_sample_size):
+            # Price alert
+            target_price = round(random.uniform(50, 500), 2)
+            alert_msg = random.choice(price_alert_messages).format(
+                symbol=ticker.symbol,
+                price=f"${target_price:.2f}"
+            )
+            
             alert = Alert(
                 ticker_id=ticker.id,
-                message=f"התראה על {ticker.symbol}",
-                status='open',
+                message=alert_msg,
+                status='open' if random.random() > 0.2 else 'closed',
                 is_triggered='false',
                 related_type_id=ALERT_RELATED_TYPES['ticker'],
                 related_id=ticker.id,
                 condition_attribute='price',
-                condition_operator='more_than',
-                condition_number=str(round(random.uniform(100, 500), 2)),
-                triggered_at=None
+                condition_operator='more_than' if random.random() > 0.5 else 'less_than',
+                condition_number=str(target_price),
+                triggered_at=self.date_gen.generate_date('random') if random.random() > 0.3 else None
             )
             self.db.add(alert)
             created += 1
         
-        # Alerts on trades
-        for trade in random.sample(
-            self.relationship_manager.trades,
-            min(len(self.relationship_manager.trades), 15)
-        ):
-            alert = Alert(
-                ticker_id=trade.ticker_id,
-                message=f"התראה על טרייד {trade.id}",
-                status='open' if random.random() > 0.3 else 'closed',
-                is_triggered='true' if random.random() > 0.5 else 'false',
-                related_type_id=ALERT_RELATED_TYPES['trade'],
-                related_id=trade.id,
-                condition_attribute='price',
-                condition_operator='more_than',
-                condition_number=str(round(random.uniform(100, 500), 2)),
-                triggered_at=self.date_gen.generate_date('random') if random.random() > 0.5 else None
-            )
-            self.db.add(alert)
-            created += 1
+        # Alerts on trades (stop loss / take profit)
+        trade_sample_size = min(len(self.relationship_manager.trades), 20)
+        for trade in random.sample(self.relationship_manager.trades, trade_sample_size):
+            if trade.entry_price:
+                # Stop loss alert
+                if random.random() > 0.3:  # 70% have stop loss
+                    stop_price = round(trade.entry_price * (0.92 if trade.side == 'Long' else 1.08), 2)
+                    alert_msg = random.choice(stop_loss_messages).format(
+                        symbol=trade.ticker.symbol if hasattr(trade, 'ticker') and trade.ticker else 'טיקר',
+                        price=f"${stop_price:.2f}"
+                    )
+                    
+                    alert = Alert(
+                        ticker_id=trade.ticker_id,
+                        message=alert_msg,
+                        status='open' if random.random() > 0.4 else 'closed',
+                        is_triggered='true' if random.random() > 0.6 else 'false',
+                        related_type_id=ALERT_RELATED_TYPES['trade'],
+                        related_id=trade.id,
+                        condition_attribute='price',
+                        condition_operator='less_than' if trade.side == 'Long' else 'more_than',
+                        condition_number=str(stop_price),
+                        triggered_at=self.date_gen.generate_date('random') if random.random() > 0.5 else None
+                    )
+                    self.db.add(alert)
+                    created += 1
+                
+                # Take profit alert
+                if random.random() > 0.4:  # 60% have take profit
+                    profit_price = round(trade.entry_price * (1.15 if trade.side == 'Long' else 0.85), 2)
+                    alert_msg = random.choice(take_profit_messages).format(
+                        symbol=trade.ticker.symbol if hasattr(trade, 'ticker') and trade.ticker else 'טיקר',
+                        price=f"${profit_price:.2f}"
+                    )
+                    
+                    alert = Alert(
+                        ticker_id=trade.ticker_id,
+                        message=alert_msg,
+                        status='open' if random.random() > 0.5 else 'closed',
+                        is_triggered='true' if random.random() > 0.5 else 'false',
+                        related_type_id=ALERT_RELATED_TYPES['trade'],
+                        related_id=trade.id,
+                        condition_attribute='price',
+                        condition_operator='more_than' if trade.side == 'Long' else 'less_than',
+                        condition_number=str(profit_price),
+                        triggered_at=self.date_gen.generate_date('random') if random.random() > 0.4 else None
+                    )
+                    self.db.add(alert)
+                    created += 1
         
-        # Alerts on trade plans
-        for plan in random.sample(
-            self.relationship_manager.trade_plans,
-            min(len(self.relationship_manager.trade_plans), 10)
-        ):
-            alert = Alert(
-                ticker_id=plan.ticker_id,
-                message=f"התראה על תוכנית {plan.id}",
-                status='open',
-                is_triggered='false',
-                related_type_id=ALERT_RELATED_TYPES['trade_plan'],
-                related_id=plan.id,
-                condition_attribute='price',
-                condition_operator='more_than',
-                condition_number=str(round(plan.entry_price * 1.1, 2))
-            )
-            self.db.add(alert)
-            created += 1
+        # Alerts on trade plans (entry price alerts)
+        plan_sample_size = min(len(self.relationship_manager.trade_plans), 15)
+        for plan in random.sample(self.relationship_manager.trade_plans, plan_sample_size):
+            if plan.entry_price:
+                target_price = round(plan.entry_price * random.uniform(0.95, 1.05), 2)
+                alert_msg = f"תוכנית {plan.id}: {plan.ticker.symbol if hasattr(plan, 'ticker') and plan.ticker else 'טיקר'} הגיע למחיר כניסה {target_price:.2f}"
+                
+                alert = Alert(
+                    ticker_id=plan.ticker_id,
+                    message=alert_msg,
+                    status='open',
+                    is_triggered='false',
+                    related_type_id=ALERT_RELATED_TYPES['trade_plan'],
+                    related_id=plan.id,
+                    condition_attribute='price',
+                    condition_operator='more_than' if random.random() > 0.5 else 'less_than',
+                    condition_number=str(target_price)
+                )
+                self.db.add(alert)
+                created += 1
         
         self.created_count['alerts'] = created
         print(f"   ✅ נוצרו {created} התראות")
     
     def _create_notes(self) -> None:
-        """יוצר הערות"""
+        """יוצר הערות מרשימות ומפורטות"""
         print(f"\n📝 יוצר הערות...")
         
         created = 0
         
-        # Notes on tickers
-        for ticker in random.sample(
-            self.relationship_manager.tickers,
-            min(len(self.relationship_manager.tickers), 8)
-        ):
+        # Realistic note templates for tickers
+        ticker_notes_templates = [
+            "<p><strong>{symbol} - ניתוח טכני:</strong><br>הטיקר נמצא במגמת עליה עם תמיכה חזקה ב-${support}. התנגדות ראשית ב-${resistance}. מומלץ להמתין לpullback לפני כניסה.</p>",
+            "<p><strong>{symbol} - אסטרטגיה:</strong><br>מומלץ להשתמש באסטרטגיית breakout מעל ${resistance}. Stop loss ב-${support}. Target ראשון ב-${target}.</p>",
+            "<p><strong>{symbol} - חדשות:</strong><br>החברה הודיעה על תוצאות טובות מהצפוי. נראה שיש פוטנציאל לעלייה נוספת. מעקב אחר התנהגות ה-VOLUME חשוב.</p>",
+            "<p><strong>{symbol} - מעקב:</strong><br>הטיקר מטפס בצורה איטית ויציבה. RSI ב-{rsi} - עדיין מקום לעלייה. היציאה ב-${exit_price}.</p>",
+            "<p><strong>{symbol} - התרעות:</strong><br>יש סיכון לנסיגה קלה בגלל התנגדות חזקה. מומלץ לקחת חלק מהרווחים ולשמור על stop loss הדוק.</p>",
+        ]
+        
+        # Notes on tickers (30% of tickers get notes)
+        ticker_sample_size = min(len(self.relationship_manager.tickers), max(15, int(len(self.relationship_manager.tickers) * 0.3)))
+        for ticker in random.sample(self.relationship_manager.tickers, ticker_sample_size):
+            template = random.choice(ticker_notes_templates)
+            content = template.format(
+                symbol=ticker.symbol,
+                support=f"{random.uniform(50, 200):.2f}",
+                resistance=f"{random.uniform(250, 500):.2f}",
+                target=f"{random.uniform(300, 600):.2f}",
+                rsi=random.randint(45, 75),
+                exit_price=f"{random.uniform(100, 400):.2f}"
+            )
+            
             note = Note(
-                content=f"הערה על {ticker.symbol}: {ticker.name}",
+                content=content,
                 related_type_id=NOTE_RELATED_TYPES['ticker'],
                 related_id=ticker.id
             )
             self.db.add(note)
             created += 1
         
-        # Notes on trades
-        for trade in random.sample(
-            self.relationship_manager.trades,
-            min(len(self.relationship_manager.trades), 12)
-        ):
+        # Realistic note templates for trades
+        trade_notes_templates = [
+            "<p><strong>ניהול טרייד {trade_id}:</strong><br>נכנסתי ב-${entry} במחיר טוב. Stop loss ב-${stop_loss}, target ראשון ב-${target}. Risk/Reward של 1:{rr}.</p>",
+            "<p><strong>מעקב טרייד {trade_id}:</strong><br>הטרייד מתפתח יפה, מחיר עובר את נקודת ה-entry. עודכן stop loss ל-${new_stop} כדי להגן על הרווחים.</p>",
+            "<p><strong>עדכון טרייד {trade_id}:</strong><br>הגעתי ל-target הראשון, לקחתי 50% מהפוזיציה. השארתי את השאר ל-target שני ב-${target2}.</p>",
+            "<p><strong>טרייד {trade_id} - לקח לקח:</strong><br>יצאתי מוקדם מדי מהטרייד. צריך להיות יותר סבלני. המחיר המשיך לעלות עוד {percent}%.</p>",
+        ]
+        
+        # Notes on trades (40% of trades get notes)
+        trade_sample_size = min(len(self.relationship_manager.trades), max(20, int(len(self.relationship_manager.trades) * 0.4)))
+        for trade in random.sample(self.relationship_manager.trades, trade_sample_size):
+            entry_price = trade.entry_price if trade.entry_price else random.uniform(100, 300)
+            template = random.choice(trade_notes_templates)
+            content = template.format(
+                trade_id=trade.id,
+                entry=f"{entry_price:.2f}",
+                stop_loss=f"{entry_price * 0.95:.2f}",
+                target=f"{entry_price * 1.15:.2f}",
+                target2=f"{entry_price * 1.25:.2f}",
+                new_stop=f"{entry_price * 1.02:.2f}",
+                rr=random.randint(2, 4),
+                percent=random.randint(5, 15)
+            )
+            
             note = Note(
-                content=f"הערה על טרייד {trade.id}: {trade.investment_type} {trade.side}",
+                content=content,
                 related_type_id=NOTE_RELATED_TYPES['trade'],
                 related_id=trade.id
             )
             self.db.add(note)
             created += 1
         
-        # Notes on trade plans
-        for plan in random.sample(
-            self.relationship_manager.trade_plans,
-            min(len(self.relationship_manager.trade_plans), 10)
-        ):
+        # Realistic note templates for trade plans
+        plan_notes_templates = [
+            "<p><strong>תוכנית {plan_id} - הכנה:</strong><br>ממתין למחיר כניסה ב-${entry}. תנאים: מחיר מעל MA50, volume גבוה, breakout מהתנגדות.</p>",
+            "<p><strong>תוכנית {plan_id} - אסטרטגיה:</strong><br>תוכנית swing trade לטווח 2-4 שבועות. Target ב-${target}, stop loss ב-${stop}. Position size: ${size}.</p>",
+            "<p><strong>תוכנית {plan_id} - עדכון:</strong><br>התנאים עדיין לא התקיימו. ממשיך לעקוב. אם מחיר לא יגיע ל-target השבוע, אשקול לבטל את התוכנית.</p>",
+        ]
+        
+        # Notes on trade plans (30% of plans get notes)
+        plan_sample_size = min(len(self.relationship_manager.trade_plans), max(20, int(len(self.relationship_manager.trade_plans) * 0.3)))
+        for plan in random.sample(self.relationship_manager.trade_plans, plan_sample_size):
+            entry_price = plan.entry_price if plan.entry_price else random.uniform(100, 300)
+            template = random.choice(plan_notes_templates)
+            content = template.format(
+                plan_id=plan.id,
+                entry=f"{entry_price:.2f}",
+                target=f"{entry_price * 1.2:.2f}",
+                stop=f"{entry_price * 0.93:.2f}",
+                size=f"{plan.planned_amount:.0f}"
+            )
+            
             note = Note(
-                content=f"הערה על תוכנית {plan.id}: תוכנית {plan.investment_type}",
+                content=content,
                 related_type_id=NOTE_RELATED_TYPES['trade_plan'],
                 related_id=plan.id
             )
@@ -1266,9 +1396,18 @@ class DemoDataGenerator:
             created += 1
         
         # Notes on accounts
+        account_notes_templates = [
+            "<p><strong>חשבון {account_name}:</strong><br>חשבון פעיל עם אסטרטגיה מגוונת. משלב swing trades עם השקעות ארוכות טווח. ביצועים טובים בשנה האחרונה.</p>",
+            "<p><strong>חשבון {account_name} - אסטרטגיה:</strong><br>החשבון מתמקד בעיקר ב-tech stocks ו-ETFs. Diversification טוב בין סקטורים שונים. Risk management הדוק.</p>",
+            "<p><strong>חשבון {account_name} - מטרות:</strong><br>החשבון מיועד להשקעות ארוכות טווח עם focus על צמיחה. Rebalancing רבעוני. מעקב אחר ביצועים מול benchmark.</p>",
+        ]
+        
         for account in self.relationship_manager.accounts:
+            template = random.choice(account_notes_templates)
+            content = template.format(account_name=account.name)
+            
             note = Note(
-                content=f"הערה על חשבון {account.name}",
+                content=content,
                 related_type_id=NOTE_RELATED_TYPES['trading_account'],
                 related_id=account.id
             )

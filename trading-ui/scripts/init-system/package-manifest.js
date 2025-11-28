@@ -816,10 +816,17 @@ const PACKAGE_MANIFEST = {
         description: 'Preferences group manager',
         required: true,
         loadOrder: 8
+      },
+      {
+        file: 'testing/automated/preferences-browser-test.js',
+        globalCheck: 'window.runAllPreferenceTests',
+        description: 'Automated browser test suite for preferences',
+        required: false,
+        loadOrder: 9
       }
     ],
-    estimatedSize: '~160KB',
-    initTime: '~90ms'
+    estimatedSize: '~170KB',
+    initTime: '~95ms'
   },
 
   // 6. VALIDATION PACKAGE - Validation

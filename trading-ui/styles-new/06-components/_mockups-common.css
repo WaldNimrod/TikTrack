@@ -238,3 +238,21 @@
     z-index: 1000000002;
 }
 
+/* ==========================================================================
+   Dynamic Color Support via Data Attributes
+   תמיכה בצבעים דינמיים דרך data attributes
+   ========================================================================== */
+
+/* Note: CSS attr() function doesn't work for color values in all browsers yet.
+   So we use JavaScript to set CSS variables, and reference them here */
+
+/* Background color support via data-bg-color attribute */
+[data-bg-color] {
+    background-color: var(--dynamic-bg-color, transparent);
+}
+
+/* Icon color support via data-icon-color attribute */
+[data-icon-color]:not([data-icon-color="muted"]) {
+    color: var(--dynamic-icon-color, currentColor);
+}
+

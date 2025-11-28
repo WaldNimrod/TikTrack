@@ -1710,8 +1710,15 @@ async function renderCashFlowsTable() {
   }
 
   // Render unified forex exchanges table
+  // IMPORTANT: Use ALL cash flows data (not filtered/paginated) for unified exchanges table
+  // The second table should show all relevant exchanges regardless of filter or pagination
   try {
-    renderUnifiedForexExchangesTable(Array.isArray(window.filteredCashFlowsData) ? window.filteredCashFlowsData : cashFlowsData);
+    const allData = Array.isArray(window.allCashFlowsData) && window.allCashFlowsData.length > 0
+      ? window.allCashFlowsData
+      : (Array.isArray(window.cashFlowsData) && window.cashFlowsData.length > 0
+          ? window.cashFlowsData
+          : []);
+    renderUnifiedForexExchangesTable(allData);
   } catch (e) {
     window.Logger?.warn('renderUnifiedForexExchangesTable failed', { error: e?.message, page: 'cash_flows' });
   }

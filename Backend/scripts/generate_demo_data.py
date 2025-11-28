@@ -701,9 +701,31 @@ class DemoDataGenerator:
         
         self.db.flush()
         
+        # CRITICAL: Verify primary account is in USD
+        if account1.currency_id != usd_currency.id:
+            raise DataGenerationError(
+                'trading_accounts',
+                f"חשבון ראשי נוצר במטבע שגוי! (ID: {account1.currency_id} במקום USD ID: {usd_currency.id})",
+                "החשבון הראשי חייב להיות תמיד ב-USD"
+            )
+        
+        # Verify account1 is indeed in USD
+        account1_currency = db.execute(text('''
+            SELECT c.symbol FROM currencies c 
+            WHERE c.id = :currency_id
+        '''), {'currency_id': account1.currency_id}).scalar()
+        
+        if account1_currency != 'USD':
+            raise DataGenerationError(
+                'trading_accounts',
+                f"חשבון ראשי נוצר במטבע {account1_currency} במקום USD!",
+                "החשבון הראשי חייב להיות תמיד ב-USD"
+            )
+        
         self.relationship_manager.accounts = [account1, account2, account3]
         self.created_count['accounts'] = 3
         print(f"   ✅ נוצרו 3 חשבונות מסחר")
+        print(f"   ✅ החשבון הראשי במטבע USD (ID: {usd_currency.id})")
     
     def _create_trade_plans(self) -> None:
         """יוצר תוכניות טרייד"""

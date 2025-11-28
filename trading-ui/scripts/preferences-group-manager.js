@@ -567,6 +567,45 @@ class PreferencesGroupManager {
       const profileId = window.PreferencesCore?.currentProfileId || window.PreferencesUI?.currentProfileId || this.currentProfileId || 0;
       const savedKeys = Object.keys(formData);
 
+      // OPTIMIZED: Use PreferencesManager for optimistic updates
+      // No need to refresh/reload after save - use saved values directly
+      if (window.PreferencesManager && typeof window.PreferencesManager.saveGroup === 'function') {
+        // Use PreferencesManager which handles optimistic updates
+        const saveResults = await window.PreferencesManager.saveGroup(groupName, formData, {
+          userId,
+          profileId,
+          optimisticUpdate: true, // Update UI immediately without reload
+        });
+
+        // Only invalidate cache (don't reload)
+        if (window.PreferencesCache) {
+          await window.PreferencesCache.clearGroup(groupName, userId, profileId);
+        }
+
+        // Update UI with saved values (optimistic update already done by PreferencesManager)
+        const sectionId = Object.keys(this.groupsMap).find(id => this.groupsMap[id] === groupName);
+        if (sectionId && window.PreferencesUI && typeof window.PreferencesUI.updateFields === 'function') {
+          // Mark fields as allowRepopulate to allow update
+          const section = document.getElementById(sectionId);
+          if (section) {
+            const fields = section.querySelectorAll('input, select, textarea');
+            fields.forEach(field => {
+              field.dataset.allowRepopulate = 'true';
+            });
+            // Update fields with saved values
+            window.PreferencesUI.updateFields(formData);
+            // Clear allowRepopulate flag
+            fields.forEach(field => {
+              delete field.dataset.allowRepopulate;
+              delete field.dataset.userModified;
+            });
+          }
+        }
+
+        return saveResults;
+      }
+
+      // FALLBACK: Original flow (for backward compatibility)
       // ניקוי cache של הקבוצה
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.refreshUserPreferences) {
         await window.UnifiedCacheManager.refreshUserPreferences(profileId, groupName, {
@@ -796,28 +835,36 @@ class PreferencesGroupManager {
         }
       }
 
-      // Re-populate UI fields with refreshed values
-      // CRITICAL: Mark fields as allowRepopulate to override user modification check
-      // This is safe because we just saved the values, so refreshing from server is expected
+      // OPTIMIZED: Only populate if explicitly requested (not after save)
+      // After save, we use optimistic updates, so no need to reload
       const sectionId = Object.keys(this.groupsMap).find(id => this.groupsMap[id] === groupName);
       if (sectionId) {
         const section = document.getElementById(sectionId);
         if (section) {
-          // Mark all fields in this section as allowRepopulate temporarily
-          const fields = section.querySelectorAll('input, select, textarea');
-          fields.forEach(field => {
-            field.dataset.allowRepopulate = 'true';
-          });
-          
-          // Populate fields
-          this.populateGroupFields(sectionId, refreshedGroup);
-          
-          // Clear allowRepopulate flag after population
-          fields.forEach(field => {
-            delete field.dataset.allowRepopulate;
-            // Also clear userModified flag since we just refreshed from server
-            delete field.dataset.userModified;
-          });
+          // Only populate if this is a manual refresh, not after save
+          // Check if we have savedKeys - if yes, this is after save, skip population
+          if (savedKeys.length === 0) {
+            // Manual refresh - populate fields
+            const fields = section.querySelectorAll('input, select, textarea');
+            fields.forEach(field => {
+              field.dataset.allowRepopulate = 'true';
+            });
+            
+            // Populate fields
+            this.populateGroupFields(sectionId, refreshedGroup);
+            
+            // Clear allowRepopulate flag after population
+            fields.forEach(field => {
+              delete field.dataset.allowRepopulate;
+              delete field.dataset.userModified;
+            });
+          } else {
+            // After save - optimistic update already done, just update cache
+            window.Logger?.debug?.('Skipping population after save (optimistic update already done)', {
+              page: 'preferences-group-manager',
+              groupName,
+            });
+          }
         }
       }
 

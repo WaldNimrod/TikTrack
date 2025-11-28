@@ -74,6 +74,9 @@ async function loadAllTables() {
  * @param {string} containerId - The container ID for the table
  */
 async function loadTableDataLocal(tableType, apiSlug, containerId) {
+  // Normalize table type once at the beginning - used throughout the function
+  const tableTypeNormalized = tableType.replace(/-/g, '_');
+  
   try {
     window.Logger?.debug('Loading data for table type', { page: 'db_extradata', tableType });
 
@@ -82,7 +85,6 @@ async function loadTableDataLocal(tableType, apiSlug, containerId) {
 
     // Use centralized loadTableData function from services package
     // Try to use tableType normalized, fallback to direct API call if not in mapping
-    const tableTypeNormalized = tableType.replace(/-/g, '_');
     let data;
     
     // Try centralized function first
@@ -121,7 +123,6 @@ async function loadTableDataLocal(tableType, apiSlug, containerId) {
     tableData[tableType] = Array.isArray(data) ? data : [];
 
     // Update table display using centralized system
-    const tableTypeNormalized = tableType.replace(/-/g, '_');
     if (typeof window.updateTable === 'function') {
       window.updateTable(tableTypeNormalized, tableData[tableType]);
     } else {
@@ -141,7 +142,6 @@ async function loadTableDataLocal(tableType, apiSlug, containerId) {
     const identifier = apiSlug || tableType;
     window.Logger?.error('Error loading table data', { page: 'db_extradata', identifier, error: error?.message || error });
     // Show error state
-    const tableTypeNormalized = tableType.replace(/-/g, '_');
     if (typeof window.updateTable === 'function') {
       window.updateTable(tableTypeNormalized, []);
     } else {

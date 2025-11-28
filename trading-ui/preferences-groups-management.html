@@ -10,7 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
     <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">    
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/07-pages/_preferences-groups-management.css?v=1.0.0">    
     <!-- Font Awesome Icons -->
     
     <!-- Bootstrap Icons -->
@@ -76,7 +77,7 @@
                     <div class="section-header">
                         <h3>⚙️ כל ההעדפות</h3>
                         <div class="d-flex gap-2">
-                            <input type="text" class="form-control form-control-sm" id="searchPreferencesInput" placeholder="חיפוש העדפות..." style="max-width: 300px;">
+                            <input type="text" class="form-control form-control-sm" id="searchPreferencesInput" placeholder="חיפוש העדפות...">
                             <button class="btn btn-sm btn-outline-secondary" id="clearSearchBtn" title="נקה חיפוש">
                                 <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
                             </button>
@@ -87,13 +88,13 @@
                             <table class="table table-sm table-striped table-hover" id="preferencesTable">
                                 <thead class="table-light">
                                     <tr>
-                                        <th style="width: 50px;">#</th>
-                                        <th style="width: 200px;">שם העדפה</th>
-                                        <th style="width: 150px;">סוג נתון</th>
-                                        <th style="width: 200px;">קבוצה נוכחית</th>
-                                        <th style="width: 200px;">העבר ל:</th>
-                                        <th style="width: 150px;">ערך ברירת מחדל</th>
-                                        <th style="width: 100px;">פעיל</th>
+                                        <th>#</th>
+                                        <th>שם העדפה</th>
+                                        <th>סוג נתון</th>
+                                        <th>קבוצה נוכחית</th>
+                                        <th>העבר ל:</th>
+                                        <th>ערך ברירת מחדל</th>
+                                        <th>פעיל</th>
                                     </tr>
                                 </thead>
                                 <tbody id="preferencesTableBody">

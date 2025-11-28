@@ -34,6 +34,9 @@ from config.database import SessionLocal
 from models.ticker import Ticker
 from models.external_data import ExternalDataProvider
 from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
+import logging
+
+logger = logging.getLogger(__name__)
 
 # ============================================================================
 # Market Data Loader
@@ -123,20 +126,35 @@ class MarketDataLoader:
                 print(f"      ... ועוד {len(valid_tickers) - 10} טיקרים")
             return self.stats
         
-        # Process in batches
+        # Process in batches - each batch in its own transaction
         batch_size = 50  # Yahoo Finance batch size
         for i in range(0, len(valid_tickers), batch_size):
             batch = valid_tickers[i:i + batch_size]
-            self._load_batch(batch)
+            try:
+                # Ensure clean transaction state before each batch
+                try:
+                    self.db.execute(text("SELECT 1"))
+                except Exception:
+                    self.db.rollback()
+                
+                self._load_batch(batch)
+                
+                # Commit after each batch to avoid transaction issues
+                try:
+                    self.db.commit()
+                except Exception as commit_error:
+                    logger.warning(f"Commit failed for batch {i//batch_size + 1}, rolling back: {commit_error}")
+                    self.db.rollback()
+                    
+            except Exception as batch_error:
+                logger.error(f"Error processing batch {i//batch_size + 1}: {batch_error}")
+                try:
+                    self.db.rollback()
+                except Exception:
+                    pass
+                # Continue with next batch even if this one failed
         
-        # Commit all changes
-        try:
-            self.db.commit()
-            print(f"\n✅ כל השינויים נשמרו בהצלחה!")
-        except Exception as e:
-            self.db.rollback()
-            print(f"\n❌ שגיאה בשמירת השינויים: {e}")
-            raise
+        print(f"\n✅ עיבוד כל ה-batches הושלם")
         
         return self.stats
     
@@ -151,26 +169,45 @@ class MarketDataLoader:
         print(f"\n   📡 טוען נתונים עבור {len(symbols)} טיקרים...")
         print(f"      סמלים: {', '.join(symbols[:5])}" + (f"... ({len(symbols)-5} נוספים)" if len(symbols) > 5 else ""))
         
-        try:
-            # Fetch quotes from Yahoo Finance
-            quotes_data = self.yahoo_adapter.get_quotes_batch(symbols)
-            
-            # Count results
-            quotes_by_symbol = {quote.symbol: quote for quote in quotes_data if quote}
-            
-            # Update statistics
-            for ticker in tickers:
-                symbol = ticker.symbol
-                if symbol in quotes_by_symbol:
+        # Process each ticker individually to avoid transaction issues
+        for ticker in tickers:
+            symbol = ticker.symbol
+            if not symbol or not symbol.strip():
+                continue
+                
+            try:
+                # Ensure clean transaction state for each ticker
+                try:
+                    self.db.execute(text("SELECT 1"))
+                except Exception:
+                    self.db.rollback()
+                
+                # Fetch quote for single ticker
+                quote = self.yahoo_adapter.get_quote(symbol, ticker)
+                
+                if quote:
                     self.stats['loaded'] += 1
                     print(f"      ✅ {symbol}: נטען")
                 else:
                     self.stats['failed'] += 1
-                    print(f"      ❌ {symbol}: נכשל")
-            
-        except Exception as e:
-            print(f"      ❌ שגיאה בטעינת batch: {e}")
-            self.stats['failed'] += len(symbols)
+                    print(f"      ❌ {symbol}: נכשל (לא נמצא נתון)")
+                
+                # Commit after each ticker to avoid transaction issues
+                try:
+                    self.db.commit()
+                except Exception as commit_error:
+                    logger.warning(f"Commit failed for {symbol}, rolling back: {commit_error}")
+                    self.db.rollback()
+                    
+            except Exception as ticker_error:
+                logger.error(f"Error loading data for {symbol}: {ticker_error}")
+                self.stats['failed'] += 1
+                print(f"      ❌ {symbol}: נכשל ({str(ticker_error)[:50]})")
+                # Rollback on error
+                try:
+                    self.db.rollback()
+                except Exception:
+                    pass
     
     def print_summary(self):
         """מדפיס סיכום"""

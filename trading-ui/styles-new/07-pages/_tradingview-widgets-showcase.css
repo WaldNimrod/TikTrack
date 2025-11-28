@@ -1,0 +1,53 @@
+/* ========================================
+   TradingView Widgets Showcase Page Styles
+   ======================================== */
+
+/* Widget section highlight styling */
+.tradingview-widgets-showcase-page .widget-section.highlighted {
+    background: #e7f3ff;
+    border: 2px solid #26baac;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+/* Widget section summary styling */
+.tradingview-widgets-showcase-page .widget-section.summary {
+    background: #e7f3ff;
+    border: 2px solid #26baac;
+}
+
+.tradingview-widgets-showcase-page .widget-section.summary h2 {
+    color: #26baac;
+}
+
+.tradingview-widgets-showcase-page .widget-section.summary .summary-content {
+    margin-top: 1.5rem;
+}
+
+.tradingview-widgets-showcase-page .widget-section.summary h3 {
+    color: #26baac;
+}
+
+.tradingview-widgets-showcase-page .widget-section.summary h3.orange {
+    color: #fc5a06;
+}
+
+.tradingview-widgets-showcase-page .widget-section.summary h3 + ul {
+    margin-top: 0.5rem;
+}
+
+.tradingview-widgets-showcase-page .widget-section.summary h3.orange + ul {
+    margin-top: 0.5rem;
+}
+
+/* Test widgets container */
+.tradingview-widgets-showcase-page #testWidgetsContainer {
+    min-height: 200px;
+}
+
+/* TradingView chart container */
+.tradingview-widgets-showcase-page #tradingview_chart_1 {
+    height: 600px;
+    width: 100%;
+}
+

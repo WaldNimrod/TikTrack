@@ -1357,7 +1357,7 @@ async function performTickerCancellation(tickerId) {
         const errorData = JSON.parse(errorResponse);
 
         // בדיקה אם השגיאה קשורה לטריידים פעילים
-        if (errorData.error && errorData.error.message &&
+        if (errorData.error && errorData.error.message && typeof errorData.error.message === 'string' &&
                     errorData.error.message.includes('active trades')) {
 
           // הצגת אזהרת פריטים מקושרים
@@ -1382,7 +1382,7 @@ async function performTickerCancellation(tickerId) {
         }
 
         // בדיקה אם הטיקר כבר מבוטל
-        if (errorData.error && errorData.error.message &&
+        if (errorData.error && errorData.error.message && typeof errorData.error.message === 'string' &&
                     errorData.error.message.includes('already cancelled')) {
 
           if (window.showErrorNotification) {
@@ -1592,7 +1592,7 @@ async function performCancelTicker(id) {
         const errorData = JSON.parse(errorResponse);
 
         // בדיקה אם הטיקר כבר מבוטל
-        if (errorData.error && errorData.error.message &&
+        if (errorData.error && errorData.error.message && typeof errorData.error.message === 'string' &&
                     errorData.error.message.includes('already cancelled')) {
 
           if (window.showErrorNotification) {

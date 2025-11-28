@@ -7,6 +7,7 @@
     
     <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/07-pages/_init-system-management.css?v=1.0.0">
     
     <style>
         .pages-grid {
@@ -471,7 +472,7 @@
                     <div class="section-header">
                         <h2>📝 יוצר קוד טעינה עבור עמוד</h2>
                         <div class="table-actions">
-                            <button onclick="copyGeneratedScriptCode()" class="btn btn-outline-secondary btn-sm" id="copyGeneratedScriptBtn" style="display: none;">
+                            <button onclick="copyGeneratedScriptCode()" class="btn btn-outline-secondary btn-sm" id="copyGeneratedScriptBtn">
                                 <img src="/trading-ui/images/icons/tabler/copy.svg" width="16" height="16" alt="copy" class="icon"> העתק קוד
                             </button>
                         </div>
@@ -498,7 +499,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div id="generatedScriptContent" class="generated-script-content mt-3" style="display: none;">
+                        <div id="generatedScriptContent" class="generated-script-content mt-3 d-none">
                             <div class="alert alert-success">
                                 <img src="/trading-ui/images/icons/tabler/check.svg" width="16" height="16" alt="check" class="icon">
                                 <strong>קוד נוצר בהצלחה!</strong>
@@ -506,8 +507,8 @@
                                     <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> הצג ב-modal
                                 </button>
                             </div>
-                            <div class="code-container" style="position: relative;">
-                                <pre id="generatedScriptCodeDisplay" style="background: #f5f5f5; padding: 15px; border-radius: 4px; max-height: 500px; overflow-y: auto; direction: ltr; text-align: left; font-family: 'Courier New', monospace; white-space: pre-wrap; word-wrap: break-word; font-size: 12px;"></pre>
+                            <div class="code-container">
+                                <pre id="generatedScriptCodeDisplay"></pre>
                             </div>
                         </div>
                     </div>

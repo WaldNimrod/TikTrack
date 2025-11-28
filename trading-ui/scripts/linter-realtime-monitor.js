@@ -1490,7 +1490,7 @@ async function scanSingleFile(fileName) {
         await updateRealtimeProgress();
         
     } catch (error) {
-        if (error.message.includes('404')) {
+        if (error?.message && typeof error.message === 'string' && error.message.includes('404')) {
         } else {
         }
         // Count as scanned to avoid infinite loops

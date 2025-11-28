@@ -13,6 +13,7 @@
     <!-- System CSS -->
     <link rel="stylesheet" href="styles-new/master.css">
     <link rel="stylesheet" href="styles-new/header-styles.css">
+    <link rel="stylesheet" href="styles-new/07-pages/_tradingview-widgets-showcase.css?v=1.0.0">
     
     <style>
         .widget-section {
@@ -190,7 +191,7 @@
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="widget-section" style="background: #e7f3ff; border: 2px solid #26baac; padding: 1.5rem; border-radius: 8px;">
+                        <div class="widget-section highlighted">
                             <p>ממשק זה משתמש ב-<code>TradingViewWidgetsManager</code> ליצירה וניהול ווידג'טים</p>
                             
                             <div class="row mt-3">
@@ -238,7 +239,7 @@
             
             <div class="mt-3">
                 <h3>ווידג'טים שנוצרו (Core System)</h3>
-                <div id="testWidgetsContainer" class="widget-container" style="min-height: 200px;">
+                <div id="testWidgetsContainer" class="widget-container">
                     <p class="text-muted">אין ווידג'טים שנוצרו עדיין. השתמש בטופס למעלה ליצירת ווידג'ט.</p>
                 </div>
                             </div>
@@ -392,7 +393,7 @@
             <div class="widget-container">
                 <!-- TradingView Chart BEGIN -->
                 <div class="tradingview-widget-container">
-                    <div id="tradingview_chart_1" style="height: 600px; width: 100%;"></div>
+                    <div id="tradingview_chart_1"></div>
                     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
                     <script type="text/javascript">
                     new TradingView.widget({
@@ -1695,27 +1696,27 @@
         </div>
         
         <!-- Summary Section -->
-                        <div class="widget-section" style="background: #e7f3ff; border: 2px solid #26baac;">
-            <h2 style="color: #26baac;">📊 סיכום: מה הכי מתאים ל-TikTrack?</h2>
+                        <div class="widget-section summary">
+            <h2>📊 סיכום: מה הכי מתאים ל-TikTrack?</h2>
             
-            <div style="margin-top: 1.5rem;">
-                <h3 style="color: #26baac;">🔵 לשימוש כגרף מרכזי טרייד:</h3>
+            <div class="summary-content">
+                <h3>🔵 לשימוש כגרף מרכזי טרייד:</h3>
                 <p><strong>Advanced Real-Time Chart</strong> - הגרף המלא עם כל הפיצ'רים</p>
                 
-                <h3 style="color: #fc5a06; margin-top: 1rem;">🟠 בתצוגת רשימת נכסים:</h3>
+                <h3 class="orange">🟠 בתצוגת רשימת נכסים:</h3>
                 <ul>
                     <li><strong>Mini Chart</strong> - גרף קטן ברשימות</li>
                     <li><strong>Symbol Overview</strong> - מידע בסיסי + גרף קטן</li>
                 </ul>
                 
-                <h3 style="color: #fc5a06; margin-top: 1rem;">🔴 בדשבורד:</h3>
+                <h3 class="orange">🔴 בדשבורד:</h3>
                 <ul>
                     <li><strong>Heatmap</strong> - מפת חום ויזואלית</li>
                     <li><strong>Market Overview</strong> - סקירה כללית של השווקים</li>
                     <li><strong>Ticker Tape</strong> - פס גלילה בראש או בתחתית</li>
                 </ul>
                 
-                <h3 style="color: #26baac; margin-top: 1rem;">🟢 במסך מחקר:</h3>
+                <h3>🟢 במסך מחקר:</h3>
                 <ul>
                     <li><strong>Economic Calendar</strong> - לוח אירועים כלכליים</li>
                     <li><strong>Financials</strong> - נתונים פיננסיים</li>
@@ -1723,7 +1724,7 @@
                     <li><strong>Technical Analysis</strong> - אנליזה טכנית אוטומטית</li>
                 </ul>
                 
-                <h3 style="color: #fc5a06; margin-top: 1rem;">🔍 כלי חיפוש ובחירה:</h3>
+                <h3 class="orange">🔍 כלי חיפוש ובחירה:</h3>
                 <ul>
                     <li><strong>Symbol Search</strong> - חיפוש נכסים מהיר</li>
                 </ul>

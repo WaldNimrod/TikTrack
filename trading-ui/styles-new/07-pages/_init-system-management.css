@@ -1,0 +1,31 @@
+/* ========================================
+   Init System Management Page Styles
+   ======================================== */
+
+/* Hide copy button initially */
+.init-system-management-page #copyGeneratedScriptBtn {
+    display: none;
+}
+
+/* Hide generated script content initially (using Bootstrap d-none class in HTML) */
+
+/* Code container positioning */
+.init-system-management-page .code-container {
+    position: relative;
+}
+
+/* Generated script code display styling */
+.init-system-management-page #generatedScriptCodeDisplay {
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 4px;
+    max-height: 500px;
+    overflow-y: auto;
+    direction: ltr;
+    text-align: left;
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 12px;
+}
+

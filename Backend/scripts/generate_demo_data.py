@@ -722,11 +722,10 @@ class DemoDataGenerator:
         other_accounts = [acc for acc in self.relationship_manager.accounts if acc.id != primary_account.id]
         
         # Create shuffled lists for distribution to ensure correct percentages
-        plan_indices = list(range(count))
-        random.shuffle(plan_indices)
-        
         # Assign account distribution - primary gets 70%
-        primary_plan_indices = set(plan_indices[:primary_account_count])
+        primary_plan_indices = list(range(count))
+        random.shuffle(primary_plan_indices)
+        primary_plan_indices_set = set(primary_plan_indices[:primary_account_count])
         
         # Prepare side distribution - first long_count will be Long
         side_indices = list(range(count))
@@ -742,7 +741,8 @@ class DemoDataGenerator:
         
         for i in range(count):
             # Determine account - primary gets 70% of all plans
-            is_primary_plan = i in primary_plan_indices
+            # Check if this plan index should go to primary account
+            is_primary_plan = (i in primary_plan_indices_set)
             
             # Determine investment type and account
             if created < swing_count and is_primary_plan:
@@ -770,8 +770,11 @@ class DemoDataGenerator:
             # Generate date using shuffled indices
             date_index = date_indices[i]
             if date_index < last_3m_count:
-                # 28% (70% of 40%) in last 3 months
-                plan_date = self.date_gen.generate_date('recent')
+                # 28% (70% of 40%) in last 3 months - use precise range
+                plan_date = self.date_gen.generate_date_in_range(
+                    self.date_gen.three_months_ago,
+                    self.date_gen.now
+                )
             elif date_index < last_6m_count:
                 # 12% (remaining of 40%) in months 3-6 (between 3-6 months ago)
                 plan_date = self.date_gen.generate_date_in_range(
@@ -779,8 +782,13 @@ class DemoDataGenerator:
                     self.date_gen.three_months_ago
                 )
             else:
-                # 60% in previous 1.5 years
-                plan_date = self.date_gen.generate_date('random')
+                # 60% in previous 1.5 years (before 6 months, up to 1.5 years ago)
+                from datetime import timedelta
+                one_and_half_years_ago = self.date_gen.now - timedelta(days=730)
+                plan_date = self.date_gen.generate_date_in_range(
+                    one_and_half_years_ago,
+                    self.date_gen.six_months_ago
+                )
             
             # Generate realistic entry price (50-500 range)
             entry_price = round(random.uniform(50, 500), 2)
@@ -888,10 +896,13 @@ class DemoDataGenerator:
             self.db.add(trade)
             created += 1
         
-        # Independent trades - ensure 90% Long
+        # Independent trades - ensure 90% Long using shuffled indices
         long_percent = self.config['trade_plans']['long_percent']
         independent_long_count = int(independent_count * long_percent / 100)
-        independent_created = 0
+        
+        # Create shuffled indices for side distribution
+        independent_indices = list(range(independent_count))
+        random.shuffle(independent_indices)
         
         for i in range(independent_count):
             account = random.choice(self.relationship_manager.accounts)
@@ -903,9 +914,9 @@ class DemoDataGenerator:
             
             status = 'open' if random.random() > 0.5 else 'closed'
             investment_type = random.choice(INVESTMENT_TYPES)
-            # Ensure 90% Long for independent trades too
-            side = 'Long' if independent_created < independent_long_count else 'Short'
-            independent_created += 1
+            # Ensure 90% Long for independent trades using shuffled indices
+            side_index = independent_indices[i]
+            side = 'Long' if side_index < independent_long_count else 'Short'
             
             entry_price = round(random.uniform(50, 500), 2)
             planned_amount = round(random.uniform(5000, 50000), 2)

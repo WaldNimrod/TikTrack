@@ -1,0 +1,70 @@
+/**
+ * Designs Page - Page-specific Styles
+ * 
+ * סגנונות ספציפיים לעמוד עיצובים
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* Button Table Column Widths */
+#buttonTableBody ~ thead th:nth-child(1),
+#buttonTableBody + thead th:nth-child(1),
+table thead th.col-live-examples {
+    width: 24%;
+}
+
+table thead th.col-button-name {
+    width: 14%;
+}
+
+table thead th.col-description {
+    width: 16%;
+}
+
+table thead th.col-color-var {
+    width: 12%;
+}
+
+table thead th.col-html-old,
+table thead th.col-html-new,
+table thead th.col-javascript {
+    width: 10%;
+}
+
+table thead th.col-actions {
+    width: 4%;
+}
+
+/* Color Map Table Column Widths */
+table thead th.col-group {
+    width: 14%;
+}
+
+table thead th.col-name {
+    width: 18%;
+}
+
+table thead th.col-identifier {
+    width: 20%;
+}
+
+table thead th.col-current-value {
+    width: 18%;
+}
+
+table thead th.col-details {
+    width: 22%;
+}
+
+table thead th.col-actions-color {
+    width: 8%;
+}
+
+/* Button System Demo Description */
+.button-system-demo-intro {
+    margin-bottom: 15px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+

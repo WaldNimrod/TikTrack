@@ -328,13 +328,13 @@ class UserDataCleanup:
         print(f"   לפני: {trade_plans_count} תוכניות, {trades_count} טריידים")
         
         if not self.dry_run:
-            # Delete trade plans
-            result = self.db.execute(text("DELETE FROM trade_plans"))
-            deleted_trade_plans = result.rowcount
-            
-            # Delete trades
+            # IMPORTANT: Delete trades FIRST before trade plans (due to FK constraints)
             result = self.db.execute(text("DELETE FROM trades"))
             deleted_trades = result.rowcount
+            
+            # Now delete trade plans (after trades are deleted)
+            result = self.db.execute(text("DELETE FROM trade_plans"))
+            deleted_trade_plans = result.rowcount
             
             self.stats['deleted']['trade_plans'] = deleted_trade_plans
             self.stats['deleted']['trades'] = deleted_trades

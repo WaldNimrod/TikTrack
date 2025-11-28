@@ -24,6 +24,9 @@
     <!-- Header Styles - Separate CSS file -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     
+    <!-- Page-specific styles -->
+    <link rel="stylesheet" href="styles-new/07-pages/_designs.css?v=1.0.0">
+    
 </head>
 
 <body class="designs-page" data-entity-type="ticker">
@@ -69,14 +72,14 @@
                                 <table class="table table-striped table-hover" id="buttonSystemTable" data-table-type="button-system">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th style="width: 24%;">דוגמאות חיות</th>
-                                            <th style="width: 14%;">שם הכפתור</th>
-                                            <th style="width: 16%;">תיאור</th>
-                                            <th style="width: 12%;">משתנה צבע</th>
-                                            <th style="width: 10%;">HTML (ישן)</th>
-                                            <th style="width: 10%;">HTML (חדש)</th>
-                                            <th style="width: 10%;">JavaScript</th>
-                                            <th style="width: 4%;">פעולות</th>
+                                            <th class="col-live-examples">דוגמאות חיות</th>
+                                            <th class="col-button-name">שם הכפתור</th>
+                                            <th class="col-description">תיאור</th>
+                                            <th class="col-color-var">משתנה צבע</th>
+                                            <th class="col-html-old">HTML (ישן)</th>
+                                            <th class="col-html-new">HTML (חדש)</th>
+                                            <th class="col-javascript">JavaScript</th>
+                                            <th class="col-actions">פעולות</th>
                                         </tr>
                                     </thead>
                                     <tbody id="buttonTableBody"></tbody>
@@ -102,7 +105,7 @@
                                 </div>
                             </div>
                             
-                            <p style="margin-bottom: 15px; font-size: 14px; line-height: 1.4;">להלן רשימה מלאה של כל הכפתורים הזמינים במערכת המרכזית, עם דוגמאות פעילות וקוד לשילוב:</p>
+                            <p class="button-system-demo-intro">להלן רשימה מלאה של כל הכפתורים הזמינים במערכת המרכזית, עם דוגמאות פעילות וקוד לשילוב:</p>
                             
                             <div class="button-stats mt-4">
                                 <div class="row">
@@ -214,12 +217,12 @@
                             <table class="table table-striped table-hover" id="colorTokensTable" data-table-type="color-tokens">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th style="width: 14%;">קבוצה</th>
-                                        <th style="width: 18%;">שם</th>
-                                        <th style="width: 20%;">מזהה / משתנה</th>
-                                        <th style="width: 18%;">ערך נוכחי</th>
-                                        <th style="width: 22%;">פרטים</th>
-                                        <th style="width: 8%;">פעולות</th>
+                                        <th class="col-group">קבוצה</th>
+                                        <th class="col-name">שם</th>
+                                        <th class="col-identifier">מזהה / משתנה</th>
+                                        <th class="col-current-value">ערך נוכחי</th>
+                                        <th class="col-details">פרטים</th>
+                                        <th class="col-actions-color">פעולות</th>
                                     </tr>
                                 </thead>
                                 <tbody id="colorTokensBody"></tbody>

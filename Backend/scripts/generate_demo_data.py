@@ -709,8 +709,8 @@ class DemoDataGenerator:
                 "החשבון הראשי חייב להיות תמיד ב-USD"
             )
         
-        # Verify account1 is indeed in USD
-        account1_currency = db.execute(text('''
+        # Verify account1 is indeed in USD (double-check from database)
+        account1_currency = self.db.execute(text('''
             SELECT c.symbol FROM currencies c 
             WHERE c.id = :currency_id
         '''), {'currency_id': account1.currency_id}).scalar()

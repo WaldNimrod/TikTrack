@@ -1,20 +1,20 @@
 # דוח בדיקות מקיף - עמודי מוקאפ
 # Comprehensive Mockups Testing Report
 
-**תאריך בדיקה:** 27.11.2025, 19:10:00  
+**תאריך בדיקה:** 28.11.2025, 23:16:48  
 **סה"כ עמודים:** 12  
-**עמודים שעברו:** 1 ✅  
-**עמודים נכשלו:** 11 ❌  
-**שיעור הצלחה:** 8%
+**עמודים שעברו:** 5 ✅  
+**עמודים נכשלו:** 7 ❌  
+**שיעור הצלחה:** 42%
 
 ---
 
 ## סיכום כללי
 
 ### סטטיסטיקות:
-- **שגיאות קונסולה:** 23
+- **שגיאות קונסולה:** 8
 - **אזהרות קונסולה:** 0
-- **שגיאות JavaScript:** 14
+- **שגיאות JavaScript:** 8
 - **אזהרות:** 0
 
 ---
@@ -40,8 +40,8 @@
 - שבורים: 10
 
 **❌ שגיאות קונסולה:** 2
-- [7:09:12 PM] ERROR: ❌ Error saving preference comparative-analysis-comparison-params: JSHandle@error...
-- [7:09:12 PM] ERROR: ❌ Error saving preference comparative-analysis-filters: JSHandle@error...
+- [11:16:09 PM] ERROR: ❌ Error saving preference comparative-analysis-comparison-params: JSHandle@erro...
+- [11:16:10 PM] ERROR: ❌ Error saving preference comparative-analysis-filters: JSHandle@error...
 
 ---
 
@@ -107,7 +107,7 @@
 - שבורים: 3
 
 **❌ שגיאות:**
-- **JavaScript Error:** await is only valid in async functions and the top level bodies of modules
+- **JavaScript Error:** Unexpected token ')'
 - **Page Load Error:** e.includes is not a function
 
 ---
@@ -155,7 +155,6 @@
 - שבורים: 5
 
 **❌ שגיאות:**
-- **JavaScript Error:** Identifier 'Logger' has already been declared
 - **JavaScript Error:** Unexpected token 'catch'
 - **Page Load Error:** e.includes is not a function
 
@@ -165,7 +164,7 @@
 
 ---
 
-### ❌ price-history-page
+### ✅ price-history-page
 
 **נתיב:** `/mockups/daily-snapshots/price-history-page.html`
 
@@ -182,10 +181,6 @@
 - סה"כ: 5
 - עובדים: 0
 - שבורים: 5
-
-**❌ שגיאות:**
-- **JavaScript Error:** Identifier 'EntityDetailsRenderer' has already been declared
-- **Page Load Error:** e.includes is not a function
 
 ---
 
@@ -206,10 +201,6 @@
 - סה"כ: 18
 - עובדים: 0
 - שבורים: 10
-
-**❌ שגיאות:**
-- **JavaScript Error:** Identifier 'Logger' has already been declared
-- **Page Load Error:** e.includes is not a function
 
 **❌ שגיאות קונסולה:** 1
 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)...
@@ -239,12 +230,12 @@
 - **Page Load Error:** e.includes is not a function
 
 **❌ שגיאות קונסולה:** 2
-- [7:09:44 PM] ERROR: ❌ Global Error: JSHandle@error...
-- [7:09:44 PM] ERROR: ❌ Error details: JSHandle@object...
+- [11:16:35 PM] ERROR: ❌ Global Error: JSHandle@error...
+- [11:16:35 PM] ERROR: ❌ Error details: JSHandle@object...
 
 ---
 
-### ❌ trading-journal-page
+### ✅ trading-journal-page
 
 **נתיב:** `/mockups/daily-snapshots/trading-journal-page.html`
 
@@ -253,7 +244,7 @@
 - תפריט עובד: ✅
 
 **כפתורים:**
-- סה"כ: 37
+- סה"כ: 46
 - עובדים: 0
 - שבורים: 10
 
@@ -262,17 +253,9 @@
 - עובדים: 0
 - שבורים: 3
 
-**❌ שגיאות קונסולה:** 6
-- Failed to load resource: the server responded with a status of 404 (NOT FOUND)...
-- Failed to load resource: the server responded with a status of 404 (NOT FOUND)...
-- Failed to load resource: the server responded with a status of 404 (NOT FOUND)...
-- Refused to execute script from 'http://localhost:8080/mockups/daily-snapshots/scripts/entity-details...
-- Refused to execute script from 'http://localhost:8080/mockups/daily-snapshots/scripts/entity-details...
-- ... ועוד 1 שגיאות
-
 ---
 
-### ❌ tradingview-test-page
+### ✅ tradingview-test-page
 
 **נתיב:** `/mockups/daily-snapshots/tradingview-test-page.html`
 
@@ -290,12 +273,9 @@
 - עובדים: 0
 - שבורים: 1
 
-**❌ שגיאות:**
-- Missing .main-content
-
 ---
 
-### ❌ watch-lists-page
+### ✅ watch-lists-page
 
 **נתיב:** `/mockups/watch-lists-page.html`
 
@@ -312,14 +292,6 @@
 - סה"כ: 1
 - עובדים: 0
 - שבורים: 1
-
-**❌ שגיאות קונסולה:** 9
-- Failed to load resource: the server responded with a status of 404 (NOT FOUND)...
-- Failed to load resource: the server responded with a status of 404 (NOT FOUND)...
-- Failed to load resource: the server responded with a status of 404 (NOT FOUND)...
-- Failed to load resource: the server responded with a status of 404 (NOT FOUND)...
-- Failed to load resource: the server responded with a status of 404 (NOT FOUND)...
-- ... ועוד 4 שגיאות
 
 ---
 

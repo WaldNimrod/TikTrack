@@ -261,10 +261,10 @@
             container.innerHTML = '';
 
             // Render entries
-            entries.forEach(entry => {
+            for (const entry of entries) {
                 const entryElement = await createEntryElement(entry);
                 container.appendChild(entryElement);
-            });
+            }
 
             if (window.Logger) {
                 window.Logger.info('✅ Recent entries updated', { page: 'emotional-tracking-widget', count: entries.length });

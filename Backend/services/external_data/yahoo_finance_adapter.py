@@ -41,6 +41,10 @@ class QuoteData:
     open_price: Optional[float] = None
     change_pct_from_open: Optional[float] = None
     change_amount_from_open: Optional[float] = None
+    # Daily OHLC data (for ATR calculation and historical analysis)
+    high_price: Optional[float] = None  # Daily high price
+    low_price: Optional[float] = None   # Daily low price
+    close_price: Optional[float] = None  # Daily close price (previous day's close)
     # ATR (Average True Range) - technical indicator
     atr: Optional[float] = None
     atr_period: int = 14  # Default ATR period (typically 14 days)
@@ -776,27 +780,35 @@ class YahooFinanceAdapter:
             else:
                 logger.warning(f"📊 {symbol}: regularMarketOpen not available in Yahoo Finance response")
             
-            # Calculate ATR if we have enough historical data
-            try:
-                historical_data = self._get_historical_ohlc_data(symbol, days_back=20)
-                if historical_data:
-                    atr = self._calculate_atr(historical_data, period=quote.atr_period)
-                    if atr is not None:
-                        quote.atr = atr
-                        logger.info(f"📊 {symbol}: ATR calculated: {atr:.4f} (period: {quote.atr_period})")
-                    else:
-                        logger.warning(f"📊 {symbol}: Could not calculate ATR - insufficient data")
-                else:
-                    logger.warning(f"📊 {symbol}: No historical data available for ATR calculation")
-            except Exception as e:
-                logger.warning(f"📊 {symbol}: Error calculating ATR: {e}")
-                # Don't fail the whole quote if ATR calculation fails
+            # Extract daily OHLC data (high, low, close)
+            # Note: ATR calculation is now handled by ATRCalculator service, not here
+            if 'regularMarketDayHigh' in meta:
+                try:
+                    quote.high_price = float(meta['regularMarketDayHigh'])
+                    logger.info(f"📊 {symbol}: Daily high price: ${quote.high_price}")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"📊 {symbol}: Error parsing regularMarketDayHigh: {e}")
+            
+            if 'regularMarketDayLow' in meta:
+                try:
+                    quote.low_price = float(meta['regularMarketDayLow'])
+                    logger.info(f"📊 {symbol}: Daily low price: ${quote.low_price}")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"📊 {symbol}: Error parsing regularMarketDayLow: {e}")
+            
+            # Close price is typically the previous day's close
+            if 'chartPreviousClose' in meta:
+                try:
+                    quote.close_price = float(meta['chartPreviousClose'])
+                    logger.info(f"📊 {symbol}: Previous day close price: ${quote.close_price}")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"📊 {symbol}: Error parsing chartPreviousClose: {e}")
             
             change_pct_display = f"{quote.change_pct:.2f}%" if quote.change_pct is not None else "N/A"
             change_amount_display = f"${quote.change_amount:.2f}" if quote.change_amount is not None else "N/A"
             change_from_open_display = f"${quote.change_amount_from_open:.2f} ({quote.change_pct_from_open:.2f}%)" if quote.change_amount_from_open is not None else "N/A"
-            atr_display = f"{quote.atr:.4f}" if quote.atr is not None else "N/A"
-            logger.info(f"📊 {symbol}: Final quote data - price: ${quote.price}, change_pct: {change_pct_display}, change_amount: {change_amount_display}, change_from_open: {change_from_open_display}, ATR: {atr_display}")
+            ohlc_display = f"H:${quote.high_price:.2f} L:${quote.low_price:.2f} C:${quote.close_price:.2f}" if quote.high_price and quote.low_price and quote.close_price else "N/A"
+            logger.info(f"📊 {symbol}: Final quote data - price: ${quote.price}, change_pct: {change_pct_display}, change_amount: {change_amount_display}, change_from_open: {change_from_open_display}, OHLC: {ohlc_display}")
             
             return quote
             
@@ -841,6 +853,10 @@ class YahooFinanceAdapter:
                     open_price=quote.open_price,
                     change_pct_from_open=quote.change_pct_from_open,
                     change_amount_from_open=quote.change_amount_from_open,
+                    # Daily OHLC data
+                    high_price=quote.high_price,
+                    low_price=quote.low_price,
+                    close_price=quote.close_price,
                     # ATR data
                     atr=quote.atr,
                     atr_period=quote.atr_period or 14
@@ -918,14 +934,18 @@ class YahooFinanceAdapter:
                 source=quote.source,
                 is_stale=False,
                 quality_score=1.0,
-                # Open price data
-                open_price=quote.open_price,
-                change_pct_from_open=quote.change_pct_from_open,
-                change_amount_from_open=quote.change_amount_from_open,
-                # ATR data
-                atr=quote.atr,
-                atr_period=quote.atr_period or 14
-            )
+                    # Open price data
+                    open_price=quote.open_price,
+                    change_pct_from_open=quote.change_pct_from_open,
+                    change_amount_from_open=quote.change_amount_from_open,
+                    # Daily OHLC data
+                    high_price=quote.high_price,
+                    low_price=quote.low_price,
+                    close_price=quote.close_price,
+                    # ATR data
+                    atr=quote.atr,
+                    atr_period=quote.atr_period or 14
+                )
             
             logger.info(f"💾 Adding quote to database: {ticker.symbol} = ${quote.price} ({quote.currency})")
             self.db_session.add(db_quote)

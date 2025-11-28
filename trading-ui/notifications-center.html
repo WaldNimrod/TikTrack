@@ -33,6 +33,9 @@
     <!-- FontAwesome Icons - Local -->
     <link rel="stylesheet" href="images/fontawesome/css/all.min.css?v=0da3519a_20251102_104906">
     
+    <!-- Page-specific styles -->
+    <link rel="stylesheet" href="styles-new/07-pages/_notifications-center.css?v=1.0.0">
+    
     <!-- Bootstrap JavaScript -->
     
     <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
@@ -214,7 +217,7 @@
                                         </div>
                                         
                                         <!-- Test Results -->
-                                        <div class="test-results" id="notificationModeTestResults" style="display: none;">
+                                        <div class="test-results d-none" id="notificationModeTestResults">
                                             <h6 class="text-primary mb-3">
                                                 <img src="/trading-ui/images/icons/tabler/chart-bar.svg" width="16" height="16" alt="chart-bar" class="icon me-2">
                                                 תוצאות בדיקה
@@ -331,7 +334,7 @@
                     </div>
                     <div class="section-body">
                         <!-- לוג התראות בלבד -->
-                        <div id="notification-log-container" style="min-height: 400px;">
+                        <div id="notification-log-container" class="notification-log-container">
                             <!-- הלוג יטען אוטומטית -->
                         </div>
                     </div>
@@ -384,6 +387,8 @@
     <script src="scripts/icon-mappings.js?v=1.0.0"></script> <!-- מיפוי איקונים מרכזי -->
     <!-- [8.6] Load Order: 7.6 -->
     <script src="scripts/icon-system.js?v=1.0.0"></script> <!-- מערכת איקונים מרכזית -->
+    <!-- [8.7] Load Order: 7.7 -->
+    <script src="scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- עזר החלפת איקונים -->
     <!-- [9] Load Order: 9 -->
     <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
     <!-- [10] Load Order: 10 -->

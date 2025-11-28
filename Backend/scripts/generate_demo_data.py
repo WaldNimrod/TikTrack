@@ -412,7 +412,7 @@ class DateDistributionGenerator:
     def generate_date_in_range(self, start_date: datetime, end_date: datetime) -> datetime:
         """יוצר תאריך בטווח מסוים"""
         delta = end_date - start_date
-        days = random.randint(0, delta.days)
+        days = random.randint(0, max(0, delta.days))
         return start_date + timedelta(days=days)
 
 
@@ -711,35 +711,76 @@ class DemoDataGenerator:
         count = self.config['trade_plans']['count']
         swing_percent = self.config['trade_plans']['swing_percent']
         long_percent = self.config['trade_plans']['long_percent']
+        primary_account_activity_percent = self.config['trading_accounts']['primary_account_activity_percent']
         
         swing_count = int(count * swing_percent / 100)
         long_count = int(count * long_percent / 100)
+        primary_account_count = int(count * primary_account_activity_percent / 100)
         
-        # Primary account gets all swing plans
+        # Primary account gets all swing plans + additional plans to reach 70%
         primary_account = self.relationship_manager.get_primary_account()
         other_accounts = [acc for acc in self.relationship_manager.accounts if acc.id != primary_account.id]
+        
+        # Create shuffled lists for distribution to ensure correct percentages
+        plan_indices = list(range(count))
+        random.shuffle(plan_indices)
+        
+        # Assign account distribution - primary gets 70%
+        primary_plan_indices = set(plan_indices[:primary_account_count])
+        
+        # Prepare side distribution - first long_count will be Long
+        side_indices = list(range(count))
+        random.shuffle(side_indices)
+        
+        # Prepare date distribution - 40% in last 6 months, 70% of those in last 3 months
+        date_indices = list(range(count))
+        random.shuffle(date_indices)
+        last_6m_count = int(count * 0.4)
+        last_3m_count = int(last_6m_count * 0.7)
         
         created = 0
         
         for i in range(count):
-            # Determine investment type
-            if created < swing_count:
+            # Determine account - primary gets 70% of all plans
+            is_primary_plan = i in primary_plan_indices
+            
+            # Determine investment type and account
+            if created < swing_count and is_primary_plan:
+                # All swing plans go to primary account
                 investment_type = 'swing'
-                account = primary_account  # All swing in primary
+                account = primary_account
+            elif is_primary_plan:
+                # Additional plans for primary account (non-swing)
+                investment_type = random.choice(['investment', 'passive'])
+                account = primary_account
             else:
+                # Plans for other accounts
                 investment_type = random.choice(['investment', 'passive'])
                 account = random.choice(other_accounts) if other_accounts else primary_account
             
-            # Determine side
-            side = 'Long' if created < long_count else 'Short'
+            # Determine side using shuffled indices - ensure 90% Long
+            side_index = side_indices[i]
+            side = 'Long' if side_index < long_count else 'Short'
             
             # Get ticker from account's currency
             ticker = self.relationship_manager.get_random_ticker(account.currency_id)
             if not ticker:
                 ticker = self.relationship_manager.get_random_ticker()
             
-            # Generate date (40% in last 6 months)
-            plan_date = self.date_gen.generate_date('random')
+            # Generate date using shuffled indices
+            date_index = date_indices[i]
+            if date_index < last_3m_count:
+                # 28% (70% of 40%) in last 3 months
+                plan_date = self.date_gen.generate_date('recent')
+            elif date_index < last_6m_count:
+                # 12% (remaining of 40%) in months 3-6 (between 3-6 months ago)
+                plan_date = self.date_gen.generate_date_in_range(
+                    self.date_gen.six_months_ago,
+                    self.date_gen.three_months_ago
+                )
+            else:
+                # 60% in previous 1.5 years
+                plan_date = self.date_gen.generate_date('random')
             
             # Generate realistic entry price (50-500 range)
             entry_price = round(random.uniform(50, 500), 2)
@@ -847,7 +888,11 @@ class DemoDataGenerator:
             self.db.add(trade)
             created += 1
         
-        # Independent trades
+        # Independent trades - ensure 90% Long
+        long_percent = self.config['trade_plans']['long_percent']
+        independent_long_count = int(independent_count * long_percent / 100)
+        independent_created = 0
+        
         for i in range(independent_count):
             account = random.choice(self.relationship_manager.accounts)
             ticker = self.relationship_manager.get_random_ticker(account.currency_id)
@@ -858,7 +903,9 @@ class DemoDataGenerator:
             
             status = 'open' if random.random() > 0.5 else 'closed'
             investment_type = random.choice(INVESTMENT_TYPES)
-            side = random.choice(TRADE_SIDES)
+            # Ensure 90% Long for independent trades too
+            side = 'Long' if independent_created < independent_long_count else 'Short'
+            independent_created += 1
             
             entry_price = round(random.uniform(50, 500), 2)
             planned_amount = round(random.uniform(5000, 50000), 2)

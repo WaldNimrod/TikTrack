@@ -348,6 +348,9 @@ class EntityDetailsRenderer {
         const currencySymbol = tickerData.currency_symbol || (tickerData.currency && tickerData.currency.symbol) || '$';
         const updatedAt = tickerData.yahoo_updated_at || tickerData.updated_at || null;
         const dataSource = tickerData.data_source || null;
+        const atr = tickerData.atr || null;
+        const atrPeriod = tickerData.atr_period || 14;
+        const atrWarnings = tickerData.atr_warnings || [];
         
         // אם אין נתוני שוק, נחזיר רק קו מפריד
         if (!price || price === 0) {
@@ -423,7 +426,17 @@ class EntityDetailsRenderer {
                         מקור: ${dataSource}
                     </div>
                     ` : ''}
+                    ${atr !== null ? `
+                    <div class="text-muted small">
+                        ATR: ${parseFloat(atr).toFixed(4)} (${atrPeriod} ימים)
+                    </div>
+                    ` : ''}
                 </div>
+                ${atrWarnings.length > 0 ? `
+                <div class="alert alert-warning alert-sm mt-2 mb-0">
+                    ${atrWarnings.map(w => `<div>${w}</div>`).join('')}
+                </div>
+                ` : ''}
             </div>
         `;
     }

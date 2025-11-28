@@ -34,6 +34,13 @@ class NormalizedQuote:
     open_price: Optional[float] = None
     change_pct_from_open: Optional[float] = None
     change_amount_from_open: Optional[float] = None
+    # Daily OHLC data (for ATR calculation and historical analysis)
+    high_price: Optional[float] = None
+    low_price: Optional[float] = None
+    close_price: Optional[float] = None
+    # ATR (Average True Range) - technical indicator
+    atr: Optional[float] = None
+    atr_period: int = 14
 
 @dataclass
 class NormalizedIntraday:
@@ -120,6 +127,15 @@ class DataNormalizer:
             normalized_change_pct_from_open = self._aggregate_change_pct_from_open(valid_quotes)
             normalized_change_amount_from_open = self._aggregate_change_amount_from_open(valid_quotes)
             
+            # Aggregate OHLC fields
+            normalized_high_price = self._aggregate_high_prices(valid_quotes)
+            normalized_low_price = self._aggregate_low_prices(valid_quotes)
+            normalized_close_price = self._aggregate_close_prices(valid_quotes)
+            
+            # Aggregate ATR (if provided by provider)
+            normalized_atr = self._aggregate_atr(valid_quotes)
+            normalized_atr_period = self._aggregate_atr_period(valid_quotes)
+            
             # Determine currency (use most common)
             currency = self._determine_currency(valid_quotes)
             
@@ -148,7 +164,14 @@ class DataNormalizer:
                 # Open price data
                 open_price=normalized_open_price,
                 change_pct_from_open=normalized_change_pct_from_open,
-                change_amount_from_open=normalized_change_amount_from_open
+                change_amount_from_open=normalized_change_amount_from_open,
+                # Daily OHLC data
+                high_price=normalized_high_price,
+                low_price=normalized_low_price,
+                close_price=normalized_close_price,
+                # ATR data
+                atr=normalized_atr,
+                atr_period=normalized_atr_period
             )
             
         except Exception as e:
@@ -337,6 +360,88 @@ class DataNormalizer:
         
         # Use median for change amounts to avoid outliers
         return sorted(valid_changes)[len(valid_changes) // 2]
+    
+    def _aggregate_high_prices(self, quotes: List[Dict]) -> Optional[float]:
+        """Aggregate high prices"""
+        valid_highs = [
+            float(q['high_price']) for q in quotes 
+            if q.get('high_price') is not None and q.get('high_price') > 0
+        ]
+        
+        if not valid_highs:
+            return None
+        
+        if len(valid_highs) == 1:
+            return valid_highs[0]
+        
+        # Use maximum for high prices (highest high)
+        return max(valid_highs)
+    
+    def _aggregate_low_prices(self, quotes: List[Dict]) -> Optional[float]:
+        """Aggregate low prices"""
+        valid_lows = [
+            float(q['low_price']) for q in quotes 
+            if q.get('low_price') is not None and q.get('low_price') > 0
+        ]
+        
+        if not valid_lows:
+            return None
+        
+        if len(valid_lows) == 1:
+            return valid_lows[0]
+        
+        # Use minimum for low prices (lowest low)
+        return min(valid_lows)
+    
+    def _aggregate_close_prices(self, quotes: List[Dict]) -> Optional[float]:
+        """Aggregate close prices"""
+        valid_closes = [
+            float(q['close_price']) for q in quotes 
+            if q.get('close_price') is not None and q.get('close_price') > 0
+        ]
+        
+        if not valid_closes:
+            return None
+        
+        if len(valid_closes) == 1:
+            return valid_closes[0]
+        
+        # Use median for close prices to avoid outliers
+        return sorted(valid_closes)[len(valid_closes) // 2]
+    
+    def _aggregate_atr(self, quotes: List[Dict]) -> Optional[float]:
+        """Aggregate ATR values from multiple providers"""
+        valid_atrs = [
+            float(q['atr']) for q in quotes 
+            if q.get('atr') is not None and q.get('atr') > 0
+        ]
+        
+        if not valid_atrs:
+            return None
+        
+        if len(valid_atrs) == 1:
+            return valid_atrs[0]
+        
+        # Use median for ATR to avoid outliers
+        return sorted(valid_atrs)[len(valid_atrs) // 2]
+    
+    def _aggregate_atr_period(self, quotes: List[Dict]) -> int:
+        """Aggregate ATR period (use most common, default 14)"""
+        valid_periods = [
+            int(q['atr_period']) for q in quotes 
+            if q.get('atr_period') is not None and 3 <= int(q.get('atr_period', 14)) <= 90
+        ]
+        
+        if not valid_periods:
+            return 14  # Default
+        
+        if len(valid_periods) == 1:
+            return valid_periods[0]
+        
+        # Use most common period
+        from collections import Counter
+        period_counts = Counter(valid_periods)
+        return period_counts.most_common(1)[0][0]
     
     def _determine_currency(self, quotes: List[Dict]) -> str:
         """Determine the currency to use (most common)"""
@@ -545,6 +650,13 @@ class DataNormalizer:
                 existing_quote.open_price = normalized_quote.open_price
                 existing_quote.change_pct_from_open = normalized_quote.change_pct_from_open
                 existing_quote.change_amount_from_open = normalized_quote.change_amount_from_open
+                # Daily OHLC data
+                existing_quote.high_price = normalized_quote.high_price
+                existing_quote.low_price = normalized_quote.low_price
+                existing_quote.close_price = normalized_quote.close_price
+                # ATR data
+                existing_quote.atr = normalized_quote.atr
+                existing_quote.atr_period = normalized_quote.atr_period
                 existing_quote.updated_at = datetime.now(timezone.utc)
             else:
                 # Create new normalized quote
@@ -563,7 +675,14 @@ class DataNormalizer:
                     # Open price data
                     open_price=normalized_quote.open_price,
                     change_pct_from_open=normalized_quote.change_pct_from_open,
-                    change_amount_from_open=normalized_quote.change_amount_from_open
+                    change_amount_from_open=normalized_quote.change_amount_from_open,
+                    # Daily OHLC data
+                    high_price=normalized_quote.high_price,
+                    low_price=normalized_quote.low_price,
+                    close_price=normalized_quote.close_price,
+                    # ATR data
+                    atr=normalized_quote.atr,
+                    atr_period=normalized_quote.atr_period
                 )
                 self.db_session.add(db_quote)
             

@@ -497,7 +497,36 @@ class EntityDetailsService:
                         entity_dict['ticker']['open_price'] = latest_quote.open_price
                         entity_dict['ticker']['change_from_open'] = latest_quote.change_amount_from_open
                         entity_dict['ticker']['change_from_open_percent'] = latest_quote.change_pct_from_open
-                        logger.debug(f"Added market data to ticker {entity.ticker.id} for {entity_type} {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%, change_from_open={latest_quote.change_pct_from_open}%")
+                        # ATR data
+                        entity_dict['ticker']['atr'] = latest_quote.atr
+                        entity_dict['ticker']['atr_period'] = latest_quote.atr_period or 14
+                        
+                        # Calculate ATR if not available
+                        if latest_quote.atr is None:
+                            try:
+                                from services.external_data.atr_calculator import ATRCalculator
+                                from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
+                                
+                                user_id = EntityDetailsService._get_default_user_id()
+                                atr_calculator = ATRCalculator(db)
+                                adapter = YahooFinanceAdapter(db)
+                                
+                                atr_result = atr_calculator.get_atr_with_fallback(
+                                    ticker_id=entity.ticker.id,
+                                    adapter=adapter,
+                                    user_id=user_id,
+                                    db_session=db
+                                )
+                                
+                                if atr_result and atr_result.atr:
+                                    entity_dict['ticker']['atr'] = atr_result.atr
+                                    entity_dict['ticker']['atr_period'] = atr_result.period
+                                    if atr_result.warnings:
+                                        entity_dict['ticker']['atr_warnings'] = atr_result.warnings
+                            except Exception as atr_error:
+                                logger.warning(f"Error calculating ATR for ticker {entity.ticker.id}: {atr_error}")
+                        
+                        logger.debug(f"Added market data to ticker {entity.ticker.id} for {entity_type} {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%, change_from_open={latest_quote.change_pct_from_open}%, ATR={entity_dict['ticker'].get('atr')}")
                     else:
                         logger.debug(f"No market data found for ticker {entity.ticker.id} in {entity_type} {entity_id}")
                 elif hasattr(entity, 'ticker_id') and entity.ticker_id:
@@ -522,6 +551,9 @@ class EntityDetailsService:
                             # Open price data
                             entity_dict['ticker']['open_price'] = latest_quote.open_price
                             entity_dict['ticker']['change_from_open'] = latest_quote.change_amount_from_open
+                            # ATR data
+                            entity_dict['ticker']['atr'] = latest_quote.atr
+                            entity_dict['ticker']['atr_period'] = latest_quote.atr_period or 14
                             entity_dict['ticker']['change_from_open_percent'] = latest_quote.change_pct_from_open
             
             # Add trade_plan object for trade

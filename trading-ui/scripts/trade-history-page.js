@@ -134,8 +134,8 @@
             
             // Load from API using safeApiCall
             const data = await window.safeApiCall('/api/tickers/');
-                const tickers = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
-                allTickers = tickers.map(t => ({
+            const tickers = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+            allTickers = tickers.map(t => ({
                     id: t.id,
                     symbol: t.symbol || t.ticker_symbol || ''
                 })).filter(t => t.symbol).sort((a, b) => a.symbol.localeCompare(b.symbol));
@@ -212,27 +212,27 @@
             
             // Load from API using safeApiCall
             const data = await window.safeApiCall('/api/trades/');
-                const trades = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
-                
-                // Transform trades to match our format
-                allTrades = trades.map(trade => ({
-                    id: trade.id,
-                    ticker: trade.ticker_symbol || trade.ticker?.symbol || '',
-                    side: trade.side || '',
-                    investment_type: trade.investment_type || '',
-                    created_at: trade.created_at?.utc || trade.created_at || '',
-                    closed_at: trade.closed_at?.utc || trade.closed_at || '',
-                    pl: trade.realized_pl || trade.pl || 0,
-                    pl_percent: trade.pl_percent || 0
-                })).filter(t => t.ticker); // Only trades with ticker
+            const trades = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
             
+            // Transform trades to match our format
+            allTrades = trades.map(trade => ({
+                id: trade.id,
+                ticker: trade.ticker_symbol || trade.ticker?.symbol || '',
+                side: trade.side || '',
+                investment_type: trade.investment_type || '',
+                created_at: trade.created_at?.utc || trade.created_at || '',
+                closed_at: trade.closed_at?.utc || trade.closed_at || '',
+                pl: trade.realized_pl || trade.pl || 0,
+                pl_percent: trade.pl_percent || 0
+            })).filter(t => t.ticker); // Only trades with ticker
+        
             // Save to cache
             if (window.UnifiedCacheManager) {
                 await window.UnifiedCacheManager.save(cacheKey, allTrades, 'memory', { ttl: 300 }); // 5 minutes
             }
-                
-                filteredTrades = [...allTrades];
-                loadTradesTable();
+            
+            filteredTrades = [...allTrades];
+            loadTradesTable();
         } catch (error) {
             // Error already handled by safeApiCall, but fallback to mock data
             if (window.NotificationSystem) {

@@ -1913,9 +1913,10 @@ async function initStrategyPerformanceChart() {
                 } catch (e) {
                     // Silently ignore errors when removing series (series might already be removed)
                     // Only log if it's not a common "series not found" error
-                    if (e.message && !e.message.includes('undefined') && !e.message.includes('not found')) {
+                    const errorMessage = e?.message || (typeof e === 'string' ? e : String(e));
+                    if (errorMessage && typeof errorMessage === 'string' && !errorMessage.includes('undefined') && !errorMessage.includes('not found')) {
                         if (window.Logger) {
-                            window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: e.message });
+                            window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: errorMessage });
                         }
                     }
                 }
@@ -2109,9 +2110,10 @@ async function updateStrategyPerformanceChart(filters) {
                 } catch (e) {
                     // Silently ignore errors when removing series (series might already be removed)
                     // Only log if it's not a common "series not found" error
-                    if (e.message && !e.message.includes('undefined') && !e.message.includes('not found')) {
+                    const errorMessage = e?.message || (typeof e === 'string' ? e : String(e));
+                    if (errorMessage && typeof errorMessage === 'string' && !errorMessage.includes('undefined') && !errorMessage.includes('not found')) {
                         if (window.Logger) {
-                            window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: e.message });
+                            window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: errorMessage });
                         }
                     }
                 }

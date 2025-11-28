@@ -485,7 +485,36 @@ class UserDataCleanup:
         print(f"   ✅ SPY קיים (ID: {spy.id})")
         
         if not self.dry_run:
-            # Delete all tickers except SPY
+            # IMPORTANT: Delete market data FIRST before deleting tickers (due to FK constraints)
+            deleted_market_quotes = 0
+            try:
+                result = self.db.execute(text("DELETE FROM market_data_quotes"))
+                deleted_market_quotes = result.rowcount
+            except Exception:
+                pass
+            
+            deleted_refresh_logs = 0
+            try:
+                result = self.db.execute(text("DELETE FROM data_refresh_logs"))
+                deleted_refresh_logs = result.rowcount
+            except Exception:
+                pass
+            
+            deleted_intraday_slots = 0
+            try:
+                result = self.db.execute(text("DELETE FROM intraday_data_slots"))
+                deleted_intraday_slots = result.rowcount
+            except Exception:
+                pass
+            
+            deleted_quotes_last = 0
+            try:
+                result = self.db.execute(text("DELETE FROM quotes_last"))
+                deleted_quotes_last = result.rowcount
+            except Exception:
+                pass
+            
+            # Now delete all tickers except SPY (after market data is deleted)
             result = self.db.execute(text("DELETE FROM tickers WHERE symbol != 'SPY'"))
             deleted_tickers = result.rowcount
             
@@ -496,14 +525,6 @@ class UserDataCleanup:
                     text("DELETE FROM ticker_provider_symbols WHERE ticker_id NOT IN (SELECT id FROM tickers WHERE symbol = 'SPY')")
                 )
                 deleted_provider_symbols = result.rowcount
-            except Exception:
-                pass
-            
-            # Delete market data
-            deleted_market_quotes = 0
-            try:
-                result = self.db.execute(text("DELETE FROM market_data_quotes"))
-                deleted_market_quotes = result.rowcount
             except Exception:
                 pass
             

@@ -706,12 +706,40 @@ const PACKAGE_MANIFEST = {
   preferences: {
     id: 'preferences',
     name: 'Preferences Package',
-    description: 'User preferences system v2.0 (6 files)',
-    version: '2.0.0',
+    description: 'User preferences system v2.0 (10 files)',
+    version: '2.1.0',
     critical: false,
     loadOrder: 5,
     dependencies: ['base', 'services'], // Added 'services' dependency for preferences-data.js
     scripts: [
+      {
+        file: 'preferences-cache.js',
+        globalCheck: 'window.PreferencesCache',
+        description: 'Preferences cache management layer',
+        required: true,
+        loadOrder: 0
+      },
+      {
+        file: 'preferences-events.js',
+        globalCheck: 'window.PreferencesEvents',
+        description: 'Preferences event system',
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'preferences-ui-layer.js',
+        globalCheck: 'window.PreferencesUI',
+        description: 'Preferences UI layer',
+        required: true,
+        loadOrder: 2
+      },
+      {
+        file: 'preferences-manager.js',
+        globalCheck: 'window.PreferencesManager',
+        description: 'Preferences manager (central)',
+        required: true,
+        loadOrder: 3
+      },
       {
         file: 'services/preferences-v4.js',
         globalCheck: 'window.PreferencesV4',

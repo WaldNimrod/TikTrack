@@ -96,7 +96,10 @@ def get_quotes_batch():
                             "currency": quote.currency,
                             "asof_utc": quote.asof_utc.isoformat() if quote.asof_utc else None,
                             "fetched_at": quote.fetched_at.isoformat(),
-                            "source": quote.source
+                            "source": quote.source,
+                            # Technical indicators
+                            "atr": quote.atr,
+                            "atr_period": quote.atr_period or 14
                         }
                         quotes.append(quote_data)
                         
@@ -166,7 +169,10 @@ def get_quote(ticker_id: int):
                 "currency": quote.currency,
                 "asof_utc": quote.asof_utc.isoformat() if quote.asof_utc else None,
                 "fetched_at": quote.fetched_at.isoformat(),
-                "source": quote.source
+                "source": quote.source,
+                # Technical indicators
+                "atr": quote.atr,
+                "atr_period": quote.atr_period or 14
             }
             
             return jsonify({

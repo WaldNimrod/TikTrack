@@ -41,6 +41,9 @@ class QuoteData:
     open_price: Optional[float] = None
     change_pct_from_open: Optional[float] = None
     change_amount_from_open: Optional[float] = None
+    # ATR (Average True Range) - technical indicator
+    atr: Optional[float] = None
+    atr_period: int = 14  # Default ATR period (typically 14 days)
 
 @dataclass
 class IntradayData:
@@ -773,10 +776,27 @@ class YahooFinanceAdapter:
             else:
                 logger.warning(f"📊 {symbol}: regularMarketOpen not available in Yahoo Finance response")
             
+            # Calculate ATR if we have enough historical data
+            try:
+                historical_data = self._get_historical_ohlc_data(symbol, days_back=20)
+                if historical_data:
+                    atr = self._calculate_atr(historical_data, period=quote.atr_period)
+                    if atr is not None:
+                        quote.atr = atr
+                        logger.info(f"📊 {symbol}: ATR calculated: {atr:.4f} (period: {quote.atr_period})")
+                    else:
+                        logger.warning(f"📊 {symbol}: Could not calculate ATR - insufficient data")
+                else:
+                    logger.warning(f"📊 {symbol}: No historical data available for ATR calculation")
+            except Exception as e:
+                logger.warning(f"📊 {symbol}: Error calculating ATR: {e}")
+                # Don't fail the whole quote if ATR calculation fails
+            
             change_pct_display = f"{quote.change_pct:.2f}%" if quote.change_pct is not None else "N/A"
             change_amount_display = f"${quote.change_amount:.2f}" if quote.change_amount is not None else "N/A"
             change_from_open_display = f"${quote.change_amount_from_open:.2f} ({quote.change_pct_from_open:.2f}%)" if quote.change_amount_from_open is not None else "N/A"
-            logger.info(f"📊 {symbol}: Final quote data - price: ${quote.price}, change_pct: {change_pct_display}, change_amount: {change_amount_display}, change_from_open: {change_from_open_display}")
+            atr_display = f"{quote.atr:.4f}" if quote.atr is not None else "N/A"
+            logger.info(f"📊 {symbol}: Final quote data - price: ${quote.price}, change_pct: {change_pct_display}, change_amount: {change_amount_display}, change_from_open: {change_from_open_display}, ATR: {atr_display}")
             
             return quote
             
@@ -820,7 +840,10 @@ class YahooFinanceAdapter:
                     # Open price data
                     open_price=quote.open_price,
                     change_pct_from_open=quote.change_pct_from_open,
-                    change_amount_from_open=quote.change_amount_from_open
+                    change_amount_from_open=quote.change_amount_from_open,
+                    # ATR data
+                    atr=quote.atr,
+                    atr_period=quote.atr_period or 14
                 )
             
             return None
@@ -898,7 +921,10 @@ class YahooFinanceAdapter:
                 # Open price data
                 open_price=quote.open_price,
                 change_pct_from_open=quote.change_pct_from_open,
-                change_amount_from_open=quote.change_amount_from_open
+                change_amount_from_open=quote.change_amount_from_open,
+                # ATR data
+                atr=quote.atr,
+                atr_period=quote.atr_period or 14
             )
             
             logger.info(f"💾 Adding quote to database: {ticker.symbol} = ${quote.price} ({quote.currency})")
@@ -1350,6 +1376,128 @@ class YahooFinanceAdapter:
             
         except Exception as e:
             logger.error(f"Error getting historical quote for {symbol}: {e}")
+            return None
+    
+    def _get_historical_ohlc_data(self, symbol: str, days_back: int = 20) -> List[Dict[str, Any]]:
+        """
+        Get historical OHLC (Open, High, Low, Close) data for ATR calculation
+        
+        Args:
+            symbol: Ticker symbol
+            days_back: Number of days to fetch (default 20 to ensure we have enough for ATR 14)
+            
+        Returns:
+            List of dicts with 'date', 'open', 'high', 'low', 'close' keys, sorted by date (oldest first)
+        """
+        try:
+            from datetime import date, timedelta
+            
+            end_date = date.today()
+            start_date = end_date - timedelta(days=days_back + 5)  # Get more data for reliability
+            
+            url = f"{self.base_url}/v8/finance/chart/{symbol}"
+            params = {
+                'interval': '1d',
+                'period1': int(start_date.strftime('%s')),
+                'period2': int(end_date.strftime('%s'))
+            }
+            
+            data = self._make_request(url, params)
+            if not data:
+                return []
+            
+            if 'chart' not in data or 'result' not in data['chart'] or not data['chart']['result']:
+                return []
+            
+            result = data['chart']['result'][0]
+            if 'timestamp' not in result or 'indicators' not in result:
+                return []
+            
+            timestamps = result['timestamp']
+            quotes = result['indicators']['quote'][0]
+            
+            historical_data = []
+            for i in range(len(timestamps)):
+                try:
+                    if (quotes['open'][i] is not None and quotes['high'][i] is not None and 
+                        quotes['low'][i] is not None and quotes['close'][i] is not None):
+                        historical_date = datetime.fromtimestamp(timestamps[i], tz=timezone.utc)
+                        historical_data.append({
+                            'date': historical_date,
+                            'open': float(quotes['open'][i]),
+                            'high': float(quotes['high'][i]),
+                            'low': float(quotes['low'][i]),
+                            'close': float(quotes['close'][i])
+                        })
+                except (ValueError, TypeError, IndexError) as e:
+                    logger.warning(f"Error parsing historical data point {i} for {symbol}: {e}")
+                    continue
+            
+            # Sort by date (oldest first) for ATR calculation
+            historical_data.sort(key=lambda x: x['date'])
+            logger.info(f"📊 {symbol}: Fetched {len(historical_data)} historical OHLC data points")
+            return historical_data
+            
+        except Exception as e:
+            logger.error(f"Error getting historical OHLC data for {symbol}: {e}")
+            return []
+    
+    def _calculate_atr(self, historical_data: List[Dict[str, Any]], period: int = 14) -> Optional[float]:
+        """
+        Calculate Average True Range (ATR) from historical OHLC data
+        
+        ATR formula:
+        1. True Range (TR) = max of:
+           - High - Low
+           - |High - Previous Close|
+           - |Low - Previous Close|
+        2. ATR = Simple Moving Average of TR over the specified period
+        
+        Args:
+            historical_data: List of dicts with 'high', 'low', 'close' keys, sorted by date (oldest first)
+            period: ATR period (default 14)
+            
+        Returns:
+            ATR value or None if insufficient data
+        """
+        try:
+            if len(historical_data) < period + 1:  # Need period+1 because we need previous close
+                logger.warning(f"Insufficient data for ATR calculation: {len(historical_data)} points, need {period + 1}")
+                return None
+            
+            true_ranges = []
+            
+            # Calculate True Range for each period (skip first one as we need previous close)
+            for i in range(1, len(historical_data)):
+                current = historical_data[i]
+                previous = historical_data[i - 1]
+                
+                high = current['high']
+                low = current['low']
+                prev_close = previous['close']
+                
+                # Calculate True Range
+                tr1 = high - low
+                tr2 = abs(high - prev_close)
+                tr3 = abs(low - prev_close)
+                
+                true_range = max(tr1, tr2, tr3)
+                true_ranges.append(true_range)
+            
+            # Calculate ATR as Simple Moving Average of True Ranges
+            if len(true_ranges) < period:
+                logger.warning(f"Insufficient true ranges for ATR: {len(true_ranges)}, need {period}")
+                return None
+            
+            # Use the last 'period' true ranges
+            atr_values = true_ranges[-period:]
+            atr = sum(atr_values) / len(atr_values)
+            
+            logger.info(f"📊 Calculated ATR: {atr:.4f} (period: {period}, data points: {len(historical_data)})")
+            return atr
+            
+        except Exception as e:
+            logger.error(f"Error calculating ATR: {e}")
             return None
     
     def _update_quotes_last(self, ticker_id: int, quote: QuoteData):

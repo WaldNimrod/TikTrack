@@ -2,8 +2,11 @@
 ## User Data Cleanup Process - Working Document
 
 **תאריך יצירה:** 29 בינואר 2025  
-**גרסה:** 1.0.0  
+**תאריך עדכון:** 31 בינואר 2025  
+**גרסה:** 2.0.0  
 **מטרה:** הגדרת תהליך מקיף לניקוי כל נתוני המשתמש מהמערכת לצורך יצירת סט נתונים למשתמש חדש
+
+**⚠️ עדכון חשוב:** המסמך עודכן ל-PostgreSQL בלבד (SQLite הוסר מהמערכת). נוספו סקריפטים אוטומטיים להרצה מלאה של התהליך.
 
 ---
 
@@ -71,9 +74,16 @@ docker exec tiktrack-postgres-dev pg_dump -U TikTrakDBAdmin -d TikTrack-db-devel
   docker exec -i tiktrack-postgres-dev psql -U TikTrakDBAdmin -d TikTrack-db-cleanup-test
 ```
 
-**או שימוש בסקריפט:**
+**שימוש בסקריפט (מומלץ):**
 ```bash
+# שיכפול ל-database ברירת מחדל (TikTrack-db-cleanup-test)
 python3 Backend/scripts/clone_database_for_cleanup.py
+
+# שיכפול עם שם מותאם
+python3 Backend/scripts/clone_database_for_cleanup.py --target-name TikTrack-db-demo --source-name TikTrack-db-development
+
+# שיכפול עם החלפה של database קיים
+python3 Backend/scripts/clone_database_for_cleanup.py --target-name TikTrack-db-cleanup-test --force
 ```
 
 #### 2. הגדרת בסיס הנתונים לשיכפול
@@ -738,15 +748,34 @@ JOIN tickers t ON tps.ticker_id = t.id;
 
 ### איך להריץ?
 
-#### שיטה 1: הרצה ישירה
+#### שיטה 1: הרצה מלאה אוטומטית (מומלץ)
 ```bash
-cd Backend
-python3 scripts/generate_demo_data.py
+# הרצת כל התהליך ברצף (שלב 1 + בדיקה + שלב 2 + בדיקה)
+python3 Backend/scripts/run_cleanup_and_demo_data.py
 ```
 
-#### שיטה 2: עם פרמטרים
+#### שיטה 2: הרצה ידנית של שלבים
 ```bash
-python3 Backend/scripts/generate_demo_data.py --help
+# שלב 1: ניקוי
+python3 Backend/scripts/cleanup_user_data.py
+
+# בדיקה: אימות תוצאות שלב 1
+python3 Backend/scripts/verify_cleanup_results.py
+
+# שלב 2: יצירת דוגמה
+python3 Backend/scripts/generate_demo_data.py
+```
+
+#### שיטה 3: עם פרמטרים
+```bash
+# Dry run (ללא שינויים)
+python3 Backend/scripts/run_cleanup_and_demo_data.py --dry-run
+
+# רק שלב 2 (אם שלב 1 כבר בוצע)
+python3 Backend/scripts/run_cleanup_and_demo_data.py --skip-phase1
+
+# רק שלב 1 (אם לא רוצים דוגמה)
+python3 Backend/scripts/run_cleanup_and_demo_data.py --skip-phase2
 ```
 
 ### דוקומנטציה

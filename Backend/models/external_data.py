@@ -72,6 +72,10 @@ class MarketDataQuote(BaseModel):
     change_pct_from_open = Column(Float, nullable=True)             # Change percentage from open
     change_amount_from_open = Column(Float, nullable=True)         # Change amount from open
     
+    # Technical indicators
+    atr = Column(Float, nullable=True)                             # Average True Range (ATR)
+    atr_period = Column(Integer, default=14)                       # ATR calculation period (default 14 days)
+    
     # Additional data
     currency = Column(String(10), nullable=False, default='USD')    # Currency code
     source = Column(String(50), nullable=False)                     # Data source identifier

@@ -264,7 +264,9 @@ class PreferencesGroupManager {
         return;
       }
 
-      const preferences = await window.PreferencesCore.loadGroupPreferences(groupName);
+      // CRITICAL: Force refresh to ensure we get latest data from server, not stale cache
+      // This is especially important after saving preferences
+      const preferences = await window.PreferencesCore.loadGroupPreferences(groupName, null, null, true); // forceRefresh = true
       const populatedStats = this.populateGroupFields(sectionId, preferences);
       this.markGroupAsLoaded(sectionId);
 

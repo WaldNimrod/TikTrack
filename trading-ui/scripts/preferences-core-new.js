@@ -936,15 +936,25 @@ class PreferencesCore {
      * @param {number} profileId - Profile ID
      * @returns {Promise<Object>} Group preferences
      */
-  async loadGroupPreferences(groupName, userId = null, profileId = null) {
+  async loadGroupPreferences(groupName, userId = null, profileId = null, forceRefresh = false) {
     const finalUserId = userId || this.currentUserId;
     const finalProfileId = profileId !== null && profileId !== undefined ? profileId : this.currentProfileId !== null ? this.currentProfileId : 0;
 
     // Cache key for group
     const cacheKey = `preference_group_${groupName}_${finalUserId}_${finalProfileId}`;
 
-    // Check cache
-    if (window.UnifiedCacheManager) {
+    // If forceRefresh is true, clear cache first
+    if (forceRefresh) {
+      window.Logger.info(`🔄 Force refresh: clearing cache for group ${groupName} before loading from server`, { page: 'preferences-core-new' });
+      if (window.UnifiedCacheManager) {
+        await window.UnifiedCacheManager.remove(cacheKey);
+        const prefixedKey = `tiktrack_${cacheKey}`;
+        await window.UnifiedCacheManager.remove(prefixedKey);
+      }
+    }
+
+    // Check cache only if not forcing refresh
+    if (!forceRefresh && window.UnifiedCacheManager) {
       const cached = await window.UnifiedCacheManager.get(cacheKey, {
         layer: 'localStorage',
         ttl: 300000, // 5 minutes

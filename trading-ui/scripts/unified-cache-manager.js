@@ -3232,22 +3232,31 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
                 
                 const prefixedKey = `tiktrack_${normalizedKey}`;
                 
+                // CRITICAL: Remove from ALL layers using UnifiedCacheManager.remove()
+                // This ensures memory, localStorage, and IndexedDB are all cleared
+                console.log(`🗑️ DEBUG: Removing ${normalizedKey} from all cache layers`);
+                const removed1 = await this.remove(normalizedKey);
+                if (removed1) removedCount++;
+                
+                // Also remove prefixed version
+                console.log(`🗑️ DEBUG: Removing ${prefixedKey} from all cache layers`);
+                const removed2 = await this.remove(prefixedKey);
+                if (removed2) removedCount++;
+                
+                // Fallback: Direct localStorage cleanup (in case UnifiedCacheManager missed it)
                 if (localStorage.getItem(normalizedKey) !== null) {
                     localStorage.removeItem(normalizedKey);
                     removedCount++;
-                    console.log(`✅ DEBUG: Removed ${normalizedKey} from localStorage`);
-                    window.Logger.debug(`🗑️ Removed ${normalizedKey} from localStorage`, { page: "unified-cache-manager" });
+                    console.log(`✅ DEBUG: Fallback removed ${normalizedKey} from localStorage`);
                 }
                 
                 if (localStorage.getItem(prefixedKey) !== null) {
                     localStorage.removeItem(prefixedKey);
                     removedCount++;
-                    console.log(`✅ DEBUG: Removed ${prefixedKey} from localStorage`);
-                    window.Logger.debug(`🗑️ Removed ${prefixedKey} from localStorage`, { page: "unified-cache-manager" });
+                    console.log(`✅ DEBUG: Fallback removed ${prefixedKey} from localStorage`);
                 }
                 
-                console.log(`🗑️ DEBUG: Trying UnifiedCacheManager.remove("${normalizedKey}")`);
-                await this.remove(normalizedKey);
+                console.log(`✅ DEBUG: Removed ${normalizedKey} from all cache layers`);
             } catch (removeError) {
                 console.error(`❌ DEBUG: Failed to remove key ${normalizedKey}:`, removeError);
                 window.Logger.warn(`⚠️ Failed to remove key ${normalizedKey}:`, removeError, { page: "unified-cache-manager" });

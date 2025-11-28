@@ -1593,7 +1593,8 @@ ction -->
         // Function to get current trade ID (placeholder - should be set based on selected trade)
         function getCurrentTradeId() {
             // In production, this should get the actual trade ID from the selected trade
-            return 123; // Placeholder
+            // Return null if no trade is selected to avoid errors
+            return null; // No trade selected - return null to prevent errors
         }
         
         // Function to load linked items for the trade
@@ -1602,6 +1603,16 @@ ction -->
             const container = document.getElementById('linkedItemsContainer');
             
             if (!container) return;
+            
+            // Skip if no trade ID is available
+            if (!tradeId) {
+                container.innerHTML = `
+                    <div class="alert alert-info">
+                        <span data-icon="info-circle" class="icon"></span> בחר טרייד להצגת פריטים מקושרים
+                    </div>
+                `;
+                return;
+            }
             
             try {
                 // Check if linked items API is available
@@ -1626,12 +1637,18 @@ ction -->
                     `;
                 }
             } catch (error) {
+                // Better error handling - check if error is an object with message
+                const errorMessage = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
                 if (window.Logger) {
-                    window.Logger.error('Error loading linked items', { page: 'trade-history-page', error });
+                    window.Logger.warn('Error loading linked items for trade', { 
+                        page: 'trade-history-page', 
+                        tradeId: tradeId,
+                        error: errorMessage 
+                    });
                 }
                 container.innerHTML = `
-                    <div class="alert alert-danger">
-                        <span data-icon="alert-triangle" class="icon"></span> שגיאה בטעינת פריטים מקושרים: ${error.message}
+                    <div class="alert alert-warning">
+                        <span data-icon="alert-triangle" class="icon"></span> שגיאה בטעינת פריטים מקושרים: ${errorMessage}
                     </div>
                 `;
             }

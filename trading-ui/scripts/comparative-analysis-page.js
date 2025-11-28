@@ -574,9 +574,13 @@ async function saveFilterState() {
             const filters = getFilterValues();
             localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
         } catch (e) {
-            // Ignore localStorage errors
+            // Log localStorage errors (non-critical - already attempted fallback)
             if (window.Logger) {
-                window.Logger.error('❌ Error saving preference comparative-analysis-filters:', e, { page: 'comparative-analysis-page' });
+                window.Logger.warn('Failed to save preference to localStorage (final fallback failed)', { 
+                    preference: 'comparative-analysis-filters',
+                    error: e,
+                    page: 'comparative-analysis-page' 
+                });
             }
         }
     }
@@ -3071,9 +3075,13 @@ async function saveComparisonParameterState() {
             const params = getComparisonParameterValues();
             localStorage.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
         } catch (e) {
-            // Log localStorage errors
+            // Log localStorage errors (non-critical - already attempted fallback)
             if (window.Logger) {
-                window.Logger.error('❌ Error saving preference comparative-analysis-comparison-params:', e, { page: 'comparative-analysis-page' });
+                window.Logger.warn('Failed to save preference to localStorage (final fallback failed)', { 
+                    preference: 'comparative-analysis-comparison-params',
+                    error: e,
+                    page: 'comparative-analysis-page' 
+                });
             }
         }
     }

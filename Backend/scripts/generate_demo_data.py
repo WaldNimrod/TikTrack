@@ -666,9 +666,10 @@ class DemoDataGenerator:
             other_currency = usd_currency  # Fallback
         
         # Account 1: Primary (70% activity, all swing)
+        # CRITICAL: Primary account MUST be in USD currency
         account1 = TradingAccount(
             name="חשבון מסחר ראשי",
-            currency_id=usd_currency.id,
+            currency_id=usd_currency.id,  # MUST be USD - never use other_currency here!
             status='open',
             opening_balance=100000.0,
             cash_balance=50000.0,

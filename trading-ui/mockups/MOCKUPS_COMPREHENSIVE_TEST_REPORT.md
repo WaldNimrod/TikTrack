@@ -1,18 +1,18 @@
 # דוח בדיקות מקיף - עמודי מוקאפ
 # Comprehensive Mockups Testing Report
 
-**תאריך בדיקה:** 29.11.2025, 0:18:10  
+**תאריך בדיקה:** 29.11.2025, 0:21:36  
 **סה"כ עמודים:** 12  
-**עמודים שעברו:** 7 ✅  
-**עמודים נכשלו:** 5 ❌  
-**שיעור הצלחה:** 58%
+**עמודים שעברו:** 9 ✅  
+**עמודים נכשלו:** 3 ❌  
+**שיעור הצלחה:** 75%
 
 ---
 
 ## סיכום כללי
 
 ### סטטיסטיקות:
-- **שגיאות קונסולה:** 6
+- **שגיאות קונסולה:** 4
 - **אזהרות קונסולה:** 0
 - **שגיאות JavaScript:** 0
 - **אזהרות:** 0
@@ -40,8 +40,8 @@
 - שבורים: 10
 
 **❌ שגיאות קונסולה:** 2
-- [12:17:31 AM] ERROR: ❌ Error saving preference comparative-analysis-comparison-params: JSHandle@erro...
-- [12:17:31 AM] ERROR: ❌ Error saving preference comparative-analysis-filters: JSHandle@error...
+- [12:20:57 AM] ERROR: ❌ Error saving preference comparative-analysis-comparison-params: JSHandle@erro...
+- [12:20:57 AM] ERROR: ❌ Error saving preference comparative-analysis-filters: JSHandle@error...
 
 ---
 
@@ -128,7 +128,7 @@
 
 ---
 
-### ❌ portfolio-state-page
+### ✅ portfolio-state-page
 
 **נתיב:** `/mockups/daily-snapshots/portfolio-state-page.html`
 
@@ -145,9 +145,6 @@
 - סה"כ: 5
 - עובדים: 0
 - שבורים: 5
-
-**❌ שגיאות קונסולה:** 1
-- Container 'portfolio-state-summary' not found...
 
 ---
 
@@ -194,7 +191,7 @@
 
 ---
 
-### ❌ trade-history-page
+### ✅ trade-history-page
 
 **נתיב:** `/mockups/daily-snapshots/trade-history-page.html`
 
@@ -211,9 +208,6 @@
 - סה"כ: 6
 - עובדים: 0
 - שבורים: 6
-
-**❌ שגיאות קונסולה:** 1
-- [12:18:00 AM] ERROR: Error getting linked items for trade 123: JSHandle@error...
 
 ---
 

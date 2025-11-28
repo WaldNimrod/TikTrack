@@ -202,7 +202,8 @@ async function loadTradingAccounts() {
 
 // Populate account filter menu (extracted for reuse)
 function populateAccountFilterMenu() {
-    const accountMenu = document.getElementById('accountFilterMenu');
+    try {
+        const accountMenu = document.getElementById('accountFilterMenu');
         if (accountMenu) {
             // Remove all items except "הכול"
             const existingItems = accountMenu.querySelectorAll('.account-filter-item:not([data-value="הכול"])');

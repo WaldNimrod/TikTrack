@@ -614,40 +614,8 @@ class UnifiedLogDisplay {
             // Check for CSS conflicts
             const testBtn = document.createElement('button');
             testBtn.className = 'btn btn-action';
-            // Use IconSystem to render icon
-            if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
-              try {
-                const iconHTML = await window.IconSystem.renderIcon('button', 'info-circle', {
-                  size: '16',
-                  alt: 'info',
-                  class: 'icon'
-                });
-                testBtn.innerHTML = iconHTML;
-              } catch (error) {
-                // Fallback - use IconSystem.getButtonIcon if available
-              if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
-                try {
-                  const fallbackIcon = await window.IconSystem.renderIcon('button', 'info-circle', { size: '16', alt: 'info', class: 'icon' });
-                  testBtn.innerHTML = fallbackIcon;
-                } catch (error) {
-                  testBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info" class="icon">';
-                }
-              } else {
-                testBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info" class="icon">';
-              }
-            } else {
-              // Fallback if IconSystem not available
-              if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
-                try {
-                  const fallbackIcon = await window.IconSystem.renderIcon('button', 'info-circle', { size: '16', alt: 'info', class: 'icon' });
-                  testBtn.innerHTML = fallbackIcon;
-                } catch (error) {
-                  testBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info" class="icon">';
-                }
-              } else {
-                testBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info" class="icon">';
-              }
-            }
+            // Use sync fallback for icon (debug code doesn't need async)
+            testBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info" class="icon">';
             testBtn.style.position = 'absolute';
             testBtn.style.top = '-1000px';
             testBtn.style.left = '-1000px';

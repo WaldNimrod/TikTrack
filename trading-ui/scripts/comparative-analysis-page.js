@@ -3071,7 +3071,10 @@ async function saveComparisonParameterState() {
             const params = getComparisonParameterValues();
             localStorage.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
         } catch (e) {
-            // Ignore localStorage errors
+            // Log localStorage errors
+            if (window.Logger) {
+                window.Logger.error('❌ Error saving preference comparative-analysis-comparison-params:', e, { page: 'comparative-analysis-page' });
+            }
         }
     }
 }

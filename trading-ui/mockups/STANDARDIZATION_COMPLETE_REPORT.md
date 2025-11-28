@@ -1,7 +1,7 @@
 # דוח בדיקות סטנדרטיזציה מלאות - עמודי מוקאפ
 # Full Standardization Test Report - Mockups Pages
 
-**תאריך:** 29.11.2025, 0:30:24  
+**תאריך:** 29.11.2025, 0:34:32  
 **סה"כ עמודים:** 12  
 **עמודים שעברו:** 0 ✅  
 **עמודים נכשלו:** 12 ❌  
@@ -14,10 +14,10 @@
 ### סטטיסטיקות בדיקות:
 
 ### מבנה HTML:
-- ✅ background-wrapper: 0/12
-- ✅ unified-header: 0/12
-- ✅ page-body: 0/12
-- ✅ main-content: 0/12
+- ✅ background-wrapper: 12/12
+- ✅ unified-header: 12/12
+- ✅ page-body: 12/12
+- ✅ main-content: 12/12
 - ✅ header in wrapper: 10/12
 
 ### ITCSS:
@@ -44,10 +44,10 @@
 **נתיב:** `/mockups/daily-snapshots/comparative-analysis-page.html`
 
 **מבנה HTML:**
-- background-wrapper: ❌
-- unified-header: ❌
-- page-body: ❌
-- main-content: ❌
+- background-wrapper: ✅
+- unified-header: ✅
+- page-body: ✅
+- main-content: ✅
 - header in wrapper: ✅
 
 **ITCSS:**
@@ -74,8 +74,8 @@
 - ללא אזהרות: ❌
 
 **❌ שגיאות:** 2
-- [12:29:35 AM] ERROR: ❌ Error saving preference comparative-analysis-comparison-params: JSHandle@error
-- [12:29:35 AM] ERROR: ❌ Error saving preference comparative-analysis-filters: JSHandle@error
+- [12:33:41 AM] ERROR: ❌ Error saving preference comparative-analysis-comparison-params: JSHandle@error
+- [12:33:41 AM] ERROR: ❌ Error saving preference comparative-analysis-filters: JSHandle@error
 
 ---
 
@@ -84,10 +84,10 @@
 **נתיב:** `/mockups/daily-snapshots/date-comparison-modal.html`
 
 **מבנה HTML:**
-- background-wrapper: ❌
-- unified-header: ❌
-- page-body: ❌
-- main-content: ❌
+- background-wrapper: ✅
+- unified-header: ✅
+- page-body: ✅
+- main-content: ✅
 - header in wrapper: ✅
 
 **ITCSS:**
@@ -120,10 +120,10 @@
 **נתיב:** `/mockups/daily-snapshots/economic-calendar-page.html`
 
 **מבנה HTML:**
-- background-wrapper: ❌
-- unified-header: ❌
-- page-body: ❌
-- main-content: ❌
+- background-wrapper: ✅
+- unified-header: ✅
+- page-body: ✅
+- main-content: ✅
 - header in wrapper: ✅
 
 **ITCSS:**
@@ -159,10 +159,10 @@
 **נתיב:** `/mockups/daily-snapshots/emotional-tracking-widget.html`
 
 **מבנה HTML:**
-- background-wrapper: ❌
-- unified-header: ❌
-- page-body: ❌
-- main-content: ❌
+- background-wrapper: ✅
+- unified-header: ✅
+- page-body: ✅
+- main-content: ✅
 - header in wrapper: ✅
 
 **ITCSS:**
@@ -195,10 +195,10 @@
 **נתיב:** `/mockups/daily-snapshots/history-widget.html`
 
 **מבנה HTML:**
-- background-wrapper: ❌
-- unified-header: ❌
-- page-body: ❌
-- main-content: ❌
+- background-wrapper: ✅
+- unified-header: ✅
+- page-body: ✅
+- main-content: ✅
 - header in wrapper: ✅
 
 **ITCSS:**
@@ -231,10 +231,10 @@
 **נתיב:** `/mockups/daily-snapshots/portfolio-state-page.html`
 
 **מבנה HTML:**
-- background-wrapper: ❌
-- unified-header: ❌
-- page-body: ❌
-- main-content: ❌
+- background-wrapper: ✅
+- unified-header: ✅
+- page-body: ✅
+- main-content: ✅
 - header in wrapper: ✅
 
 **ITCSS:**
@@ -267,10 +267,10 @@
 **נתיב:** `/mockups/daily-snapshots/price-history-page.html`
 
 **מבנה HTML:**
-- background-wrapper: ❌
-- unified-header: ❌
-- page-body: ❌
-- main-content: ❌
+- background-wrapper: ✅
+- unified-header: ✅
+- page-body: ✅
+- main-content: ✅
 - header in wrapper: ✅
 
 **ITCSS:**
@@ -303,10 +303,10 @@
 **נתיב:** `/mockups/daily-snapshots/strategy-analysis-page.html`
 
 **מבנה HTML:**
-- background-wrapper: ❌
-- unified-header: ❌
-- page-body: ❌
-- main-content: ❌
+- background-wrapper: ✅
+- unified-header: ✅
+- page-body: ✅
+- main-content: ✅
 - header in wrapper: ✅
 
 **ITCSS:**
@@ -342,10 +342,10 @@
 **נתיב:** `/mockups/daily-snapshots/trade-history-page.html`
 
 **מבנה HTML:**
-- background-wrapper: ❌
-- unified-header: ❌
-- page-body: ❌
-- main-content: ❌
+- background-wrapper: ✅
+- unified-header: ✅
+- page-body: ✅
+- main-content: ✅
 - header in wrapper: ❌
 
 **ITCSS:**
@@ -378,10 +378,10 @@
 **נתיב:** `/mockups/daily-snapshots/trading-journal-page.html`
 
 **מבנה HTML:**
-- background-wrapper: ❌
-- unified-header: ❌
-- page-body: ❌
-- main-content: ❌
+- background-wrapper: ✅
+- unified-header: ✅
+- page-body: ✅
+- main-content: ✅
 - header in wrapper: ❌
 
 **ITCSS:**
@@ -414,10 +414,10 @@
 **נתיב:** `/mockups/daily-snapshots/tradingview-test-page.html`
 
 **מבנה HTML:**
-- background-wrapper: ❌
-- unified-header: ❌
-- page-body: ❌
-- main-content: ❌
+- background-wrapper: ✅
+- unified-header: ✅
+- page-body: ✅
+- main-content: ✅
 - header in wrapper: ✅
 
 **ITCSS:**
@@ -450,10 +450,10 @@
 **נתיב:** `/mockups/watch-lists-page.html`
 
 **מבנה HTML:**
-- background-wrapper: ❌
-- unified-header: ❌
-- page-body: ❌
-- main-content: ❌
+- background-wrapper: ✅
+- unified-header: ✅
+- page-body: ✅
+- main-content: ✅
 - header in wrapper: ✅
 
 **ITCSS:**

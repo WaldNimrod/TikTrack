@@ -155,36 +155,66 @@ async function testFullStandardization(browser, pageInfo) {
 
         // בדיקת מבנה HTML
         try {
+            // המתן לטעינת DOM
+            await page.waitForSelector('body', { timeout: 5000 }).catch(() => {});
+            
             const htmlChecks = await page.evaluate(() => {
+                const body = document.body;
+                const bgWrapper = body.querySelector('.background-wrapper');
+                const header = document.getElementById('unified-header');
+                const pageBody = body.querySelector('.page-body');
+                const mainContent = body.querySelector('.main-content');
+                
                 return {
-                    hasBackgroundWrapper: !!document.querySelector('.background-wrapper'),
-                    hasUnifiedHeader: !!document.getElementById('unified-header'),
-                    hasPageBody: !!document.querySelector('.page-body'),
-                    hasMainContent: !!document.querySelector('.main-content'),
-                    headerInWrapper: (() => {
-                        const header = document.getElementById('unified-header');
-                        if (!header) return false;
-                        const wrapper = header.closest('.background-wrapper');
-                        return !!wrapper;
-                    })()
+                    backgroundWrapper: !!bgWrapper,
+                    unifiedHeader: !!header,
+                    pageBody: !!pageBody,
+                    mainContent: !!mainContent,
+                    headerInWrapper: header && header.closest('.background-wrapper') ? true : false
                 };
             });
             
             results.checks.htmlStructure = htmlChecks;
         } catch (e) {
             results.errors.push(`HTML structure check failed: ${e.message}`);
+            // Fallback - בדיקה פשוטה יותר
+            const simpleCheck = await page.evaluate(() => ({
+                backgroundWrapper: !!document.querySelector('.background-wrapper'),
+                unifiedHeader: !!document.getElementById('unified-header'),
+                pageBody: !!document.querySelector('.page-body'),
+                mainContent: !!document.querySelector('.main-content'),
+                headerInWrapper: false
+            })).catch(() => ({}));
+            
+            if (Object.keys(simpleCheck).length > 0) {
+                results.checks.htmlStructure = simpleCheck;
+            }
         }
 
         // בדיקת ITCSS
         try {
             const cssChecks = await page.evaluate(() => {
                 const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
-                const styles = Array.from(document.querySelectorAll('style'));
-                const inlineStyles = Array.from(document.querySelectorAll('[style]'));
+                const styles = Array.from(document.querySelectorAll('style')).filter(s => {
+                    // התעלם מ-style tags ריקים או של third-party
+                    const content = s.textContent || s.innerHTML || '';
+                    return content.trim().length > 0;
+                });
+                // בדיקת inline styles - רק כאלה שלא מ-third-party
+                const inlineStyles = Array.from(document.querySelectorAll('[style]')).filter(el => {
+                    const style = el.getAttribute('style') || '';
+                    return style.trim().length > 0 && !el.closest('[data-third-party]');
+                });
                 
                 return {
-                    masterCss: links.some(link => link.href.includes('master.css')),
-                    headerStyles: links.some(link => link.href.includes('header-styles.css')),
+                    masterCss: links.some(link => {
+                        const href = link.href || '';
+                        return href.includes('master.css') || href.includes('styles-new/master.css');
+                    }),
+                    headerStyles: links.some(link => {
+                        const href = link.href || '';
+                        return href.includes('header-styles.css') || href.includes('styles-new/header-styles.css');
+                    }),
                     noStyleTags: styles.length === 0,
                     noInlineStyles: inlineStyles.length === 0
                 };

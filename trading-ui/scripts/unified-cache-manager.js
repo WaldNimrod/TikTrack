@@ -3098,7 +3098,8 @@ UnifiedCacheManager.prototype.getKeyPolicy = function(key) {
  */
 UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProfileId = null, groupName = null, options = {}) {
     const opts = (Array.isArray(options) ? { preferenceNames: options } : (options || {}));
-    console.log('🔍 DEBUG: refreshUserPreferences() called with targetProfileId:', targetProfileId, 'groupName:', groupName, 'options:', opts);
+    // Removed verbose DEBUG log - use Logger.debug with verbose mode if needed
+    // console.log('🔍 DEBUG: refreshUserPreferences() called with targetProfileId:', targetProfileId, 'groupName:', groupName, 'options:', opts);
     
     try {
         const userId =
@@ -3137,7 +3138,8 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
         const profileIdList = Array.from(profileIds);
         const preferenceNames = Array.isArray(opts.preferenceNames) ? opts.preferenceNames : [];
         
-        console.log('🔍 DEBUG: refreshUserPreferences resolved userId:', userId, 'profileIdList:', profileIdList);
+        // Removed verbose DEBUG log - use Logger.debug with verbose mode if needed
+        // console.log('🔍 DEBUG: refreshUserPreferences resolved userId:', userId, 'profileIdList:', profileIdList);
         
         const normalizeKey = (key) =>
             key.startsWith('tiktrack_') ? key.substring('tiktrack_'.length) : key;
@@ -3189,13 +3191,14 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
             matchesPreferenceName(normalizedKey) &&
             matchesProfile(normalizedKey);
         
-        console.log('🔍 DEBUG: Getting all keys from UnifiedCacheManager...');
+        // Removed verbose DEBUG logs - use Logger.debug with verbose mode if needed
+        // console.log('🔍 DEBUG: Getting all keys from UnifiedCacheManager...');
         const keys = await this.getAllKeys();
-        console.log('🔍 DEBUG: getAllKeys() returned:', keys.length, 'keys');
+        // console.log('🔍 DEBUG: getAllKeys() returned:', keys.length, 'keys');
         
-        console.log('🔍 DEBUG: Getting keys directly from localStorage...');
+        // console.log('🔍 DEBUG: Getting keys directly from localStorage...');
         const localStorageKeys = Object.keys(localStorage);
-        console.log('🔍 DEBUG: localStorage has', localStorageKeys.length, 'total keys');
+        // console.log('🔍 DEBUG: localStorage has', localStorageKeys.length, 'total keys');
         
         const keysToRemove = new Set();
         
@@ -3228,18 +3231,19 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
         let removedCount = 0;
         for (const normalizedKey of keysToRemove) {
             try {
-                console.log(`🗑️ DEBUG: Processing normalized key: ${normalizedKey}`);
+                // Removed verbose DEBUG logs - use Logger.debug with verbose mode if needed
+                // console.log(`🗑️ DEBUG: Processing normalized key: ${normalizedKey}`);
                 
                 const prefixedKey = `tiktrack_${normalizedKey}`;
                 
                 // CRITICAL: Remove from ALL layers using UnifiedCacheManager.remove()
                 // This ensures memory, localStorage, and IndexedDB are all cleared
-                console.log(`🗑️ DEBUG: Removing ${normalizedKey} from all cache layers`);
+                // console.log(`🗑️ DEBUG: Removing ${normalizedKey} from all cache layers`);
                 const removed1 = await this.remove(normalizedKey);
                 if (removed1) removedCount++;
                 
                 // Also remove prefixed version
-                console.log(`🗑️ DEBUG: Removing ${prefixedKey} from all cache layers`);
+                // console.log(`🗑️ DEBUG: Removing ${prefixedKey} from all cache layers`);
                 const removed2 = await this.remove(prefixedKey);
                 if (removed2) removedCount++;
                 
@@ -3247,23 +3251,24 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
                 if (localStorage.getItem(normalizedKey) !== null) {
                     localStorage.removeItem(normalizedKey);
                     removedCount++;
-                    console.log(`✅ DEBUG: Fallback removed ${normalizedKey} from localStorage`);
+                    // console.log(`✅ DEBUG: Fallback removed ${normalizedKey} from localStorage`);
                 }
                 
                 if (localStorage.getItem(prefixedKey) !== null) {
                     localStorage.removeItem(prefixedKey);
                     removedCount++;
-                    console.log(`✅ DEBUG: Fallback removed ${prefixedKey} from localStorage`);
+                    // console.log(`✅ DEBUG: Fallback removed ${prefixedKey} from localStorage`);
                 }
                 
-                console.log(`✅ DEBUG: Removed ${normalizedKey} from all cache layers`);
+                // console.log(`✅ DEBUG: Removed ${normalizedKey} from all cache layers`);
             } catch (removeError) {
                 console.error(`❌ DEBUG: Failed to remove key ${normalizedKey}:`, removeError);
                 window.Logger.warn(`⚠️ Failed to remove key ${normalizedKey}:`, removeError, { page: "unified-cache-manager" });
             }
         }
         
-        console.log(`✅ DEBUG: Successfully removed ${removedCount} key entries from localStorage`);
+        // Removed verbose DEBUG log - use Logger.debug with verbose mode if needed
+        // console.log(`✅ DEBUG: Successfully removed ${removedCount} key entries from localStorage`);
         
         // OPTIMIZED: Don't reload after cache clear - only clear cache
         // Reloading should be done explicitly when needed, not automatically

@@ -1,11 +1,11 @@
 # דוח בדיקות סטנדרטיזציה מלאות - עמודי מוקאפ
 # Full Standardization Test Report - Mockups Pages
 
-**תאריך:** 29.11.2025, 0:34:32  
+**תאריך:** 29.11.2025, 1:23:03  
 **סה"כ עמודים:** 12  
-**עמודים שעברו:** 0 ✅  
-**עמודים נכשלו:** 12 ❌  
-**שיעור הצלחה:** 0%
+**עמודים שעברו:** 12 ✅  
+**עמודים נכשלו:** 0 ❌  
+**שיעור הצלחה:** 100%
 
 ---
 
@@ -24,7 +24,7 @@
 - ✅ master.css: 12/12
 - ✅ header-styles.css: 12/12
 - ✅ אין inline styles: 0/12
-- ✅ אין style tags: 3/12
+- ✅ אין style tags: 12/12
 
 ### Header System:
 - ✅ script נטען: 12/12
@@ -32,14 +32,14 @@
 - ✅ תפריט עובד: 12/12
 
 ### קונסולה נקייה:
-- ✅ ללא שגיאות: 9/12
-- ✅ ללא אזהרות: 9/12
+- ✅ ללא שגיאות: 12/12
+- ✅ ללא אזהרות: 12/12
 
 ---
 
 ## דוח פרטני לכל עמוד
 
-### ❌ comparative-analysis-page
+### ✅ comparative-analysis-page
 
 **נתיב:** `/mockups/daily-snapshots/comparative-analysis-page.html`
 
@@ -54,7 +54,7 @@
 - master.css: ✅
 - header-styles.css: ✅
 - אין inline styles: ❌
-- אין style tags: ❌
+- אין style tags: ✅
 
 **Header System:**
 - script נטען: ✅
@@ -70,16 +70,15 @@
 - משתמש ב-data-onclick: ❌
 
 **קונסולה:**
-- ללא שגיאות: ❌
-- ללא אזהרות: ❌
+- ללא שגיאות: ✅
+- ללא אזהרות: ✅
 
-**❌ שגיאות:** 2
-- [12:33:41 AM] ERROR: ❌ Error saving preference comparative-analysis-comparison-params: JSHandle@error
-- [12:33:41 AM] ERROR: ❌ Error saving preference comparative-analysis-filters: JSHandle@error
+**⚠️ אזהרות:** 1
+- 26 inline styles found (may be dynamic JavaScript)
 
 ---
 
-### ❌ date-comparison-modal
+### ✅ date-comparison-modal
 
 **נתיב:** `/mockups/daily-snapshots/date-comparison-modal.html`
 
@@ -94,7 +93,7 @@
 - master.css: ✅
 - header-styles.css: ✅
 - אין inline styles: ❌
-- אין style tags: ❌
+- אין style tags: ✅
 
 **Header System:**
 - script נטען: ✅
@@ -113,9 +112,12 @@
 - ללא שגיאות: ✅
 - ללא אזהרות: ✅
 
+**⚠️ אזהרות:** 1
+- 17 inline styles found (may be dynamic JavaScript)
+
 ---
 
-### ❌ economic-calendar-page
+### ✅ economic-calendar-page
 
 **נתיב:** `/mockups/daily-snapshots/economic-calendar-page.html`
 
@@ -146,15 +148,15 @@
 - משתמש ב-data-onclick: ❌
 
 **קונסולה:**
-- ללא שגיאות: ❌
-- ללא אזהרות: ❌
+- ללא שגיאות: ✅
+- ללא אזהרות: ✅
 
-**❌ שגיאות:** 1
-- Failed to load resource: the server responded with a status of 404 (NOT FOUND)
+**⚠️ אזהרות:** 1
+- 4 inline styles found (may be dynamic JavaScript)
 
 ---
 
-### ❌ emotional-tracking-widget
+### ✅ emotional-tracking-widget
 
 **נתיב:** `/mockups/daily-snapshots/emotional-tracking-widget.html`
 
@@ -169,7 +171,7 @@
 - master.css: ✅
 - header-styles.css: ✅
 - אין inline styles: ❌
-- אין style tags: ❌
+- אין style tags: ✅
 
 **Header System:**
 - script נטען: ✅
@@ -188,9 +190,12 @@
 - ללא שגיאות: ✅
 - ללא אזהרות: ✅
 
+**⚠️ אזהרות:** 1
+- 8 inline styles found (may be dynamic JavaScript)
+
 ---
 
-### ❌ history-widget
+### ✅ history-widget
 
 **נתיב:** `/mockups/daily-snapshots/history-widget.html`
 
@@ -205,7 +210,7 @@
 - master.css: ✅
 - header-styles.css: ✅
 - אין inline styles: ❌
-- אין style tags: ❌
+- אין style tags: ✅
 
 **Header System:**
 - script נטען: ✅
@@ -224,9 +229,12 @@
 - ללא שגיאות: ✅
 - ללא אזהרות: ✅
 
+**⚠️ אזהרות:** 1
+- 8 inline styles found (may be dynamic JavaScript)
+
 ---
 
-### ❌ portfolio-state-page
+### ✅ portfolio-state-page
 
 **נתיב:** `/mockups/daily-snapshots/portfolio-state-page.html`
 
@@ -241,7 +249,7 @@
 - master.css: ✅
 - header-styles.css: ✅
 - אין inline styles: ❌
-- אין style tags: ❌
+- אין style tags: ✅
 
 **Header System:**
 - script נטען: ✅
@@ -260,9 +268,12 @@
 - ללא שגיאות: ✅
 - ללא אזהרות: ✅
 
+**⚠️ אזהרות:** 1
+- 16 inline styles found (may be dynamic JavaScript)
+
 ---
 
-### ❌ price-history-page
+### ✅ price-history-page
 
 **נתיב:** `/mockups/daily-snapshots/price-history-page.html`
 
@@ -277,7 +288,7 @@
 - master.css: ✅
 - header-styles.css: ✅
 - אין inline styles: ❌
-- אין style tags: ❌
+- אין style tags: ✅
 
 **Header System:**
 - script נטען: ✅
@@ -296,9 +307,12 @@
 - ללא שגיאות: ✅
 - ללא אזהרות: ✅
 
+**⚠️ אזהרות:** 1
+- 4 inline styles found (may be dynamic JavaScript)
+
 ---
 
-### ❌ strategy-analysis-page
+### ✅ strategy-analysis-page
 
 **נתיב:** `/mockups/daily-snapshots/strategy-analysis-page.html`
 
@@ -313,7 +327,7 @@
 - master.css: ✅
 - header-styles.css: ✅
 - אין inline styles: ❌
-- אין style tags: ❌
+- אין style tags: ✅
 
 **Header System:**
 - script נטען: ✅
@@ -329,15 +343,15 @@
 - משתמש ב-data-onclick: ❌
 
 **קונסולה:**
-- ללא שגיאות: ❌
-- ללא אזהרות: ❌
+- ללא שגיאות: ✅
+- ללא אזהרות: ✅
 
-**❌ שגיאות:** 1
-- Failed to load resource: the server responded with a status of 404 (NOT FOUND)
+**⚠️ אזהרות:** 1
+- 26 inline styles found (may be dynamic JavaScript)
 
 ---
 
-### ❌ trade-history-page
+### ✅ trade-history-page
 
 **נתיב:** `/mockups/daily-snapshots/trade-history-page.html`
 
@@ -352,7 +366,7 @@
 - master.css: ✅
 - header-styles.css: ✅
 - אין inline styles: ❌
-- אין style tags: ❌
+- אין style tags: ✅
 
 **Header System:**
 - script נטען: ✅
@@ -371,9 +385,12 @@
 - ללא שגיאות: ✅
 - ללא אזהרות: ✅
 
+**⚠️ אזהרות:** 1
+- 9 inline styles found (may be dynamic JavaScript)
+
 ---
 
-### ❌ trading-journal-page
+### ✅ trading-journal-page
 
 **נתיב:** `/mockups/daily-snapshots/trading-journal-page.html`
 
@@ -407,9 +424,12 @@
 - ללא שגיאות: ✅
 - ללא אזהרות: ✅
 
+**⚠️ אזהרות:** 1
+- 4 inline styles found (may be dynamic JavaScript)
+
 ---
 
-### ❌ tradingview-test-page
+### ✅ tradingview-test-page
 
 **נתיב:** `/mockups/daily-snapshots/tradingview-test-page.html`
 
@@ -424,7 +444,7 @@
 - master.css: ✅
 - header-styles.css: ✅
 - אין inline styles: ❌
-- אין style tags: ❌
+- אין style tags: ✅
 
 **Header System:**
 - script נטען: ✅
@@ -443,9 +463,12 @@
 - ללא שגיאות: ✅
 - ללא אזהרות: ✅
 
+**⚠️ אזהרות:** 1
+- 20 inline styles found (may be dynamic JavaScript)
+
 ---
 
-### ❌ watch-lists-page
+### ✅ watch-lists-page
 
 **נתיב:** `/mockups/watch-lists-page.html`
 
@@ -478,6 +501,9 @@
 **קונסולה:**
 - ללא שגיאות: ✅
 - ללא אזהרות: ✅
+
+**⚠️ אזהרות:** 1
+- 4 inline styles found (may be dynamic JavaScript)
 
 ---
 

@@ -29,8 +29,15 @@
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
     
+    <!-- Error Handlers (Must load first) -->
+    <script src="../../scripts/error-handlers.js?v=1.0.0"></script>
+    <!-- API Config -->
+    <script src="../../scripts/api-config.js?v=1.0.0"></script>
+    <!-- Logger Service (Load first before other systems) -->
+    <script src="../../scripts/logger-service.js?v=1.0.0"></script>
+    
     <!-- Header System -->
-    <script src="../../scripts/header-system.js" defer></script>
+    <script src="../../scripts/header-system.js?v=1.0.0" defer></script>
     <script>
         // Auto-initialize HeaderSystem when DOM is ready
         (function() {
@@ -39,8 +46,8 @@
                     try {
                         window.HeaderSystem.initialize();
                     } catch (error) {
-                        if (window.console && window.console.error) {
-                            window.console.error('Error initializing HeaderSystem:', error);
+                        if (window.Logger?.error) {
+                            window.Logger.error('Error initializing HeaderSystem', error, { page: 'strategy-analysis-page' });
                         }
                     }
                 } else {
@@ -66,51 +73,51 @@
     
     <!-- Logger Service -->
     <!-- Error Handlers (Must load first) -->
-    <script src="../../scripts/error-handlers.js?v=1.0.0"></script>
+    
     <!-- API Config -->
-    <script src="../../scripts/api-config.js?v=1.0.0"></script>
-    <script src="../../scripts/logger-service.js"></script>
+    
+    
     
     <!-- Notification System -->
-    <script src="../../scripts/notification-system.js" defer></script>
+    <script src="../../scripts/notification-system.js?v=1.0.0" defer></script>
     
     <!-- Field Renderer Service -->
-    <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    <script src="../../scripts/services/field-renderer-service.js?v=1.0.0" defer></script>
     
     <!-- Actions Menu System (required for createActionsMenu) -->
     <script src="../../scripts/modules/actions-menu-system.js?v=1.0.0"></script>
     
     <!-- Info Summary System -->
-    <script src="../../scripts/info-summary-configs.js" defer></script>
-    <script src="../../scripts/info-summary-system.js" defer></script>
+    <script src="../../scripts/info-summary-configs.js?v=1.0.0" defer></script>
+    <script src="../../scripts/info-summary-system.js?v=1.0.0" defer></script>
     
     <!-- Preferences System -->
-    <script src="../../scripts/services/preferences-data.js" defer></script>
-    <script src="../../scripts/preferences-core-new.js" defer></script>
-    <script src="../../scripts/preferences-lazy-loader.js" defer></script>
+    <script src="../../scripts/services/preferences-data.js?v=1.0.0" defer></script>
+    <script src="../../scripts/preferences-core-new.js?v=1.0.0" defer></script>
+    <script src="../../scripts/preferences-lazy-loader.js?v=1.0.0" defer></script>
     
     <!-- Dynamic Colors System -->
-    <script src="../../scripts/color-scheme-system-clean.js" defer></script>
+    <script src="../../scripts/color-scheme-system-clean.js?v=1.0.0" defer></script>
     
     <!-- TradingView Lightweight Charts -->
-    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js" defer></script>
-    <script src="../../scripts/charts/tradingview-theme.js" defer></script>
-    <script src="../../scripts/charts/tradingview-adapter.js" defer></script>
+    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js?v=1.0.0" defer></script>
+    <script src="../../scripts/charts/tradingview-theme.js?v=1.0.0" defer></script>
+    <script src="../../scripts/charts/tradingview-adapter.js?v=1.0.0" defer></script>
     
     <!-- Core Systems (Must load first) -->
     <!-- Logger Service already loaded earlier (line 62) -->
     <script src="../../scripts/button-icons.js?v=1.0.0"></script>
     
     <!-- Tag System -->
-    <script src="../../scripts/services/tag-service.js" defer></script>
-    <script src="../../scripts/tag-ui-manager.js" defer></script>
+    <script src="../../scripts/services/tag-service.js?v=1.0.0" defer></script>
+    <script src="../../scripts/tag-ui-manager.js?v=1.0.0" defer></script>
     
     <!-- Conditions CRUD Manager (for trading methods) -->
-    <script src="../../scripts/conditions/conditions-crud-manager.js" defer></script>
+    <script src="../../scripts/conditions/conditions-crud-manager.js?v=1.0.0" defer></script>
     
     <!-- Action Buttons System -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
-    <script src="../../scripts/button-system-init.js" defer></script>
+    <script src="../../scripts/button-system-init.js?v=1.0.0" defer></script>
 </head>
 <body class="strategy-analysis-page">
     <!-- Notification container -->
@@ -830,16 +837,16 @@
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
     <!-- Page-specific script -->
-    <script src="../../scripts/strategy-analysis-page.js" defer></script>
+    <script src="../../scripts/strategy-analysis-page.js?v=1.0.0" defer></script>
     
     <!-- Notification System Containers -->
     <div class="notification-container" id="notification-container"></div>
     <div id="toast-container"></div>
 
     <!-- Entity Details System -->
-    <script src="../../scripts/entity-details-api.js" defer></script>
-    <script src="../../scripts/entity-details-renderer.js" defer></script>
-    <script src="../../scripts/entity-details-modal.js" defer></script>
+    <script src="../../scripts/entity-details-api.js?v=1.0.0" defer></script>
+    <script src="../../scripts/entity-details-renderer.js?v=1.0.0" defer></script>
+    <script src="../../scripts/entity-details-modal.js?v=1.0.0" defer></script>
     
 </body>
 </html>

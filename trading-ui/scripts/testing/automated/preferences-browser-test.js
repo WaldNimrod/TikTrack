@@ -19,7 +19,7 @@
 
   const TEST_CONFIG = {
     testUser: 1,
-    testProfile: 0,
+    testProfile: 2, // Use actual profile ID from system (was 0, but system uses 2)
     testGroup: 'trading_settings',
     testPreference: 'atr_period',
     testValue: '21',

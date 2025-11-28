@@ -78,8 +78,8 @@
                     try {
                         window.HeaderSystem.initialize();
                     } catch (error) {
-                        if (window.console && window.console.error) {
-                            window.console.error('Error initializing HeaderSystem:', error);
+                        if (window.Logger?.error) {
+                            window.Logger.error('Error initializing HeaderSystem', error, { page: 'trading-journal-page' });
                         }
                     }
                 } else {
@@ -846,7 +846,7 @@ r Section -->
     <script src="../../scripts/calendar/calendar-renderer.js?v=1.0.0"></script> <!-- Calendar renderer -->
     
     <!-- Page-specific script -->
-    <script src="../../scripts/trading-journal-page.js" defer></script>
+    <script src="../../scripts/trading-journal-page.js?v=1.0.0" defer></script>
     
     <!-- Journal Filter Script -->
     <script>

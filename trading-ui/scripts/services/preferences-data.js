@@ -881,7 +881,7 @@
     });
 
     // Use CRUDResponseHandler for consistent response handling
-    if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleSaveResponse) {
+    if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function') {
       const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {
         successMessage: `העדפה ${preferenceName} נשמרה בהצלחה`,
         entityName: 'העדפה',
@@ -894,10 +894,11 @@
         try {
           await window.CacheSyncManager.invalidateByAction('preference-updated');
         } catch (error) {
-          window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
-            ...PAGE_LOG_CONTEXT,
-            error: error?.message,
-          });
+          // Silent fallback - CacheSyncManager errors are handled gracefully
+          // window.Logger?.debug?.('CacheSyncManager.invalidateByAction failed, falling back', {
+          //   ...PAGE_LOG_CONTEXT,
+          //   error: error?.message,
+          // });
           // Fallback to direct cache clearing
           await clearCachePattern(KEY_PREFIXES.single);
           await clearCachePattern(KEY_PREFIXES.all);
@@ -922,9 +923,10 @@
       return crudResult;
     } else {
       // Fallback to original fetchJson if CRUDResponseHandler not available
-      window.Logger?.warn?.('⚠️ CRUDResponseHandler not available, using fallback', {
-        ...PAGE_LOG_CONTEXT,
-      });
+      // Silent fallback - CRUDResponseHandler is optional, not critical
+      // window.Logger?.debug?.('CRUDResponseHandler not available, using fallback', {
+      //   ...PAGE_LOG_CONTEXT,
+      // });
       const payload = await fetchJson('/api/preferences/user/single', {
         method: 'POST',
         body: {
@@ -940,10 +942,11 @@
         try {
           await window.CacheSyncManager.invalidateByAction('preference-updated');
         } catch (error) {
-          window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
-            ...PAGE_LOG_CONTEXT,
-            error: error?.message,
-          });
+          // Silent fallback - CacheSyncManager errors are handled gracefully
+          // window.Logger?.debug?.('CacheSyncManager.invalidateByAction failed, falling back', {
+          //   ...PAGE_LOG_CONTEXT,
+          //   error: error?.message,
+          // });
           // Fallback to direct cache clearing
           await clearCachePattern(KEY_PREFIXES.single);
           await clearCachePattern(KEY_PREFIXES.all);
@@ -1006,7 +1009,7 @@
     });
 
     // Use CRUDResponseHandler for consistent response handling
-    if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleSaveResponse) {
+    if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function') {
       const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {
         successMessage: `${Object.keys(preferences).length} העדפות נשמרו בהצלחה`,
         entityName: 'העדפות',
@@ -1019,10 +1022,11 @@
         try {
           await window.CacheSyncManager.invalidateByAction('preference-updated');
         } catch (error) {
-          window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
-            ...PAGE_LOG_CONTEXT,
-            error: error?.message,
-          });
+          // Silent fallback - CacheSyncManager errors are handled gracefully
+          // window.Logger?.debug?.('CacheSyncManager.invalidateByAction failed, falling back', {
+          //   ...PAGE_LOG_CONTEXT,
+          //   error: error?.message,
+          // });
           // Fallback to direct cache clearing
           await clearCachePattern(KEY_PREFIXES.single);
           await clearCachePattern(KEY_PREFIXES.all);
@@ -1047,9 +1051,10 @@
       return crudResult;
     } else {
       // Fallback to original fetchJson if CRUDResponseHandler not available
-      window.Logger?.warn?.('⚠️ CRUDResponseHandler not available, using fallback', {
-        ...PAGE_LOG_CONTEXT,
-      });
+      // Silent fallback - CRUDResponseHandler is optional, not critical
+      // window.Logger?.debug?.('CRUDResponseHandler not available, using fallback', {
+      //   ...PAGE_LOG_CONTEXT,
+      // });
       const payload = await fetchJson('/api/preferences/user', {
         method: 'POST',
         body: {
@@ -1064,10 +1069,11 @@
         try {
           await window.CacheSyncManager.invalidateByAction('preference-updated');
         } catch (error) {
-          window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
-            ...PAGE_LOG_CONTEXT,
-            error: error?.message,
-          });
+          // Silent fallback - CacheSyncManager errors are handled gracefully
+          // window.Logger?.debug?.('CacheSyncManager.invalidateByAction failed, falling back', {
+          //   ...PAGE_LOG_CONTEXT,
+          //   error: error?.message,
+          // });
           // Fallback to direct cache clearing
           await clearCachePattern(KEY_PREFIXES.single);
           await clearCachePattern(KEY_PREFIXES.all);

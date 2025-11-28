@@ -328,13 +328,15 @@ class EventHandlerManager {
                         ...eventContext
                     });
                 
+                // Define result outside try block to ensure it's available in catch/finally
+                let result = null;
+                
                 try {
                     // Execute the onclick handler using eval (safe because it's controlled)
                     // Note: Following documentation spec - no preventDefault/stopPropagation
                     // to allow Bootstrap modals and other standard behaviors to work
                     // Eval runs in current scope, so window functions are available
                     // If function is not found, try with window. prefix
-                    let result = null;
                     
                     // First, check if the function exists in global scope
                     const functionName = onclickValue.replace(/\(.*\)/, '').trim();
@@ -598,7 +600,8 @@ class EventHandlerManager {
                     // Track final execution
                     if (handlerExecuted && !error) {
                         const executionTime = performance.now() - startTime;
-                        if (!result || typeof result.then !== 'function') {
+                        // Only check result if it was defined (not null means it was set in try block)
+                        if (result !== null && (!result || typeof result.then !== 'function')) {
                             // Only track sync execution here (async was tracked above)
                             this._trackEvent(
                                 'click',

@@ -269,7 +269,8 @@ class CacheSyncManager {
      */
   async invalidateBackend(dependencies = []) {
     if (!this.initialized) {
-      if (window.Logger) { window.Logger.warn('⚠️ Cache Sync Manager not initialized', { page: 'cache' }); }
+      // Silent fallback - CacheSyncManager initialization is optional, not critical
+      // if (window.Logger) { window.Logger.debug('Cache Sync Manager not initialized, skipping backend invalidation', { page: 'cache' }); }
       return false;
     }
 

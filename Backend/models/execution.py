@@ -6,6 +6,8 @@ from typing import Dict, Any, Optional
 class Execution(BaseModel):
     __tablename__ = "executions"
     
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True,
+                    comment="User who owns this execution")
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)  # Required - every execution must have a ticker
     trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=True)
     trade_id = Column(Integer, ForeignKey('trades.id'), nullable=True)  # Make nullable - executions can exist without trades

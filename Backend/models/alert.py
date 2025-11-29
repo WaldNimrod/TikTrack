@@ -8,6 +8,8 @@ class Alert(BaseModel):
     __tablename__ = "alerts"
     
     # Fields that exist in the database
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True,
+                    comment="User who owns this alert")
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=True)
     message = Column(String(5000), nullable=True)
     triggered_at = Column(DateTime, nullable=True)

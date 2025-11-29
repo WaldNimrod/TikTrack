@@ -19,6 +19,8 @@ class Note(BaseModel):
     """
     __tablename__ = "notes"
     
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True,
+                    comment="User who owns this note")
     content = Column(String(10000), nullable=False)
     attachment = Column(String(500), nullable=True)  # path to file
     related_type_id = Column(Integer, ForeignKey('note_relation_types.id'), nullable=False)

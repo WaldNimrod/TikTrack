@@ -40,3 +40,4 @@ This log records every production version update, including manual major/minor a
 | 2025-11-24T14:13:24+00:00 | 1.3.8.0 | 1.3.7.0 | c52e595f120b222d20fcb05b126fb0b54d73f898 | c3ff970200899a9198c499bd05188f5c54cb3e1d | patch | Add comprehensive bug documentation for execution clustering issue |
 | 2025-11-24T23:55:08+00:00 | 1.3.9.0 | 1.3.8.0 | c944b39c4f2b04e9e22707f98d72b9628946bfe3 | c52e595f120b222d20fcb05b126fb0b54d73f898 | patch | Remove all SQLite references - PostgreSQL only |
 | 2025-11-29T00:23:03+00:00 | 1.3.10.0 | 1.3.9.0 | f778ed96d9059408c5426821836c993fe0a6bdab | c944b39c4f2b04e9e22707f98d72b9628946bfe3 | patch | תיקון: עדכון ברירת מחדל - כל סוגי תזרימי המזומן מסומנים בשלב 2 של הייבוא |
+| 2025-11-29T00:26:10+00:00 | 1.3.11.0 | 1.3.10.0 | 2cd10e34a400514cbd9a66ea05a2f19db718f775 | f778ed96d9059408c5426821836c993fe0a6bdab | patch | הוספת מערכת רמזור ATR - מימוש מלא עם תמיכה בכל המקומות |

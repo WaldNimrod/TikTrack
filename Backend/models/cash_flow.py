@@ -7,6 +7,8 @@ from datetime import datetime, date
 class CashFlow(BaseModel):
     __tablename__ = "cash_flows"
     
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True,
+                    comment="User who owns this cash flow")
     trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=False)
     type = Column(
         String(50),

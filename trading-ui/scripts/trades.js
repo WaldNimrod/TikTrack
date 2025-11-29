@@ -658,7 +658,7 @@ async function loadTradeTickerInfo(tickerId) {
     }
     
     // Display ticker info
-    displayTradeTickerInfo(ticker);
+    await displayTradeTickerInfo(ticker);
     
   } catch (error) {
     window.Logger.error('❌ Error loading ticker info:', error, { page: "trades" });
@@ -670,7 +670,7 @@ async function loadTradeTickerInfo(tickerId) {
  * @param {Object} ticker - Ticker object
  * @returns {void}
  */
-function displayTradeTickerInfo(ticker) {
+async function displayTradeTickerInfo(ticker) {
   const tickerInfoContainer = document.getElementById('tradeTickerInfoDisplay');
   if (!tickerInfoContainer) {
     window.Logger?.warn('⚠️ tradeTickerInfoDisplay element not found in trades modal', { page: 'trades' });
@@ -686,7 +686,8 @@ function displayTradeTickerInfo(ticker) {
   
   // Use the new global renderTickerInfo function
   if (window.renderTickerInfo) {
-    tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+    const tickerInfoHtml = await window.renderTickerInfo(ticker, 'ticker-info-display');
+    tickerInfoDiv.innerHTML = tickerInfoHtml;
   } else {
     // Fallback if renderTickerInfo not available
     const currentPrice = typeof ticker.current_price === 'number' ? `$${ticker.current_price.toFixed(2)}` : 'לא זמין';

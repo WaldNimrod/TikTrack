@@ -14,134 +14,6 @@
     <link rel="stylesheet" href="styles-new/master.css">
     <link rel="stylesheet" href="styles-new/header-styles.css">
     <link rel="stylesheet" href="styles-new/07-pages/_tradingview-widgets-showcase.css?v=1.0.0">
-    
-    <style>
-        .widget-section {
-            margin-bottom: 3rem;
-            padding: 1.5rem;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            background: #fff;
-        }
-        
-        .widget-section h2 {
-            color: #26baac;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
-        
-        .widget-section h3 {
-            color: #fc5a06;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            font-size: 1.2rem;
-        }
-        
-        .widget-description {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 4px;
-            margin-bottom: 1rem;
-            border-right: 3px solid #26baac;
-        }
-        
-        .widget-description ul {
-            margin: 0.5rem 0 0 1.5rem;
-            padding: 0;
-        }
-        
-        .widget-description li {
-            margin: 0.25rem 0;
-        }
-        
-        .widget-params {
-            background: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .widget-params table {
-            width: 100%;
-            margin-top: 0.5rem;
-        }
-        
-        .widget-params th {
-            background: #f8f9fa;
-            padding: 0.5rem;
-            text-align: right;
-            border-bottom: 2px solid #dee2e6;
-        }
-        
-        .widget-params td {
-            padding: 0.5rem;
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .widget-params code {
-            background: #f8f9fa;
-            padding: 0.2rem 0.4rem;
-            border-radius: 3px;
-            font-size: 0.9em;
-        }
-        
-        .widget-container {
-            margin-top: 1rem;
-            min-height: 300px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            padding: 0.5rem;
-            background: #fff;
-        }
-        
-        .widget-container iframe {
-            width: 100%;
-            border: none;
-        }
-        
-        .page-header {
-            background: linear-gradient(135deg, #26baac 0%, #fc5a06 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-        }
-        
-        .page-header h1 {
-            margin: 0;
-            font-size: 2rem;
-        }
-        
-        .page-header p {
-            margin: 0.5rem 0 0 0;
-            opacity: 0.9;
-        }
-        
-        .note-box {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            border-radius: 4px;
-            padding: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .note-box strong {
-            color: #856404;
-        }
-        
-        .use-case-box {
-            background: #e7f3ff;
-            border: 1px solid #26baac;
-            border-radius: 4px;
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .use-case-box strong {
-            color: #26baac;
-        }
-    </style>
 </head>
 <body class="tradingview-widgets-showcase-page">
     <!-- Header System -->
@@ -1752,7 +1624,14 @@
     
     <!-- System Scripts -->
     <!-- 📦 Packages: base, preferences, tradingview-widgets, init-system -->
+    <!-- Error Handlers (Must load first) -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script>
+    <!-- API Config -->
     <script src="scripts/api-config.js?v=1.0.0"></script> <!-- הגדרות API מרכזיות -->
+    <!-- Logger Service (Load first before other systems) -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script>
+    <!-- [8] Load Order: 8 -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
     <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
     <!-- [8.5] Load Order: 8.5 -->
     <script src="scripts/icon-mappings.js?v=1.0.0"></script> <!-- מיפוי איקונים מרכזי -->
@@ -1869,7 +1748,9 @@
                             window.NotificationSystem.showSuccess(`ווידג'ט ${widgetType} נוצר בהצלחה`);
                         }
                     } catch (error) {
-                        console.error('Error creating widget:', error);
+                        if (window.Logger?.error) {
+                            window.Logger.error('Error creating widget', error, { page: 'tradingview-widgets-showcase', widgetType });
+                        }
                         if (window.NotificationSystem) {
                             window.NotificationSystem.showError(`שגיאה ביצירת ווידג'ט: ${error.message}`);
                         }

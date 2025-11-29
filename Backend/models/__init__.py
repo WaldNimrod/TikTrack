@@ -10,6 +10,7 @@ from .note_relation_type import NoteRelationType
 from .execution import Execution
 from .currency import Currency
 from .user import User
+from .user_ticker import UserTicker
 from .preferences import PreferenceGroup, PreferenceType, PreferenceProfile, UserPreference
 from .external_data import ExternalDataProvider, MarketDataQuote, DataRefreshLog, IntradayDataSlot
 from .trading_method import TradingMethod, MethodParameter
@@ -35,6 +36,7 @@ __all__ = [
     'Execution',
     'Currency',
     'User',
+    'UserTicker',
     'PreferenceGroup',
     'PreferenceType',
     'PreferenceProfile',

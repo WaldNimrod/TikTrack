@@ -9,6 +9,8 @@ logger = logging.getLogger(__name__)
 class TradePlan(BaseModel):
     __tablename__ = "trade_plans"
     
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True,
+                    comment="User who owns this trade plan")
     trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=False)
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)
     investment_type = Column(String(20), default='swing', nullable=False)  # NOT NULL per constraints

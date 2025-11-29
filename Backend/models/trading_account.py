@@ -34,6 +34,8 @@ class TradingAccount(BaseModel):
     __table_args__ = {'extend_existing': True}
     
     # Database columns - matching actual database schema
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True,
+                    comment="User who owns this trading account")
     name = Column(String(100), nullable=False)
     currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=False)  # Foreign key to currencies table
     status = Column(String(20), default='open')

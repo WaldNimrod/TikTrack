@@ -13,6 +13,8 @@ logger.info("Trade model loaded - opened_at fix applied")
 class Trade(BaseModel):
     __tablename__ = "trades"
     
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True,
+                    comment="User who owns this trade")
     trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=False)
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)
     trade_plan_id = Column(Integer, ForeignKey('trade_plans.id'), nullable=True)  # Allow NULL for trades without plans

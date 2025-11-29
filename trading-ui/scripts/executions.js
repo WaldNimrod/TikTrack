@@ -2615,7 +2615,7 @@ async function loadExecutionTickerInfo(tickerId) {
     }
     
     // Display ticker info
-    displayExecutionTickerInfo(ticker);
+    await displayExecutionTickerInfo(ticker);
     
     // Set default quantity to 100
     if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
@@ -2668,7 +2668,7 @@ async function loadExecutionTickerInfo(tickerId) {
  * @param {Object} ticker - Ticker object
  * @returns {void}
  */
-function displayExecutionTickerInfo(ticker) {
+async function displayExecutionTickerInfo(ticker) {
   // Create or update ticker info display
   let tickerInfoDiv = document.getElementById('executionTickerInfo');
   if (!tickerInfoDiv) {
@@ -2704,9 +2704,11 @@ function displayExecutionTickerInfo(ticker) {
   
   // Use FieldRendererService.renderTickerInfo for consistent rendering
   if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
-    tickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker, 'ticker-info-display');
+    const tickerInfoHtml = await window.FieldRendererService.renderTickerInfo(ticker, 'ticker-info-display');
+    tickerInfoDiv.innerHTML = tickerInfoHtml;
   } else if (window.renderTickerInfo) {
-    tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+    const tickerInfoHtml = await window.renderTickerInfo(ticker, 'ticker-info-display');
+    tickerInfoDiv.innerHTML = tickerInfoHtml;
   } else {
     // Fallback if renderTickerInfo not available
     tickerInfoDiv.innerHTML = `

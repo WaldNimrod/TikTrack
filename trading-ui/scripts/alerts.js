@@ -4222,7 +4222,7 @@ async function loadAlertTickerInfo(tickerId) {
     }
     
     // Display ticker info
-    displayAlertTickerInfo(ticker);
+    await displayAlertTickerInfo(ticker);
     window.Logger?.info?.('✅ [loadAlertTickerInfo] Ticker loaded', {
       tickerId,
       symbol: ticker?.symbol
@@ -4236,7 +4236,7 @@ async function loadAlertTickerInfo(tickerId) {
 /**
  * הצגת מידע על הטיקר (למודל החדש)
  */
-function displayAlertTickerInfo(ticker) {
+async function displayAlertTickerInfo(ticker) {
   window.Logger?.info?.('🖥️ [displayAlertTickerInfo] Rendering ticker', {
     tickerId: ticker?.id,
     symbol: ticker?.symbol
@@ -4257,9 +4257,11 @@ function displayAlertTickerInfo(ticker) {
     
     if (tickerInfoDiv) {
       if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
-        tickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
+        const tickerInfoHtml = await window.FieldRendererService.renderTickerInfo(ticker);
+        tickerInfoDiv.innerHTML = tickerInfoHtml;
       } else if (window.renderTickerInfo) {
-        tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+        const tickerInfoHtml = await window.renderTickerInfo(ticker, 'ticker-info-display');
+        tickerInfoDiv.innerHTML = tickerInfoHtml;
       } else {
         tickerInfoDiv.innerHTML = `
           <div class="ticker-info-display">
@@ -4310,11 +4312,13 @@ function displayAlertTickerInfo(ticker) {
   }
   
   if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
-    legacyTickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
+    const tickerInfoHtml = await window.FieldRendererService.renderTickerInfo(ticker);
+    legacyTickerInfoDiv.innerHTML = tickerInfoHtml;
   } else {
-    legacyTickerInfoDiv.innerHTML = window.renderTickerInfo
-      ? window.renderTickerInfo(ticker, 'ticker-info-display')
+    const tickerInfoHtml = window.renderTickerInfo
+      ? await window.renderTickerInfo(ticker, 'ticker-info-display')
       : `<strong>${ticker.symbol || 'N/A'}</strong>`;
+    legacyTickerInfoDiv.innerHTML = tickerInfoHtml;
   }
   window.Logger?.info?.('✅ [displayAlertTickerInfo] Ticker rendered (legacy)', {}, { page: "alerts" });
 }

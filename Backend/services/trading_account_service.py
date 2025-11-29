@@ -11,29 +11,41 @@ logger = logging.getLogger(__name__)
 
 class TradingAccountService:
     @staticmethod
-    def get_all(db: Session) -> List[TradingAccount]:
-        """Get all trading_accounts"""
-        return db.query(TradingAccount).all()
+    def get_all(db: Session, user_id: Optional[int] = None) -> List[TradingAccount]:
+        """Get all trading_accounts for a user"""
+        query = db.query(TradingAccount)
+        if user_id is not None:
+            query = query.filter(TradingAccount.user_id == user_id)
+        return query.all()
     
     @staticmethod
-    def get_by_id(db: Session, trading_account_id: int) -> Optional[TradingAccount]:
-        """Get trading_account by ID"""
-        return db.query(TradingAccount).filter(TradingAccount.id == trading_account_id).first()
+    def get_by_id(db: Session, trading_account_id: int, user_id: Optional[int] = None) -> Optional[TradingAccount]:
+        """Get trading_account by ID (with user_id check)"""
+        query = db.query(TradingAccount).filter(TradingAccount.id == trading_account_id)
+        if user_id is not None:
+            query = query.filter(TradingAccount.user_id == user_id)
+        return query.first()
     
     @staticmethod
-    def get_by_name(db: Session, account_name: str) -> Optional[TradingAccount]:
-        """Get trading_account by name with currency relationship"""
-        return db.query(TradingAccount).options(
+    def get_by_name(db: Session, account_name: str, user_id: Optional[int] = None) -> Optional[TradingAccount]:
+        """Get trading_account by name with currency relationship (with user_id check)"""
+        query = db.query(TradingAccount).options(
             joinedload(TradingAccount.currency)
-        ).filter(TradingAccount.name == account_name).first()
+        ).filter(TradingAccount.name == account_name)
+        if user_id is not None:
+            query = query.filter(TradingAccount.user_id == user_id)
+        return query.first()
     
     @staticmethod
-    def get_open_trading_accounts(db: Session) -> List[TradingAccount]:
-        """Get all open trading_accounts"""
-        return db.query(TradingAccount).filter(TradingAccount.status == 'open').all()
+    def get_open_trading_accounts(db: Session, user_id: Optional[int] = None) -> List[TradingAccount]:
+        """Get all open trading_accounts for a user"""
+        query = db.query(TradingAccount).filter(TradingAccount.status == 'open')
+        if user_id is not None:
+            query = query.filter(TradingAccount.user_id == user_id)
+        return query.all()
     
     @staticmethod
-    def create(db: Session, data: Dict[str, Any]) -> TradingAccount:
+    def create(db: Session, data: Dict[str, Any], user_id: Optional[int] = None) -> TradingAccount:
         """Create new trading_account"""
         # Validate that all fields exist in the TradingAccount model
         allowed_fields = {
@@ -45,11 +57,16 @@ class TradingAccountService:
             'total_pl',
             'notes',
             'opening_balance',
-            'external_account_number'
+            'external_account_number',
+            'user_id'
         }
         invalid_fields = set(data.keys()) - allowed_fields
         if invalid_fields:
             raise ValueError(f"Invalid fields: {', '.join(invalid_fields)}. Allowed fields: {', '.join(allowed_fields)}")
+        
+        # Set user_id if provided and not in data
+        if user_id is not None and 'user_id' not in data:
+            data['user_id'] = user_id
         
         # Validate data against dynamic constraints
         is_valid, errors = ValidationService.validate_data(db, 'trading_accounts', data)
@@ -64,10 +81,13 @@ class TradingAccountService:
         return trading_account
     
     @staticmethod
-    def update(db: Session, trading_account_id: int, data: Dict[str, Any]) -> Optional[TradingAccount]:
-        """Update trading_account"""
+    def update(db: Session, trading_account_id: int, data: Dict[str, Any], user_id: Optional[int] = None) -> Optional[TradingAccount]:
+        """Update trading_account (with user_id check)"""
         logger.info(f"Updating trading_account {trading_account_id} with data: {data}")
-        trading_account = db.query(TradingAccount).filter(TradingAccount.id == trading_account_id).first()
+        query = db.query(TradingAccount).filter(TradingAccount.id == trading_account_id)
+        if user_id is not None:
+            query = query.filter(TradingAccount.user_id == user_id)
+        trading_account = query.first()
         if not trading_account:
             logger.error(f"TradingAccount {trading_account_id} not found")
             return None
@@ -103,7 +123,7 @@ class TradingAccountService:
         return trading_account
     
     @staticmethod
-    def delete(db: Session, trading_account_id: int) -> bool:
+    def delete(db: Session, trading_account_id: int, user_id: Optional[int] = None) -> bool:
         """Delete trading_account"""
         from models.trade import Trade
         from models.execution import Execution

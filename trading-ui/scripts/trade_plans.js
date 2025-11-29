@@ -206,7 +206,7 @@ async function loadTradePlanTickerInfo(tickerId) {
     }
     
     // Display ticker info
-    displayTradePlanTickerInfo(ticker);
+    await displayTradePlanTickerInfo(ticker);
     
   } catch (error) {
     window.Logger.error('❌ Error loading ticker info:', error, { page: "trade_plans" });
@@ -218,7 +218,7 @@ async function loadTradePlanTickerInfo(tickerId) {
  * @param {Object} ticker - Ticker object
  * @returns {void}
  */
-function displayTradePlanTickerInfo(ticker) {
+async function displayTradePlanTickerInfo(ticker) {
   // Create or update ticker info display
   let tickerInfoDiv = document.getElementById('tradePlanTickerInfo');
   if (!tickerInfoDiv) {
@@ -254,7 +254,8 @@ function displayTradePlanTickerInfo(ticker) {
   
   // Use the new global renderTickerInfo function
   if (window.renderTickerInfo) {
-    tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+    const tickerInfoHtml = await window.renderTickerInfo(ticker, 'ticker-info-display');
+    tickerInfoDiv.innerHTML = tickerInfoHtml;
   } else {
     // Fallback if renderTickerInfo not available
     tickerInfoDiv.innerHTML = `

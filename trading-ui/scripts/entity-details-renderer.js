@@ -293,11 +293,11 @@ class EntityDetailsRenderer {
             // בחירת פונקציית רנדור לפי סוג הישות
             switch (normalizedEntityType) {
                 case 'ticker':
-                    return this.renderTicker(entityData, options);
+                    return await this.renderTicker(entityData, options);
                 case 'trade':
-                    return this.renderTrade(entityData, options);
+                    return await this.renderTrade(entityData, options);
                 case 'trade_plan':
-                    return this.renderTradePlan(entityData, options);
+                    return await this.renderTradePlan(entityData, options);
                 case 'execution':
                     return this.renderExecution(entityData, options);
                 case 'position':
@@ -333,10 +333,10 @@ class EntityDetailsRenderer {
      * 
      * @param {Object} tickerData - נתוני טיקר
      * @param {string} tickerColor - צבע הטיקר
-     * @returns {string} - HTML מרונדר
+     * @returns {Promise<string>} - HTML מרונדר
      * @public
      */
-    renderMarketData(tickerData, tickerColor = null) {
+    async renderMarketData(tickerData, tickerColor = null) {
         // Use centralized Color Scheme System if color not provided
         if (!tickerColor && typeof window.getEntityColor === 'function') {
             tickerColor = window.getEntityColor('ticker') || '';
@@ -351,6 +351,48 @@ class EntityDetailsRenderer {
         const atr = tickerData.atr || null;
         const atrPeriod = tickerData.atr_period || 14;
         const atrWarnings = tickerData.atr_warnings || [];
+        
+        // חישוב ATR באחוזים
+        let atrPercent = null;
+        let atrHtml = '';
+        if (atr !== null && price && price > 0) {
+            atrPercent = (parseFloat(atr) / parseFloat(price)) * 100;
+            // שימוש ב-renderATR אם זמין
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderATR === 'function') {
+                try {
+                    // ננסה לטעון העדפות מראש אם אפשר
+                    let highThreshold = 3.0;
+                    let dangerThreshold = 5.0;
+                    
+                    if (typeof window.getCurrentPreference === 'function') {
+                        try {
+                            highThreshold = await window.getCurrentPreference('atr_high_threshold') || 3.0;
+                            dangerThreshold = await window.getCurrentPreference('atr_danger_threshold') || 5.0;
+                        } catch (e) {
+                            // Use defaults
+                        }
+                    } else if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                        try {
+                            highThreshold = await window.PreferencesCore.getPreference('atr_high_threshold') || 3.0;
+                            dangerThreshold = await window.PreferencesCore.getPreference('atr_danger_threshold') || 5.0;
+                        } catch (e) {
+                            // Use defaults
+                        }
+                    }
+                    
+                    atrHtml = await window.FieldRendererService.renderATR(atr, atrPercent, {
+                        highThreshold: highThreshold,
+                        dangerThreshold: dangerThreshold
+                    });
+                } catch (e) {
+                    // Fallback לתצוגה פשוטה
+                    atrHtml = `<span class="atr-value" dir="ltr">${atrPercent.toFixed(2)}%</span>`;
+                }
+            } else {
+                // Fallback אם renderATR לא זמין
+                atrHtml = `<span class="atr-value" dir="ltr">${atrPercent.toFixed(2)}%</span>`;
+            }
+        }
         
         // אם אין נתוני שוק, נחזיר רק קו מפריד
         if (!price || price === 0) {
@@ -426,9 +468,9 @@ class EntityDetailsRenderer {
                         מקור: ${dataSource}
                     </div>
                     ` : ''}
-                    ${atr !== null ? `
+                    ${atr !== null && atrHtml ? `
                     <div class="text-muted small">
-                        ATR: ${parseFloat(atr).toFixed(4)} (${atrPeriod} ימים)
+                        ATR: ${atrHtml} (${atrPeriod} ימים)
                     </div>
                     ` : ''}
                 </div>
@@ -452,7 +494,7 @@ class EntityDetailsRenderer {
      * @returns {string}
      * @public
      */
-    renderTradePlan(tradePlanData, options = {}) {
+    async renderTradePlan(tradePlanData, options = {}) {
         try {
             if (!tradePlanData) {
                 return this.renderError('לא נמצאו פרטי תכנית להצגה');
@@ -475,7 +517,7 @@ class EntityDetailsRenderer {
 
             let tickerInfoHTML = '';
             if (tickerData && FieldRenderer?.renderTickerInfo) {
-                tickerInfoHTML = FieldRenderer.renderTickerInfo(tickerData, 'mb-2');
+                tickerInfoHTML = await FieldRenderer.renderTickerInfo(tickerData, 'mb-2');
             }
 
             // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
@@ -794,7 +836,7 @@ class EntityDetailsRenderer {
      * @returns {string} - HTML מרונדר
      * @public
      */
-    renderTicker(tickerData, options = {}) {
+    async renderTicker(tickerData, options = {}) {
         // קבלת צבע הטיקר מההעדפות
         const tickerColor = this.entityColors.ticker || (typeof window.getEntityColor === 'function' ? window.getEntityColor('ticker') : '');
         const sourceInfo = (options && options.sourceInfo) ? options.sourceInfo : null;
@@ -827,7 +869,7 @@ class EntityDetailsRenderer {
                 
                 <!-- נתוני שוק למעלה -->
                 <div class="mb-4">
-                    ${this.renderMarketData(tickerData, tickerColor)}
+                    ${await this.renderMarketData(tickerData, tickerColor)}
                 </div>
                 
                 <!-- מידע בסיסי בשתי עמודות -->
@@ -964,7 +1006,7 @@ class EntityDetailsRenderer {
      * @returns {string} - HTML מרונדר
      * @public
      */
-    renderTrade(tradeData, options = {}) {
+    async renderTrade(tradeData, options = {}) {
         try {
         const entityColor = this.entityColors.trade || (typeof window.getEntityColor === 'function' ? window.getEntityColor('trade') : '');
         
@@ -1029,7 +1071,7 @@ class EntityDetailsRenderer {
             // רק אם יש לפחות מחיר או שינוי - נציג את המידע
             if (tickerData.current_price > 0 || tickerData.daily_change !== 0 || tickerData.volume > 0) {
                 console.log('🔍🔍🔍 [renderTrade] Calling renderTickerInfo...');
-                tickerInfoHTML = window.FieldRendererService.renderTickerInfo(tickerData, 'mb-2');
+                tickerInfoHTML = await window.FieldRendererService.renderTickerInfo(tickerData, 'mb-2');
                 console.log('🔍🔍🔍 [renderTrade] renderTickerInfo returned:', {
                     tickerInfoHTMLLength: tickerInfoHTML.length,
                     tickerInfoHTML: tickerInfoHTML.substring(0, 200)
@@ -1676,7 +1718,7 @@ class EntityDetailsRenderer {
      * @returns {string} - HTML מרונדר של התכנית
      * @public
      */
-    renderTradePlan(tradePlanData, options = {}) {
+    async renderTradePlan(tradePlanData, options = {}) {
         if (!tradePlanData) {
             return this.renderError('לא נמצאו נתוני תכנית מסחר להצגה');
         }

@@ -295,11 +295,12 @@ def monitor_performance(log_slow_queries: bool = True, slow_query_threshold: flo
 def require_authentication(roles: List[str] = None):
     """
     Decorator for authentication and authorization.
-    Currently uses a default user fallback when no authenticated user
-    is attached to the request context.
+    
+    Primary source: g.user_id set by auth middleware from session
+    Fallback: explicit user_id in request (for backward compatibility and tools)
     
     Args:
-        roles: List of required roles (optional)
+        roles: List of required roles (optional - not implemented yet)
     """
     def decorator(func: Callable) -> Callable:
         @wraps(func)
@@ -339,7 +340,7 @@ def require_authentication(roles: List[str] = None):
                     "timestamp": datetime.now().isoformat()
                 }), 401
             
-            # Check roles if specified
+            # Check roles if specified (not implemented yet - for future use)
             if roles:
                 user_roles = getattr(g, 'user_roles', [])
                 if not any(role in user_roles for role in roles):

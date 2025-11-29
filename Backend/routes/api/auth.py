@@ -9,6 +9,7 @@ import logging
 from datetime import datetime
 
 from services.auth_service import AuthService
+from services.password_reset_service import PasswordResetService
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,7 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 # Initialize auth service
 auth_service = AuthService()
+password_reset_service = PasswordResetService()
 
 
 @auth_bp.route('/register', methods=['POST'])
@@ -438,5 +440,206 @@ def update_current_user():
         return jsonify({
             'status': 'error',
             'error': {'message': f'Update failed: {str(e)}'}
+        }), 500
+
+
+@auth_bp.route('/password-reset/request', methods=['POST'])
+def request_password_reset():
+    """
+    Request password reset - sends email with reset link
+    
+    Request Body:
+        {
+            "email": "string (optional)",
+            "username": "string (optional)"
+        }
+    
+    Returns:
+        {
+            "status": "success" | "error",
+            "data": {
+                "message": "If the email exists, a password reset link has been sent."
+            } | null,
+            "error": {...} | null
+        }
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'No data provided'}
+            }), 400
+        
+        email = data.get('email')
+        username = data.get('username')
+        
+        if not email and not username:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'Email or username is required'}
+            }), 400
+        
+        # Get base URL from request
+        base_url = request.host_url.rstrip('/')
+        if request.is_secure:
+            base_url = base_url.replace('http://', 'https://')
+        
+        # Request password reset
+        result = password_reset_service.request_password_reset(
+            email=email,
+            username=username,
+            base_url=base_url
+        )
+        
+        if result['success']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'message': result['message']
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': result.get('error', 'Failed to send reset email')}
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error in password reset request: {e}")
+        return jsonify({
+            'status': 'error',
+            'error': {'message': f'Password reset request failed: {str(e)}'}
+        }), 500
+
+
+@auth_bp.route('/password-reset/validate', methods=['POST'])
+def validate_reset_token():
+    """
+    Validate password reset token
+    
+    Request Body:
+        {
+            "token": "string"
+        }
+    
+    Returns:
+        {
+            "status": "success" | "error",
+            "data": {
+                "valid": bool
+            } | null,
+            "error": {...} | null
+        }
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'No data provided'}
+            }), 400
+        
+        token = data.get('token')
+        if not token:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'Token is required'}
+            }), 400
+        
+        result = password_reset_service.validate_token(token)
+        
+        if result['success']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'valid': result.get('valid', False)
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': result.get('error', 'Token validation failed')}
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating reset token: {e}")
+        return jsonify({
+            'status': 'error',
+            'error': {'message': f'Token validation failed: {str(e)}'}
+        }), 500
+
+
+@auth_bp.route('/password-reset/reset', methods=['POST'])
+def reset_password():
+    """
+    Reset password using token
+    
+    Request Body:
+        {
+            "token": "string",
+            "new_password": "string"
+        }
+    
+    Returns:
+        {
+            "status": "success" | "error",
+            "data": {
+                "message": "Password reset successfully"
+            } | null,
+            "error": {...} | null
+        }
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'No data provided'}
+            }), 400
+        
+        token = data.get('token')
+        new_password = data.get('new_password')
+        
+        if not token:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'Token is required'}
+            }), 400
+        
+        if not new_password:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'New password is required'}
+            }), 400
+        
+        # Validate password length
+        if len(new_password) < 6:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'Password must be at least 6 characters'}
+            }), 400
+        
+        # Reset password
+        result = password_reset_service.reset_password(token, new_password)
+        
+        if result['success']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'message': result['message']
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': result.get('error', 'Password reset failed')}
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error resetting password: {e}")
+        return jsonify({
+            'status': 'error',
+            'error': {'message': f'Password reset failed: {str(e)}'}
         }), 500
 

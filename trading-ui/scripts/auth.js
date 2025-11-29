@@ -408,6 +408,10 @@ function createLoginInterface(containerId, onSuccess = null) {
         </button>
       </form>
       
+      <div style="text-align: center; margin-top: 1rem;">
+        <a href="forgot-password.html" style="color: var(--apple-blue, #007AFF); text-decoration: none; font-size: 0.9rem;">שכחת סיסמה?</a>
+      </div>
+      
       <div class="demo-credentials">
         <p><strong>מנהל:</strong> username=admin, password=admin123</p>
         <p><strong>משתמש:</strong> username=user, password=user123</p>

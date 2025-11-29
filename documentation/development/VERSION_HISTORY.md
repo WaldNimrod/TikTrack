@@ -185,3 +185,11 @@ This log tracks version bumps for the development environment (branch `main`). M
 - research.html: header ללא פילטרים (כמבוקש)
 - trades.html: header עם פילטרים (כמבוקש)
 - תיקון שגיאת תחביר שגרמה ל-header לא להיטען במלואו |
+| 2025-11-29T16:31:38+00:00 | 1.3.43.0 | 1.3.42.0 | ef44ce88126eda61f160956ec90c1dbf3ad80de8 | f8c7fd01a0225ea70aedb8797b309e1b5c7c15cd | patch | תיקון: שיפורים נוספים במערכת
+
+תיקונים עיקריים:
+- שיפורים במערכת אימות (auth.js, auth.py)
+- עדכוני icon mappings
+- שיפורי עיצוב (layout.css)
+- עדכוני עמודים (index.html, user-profile.html)
+- שיפורים נוספים במערכת |

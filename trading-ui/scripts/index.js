@@ -312,6 +312,102 @@ function updateSummaryStats(data, currencySymbol) {
 }
 
 /**
+ * Update recent trade plans section
+ * @param {Array} [tradePlans=[]] - Array of trade plans
+ * @param {string} currencySymbol - Currency symbol
+ * @returns {void}
+ */
+function updateRecentTradePlans(tradePlans = [], currencySymbol) {
+    if (window.RecentTradePlansWidget?.render) {
+        window.RecentTradePlansWidget.render(tradePlans, currencySymbol);
+        return;
+    }
+
+    const container = document.getElementById('recentTradePlans');
+    if (!container) {
+        return;
+    }
+
+    if (!Array.isArray(tradePlans) || tradePlans.length === 0) {
+        container.innerHTML = '<div class="text-muted small">אין תוכניות זמינות</div>';
+        return;
+    }
+
+    // Use TableSortValueAdapter for consistent sorting
+    const sorted = [...tradePlans].sort((a, b) => {
+        const dateA = resolveDateValue(a?.created_at || a?.opened_at || a?.entry_date);
+        const dateB = resolveDateValue(b?.created_at || b?.opened_at || b?.entry_date);
+        
+        if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+            const sortValueA = window.TableSortValueAdapter.getSortValue({ value: dateA, type: 'date' });
+            const sortValueB = window.TableSortValueAdapter.getSortValue({ value: dateB, type: 'date' });
+            return (sortValueB || 0) - (sortValueA || 0);
+        }
+        
+        const epochA = dateA ? new Date(dateA).getTime() : 0;
+        const epochB = dateB ? new Date(dateB).getTime() : 0;
+        return epochB - epochA;
+    });
+
+    const topPlans = sorted.slice(0, 5);
+    const list = document.createElement('ul');
+    list.className = 'list-group list-group-flush';
+
+    topPlans.forEach((plan) => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item d-flex justify-content-between align-items-start gap-2';
+
+        const mainWrap = document.createElement('div');
+        mainWrap.className = 'd-flex flex-column';
+
+        const title = document.createElement('span');
+        title.className = 'fw-semibold';
+        title.textContent = plan?.name || plan?.title || (plan?.id ? `תוכנית #${plan.id}` : 'לא זמין');
+        mainWrap.appendChild(title);
+
+        const metaRow = document.createElement('div');
+        metaRow.className = 'd-flex flex-wrap align-items-center gap-2 text-muted small';
+
+        const symbol = plan?.ticker?.symbol || plan?.symbol;
+        if (symbol) {
+            const symbolSpan = document.createElement('span');
+            symbolSpan.textContent = symbol;
+            metaRow.appendChild(symbolSpan);
+        }
+
+        const dateLabel = formatDateShort(plan?.created_at || plan?.opened_at || plan?.entry_date);
+        if (dateLabel) {
+            const dateSpan = document.createElement('span');
+            dateSpan.textContent = dateLabel;
+            metaRow.appendChild(dateSpan);
+        }
+
+        mainWrap.appendChild(metaRow);
+        item.appendChild(mainWrap);
+
+        const amountWrapper = document.createElement('div');
+        amountWrapper.className = 'text-muted small text-end';
+        const value = plan?.amount || plan?.total_amount || plan?.investment_amount;
+        if (value !== undefined && value !== null) {
+            const numericValue = toNumber(value);
+            if (Number.isFinite(numericValue) && window.FieldRendererService?.renderAmount) {
+                amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, true);
+            } else {
+                amountWrapper.textContent = 'לא זמין';
+            }
+        } else {
+            amountWrapper.textContent = 'לא זמין';
+        }
+        item.appendChild(amountWrapper);
+
+        list.appendChild(item);
+    });
+
+    container.innerHTML = '';
+    container.appendChild(list);
+}
+
+/**
  * Update recent trades section
  * @param {Array} [trades=[]] - Array of trades
  * @param {string} currencySymbol - Currency symbol
@@ -670,11 +766,50 @@ function processDashboardData(data, source = 'network') {
     updateActiveAlerts(alerts);
     updateDashboardCount({ trades, alerts, accounts });
     updatePortfolioSummary({ accounts, trades, cashFlows }, currencySymbol);
+    
+    // Load and update recent trade plans
+    loadRecentTradePlans(currencySymbol).catch((error) => {
+        window.Logger?.warn?.('⚠️ Failed to load recent trade plans', { error: error?.message }, { page: 'index' });
+    });
 
     dashboardDataState.lastLoadedAt = Date.now();
     dashboardDataState.source = source;
     dashboardDataState.data = { trades, alerts, accounts, cashFlows };
     window.dashboardData = dashboardDataState.data;
+}
+
+/**
+ * Load and update recent trade plans
+ * @param {string} currencySymbol - Currency symbol
+ * @returns {Promise<void>}
+ */
+async function loadRecentTradePlans(currencySymbol) {
+    try {
+        // Try to use trade plans data service if available
+        if (window.TradePlansDataService?.loadTradePlansData) {
+            const tradePlans = await window.TradePlansDataService.loadTradePlansData({ force: false });
+            if (Array.isArray(tradePlans)) {
+                updateRecentTradePlans(tradePlans, currencySymbol);
+                return;
+            }
+        }
+        
+        // Fallback: fetch directly from API
+        const response = await fetch('/api/trade-plans/', { headers: { Accept: 'application/json' } });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const payload = await response.json();
+        const tradePlans = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+        updateRecentTradePlans(tradePlans, currencySymbol);
+    } catch (error) {
+        window.Logger?.warn?.('⚠️ Failed to load trade plans for recent widget', { error: error?.message }, { page: 'index' });
+        // Set empty state
+        const container = document.getElementById('recentTradePlans');
+        if (container) {
+            container.innerHTML = '<div class="text-muted small">אין תוכניות זמינות</div>';
+        }
+    }
 }
 
 /**

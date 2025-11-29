@@ -193,6 +193,7 @@ const IconMappings = {
         'system-management.html': 'settings',
         'notifications-center.html': 'inbox',
         'preferences.html': 'settings',
+        'user-profile.html': 'user',
         'tickers.html': 'currency-dollar',
         'executions.html': 'bolt',
         'cash_flows.html': 'currency-dollar',

@@ -10,13 +10,13 @@
     "notes": "תיקון: ענן תגיות בדף הבית - הוספת תמיכה מלאה\n\n1. הוספת get_tag_cloud_data ב-Backend TagService - מחזיר תגיות עם usage_count\n2. יצירת endpoint /api/tags/cloud ב-Backend routes\n3. הוספת getTagCloudData() ל-frontend TagService עם מטמון\n4. עדכון מטמון - ניקוי אוטומטי של cache ענן התגיות"
   },
   "development": {
-    "version": "1.3.42.0",
+    "version": "1.3.43.0",
     "major": 1,
     "minor": 3,
-    "patch": 42,
+    "patch": 43,
     "build": 0,
-    "commit": "f8c7fd01a0225ea70aedb8797b309e1b5c7c15cd",
-    "updated_at": "2025-11-29T15:53:58+00:00",
-    "notes": "תיקון: תיקון תצוגת ראש הדף בכל המערכת\n\nתיקונים עיקריים:\n- תיקון template literal ב-header-system.js שגרם לשגיאת תחביר\n- הוספת filter-toggle-main שחסר (כפתור טוגל ראשי)\n- הוספת header-styles.css ל-research.html\n- הסתרת פילטרים בעמוד research (דשבורד עתידי)\n\nשיפורים:\n- Header נטען כראוי בכל העמודים\n- research.html: header ללא פילטרים (כמבוקש)\n- trades.html: header עם פילטרים (כמבוקש)\n- תיקון שגיאת תחביר שגרמה ל-header לא להיטען במלואו"
+    "commit": "ef44ce88126eda61f160956ec90c1dbf3ad80de8",
+    "updated_at": "2025-11-29T16:31:38+00:00",
+    "notes": "תיקון: שיפורים נוספים במערכת\n\nתיקונים עיקריים:\n- שיפורים במערכת אימות (auth.js, auth.py)\n- עדכוני icon mappings\n- שיפורי עיצוב (layout.css)\n- עדכוני עמודים (index.html, user-profile.html)\n- שיפורים נוספים במערכת"
   }
 }

@@ -58,5 +58,6 @@ __all__ = [
     'TagCategory',
     'Tag',
     'TagLink',
-    'QuotesLast'
+    'QuotesLast',
+    'PasswordResetToken'
 ]

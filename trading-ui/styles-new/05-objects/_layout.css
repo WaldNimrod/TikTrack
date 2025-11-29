@@ -394,6 +394,8 @@
 .table-title {
   background: transparent; /* אין רקע */
   color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary)));
+  order: 0; /* ראשון - מימין (בסוף השורה ב-RTL) */
+  flex: 1; /* תופס את כל המקום הנותר */
 }
 
 .table-title h1,
@@ -591,7 +593,14 @@
   gap: 0.5rem;
   align-items: center;
   justify-content: flex-end;
-  order: 2; /* לפני כפתור הפתיחה/סגירה */
+  order: 1; /* בסוף השורה משמאל (לפני כפתור הפתיחה/סגירה) */
+}
+
+/* כפתור toggle - תמיד בסוף השורה משמאל */
+.section-header button[onclick*="toggleSection"],
+.section-header [data-button-type="TOGGLE"] {
+  order: 2; /* אחרי section-actions */
+  margin-inline-start: 0.5rem;
 }
 
 

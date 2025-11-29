@@ -1037,6 +1037,7 @@ class HeaderSystem {
       this.setupEventListeners();
       this.menuManager.init();
       this.filterManager.init();
+      this.updateUserDisplay(); // Update user display after header creation
       this.isInitialized = true;
       
       window.Logger?.info?.('✅ HeaderSystem.init() completed', { page: 'header-system' });
@@ -1064,6 +1065,57 @@ class HeaderSystem {
     const existingHeader = document.getElementById('unified-header');
     const headerHTML = HeaderSystem.getHeaderHTML();
     existingHeader.innerHTML = headerHTML;
+  }
+
+  /**
+   * Update user display in header
+   */
+  updateUserDisplay() {
+    try {
+      const userSection = document.getElementById('headerUserSection');
+      const userNameElement = document.getElementById('headerUserName');
+      
+      if (!userSection || !userNameElement) {
+        // User section might not exist on all pages
+        return;
+      }
+
+      // Get current user
+      let currentUser = null;
+      if (typeof window.getCurrentUser === 'function') {
+        currentUser = window.getCurrentUser();
+      } else if (typeof window.TikTrackAuth?.getCurrentUser === 'function') {
+        currentUser = window.TikTrackAuth.getCurrentUser();
+      } else {
+        // Try localStorage
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+          try {
+            currentUser = JSON.parse(storedUser);
+          } catch (e) {
+            // Ignore parse errors
+          }
+        }
+      }
+
+      if (currentUser && currentUser.id) {
+        // Display user name
+        const displayName = currentUser.display_name || 
+                          currentUser.full_name || 
+                          currentUser.username || 
+                          'משתמש';
+        userNameElement.textContent = displayName;
+        userSection.style.display = 'flex';
+      } else {
+        // Hide user section if not authenticated
+        userSection.style.display = 'none';
+      }
+    } catch (error) {
+      window.Logger?.warn?.('⚠️ Failed to update user display in header', {
+        error: error?.message || error,
+        page: 'header-system',
+      });
+    }
   }
 
   static getHeaderHTML() {
@@ -1217,6 +1269,18 @@ class HeaderSystem {
                     </li>
                   </ul>
                 </nav>
+              </div>
+
+              <div class="user-section" id="headerUserSection" style="display: flex; align-items: center; gap: 12px; margin-left: 20px;">
+                <div class="user-info" id="headerUserInfo" style="display: flex; align-items: center; gap: 8px;">
+                  <span class="user-name" id="headerUserName" style="color: #333; font-size: 14px; font-weight: 500;"></span>
+                </div>
+                <button class="logout-btn" id="headerLogoutBtn" 
+                        onclick="if(window.TikTrackAuth?.logout) { window.TikTrackAuth.logout(); } else if(window.logout) { window.logout(); }"
+                        style="padding: 6px 12px; background: #fc5a06; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500;"
+                        title="התנתקות">
+                  התנתק
+                </button>
               </div>
 
               <div class="logo-section">
@@ -1651,6 +1715,40 @@ window.resetAllFilters = async function() {
   }
 };
 
+// ===== User Display Update =====
+// Update user display when authentication state changes
+if (typeof window.addEventListener === 'function') {
+  // Listen for authentication events
+  window.addEventListener('user:logged-in', () => {
+    if (window.headerSystem) {
+      window.headerSystem.updateUserDisplay();
+    }
+  });
+  
+  window.addEventListener('user:logged-out', () => {
+    if (window.headerSystem) {
+      window.headerSystem.updateUserDisplay();
+    }
+  });
+
+  // Also update on page load after a short delay
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        if (window.headerSystem) {
+          window.headerSystem.updateUserDisplay();
+        }
+      }, 500);
+    });
+  } else {
+    setTimeout(() => {
+      if (window.headerSystem) {
+        window.headerSystem.updateUserDisplay();
+      }
+    }, 500);
+  }
+}
+
 window.clearAllFilters = function() {
   window.Logger?.info?.('🧹 clearAllFilters - מוחק את כל הפילטרים', { page: 'header-system' });
 
@@ -1694,6 +1792,40 @@ window.clearAllFilters = function() {
   window.headerSystem.filterManager.saveFilters();
   window.headerSystem.filterManager.applyFilters();
 };
+
+// ===== User Display Update =====
+// Update user display when authentication state changes
+if (typeof window.addEventListener === 'function') {
+  // Listen for authentication events
+  window.addEventListener('user:logged-in', () => {
+    if (window.headerSystem) {
+      window.headerSystem.updateUserDisplay();
+    }
+  });
+  
+  window.addEventListener('user:logged-out', () => {
+    if (window.headerSystem) {
+      window.headerSystem.updateUserDisplay();
+    }
+  });
+
+  // Also update on page load after a short delay
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        if (window.headerSystem) {
+          window.headerSystem.updateUserDisplay();
+        }
+      }, 500);
+    });
+  } else {
+    setTimeout(() => {
+      if (window.headerSystem) {
+        window.headerSystem.updateUserDisplay();
+      }
+    }, 500);
+  }
+}
 
 // ===== Global API =====
 

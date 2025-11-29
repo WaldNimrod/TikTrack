@@ -1,22 +1,22 @@
 {
   "production": {
-    "version": "1.3.11.0",
+    "version": "1.3.12.0",
     "major": 1,
     "minor": 3,
-    "patch": 11,
+    "patch": 12,
     "build": 0,
-    "commit": "2cd10e34a400514cbd9a66ea05a2f19db718f775",
-    "updated_at": "2025-11-29T00:26:10+00:00",
-    "notes": "הוספת מערכת רמזור ATR - מימוש מלא עם תמיכה בכל המקומות"
+    "commit": "9ddc904bb9989fac5178b4823650e22a858b937f",
+    "updated_at": "2025-11-29T06:16:11+00:00",
+    "notes": "תיקון: תיקון טבלת המרות מטבע מאוחדות ותיקון ברירת מחדל ייבוא תזרימי מזומן\n\n1. תיקון טבלת המרות מטבע מאוחדות: הטבלה השנייה מציגה כעת את כל ההמרות הרלוונטיות ללא קשר לסינון או חלוקה לעמודים בטבלה הראשונה\n2. תיקון ברירת מחדל ייבוא: כל סוגי תזרימי המזומן מסומנים כברירת מחדל בשלב 2 של הייבוא (במקום רק interest ו-borrow_fee)"
   },
   "development": {
-    "version": "1.3.38.0",
+    "version": "1.3.39.0",
     "major": 1,
     "minor": 3,
-    "patch": 38,
+    "patch": 39,
     "build": 0,
-    "commit": "4270e4a0f88575e8b52574ac6a56308be09e4a03",
-    "updated_at": "2025-11-26T13:17:05+00:00",
-    "notes": "Event Handler Manager v2.0.0 - Advanced debugging and monitoring system with comprehensive testing (29/29 tests passed)"
+    "commit": "2cd10e34a400514cbd9a66ea05a2f19db718f775",
+    "updated_at": "2025-11-29T00:26:24+00:00",
+    "notes": "הוספת מערכת רמזור ATR - מימוש מלא עם תמיכה בכל המקומות"
   }
 }

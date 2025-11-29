@@ -67,9 +67,33 @@
       try {
         window.Logger?.info('Loading user profile data...', { page: 'user-profile' });
 
-        const user = window.TikTrackAuth?.getCurrentUser();
+        // Try to get from cache first (UnifiedCacheManager)
+        let user = null;
+        const cacheKey = 'user_profile_data';
+        
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+          try {
+            const cachedUser = await window.UnifiedCacheManager.get(cacheKey, {
+              layer: 'localStorage',
+              ttl: 300000, // 5 minutes
+              includeUserId: false
+            });
+            if (cachedUser) {
+              user = cachedUser;
+              window.Logger?.debug('✅ Loaded user profile from cache', { page: 'user-profile' });
+            }
+          } catch (cacheError) {
+            window.Logger?.warn('Cache read failed, fetching from API', { error: cacheError, page: 'user-profile' });
+          }
+        }
+
+        // If not in cache, try from TikTrackAuth
         if (!user) {
-          // Try to fetch from API
+          user = window.TikTrackAuth?.getCurrentUser();
+        }
+
+        // If still no user, fetch from API
+        if (!user) {
           const response = await fetch('/api/auth/me', {
             method: 'GET',
             credentials: 'include'
@@ -78,15 +102,29 @@
           if (response.ok) {
             const data = await response.json();
             if (data.status === 'success' && data.data?.user) {
-              this.populateProfileForm(data.data.user);
-              return;
+              user = data.data.user;
+              
+              // Save to cache
+              if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                try {
+                  await window.UnifiedCacheManager.save(cacheKey, user, {
+                    layer: 'localStorage',
+                    ttl: 300000,
+                    includeUserId: false
+                  });
+                } catch (cacheError) {
+                  window.Logger?.warn('Cache save failed', { error: cacheError, page: 'user-profile' });
+                }
+              }
             }
           }
 
           // Not authenticated - redirect to login
-          window.Logger?.warn('User not authenticated, redirecting to login', { page: 'user-profile' });
-          window.location.href = 'login.html';
-          return;
+          if (!user) {
+            window.Logger?.warn('User not authenticated, redirecting to login', { page: 'user-profile' });
+            window.location.href = 'login.html';
+            return;
+          }
         }
 
         // Populate form with user data
@@ -180,22 +218,71 @@
         if (response.ok && data.status === 'success') {
           window.Logger?.info('User profile updated successfully', { page: 'user-profile' });
 
+          const updatedUser = data.data?.user;
+          if (updatedUser) {
+            // Update TikTrackAuth current user (update the internal state directly)
+            // We already have the updated user from the API response, no need to call updateUserProfile again
+            if (window.TikTrackAuth) {
+              // Update the internal currentUser variable in auth.js
+              // Since we can't directly access the private variable, we update localStorage
+              // and the next getCurrentUser() call will load it
+              localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+              
+              // Also try to update via getCurrentUser if it exists and returns a reference
+              const currentUser = window.TikTrackAuth.getCurrentUser();
+              if (currentUser) {
+                // Update the returned object (if it's a reference)
+                Object.assign(currentUser, updatedUser);
+              }
+            } else {
+              // Fallback: update localStorage directly
+              localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            }
+
+            // Update UnifiedCacheManager cache
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+              try {
+                const cacheKey = 'user_profile_data';
+                await window.UnifiedCacheManager.save(cacheKey, updatedUser, {
+                  layer: 'localStorage',
+                  ttl: 300000, // 5 minutes
+                  includeUserId: false
+                });
+                window.Logger?.debug('✅ User profile saved to cache', { page: 'user-profile' });
+              } catch (cacheError) {
+                window.Logger?.warn('Cache save failed', { error: cacheError, page: 'user-profile' });
+              }
+            }
+
+            // Invalidate user-related cache via CacheSyncManager
+            if (window.CacheSyncManager) {
+              try {
+                await window.CacheSyncManager.invalidateByAction('user-updated');
+                window.Logger?.debug('✅ Cache invalidated via CacheSyncManager', { page: 'user-profile' });
+              } catch (syncError) {
+                window.Logger?.warn('CacheSyncManager invalidation failed', { error: syncError, page: 'user-profile' });
+              }
+            }
+
+            // Update header display
+            if (window.HeaderSystem && typeof window.HeaderSystem.updateUserDisplay === 'function') {
+              window.HeaderSystem.updateUserDisplay();
+              window.Logger?.debug('✅ Header user display updated', { page: 'user-profile' });
+            }
+
+            // Dispatch event for other systems
+            if (window.dispatchEvent) {
+              window.dispatchEvent(new CustomEvent('user:updated', { detail: { user: updatedUser } }));
+              window.dispatchEvent(new Event('login:success')); // For backward compatibility
+            }
+          }
+
           // Show success notification
           if (window.NotificationSystem) {
             window.NotificationSystem.showSuccess('פרטי המשתמש עודכנו בהצלחה', 'business');
           }
 
-          // Update local storage
-          if (data.data?.user) {
-            localStorage.setItem('currentUser', JSON.stringify(data.data.user));
-            
-            // Update header display if available
-            if (window.dispatchEvent) {
-              window.dispatchEvent(new Event('login:success'));
-            }
-          }
-
-          // Reload profile to get updated data
+          // Reload profile to get updated data (this will also refresh from cache/API)
           await this.loadUserProfile();
         } else {
           const errorMessage = data.error?.message || 'שגיאה בעדכון פרטים';

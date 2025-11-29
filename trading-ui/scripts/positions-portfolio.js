@@ -96,17 +96,58 @@ function createDiagnosticsMessageFromPortfolio(diagnostics) {
     if (!diagnostics || !Array.isArray(diagnostics.accounts_without_executions) || diagnostics.accounts_without_executions.length === 0) {
         return null;
     }
+    
+    // Don't show message if there are executions in any account
+    // Check if execution_pairs_count exists and is > 0
+    if (diagnostics.execution_pairs_count !== undefined && diagnostics.execution_pairs_count > 0) {
+        return null;
+    }
+    
     const missingCount = diagnostics.accounts_without_executions.length;
-    const ids = diagnostics.accounts_without_executions.slice(0, 5).join(', ');
-    const idsSuffix = missingCount > 5 ? ` ועוד ${missingCount - 5}` : '';
-    return `לא נמצאו Executions ב-${missingCount} חשבונות (${ids}${idsSuffix}). יש להעלות נתוני ביצוע (Buy/Sell) כדי לחשב פוזיציות ופורטפוליו.`;
+    
+    // Try to get account names instead of just IDs
+    let accountNames = [];
+    if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
+        accountNames = diagnostics.accounts_without_executions.slice(0, 5).map(id => {
+            const account = window.trading_accountsData.find(acc => acc.id === id);
+            return account && account.name ? account.name : `#${id}`;
+        });
+    } else {
+        accountNames = diagnostics.accounts_without_executions.slice(0, 5).map(id => `#${id}`);
+    }
+    
+    const accountList = accountNames.join(', ');
+    const idsSuffix = missingCount > 5 ? ` ועוד ${missingCount - 5} חשבונות` : '';
+    
+    // More gentle message for new systems
+    return `עדיין לא נוספו נתוני ביצוע (Buy/Sell) ב-${missingCount} חשבונות${missingCount > 1 ? '' : ''} (${accountList}${idsSuffix}). לאחר הוספת נתוני ביצוע, הפוזיציות יופיעו כאן אוטומטית.`;
 }
 
 function createDiagnosticsMessageFromAccount(diagnostics) {
+    // Don't show message if there are executions
     if (!diagnostics || diagnostics.execution_pairs_count > 0) {
         return null;
     }
-    return `לא נמצאו Executions לחשבון ${diagnostics.account_id}. הוסף נתוני ביצוע כדי לראות פוזיציות פעילות.`;
+    
+    // Don't show message if account_id is missing or undefined
+    if (!diagnostics.account_id) {
+        return null;
+    }
+    
+    // Try to get account name from trading_accountsData
+    let accountName = null;
+    if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
+        const account = window.trading_accountsData.find(acc => acc.id === diagnostics.account_id);
+        if (account && account.name) {
+            accountName = account.name;
+        }
+    }
+    
+    // Use account name if available, otherwise use ID
+    const accountDisplay = accountName || `#${diagnostics.account_id}`;
+    
+    // More gentle message for new systems
+    return `עדיין לא נוספו נתוני ביצוע (Buy/Sell) לחשבון ${accountDisplay}. לאחר הוספת נתוני ביצוע, הפוזיציות יופיעו כאן אוטומטית.`;
 }
 
 function setPortfolioDiagnostics(diagnostics) {
@@ -141,21 +182,35 @@ function getNoPositionsMessage(diagnostics, context = 'portfolio') {
 }
 
 function renderDiagnosticsBanner(targetElement, diagnostics) {
-    if (!targetElement) {
+    if (!targetElement || !diagnostics) {
         return;
     }
+    
+    // Don't show banner if there are executions (for account diagnostics)
+    if (diagnostics.execution_pairs_count !== undefined && diagnostics.execution_pairs_count > 0) {
+        // Remove existing banner if executions exist
+        const existing = targetElement.querySelector('.portfolio-diagnostics-banner');
+        if (existing) {
+            existing.remove();
+        }
+        return;
+    }
+    
     const existing = targetElement.querySelector('.portfolio-diagnostics-banner');
     if (existing) {
         existing.remove();
     }
+    
     const message =
         createDiagnosticsMessageFromPortfolio(diagnostics) ||
         createDiagnosticsMessageFromAccount(diagnostics);
+    
     if (!message) {
         return;
     }
+    
     const banner = document.createElement('div');
-    banner.className = 'alert alert-warning portfolio-diagnostics-banner mt-2 mb-0 small';
+    banner.className = 'alert alert-info portfolio-diagnostics-banner mt-2 mb-0 small';
     banner.textContent = message;
     targetElement.appendChild(banner);
 }
@@ -1034,7 +1089,7 @@ function setupSummaryToggle() {
 /**
  * Update portfolio summary toggle button state (icon, tooltip, accessibility)
  */
-function updatePortfolioSummaryToggleButton() {
+async function updatePortfolioSummaryToggleButton() {
     const toggleBtn = document.getElementById('portfolioSummaryToggleSize');
     if (!toggleBtn) {
         return;
@@ -1043,10 +1098,57 @@ function updatePortfolioSummaryToggleButton() {
     const currentSize = window.positionsPortfolioState.summarySize || 'minimal';
     const isMinimal = currentSize === 'minimal';
     const nextActionLabel = isMinimal ? 'הצג סיכום מלא' : 'הצג סיכום מצומצם';
-    const expandIcon = window.BUTTON_ICONS?.VIEW || '👁️';
-    const collapseIcon = window.BUTTON_ICONS?.CLOSE || '✖️';
-
-    toggleBtn.textContent = isMinimal ? expandIcon : collapseIcon;
+    
+    // Determine icon type and name
+    const iconType = 'button';
+    const iconName = isMinimal ? 'eye' : 'close';
+    
+    // Clear existing content
+    toggleBtn.innerHTML = '';
+    
+    // Render icon using IconSystem - no fallback
+    if (!window.IconSystem || !window.IconSystem.initialized) {
+        if (window.Logger) {
+            window.Logger.error('IconSystem not available for portfolio summary toggle button', { 
+                iconType,
+                iconName
+            }, { page: 'positions-portfolio' });
+        }
+        return;
+    }
+    
+    try {
+        const iconHTML = await window.IconSystem.renderIcon(iconType, iconName, {
+            size: '16',
+            alt: nextActionLabel,
+            class: 'icon'
+        });
+        
+        // Parse and insert icon HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = iconHTML;
+        const iconElement = tempDiv.firstElementChild;
+        
+        if (iconElement) {
+            toggleBtn.appendChild(iconElement);
+        } else {
+            if (window.Logger) {
+                window.Logger.error('IconSystem.renderIcon returned empty HTML for portfolio summary toggle', { 
+                    iconType,
+                    iconName,
+                    iconHTML
+                }, { page: 'positions-portfolio' });
+            }
+        }
+    } catch (error) {
+        if (window.Logger) {
+            window.Logger.error('Failed to render icon for portfolio summary toggle', { 
+                error: error?.message,
+                iconType,
+                iconName
+            }, { page: 'positions-portfolio' });
+        }
+    }
     
     // Use centralized updateTooltip function instead of manual updates
     if (window.advancedButtonSystem && typeof window.advancedButtonSystem.updateTooltip === 'function') {
@@ -1073,11 +1175,11 @@ function updatePortfolioSummaryToggleButton() {
  * Toggle portfolio summary size (minimal/full)
  * Called via data-onclick attribute
  */
-window.togglePortfolioSummarySize = function() {
+window.togglePortfolioSummarySize = async function() {
     const currentSize = window.positionsPortfolioState.summarySize || 'minimal';
     const newSize = currentSize === 'minimal' ? 'full' : 'minimal';
     window.positionsPortfolioState.summarySize = newSize;
-    updatePortfolioSummaryToggleButton();
+    await updatePortfolioSummaryToggleButton();
     loadPortfolioSummary();
 };
 
@@ -1085,7 +1187,7 @@ window.togglePortfolioSummarySize = function() {
  * Load portfolio summary
  */
 async function loadPortfolioSummary() {
-    updatePortfolioSummaryToggleButton();
+    await updatePortfolioSummaryToggleButton();
     const summaryElement = document.getElementById('portfolioSummaryStats');
     if (!summaryElement) return;
     

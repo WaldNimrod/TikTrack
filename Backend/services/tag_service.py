@@ -408,6 +408,103 @@ class TagService:
         return tags
 
     @staticmethod
+    def search_tags(
+        db: Session,
+        user_id: int,
+        query: str,
+        *,
+        entity_type: Optional[str] = None,
+        limit: int = 25,
+        include_inactive: bool = False,
+    ) -> List[Dict[str, Any]]:
+        """
+        Search tags by name query string and return with assignments.
+        
+        Returns tags matching the query, each with a list of assignments (TagLinks).
+        Optionally filters assignments by entity_type.
+        
+        Args:
+            db: Database session
+            user_id: User ID to filter tags
+            query: Search query string (minimum 2 characters)
+            entity_type: Optional entity type to filter assignments
+            limit: Maximum number of tags to return
+            include_inactive: Whether to include inactive tags
+            
+        Returns:
+            List of dicts with keys: tag (dict), assignments (list of dicts)
+        """
+        if not query or len(query.strip()) < 2:
+            raise ValueError("Query must be at least 2 characters long")
+        
+        query_lower = query.strip().lower()
+        
+        # Build base query for tags
+        tag_query = db.query(Tag).filter(Tag.user_id == user_id)
+        
+        if not include_inactive:
+            tag_query = tag_query.filter(Tag.is_active.is_(True))
+        
+        # Filter by name (case-insensitive partial match)
+        tag_query = tag_query.filter(
+            func.lower(Tag.name).contains(query_lower)
+        )
+        
+        # Limit results
+        tags = tag_query.order_by(Tag.usage_count.desc(), Tag.name.asc()).limit(limit).all()
+        
+        # Build results with assignments
+        results: List[Dict[str, Any]] = []
+        for tag in tags:
+            # Get all assignments for this tag
+            assignment_query = db.query(TagLink).filter(TagLink.tag_id == tag.id)
+            
+            # Filter by entity_type if provided
+            if entity_type:
+                TagService._validate_entity_type(entity_type)
+                assignment_query = assignment_query.filter(TagLink.entity_type == entity_type)
+            
+            assignments = assignment_query.all()
+            
+            # Serialize tag
+            tag_dict = {
+                "id": tag.id,
+                "name": tag.name,
+                "slug": tag.slug,
+                "description": tag.description,
+                "category_id": tag.category_id,
+                "usage_count": tag.usage_count or 0,
+                "last_used_at": tag.last_used_at.isoformat() if tag.last_used_at else None,
+                "is_active": tag.is_active,
+                "created_at": tag.created_at.isoformat() if tag.created_at else None,
+            }
+            
+            # Serialize assignments
+            assignment_dicts = [
+                {
+                    "id": link.id,
+                    "entity_type": link.entity_type,
+                    "entity_id": link.entity_id,
+                    "created_at": link.created_at.isoformat() if link.created_at else None,
+                }
+                for link in assignments
+            ]
+            
+            results.append({
+                "tag": tag_dict,
+                "assignments": assignment_dicts,
+            })
+        
+        logger.debug(
+            "Search returned %s tags with query '%s' (entity_type=%s)",
+            len(results),
+            query,
+            entity_type or "all",
+        )
+        
+        return results
+
+    @staticmethod
     def get_analytics(
         db: Session, user_id: int, *, limit: int = 10
     ) -> Dict[str, Any]:

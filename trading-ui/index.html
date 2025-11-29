@@ -127,73 +127,109 @@
         </div>
         </div>
         
-        <!-- שורה שלישית: 2 ממשקי תגיות -->
+        <!-- שורה שלישית: ווידג'ט תגיות מאוחד (ענן + חיפוש) -->
         <div class="row g-3 mb-3">
             <div class="col-md-6">
-            <div class="card h-100" id="tagCloudCard">
-                <div class="card-header d-flex align-items-center justify-content-between gap-2">                                                               
-                    <h5 class="mb-0 d-flex align-items-center gap-2">
-                        <img src="images/icons/entities/home.svg" alt="סמל קונטיינר" class="section-icon">                                                               
-                        <span>ענן תגיות</span>
-                    </h5>
-                </div>
-                <div class="card-body d-flex flex-column gap-3">
-                    <div id="tagCloudLoading" class="d-flex align-items-center justify-content-center text-muted small">
-                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
-                        <span>טוען נתוני תגיות...</span>
+                <div class="card h-100" id="tagWidgetContainer">
+                    <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                        <h5 class="mb-0 d-flex align-items-center gap-2">
+                            <img src="images/icons/entities/home.svg" alt="תגיות" class="section-icon">
+                            <span>תגיות</span>
+                        </h5>
+                        <!-- Bootstrap Tabs - מימין (סוף השורה ב-RTL) -->
+                        <ul class="nav nav-tabs mb-0" id="tagWidgetTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" 
+                                        id="tagWidgetCloudTab" 
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#tagWidgetCloudPane" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="tagWidgetCloudPane" 
+                                        aria-selected="true">
+                                    ענן תגיות
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" 
+                                        id="tagWidgetSearchTab" 
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#tagWidgetSearchPane" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="tagWidgetSearchPane" 
+                                        aria-selected="false">
+                                    חיפוש מהיר
+                                </button>
+                            </li>
+                        </ul>
                     </div>
-                    <div id="tagCloudError" class="alert alert-danger d-none" role="alert"></div>
-                    <div id="tagCloudEmpty" class="alert alert-info d-none" role="status">
-                        אין עדיין נתונים להצגה. צרף תגיות לטרנזקציות כדי לראות תובנות כאן.
+                    <div class="card-body">
+
+                        <!-- Tab Content -->
+                        <div class="tab-content" id="tagWidgetTabContent">
+                            <!-- Cloud Tab Pane -->
+                            <div class="tab-pane fade show active" 
+                                 id="tagWidgetCloudPane" 
+                                 role="tabpanel" 
+                                 aria-labelledby="tagWidgetCloudTab">
+                                <div class="d-flex flex-column gap-3 mt-3 position-relative">
+                                    <div id="tagWidgetCloudLoading" class="d-flex align-items-center justify-content-center text-muted small">
+                                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                        <span>טוען נתוני תגיות...</span>
+                                    </div>
+                                    <div id="tagWidgetCloudError" class="alert alert-danger d-none" role="alert"></div>
+                                    <div id="tagWidgetCloudEmpty" class="alert alert-info d-none" role="status">
+                                        אין עדיין נתונים להצגה. צרף תגיות לטרנזקציות כדי לראות תובנות כאן.
+                                    </div>
+                                    <div id="tagWidgetCloudContainer" class="d-flex flex-wrap gap-2 align-items-center"></div>
+                                </div>
+                            </div>
+
+                            <!-- Search Tab Pane -->
+                            <div class="tab-pane fade" 
+                                 id="tagWidgetSearchPane" 
+                                 role="tabpanel" 
+                                 aria-labelledby="tagWidgetSearchTab">
+                                <div class="d-flex flex-column gap-3 mt-3">
+                                    <form id="tagWidgetSearchForm" class="d-flex flex-column gap-3">
+                                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                                            <label for="tagWidgetSearchInput" class="visually-hidden">חיפוש תגית</label>
+                                            <input id="tagWidgetSearchInput"
+                                                   type="search"
+                                                   class="form-control flex-grow-1"
+                                                   placeholder="לדוגמה: אסטרטגיה, סוג מניה, סטטוס..."
+                                                   minlength="2"
+                                                   autocomplete="off">
+                                            <select id="tagWidgetSearchEntityFilter" class="form-select w-auto">
+                                                <option value="">כל היישויות</option>
+                                                <option value="trade">טריידים</option>
+                                                <option value="trade_plan">תכניות</option>
+                                                <option value="execution">ביצועים</option>
+                                                <option value="trading_account">חשבונות</option>
+                                                <option value="alert">התראות</option>
+                                                <option value="ticker">טיקרים</option>
+                                                <option value="cash_flow">תזרימי מזומנים</option>
+                                                <option value="note">הערות</option>
+                                            </select>
+                                            <button type="submit"
+                                                    data-button-type="PRIMARY"
+                                                    data-variant="full"
+                                                    data-icon="search"
+                                                    data-text="חפש"
+                                                    title="הפעל חיפוש תגיות"></button>
+                                        </div>
+                                        <div class="text-muted small">
+                                            הקלד לפחות שני תווים ולחץ חפש. לחיצה על תגית בענן תמלא את השדה אוטומטית.
+                                        </div>
+                                        <div id="tagWidgetSearchStatus" class="small text-muted"></div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div id="tagCloudContainer" class="d-flex flex-wrap gap-2 align-items-center"></div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card h-100" id="tagQuickSearchCard">
-                <div class="card-header d-flex align-items-center justify-content-between gap-2">
-                    <h5 class="mb-0 d-flex align-items-center gap-2">
-                        <img src="images/icons/entities/home.svg" alt="סמל קונטיינר" class="section-icon">
-                        <span>חיפוש תגיות מהיר</span>
-                    </h5>
-                </div>
-                <div class="card-body d-flex flex-column gap-3">
-                    <form id="tagQuickSearchForm" class="d-flex flex-column gap-3">
-                        <div class="d-flex flex-wrap gap-2 align-items-center">
-                            <label for="tagQuickSearchInput" class="visually-hidden">חיפוש תגית</label>
-                            <input id="tagQuickSearchInput"
-                                   type="search"
-                                   class="form-control flex-grow-1"
-                                   placeholder="לדוגמה: אסטרטגיה, סוג מניה, סטטוס..."
-                                   minlength="2"
-                                   autocomplete="off">
-                            <select id="tagQuickSearchEntityFilter" class="form-select w-auto">
-                                <option value="">כל היישויות</option>
-                                <option value="trade">טריידים</option>
-                                <option value="trade_plan">תכניות</option>
-                                <option value="execution">ביצועים</option>
-                                <option value="trading_account">חשבונות</option>
-                                <option value="alert">התראות</option>
-                                <option value="ticker">טיקרים</option>
-                                <option value="cash_flow">תזרימי מזומנים</option>
-                                <option value="note">הערות</option>
-                            </select>
-                            <button type="submit"
-                                    data-button-type="PRIMARY"
-                                    data-variant="full"
-                                    data-icon="search"
-                                    data-text="חפש"
-                                    title="הפעל חיפוש תגיות"></button>
-                        </div>
-                        <div class="text-muted small" id="tagQuickSearchHint">
-                            הקלד לפחות שני תווים ולחץ חפש. לחיצה על תגית בענן תמלא את השדה אוטומטית.
-                        </div>
-                        <div id="tagQuickSearchStatus" class="small text-muted"></div>
-                    </form>
-                </div>
-            </div>
-        </div>
         </div>
         
         <!-- שורה רביעית: גרפים -->
@@ -308,268 +344,274 @@
             
         </div></div><div class="bottom-spacer"></div><div class="notification-container" id="notificationContainer"></div><div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div></div>
             <!-- =============================================================== -->
+        <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
     <!-- =============================================================== -->
-    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
     <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
-    <!-- 🎯 Page: index | Generated: 2025-11-15T00:29:03.486Z -->
-    <!-- 📦 Packages: base, services, ui-advanced, crud, preferences, entity-services, entity-details, dashboard-widgets, init-system -->
+    <!-- 🎯 Page: index | Generated: 2025-11-29T19:33:03.766Z -->
+    <!-- 📦 Packages: base, services, ui-advanced, crud, preferences, entity-services, entity-details, info-summary, dashboard-widgets, init-system -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 1/9: BASE PACKAGE ===== -->
+    <!-- ===== PACKAGE 1/10: BASE PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 1 | Description: מערכות ליבה חובה לכל עמוד -->
+    <!-- Load Order: 1 | Description: Core systems required for all pages -->
     <!-- Dependencies:  -->
     <!-- Critical: YES | Version: 2.0.0 -->
 
-    <!-- [0] Load Order: 0 - DEBUG TOOLS (Remove after fixing) -->
-    <script src="scripts/debug-promise-error-detector.js?v=1.0.0"></script> <!-- כלי אבחון שגיאת Promise -->
-    <script src="scripts/debug-isolation-tool.js?v=1.0.0"></script> <!-- כלי בידוד קומפוננטות -->
     <!-- [1] Load Order: 1 -->
-    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- הגדרות API מרכזיות -->
-    <!-- [1.5] Load Order: 1.5 - Authentication (MUST BE EARLY) -->
-    <script src="scripts/auth.js?v=1.0.0"></script> <!-- מערכת אימות -->
-    <script src="scripts/auth-guard.js?v=1.0.0"></script> <!-- הגנת נתיבים - בדיקת אימות -->
+    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- Central API configuration -->
     <!-- [2] Load Order: 2 -->
-    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- Favicon management -->
     <!-- [3] Load Order: 3 -->
-    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- Notification system -->
     <!-- [4] Load Order: 4 -->
-    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- Cache synchronization manager -->
     <!-- [5] Load Order: 5 -->
-    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- UI utilities -->
     <!-- [6] Load Order: 6 -->
-    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- Warning system -->
     <!-- [7] Load Order: 7 -->
-    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- Error handling system -->
     <!-- [8] Load Order: 8 -->
-    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
-    <!-- [8.5] Load Order: 8.5 -->
-    <script src="scripts/icon-mappings.js?v=1.0.0"></script> <!-- מיפוי איקונים מרכזי -->
-    <!-- [8.6] Load Order: 8.6 -->
-    <script src="scripts/icon-system.js?v=1.0.0"></script> <!-- מערכת איקונים מרכזית -->
-    <!-- [8.7] Load Order: 8.7 -->
-    <script src="scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- עזר החלפת איקונים -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- Unified cache manager -->
     <!-- [9] Load Order: 9 -->
-    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
+    <script src="scripts/icon-mappings.js?v=1.0.0"></script> <!-- Central icon mappings -->
     <!-- [10] Load Order: 10 -->
-    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
+    <script src="scripts/icon-system.js?v=1.0.0"></script> <!-- Central icon system -->
     <!-- [11] Load Order: 11 -->
-    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <script src="scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- Icon replacement helper for standardizing icon usage -->
     <!-- [12] Load Order: 12 -->
-    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- Cache clearing control (Stage B-Lite) -->
     <!-- [13] Load Order: 13 -->
-    <script src="scripts/page-state-manager.js?v=1.0.0"></script> <!-- מנהל מצב עמודים מאוחד -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
     <!-- [14] Load Order: 14 -->
-    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- Advanced logging service -->
     <!-- [15] Load Order: 15 -->
-    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- Header system -->
     <!-- [16] Load Order: 16 -->
-    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <script src="scripts/page-state-manager.js?v=1.0.0"></script> <!-- Unified page state manager -->
     <!-- [17] Load Order: 17 -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- Page utilities -->
     <!-- [18] Load Order: 18 -->
-    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- Translations -->
     <!-- [19] Load Order: 19 -->
-    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- Icon and button system -->
     <!-- [20] Load Order: 20 -->
-    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
     <!-- [21] Load Order: 21 -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכת אתחול מאוחדת - נקודת כניסה אחת (חובה לכל עמוד) -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 2/9: SERVICES PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 2 | Description: שירותים כלליים -->
-    <!-- Dependencies: base -->
-    <!-- Critical: NO | Version: 2.0.0 -->
-
-    <!-- [21] Load Order: 21 -->
-    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script> <!-- שירות איסוף נתונים -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- Central event management system -->
     <!-- [22] Load Order: 22 -->
-    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script> <!-- שירות רנדור שדות -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- Button system -->
     <!-- [23] Load Order: 23 -->
-    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script> <!-- שירות מילוי select boxes -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- Dynamic color system -->
     <!-- [24] Load Order: 24 -->
-    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- מחשבון סטטיסטיקות -->
-    <!-- [25] Load Order: 25 -->
-    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- שירות ברירות מחדל -->
-    <!-- [25a] Preferences Data Service -->
-    <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- שירות נתוני העדפות (API + Cache) -->
-    <!-- [26] Load Order: 26 - MUST BE BEFORE unified-crud-service -->
-    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
-    <!-- [26.5] Load Order: 26.5 - MUST BE BEFORE investment-calculation-service -->
-    <script src="scripts/services/unified-crud-service.js?v=1.0.0"></script> <!-- שירות CRUD מאוחד לכל הישויות -->
-    <!-- [27] Load Order: 27 -->
-    <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- חישובי סכום ↔ כמות לטפסי השקעות -->
-    <!-- [28] Load Order: 28 -->
-    <script src="scripts/services/tag-service.js?v=1.0.0"></script> <!-- שירות תגיות מרכזי (ניהול ואחזור תגיות) -->
-    <!-- [29] Load Order: 29 -->
-    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script> <!-- Adapter למסירת ערכי מיון אחידים (DateEnvelope, legacy) -->
-    <!-- [30] Load Order: 30 -->
-    <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- שירות סטטוס לינטר מאוחד (קריאת API והמרת נתונים) -->
-    <!-- [31] Load Order: 31 -->
-    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
-    <!-- [32] Load Order: 32 -->
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
-    <!-- [33] Load Order: 33 -->
-    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- שירות עורך טקסט עשיר -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- Unified initialization system - single entry point (required for all pages) -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 3/9: UI ADVANCED PACKAGE ===== -->
+    <!-- ===== PACKAGE 2/10: SERVICES PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 3 | Description: ממשק משתמש מתקדם -->
-    <!-- Dependencies: base, services -->
-    <!-- Critical: NO | Version: 2.0.0 -->
-
-    <!-- [34] Load Order: 34 -->
-    <script src="scripts/table-mappings.js?v=1.0.0"></script> <!-- מיפוי טבלאות -->
-    <!-- [35] Load Order: 35 -->
-    <script src="scripts/tables.js?v=1.0.0"></script> <!-- מערכת טבלאות -->
-    <!-- [36] Load Order: 36 -->
-    <script src="scripts/table-data-registry.js?v=1.0.0"></script> <!-- רישום נתוני טבלאות -->
-    <!-- [37] Load Order: 37 -->
-    <script src="scripts/pagination-system.js?v=1.0.0"></script> <!-- מערכת עימוד -->
-    <!-- [38] Load Order: 38 -->
-    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- מערכת תפריט פעולות -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 4/9: CRUD OPERATIONS PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 4 | Description: מערכות לניהול נתונים וטבלאות -->
-    <!-- Dependencies: base, services -->
-    <!-- Critical: NO | Version: 2.0.0 -->
-
-    <!-- [39] Load Order: 39 -->
-    <script src="scripts/date-utils.js?v=1.0.0"></script> <!-- כלי עזר תאריכים -->
-    <!-- [40] Load Order: 40 -->
-    <script src="scripts/data-utils.js?v=1.0.0"></script> <!-- כלי עזר נתונים כלליים -->
-    <!-- [41] Load Order: 41 -->
-    <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- מערכת טבלאות מרכזית מאוחדת -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 5/9: PREFERENCES PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 5 | Description: מערכת העדפות משתמש v2.0 (6 קבצים) -->
+    <!-- Load Order: 2 | Description: General services -->
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [41.5] Load Order: 41.5 - Preferences V4 SDK (group-first) - Must load before preferences-core-new.js -->
-    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
-    <!-- [42] Load Order: 42 -->
-    <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
-    <!-- [43] Load Order: 43 -->
-    <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- מערכת צבעים (60+ העדפות) -->
-    <!-- [44] Load Order: 44 -->
-    <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- ניהול פרופילים -->
-    <!-- [45] Load Order: 45 -->
-    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
-    <!-- [45.5] Load Order: 45.5 - Preferences Validation - Must load before preferences-ui-v4.js -->
-    <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
-    <!-- [46] Load Order: 46 - Preferences UI V4 (Group-First) - Must load before preferences-ui.js -->
-    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
-    <!-- [47] Load Order: 47 - Preferences UI - Must load before preferences-group-manager.js -->
-    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
-    <!-- [48] Load Order: 48 -->
-    <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
+    <!-- [25] Load Order: 25 -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script> <!-- Data collection service -->
+    <!-- [26] Load Order: 26 -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script> <!-- Field rendering service -->
+    <!-- [27] Load Order: 27 -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script> <!-- Select box population service -->
+    <!-- [28] Load Order: 28 -->
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- Statistics calculator -->
+    <!-- [29] Load Order: 29 -->
+    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- Default value service -->
+    <!-- [30] Load Order: 30 -->
+    <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- Preferences data service (API + Cache) -->
+    <!-- [31] Load Order: 31 -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- CRUD response handler -->
+    <!-- [32] Load Order: 32 -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0"></script> <!-- Unified CRUD service for all entities -->
+    <!-- [33] Load Order: 33 -->
+    <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- Investment form amount ↔ quantity calculations -->
+    <!-- [34] Load Order: 34 -->
+    <script src="scripts/services/tag-service.js?v=1.0.0"></script> <!-- Central tag service (tag management and retrieval) -->
+    <!-- [35] Load Order: 35 -->
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
+    <!-- [36] Load Order: 36 -->
+    <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- Unified linter status service (API reading and data conversion) -->
+    <!-- [37] Load Order: 37 -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [38] Load Order: 38 -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
+    <!-- [39] Load Order: 39 -->
+    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- Rich text editor service -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 6/9: ENTITY SERVICES PACKAGE ===== -->
+    <!-- ===== PACKAGE 3/10: UI ADVANCED PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 10 | Description: שירותי ישויות -->
+    <!-- Load Order: 3 | Description: Advanced user interface -->
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [49] Load Order: 49 -->
-    <script src="scripts/account-service.js?v=1.0.0"></script> <!-- שירות חשבונות -->
-    <!-- [50] Load Order: 50 -->
-    <script src="scripts/alert-service.js?v=1.0.0"></script> <!-- שירות התראות -->
-    <!-- [51] Load Order: 51 -->
-    <script src="scripts/ticker-service.js?v=1.0.0"></script> <!-- שירות טיקרים -->
-    <!-- [52] Load Order: 52 -->
-    <script src="scripts/trade-plan-service.js?v=1.0.0"></script> <!-- שירות תכניות מסחר -->
-    <!-- [53] Load Order: 53 -->
-    <script src="scripts/condition-translator.js?v=1.0.0"></script> <!-- מתרגם תנאים -->
-    <!-- [54] Load Order: 54 -->
-    <script src="scripts/constraints.js?v=1.0.0"></script> <!-- מערכת אילוצים -->
-    <!-- [55] Load Order: 55 -->
-    <script src="scripts/services/linked-items-service.js?v=1.0.0"></script> <!-- שירות לוגיקה משותפת לפריטים מקושרים -->
-    <!-- [56] Load Order: 56 -->
-    <script src="scripts/linked-items.js?v=1.0.0"></script> <!-- פריטים מקושרים -->
-    <!-- [57] Load Order: 57 -->
-    <script src="scripts/related-object-filters.js?v=1.0.0"></script> <!-- פילטרים של אובייקטים קשורים -->
+    <!-- [40] Load Order: 40 -->
+    <script src="scripts/table-mappings.js?v=1.0.0"></script> <!-- Table mappings -->
+    <!-- [41] Load Order: 41 -->
+    <script src="scripts/tables.js?v=1.0.0"></script> <!-- Table system -->
+    <!-- [42] Load Order: 42 -->
+    <script src="scripts/table-data-registry.js?v=1.0.0"></script> <!-- Table data registry -->
+    <!-- [43] Load Order: 43 -->
+    <script src="scripts/pagination-system.js?v=1.0.0"></script> <!-- Pagination system -->
+    <!-- [44] Load Order: 44 -->
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- Actions menu system -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 7/9: ENTITY DETAILS PACKAGE ===== -->
+    <!-- ===== PACKAGE 4/10: CRUD OPERATIONS PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
-    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Load Order: 4 | Description: Data and table management systems -->
+    <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [58] Load Order: 58 -->
-    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
-    <!-- [59] Load Order: 59 -->
-    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
-    <!-- [60] Load Order: 60 -->
-    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+    <!-- [45] Load Order: 45 -->
+    <script src="scripts/date-utils.js?v=1.0.0"></script> <!-- Date utilities -->
+    <!-- [46] Load Order: 46 -->
+    <script src="scripts/data-utils.js?v=1.0.0"></script> <!-- General data utilities -->
+    <!-- [47] Load Order: 47 -->
+    <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- Unified central table system -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 8/9: INITIALIZATION PACKAGE ===== -->
+    <!-- ===== PACKAGE 5/10: PREFERENCES PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
-    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary -->
+    <!-- Load Order: 5 | Description: User preferences system v2.0 (10 files) -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.1.0 -->
+
+    <!-- [48] Load Order: 48 -->
+    <script src="scripts/preferences-cache.js?v=1.0.0"></script> <!-- Preferences cache management layer -->
+    <!-- [49] Load Order: 49 -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/preferences-events.js?v=1.0.0"></script> <!-- Preferences event system -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- Preferences core (without colors) -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/preferences-ui-layer.js?v=1.0.0"></script> <!-- Preferences UI layer -->
+    <!-- [53] Load Order: 53 -->
+    <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- Color system (60+ preferences) -->
+    <!-- [54] Load Order: 54 -->
+    <script src="scripts/preferences-manager.js?v=1.0.0"></script> <!-- Preferences manager (central) -->
+    <!-- [55] Load Order: 55 -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- Profile management -->
+    <!-- [56] Load Order: 56 -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
+    <!-- [57] Load Order: 57 -->
+    <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
+    <!-- [58] Load Order: 58 -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- User interface V4 (Group-First) -->
+    <!-- [59] Load Order: 59 -->
+    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- User interface -->
+    <!-- [60] Load Order: 60 -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- Preferences group manager -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 6/10: ENTITY SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 10 | Description: Entity services -->
+    <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
     <!-- [61] Load Order: 61 -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <script src="scripts/account-service.js?v=1.0.0"></script> <!-- Account service -->
     <!-- [62] Load Order: 62 -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <script src="scripts/alert-service.js?v=1.0.0"></script> <!-- Alert service -->
     <!-- [63] Load Order: 63 -->
-    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <script src="scripts/ticker-service.js?v=1.0.0"></script> <!-- Ticker service -->
     <!-- [64] Load Order: 64 -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <script src="scripts/trade-plan-service.js?v=1.0.0"></script> <!-- Trade plan service -->
     <!-- [65] Load Order: 65 -->
-    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
+    <script src="scripts/condition-translator.js?v=1.0.0"></script> <!-- Condition translator -->
+    <!-- [66] Load Order: 66 -->
+    <script src="scripts/constraints.js?v=1.0.0"></script> <!-- Constraints system -->
+    <!-- [67] Load Order: 67 -->
+    <script src="scripts/services/linked-items-service.js?v=1.0.0"></script> <!-- Shared logic service for linked items -->
+    <!-- [68] Load Order: 68 -->
+    <script src="scripts/linked-items.js?v=1.0.0"></script> <!-- Linked items -->
+    <!-- [69] Load Order: 69 -->
+    <script src="scripts/related-object-filters.js?v=1.0.0"></script> <!-- Related object filters -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 9/9: DASHBOARD WIDGETS ===== -->
+    <!-- ===== PACKAGE 7/10: ENTITY DETAILS PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 19.5 | Description: ווידג׳טים וממשקי דף הבית (Pending Executions, Trade Creation) -->
+    <!-- Load Order: 17 | Description: Entity details systems -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [70] Load Order: 70 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- Entity details API -->
+    <!-- [71] Load Order: 71 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- Entity details renderer -->
+    <!-- [72] Load Order: 72 -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- Entity details modal -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 8/10: INFO SUMMARY PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 18 | Description: Unified data summary system for all pages -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [73] Load Order: 73 -->
+    <script src="scripts/info-summary-system.js?v=1.0.0"></script> <!-- Core data summary system -->
+    <!-- [74] Load Order: 74 -->
+    <script src="scripts/info-summary-configs.js?v=1.0.0"></script> <!-- Page configurations for data summary -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 9/10: DASHBOARD WIDGETS ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 19.5 | Description: Widgets and dashboard interfaces (Pending Executions, Trade Creation) -->
     <!-- Dependencies: base, services, ui-advanced, entity-services -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [66] Load Order: 66 -->
-    <script src="scripts/services/dashboard-data.js?v=1.0.0"></script> <!-- שירות נתוני דשבורד מאוחד -->
-    <!-- [67] Load Order: 67 -->
-    <script src="scripts/widgets/recent-trades-widget.js?v=1.0.0"></script> <!-- ווידג׳ט טריידים אחרונים -->
-    <!-- [67.5] Load Order: 67.5 -->
-    <script src="scripts/widgets/recent-trade-plans-widget.js?v=1.0.0"></script> <!-- ווידג׳ט תוכניות אחרונות -->
-    <!-- [68] Load Order: 68 -->
-    <script src="scripts/pending-executions-widget.js?v=1.0.0"></script> <!-- ווידג׳ט המלצות שיוך -->
-    <!-- [69] Load Order: 69 -->
-    <script src="scripts/pending-execution-trade-creation.js?v=1.0.0"></script> <!-- ממשק יצירת טרייד מביצועים -->
-    <!-- [70] Load Order: 70 -->
-    <script src="scripts/pending-trade-plan-widget.js?v=1.0.0"></script> <!-- ווידג׳ט שיוך תוכניות למסחר -->
-    <!-- [71] Load Order: 71 -->
-    <script src="scripts/active-alerts-component.js?v=1.0.0"></script> <!-- רכיב התראות פעילות -->
-    <!-- [72] Load Order: 72 -->
-    <script src="scripts/modal-configs/tag-search-config.js?v=1.0.0"></script> <!-- תצורת מגירת חיפוש תגיות -->
-    <!-- [73] Load Order: 73 -->
-    <script src="scripts/tag-search-controller.js?v=1.0.0"></script> <!-- בקר חיפוש תגיות -->
-    <!-- [74] Load Order: 74 -->
-    <script src="scripts/index.js?v=1.0.0"></script> <!-- לוגיקת דף הבית -->
+    <!-- [75] Load Order: 75 -->
+    <script src="scripts/services/dashboard-data.js?v=1.0.0"></script> <!-- Unified dashboard data service -->
+    <!-- [76] Load Order: 76 -->
+    <script src="scripts/widgets/recent-trades-widget.js?v=1.0.0"></script> <!-- Recent trades widget -->
+    <!-- [77] Load Order: 77 -->
+    <script src="scripts/pending-executions-widget.js?v=1.0.0"></script> <!-- Assignment recommendations widget -->
+    <!-- [78] Load Order: 78 -->
+    <script src="scripts/pending-trade-plan-widget.js?v=1.0.0"></script> <!-- Trade plan assignment widget -->
+    <!-- [79] Load Order: 79 -->
+    <script src="scripts/widgets/tag-widget.js?v=1.0.0"></script> <!-- Unified tag widget (cloud + search) -->
+    <!-- [80] Load Order: 80 -->
+    <script src="scripts/active-alerts-component.js?v=1.0.0"></script> <!-- Active alerts component -->
+    <!-- [81] Load Order: 81 -->
+    <script src="scripts/modal-configs/tag-search-config.js?v=1.0.0"></script> <!-- Tag search drawer configuration (for TagWidget) -->
+    <!-- [82] Load Order: 82 -->
+    <script src="scripts/index.js?v=1.0.0"></script> <!-- Dashboard page logic -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 10/10: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary, dashboard-widgets, tradingview-widgets, tradingview-charts, watch-lists, ai-analysis -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [83] Load Order: 83 -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- Package manifest -->
+    <!-- [84] Load Order: 84 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- Page initialization configurations -->
+    <!-- [85] Load Order: 85 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- Initialization system check -->
+    <!-- [86] Load Order: 86 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- Page monitoring functions -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
-    <!-- ⚠️ Page-specific script "index.js" already loaded via selected packages -->
-
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 73 | Unique Scripts Loaded: 73 -->
-    <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("index") -->
-
+    <!-- 📊 Total Scripts Processed: 86 | Unique Scripts Loaded: 86 -->
+    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
 </body>
 </html>

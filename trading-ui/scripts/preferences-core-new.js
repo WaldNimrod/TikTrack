@@ -202,6 +202,16 @@ class PreferencesAPIClient {
       force: true,
     });
 
+    // Handle null payload - PreferencesData.loadAllPreferencesRaw may return null
+    if (!payload) {
+      window.Logger?.warn?.('[PreferencesAPIClient] loadAllPreferencesRaw returned null', {
+        page: 'preferences-core-new',
+        userId: userId || this.defaultUserId,
+        profileId,
+      });
+      return null;
+    }
+
     window.Logger?.debug?.('🔍 PreferencesAPIClient.getAllPreferences received payload', {
       page: 'preferences-core-new',
       userId: userId || this.defaultUserId,
@@ -644,6 +654,16 @@ class PreferencesCore {
             finalUserId,
             finalProfileId,
           );
+          
+          // Handle null result - PreferencesAPIClient returns null if PreferencesData is not available
+          if (!apiResult) {
+            window.Logger?.warn?.('⚠️ PreferencesAPIClient.getAllPreferences returned null - PreferencesData not available', {
+              page: 'preferences-core-new',
+              userId: finalUserId,
+              profileId: finalProfileId,
+            });
+            return {};
+          }
           
           window.Logger?.debug?.('🔍 apiClient.getAllPreferences result', {
             page: 'preferences-core-new',

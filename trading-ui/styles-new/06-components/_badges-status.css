@@ -285,24 +285,213 @@ background-color: var(--status-pending-color);
 
 /* ===== עיצוב תגיות (Tags) - קטן ועדין ===== */
 .entity-tag-badge {
-  /* פונט קטן */
-  font-size: 0.7rem !important;
+  /* פונט קטן - 10px */
+  font-size: 0.625rem; /* 10px */
   font-weight: 400;
   
-  /* ריווח גדול */
-  padding: 0.35rem 0.75rem !important;
-  margin: 0.25rem !important;
+  /* ריווח מינימלי - מסגרת צמודה לטקסט */
+  padding: 0.1rem 0.25rem; /* ריווח מינימלי - צמוד לטקסט */
+  margin: 0.25rem;
   
   /* טקסט בצבע רגיל - רק המסגרת בצבע */
-  color: var(--text-color, #6c757d) !important;
-  background-color: transparent !important;
+  color: var(--text-color, #6c757d);
+  background-color: transparent;
   
   /* רק המסגרת בצבע משני */
   border-width: 1px;
   border-style: solid;
   
   /* עיצוב עדין */
+  border-radius: 0.25rem; /* מעט יותר קטן */
+  line-height: 1.2; /* צפוף יותר */
+}
+
+/* ===== עיצוב כפתורי ענן התגיות - קטן ועדין ===== */
+/* תמיכה גם בווידג'ט הישן וגם בחדש */
+#tagCloudContainer button,
+#tagWidgetCloudContainer button {
+  /* פונט קטן - 10px - דורס את כל גדלי הפונט של Bootstrap */
+  font-size: 0.625rem; /* 10px */
+  font-weight: 400;
+  color: #000000; /* טקסט שחור */
+  
+  /* ריווח מינימלי - מסגרת צמודה לטקסט */
+  padding: 0.1rem 0.25rem; /* ריווח מינימלי - צמוד לטקסט (~1.6px 4px) */
+  margin: 0.025rem; /* מרווח מינימלי מאוד בין תגיות */
+  
+  /* גובה אוטומטי - דורס את כל ההגדרות של height/min-height */
+  height: auto;
+  min-height: 0; /* 0 כדי לדרוס calc() */
+  min-width: 0; /* 0 כדי לדרוס calc() */
+  
+  /* עיצוב עדין */
+  border-radius: 0.25rem; /* מעט יותר קטן */
+  line-height: 1.2; /* צפוף יותר */
+  
+  /* וודא שהגובה נקבע רק על ידי התוכן */
+  box-sizing: border-box;
+  
+  /* וודא שיש מסגרת - צבע יוגדר לפי data-tier */
+  border: 1px solid;
+  border-color: var(--text-muted, #6c757d); /* ברירת מחדל - עדין */
+}
+
+/* דריסה ספציפית ל-fs classes של Bootstrap בענן התגיות */
+#tagCloudContainer button.fs-2,
+#tagCloudContainer button.fs-3,
+#tagCloudContainer button.fs-4,
+#tagCloudContainer button.fs-5,
+#tagWidgetCloudContainer button.fs-2,
+#tagWidgetCloudContainer button.fs-3,
+#tagWidgetCloudContainer button.fs-4,
+#tagWidgetCloudContainer button.fs-5 {
+  font-size: 0.625rem; /* 10px - דורס את כל גדלי הפונט */
+}
+
+/* ===== סולם צבעים לפי עוצמת שימוש בתגיות ===== */
+/* ספציפיות גבוהה כדי לדרוס את סגנונות FILTER הכלליים */
+/* Tier 1: שימוש גבוה מאוד (75%+) - הצבע הכי חזק */
+#tagCloudContainer button[data-button-type="FILTER"][data-tier="1"],
+#tagCloudContainer button[data-tier="1"],
+#tagWidgetCloudContainer button[data-button-type="FILTER"][data-tier="1"],
+#tagWidgetCloudContainer button[data-tier="1"] {
+  border: 1px solid var(--brand-primary-dark, #1a8f83);
+  border-color: var(--brand-primary-dark, #1a8f83);
+  background-color: rgba(26, 143, 131, 0.1); /* רקע שקוף עם צבע tier */
+  color: #000000; /* טקסט שחור - לא משתנה לפי tier */
+}
+
+/* Tier 2: שימוש גבוה (50-75%) - חזק */
+#tagCloudContainer button[data-button-type="FILTER"][data-tier="2"],
+#tagCloudContainer button[data-tier="2"],
+#tagWidgetCloudContainer button[data-button-type="FILTER"][data-tier="2"],
+#tagWidgetCloudContainer button[data-tier="2"] {
+  border: 1px solid var(--brand-primary-color, #26baac);
+  border-color: var(--brand-primary-color, #26baac);
+  background-color: rgba(38, 186, 172, 0.1); /* רקע שקוף עם צבע tier */
+  color: #000000; /* טקסט שחור - לא משתנה לפי tier */
+}
+
+/* Tier 3: שימוש בינוני (30-50%) - בינוני */
+#tagCloudContainer button[data-button-type="FILTER"][data-tier="3"],
+#tagCloudContainer button[data-tier="3"],
+#tagWidgetCloudContainer button[data-button-type="FILTER"][data-tier="3"],
+#tagWidgetCloudContainer button[data-tier="3"] {
+  border: 1px solid var(--brand-primary-light, #6ed8ca);
+  border-color: var(--brand-primary-light, #6ed8ca);
+  background-color: rgba(110, 216, 202, 0.1); /* רקע שקוף עם צבע tier */
+  color: #000000; /* טקסט שחור - לא משתנה לפי tier */
+}
+
+/* Tier 4: שימוש נמוך (<30%) - עדין */
+#tagCloudContainer button[data-button-type="FILTER"][data-tier="4"],
+#tagCloudContainer button[data-tier="4"],
+#tagWidgetCloudContainer button[data-button-type="FILTER"][data-tier="4"],
+#tagWidgetCloudContainer button[data-tier="4"] {
+  border: 1px solid var(--text-muted, #6c757d);
+  border-color: var(--text-muted, #6c757d);
+  background-color: rgba(108, 117, 125, 0.05); /* רקע שקוף עדין מאוד */
+  color: #000000; /* טקסט שחור - לא משתנה לפי tier */
+}
+
+/* ===== הגבלת גובה ענן התגיות - ניצול מקסימלי של השטח במצב סגור ===== */
+/* הקונטיינר נשאר בגובה קבוע, והתגיות הנוספות גולשות מעל ב-overlay */
+/* תומך בהגדרות דינמיות דרך CSS variables מ-TagWidget */
+#tagCloudContainer,
+#tagWidgetCloudContainer {
+  /* הסרת gap-2 של Bootstrap - נעשה עם margin קטן יותר */
+  gap: 0;
+  position: relative;
+  
+  /* גובה מקסימלי במצב סגור - ברירת מחדל, ניתן לעדכן דרך CSS variables */
+  /* אם אין CSS variable, משתמש ב-100% של הקונטיינר הזמין */
+  max-height: var(--tag-widget-max-height, 100%); /* ברירת מחדל: ניצול מקסימלי */
+  height: 100%; /* גובה מלא של הקונטיינר */
+  
+  /* גובה מינימלי - ברירת מחדל, ניתן לעדכן דרך CSS variables */
+  min-height: var(--tag-widget-min-height, 20px); /* ברירת מחדל: שורה אחת */
+  
+  overflow: hidden;
+  z-index: 1;
+  flex: 1 1 auto; /* תופס את כל השטח הזמין */
+}
+
+/* Wrapper עם position relative מאפשר overlay גולש */
+/* תומך בהגדרות דינמיות דרך CSS variables מ-TagWidget */
+#tagWidgetCloudPane > .d-flex.position-relative {
+  position: relative;
+  overflow: visible;
+  
+  /* גובה מינימלי - ברירת מחדל, ניתן לעדכן דרך CSS variables */
+  min-height: var(--tag-widget-min-height, 20px); /* ברירת מחדל: שורה אחת */
+  
+  /* גובה מקסימלי במצב סגור - ברירת מחדל, ניתן לעדכן דרך CSS variables */
+  max-height: var(--tag-widget-max-height, 60px); /* ברירת מחדל: 3 שורות */
+  
+  height: 100%; /* ניצול מקסימלי של השטח הזמין */
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* תופס את כל השטח הזמין */
+}
+
+/* הקונטיינר צריך לקחת את כל השטח הזמין */
+#tagWidgetCloudContainer {
+  flex: 1 1 auto; /* תופס את כל השטח הזמין ב-wrapper */
+  min-height: 0; /* מאפשר להשתמש בכל השטח */
+}
+
+/* יצירת overlay על hover - הקונטיינר הופך ל-overlay מעל */
+#tagWidgetContainer:hover #tagWidgetCloudContainer {
+  /* יציאה מהזרימה - לא תופס מקום */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  
+  /* הסרת הגבלת גובה */
+  max-height: none;
+  height: auto;
+  
+  /* עיצוב overlay */
+  background-color: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #dee2e6);
   border-radius: 0.375rem;
-  line-height: 1.3;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  padding: 0.5rem;
+  
+  /* מיקום מעל התוכן */
+  z-index: 1050; /* מעל התוכן הרגיל */
+  overflow: visible;
+  transition: box-shadow 0.3s ease, padding 0.3s ease;
+}
+
+/* שמירה על גובה קבוע של ה-wrapper גם כשיש overlay */
+/* ה-wrapper נשאר בגובה קבוע כדי לא להזיז את התוכן */
+#tagWidgetContainer:hover #tagWidgetCloudPane > .d-flex.position-relative {
+  min-height: 120px; /* גובה מינימלי - תואם לקונטיינר */
+  height: 120px; /* גובה קבוע - לא משתנה */
+  overflow: visible;
+}
+
+/* עבור הווידג'ט הישן */
+#tagCloudCard {
+  position: relative;
+  overflow: visible;
+}
+
+#tagCloudCard:hover #tagCloudContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  max-height: none;
+  height: auto;
+  background-color: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #dee2e6);
+  border-radius: 0.375rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  padding: 0.5rem;
+  z-index: 1050;
+  overflow: visible;
 }
 

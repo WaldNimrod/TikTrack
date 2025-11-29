@@ -17,7 +17,7 @@
 // PREFERENCES UI LAYER CLASS
 // ============================================================================
 
-class PreferencesUI {
+class PreferencesUILayer {
   constructor() {
     this.modifiedFields = new Set(); // Track modified fields
   }
@@ -145,7 +145,15 @@ class PreferencesUI {
 // GLOBAL INSTANCE
 // ============================================================================
 
-window.PreferencesUI = window.PreferencesUI || new PreferencesUI();
+// Create layer instance (this is a lightweight layer, the full PreferencesUI will be loaded later)
+window.PreferencesUILayer = new PreferencesUILayer();
+
+// Expose layer methods as PreferencesUI placeholder until full PreferencesUI loads
+// This allows code to use PreferencesUI methods before preferences-ui.js loads
+// The full PreferencesUI class will override this in preferences-ui.js
+if (!window.PreferencesUI) {
+  window.PreferencesUI = window.PreferencesUILayer;
+}
 
 window.Logger?.info?.('✅ PreferencesUI layer loaded', {
   page: 'preferences-ui-layer',

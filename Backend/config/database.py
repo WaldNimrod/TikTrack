@@ -40,7 +40,7 @@ def get_db() -> Generator[Session, None, None]:
 def init_db() -> None:
     """יצירת כל הטבלאות"""
     from models.base import Base
-    from models import ticker, trade, trading_account, trade_plan, alert, cash_flow, note, execution, currency, note_relation_type, user, preferences
+    from models import ticker, trade, trading_account, trade_plan, alert, cash_flow, note, execution, currency, note_relation_type, user, preferences, ai_analysis
     # PostgreSQL does not allow subqueries in CHECK constraints; strip problematic ones
     # These constraints will be implemented as triggers instead
     try:

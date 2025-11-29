@@ -298,11 +298,11 @@ class EventHandlerManager {
                 this._log('debug', 'Click event received', eventContext);
             }
         
-        // Handle buttons and links with data-onclick attribute (centralized button system)
+        // Handle elements with data-onclick attribute (centralized button system)
         // This is the primary way to handle button clicks in TikTrack
         // Based on documentation: documentation/frontend/button-system.md
-        // Supports both <button> and <a> elements with data-onclick
-        const elementWithOnclick = target.closest('button[data-onclick], a[data-onclick]');
+        // Supports <button>, <a>, <div>, and any other element with data-onclick
+        const elementWithOnclick = target.closest('[data-onclick]');
         
         if (elementWithOnclick) {
             // Don't process if element is disabled (for buttons)
@@ -339,8 +339,37 @@ class EventHandlerManager {
                     // If function is not found, try with window. prefix
                     
                     // First, check if the function exists in global scope
-                    const functionName = onclickValue.replace(/\(.*\)/, '').trim();
+                    // Handle both direct function calls and nested object calls (e.g., window.AITemplateSelector.selectTemplate)
+                    let functionName = onclickValue.replace(/\(.*\)/, '').trim();
                     const functionArgs = onclickValue.match(/\((.*)\)/)?.[1] || '';
+                    
+                    // Check if it's a nested call (e.g., window.AITemplateSelector.selectTemplate)
+                    let targetFunction = null;
+                    if (functionName.includes('.')) {
+                        // Try to resolve nested path
+                        try {
+                            const parts = functionName.split('.');
+                            let obj = window;
+                            for (let i = 0; i < parts.length; i++) {
+                                if (obj && typeof obj === 'object' && parts[i] in obj) {
+                                    obj = obj[parts[i]];
+                                } else {
+                                    obj = null;
+                                    break;
+                                }
+                            }
+                            if (obj && typeof obj === 'function') {
+                                targetFunction = obj;
+                            }
+                        } catch (e) {
+                            // Fall through to eval
+                        }
+                    } else {
+                        // Direct function name
+                        if (window[functionName] && typeof window[functionName] === 'function') {
+                            targetFunction = window[functionName];
+                        }
+                    }
                     
                     if (this.verboseLogging) {
                         this._log('debug', 'Parsing onclick handler', {
@@ -348,15 +377,15 @@ class EventHandlerManager {
                             onclickValue,
                             functionName,
                             functionArgs,
-                            functionExists: typeof window[functionName],
+                            targetFunctionExists: !!targetFunction,
                             element: this._getElementSelector(elementWithOnclick)
                         });
                     }
                     
-                    // Try direct window access first if function exists there
-                    if (window[functionName] && typeof window[functionName] === 'function') {
+                    // Try direct function call if we found it
+                    if (targetFunction) {
                             if (this.verboseLogging) {
-                                this._log('debug', `Function found in window, calling directly: ${functionName}`, {
+                                this._log('debug', `Function found, calling directly: ${functionName}`, {
                                     component: 'handleDelegatedClick',
                                     functionName,
                                     functionArgs
@@ -368,6 +397,11 @@ class EventHandlerManager {
                                 // Parse arguments (simple comma-separated, no complex parsing)
                                 const args = functionArgs.split(',').map(arg => {
                                     const trimmed = arg.trim();
+                                    // Remove quotes if present
+                                    if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || 
+                                        (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+                                        return trimmed.slice(1, -1);
+                                    }
                                     // Try to evaluate as JavaScript expression, fallback to string
                                     try {
                                         return eval(trimmed);
@@ -375,9 +409,9 @@ class EventHandlerManager {
                                         return trimmed;
                                     }
                                 });
-                                result = window[functionName](...args);
+                                result = targetFunction(...args);
                             } else {
-                                result = window[functionName]();
+                                result = targetFunction();
                             }
                                 
                                 if (this.verboseLogging) {
@@ -1107,7 +1141,7 @@ class EventHandlerManager {
      */
     handleSortableClick(element, event) {
         // If this click is already handled by data-onclick button system, skip to avoid double execution
-        const delegatedElement = element.closest('button[data-onclick], a[data-onclick]');
+        const delegatedElement = element.closest('[data-onclick]');
         if (delegatedElement) {
             return;
         }

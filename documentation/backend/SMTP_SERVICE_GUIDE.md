@@ -5,6 +5,8 @@
 **גרסה**: 1.0.0  
 **מחבר**: TikTrack Development Team
 
+> **📖 ארכיטקטורה**: ראה [SMTP_ARCHITECTURE.md](./SMTP_ARCHITECTURE.md) להבנה מעמיקה של הארכיטקטורה והחלפת שרת SMTP ללא שינויי קוד.
+
 ---
 
 ## תוכן עניינים

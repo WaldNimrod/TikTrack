@@ -49,12 +49,38 @@
 | Entity Details Modal | `trading-ui/scripts/entity-details-modal.js`<br>`trading-ui/scripts/entity-details-renderer.js`<br>`trading-ui/scripts/entity-details-api.js` | [entity-details-system/README.md](../features/entity-details-system/README.md) | מודל פרטי ישות מאוחד עם תמיכה ב-linked items והעדפות תצוגה |
 | Pending Trade Plan Widget | `trading-ui/scripts/pending-trade-plan-widget.js` | [PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md) | ווידג'ט דשבורד להצעות שיוך/יצירה, כולל Prefill מודלים ועדכון מטמון מאוחד |
 
+### 🧩 מערכת ווידג'טים
+| מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
+| --- | --- | --- | --- |
+| **רשימת ווידג'טים** | - | [WIDGETS_LIST.md](WIDGETS_LIST.md) | רשימה מלאה של כל הווידג'טים במערכת (Dashboard, Special, TradingView) ✅ **חדש! ינואר 2025** |
+| **ארכיטקטורת ווידג'טים** | - | [WIDGET_SYSTEM_ARCHITECTURE.md](../02-ARCHITECTURE/FRONTEND/WIDGET_SYSTEM_ARCHITECTURE.md) | סקירה כללית של מערכת הווידג'טים, ארכיטקטורות מומלצות ואינטגרציות ✅ **חדש! ינואר 2025** |
+| **מדריך למפתח - ווידג'טים** | - | [WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/WIDGET_DEVELOPER_GUIDE.md) | מדריך מקיף ליצירת ווידג'טים חדשים עם תבניות ודוגמאות ✅ **חדש! ינואר 2025** |
+| **מדריך מערכת טאבים** | - | [TAB_SYSTEM_GUIDE.md](../02-ARCHITECTURE/FRONTEND/TAB_SYSTEM_GUIDE.md) | שימוש ב-Bootstrap Tabs בווידג'טים ומודלים ✅ **חדש! ינואר 2025** |
+| **Tag Widget (מאוחד)** | `trading-ui/scripts/widgets/tag-widget.js`<br>`trading-ui/styles-new/06-components/_tag-widget.css` | [TAG_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TAG_WIDGET_DEVELOPER_GUIDE.md) | ווידג'ט תגיות מאוחד (ענן + חיפוש) עם Bootstrap Tabs ✅ **חדש! ינואר 2025** |
+| **Recent Trades Widget** | `trading-ui/scripts/widgets/recent-trades-widget.js` | - | ווידג'ט טריידים אחרונים בדשבורד |
+| **Recent Trade Plans Widget** | `trading-ui/scripts/widgets/recent-trade-plans-widget.js` | - | ווידג'ט תוכניות אחרונות בדשבורד |
+| **Pending Executions Widget** | `trading-ui/scripts/pending-executions-widget.js` | - | המלצות שיוך בולטות לביצועים |
+| **Pending Execution Trade Creation** | `trading-ui/scripts/pending-execution-trade-creation.js` | - | ממשק יצירת טרייד מביצועים |
+| **History Widget** | `trading-ui/scripts/history-widget.js` | [HISTORY_WIDGET_DEVELOPER_GUIDE.md](HISTORY_WIDGET_DEVELOPER_GUIDE.md) | ווידג'ט היסטוריה עם גרפים וסטטיסטיקות |
+| **Emotional Tracking Widget** | `trading-ui/scripts/emotional-tracking-widget.js` | [EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md](EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md) | ווידג'ט תיעוד רגשי |
+| **TradingView Widgets System** | `trading-ui/scripts/tradingview-widgets/` | [TRADINGVIEW_WIDGETS_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/TRADINGVIEW_WIDGETS_SYSTEM.md) | מערכת מרכזית לניהול 11 ווידג'טים רשמיים של TradingView |
+
 ### 🔔 התראות, לוגים ומעקב
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
 | Logger Service | `trading-ui/scripts/logger-service.js` | [UNIFIED_LOG_SYSTEM_GUIDE.md](../02-ARCHITECTURE/FRONTEND/UNIFIED_LOG_SYSTEM_GUIDE.md)<br>[logger-service.md](../03-API_REFERENCE/logger-service.md) | מערכת לוגים מאוחדת (info/warn/error/debug) + דוחות מפורטים |
 | Warning System | `trading-ui/scripts/warning-system.js` | [NOTIFICATION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/NOTIFICATION_SYSTEM.md) | תצוגת אזהרות/אישורים, החלפה ל-confirm גלובלי |
 | Notification Category Detector | `trading-ui/scripts/notification-category-detector.js` | [NOTIFICATION_CATEGORY_DETECTOR_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/NOTIFICATION_CATEGORY_DETECTOR_SYSTEM.md) | זיהוי קטגוריות והתאמת מסרים לפי Severity |
+
+### 📧 מערכות תקשורת
+| מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
+| --- | --- | --- | --- |
+| SMTP Service | `Backend/services/email_service.py`<br>`Backend/services/email_templates.py`<br>`Backend/services/smtp_settings_service.py`<br>`trading-ui/scripts/user-profile-smtp.js` | [SMTP_SERVICE_GUIDE.md](../backend/SMTP_SERVICE_GUIDE.md)<br>[EMAIL_TEMPLATES_GUIDE.md](../backend/EMAIL_TEMPLATES_GUIDE.md)<br>[SMTP_MANAGEMENT_GUIDE.md](../admin/SMTP_MANAGEMENT_GUIDE.md)<br>[SMTP_USER_GUIDE.md](../05-USER-GUIDES/SMTP_USER_GUIDE.md) | שירות SMTP גמיש לשליחת מגוון הודעות עם תמיכה ב-templates, הגדרות במערכת הכלליות, ולוגים. תמיכה מלאה ב-RTL ועברית עם header ו-footer קבועים ✅ **חדש! ינואר 2025** |
+
+### 🤖 מערכות AI וניתוח
+| מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
+| --- | --- | --- | --- |
+| AI Analysis System | `trading-ui/scripts/services/ai-analysis-data.js`<br>`trading-ui/scripts/ai-analysis-manager.js`<br>`trading-ui/scripts/ai-result-renderer.js`<br>`trading-ui/scripts/ai-template-selector.js`<br>`trading-ui/scripts/ai-notes-integration.js`<br>`trading-ui/scripts/ai-export-service.js`<br>`Backend/services/ai_analysis_service.py`<br>`Backend/services/llm_providers/*.py` | [AI_ANALYSIS_SYSTEM_DEVELOPER_GUIDE.md](../04-FEATURES/AI_ANALYSIS_SYSTEM_DEVELOPER_GUIDE.md)<br>[AI_ANALYSIS_SYSTEM_USER_GUIDE.md](../04-FEATURES/AI_ANALYSIS_SYSTEM_USER_GUIDE.md)<br>[AI_ANALYSIS_API.md](../backend/AI_ANALYSIS_API.md) | מערכת ניתוח AI למניות עם תמיכה ב-4 תבניות פרומפטים, אינטגרציה עם מנועי LLM (Gemini/Perplexity), ניהול API keys אישיים, שמירה כהערה, וייצוא תוצאות ✅ **חדש! ינואר 2025** |
 
 ### ♻️ מטמון, ביצועים וסנכרון
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
@@ -80,8 +106,8 @@
 | Memory Optimizer (גרסה קודמת) | `trading-ui/scripts/memory-optimizer.js.backup` | כלול רק כגיבוי, ההגדרות מוזגו ל-Cache Policy |
 
 ### ✅ סיכום
-- **סה״כ מערכות פעילות מתועדות:** 28 (לפי הטבלאות לעיל).
+- **סה״כ מערכות פעילות מתועדות:** 30 (לפי הטבלאות לעיל).
 - **חובת שימוש:** לפני כל פיתוח חדש יש לבדוק התאמה למערכת קיימת ולהשתמש בה דרך ה-API המתועד.
-- **עדכון אחרון:** 27 בינואר 2025 (הוספת alerts-data.js, tickers-data.js, עדכון תיעוד שירותי נתונים).
+- **עדכון אחרון:** 28 בינואר 2025 (הוספת AI Analysis System, SMTP Service, עדכון תיעוד שירותי תקשורת).
 - **אחריות המשך:** כל מערכת חדשה שנכנסת לפרויקט חייבת להוסיף שורה בטבלה הרלוונטית + לינק לדוקומנטציה מעודכנת.
 

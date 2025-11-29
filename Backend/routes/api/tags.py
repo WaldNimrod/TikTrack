@@ -574,6 +574,51 @@ def get_analytics():
     )
 
 
+@tags_bp.route("/search", methods=["GET"])
+@handle_database_session()
+def search_tags():
+    """Search tags by query string and return with assignments."""
+    db: Session = g.db
+    user_id = _resolve_user_id()
+    normalizer = _normalize_timestamp()
+
+    query = request.args.get("query", "").strip()
+    entity_type = request.args.get("entity_type") or None
+    limit = request.args.get("limit", default=25, type=int)
+    include_inactive = request.args.get("include_inactive", "false").lower() == "true"
+
+    try:
+        results = TagService.search_tags(
+            db,
+            user_id,
+            query,
+            entity_type=entity_type,
+            limit=limit,
+            include_inactive=include_inactive,
+        )
+        return jsonify(
+            {
+                "status": "success",
+                "data": normalizer.normalize_output(results),
+                "message": "Tag search completed successfully",
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0",
+            }
+        )
+    except ValueError as exc:
+        logger.warning("Tag search failed: %s", exc)
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "error": {"message": str(exc)},
+                    "version": "1.0",
+                }
+            ),
+            400,
+        )
+
+
 @tags_bp.route("/cloud", methods=["GET"])
 @handle_database_session()
 def get_tag_cloud():

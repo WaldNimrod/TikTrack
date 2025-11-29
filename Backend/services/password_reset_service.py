@@ -138,12 +138,17 @@ class PasswordResetService:
             # Generate reset URL
             reset_url = f"{base_url}/reset-password.html?token={token}"
             
-            # Send email
+            # Load SMTP settings from database
+            self.email_service.load_settings_from_db(session)
+            
+            # Send email with logging
             email_result = self.email_service.send_password_reset_email(
                 to_email=user.email,
                 username=user.username,
                 reset_token=token,
-                reset_url=reset_url
+                reset_url=reset_url,
+                db_session=session,
+                user_id=user.id
             )
             
             if email_result['success']:

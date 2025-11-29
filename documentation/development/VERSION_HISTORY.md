@@ -193,3 +193,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 - שיפורי עיצוב (layout.css)
 - עדכוני עמודים (index.html, user-profile.html)
 - שיפורים נוספים במערכת |
+| 2025-11-29T21:14:17+00:00 | 1.3.44.0 | 1.3.43.0 | 3d63fafb46fe4c856588afd3bb78ed46ba1ec497 | ef44ce88126eda61f160956ec90c1dbf3ad80de8 | patch | Implement SMTP service and Multi-User system with comprehensive documentation |

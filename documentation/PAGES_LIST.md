@@ -85,7 +85,7 @@
 
 ---
 
-## 📋 עמודים ראשיים (28 עמודים) ✅ **סטנדרטיזציה מלאה הושלמה**
+## 📋 עמודים ראשיים (29 עמודים) ✅ **סטנדרטיזציה מלאה הושלמה**
 
 ### עמודים מרכזיים
 | עמוד | תיאור | גישה | API | Business Logic Service | סטטוס |
@@ -101,6 +101,7 @@
 | **cash_flows.html** | תזרימי מזומן | `http://localhost:5000/cash_flows.html` | `/api/cash-flows/*` | ✅ CashFlowBusinessService | ✅ מוכן |
 | **notes.html** | מערכת הערות | `http://localhost:5000/notes.html` | `/api/notes/*` | ✅ NoteBusinessService | ✅ מוכן |
 | **research.html** | מחקר וניתוח | `http://localhost:5000/research.html` | `/api/research/*` | ❌ חסר | ⏳ צריך Business Service |
+| **ai-analysis.html** | ניתוח AI - יצירת ניתוחים באמצעות מנועי LLM | `http://localhost:8080/ai-analysis` | `/api/ai-analysis/*` | ✅ AIAnalysisService | ✅ מוכן |
 | **preferences.html** | הגדרות מערכת v3.0 | `http://localhost:8080/preferences.html` | `/api/preferences/*` | ❌ חסר (מורכב) | ⏳ אופציונלי |
 | **user-profile.html** | ניהול פרופיל משתמש | `http://localhost:8080/user-profile.html` | `/api/auth/me`, `/api/auth/me/password` | ❌ חסר | ✅ מוכן |
 
@@ -161,10 +162,10 @@
 ## 📊 סטטיסטיקות
 
 - **סה"כ עמודים ראשיים:** 24 עמודים
-- **עמודים מרכזיים:** 11 עמודים
+- **עמודים מרכזיים:** 12 עמודים
 - **עמודים טכניים:** 12 עמודים
 - **עמודים משניים:** 5 עמודים
-- **סה"כ עמודים:** 28 עמודים
+- **סה"כ עמודים:** 29 עמודים
 
 ---
 

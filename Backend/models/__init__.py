@@ -23,11 +23,13 @@ from .tag import Tag
 from .tag_link import TagLink
 from .quotes_last import QuotesLast
 from .password_reset_token import PasswordResetToken
+from .email_log import EmailLog
+from .ai_analysis import AIPromptTemplate, AIAnalysisRequest, UserLLMProvider
 
 __all__ = [
     'BaseModel',
     'Ticker',
-    'TradingAccount', 
+    'TradingAccount',
     'TradePlan',
     'Trade',
     'Alert',
@@ -59,5 +61,9 @@ __all__ = [
     'Tag',
     'TagLink',
     'QuotesLast',
-    'PasswordResetToken'
+    'PasswordResetToken',
+    'EmailLog',
+    'AIPromptTemplate',
+    'AIAnalysisRequest',
+    'UserLLMProvider'
 ]

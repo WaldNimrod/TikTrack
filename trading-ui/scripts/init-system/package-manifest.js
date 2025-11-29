@@ -306,6 +306,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 3
       },
       {
+        file: 'services/ai-analysis-data.js',
+        globalCheck: 'window.AIAnalysisData',
+        description: 'AI Analysis data service',
+        required: false,
+        loadOrder: 4
+      },
+      {
         file: 'services/statistics-calculator.js',
         globalCheck: 'window.StatisticsCalculator',
         description: 'Statistics calculator',
@@ -728,7 +735,7 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'preferences-ui-layer.js',
-        globalCheck: 'window.PreferencesUI',
+        globalCheck: 'window.PreferencesUILayer',
         description: 'Preferences UI layer',
         required: true,
         loadOrder: 2
@@ -1638,6 +1645,56 @@ const PACKAGE_MANIFEST = {
     notes: 'Mockup mode - UI layer only, no API calls'
   },
 
+  // 20.5. AI-ANALYSIS PACKAGE - AI Analysis System
+  'ai-analysis': {
+    id: 'ai-analysis',
+    name: 'AI Analysis Package',
+    description: 'AI analysis system with LLM integration',
+    version: '1.0.0',
+    critical: false,
+    loadOrder: 20.5, // After entity-services, before init-system
+    dependencies: ['base', 'services', 'ui-advanced', 'modules', 'preferences', 'entity-services'],
+    scripts: [
+      {
+        file: 'ai-analysis-manager.js',
+        globalCheck: 'window.AIAnalysisManager',
+        description: 'AI Analysis UI manager',
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'ai-template-selector.js',
+        globalCheck: 'window.AITemplateSelector',
+        description: 'Template selector component',
+        required: true,
+        loadOrder: 2
+      },
+      {
+        file: 'ai-result-renderer.js',
+        globalCheck: 'window.AIResultRenderer',
+        description: 'AI result renderer with markdown and infographics',
+        required: true,
+        loadOrder: 3
+      },
+      {
+        file: 'ai-notes-integration.js',
+        globalCheck: 'window.AINotesIntegration',
+        description: 'AI analysis notes integration',
+        required: true,
+        loadOrder: 4
+      },
+      {
+        file: 'ai-export-service.js',
+        globalCheck: 'window.AIExportService',
+        description: 'AI analysis export service',
+        required: true,
+        loadOrder: 5
+      }
+    ],
+    estimatedSize: '~80KB',
+    initTime: '~50ms'
+  },
+
   // 21. INIT PACKAGE - Initialization
   'init-system': {
     id: 'init-system',
@@ -1646,7 +1703,7 @@ const PACKAGE_MANIFEST = {
     version: '2.0.0',
     critical: false,
     loadOrder: 22, // Changed from 20 to 22 to load after all other packages (dashboard-widgets 19.5, tradingview-charts 19, tradingview-widgets 21, watch-lists 20)
-    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'advanced-notifications', 'entity-details', 'info-summary', 'dashboard-widgets', 'tradingview-widgets', 'tradingview-charts', 'watch-lists'],
+    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'advanced-notifications', 'entity-details', 'info-summary', 'dashboard-widgets', 'tradingview-widgets', 'tradingview-charts', 'watch-lists', 'ai-analysis'],
     scripts: [
       {
         file: 'init-system/package-manifest.js',
@@ -1756,6 +1813,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 4
       },
       {
+        file: 'widgets/tag-widget.js',
+        globalCheck: 'window.TagWidget',
+        description: 'Unified tag widget (cloud + search)',
+        required: true,
+        loadOrder: 5
+      },
+      {
         file: 'active-alerts-component.js',
         globalCheck: 'window.updateActiveAlertsComponent',
         description: 'Active alerts component',
@@ -1765,16 +1829,9 @@ const PACKAGE_MANIFEST = {
       {
         file: 'modal-configs/tag-search-config.js',
         globalCheck: 'window.tagSearchDrawerConfig',
-        description: 'Tag search drawer configuration',
+        description: 'Tag search drawer configuration (for TagWidget)',
         required: true,
         loadOrder: 6
-      },
-      {
-        file: 'tag-search-controller.js',
-        globalCheck: 'window.TagSearchController',
-        description: 'Tag search controller',
-        required: true,
-        loadOrder: 7
       },
       {
         file: 'index.js',

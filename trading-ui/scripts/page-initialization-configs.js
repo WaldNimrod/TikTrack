@@ -218,6 +218,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.RecentTradesWidget',
         'window.PendingExecutionsHighlights',
         'window.PendingExecutionTradeCreation',
+        'window.TagWidget',
       ],
 
       // ← NEW: מטאדאטה
@@ -282,6 +283,30 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
                 page: 'page-initialization-configs',
               });
             }
+          }
+
+          // Initialize unified tag widget
+          if (typeof window.TagWidget !== 'undefined' && typeof window.TagWidget.init === 'function') {
+            try {
+              window.Logger?.info?.('🏷️ Initializing TagWidget...', { page: 'page-initialization-configs' });
+              // Initialize with default configuration: min 1 row, max 3 rows
+              window.TagWidget.init('tagWidgetContainer', {
+                minRows: 1,
+                maxRows: 3,
+                rowHeight: 20
+              });
+              window.Logger?.info?.('✅ TagWidget initialization called', { page: 'page-initialization-configs' });
+            } catch (error) {
+              window.Logger?.warn('⚠️ Error initializing TagWidget:', error, {
+                page: 'page-initialization-configs',
+              });
+            }
+          } else {
+            window.Logger?.warn('⚠️ TagWidget not available', {
+              TagWidgetExists: typeof window.TagWidget !== 'undefined',
+              hasInit: typeof window.TagWidget?.init === 'function',
+              page: 'page-initialization-configs',
+            });
           }
         },
       ],
@@ -3065,6 +3090,78 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
           if (window.FlagQuickAction && typeof window.FlagQuickAction.init === 'function') {
             window.FlagQuickAction.init();
+          }
+        },
+      ],
+    },
+
+    'ai-analysis': {
+      name: 'AI Analysis',
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'preferences',
+        'entity-services',
+        'ai-analysis',
+        'init-system'
+      ],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.Logger',
+        'window.AIAnalysisData',
+        'window.AIAnalysisManager',
+        'window.AITemplateSelector',
+        'window.AIResultRenderer',
+        'window.AINotesIntegration',
+        'window.AIExportService',
+        'window.SelectPopulatorService',
+        'window.DataCollectionService',
+        'window.FieldRendererService',
+        'window.NotesData',
+        'window.ModalManagerV2',
+        'window.CRUDResponseHandler'
+      ],
+      description: 'ניתוח AI - יצירת ניתוחים באמצעות מנועי LLM',
+      lastModified: '2025-01-28',
+      pageType: 'feature',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('🤖 Initializing AI Analysis Page...', {
+            page: 'page-initialization-configs',
+          });
+
+          // Wait a bit for all scripts to be fully loaded
+          await new Promise(resolve => setTimeout(resolve, 300));
+
+          // Initialize initSystemCheck if available (for monitoring button)
+          if (window.initSystemCheck && typeof window.initSystemCheck.init === 'function') {
+            if (!window.initSystemCheck.isInitialized) {
+              window.initSystemCheck.init();
+              window.Logger?.info('✅ InitSystemCheck initialized', {
+                page: 'page-initialization-configs',
+              });
+            }
+          }
+
+          // AIAnalysisManager will auto-initialize
+          if (window.AIAnalysisManager && typeof window.AIAnalysisManager.init === 'function') {
+            if (!window.AIAnalysisManager.initialized) {
+              await window.AIAnalysisManager.init();
+            } else {
+              window.Logger?.info('✅ AIAnalysisManager already initialized', {
+                page: 'page-initialization-configs',
+              });
+            }
+          } else {
+            window.Logger?.warn('⚠️ AIAnalysisManager not available', {
+              page: 'page-initialization-configs',
+            });
           }
         },
       ],

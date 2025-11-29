@@ -1521,13 +1521,8 @@ window.initializeIndexPage = async function() {
         await refreshAllCharts();
     }, 1000);
  
-    // Register portfolio table with UnifiedTableSystem
-    if (typeof window.registerPortfolioTable === 'function') {
-        // Wait a bit for positions-portfolio.js to load
-        setTimeout(() => {
-            window.registerPortfolioTable();
-        }, 500);
-    }
+    // Note: positions & portfolio system initialization is handled by page-initialization-configs.js
+    // which calls initPositionsPortfolio() after initializeIndexPage()
     
     // Initialize pending execution trade creation widget
     if (window.PendingExecutionTradeCreation?.initializeDashboardWidget) {

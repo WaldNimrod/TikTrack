@@ -146,6 +146,7 @@ from routes.api import (
 )
 from routes.api.preferences_v4 import preferences_v4_bp
 from routes.api.server_logs import server_logs_bp
+from routes.api.email_logs import email_logs_bp
 from routes.api.cache_changes import cache_changes_bp
 from routes.api.auth import auth_bp
 
@@ -156,6 +157,7 @@ from routes.api.external_data_providers import external_data_providers_bp
 from routes.api.quotes_last import quotes_last_bp
 from routes.api.plan_conditions_list import plan_conditions_list_bp
 from routes.api.user_preferences_list import user_preferences_list_bp
+from routes.api.ai_analysis import ai_analysis_bp
 from routes.api.base_entity_utils import BaseEntityUtils
 
 # Patch Flask's Request.get_json to auto-normalize incoming payloads
@@ -492,6 +494,7 @@ app.register_blueprint(system_overview_bp)
 app.register_blueprint(css_management_bp)
 app.register_blueprint(wal_bp)
 app.register_blueprint(system_settings_bp)
+app.register_blueprint(email_logs_bp)
 app.register_blueprint(server_logs_bp)
 app.register_blueprint(quality_check_bp, url_prefix='/api/quality-check')
 app.register_blueprint(quality_lint_bp, url_prefix='/api')
@@ -528,6 +531,7 @@ app.register_blueprint(external_data_providers_bp)
 app.register_blueprint(quotes_last_bp)
 app.register_blueprint(plan_conditions_list_bp)
 app.register_blueprint(user_preferences_list_bp)
+app.register_blueprint(ai_analysis_bp)
 
 # Debug logging endpoint
 @app.route('/api/debug/log', methods=['POST'])

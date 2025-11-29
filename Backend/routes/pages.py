@@ -1,6 +1,7 @@
 from flask import Blueprint, send_from_directory, request, make_response, send_file
 from config.settings import UI_DIR
 import os
+import mimetypes
 from typing import Any
 
 # Create Blueprint
@@ -97,6 +98,17 @@ def currencies() -> Any:
 def preferences() -> Any:
     """Preferences page"""
     return send_from_directory(UI_DIR, "preferences.html")
+
+@pages_bp.route('/ai-analysis')
+def ai_analysis() -> Any:
+    """AI Analysis page"""
+    return send_from_directory(UI_DIR, "ai-analysis.html")
+
+@pages_bp.route('/trading-ui/ai-analysis.html')
+def ai_analysis_old() -> Any:
+    """AI Analysis page - redirect from old URL"""
+    from flask import redirect
+    return redirect('/ai-analysis', code=301)
 
 @pages_bp.route('/tag-management')
 def tag_management() -> Any:
@@ -212,8 +224,18 @@ def static_files(filename: str) -> Any:
         if html_path.exists():
             return send_from_directory(UI_DIR, html_file)
     
-    # Otherwise, return the file as is
-    return send_from_directory(UI_DIR, filename)
+    # Otherwise, return the file as is with correct MIME type
+    full_path = UI_DIR / filename
+    if not full_path.exists():
+        from flask import abort
+        abort(404)
+    
+    # Guess and set MIME type explicitly to avoid JSON default
+    guessed_mime, _ = mimetypes.guess_type(str(full_path))
+    response = send_from_directory(UI_DIR, filename)
+    if guessed_mime:
+        response.mimetype = guessed_mime
+    return response
 
 # NOTE: Cache headers are now handled by ResponseOptimizer in app.py
 # This removes duplication and ensures consistent cache control headers

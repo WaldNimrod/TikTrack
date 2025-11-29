@@ -836,6 +836,7 @@ const PAGE_TO_ENTITY_MAPPING = {
   'designs-page': 'design',
   'constraints-page': 'constraint',
   'tag-management-page': 'preference', // Tag management page - uses preference colors
+  'ai-analysis-page': 'research', // AI Analysis page - uses research colors
   'db-display-page': null, // Uses fixed gray color
   'db-extradata-page': null, // Uses fixed gray color
   'extra-data-page': null, // Alias

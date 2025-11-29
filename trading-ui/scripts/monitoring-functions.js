@@ -709,9 +709,11 @@ async function runDetailedPageScan(pageName, pageConfig) {
         currentPage = currentPage.replace('.html', '');
     }
     
-    // Handle tag-management specifically (URL might be /tag-management without .html)
+    // Handle specific pages with custom URL mapping (without .html and /trading-ui/)
     if (path.includes('tag-management')) {
         currentPage = 'tag-management';
+    } else if (path.includes('ai-analysis')) {
+        currentPage = 'ai-analysis';
     }
     
     if (currentPage !== pageName) {
@@ -886,10 +888,10 @@ async function parseHTMLFile(pageName) {
             // Mockup pages are in trading-ui/mockups/daily-snapshots/
             htmlPath = `/trading-ui/mockups/daily-snapshots/${pageName}.html`;
         } else {
-            // Regular pages are in root or trading-ui/
-            htmlPath = `/${pageName}.html`;
-            // Also try mockup path as fallback
-            altPath = `/trading-ui/mockups/daily-snapshots/${pageName}.html`;
+            // Regular pages - try trading-ui/ first (standard location)
+            htmlPath = `/trading-ui/${pageName}.html`;
+            // Also try root path as fallback
+            altPath = `/${pageName}.html`;
         }
         
         // Try primary path

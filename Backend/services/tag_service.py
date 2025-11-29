@@ -498,6 +498,51 @@ class TagService:
             "usage": usage,
         }
 
+    @staticmethod
+    def get_tag_cloud_data(
+        db: Session, user_id: int, *, limit: int = 50
+    ) -> List[Dict[str, Any]]:
+        """
+        Return tag cloud data with usage counts for dashboard display.
+        
+        Returns active tags sorted by usage_count descending, including
+        category name for display.
+        
+        Args:
+            db: Database session
+            user_id: User ID to filter tags
+            limit: Maximum number of tags to return (default: 50)
+            
+        Returns:
+            List of dicts with keys: tag_id, name, usage_count, category_name
+        """
+        cloud_rows = (
+            db.query(
+                Tag.id.label("tag_id"),
+                Tag.name.label("name"),
+                Tag.usage_count,
+                TagCategory.name.label("category_name"),
+            )
+            .outerjoin(TagCategory, Tag.category_id == TagCategory.id)
+            .filter(Tag.user_id == user_id, Tag.is_active.is_(True))
+            .order_by(Tag.usage_count.desc(), Tag.name.asc())
+            .limit(limit)
+            .all()
+        )
+        
+        cloud: List[Dict[str, Any]] = []
+        for row in cloud_rows:
+            cloud.append(
+                {
+                    "tag_id": row.tag_id,
+                    "name": row.name,
+                    "usage_count": row.usage_count or 0,
+                    "category_name": row.category_name,
+                }
+            )
+        
+        return cloud
+
     # --------------------------------------------------------------------- #
     # Internal Helpers
     # --------------------------------------------------------------------- #

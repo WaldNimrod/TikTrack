@@ -45,3 +45,9 @@ This log records every production version update, including manual major/minor a
 
 1. תיקון טבלת המרות מטבע מאוחדות: הטבלה השנייה מציגה כעת את כל ההמרות הרלוונטיות ללא קשר לסינון או חלוקה לעמודים בטבלה הראשונה
 2. תיקון ברירת מחדל ייבוא: כל סוגי תזרימי המזומן מסומנים כברירת מחדל בשלב 2 של הייבוא (במקום רק interest ו-borrow_fee) |
+| 2025-11-29T07:15:29+00:00 | 1.3.13.0 | 1.3.12.0 | 69d6b0878fc858aa8ceb6eb2169b58b004f3ba42 | 9ddc904bb9989fac5178b4823650e22a858b937f | patch | תיקון: ענן תגיות בדף הבית - הוספת תמיכה מלאה
+
+1. הוספת get_tag_cloud_data ב-Backend TagService - מחזיר תגיות עם usage_count
+2. יצירת endpoint /api/tags/cloud ב-Backend routes
+3. הוספת getTagCloudData() ל-frontend TagService עם מטמון
+4. עדכון מטמון - ניקוי אוטומטי של cache ענן התגיות |

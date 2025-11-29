@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.3.12.0",
+    "version": "1.3.13.0",
     "major": 1,
     "minor": 3,
-    "patch": 12,
+    "patch": 13,
     "build": 0,
-    "commit": "9ddc904bb9989fac5178b4823650e22a858b937f",
-    "updated_at": "2025-11-29T06:16:11+00:00",
-    "notes": "תיקון: תיקון טבלת המרות מטבע מאוחדות ותיקון ברירת מחדל ייבוא תזרימי מזומן\n\n1. תיקון טבלת המרות מטבע מאוחדות: הטבלה השנייה מציגה כעת את כל ההמרות הרלוונטיות ללא קשר לסינון או חלוקה לעמודים בטבלה הראשונה\n2. תיקון ברירת מחדל ייבוא: כל סוגי תזרימי המזומן מסומנים כברירת מחדל בשלב 2 של הייבוא (במקום רק interest ו-borrow_fee)"
+    "commit": "69d6b0878fc858aa8ceb6eb2169b58b004f3ba42",
+    "updated_at": "2025-11-29T07:15:29+00:00",
+    "notes": "תיקון: ענן תגיות בדף הבית - הוספת תמיכה מלאה\n\n1. הוספת get_tag_cloud_data ב-Backend TagService - מחזיר תגיות עם usage_count\n2. יצירת endpoint /api/tags/cloud ב-Backend routes\n3. הוספת getTagCloudData() ל-frontend TagService עם מטמון\n4. עדכון מטמון - ניקוי אוטומטי של cache ענן התגיות"
   },
   "development": {
     "version": "1.3.40.0",

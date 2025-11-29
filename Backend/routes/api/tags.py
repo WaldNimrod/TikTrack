@@ -573,3 +573,24 @@ def get_analytics():
         }
     )
 
+
+@tags_bp.route("/cloud", methods=["GET"])
+@handle_database_session()
+def get_tag_cloud():
+    """Return tag cloud data with usage counts for dashboard display."""
+    db: Session = g.db
+    user_id = _resolve_user_id()
+    limit = request.args.get("limit", default=50, type=int)
+    normalizer = _normalize_timestamp()
+
+    cloud = TagService.get_tag_cloud_data(db, user_id, limit=limit)
+    return jsonify(
+        {
+            "status": "success",
+            "data": normalizer.normalize_output(cloud),
+            "message": "Tag cloud data retrieved successfully",
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0",
+        }
+    )
+

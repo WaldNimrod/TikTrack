@@ -22,7 +22,8 @@
         categories: 'tags:categories',
         tags: (categoryId = 'all') => `tags:list:${categoryId}`,
         entity: (entityType, entityId) => `tags:entity:${entityType}:${entityId}`,
-        suggestions: (entityType = 'all') => `tags:suggestions:${entityType}`
+        suggestions: (entityType = 'all') => `tags:suggestions:${entityType}`,
+        cloud: 'tags:cloud'
     };
 
     /**
@@ -291,6 +292,25 @@
         return analytics;
     }
 
+    async function getTagCloudData({ force = false, limit = 50 } = {}) {
+        const cacheKey = 'tags:cloud';
+        if (!force) {
+            const cached = await getCached(cacheKey);
+            if (cached) {
+                return cached;
+            }
+        }
+
+        const params = new URLSearchParams();
+        if (limit) {
+            params.set('limit', String(limit));
+        }
+
+        const cloud = await requestJSON(`${API_BASE}/cloud?${params.toString()}`);
+        await setCached(cacheKey, cloud);
+        return cloud;
+    }
+
     // ========================================================================
     // Business Logic API Wrappers
     // ========================================================================
@@ -427,12 +447,14 @@
         await removeCached(CACHE_KEYS.suggestions('all'));
         await removeCached(CACHE_KEYS.suggestions(entityType));
         await removeCached(CACHE_KEYS.analytics);
+        await removeCached(CACHE_KEYS.cloud);
     }
 
     async function clearCache() {
         await removeCached(CACHE_KEYS.categories);
         await removeCached(CACHE_KEYS.tags('all'));
         await removeCached(CACHE_KEYS.analytics);
+        await removeCached(CACHE_KEYS.cloud);
     }
 
     window.TagService = {
@@ -449,6 +471,7 @@
         removeTagFromEntity,
         getSuggestions,
         getAnalytics,
+        getTagCloudData,
         invalidateEntity,
         clearCache,
         validateTagViaAPI,

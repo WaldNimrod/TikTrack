@@ -219,6 +219,103 @@ def logout():
         }), 500
 
 
+@auth_bp.route('/me/password', methods=['PUT'])
+def update_password():
+    """
+    Update current user password
+    
+    Request Body:
+        {
+            "current_password": "string",
+            "new_password": "string"
+        }
+    
+    Returns:
+        {
+            "status": "success" | "error",
+            "data": {
+                "message": "Password updated successfully"
+            } | null,
+            "error": {...} | null
+        }
+    """
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'Not authenticated'}
+            }), 401
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'No data provided'}
+            }), 400
+        
+        current_password = data.get('current_password')
+        new_password = data.get('new_password')
+        
+        if not current_password or not new_password:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'Current password and new password are required'}
+            }), 400
+        
+        # Validate new password length
+        if len(new_password) < 6:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'New password must be at least 6 characters'}
+            }), 400
+        
+        # Get user from database
+        from config.database import SessionLocal
+        from models.user import User
+        from sqlalchemy import select
+        
+        db = SessionLocal()
+        try:
+            user = db.scalars(select(User).where(User.id == user_id)).first()
+            
+            if not user:
+                return jsonify({
+                    'status': 'error',
+                    'error': {'message': 'User not found'}
+                }), 404
+            
+            # Verify current password
+            if not user.check_password(current_password):
+                return jsonify({
+                    'status': 'error',
+                    'error': {'message': 'Current password is incorrect'}
+                }), 401
+            
+            # Update password
+            user.set_password(new_password)
+            db.commit()
+            
+            logger.info(f"Password updated for user {user_id}")
+            
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'message': 'Password updated successfully'
+                }
+            }), 200
+            
+        finally:
+            db.close()
+            
+    except Exception as e:
+        logger.error(f"Error updating password: {e}")
+        return jsonify({
+            'status': 'error',
+            'error': {'message': f'Password update failed: {str(e)}'}
+        }), 500
+
+
 @auth_bp.route('/me', methods=['GET'])
 def get_current_user():
     """
@@ -266,5 +363,80 @@ def get_current_user():
         return jsonify({
             'status': 'error',
             'error': {'message': f'Failed to get user: {str(e)}'}
+        }), 500
+
+
+@auth_bp.route('/me', methods=['PUT'])
+def update_current_user():
+    """
+    Update current authenticated user profile
+    
+    Request Body:
+        {
+            "email": "string (optional)",
+            "first_name": "string (optional)",
+            "last_name": "string (optional)"
+        }
+    
+    Returns:
+        {
+            "status": "success" | "error",
+            "data": {
+                "user": {...},
+                "message": "User updated successfully"
+            } | null,
+            "error": {...} | null
+        }
+    """
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'Not authenticated'}
+            }), 401
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'No data provided'}
+            }), 400
+        
+        # Get user service
+        from services.user_service import UserService
+        user_service = UserService()
+        
+        # Update user (only allowed fields)
+        allowed_fields = ['email', 'first_name', 'last_name']
+        update_data = {k: v for k, v in data.items() if k in allowed_fields}
+        
+        if not update_data:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'No valid fields to update'}
+            }), 400
+        
+        user = user_service.update_user(user_id, **update_data)
+        
+        if user:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'user': user,
+                    'message': 'User updated successfully'
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {'message': 'Failed to update user'}
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error updating user: {e}")
+        return jsonify({
+            'status': 'error',
+            'error': {'message': f'Update failed: {str(e)}'}
         }), 500
 

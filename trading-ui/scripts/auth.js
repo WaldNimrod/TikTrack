@@ -33,6 +33,12 @@ async function login(username, password) {
     throw new Error(data.error?.message || 'שגיאה בהתחברות');
   }
 
+  // Store user in localStorage
+  if (data.data?.user) {
+    currentUser = data.data.user;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  }
+
   return data;
 }
 
@@ -372,7 +378,9 @@ function createLoginInterface(containerId, onSuccess = null) {
   container.innerHTML = `
     <div class="login-container">
       <div class="login-header">
-        <div class="login-logo">📊</div>
+        <div class="login-logo">
+          <img src="images/logo.svg" alt="TikTrack Logo" />
+        </div>
         <h1 class="login-title">ברוכים הבאים ל-TikTrack</h1>
         <p class="login-subtitle">מערכת ניהול השקעות מתקדמת</p>
       </div>
@@ -441,6 +449,59 @@ function hasRole(role) {
   return currentUser.roles.includes(role);
 }
 
+/**
+ * Update user profile
+ */
+async function updateUserProfile(updates) {
+  const response = await fetch('/api/auth/me', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(updates),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || data.status !== 'success') {
+    throw new Error(data.error?.message || 'שגיאה בעדכון פרופיל');
+  }
+
+  // Update local storage
+  if (data.data?.user) {
+    currentUser = data.data.user;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  }
+
+  return data;
+}
+
+/**
+ * Update user password
+ */
+async function updatePassword(currentPassword, newPassword) {
+  const response = await fetch('/api/auth/me/password', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({
+      current_password: currentPassword,
+      new_password: newPassword,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || data.status !== 'success') {
+    throw new Error(data.error?.message || 'שגיאה בעדכון סיסמה');
+  }
+
+  return data;
+}
+
 // ייצוא פונקציות גלובליות
 window.TikTrackAuth = {
   login,
@@ -448,6 +509,8 @@ window.TikTrackAuth = {
   isAuthenticated,
   getAuthToken,
   getCurrentUser,
+  updateUserProfile,
+  updatePassword,
   setupLoginForm,
   checkAuthentication,
   createLoginInterface,
@@ -458,7 +521,9 @@ window.TikTrackAuth = {
   showDashboard,
   showLoginError,
   showLoginSuccess,
+  setLoadingState,
   register,
+  loadSavedCredentials,
 };
 
 // Export register function globally

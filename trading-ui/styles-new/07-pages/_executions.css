@@ -1,0 +1,22 @@
+/* Executions Page Specific Styles */
+
+/* Step Actions */
+.step-actions {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.step-actions .btn {
+    margin-left: 0.5rem;
+}
+
+/* Import Modal Styles */
+.import-modal .step-content {
+    min-height: 200px;
+}
+
+.import-modal .step-indicator {
+    margin-bottom: 1rem;
+}
+

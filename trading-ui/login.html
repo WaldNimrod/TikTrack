@@ -16,7 +16,7 @@
     
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: white;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -27,11 +27,12 @@
         .login-container {
             background: white;
             border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             padding: 3rem;
             width: 100%;
             max-width: 450px;
             margin: 2rem;
+            border: 1px solid #e0e0e0;
         }
         
         .login-header {
@@ -40,8 +41,12 @@
         }
         
         .login-logo {
-            font-size: 4rem;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .login-logo img {
+            max-width: 200px;
+            height: auto;
         }
         
         .login-title {
@@ -194,7 +199,9 @@
                 // Fallback if auth.js is not loaded
                 document.getElementById('loginContainer').innerHTML = `
                     <div class="login-header">
-                        <div class="login-logo">📊</div>
+                        <div class="login-logo">
+                            <img src="images/logo.svg" alt="TikTrack Logo" />
+                        </div>
                         <h1 class="login-title">ברוכים הבאים ל-TikTrack</h1>
                         <p class="login-subtitle">מערכת ניהול השקעות מתקדמת</p>
                     </div>

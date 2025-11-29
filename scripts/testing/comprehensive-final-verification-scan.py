@@ -97,7 +97,8 @@ def check_logger_service(content):
 
 def check_inline_styles(content):
     """בדיקת inline styles"""
-    inline_style_pattern = r'style=["\']([^"\']+)["\']'
+    # חיפוש רק style= ולא data-style=
+    inline_style_pattern = r'(?<!data-)style=["\']([^"\']+)["\']'
     matches = re.findall(inline_style_pattern, content)
     
     # דילוג על dynamic styles
@@ -105,7 +106,7 @@ def check_inline_styles(content):
     filtered_matches = []
     for match in matches:
         is_dynamic = any(indicator in match for indicator in dynamic_indicators)
-        if not is_dynamic and match.strip() and not match.strip().startswith('data-'):
+        if not is_dynamic and match.strip():
             filtered_matches.append(match.strip())
     
     return filtered_matches
@@ -147,8 +148,9 @@ def check_console_usage(content):
 
 def check_load_order(content):
     """בדיקת סדר טעינה - logger-service לפני header-system"""
-    logger_match = re.search(r'logger-service\.js', content)
-    header_match = re.search(r'header-system\.js', content)
+    # חיפוש רק בתגי script, לא בהערות
+    logger_match = re.search(r'<script[^>]*logger-service\.js[^>]*>', content)
+    header_match = re.search(r'<script[^>]*header-system\.js[^>]*>', content)
     
     if not logger_match or not header_match:
         return None

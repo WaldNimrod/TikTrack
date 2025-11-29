@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>פרופיל משתמש - TikTrack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles-new/master.css">
+    <link rel="stylesheet" href="styles-new/login-page.css">
+</head>
+<body>
+    <div class="login-page-wrapper">
+        <div class="login-container" style="max-width: 600px; margin: 50px auto;">
+            <div class="login-header">
+                <div class="login-logo">👤</div>
+                <h1 class="login-title">פרופיל משתמש</h1>
+                <p class="login-subtitle" id="userDisplayName">טוען...</p>
+            </div>
+            
+            <div class="login-error" id="profileError"></div>
+            <div class="login-success" id="profileSuccess"></div>
+            
+            <!-- User Info Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>פרטי משתמש</h5>
+                </div>
+                <div class="card-body">
+                    <form id="userInfoForm">
+                        <div class="form-group mb-3">
+                            <label class="form-label" for="profileUsername">שם משתמש</label>
+                            <input type="text" id="profileUsername" class="form-control" readonly>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label" for="profileEmail">אימייל</label>
+                            <input type="email" id="profileEmail" class="form-control" placeholder="הכנס כתובת אימייל">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label" for="profileFirstName">שם פרטי</label>
+                            <input type="text" id="profileFirstName" class="form-control" placeholder="הכנס שם פרטי">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label" for="profileLastName">שם משפחה</label>
+                            <input type="text" id="profileLastName" class="form-control" placeholder="הכנס שם משפחה">
+                        </div>
+                        
+                        <button type="submit" class="btn-login" id="updateInfoBtn">
+                            <span id="updateInfoBtnText">עדכן פרטים</span>
+                            <span id="updateInfoBtnSpinner" style="display: none;">⏳ מעדכן...</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Password Change Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>שינוי סיסמה</h5>
+                </div>
+                <div class="card-body">
+                    <form id="passwordForm">
+                        <div class="form-group mb-3">
+                            <label class="form-label" for="currentPassword">סיסמה נוכחית</label>
+                            <input type="password" id="currentPassword" class="form-control" placeholder="הכנס סיסמה נוכחית" required>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label" for="newPassword">סיסמה חדשה</label>
+                            <input type="password" id="newPassword" class="form-control" placeholder="הכנס סיסמה חדשה (מינימום 6 תווים)" required minlength="6">
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label" for="confirmNewPassword">אימות סיסמה חדשה</label>
+                            <input type="password" id="confirmNewPassword" class="form-control" placeholder="אמת סיסמה חדשה" required minlength="6">
+                        </div>
+                        
+                        <button type="submit" class="btn-login" id="updatePasswordBtn">
+                            <span id="updatePasswordBtnText">עדכן סיסמה</span>
+                            <span id="updatePasswordBtnSpinner" style="display: none;">⏳ מעדכן...</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="mt-3 text-center">
+                <a href="index.html" class="btn btn-secondary">חזרה לדף הבית</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/main.js"></script>
+    <script src="scripts/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Load current user data
+            await loadUserProfile();
+            
+            // Setup form handlers
+            setupFormHandlers();
+        });
+        
+        async function loadUserProfile() {
+            try {
+                const user = await window.TikTrackAuth.getCurrentUser();
+                if (!user) {
+                    // Not authenticated - redirect to login
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Display user info
+                document.getElementById('userDisplayName').textContent = user.display_name || user.username || 'משתמש';
+                document.getElementById('profileUsername').value = user.username || '';
+                document.getElementById('profileEmail').value = user.email || '';
+                document.getElementById('profileFirstName').value = user.first_name || '';
+                document.getElementById('profileLastName').value = user.last_name || '';
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+                window.TikTrackAuth.showLoginError('שגיאה בטעינת פרטי המשתמש', 'profileError');
+            }
+        }
+        
+        function setupFormHandlers() {
+            // User info form
+            document.getElementById('userInfoForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('profileEmail').value;
+                const firstName = document.getElementById('profileFirstName').value;
+                const lastName = document.getElementById('profileLastName').value;
+                
+                window.TikTrackAuth.setLoadingState(true, 'updateInfoBtn', 'updateInfoBtnText', 'updateInfoBtnSpinner');
+                
+                try {
+                    const response = await fetch('/api/auth/me', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            email: email || null,
+                            first_name: firstName || null,
+                            last_name: lastName || null,
+                        }),
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok && data.status === 'success') {
+                        window.TikTrackAuth.showLoginSuccess('פרטי המשתמש עודכנו בהצלחה', 'profileSuccess');
+                        // Update local storage
+                        const currentUser = await window.TikTrackAuth.getCurrentUser();
+                        if (currentUser && data.data?.user) {
+                            localStorage.setItem('currentUser', JSON.stringify(data.data.user));
+                        }
+                        // Reload profile
+                        await loadUserProfile();
+                    } else {
+                        window.TikTrackAuth.showLoginError(data.error?.message || 'שגיאה בעדכון פרטים', 'profileError');
+                    }
+                } catch (error) {
+                    window.TikTrackAuth.showLoginError('שגיאה בעדכון פרטים: ' + error.message, 'profileError');
+                } finally {
+                    window.TikTrackAuth.setLoadingState(false, 'updateInfoBtn', 'updateInfoBtnText', 'updateInfoBtnSpinner');
+                }
+            });
+            
+            // Password form
+            document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmNewPassword').value;
+                
+                if (newPassword !== confirmPassword) {
+                    window.TikTrackAuth.showLoginError('הסיסמאות החדשות אינן תואמות', 'profileError');
+                    return;
+                }
+                
+                if (newPassword.length < 6) {
+                    window.TikTrackAuth.showLoginError('סיסמה חדשה חייבת להכיל לפחות 6 תווים', 'profileError');
+                    return;
+                }
+                
+                window.TikTrackAuth.setLoadingState(true, 'updatePasswordBtn', 'updatePasswordBtnText', 'updatePasswordBtnSpinner');
+                
+                try {
+                    const response = await fetch('/api/auth/me/password', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            current_password: currentPassword,
+                            new_password: newPassword,
+                        }),
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok && data.status === 'success') {
+                        window.TikTrackAuth.showLoginSuccess('סיסמה עודכנה בהצלחה', 'profileSuccess');
+                        // Clear password fields
+                        document.getElementById('currentPassword').value = '';
+                        document.getElementById('newPassword').value = '';
+                        document.getElementById('confirmNewPassword').value = '';
+                    } else {
+                        window.TikTrackAuth.showLoginError(data.error?.message || 'שגיאה בעדכון סיסמה', 'profileError');
+                    }
+                } catch (error) {
+                    window.TikTrackAuth.showLoginError('שגיאה בעדכון סיסמה: ' + error.message, 'profileError');
+                } finally {
+                    window.TikTrackAuth.setLoadingState(false, 'updatePasswordBtn', 'updatePasswordBtnText', 'updatePasswordBtnSpinner');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+

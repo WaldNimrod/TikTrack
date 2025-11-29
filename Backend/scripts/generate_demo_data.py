@@ -58,7 +58,7 @@ from models.note_relation_type import NoteRelationType
 
 DEMO_CONFIG = {
     'trading_accounts': {
-        'count': 3,
+        'count': 2,
         'primary_account_activity_percent': 70,
         'primary_account_swing_only': True
     },
@@ -700,19 +700,8 @@ class DemoDataGenerator:
         )
         self.db.add(account1)
         
-        # Account 2: Pension (long-term investments)
+        # Account 2: Other currency (long-term investments)
         account2 = TradingAccount(
-            name="חשבון פנסיוני",
-            currency_id=usd_currency.id,
-            status='open',
-            opening_balance=500000.0,
-            cash_balance=450000.0,
-            total_value=600000.0
-        )
-        self.db.add(account2)
-        
-        # Account 3: Other currency (long-term investments)
-        account3 = TradingAccount(
             name=f"חשבון מסחר {other_currency.symbol}",
             currency_id=other_currency.id,
             status='open',
@@ -720,7 +709,7 @@ class DemoDataGenerator:
             cash_balance=180000.0,
             total_value=220000.0
         )
-        self.db.add(account3)
+        self.db.add(account2)
         
         self.db.flush()
         
@@ -745,9 +734,9 @@ class DemoDataGenerator:
                 "החשבון הראשי חייב להיות תמיד ב-USD"
             )
         
-        self.relationship_manager.accounts = [account1, account2, account3]
-        self.created_count['accounts'] = 3
-        print(f"   ✅ נוצרו 3 חשבונות מסחר")
+        self.relationship_manager.accounts = [account1, account2]
+        self.created_count['accounts'] = 2
+        print(f"   ✅ נוצרו 2 חשבונות מסחר")
         print(f"   ✅ החשבון הראשי במטבע USD (ID: {usd_currency.id})")
     
     def _create_trade_plans(self) -> None:
@@ -1018,6 +1007,7 @@ class DemoDataGenerator:
                 open_action = 'short'
             
             open_execution = Execution(
+                user_id=self.user_cache.id,
                 ticker_id=trade.ticker_id,
                 trading_account_id=trade.trading_account_id,
                 trade_id=trade.id,
@@ -1049,6 +1039,7 @@ class DemoDataGenerator:
                 realized_pl = int(trade.total_pl) if trade.total_pl else None
                 
                 close_execution = Execution(
+                    user_id=self.user_cache.id,
                     ticker_id=trade.ticker_id,
                     trading_account_id=trade.trading_account_id,
                     trade_id=trade.id,
@@ -1064,31 +1055,89 @@ class DemoDataGenerator:
                 self.db.add(close_execution)
                 created += 1
             
-            # Sometimes add partial executions for open trades
-            if trade.status == 'open' and random.random() > 0.7:
-                # Add partial execution
-                partial_date = self.date_gen.generate_date_in_range(
+            # Add partial executions for open trades to demonstrate capabilities
+            # 40% of open trades get partial executions (to show UI capabilities)
+            if trade.status == 'open' and random.random() > 0.6:
+                # Add 1-2 partial executions to show progressive execution capability
+                num_partial = random.randint(1, 2) if random.random() > 0.5 else 1
+                
+                remaining_quantity = trade.planned_quantity
+                
+                for partial_idx in range(num_partial):
+                    partial_date = self.date_gen.generate_date_in_range(
+                        trade.created_at,
+                        self.date_gen.now
+                    )
+                    
+                    # Calculate partial quantity (distribute remaining quantity)
+                    if partial_idx == num_partial - 1:
+                        # Last partial execution takes remaining quantity
+                        partial_quantity = remaining_quantity
+                    else:
+                        # Take 20-40% of remaining quantity
+                        partial_quantity = round(remaining_quantity * random.uniform(0.2, 0.4), 2)
+                        remaining_quantity -= partial_quantity
+                    
+                    partial_execution = Execution(
+                        user_id=self.user_cache.id,
+                        ticker_id=trade.ticker_id,
+                        trading_account_id=trade.trading_account_id,
+                        trade_id=trade.id,
+                        action=open_action,
+                        date=partial_date,
+                        quantity=partial_quantity,
+                        price=round(trade.entry_price * random.uniform(0.95, 1.05), 2),
+                        fee=round(random.uniform(0, 30), 2),
+                        source='manual',
+                        notes=f"ביצוע חלקי #{partial_idx + 1} לטרייד {trade.id}"
+                    )
+                    self.db.add(partial_execution)
+                    created += 1
+            
+            # Sometimes add additional executions for closed trades (scale in/out scenarios)
+            if trade.status == 'closed' and random.random() > 0.8:
+                # 20% of closed trades get additional executions (scale in/out)
+                # Add an intermediate execution between open and close
+                intermediate_date = self.date_gen.generate_date_in_range(
                     trade.created_at,
-                    self.date_gen.now
+                    trade.closed_at
                 )
                 
-                partial_execution = Execution(
+                intermediate_quantity = round(trade.planned_quantity * random.uniform(0.3, 0.7), 2)
+                
+                intermediate_execution = Execution(
+                    user_id=self.user_cache.id,
                     ticker_id=trade.ticker_id,
                     trading_account_id=trade.trading_account_id,
                     trade_id=trade.id,
-                    action=open_action,
-                    date=partial_date,
-                    quantity=round(trade.planned_quantity * random.uniform(0.2, 0.5), 2),
-                    price=round(trade.entry_price * random.uniform(0.95, 1.05), 2),
+                    action=open_action,  # Additional buy/short (scale in)
+                    date=intermediate_date,
+                    quantity=intermediate_quantity,
+                    price=round(trade.entry_price * random.uniform(0.97, 1.03), 2),
                     fee=round(random.uniform(0, 30), 2),
                     source='manual',
-                    notes=f"ביצוע חלקי לטרייד {trade.id}"
+                    notes=f"ביצוע ביניים (scale in) לטרייד {trade.id}"
                 )
-                self.db.add(partial_execution)
+                self.db.add(intermediate_execution)
                 created += 1
         
         self.created_count['executions'] = created
+        
+        # Count executions by type for reporting
+        if not self.dry_run:
+            self.db.flush()
+            buy_count = self.db.execute(text("SELECT COUNT(*) FROM executions WHERE action = 'buy'")).scalar()
+            sell_count = self.db.execute(text("SELECT COUNT(*) FROM executions WHERE action = 'sell'")).scalar()
+            short_count = self.db.execute(text("SELECT COUNT(*) FROM executions WHERE action = 'short'")).scalar()
+            cover_count = self.db.execute(text("SELECT COUNT(*) FROM executions WHERE action = 'cover'")).scalar()
+            with_trade = self.db.execute(text("SELECT COUNT(*) FROM executions WHERE trade_id IS NOT NULL")).scalar()
+        else:
+            buy_count = sell_count = short_count = cover_count = with_trade = 0
+        
         print(f"   ✅ נוצרו {created} ביצועים")
+        if not self.dry_run:
+            print(f"      - buy: {buy_count}, sell: {sell_count}, short: {short_count}, cover: {cover_count}")
+            print(f"      - מקושרים לטריידים: {with_trade}/{created}")
     
     def _create_cash_flows(self) -> None:
         """יוצר תזרימי מזומן"""
@@ -1211,6 +1260,7 @@ class DemoDataGenerator:
             )
             
             alert = Alert(
+                user_id=self.user_cache.id,
                 ticker_id=ticker.id,
                 message=alert_msg,
                 status='open' if random.random() > 0.2 else 'closed',
@@ -1238,6 +1288,7 @@ class DemoDataGenerator:
                     )
                     
                     alert = Alert(
+                        user_id=self.user_cache.id,
                         ticker_id=trade.ticker_id,
                         message=alert_msg,
                         status='open' if random.random() > 0.4 else 'closed',
@@ -1261,6 +1312,7 @@ class DemoDataGenerator:
                     )
                     
                     alert = Alert(
+                        user_id=self.user_cache.id,
                         ticker_id=trade.ticker_id,
                         message=alert_msg,
                         status='open' if random.random() > 0.5 else 'closed',
@@ -1283,6 +1335,7 @@ class DemoDataGenerator:
                 alert_msg = f"תוכנית {plan.id}: {plan.ticker.symbol if hasattr(plan, 'ticker') and plan.ticker else 'טיקר'} הגיע למחיר כניסה {target_price:.2f}"
                 
                 alert = Alert(
+                    user_id=self.user_cache.id,
                     ticker_id=plan.ticker_id,
                     message=alert_msg,
                     status='open',
@@ -1296,8 +1349,73 @@ class DemoDataGenerator:
                 self.db.add(alert)
                 created += 1
         
+        # Create at least 4 active alerts (is_triggered='new') for home page display
+        active_alerts_min = 4
+        active_alerts_created = 0
+        
+        # Ensure we have at least 4 active alerts
+        if active_alerts_created < active_alerts_min:
+            # Get recent tickers and trades for active alerts
+            recent_tickers = random.sample(self.relationship_manager.tickers, min(active_alerts_min, len(self.relationship_manager.tickers)))
+            open_trades = [t for t in self.relationship_manager.trades if t.status == 'open']
+            
+            active_alert_messages = [
+                "⚡ התראה חדשה: מחיר {symbol} הגיע ל-{price} - הזדמנות לקנייה",
+                "🔔 התראה: {symbol} חוצה קו התנגדות {price} - אפשר לקחת רווח",
+                "📈 התראה: {symbol} עלה מעל {price} - סימן חיובי",
+                "⚠️ התראה: {symbol} מתקרב ל-{price} - מומלץ לבדוק",
+                "💡 התראה: {symbol} במגמת עלייה - נקודת כניסה פוטנציאלית",
+            ]
+            
+            for i in range(active_alerts_min - active_alerts_created):
+                ticker = recent_tickers[i % len(recent_tickers)] if recent_tickers else self.relationship_manager.get_random_ticker()
+                
+                if not ticker:
+                    continue
+                
+                # Use a trade if available for more context
+                related_trade = None
+                if open_trades:
+                    related_trade = random.choice([t for t in open_trades if t.ticker_id == ticker.id] or open_trades[:1])
+                
+                target_price = round(random.uniform(100, 400), 2)
+                alert_msg = random.choice(active_alert_messages).format(
+                    symbol=ticker.symbol,
+                    price=f"${target_price:.2f}"
+                )
+                
+                # Create active alert (is_triggered='new')
+                triggered_at = self.date_gen.generate_date_in_range(
+                    self.date_gen.now - timedelta(days=2),
+                    self.date_gen.now
+                )
+                
+                alert = Alert(
+                    ticker_id=ticker.id,
+                    message=alert_msg,
+                    status='open',
+                    is_triggered='new',  # Active alert for home page
+                    related_type_id=ALERT_RELATED_TYPES['ticker'],
+                    related_id=ticker.id,
+                    condition_attribute='price',
+                    condition_operator='more_than',
+                    condition_number=str(target_price),
+                    triggered_at=triggered_at,
+                    user_id=self.user_cache.id
+                )
+                
+                # If we have a related trade, link to it
+                if related_trade:
+                    alert.related_type_id = ALERT_RELATED_TYPES['trade']
+                    alert.related_id = related_trade.id
+                
+                self.db.add(alert)
+                created += 1
+                active_alerts_created += 1
+        
         self.created_count['alerts'] = created
-        print(f"   ✅ נוצרו {created} התראות")
+        active_count = active_alerts_created if active_alerts_created > 0 else 0
+        print(f"   ✅ נוצרו {created} התראות (מתוכן {active_count} התראות פעילות)")
     
     def _create_notes(self) -> None:
         """יוצר הערות מרשימות ומפורטות"""

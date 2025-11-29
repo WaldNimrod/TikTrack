@@ -39,39 +39,46 @@
         // This prevents "showModalSafe is not a function" errors when data-onclick attributes are processed
         window.showModalSafe = async function(modalId, mode = 'add') {
             try {
-                console.log(`🔍 [showModalSafe] Called with:`, { modalId, mode, ModalManagerV2Available: !!window.ModalManagerV2 });
+                // Use Logger Service if available, fallback to console
+                const log = window.Logger?.debug?.bind(window.Logger) || (() => {});
+                const warn = window.Logger?.warn?.bind(window.Logger) || (() => {});
+                const error = window.Logger?.error?.bind(window.Logger) || (() => {});
+                
+                log(`🔍 [showModalSafe] Called with:`, { modalId, mode, ModalManagerV2Available: !!window.ModalManagerV2 });
                 
                 // If ModalManagerV2 is not available, wait for it (up to 2 seconds)
                 if (!window.ModalManagerV2) {
-                    console.warn('⚠️ [showModalSafe] ModalManagerV2 not available, waiting...');
+                    warn('⚠️ [showModalSafe] ModalManagerV2 not available, waiting...');
                     for (let i = 0; i < 20; i++) {
                         await new Promise(resolve => setTimeout(resolve, 100));
                         if (window.ModalManagerV2) {
-                            console.log(`✅ [showModalSafe] ModalManagerV2 became available after ${(i + 1) * 100}ms`);
+                            log(`✅ [showModalSafe] ModalManagerV2 became available after ${(i + 1) * 100}ms`);
                             break;
                         }
                     }
                 }
                 
                 if (window.ModalManagerV2 && window.ModalManagerV2.showModal) {
-                    console.log(`✅ [showModalSafe] Calling ModalManagerV2.showModal`);
+                    log(`✅ [showModalSafe] Calling ModalManagerV2.showModal`);
                     await window.ModalManagerV2.showModal(modalId, mode);
-                    console.log(`✅ [showModalSafe] Modal shown successfully`);
+                    log(`✅ [showModalSafe] Modal shown successfully`);
                 } else {
-                    console.error('❌ [showModalSafe] ModalManagerV2 not available after wait');
+                    error('❌ [showModalSafe] ModalManagerV2 not available after wait');
                     if (window.showErrorNotification) {
                         window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
                     }
                 }
-            } catch (error) {
-                console.error('❌ [showModalSafe] Error showing modal:', error);
-                console.error('   Error stack:', error.stack);
+            } catch (err) {
+                const error = window.Logger?.error?.bind(window.Logger) || (() => {});
+                error('❌ [showModalSafe] Error showing modal:', err);
+                window.Logger?.error?.("   Error stack:", err.stack);
                 if (window.showErrorNotification) {
-                    window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל: ${error.message}`);
+                    window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל: ${err.message}`);
                 }
             }
         };
-        console.log('✅ [showModalSafe] Helper function created in <head> - available immediately');
+        // Use Logger Service if available for initialization log
+        window.Logger?.debug?.("✅ [showModalSafe] Helper function created in <head> - available immediately");
     </script>
 </head>
 

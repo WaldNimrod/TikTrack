@@ -24,15 +24,45 @@ async function login(username, password) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ username, password }),
+    credentials: 'include' // Include cookies for session
   });
 
   const data = await response.json();
 
-  if (!response.ok) {
+  if (!response.ok || data.status !== 'success') {
     throw new Error(data.error?.message || 'שגיאה בהתחברות');
   }
 
   return data;
+}
+
+// פונקציית הרשמה
+async function register(username, password, email, first_name, last_name) {
+  const response = await fetch('/api/auth/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      username,
+      password,
+      email: email || undefined,
+      first_name: first_name || undefined,
+      last_name: last_name || undefined
+    }),
+    credentials: 'include' // Include cookies for session
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || data.status !== 'success') {
+    throw new Error(data.error?.message || 'שגיאה בהרשמה');
+  }
+
+  return {
+    success: true,
+    user: data.data?.user
+  };
 }
 
 function showLoginError(message, containerId = 'loginError') {
@@ -147,24 +177,44 @@ function showLogin(loginSectionId = 'loginSection', dashboardSectionId = 'dashbo
   if (dashboardSection) {dashboardSection.style.display = 'none';}
 }
 
-function logout() {
+async function logout() {
+  try {
+    // Call logout API
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+  } catch (error) {
+    console.warn('Logout API call failed:', error);
+  }
+  
+  // Clear local state
   authToken = null;
   currentUser = null;
   localStorage.removeItem('authToken');
   localStorage.removeItem('currentUser');
 
+  // Redirect to login page
+  window.location.href = 'login.html';
+  
   // הפעלת פונקציה גלובלית להתנתקות אם קיימת
   if (typeof onLogout === 'function') {
     onLogout();
-  } else {
-    showLogin();
   }
 }
 
 function isAuthenticated() {
-  // כרגע יש רק משתמש אחד - נימרוד
-  // מערכת המשתמשים המלאה היא עתידית
-  return true; // תמיד מחובר (נימרוד)
+  // Check if user is in localStorage
+  const storedUser = localStorage.getItem('currentUser');
+  if (storedUser) {
+    try {
+      currentUser = JSON.parse(storedUser);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  return false;
 }
 
 function getAuthToken() {
@@ -172,21 +222,24 @@ function getAuthToken() {
 }
 
 function getCurrentUser() {
-  // כרגע יש רק משתמש אחד - נימרוד
-  // מערכת המשתמשים המלאה היא עתידית
+  // Return cached user if available
   if (currentUser) {
     return currentUser;
   }
   
-  // החזרת משתמש ברירת מחדל (נימרוד)
-  return {
-    id: 1,
-    username: 'nimrod',
-    name: 'נימרוד',
-    email: 'nimrod@tiktrack.com',
-    roles: ['admin', 'user'],
-    isActive: true
-  };
+  // Try to load from localStorage
+  const storedUser = localStorage.getItem('currentUser');
+  if (storedUser) {
+    try {
+      currentUser = JSON.parse(storedUser);
+      return currentUser;
+    } catch (e) {
+      console.warn('Failed to parse stored user:', e);
+    }
+  }
+  
+  // No user found
+  return null;
 }
 
 // פונקציה גלובלית לטיפול בטופס התחברות
@@ -220,11 +273,13 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
       const loginData = await login(username, password);
 
       // שמירת פרטי התחברות
-      authToken = loginData.data.access_token;
-      currentUser = loginData.data.user;
+      authToken = loginData.data?.access_token || 'session_based';
+      currentUser = loginData.data?.user;
 
-      localStorage.setItem('authToken', authToken);
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      if (currentUser) {
+        localStorage.setItem('authToken', authToken);
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      }
 
       // שמירת פרטי התחברות אם נבחר "זכור אותי"
       saveCredentials(username, password);
@@ -252,22 +307,60 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
 }
 
 // פונקציה לבדיקת התחברות בעת טעינת הדף
-function checkAuthentication(onAuthenticated = null, onNotAuthenticated = null) {
-  // כרגע יש רק משתמש אחד - נימרוד
-  // מערכת המשתמשים המלאה היא עתידית
-  currentUser = {
-    id: 1,
-    username: 'nimrod',
-    name: 'נימרוד',
-    email: 'nimrod@tiktrack.com',
-    roles: ['admin', 'user'],
-    isActive: true
-  };
-
-  if (onAuthenticated && typeof onAuthenticated === 'function') {
-    onAuthenticated();
+async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = null) {
+  // Try to get current user from API
+  try {
+    const response = await fetch('/api/auth/me', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.status === 'success' && data.data?.user) {
+        currentUser = data.data.user;
+        authToken = 'session_based'; // Session-based auth
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        localStorage.setItem('authToken', authToken);
+        
+        if (onAuthenticated && typeof onAuthenticated === 'function') {
+          onAuthenticated();
+        } else {
+          showDashboard();
+        }
+        return;
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to check authentication:', error);
+  }
+  
+  // Not authenticated - try localStorage as fallback
+  const storedUser = localStorage.getItem('currentUser');
+  if (storedUser) {
+    try {
+      currentUser = JSON.parse(storedUser);
+      if (onAuthenticated && typeof onAuthenticated === 'function') {
+        onAuthenticated();
+      } else {
+        showDashboard();
+      }
+      return;
+    } catch (e) {
+      // Invalid stored user
+    }
+  }
+  
+  // Not authenticated
+  currentUser = null;
+  if (onNotAuthenticated && typeof onNotAuthenticated === 'function') {
+    onNotAuthenticated();
   } else {
-    showDashboard();
+    // Redirect to login if not on login/register page
+    if (!window.location.pathname.includes('login.html') && 
+        !window.location.pathname.includes('register.html')) {
+      window.location.href = 'login.html';
+    }
   }
 }
 
@@ -365,4 +458,8 @@ window.TikTrackAuth = {
   showDashboard,
   showLoginError,
   showLoginSuccess,
+  register,
 };
+
+// Export register function globally
+window.register = register;

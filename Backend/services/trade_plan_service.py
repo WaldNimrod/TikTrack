@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class TradePlanService:
     @staticmethod
-    def get_all(db: Session) -> List[TradePlan]:
+    def get_all(db: Session, user_id: Optional[int] = None) -> List[TradePlan]:
         """Get all trade plans"""
         logger.info("Loading trade plans with joinedload for ticker and account")
         
@@ -44,11 +44,14 @@ class TradePlanService:
             logger.error(f"Direct SQL count failed: {str(sql_error)}")
             sql_count = None
         
-        # Now use ORM query
-        plans = db.query(TradePlan).options(
+        # Now use ORM query (filtered by user_id if provided)
+        query = db.query(TradePlan).options(
             joinedload(TradePlan.ticker),
             joinedload(TradePlan.account)
-        ).all()
+        )
+        if user_id is not None:
+            query = query.filter(TradePlan.user_id == user_id)
+        plans = query.all()
         logger.info(f"Loaded {len(plans)} trade plans with joinedload")
         
         # Verify count matches
@@ -68,30 +71,42 @@ class TradePlanService:
         return plans
     
     @staticmethod
-    def get_by_id(db: Session, plan_id: int) -> Optional[TradePlan]:
-        """Get trade plan by ID"""
-        return db.query(TradePlan).options(
+    def get_by_id(db: Session, plan_id: int, user_id: Optional[int] = None) -> Optional[TradePlan]:
+        """Get trade plan by ID (with user_id check)"""
+        query = db.query(TradePlan).options(
             joinedload(TradePlan.ticker),
             joinedload(TradePlan.account)
-        ).filter(TradePlan.id == plan_id).first()
+        ).filter(TradePlan.id == plan_id)
+        if user_id is not None:
+            query = query.filter(TradePlan.user_id == user_id)
+        return query.first()
     
     @staticmethod
-    def get_by_account(db: Session, trading_account_id: int) -> List[TradePlan]:
-        """Get trade plans by account"""
-        return db.query(TradePlan).filter(TradePlan.trading_account_id == trading_account_id).all()
+    def get_by_account(db: Session, trading_account_id: int, user_id: Optional[int] = None) -> List[TradePlan]:
+        """Get trade plans by account (filtered by user_id if provided)"""
+        query = db.query(TradePlan).filter(TradePlan.trading_account_id == trading_account_id)
+        if user_id is not None:
+            query = query.filter(TradePlan.user_id == user_id)
+        return query.all()
     
     @staticmethod
-    def get_by_ticker(db: Session, ticker_id: int) -> List[TradePlan]:
-        """Get trade plans by ticker"""
-        return db.query(TradePlan).filter(TradePlan.ticker_id == ticker_id).all()
+    def get_by_ticker(db: Session, ticker_id: int, user_id: Optional[int] = None) -> List[TradePlan]:
+        """Get trade plans by ticker (filtered by user_id if provided)"""
+        query = db.query(TradePlan).filter(TradePlan.ticker_id == ticker_id)
+        if user_id is not None:
+            query = query.filter(TradePlan.user_id == user_id)
+        return query.all()
     
     @staticmethod
-    def get_open_plans(db: Session) -> List[TradePlan]:
-        """Get open trade plans"""
-        return db.query(TradePlan).filter(TradePlan.status == 'open').all()
+    def get_open_plans(db: Session, user_id: Optional[int] = None) -> List[TradePlan]:
+        """Get open trade plans (filtered by user_id if provided)"""
+        query = db.query(TradePlan).filter(TradePlan.status == 'open')
+        if user_id is not None:
+            query = query.filter(TradePlan.user_id == user_id)
+        return query.all()
     
     @staticmethod
-    def create(db: Session, data: Dict[str, Any]) -> TradePlan:
+    def create(db: Session, data: Dict[str, Any], user_id: Optional[int] = None) -> TradePlan:
         """
         Create a new trade plan with snapshot support from existing trade.
         
@@ -186,6 +201,10 @@ class TradePlanService:
                     data.setdefault('entry_price', trade_entry_price)
                     logger.info(f"Snapshotted planning fields from trade {trade_id}: planned_amount={trade_amount}, entry_price={trade_entry_price}")
 
+            # Set user_id if provided and not in data
+            if user_id is not None and 'user_id' not in data:
+                data['user_id'] = user_id
+            
             # Validate data against constraints
             logger.info("Validating trade plan data before creation")
             is_valid, errors = ValidationService.validate_data(db, 'trade_plans', data)
@@ -206,10 +225,13 @@ class TradePlanService:
             raise
     
     @staticmethod
-    def update(db: Session, plan_id: int, data: Dict[str, Any]) -> Optional[TradePlan]:
-        """Update trade plan"""
+    def update(db: Session, plan_id: int, data: Dict[str, Any], user_id: Optional[int] = None) -> Optional[TradePlan]:
+        """Update trade plan (with user_id check)"""
         try:
-            plan = db.query(TradePlan).filter(TradePlan.id == plan_id).first()
+            query = db.query(TradePlan).filter(TradePlan.id == plan_id)
+            if user_id is not None:
+                query = query.filter(TradePlan.user_id == user_id)
+            plan = query.first()
             if not plan:
                 logger.warning(f"Trade plan {plan_id} not found for update")
                 return None
@@ -275,11 +297,14 @@ class TradePlanService:
             raise
     
     @staticmethod
-    def delete(db: Session, plan_id: int) -> bool:
-        """Delete trade plan"""
+    def delete(db: Session, plan_id: int, user_id: Optional[int] = None) -> bool:
+        """Delete trade plan (with user_id check)"""
         from models.trade import Trade
         
-        plan = db.query(TradePlan).filter(TradePlan.id == plan_id).first()
+        query = db.query(TradePlan).filter(TradePlan.id == plan_id)
+        if user_id is not None:
+            query = query.filter(TradePlan.user_id == user_id)
+        plan = query.first()
         if not plan:
             return False
         

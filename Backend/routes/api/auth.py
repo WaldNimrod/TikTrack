@@ -163,7 +163,7 @@ def login():
             
             # For now, we use session-based auth
             # In the future, we can add JWT tokens here
-            access_token = session.get('_id', 'session_based')
+            access_token = 'session_based'
             
             return jsonify({
                 'status': 'success',

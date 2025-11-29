@@ -17,10 +17,13 @@ class AlertService:
         self.db = db
     
     @staticmethod
-    def get_all(db: Session) -> List[Alert]:
-        """Get all alerts"""
+    def get_all(db: Session, user_id: Optional[int] = None) -> List[Alert]:
+        """Get all alerts (filtered by user_id if provided)"""
         try:
-            alerts = db.query(Alert).all()
+            query = db.query(Alert)
+            if user_id is not None:
+                query = query.filter(Alert.user_id == user_id)
+            alerts = query.all()
             logger.info(f"נטענו {len(alerts)} התראות")
             return alerts
         except Exception as e:
@@ -28,20 +31,26 @@ class AlertService:
             raise
     
     @staticmethod
-    def get_by_id(db: Session, alert_id: int) -> Optional[Alert]:
-        """Get alert by ID"""
+    def get_by_id(db: Session, alert_id: int, user_id: Optional[int] = None) -> Optional[Alert]:
+        """Get alert by ID (with user_id check)"""
         try:
-            alert = db.query(Alert).filter(Alert.id == alert_id).first()
+            query = db.query(Alert).filter(Alert.id == alert_id)
+            if user_id is not None:
+                query = query.filter(Alert.user_id == user_id)
+            alert = query.first()
             return alert
         except Exception as e:
             logger.error(f"שגיאה בטעינת התראה {alert_id}: {e}")
             raise
     
     @staticmethod
-    def get_unread_alerts(db: Session) -> List[Alert]:
-        """Get unread alerts (is_triggered = 'new')"""
+    def get_unread_alerts(db: Session, user_id: Optional[int] = None) -> List[Alert]:
+        """Get unread alerts (is_triggered = 'new') (filtered by user_id if provided)"""
         try:
-            alerts = db.query(Alert).filter(Alert.is_triggered == 'new').all()
+            query = db.query(Alert).filter(Alert.is_triggered == 'new')
+            if user_id is not None:
+                query = query.filter(Alert.user_id == user_id)
+            alerts = query.all()
             logger.info(f"נטענו {len(alerts)} התראות שלא נקראו")
             return alerts
         except Exception as e:
@@ -49,12 +58,16 @@ class AlertService:
             raise
     
     @staticmethod
-    def create(db: Session, alert_data: Dict[str, Any]) -> Alert:
-        """Create a new alert"""
+    def create(db: Session, alert_data: Dict[str, Any], user_id: Optional[int] = None) -> Alert:
+        """Create a new alert (with user_id if provided)"""
         try:
             logger.info(f"AlertService.create called with data: {alert_data}")
             logger.info(f"condition_attribute in data: {'condition_attribute' in alert_data}")
             logger.info(f"condition_attribute value: {alert_data.get('condition_attribute')}")
+            
+            # Set user_id if provided and not in data
+            if user_id is not None and 'user_id' not in alert_data:
+                alert_data['user_id'] = user_id
             
             # Set default value for is_triggered
             if 'is_triggered' not in alert_data:
@@ -105,10 +118,13 @@ class AlertService:
         return self.create(self.db, alert_data)
     
     @staticmethod
-    def update(db: Session, alert_id: int, alert_data: Dict[str, Any]) -> Alert:
-        """Update an existing alert"""
+    def update(db: Session, alert_id: int, alert_data: Dict[str, Any], user_id: Optional[int] = None) -> Alert:
+        """Update an existing alert (with user_id check)"""
         try:
-            alert = db.query(Alert).filter(Alert.id == alert_id).first()
+            query = db.query(Alert).filter(Alert.id == alert_id)
+            if user_id is not None:
+                query = query.filter(Alert.user_id == user_id)
+            alert = query.first()
             if not alert:
                 raise ValueError(f"Alert {alert_id} not found")
             
@@ -161,11 +177,14 @@ class AlertService:
             raise
     
     @staticmethod
-    def delete(db: Session, alert_id: int) -> bool:
-        """Delete an alert"""
+    def delete(db: Session, alert_id: int, user_id: Optional[int] = None) -> bool:
+        """Delete an alert (with user_id check)"""
         try:
-            # Check that the alert exists
-            alert = db.query(Alert).filter(Alert.id == alert_id).first()
+            # Check that the alert exists (with user_id check)
+            query = db.query(Alert).filter(Alert.id == alert_id)
+            if user_id is not None:
+                query = query.filter(Alert.user_id == user_id)
+            alert = query.first()
             if not alert:
                 raise ValueError(f"Alert {alert_id} not found")
             

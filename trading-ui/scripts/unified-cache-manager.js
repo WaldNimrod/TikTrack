@@ -287,6 +287,38 @@ class UnifiedCacheManager {
     }
 
     /**
+     * Build cache key with user_id for multi-user support
+     * @param {string} key - Base cache key
+     * @param {number|null} userId - User ID (optional, will try to get from current user)
+     * @returns {string} - Cache key with user_id prefix
+     */
+    buildUserCacheKey(key, userId = null) {
+        // Get user_id if not provided
+        if (userId === null) {
+            try {
+                const currentUser = (typeof window !== 'undefined' && window.getCurrentUser && typeof window.getCurrentUser === 'function')
+                    ? window.getCurrentUser()
+                    : (typeof getCurrentUser === 'function' 
+                        ? getCurrentUser() 
+                        : (typeof window !== 'undefined' && window.TikTrackAuth && typeof window.TikTrackAuth.getCurrentUser === 'function'
+                            ? window.TikTrackAuth.getCurrentUser()
+                            : null));
+                userId = currentUser?.id || currentUser?.user_id || 1; // Default to 1 if no user
+            } catch (e) {
+                userId = 1; // Fallback to default user
+            }
+        }
+        
+        // If key already contains user_id, return as-is
+        if (key.includes(`:u${userId}:`) || key.startsWith(`u${userId}:`)) {
+            return key;
+        }
+        
+        // Add user_id prefix: u{userId}:{original_key}
+        return `u${userId}:${key}`;
+    }
+
+    /**
      * Get current version for a cache key
      * @param {string} key - Cache key
      * @returns {string} - Version string
@@ -375,6 +407,11 @@ class UnifiedCacheManager {
             window.Logger.warn('⚠️ Unified Cache Manager not initialized', { page: "unified-cache-manager" });
             return false;
         }
+        
+        // Add user_id to cache key for multi-user support (unless explicitly disabled)
+        if (options.includeUserId !== false) {
+            key = this.buildUserCacheKey(key, options.userId);
+        }
 
         const startTime = performance.now();
         
@@ -430,6 +467,11 @@ class UnifiedCacheManager {
         if (!this.initialized) {
             window.Logger.warn('⚠️ Unified Cache Manager not initialized', { page: "unified-cache-manager" });
             return options.fallback ? await options.fallback() : null;
+        }
+        
+        // Add user_id to cache key for multi-user support (unless explicitly disabled)
+        if (options.includeUserId !== false) {
+            key = this.buildUserCacheKey(key, options.userId);
         }
 
         const startTime = performance.now();

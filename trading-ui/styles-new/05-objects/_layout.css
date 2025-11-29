@@ -588,7 +588,7 @@
 .section-header .section-actions,
 .section-header .chart-actions,
 .section-header .table-actions {
-  margin-inline-end: 0.5rem;
+  margin-inline-end: 0;
   display: flex;
   gap: 0.5rem;
   align-items: center;
@@ -599,8 +599,8 @@
 /* כפתור toggle - תמיד בסוף השורה משמאל */
 .section-header button[onclick*="toggleSection"],
 .section-header [data-button-type="TOGGLE"] {
-  order: 2; /* אחרי section-actions */
-  margin-inline-start: 0.5rem;
+  order: 2; /* אחרי section-actions - בסוף השורה משמאל */
+  margin-inline-start: 0.5rem; /* מרווח קטן בין section-actions ל-toggle */
 }
 
 

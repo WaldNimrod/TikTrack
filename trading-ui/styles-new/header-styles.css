@@ -25,6 +25,7 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow: visible; /* מאפשר לכפתור להיות מחוץ לגבולות */
 }
 
 #unified-header .header-top {
@@ -70,6 +71,7 @@
     gap: 1rem;
     text-decoration: none;
     color: inherit;
+    cursor: pointer;
 }
 
 #unified-header .logo:hover {
@@ -313,6 +315,34 @@
     align-items: center;
 }
 
+/* כפתור ראשי - במרכז העמוד על הקו של סוף הפילטר למטה */
+/* הכפתור נמצא מחוץ ל-header-filters כך שהוא נשאר גלוי גם כשהפילטר סגור */
+#unified-header .filter-toggle-main {
+    position: absolute;
+    top: 149px; /* מיקום כשהפילטר פתוח */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    justify-content: center;
+    align-items: center;
+    z-index: 952;
+    width: 100%;
+    pointer-events: none;
+}
+
+/* כשהפילטר סגור, הכפתור צריך להיות גבוה יותר */
+#unified-header .header-content:has(.header-filters[style*="display: none"]) .filter-toggle-main,
+#unified-header .header-content:has(.header-filters[style*="display:none"]) .filter-toggle-main {
+    top: 75px; /* מיקום כשהפילטר סגור */
+}
+
+#unified-header .filter-toggle-main .header-filter-toggle-btn {
+    pointer-events: all;
+}
+
+/* כפתור משני - בתוך הפילטר, במרכז */
 #unified-header .filter-toggle-secondary {
     position: absolute;
     bottom: -16px;
@@ -337,26 +367,43 @@
 }
 
 #unified-header .header-filter-toggle-btn {
-    background: var(--apple-bg-secondary, #f5f5f7);
+    background: white;
     border: 1px solid var(--apple-border-light, #e5e5e5);
     border-radius: 50%;
     cursor: pointer;
     padding: 0;
     color: var(--apple-text-secondary, #6c757d);
-    font-size: 0.6rem;
-    width: 24px;
-    height: 24px;
+    font-size: 0.6rem; /* גודל חץ תקין */
+    width: 20px; /* קוטר קטן יותר */
+    height: 20px; /* קוטר קטן יותר */
+    min-width: 20px; /* מונע דריסה */
+    min-height: 20px; /* מונע דריסה */
+    max-width: 20px; /* מונע דריסה */
+    max-height: 20px; /* מונע דריסה */
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
     line-height: 1;
+    box-sizing: border-box; /* מונע דריסה */
+    box-shadow: none !important; /* הסרת כל צל/הילה */
+    filter: none !important; /* הסרת כל אפקטים */
+    text-shadow: none !important; /* הסרת צל טקסט */
 }
 
 #unified-header .header-filter-toggle-btn:hover {
     background: var(--apple-bg-tertiary, #e5e5e5);
     color: var(--apple-text-primary, #1d1d1f);
     border-color: var(--apple-border-medium, #d1d1d1);
+    box-shadow: none !important; /* הסרת כל צל/הילה גם ב-hover */
+    filter: none !important; /* הסרת כל אפקטים */
+    text-shadow: none !important; /* הסרת צל טקסט */
+}
+
+#unified-header .header-filter-toggle-btn .header-filter-arrow {
+    font-size: 0.6rem; /* גודל חץ תקין */
+    line-height: 1;
+    display: inline-block;
 }
 
 #unified-header .header-filter-toggle-btn.collapsed .header-filter-arrow {

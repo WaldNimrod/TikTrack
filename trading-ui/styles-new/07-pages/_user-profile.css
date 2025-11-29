@@ -7,24 +7,20 @@
  * Last Updated: January 28, 2025
  */
 
-.user-profile-page .content-section {
-  margin-bottom: 2rem;
-}
-
-.user-profile-page .content-section .section-header {
-  margin-bottom: 1rem;
-}
-
-.user-profile-page .content-section .section-body {
-  padding: 1.5rem;
-  background: var(--bg-secondary, #f8f9fa);
-  border-radius: 8px;
-}
-
-.user-profile-page #user-info-section .section-body,
-.user-profile-page #password-change-section .section-body {
-  background: white;
+.user-profile-page .section-body .card {
   border: 1px solid var(--border-color, #dee2e6);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-profile-page .section-body .card-header {
+  background: var(--current-entity-color-light, var(--bg-secondary, #f8f9fa));
+  border-bottom: 2px solid var(--current-entity-color-dark, var(--border-color, #dee2e6));
+  color: var(--current-entity-color-dark, var(--text-primary, #212529));
+  font-weight: 600;
+}
+
+.user-profile-page .section-body .card-body {
+  padding: 1.5rem;
 }
 
 .user-profile-page .form-label {
@@ -41,5 +37,41 @@
 .user-profile-page #updateInfoBtn,
 .user-profile-page #updatePasswordBtn {
   min-width: 150px;
+}
+
+/* SMTP Settings Section */
+.user-profile-page #smtpStatus {
+  margin-top: 1rem;
+}
+
+.user-profile-page #smtpStatus strong {
+  margin-left: 0.5rem;
+}
+
+.user-profile-page #updateSmtpBtn,
+.user-profile-page #testConnectionBtn,
+.user-profile-page #sendTestEmailBtn {
+  min-width: 150px;
+}
+
+.user-profile-page #togglePasswordBtn {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+}
+
+.user-profile-page .input-group #smtpPassword {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+  direction: ltr; /* Force LTR for password input */
+  text-align: left;
+}
+
+/* SMTP Section - Force LTR for email and password fields */
+.user-profile-page #smtpUser,
+.user-profile-page #smtpFromEmail,
+.user-profile-page #smtpTestEmail,
+.user-profile-page #smtpPassword {
+  direction: ltr;
+  text-align: left;
 }
 

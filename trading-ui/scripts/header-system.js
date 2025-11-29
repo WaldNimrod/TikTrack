@@ -1300,18 +1300,12 @@ class HeaderSystem {
               </div>
 
               <div class="logo-section">
-                <div class="logo">
+                <a href="/" class="logo">
                   <img src="${imagePathPrefix}images/logo.svg" alt="TikTrack Logo" class="logo-image">
                   <span class="logo-text">פשוט לנהל תיק</span>
-                </div>
+                </a>
               </div>
               
-              <div class="filter-toggle-section filter-toggle-main">
-                <button class="header-filter-toggle-btn" id="headerFilterToggleBtnMain" title="הצג/הסתר פילטרים" 
-                        data-onclick="toggleHeaderFilters()">
-                  <span class="header-filter-arrow">▲</span>
-                </button>
-              </div>
             </div>
           </div>
 
@@ -1459,6 +1453,13 @@ class HeaderSystem {
               </button>
             </div>
           </div>
+        </div>
+        
+        <div class="filter-toggle-section filter-toggle-main">
+          <button class="header-filter-toggle-btn" id="headerFilterToggleBtnMain" title="הצג/הסתר פילטרים" 
+                  data-onclick="toggleHeaderFilters()">
+            <span class="header-filter-arrow">▲</span>
+          </button>
         </div>
         ` : ''}
         

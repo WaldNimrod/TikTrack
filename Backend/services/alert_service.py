@@ -263,13 +263,16 @@ class AlertService:
             raise
     
     @staticmethod
-    def get_unread_alerts_with_symbols(db: Session) -> List[Dict[str, Any]]:
-        """Get unread alerts with ticker symbols"""
+    def get_unread_alerts_with_symbols(db: Session, user_id: Optional[int] = None) -> List[Dict[str, Any]]:
+        """Get unread alerts with ticker symbols (filtered by user_id if provided)"""
         try:
             from models.ticker import Ticker
             
-            # Get all new alerts
-            alerts = db.query(Alert).filter(Alert.is_triggered == 'new').all()
+            # Get all new alerts (filtered by user_id if provided)
+            query = db.query(Alert).filter(Alert.is_triggered == 'new')
+            if user_id is not None:
+                query = query.filter(Alert.user_id == user_id)
+            alerts = query.all()
             
             # Create list of dictionaries
             alerts_with_symbols: List[Dict[str, Any]] = []
@@ -288,7 +291,7 @@ class AlertService:
                 
                 alerts_with_symbols.append(alert_dict)
             
-            logger.info(f"Found {len(alerts_with_symbols)} unread alerts")
+            logger.info(f"Found {len(alerts_with_symbols)} unread alerts" + (f" for user {user_id}" if user_id else ""))
             return alerts_with_symbols
         except Exception as e:
             logger.error(f"Error loading unread alerts with symbols: {e}")

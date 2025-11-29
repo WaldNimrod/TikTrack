@@ -102,6 +102,7 @@
 | **notes.html** | מערכת הערות | `http://localhost:5000/notes.html` | `/api/notes/*` | ✅ NoteBusinessService | ✅ מוכן |
 | **research.html** | מחקר וניתוח | `http://localhost:5000/research.html` | `/api/research/*` | ❌ חסר | ⏳ צריך Business Service |
 | **preferences.html** | הגדרות מערכת v3.0 | `http://localhost:8080/preferences.html` | `/api/preferences/*` | ❌ חסר (מורכב) | ⏳ אופציונלי |
+| **user-profile.html** | ניהול פרופיל משתמש | `http://localhost:8080/user-profile.html` | `/api/auth/me`, `/api/auth/me/password` | ❌ חסר | ✅ מוכן |
 
 **הערה:** כל העמודים עם Business Logic Service משולבים במלואם עם מערכות מטמון ואיתחול. ראה [Business Logic Layer Documentation](../02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md) לפרטים מלאים.
 

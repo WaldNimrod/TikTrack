@@ -1777,7 +1777,7 @@ function setupFieldValidation(input, rules = {}) {
   }
 
   // יצירת פונקציית ולידציה
-  input._validationHandler = () => validateField(input, rules);
+  input._validationHandler = () => (window.validateField || validateField)(input, rules);
 
   // הוספת event listeners
   input.addEventListener('input', input._validationHandler);
@@ -1834,24 +1834,24 @@ function initializeValidation(formId, validationRules = {}) {
       case 'email':
       case 'tel':
       case 'url':
-        isValid = validateTextField(input, fieldRules);
+        isValid = (window.validateTextField || validateTextField)(input, fieldRules);
         break;
 
       case 'number':
-        isValid = validateNumberField(input, fieldRules);
+        isValid = (window.validateNumberField || validateNumberField)(input, fieldRules);
         break;
 
       case 'date':
-        isValid = validateDateField(input, fieldRules);
+        isValid = (window.validateDateField || validateDateField)(input, fieldRules);
         break;
 
       default:
         if (input.tagName === 'SELECT') {
-          isValid = validateSelectField(input, fieldRules);
+          isValid = (window.validateSelectField || validateSelectField)(input, fieldRules);
         } else if (input.tagName === 'TEXTAREA') {
-          isValid = validateTextField(input, fieldRules);
+          isValid = (window.validateTextField || validateTextField)(input, fieldRules);
         } else {
-          isValid = validateField(input, fieldRules);
+          isValid = (window.validateField || validateField)(input, fieldRules);
         }
         break;
       }

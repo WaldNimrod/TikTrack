@@ -308,10 +308,12 @@ def mark_as_triggered(alert_id: int):
 
 @alerts_bp.route('/unread', methods=['GET'])
 def get_unread_alerts():
-    """Get unread alerts (new)"""
+    """Get unread alerts (new) - filtered by user_id if available"""
     try:
         db: Session = next(get_db())
-        alerts = AlertService.get_unread_alerts_with_symbols(db)
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        alerts = AlertService.get_unread_alerts_with_symbols(db, user_id=user_id)
         normalizer = _get_date_normalizer()
         return jsonify({
             "status": "success",

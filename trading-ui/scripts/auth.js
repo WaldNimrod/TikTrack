@@ -381,8 +381,6 @@ function createLoginInterface(containerId, onSuccess = null) {
         <div class="login-logo">
           <img src="images/logo.svg" alt="TikTrack Logo" />
         </div>
-        <h1 class="login-title">ברוכים הבאים ל-TikTrack</h1>
-        <p class="login-subtitle">מערכת ניהול השקעות מתקדמת</p>
       </div>
       
       <div class="login-error" id="loginError"></div>
@@ -411,9 +409,8 @@ function createLoginInterface(containerId, onSuccess = null) {
       </form>
       
       <div class="demo-credentials">
-        <h6>🔑 פרטי התחברות לבדיקה:</h6>
         <p><strong>מנהל:</strong> username=admin, password=admin123</p>
-        <p><strong>משתמש:</strong> username=test, password=test123</p>
+        <p><strong>משתמש:</strong> username=user, password=user123</p>
       </div>
     </div>
   `;

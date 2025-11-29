@@ -172,3 +172,16 @@ This log tracks version bumps for the development environment (branch `main`). M
 - 0 console calls (לפני: 9+ בעמוד)
 - 0 שגיאות קריטיות
 - קונסולה נקייה לחלוטין |
+| 2025-11-29T15:53:58+00:00 | 1.3.42.0 | 1.3.41.0 | f8c7fd01a0225ea70aedb8797b309e1b5c7c15cd | 48a408ff686e8f80802b174f321872e1f334263c | patch | תיקון: תיקון תצוגת ראש הדף בכל המערכת
+
+תיקונים עיקריים:
+- תיקון template literal ב-header-system.js שגרם לשגיאת תחביר
+- הוספת filter-toggle-main שחסר (כפתור טוגל ראשי)
+- הוספת header-styles.css ל-research.html
+- הסתרת פילטרים בעמוד research (דשבורד עתידי)
+
+שיפורים:
+- Header נטען כראוי בכל העמודים
+- research.html: header ללא פילטרים (כמבוקש)
+- trades.html: header עם פילטרים (כמבוקש)
+- תיקון שגיאת תחביר שגרמה ל-header לא להיטען במלואו |

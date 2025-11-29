@@ -437,7 +437,12 @@ function updateActiveAlerts(alerts = []) {
         return;
     }
 
-    const activeAlerts = alerts.filter((alert) => (alert?.status || '').toLowerCase() === 'active');
+    // Filter for active alerts (is_triggered = 'new')
+    const activeAlerts = alerts.filter((alert) => {
+        const triggered = alert?.is_triggered || alert?.status;
+        return triggered === 'new';
+    });
+    
     const alertSubset = (activeAlerts.length ? activeAlerts : alerts).slice(0, 5);
 
     const list = document.createElement('ul');

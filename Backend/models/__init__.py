@@ -22,6 +22,7 @@ from .tag_category import TagCategory
 from .tag import Tag
 from .tag_link import TagLink
 from .quotes_last import QuotesLast
+from .password_reset_token import PasswordResetToken
 
 __all__ = [
     'BaseModel',

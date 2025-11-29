@@ -1068,14 +1068,16 @@ class HeaderSystem {
   }
 
   /**
-   * Update user display in header
+   * Update user display in filter row
    */
   updateUserDisplay() {
     try {
-      const userSection = document.getElementById('headerUserSection');
-      const userNameElement = document.getElementById('headerUserName');
+      const userSection = document.getElementById('filterUserSection');
+      const userAvatar = document.getElementById('filterUserAvatar');
+      const userInitials = document.getElementById('filterUserInitials');
+      const authIcon = document.getElementById('filterAuthIcon');
       
-      if (!userSection || !userNameElement) {
+      if (!userSection || !userAvatar || !userInitials || !authIcon) {
         // User section might not exist on all pages
         return;
       }
@@ -1098,20 +1100,43 @@ class HeaderSystem {
         }
       }
 
-      if (currentUser && currentUser.id) {
-        // Display user name
-        const displayName = currentUser.display_name || 
-                          currentUser.full_name || 
-                          currentUser.username || 
-                          'משתמש';
-        userNameElement.textContent = displayName;
+      const isAuthenticated = currentUser && currentUser.id;
+      
+      if (isAuthenticated) {
+        // Get user initials
+        const firstName = currentUser.first_name || '';
+        const lastName = currentUser.last_name || '';
+        const username = currentUser.username || '';
+        
+        let initials = '';
+        if (firstName && lastName) {
+          initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+        } else if (firstName) {
+          initials = firstName.charAt(0).toUpperCase();
+        } else if (username) {
+          initials = username.substring(0, 2).toUpperCase();
+        } else {
+          initials = '?';
+        }
+        
+        userInitials.textContent = initials;
+        userAvatar.style.display = 'flex';
         userSection.style.display = 'flex';
+        const profileLink = document.getElementById('filterUserProfileLink');
+        if (profileLink) profileLink.style.display = 'block';
+        authIcon.style.opacity = '0.7';
+        authIcon.title = 'התנתק';
       } else {
-        // Hide user section if not authenticated
-        userSection.style.display = 'none';
+        // Show login icon only
+        userAvatar.style.display = 'none';
+        userSection.style.display = 'flex';
+        const profileLink = document.getElementById('filterUserProfileLink');
+        if (profileLink) profileLink.style.display = 'none';
+        authIcon.style.opacity = '0.7';
+        authIcon.title = 'התחבר';
       }
     } catch (error) {
-      window.Logger?.warn?.('⚠️ Failed to update user display in header', {
+      window.Logger?.warn?.('⚠️ Failed to update user display in filter row', {
         error: error?.message || error,
         page: 'header-system',
       });
@@ -1122,6 +1147,7 @@ class HeaderSystem {
     const pathname = window.location.pathname || '';
     const href = window.location.href || '';
     const isMockupPage = pathname.includes('/mockups/') || href.includes('/mockups/');
+    const isResearchPage = pathname.includes('/research') || href.includes('/research');
     const imagePathPrefix = isMockupPage ? '../../' : '';
     
     return `
@@ -1273,28 +1299,23 @@ class HeaderSystem {
                 </nav>
               </div>
 
-              <div class="user-section" id="headerUserSection" style="display: flex; align-items: center; gap: 12px; margin-left: 20px;">
-                <div class="user-info" id="headerUserInfo" style="display: flex; align-items: center; gap: 8px;">
-                  <span class="user-name" id="headerUserName" style="color: #333; font-size: 14px; font-weight: 500;"></span>
-                </div>
-                <button class="logout-btn" id="headerLogoutBtn" 
-                        onclick="if(window.TikTrackAuth?.logout) { window.TikTrackAuth.logout(); } else if(window.logout) { window.logout(); }"
-                        style="padding: 6px 12px; background: #fc5a06; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500;"
-                        title="התנתקות">
-                  התנתק
-                </button>
-              </div>
-
               <div class="logo-section">
                 <div class="logo">
                   <img src="${imagePathPrefix}images/logo.svg" alt="TikTrack Logo" class="logo-image">
                   <span class="logo-text">פשוט לנהל תיק</span>
                 </div>
               </div>
+              
+              <div class="filter-toggle-section filter-toggle-main">
+                <button class="header-filter-toggle-btn" id="headerFilterToggleBtnMain" title="הצג/הסתר פילטרים" 
+                        data-onclick="toggleHeaderFilters()">
+                  <span class="header-filter-arrow">▲</span>
+                </button>
+              </div>
             </div>
           </div>
 
-        <div class="header-filters" id="headerFilters" data-section="filters">
+        ${!isResearchPage ? `<div class="header-filters" id="headerFilters" data-section="filters">
           <div class="filters-container">
             <div class="filter-group status-filter">
               <div class="filter-dropdown">
@@ -1423,15 +1444,23 @@ class HeaderSystem {
                 <span class="btn-text">×</span>
               </button>
             </div>
+
+            <div class="filter-user-section" id="filterUserSection" style="margin-right: auto; display: flex; align-items: center; gap: 8px;">
+              <a href="/user-profile" class="user-profile-link" id="filterUserProfileLink" title="פרופיל משתמש" style="text-decoration: none; display: none;">
+                <div class="user-avatar-badge" id="filterUserAvatar" style="width: 36px; height: 36px; border-radius: 50%; background: #26baac; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; cursor: pointer;">
+                  <span id="filterUserInitials">?</span>
+                </div>
+              </a>
+              <button class="auth-toggle-btn" id="filterAuthToggleBtn" 
+                      onclick="if(window.TikTrackAuth?.isAuthenticated && window.TikTrackAuth?.isAuthenticated()) { if(window.TikTrackAuth?.logout) { window.TikTrackAuth.logout(); } else if(window.logout) { window.logout(); } } else { window.location.href='/login.html'; }"
+                      style="width: 36px; height: 36px; border: none; background: transparent; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;"
+                      title="התחבר/התנתק">
+                <img src="${imagePathPrefix}images/icons/tabler/user.svg" alt="התחבר/התנתק" style="width: 24px; height: 24px; opacity: 0.7;" id="filterAuthIcon">
+              </button>
+            </div>
           </div>
         </div>
-        
-        <div class="filter-toggle-section filter-toggle-secondary">
-          <button class="header-filter-toggle-btn" id="headerFilterToggleBtnSecondary" title="הצג/הסתר פילטרים" 
-                  data-onclick="toggleHeaderFilters()">
-            <span class="header-filter-arrow">▼</span>
-          </button>
-        </div>
+        ` : ''}
         
         </div>
     `;
@@ -1733,6 +1762,19 @@ if (typeof window.addEventListener === 'function') {
     }
   });
 
+  // Listen for login/logout events from auth.js
+  window.addEventListener('login:success', () => {
+    if (window.headerSystem) {
+      window.headerSystem.updateUserDisplay();
+    }
+  });
+  
+  window.addEventListener('logout:success', () => {
+    if (window.headerSystem) {
+      window.headerSystem.updateUserDisplay();
+    }
+  });
+
   // Also update on page load after a short delay
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
@@ -1794,40 +1836,6 @@ window.clearAllFilters = function() {
   window.headerSystem.filterManager.saveFilters();
   window.headerSystem.filterManager.applyFilters();
 };
-
-// ===== User Display Update =====
-// Update user display when authentication state changes
-if (typeof window.addEventListener === 'function') {
-  // Listen for authentication events
-  window.addEventListener('user:logged-in', () => {
-    if (window.headerSystem) {
-      window.headerSystem.updateUserDisplay();
-    }
-  });
-  
-  window.addEventListener('user:logged-out', () => {
-    if (window.headerSystem) {
-      window.headerSystem.updateUserDisplay();
-    }
-  });
-
-  // Also update on page load after a short delay
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        if (window.headerSystem) {
-          window.headerSystem.updateUserDisplay();
-        }
-      }, 500);
-    });
-  } else {
-    setTimeout(() => {
-      if (window.headerSystem) {
-        window.headerSystem.updateUserDisplay();
-      }
-    }, 500);
-  }
-}
 
 // ===== Global API =====
 

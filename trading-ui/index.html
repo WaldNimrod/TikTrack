@@ -20,20 +20,23 @@
     <!-- External Libraries -->
     <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
 </head><body class="index-page"><div id="unified-header"></div><div class="background-wrapper"><div class="page-body"><div class="top-section" data-section="top"><div class="section-header"><div class="table-title"><img src="/trading-ui/images/icons/entities/home.svg" alt="דף הבית" class="section-icon"> דף הבית - TikTrack </div><div class="table-actions"><button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button></div></div><div class="section-body"><active-alerts></active-alerts><div class="info-summary" id="summaryStats"><div>סה"כ טריידים: <strong id="totalTrades">0</strong></div><div>סה"כ התראות: <strong id="totalAlerts">0</strong></div><div>יתרה נוכחית: <strong id="currentBalance">$0</strong></div><div>רווח/הפסד: <strong id="totalPnL">$0</strong></div></div><div class="info-summary portfolio-summary-card d-flex align-items-center justify-content-between gap-3 flex-nowrap" id="portfolioSummaryContent"><div id="portfolioSummaryStats" class="flex-grow-1"><div>טוען סיכום...</div></div><button data-button-type="VIEW" data-variant="small" data-onclick="togglePortfolioSummarySize()" data-id="portfolioSummaryToggleSize" data-tooltip="הצג סיכום מלא" data-tooltip-placement="bottom" aria-label="הצג סיכום מלא" class="flex-shrink-0 ms-2"></button></div></div></div><div class="main-content"><div class="content-section" id="main"><div class="section-header"><div class="table-title"><img src="images/icons/entities/home.svg" alt="לוח בקרה" class="section-icon"> לוח בקרה </div><div class="table-count" id="dashboardCount">טוען...</div><div class="table-actions"><button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button></div></div><div class="section-body"><div class="row g-3">
+        <!-- שורה ראשונה: טריידים אחרונים + תוכניות אחרונות -->
         <div class="col-md-6">
-            <div class="card h-100">
+            <div class="card h-100" style="max-height: 400px; display: flex; flex-direction: column;">
                 <div class="card-header"><h5>טריידים אחרונים</h5></div>
-                <div class="card-body"><div id="recentTrades">טוען טריידים...</div></div>
+                <div class="card-body" style="overflow-y: auto; flex: 1;"><div id="recentTrades">טוען טריידים...</div></div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-header"><h5>התראות פעילות</h5></div>
-                <div class="card-body"><div id="activeAlerts">טוען התראות...</div></div>
+            <div class="card h-100" style="max-height: 400px; display: flex; flex-direction: column;">
+                <div class="card-header"><h5>תוכניות אחרונות</h5></div>
+                <div class="card-body" style="overflow-y: auto; flex: 1;"><div id="recentTradePlans">טוען תוכניות...</div></div>
             </div>
         </div>
-        <div class="col-12 col-lg-6 col-xl-4">
-            <div class="card h-100" id="pendingExecutionsHighlightsCard">
+        
+        <!-- שורה שנייה: 4 עמודות - שיוך לטרייד, יצירת טרייד, שיוך לתוכנית, יצירת תוכנית -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100" id="pendingExecutionsHighlightsCard" style="max-height: 400px; display: flex; flex-direction: column;">
                 <div class="card-header d-flex align-items-center justify-content-between gap-2">
                     <h5 class="mb-0">
                         <a href="executions.html" class="d-inline-flex align-items-center gap-2 widget-title-link" data-onclick="navigateToPage('executions', { preserveState: true })">
@@ -43,7 +46,7 @@
                     </h5>
                     <span class="badge entity-execution" id="pendingExecutionsHighlightsCount">0</span>
                 </div>
-                <div class="card-body d-flex flex-column gap-3">
+                <div class="card-body d-flex flex-column gap-3" style="overflow-y: auto; flex: 1;">
                     <div id="pendingExecutionsHighlightsLoading" class="d-flex align-items-center justify-content-center text-muted small">
                         <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
                         <span>טוען המלצות...</span>
@@ -56,8 +59,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-lg-6 col-xl-4">
-            <div class="card h-100" id="pendingExecutionsTradeCreationCard">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100" id="pendingExecutionsTradeCreationCard" style="max-height: 400px; display: flex; flex-direction: column;">
                 <div class="card-header d-flex align-items-center justify-content-between gap-2">
                     <h5 class="mb-0">
                         <a href="executions.html" class="d-inline-flex align-items-center gap-2 widget-title-link" data-onclick="navigateToPage('executions', { preserveState: true })">
@@ -67,7 +70,7 @@
                     </h5>
                     <span class="badge entity-trade" id="pendingExecutionsTradeCreationCount">0</span>
                 </div>
-                <div class="card-body d-flex flex-column gap-3">
+                <div class="card-body d-flex flex-column gap-3" style="overflow-y: auto; flex: 1;">
                     <div id="pendingExecutionsTradeCreationLoading" class="d-flex align-items-center justify-content-center text-muted small">
                         <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
                         <span>טוען אשכולות ליצירת טרייד...</span>
@@ -80,8 +83,9 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-lg-6 col-xl-4">
-            <div class="card h-100" id="pendingTradePlanWidgetCard">
+        <!-- שיוך תוכנית + יצירת תוכנית - מאוחדים בווידג'ט אחד -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100" id="pendingTradePlanWidgetCard" style="max-height: 400px; display: flex; flex-direction: column;">
                 <div class="card-header d-flex align-items-center justify-content-between gap-2">
                     <h5 class="mb-0">
                         <a href="trades.html" class="d-inline-flex align-items-center gap-2 widget-title-link" data-onclick="navigateToPage('trades', { preserveState: true })">
@@ -118,7 +122,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-xl-6">
+        <!-- שורה שלישית: 2 ממשקי תגיות -->
+        <div class="col-md-6">
             <div class="card h-100" id="tagCloudCard">
                 <div class="card-header d-flex align-items-center justify-content-between gap-2">                                                               
                     <h5 class="mb-0 d-flex align-items-center gap-2">
@@ -139,7 +144,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-xl-6">
+        <div class="col-md-6">
             <div class="card h-100" id="tagQuickSearchCard">
                 <div class="card-header d-flex align-items-center justify-content-between gap-2">
                     <h5 class="mb-0 d-flex align-items-center gap-2">
@@ -527,6 +532,8 @@
     <script src="scripts/services/dashboard-data.js?v=1.0.0"></script> <!-- שירות נתוני דשבורד מאוחד -->
     <!-- [67] Load Order: 67 -->
     <script src="scripts/widgets/recent-trades-widget.js?v=1.0.0"></script> <!-- ווידג׳ט טריידים אחרונים -->
+    <!-- [67.5] Load Order: 67.5 -->
+    <script src="scripts/widgets/recent-trade-plans-widget.js?v=1.0.0"></script> <!-- ווידג׳ט תוכניות אחרונות -->
     <!-- [68] Load Order: 68 -->
     <script src="scripts/pending-executions-widget.js?v=1.0.0"></script> <!-- ווידג׳ט המלצות שיוך -->
     <!-- [69] Load Order: 69 -->

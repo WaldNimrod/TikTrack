@@ -24,6 +24,14 @@
             font-family: 'Noto Sans Hebrew', sans-serif;
         }
         
+        .login-wrapper {
+            width: 80%;
+            max-width: 1200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
         .login-container {
             background: white;
             border-radius: 16px;
@@ -31,7 +39,6 @@
             padding: 3rem;
             width: 100%;
             max-width: 450px;
-            margin: 2rem;
             border: 1px solid #e0e0e0;
         }
         
@@ -59,6 +66,31 @@
         .login-subtitle {
             color: var(--apple-text-secondary, #666);
             font-size: 1rem;
+        }
+        
+        .demo-credentials {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--apple-border, #C6C6C8);
+        }
+        
+        .demo-credentials h6 {
+            color: #999;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+        
+        .demo-credentials p {
+            color: #999;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+        
+        .demo-credentials strong {
+            color: #666;
+            font-weight: 500;
         }
         
         .form-group {
@@ -169,11 +201,38 @@
         .register-link a:hover {
             text-decoration: underline;
         }
+        
+        .demo-credentials {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--apple-border, #C6C6C8);
+        }
+        
+        .demo-credentials h6 {
+            color: #999;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+        
+        .demo-credentials p {
+            color: #999;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+        
+        .demo-credentials strong {
+            color: #666;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
-    <div id="loginContainer" class="login-container">
-        <!-- Login form will be inserted here by auth.js -->
+    <div class="login-wrapper">
+        <div id="loginContainer" class="login-container">
+            <!-- Login form will be inserted here by auth.js -->
+        </div>
     </div>
     
     <!-- Scripts -->

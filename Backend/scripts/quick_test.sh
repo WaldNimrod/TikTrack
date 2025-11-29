@@ -29,7 +29,7 @@ echo ""
 echo "2. Testing login..."
 LOGIN_RESPONSE=$(curl -s -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"nimrod","password":"nimrod123"}' \
+  -d '{"username":"nimrod","password":"nimw"}' \
   -c /tmp/test_cookies.txt)
 
 if echo "$LOGIN_RESPONSE" | grep -q '"status".*"success"'; then

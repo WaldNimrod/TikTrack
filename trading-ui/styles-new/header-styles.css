@@ -384,6 +384,8 @@
     padding: 0 20px;
     box-sizing: border-box;
     overflow: visible;
+    direction: rtl; /* RTL for Hebrew - filters start from right */
+    justify-content: flex-start; /* Filters aligned to right (start in RTL) */
 }
 
 #unified-header .filter-group {
@@ -564,6 +566,66 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+/* ===== Filter User Section ===== */
+#unified-header .filter-user-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: auto; /* Push to left (end of row in RTL) */
+}
+
+#unified-header .user-avatar-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #26baac;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#unified-header .user-avatar-badge:hover {
+    background: #1fa89a;
+    transform: scale(1.05);
+}
+
+#unified-header .auth-toggle-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+#unified-header .auth-toggle-btn:hover {
+    opacity: 1;
+}
+
+#unified-header .auth-toggle-btn img {
+    width: 24px;
+    height: 24px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+#unified-header .auth-toggle-btn:hover img {
+    opacity: 1;
+}
+
+#unified-header .user-profile-link {
+    text-decoration: none;
 }
 
 #unified-header .reset-btn,

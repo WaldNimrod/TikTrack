@@ -1350,68 +1350,74 @@ class DemoDataGenerator:
                 created += 1
         
         # Create at least 4 active alerts (is_triggered='new') for home page display
+        # CRITICAL: These alerts are displayed on the homepage via <active-alerts> component
         active_alerts_min = 4
         active_alerts_created = 0
         
-        # Ensure we have at least 4 active alerts
-        if active_alerts_created < active_alerts_min:
-            # Get recent tickers and trades for active alerts
-            recent_tickers = random.sample(self.relationship_manager.tickers, min(active_alerts_min, len(self.relationship_manager.tickers)))
-            open_trades = [t for t in self.relationship_manager.trades if t.status == 'open']
-            
-            active_alert_messages = [
-                "⚡ התראה חדשה: מחיר {symbol} הגיע ל-{price} - הזדמנות לקנייה",
-                "🔔 התראה: {symbol} חוצה קו התנגדות {price} - אפשר לקחת רווח",
-                "📈 התראה: {symbol} עלה מעל {price} - סימן חיובי",
-                "⚠️ התראה: {symbol} מתקרב ל-{price} - מומלץ לבדוק",
-                "💡 התראה: {symbol} במגמת עלייה - נקודת כניסה פוטנציאלית",
-            ]
-            
-            for i in range(active_alerts_min - active_alerts_created):
+        # Get recent tickers and trades for active alerts
+        recent_tickers = random.sample(self.relationship_manager.tickers, min(active_alerts_min, len(self.relationship_manager.tickers))) if self.relationship_manager.tickers else []
+        open_trades = [t for t in self.relationship_manager.trades if t.status == 'open']
+        
+        active_alert_messages = [
+            "⚡ התראה חדשה: מחיר {symbol} הגיע ל-{price} - הזדמנות לקנייה",
+            "🔔 התראה: {symbol} חוצה קו התנגדות {price} - אפשר לקחת רווח",
+            "📈 התראה: {symbol} עלה מעל {price} - סימן חיובי",
+            "⚠️ התראה: {symbol} מתקרב ל-{price} - מומלץ לבדוק",
+            "💡 התראה: {symbol} במגמת עלייה - נקודת כניסה פוטנציאלית",
+            "🎯 התראה: {symbol} הגיע למטרת מחיר {price} - נקודת יציאה",
+        ]
+        
+        # Ensure we create exactly active_alerts_min active alerts
+        for i in range(active_alerts_min):
+            if not recent_tickers:
+                # Fallback to any ticker if we don't have enough
+                ticker = self.relationship_manager.get_random_ticker()
+            else:
                 ticker = recent_tickers[i % len(recent_tickers)] if recent_tickers else self.relationship_manager.get_random_ticker()
-                
-                if not ticker:
-                    continue
-                
-                # Use a trade if available for more context
-                related_trade = None
-                if open_trades:
-                    related_trade = random.choice([t for t in open_trades if t.ticker_id == ticker.id] or open_trades[:1])
-                
-                target_price = round(random.uniform(100, 400), 2)
-                alert_msg = random.choice(active_alert_messages).format(
-                    symbol=ticker.symbol,
-                    price=f"${target_price:.2f}"
-                )
-                
-                # Create active alert (is_triggered='new')
-                triggered_at = self.date_gen.generate_date_in_range(
-                    self.date_gen.now - timedelta(days=2),
-                    self.date_gen.now
-                )
-                
-                alert = Alert(
-                    ticker_id=ticker.id,
-                    message=alert_msg,
-                    status='open',
-                    is_triggered='new',  # Active alert for home page
-                    related_type_id=ALERT_RELATED_TYPES['ticker'],
-                    related_id=ticker.id,
-                    condition_attribute='price',
-                    condition_operator='more_than',
-                    condition_number=str(target_price),
-                    triggered_at=triggered_at,
-                    user_id=self.user_cache.id
-                )
-                
-                # If we have a related trade, link to it
-                if related_trade:
-                    alert.related_type_id = ALERT_RELATED_TYPES['trade']
-                    alert.related_id = related_trade.id
-                
-                self.db.add(alert)
-                created += 1
-                active_alerts_created += 1
+            
+            if not ticker:
+                continue
+            
+            # Use a trade if available for more context
+            related_trade = None
+            if open_trades:
+                trades_for_ticker = [t for t in open_trades if t.ticker_id == ticker.id]
+                related_trade = random.choice(trades_for_ticker) if trades_for_ticker else random.choice(open_trades[:1])
+            
+            target_price = round(random.uniform(100, 400), 2)
+            alert_msg = random.choice(active_alert_messages).format(
+                symbol=ticker.symbol,
+                price=f"${target_price:.2f}"
+            )
+            
+            # Create active alert (is_triggered='new') - these are displayed on homepage
+            triggered_at = self.date_gen.generate_date_in_range(
+                self.date_gen.now - timedelta(days=2),
+                self.date_gen.now
+            )
+            
+            alert = Alert(
+                user_id=self.user_cache.id,
+                ticker_id=ticker.id,
+                message=alert_msg,
+                status='open',
+                is_triggered='new',  # CRITICAL: 'new' status means active alert for homepage
+                related_type_id=ALERT_RELATED_TYPES['ticker'],
+                related_id=ticker.id,
+                condition_attribute='price',
+                condition_operator='more_than',
+                condition_number=str(target_price),
+                triggered_at=triggered_at
+            )
+            
+            # If we have a related trade, link to it
+            if related_trade:
+                alert.related_type_id = ALERT_RELATED_TYPES['trade']
+                alert.related_id = related_trade.id
+            
+            self.db.add(alert)
+            created += 1
+            active_alerts_created += 1
         
         self.created_count['alerts'] = created
         active_count = active_alerts_created if active_alerts_created > 0 else 0

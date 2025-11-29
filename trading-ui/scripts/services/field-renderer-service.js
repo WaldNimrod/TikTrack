@@ -1879,7 +1879,7 @@ class FieldRendererService {
             ].filter(Boolean).join(' ');
 
             return `
-                <span class="badge rounded-pill bg-light text-dark border me-1 mb-1"
+                <span class="badge rounded-pill bg-light text-muted border entity-tag-badge"
                       style="border-color: ${normalizedColor};"
                       ${dataAttrs}>
                     ${displayLabel}

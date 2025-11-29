@@ -429,6 +429,39 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
 
+    'user-profile': {
+      name: 'User Profile',
+      packages: [
+        'base',
+        'services',
+        'validation',
+        'modules',
+        'ui-advanced',
+        'preferences',
+        'init-system',
+      ],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.Logger',
+        'window.TikTrackAuth',
+        'window.UserProfilePage',
+      ],
+      description: 'ניהול פרופיל משתמש - עדכון פרטים ושינוי סיסמה',
+      lastModified: '2025-01-28',
+      pageType: 'settings',
+      requiresFilters: false,
+      requiresValidation: true,
+      requiresTables: false,
+      customInitializers: [
+        async () => {
+          if (window.UserProfilePage && typeof window.UserProfilePage.init === 'function') {
+            await window.UserProfilePage.init();
+          }
+        },
+      ],
+    },
+
     // Trading Pages
     trades: {
       name: 'Trades',

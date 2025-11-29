@@ -1,0 +1,45 @@
+/**
+ * User Profile Page Styles
+ * סגנונות עמוד פרופיל משתמש
+ *
+ * File: trading-ui/styles-new/07-pages/_user-profile.css
+ * Version: 1.0.0
+ * Last Updated: January 28, 2025
+ */
+
+.user-profile-page .content-section {
+  margin-bottom: 2rem;
+}
+
+.user-profile-page .content-section .section-header {
+  margin-bottom: 1rem;
+}
+
+.user-profile-page .content-section .section-body {
+  padding: 1.5rem;
+  background: var(--bg-secondary, #f8f9fa);
+  border-radius: 8px;
+}
+
+.user-profile-page #user-info-section .section-body,
+.user-profile-page #password-change-section .section-body {
+  background: white;
+  border: 1px solid var(--border-color, #dee2e6);
+}
+
+.user-profile-page .form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary, #212529);
+}
+
+.user-profile-page .form-control:read-only {
+  background-color: var(--bg-secondary, #f8f9fa);
+  cursor: not-allowed;
+}
+
+.user-profile-page #updateInfoBtn,
+.user-profile-page #updatePasswordBtn {
+  min-width: 150px;
+}
+

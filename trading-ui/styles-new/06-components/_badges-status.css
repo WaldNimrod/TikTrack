@@ -283,3 +283,26 @@ background-color: var(--status-pending-color);
   border: 1px solid var(--type-scalping-color);
 }
 
+/* ===== עיצוב תגיות (Tags) - קטן ועדין ===== */
+.entity-tag-badge {
+  /* פונט קטן */
+  font-size: 0.7rem !important;
+  font-weight: 400;
+  
+  /* ריווח גדול */
+  padding: 0.35rem 0.75rem !important;
+  margin: 0.25rem !important;
+  
+  /* טקסט בצבע רגיל - רק המסגרת בצבע */
+  color: var(--text-color, #6c757d) !important;
+  background-color: transparent !important;
+  
+  /* רק המסגרת בצבע משני */
+  border-width: 1px;
+  border-style: solid;
+  
+  /* עיצוב עדין */
+  border-radius: 0.375rem;
+  line-height: 1.3;
+}
+

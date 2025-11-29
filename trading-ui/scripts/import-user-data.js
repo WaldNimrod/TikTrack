@@ -78,7 +78,7 @@ let filePrecheckState = {
     message: ''
 };
 let activeFilePrecheckRequestId = 0;
-let selectedCashflowTypes = {}; // Track selected cashflow types for import (default: all except dividend_accrual)
+let selectedCashflowTypes = {}; // Track selected cashflow types for import (default: all types selected)
 
 /**
  * Helper function to set element display using Bootstrap classes instead of inline styles
@@ -2313,19 +2313,19 @@ function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
             // are already filtered out above, so all types here are valid for import
 
             // Initialize selectedCashflowTypes if not already set
-            // Default: select 'interest' and 'borrow_fee' by default
+            // Default: select ALL types by default
             if (Object.keys(selectedCashflowTypes).length === 0) {
                 entries.forEach(([key]) => {
-                    // Select 'interest' and 'borrow_fee' by default
-                    selectedCashflowTypes[key] = (key === 'interest' || key === 'borrow_fee');
+                    // Select ALL types by default
+                    selectedCashflowTypes[key] = true;
                 });
             }
             
             // Get current selection state
-            // Default: select 'interest' and 'borrow_fee' by default
+            // Default: select ALL types by default
             const isSelected = selectedCashflowTypes[typeKey] !== undefined 
                 ? selectedCashflowTypes[typeKey] 
-                : (typeKey === 'interest' || typeKey === 'borrow_fee');
+                : true;
 
             const card = document.createElement('div');
             card.className = 'analysis-card';

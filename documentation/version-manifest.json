@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.3.9.0",
+    "version": "1.3.10.0",
     "major": 1,
     "minor": 3,
-    "patch": 9,
+    "patch": 10,
     "build": 0,
-    "commit": "c944b39c4f2b04e9e22707f98d72b9628946bfe3",
-    "updated_at": "2025-11-24T23:55:08+00:00",
-    "notes": "Remove all SQLite references - PostgreSQL only"
+    "commit": "f778ed96d9059408c5426821836c993fe0a6bdab",
+    "updated_at": "2025-11-29T00:23:03+00:00",
+    "notes": "תיקון: עדכון ברירת מחדל - כל סוגי תזרימי המזומן מסומנים בשלב 2 של הייבוא"
   },
   "development": {
     "version": "1.3.38.0",

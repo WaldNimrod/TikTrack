@@ -46,9 +46,9 @@ from datetime import datetime
 # Add Backend to path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from sqlalchemy import create_engine, text  # type: ignore
-from sqlalchemy.orm import sessionmaker, Session  # type: ignore
-from sqlalchemy.pool import QueuePool  # type: ignore
+from sqlalchemy import create_engine, text  # type: ignore[import-untyped]
+from sqlalchemy.orm import sessionmaker, Session  # type: ignore[import-untyped]
+from sqlalchemy.pool import QueuePool  # type: ignore[import-untyped]
 
 from config.settings import DATABASE_URL
 from models.ticker import Ticker

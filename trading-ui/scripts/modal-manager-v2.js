@@ -7538,9 +7538,9 @@ if (typeof window.showModalSafe === 'undefined') {
             }
         }
     };
-    console.log('✅ [showModalSafe] Helper function created');
+    // Helper function created
 } else {
-    console.log('✅ [showModalSafe] Helper function already exists - skipping duplicate definition');
+    // Helper function already exists - skipping duplicate definition
 }
 
 // אתחול אוטומטי כאשר הדף נטען

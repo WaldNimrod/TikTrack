@@ -112,6 +112,6 @@
     setConfig,
   };
 
-  window.Logger?.info?.('✅ CacheTTLGuard initialized', { page: 'cache-ttl-guard' });
+  window.Logger?.debug?.('CacheTTLGuard initialized', { page: 'cache-ttl-guard' });
 })();
 

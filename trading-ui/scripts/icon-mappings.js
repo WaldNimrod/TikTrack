@@ -44,7 +44,8 @@ const IconMappings = {
         development: '/trading-ui/images/icons/entities/development.svg',
         info: '/trading-ui/images/icons/tabler/info-circle.svg',
         position: '/trading-ui/images/icons/entities/trades.svg',
-        home: '/trading-ui/images/icons/entities/home.svg'
+        home: '/trading-ui/images/icons/entities/home.svg',
+        user: '/trading-ui/images/icons/entities/user.svg'
     },
 
     /**
@@ -216,10 +217,8 @@ const IconMappings = {
 // Export to global
 window.IconMappings = IconMappings;
 
-// Log initialization
+// Log initialization (debug only)
 if (typeof window.Logger !== 'undefined') {
-    window.Logger.info('✅ Icon Mappings loaded successfully', { page: 'icon-mappings' });
-} else {
-    console.log('✅ Icon Mappings loaded successfully');
+    window.Logger.debug('Icon Mappings loaded', { page: 'icon-mappings' });
 }
 

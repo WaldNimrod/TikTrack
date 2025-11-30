@@ -325,5 +325,3 @@ if (typeof module !== 'undefined' && module.exports) {
     };
 }
 
-console.log('✅ Dynamic Loader Configuration loaded successfully');
-

@@ -958,12 +958,10 @@ class FieldRendererService {
         // Short format: return simple text without full badge structure
         if (isShort) {
             if (type === 'trade_plan') {
-                console.log('🔍 renderLinkedEntity DEBUG:', { metaObj, planned_amount: metaObj?.planned_amount, date: metaObj?.date });
                 const amount = metaObj && metaObj.planned_amount ? `$${Number(metaObj.planned_amount).toLocaleString('en-US', { maximumFractionDigits: 0 })}` : '';
                 // Force DD/MM format for testing
                 const dateValue = metaObj && metaObj.date ? metaObj.date : null;
                 const date = dateValue ? FieldRendererService._formatDateDdMm(dateValue) : '';
-                console.log('🔍 renderLinkedEntity RESULT:', { amount, date, result: `${amount} ${date}`.trim() });
                 return `<a href="#" onclick="if (window.showEntityDetails) { showEntityDetails('trade_plan', ${relatedId}); } return false;" class="plan-link" data-plan-id="${relatedId}">${amount} ${date}</a>`.trim();
             }
             // For other types, return simple text
@@ -2001,5 +1999,3 @@ window.renderTickerInfo = async (ticker, cssClass) => await FieldRendererService
 window.renderVolume = (volume, showMillions) => FieldRendererService.renderVolume(volume, showMillions);
 window.renderExecutionDate = (date) => FieldRendererService.renderExecutionDate(date);
 window.renderUpdatedTimestamp = (value, options) => FieldRendererService.renderUpdatedTimestamp(value, options);
-
-console.log('✅ field-renderer-service.js v=1.4.0 loaded - added renderTickerInfo() for ticker price display');

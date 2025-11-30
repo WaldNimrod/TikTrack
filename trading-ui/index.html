@@ -710,10 +710,18 @@
     <!-- [83.5] Load Order: 83.5 -->
     <script src="scripts/widgets/recent-trades-widget.js?v=1.0.0"></script> <!-- Recent trades widget (deprecated - use RecentItemsWidget) -->
     <!-- [84] Load Order: 84 -->
-    <script src="scripts/pending-executions-widget.js?v=1.0.0"></script> <!-- Assignment recommendations widget -->
-    <!-- [85] Load Order: 85 -->
-    <script src="scripts/pending-trade-plan-widget.js?v=1.0.0"></script> <!-- Trade plan assignment widget -->
+    <!-- Services required for UnifiedPendingActionsWidget -->
+    <script src="scripts/services/pending-actions-cache-service.js?v=1.0.0"></script> <!-- Pending actions cache service (dismissed items management) -->
+    <!-- [84.1] Load Order: 84.1 -->
+    <script src="scripts/services/execution-clustering-service.js?v=1.0.0"></script> <!-- Execution clustering service (trade creation clusters) -->
+    <!-- [84.2] Load Order: 84.2 -->
+    <script src="scripts/services/execution-assignment-service.js?v=1.0.0"></script> <!-- Execution assignment service (highlights/suggestions) -->
+    <!-- [84.3] Load Order: 84.3 -->
+    <script src="scripts/services/trade-plan-assignment-service.js?v=1.0.0"></script> <!-- Trade plan assignment service (assignments and creations) -->
+    <!-- [84.4] Load Order: 84.4 -->
+    <script src="scripts/services/execution-cluster-helpers.js?v=1.0.0"></script> <!-- Execution cluster helper functions (rendering, actions, calculations) -->
     <!-- [85.5] Load Order: 85.5 -->
+    <!-- Note: Old pending widgets (pending-executions-widget.js, pending-trade-plan-widget.js) removed - replaced by shared services above -->
     <script src="scripts/widgets/unified-pending-actions-widget.js?v=1.0.0"></script> <!-- Unified widget for pending assignments and creations -->
     <!-- [86] Load Order: 86 -->
     <script src="scripts/widgets/tag-widget.js?v=1.0.0"></script> <!-- Unified tag widget (cloud + search) -->

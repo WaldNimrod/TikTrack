@@ -503,15 +503,34 @@ class SMServerSection extends SMBaseSection {
    * Extract system info
    * חילוץ מידע מערכת
    */
-  extractSystemInfo(status, resources, overview) {
+  extractSystemInfo(status, resources, overview, systemInfoData) {
+    // Try to get from systemInfoData first (most reliable)
+    if (systemInfoData) {
+      const osInfo = systemInfoData.os || {};
+      const pythonInfo = systemInfoData.python || {};
+      const serverInfo = systemInfoData.server || {};
+      
+      return {
+        os: osInfo.system ? `${osInfo.system} ${osInfo.release || ''}`.trim() : 'לא ידוע',
+        pythonVersion: pythonInfo.version ? pythonInfo.version.split('\n')[0] : 'לא ידוע',
+        flaskVersion: serverInfo.flask_version || 'לא ידוע',
+        architecture: osInfo.architecture || 'לא ידוע',
+        totalMemory: resources?.total_memory ? SMUIComponents.formatBytes(resources.total_memory) : 'לא זמין',
+        totalDisk: resources?.total_disk ? SMUIComponents.formatBytes(resources.total_disk) : 'לא זמין',
+        cpuCount: resources?.cpu_count || 'לא זמין',
+        uptime: overview?.summary?.uptime || status?.uptime || 'לא ידוע'
+      };
+    }
+    
+    // Fallback to other sources
     return {
-      os: status?.os_info || resources?.os_name || 'לא ידוע',
-      pythonVersion: status?.python_version || resources?.python_version || 'לא ידוע',
-      flaskVersion: status?.flask_version || resources?.flask_version || 'לא ידוע',
-      architecture: resources?.architecture || 'לא ידוע',
-      totalMemory: resources?.total_memory ? SMUIComponents.formatBytes(resources.total_memory) : 'לא ידוע',
-      totalDisk: resources?.total_disk ? SMUIComponents.formatBytes(resources.total_disk) : 'לא ידוע',
-      cpuCount: resources?.cpu_count || status?.cpu_count || 'לא ידוע',
+      os: status?.os_info || resources?.os_name || overview?.system_info?.os?.system || 'לא ידוע',
+      pythonVersion: status?.python_version || resources?.python_version || overview?.system_info?.python?.version?.split('\n')[0] || 'לא ידוע',
+      flaskVersion: status?.flask_version || resources?.flask_version || overview?.system_info?.server?.flask_version || 'לא ידוע',
+      architecture: resources?.architecture || overview?.system_info?.os?.architecture || 'לא ידוע',
+      totalMemory: resources?.total_memory ? SMUIComponents.formatBytes(resources.total_memory) : 'לא זמין',
+      totalDisk: resources?.total_disk ? SMUIComponents.formatBytes(resources.total_disk) : 'לא זמין',
+      cpuCount: resources?.cpu_count || status?.cpu_count || 'לא זמין',
       uptime: overview?.summary?.uptime || status?.uptime || 'לא ידוע'
     };
   }

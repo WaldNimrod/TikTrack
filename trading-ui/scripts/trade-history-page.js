@@ -160,7 +160,12 @@
     function populateTickerFilter() {
                 const tickerSelect = document.getElementById('filterTicker');
                 if (tickerSelect) {
-                    tickerSelect.innerHTML = '<option value="">הכל</option>';
+                    tickerSelect.innerHTML.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = '\'<option value="">הכל</option>\'';
+        while (tempDiv.firstChild) {
+            tickerSelect.innerHTML.appendChild(tempDiv.firstChild);
+        }
                     allTickers.forEach(ticker => {
                         const option = document.createElement('option');
                         option.value = ticker.symbol;
@@ -176,7 +181,12 @@
     function loadInvestmentTypes() {
         const investmentSelect = document.getElementById('filterInvestmentType');
         if (investmentSelect) {
-            investmentSelect.innerHTML = '<option value="">הכל</option>';
+            investmentSelect.innerHTML.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = '\'<option value="">הכל</option>\'';
+        while (tempDiv.firstChild) {
+            investmentSelect.innerHTML.appendChild(tempDiv.firstChild);
+        }
             INVESTMENT_TYPES.forEach(type => {
                 const option = document.createElement('option');
                 option.value = type.value;
@@ -1028,7 +1038,11 @@
                     `<div><a href="#" data-onclick="showConditionDetails(${cond.id}); return false;">${cond.description}</a></div>`
                 ).join('');
             } else {
-                conditionsEl.innerHTML = '<span class="text-muted">-</span>';
+                conditionsEl.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted';
+        div.textContent = '-';
+        conditionsEl.innerHTML.appendChild(div);
             }
             conditionsEl.classList.remove('loading');
         }

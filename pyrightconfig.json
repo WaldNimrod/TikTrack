@@ -1,0 +1,30 @@
+{
+  "include": [
+    "Backend"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    "**/node_modules",
+    "**/venv",
+    "**/.venv",
+    "**/archive",
+    "**/backup",
+    "**/production"
+  ],
+  "reportMissingImports": false,
+  "reportMissingTypeStubs": false,
+  "pythonVersion": "3.9",
+  "pythonPlatform": "Darwin",
+  "typeCheckingMode": "basic",
+  "executionEnvironments": [
+    {
+      "root": "Backend",
+      "pythonVersion": "3.9",
+      "pythonPlatform": "Darwin",
+      "extraPaths": [
+        "/Users/nimrod/Library/Python/3.9/lib/python/site-packages"
+      ]
+    }
+  ]
+}
+

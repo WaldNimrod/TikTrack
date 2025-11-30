@@ -178,12 +178,19 @@
      */
     async function initTickerDashboard() {
         try {
+            if (window.Logger) {
+                window.Logger.info('🚀 initTickerDashboard START', { page: 'ticker-dashboard' });
+            }
+            
             if (typeof window.showLoadingState === 'function') {
                 window.showLoadingState('ticker-dashboard-top');
             }
             
             // Get ticker ID from URL (async - may need to resolve symbol)
             tickerId = await getTickerIdFromURL();
+            if (window.Logger) {
+                window.Logger.info('📊 Ticker ID from URL', { tickerId, page: 'ticker-dashboard' });
+            }
             if (!tickerId) {
                 const urlParams = new URLSearchParams(window.location.search);
                 const id = urlParams.get('tickerId');
@@ -197,28 +204,99 @@
             
             // Load ticker data
             if (window.TickerDashboardData) {
+                if (window.Logger) {
+                    window.Logger.info('📊 Loading ticker dashboard data...', { tickerId, page: 'ticker-dashboard' });
+                }
                 tickerData = await window.TickerDashboardData.loadTickerDashboardData(tickerId);
+                if (window.Logger) {
+                    window.Logger.info('✅ Ticker data loaded', { 
+                        tickerId, 
+                        hasData: !!tickerData, 
+                        symbol: tickerData?.symbol,
+                        price: tickerData?.current_price || tickerData?.price,
+                        page: 'ticker-dashboard' 
+                    });
+                }
             } else {
                 throw new Error('TickerDashboardData service not available');
+            }
+            
+            if (!tickerData) {
+                throw new Error('Failed to load ticker data - tickerData is null or undefined');
             }
             
             // Update page title
             updatePageTitle();
             
             // Render KPI cards
-            await renderKPICards();
+            if (window.Logger) {
+                window.Logger.info('📊 Rendering KPI cards...', { page: 'ticker-dashboard' });
+            }
+            try {
+                await renderKPICards();
+                if (window.Logger) {
+                    window.Logger.info('✅ renderKPICards completed successfully', { page: 'ticker-dashboard' });
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('❌ renderKPICards failed', { error: error.message, stack: error.stack, page: 'ticker-dashboard' });
+                }
+                console.error('renderKPICards error:', error);
+            }
             
             // Initialize price chart
-            await initPriceChart();
+            if (window.Logger) {
+                window.Logger.info('📊 Initializing price chart...', { page: 'ticker-dashboard' });
+            }
+            try {
+                await initPriceChart();
+                if (window.Logger) {
+                    window.Logger.info('✅ initPriceChart completed successfully', { page: 'ticker-dashboard' });
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('❌ initPriceChart failed', { error: error.message, stack: error.stack, page: 'ticker-dashboard' });
+                }
+                console.error('initPriceChart error:', error);
+            }
             
-            // Render technical indicators
-            await renderTechnicalIndicators();
+            // Technical indicators are now displayed in KPI Cards - no separate section needed
             
             // Render user activity
-            await renderUserActivity();
+            if (window.Logger) {
+                window.Logger.info('📊 Rendering user activity...', { page: 'ticker-dashboard' });
+            }
+            try {
+                await renderUserActivity();
+                if (window.Logger) {
+                    window.Logger.info('✅ renderUserActivity completed successfully', { page: 'ticker-dashboard' });
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('❌ renderUserActivity failed', { error: error.message, stack: error.stack, page: 'ticker-dashboard' });
+                }
+                console.error('renderUserActivity error:', error);
+            }
             
             // Render conditions
-            await renderConditions();
+            if (window.Logger) {
+                window.Logger.info('📊 Rendering conditions...', { page: 'ticker-dashboard' });
+            }
+            try {
+                await renderConditions();
+                if (window.Logger) {
+                    window.Logger.info('✅ renderConditions completed successfully', { page: 'ticker-dashboard' });
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('❌ renderConditions failed', { error: error.message, stack: error.stack, page: 'ticker-dashboard' });
+                }
+                console.error('renderConditions error:', error);
+            }
+            
+            if (window.Logger) {
+                window.Logger.info('✅ initTickerDashboard COMPLETE', { page: 'ticker-dashboard' });
+            }
             
             // Restore page state (sections, filters, etc.)
             await restorePageState('ticker-dashboard');
@@ -265,7 +343,45 @@
      */
     async function renderKPICards() {
         const container = document.getElementById('tickerKPICards');
-        if (!container || !tickerData) return;
+        if (window.Logger) {
+            window.Logger.info('📊 renderKPICards called', { 
+                hasContainer: !!container, 
+                hasTickerData: !!tickerData,
+                tickerId,
+                page: 'ticker-dashboard' 
+            });
+        }
+        if (!container) {
+            if (window.Logger) {
+                window.Logger.error('❌ Container not found: tickerKPICards', { page: 'ticker-dashboard' });
+            }
+            return;
+        }
+        if (!tickerData) {
+            if (window.Logger) {
+                window.Logger.error('❌ tickerData is null or undefined', { tickerId, page: 'ticker-dashboard' });
+            }
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה', 'נתוני טיקר לא זמינים - לא ניתן להציג KPI Cards');
+            }
+            return;
+        }
+        
+        // Validate required data
+        const hasRequiredData = tickerData.current_price !== undefined || tickerData.price !== undefined;
+        if (!hasRequiredData) {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ tickerData missing required price data', { 
+                    tickerId,
+                    tickerDataKeys: Object.keys(tickerData),
+                    page: 'ticker-dashboard' 
+                });
+            }
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה', 'נתוני מחיר חסרים - לא ניתן להציג KPI Cards');
+            }
+            return;
+        }
         
         try {
             const price = tickerData.current_price || tickerData.price || 0;
@@ -275,7 +391,7 @@
             const atr = tickerData.atr || null;
             const currencySymbol = tickerData.currency_symbol || (tickerData.currency && tickerData.currency.symbol) || '$';
             
-            // Format ATR
+            // Format ATR - use FieldRendererService.renderATR() only (no fallback)
             let atrHtml = '';
             if (atr !== null && price && price > 0) {
                 const atrPercent = (parseFloat(atr) / parseFloat(price)) * 100;
@@ -285,7 +401,8 @@
                     if (window.Logger) {
                         window.Logger.warn('FieldRendererService.renderATR not available', { page: 'ticker-dashboard' });
                     }
-                    atrHtml = `<span class="atr-value" dir="ltr">${atrPercent.toFixed(2)}%</span>`;
+                    // If FieldRendererService not available, show N/A instead of fallback HTML
+                    atrHtml = 'N/A';
                 }
             }
             
@@ -331,12 +448,29 @@
             // Clear container
             container.innerHTML = '';
             
+            if (window.Logger) {
+                window.Logger.info('📊 Creating KPI cards', { 
+                    price,
+                    changePercent,
+                    volume,
+                    atr,
+                    page: 'ticker-dashboard' 
+                });
+            }
+            
+            // Get additional technical indicators
+            const volatility = tickerData.volatility || null;
+            const volatilityHtml = volatility ? `${volatility.toFixed(2)}%` : 'N/A';
+            
             // Create KPI cards using createElement
+            // All technical indicators are now unified in KPI Cards
             const kpiCards = [
                 { label: 'מחיר', value: priceHtml, dir: '' },
                 { label: 'שינוי', value: changeHtml, dir: '' },
                 { label: 'ATR', value: atrHtml || 'N/A', dir: '' },
+                { label: '52W Range', value: week52Html, dir: 'ltr' },
                 { label: 'נפח', value: formattedVolume, dir: 'ltr' },
+                { label: 'תנודתיות', value: volatilityHtml, dir: 'ltr' },
                 { label: '52W', value: week52Html, dir: 'ltr' }
             ];
             
@@ -367,9 +501,26 @@
                 colDiv.appendChild(cardDiv);
                 container.appendChild(colDiv);
             });
+            
+            if (window.Logger) {
+                window.Logger.info('✅ KPI cards rendered successfully', { 
+                    cardsCount: kpiCards.length,
+                    page: 'ticker-dashboard' 
+                });
+            }
         } catch (error) {
             if (window.Logger) {
-                window.Logger.error('❌ Error rendering KPI cards', { error, page: 'ticker-dashboard' });
+                window.Logger.error('❌ Error rendering KPI cards', { 
+                    error: error.message, 
+                    stack: error.stack,
+                    tickerId,
+                    hasTickerData: !!tickerData,
+                    page: 'ticker-dashboard' 
+                });
+            }
+            console.error('renderKPICards error:', error);
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה', `שגיאה בתצוגת KPI Cards: ${error.message}`);
             }
         }
     }
@@ -379,7 +530,26 @@
      */
     async function initPriceChart() {
         const container = document.getElementById('tickerPriceChartContainer');
-        if (!container || !tickerData) return;
+        if (window.Logger) {
+            window.Logger.info('📊 initPriceChart called', { 
+                hasContainer: !!container, 
+                hasTickerData: !!tickerData,
+                hasTradingViewAdapter: !!window.TradingViewChartAdapter,
+                page: 'ticker-dashboard' 
+            });
+        }
+        if (!container) {
+            if (window.Logger) {
+                window.Logger.error('❌ Container not found: tickerPriceChartContainer', { page: 'ticker-dashboard' });
+            }
+            return;
+        }
+        if (!tickerData) {
+            if (window.Logger) {
+                window.Logger.error('❌ tickerData is null or undefined', { tickerId, page: 'ticker-dashboard' });
+            }
+            return;
+        }
         
         try {
             if (typeof window.showLoadingState === 'function') {
@@ -419,34 +589,99 @@
                     }
                 });
                 
+                // Create candlestick series first
+                let candlestickSeries = null;
+                if (window.TradingViewChartAdapter && priceChart) {
+                    try {
+                        candlestickSeries = window.TradingViewChartAdapter.addCandlestickSeries(priceChart, {
+                            upColor: '#26baac',
+                            downColor: '#fc5a06',
+                            borderVisible: true
+                        });
+                    } catch (e) {
+                        if (window.Logger) {
+                            window.Logger.error('Error creating candlestick series', { 
+                                tickerId,
+                                error: e.message || e, 
+                                page: 'ticker-dashboard' 
+                            });
+                        }
+                    }
+                }
+                
                 // Try to load historical price data
                 if (tickerId && window.TickerDashboardData && typeof window.TickerDashboardData.loadHistoricalData === 'function') {
                     try {
                         const historicalData = await window.TickerDashboardData.loadHistoricalData(tickerId, { days: 30, interval: '1d' });
                         
-                        if (historicalData && Array.isArray(historicalData) && historicalData.length > 0) {
-                            // Convert historical data to TradingView format and add to chart
-                            if (window.TradingViewChartAdapter && priceChart) {
-                                // Format: [{ time: timestamp, open: number, high: number, low: number, close: number, volume: number }]
-                                const formattedData = historicalData.map(item => ({
-                                    time: item.timestamp || item.time || item.date,
+                        if (historicalData && Array.isArray(historicalData) && historicalData.length > 0 && candlestickSeries) {
+                            // Convert historical data to TradingView format
+                            const formattedData = historicalData.map(item => {
+                                // Convert timestamp to TradingView format (YYYY-MM-DD)
+                                let timeValue;
+                                if (item.timestamp) {
+                                    // If Unix timestamp (seconds), convert to YYYY-MM-DD
+                                    const date = new Date(item.timestamp * 1000);
+                                    timeValue = date.toISOString().split('T')[0];
+                                } else if (item.date) {
+                                    timeValue = item.date;
+                                } else if (item.time) {
+                                    timeValue = item.time;
+                                } else {
+                                    return null;
+                                }
+                                
+                                return {
+                                    time: timeValue,
                                     open: parseFloat(item.open || item.open_price || 0),
                                     high: parseFloat(item.high || item.high_price || 0),
                                     low: parseFloat(item.low || item.low_price || 0),
                                     close: parseFloat(item.close || item.close_price || item.price || 0),
                                     volume: parseFloat(item.volume || 0)
-                                })).filter(item => item.close > 0); // Filter out invalid data
+                                };
+                            }).filter(item => item && item.close > 0); // Filter out invalid data
+                            
+                            if (formattedData.length > 0) {
+                                // Set data to series
+                                candlestickSeries.setData(formattedData);
                                 
-                                if (formattedData.length > 0) {
-                                    window.TradingViewChartAdapter.addCandlestickSeries(priceChart, formattedData);
+                                // Add volume series (optional)
+                                try {
+                                    const volumeSeries = window.TradingViewChartAdapter.addHistogramSeries(priceChart, {
+                                        color: '#26baac',
+                                        priceFormat: {
+                                            type: 'volume',
+                                            precision: 0,
+                                            minMove: 1
+                                        },
+                                        priceScaleId: 'right'
+                                    });
+                                    
+                                    const volumeData = formattedData.map(item => ({
+                                        time: item.time,
+                                        value: item.volume,
+                                        color: item.close >= item.open ? '#26baac' : '#fc5a06'
+                                    }));
+                                    volumeSeries.setData(volumeData);
+                                } catch (volumeError) {
                                     if (window.Logger) {
-                                        window.Logger.info('✅ Historical data added to chart', { 
-                                            tickerId, 
-                                            dataPoints: formattedData.length, 
+                                        window.Logger.warn('Error adding volume series', { 
+                                            tickerId,
+                                            error: volumeError.message || volumeError, 
                                             page: 'ticker-dashboard' 
                                         });
                                     }
                                 }
+                                
+                                if (window.Logger) {
+                                    window.Logger.info('✅ Historical data added to chart', { 
+                                        tickerId, 
+                                        dataPoints: formattedData.length, 
+                                        page: 'ticker-dashboard' 
+                                    });
+                                }
+                            } else {
+                                showChartPlaceholder('נתונים היסטוריים לא זמינים כרגע. הפיצ\'ר בפיתוח.');
                             }
                         } else {
                             // Historical data not available - show placeholder
@@ -486,33 +721,42 @@
      */
     async function renderTechnicalIndicators() {
         const container = document.getElementById('tickerTechnicalIndicators');
-        if (!container || !tickerData) return;
+        if (window.Logger) {
+            window.Logger.info('📊 renderTechnicalIndicators called', { 
+                hasContainer: !!container, 
+                hasTickerData: !!tickerData,
+                tickerId,
+                page: 'ticker-dashboard' 
+            });
+        }
+        if (!container) {
+            if (window.Logger) {
+                window.Logger.error('❌ Container not found: tickerTechnicalIndicators', { page: 'ticker-dashboard' });
+            }
+            return;
+        }
+        if (!tickerData) {
+            if (window.Logger) {
+                window.Logger.error('❌ tickerData is null or undefined', { tickerId, page: 'ticker-dashboard' });
+            }
+            return;
+        }
         
         try {
-            const atr = tickerData.atr || null;
-            const volatility = tickerData.volatility || null;
-            
-            let atrHtml = '';
-            if (atr !== null && tickerData.current_price && tickerData.current_price > 0) {
-                const atrPercent = (parseFloat(atr) / parseFloat(tickerData.current_price)) * 100;
-                if (window.FieldRendererService && typeof window.FieldRendererService.renderATR === 'function') {
-                    atrHtml = await window.FieldRendererService.renderATR(atr, atrPercent);
-                } else {
-                    if (window.Logger) {
-                        window.Logger.warn('FieldRendererService.renderATR not available', { page: 'ticker-dashboard' });
-                    }
-                    atrHtml = `<span class="atr-value" dir="ltr">${atrPercent.toFixed(2)}%</span>`;
-                }
+            if (window.Logger) {
+                window.Logger.info('📊 Starting technical indicators rendering', { tickerId, page: 'ticker-dashboard' });
             }
+            // ATR removed from technical indicators - now displayed in KPI Cards only
+            const volatility = tickerData.volatility || null;
             
             // Clear container
             container.innerHTML = '';
             
             // Create technical indicator cards using createElement
+            // Note: ATR is now displayed in KPI Cards, not here
             const indicators = [
-                { label: 'ATR', value: atrHtml || 'N/A', dir: '' },
                 { label: 'Volatility', value: volatility ? `${volatility.toFixed(2)}%` : 'N/A', dir: 'ltr' },
-                { label: 'Volume Profile', value: 'בפיתוח', dir: '' }
+                { label: 'Volume Profile', value: 'לא זמין', dir: '' }
             ];
             
             indicators.forEach(indicator => {
@@ -542,9 +786,26 @@
                 colDiv.appendChild(cardDiv);
                 container.appendChild(colDiv);
             });
+            
+            if (window.Logger) {
+                window.Logger.info('✅ Technical indicators rendered successfully', { 
+                    indicatorsCount: indicators.length,
+                    page: 'ticker-dashboard' 
+                });
+            }
         } catch (error) {
             if (window.Logger) {
-                window.Logger.error('❌ Error rendering technical indicators', { error, page: 'ticker-dashboard' });
+                window.Logger.error('❌ Error rendering technical indicators', { 
+                    error: error.message, 
+                    stack: error.stack,
+                    tickerId,
+                    hasTickerData: !!tickerData,
+                    page: 'ticker-dashboard' 
+                });
+            }
+            console.error('renderTechnicalIndicators error:', error);
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה', `שגיאה בתצוגת מדדים טכניים: ${error.message}`);
             }
         }
     }
@@ -624,9 +885,30 @@
      */
     async function renderConditions() {
         const container = document.getElementById('tickerConditions');
-        if (!container || !tickerId) return;
+        if (window.Logger) {
+            window.Logger.info('📊 renderConditions called', { 
+                hasContainer: !!container, 
+                tickerId,
+                page: 'ticker-dashboard' 
+            });
+        }
+        if (!container) {
+            if (window.Logger) {
+                window.Logger.error('❌ Container not found: tickerConditions', { page: 'ticker-dashboard' });
+            }
+            return;
+        }
+        if (!tickerId) {
+            if (window.Logger) {
+                window.Logger.error('❌ tickerId is null or undefined', { page: 'ticker-dashboard' });
+            }
+            return;
+        }
         
         try {
+            if (window.Logger) {
+                window.Logger.info('📊 Loading conditions for ticker', { tickerId, page: 'ticker-dashboard' });
+            }
             // Load conditions
             let conditions = [];
             if (window.TickerDashboardData) {
@@ -654,9 +936,25 @@
                 emptyDiv.textContent = 'אין תנאים זמינים';
                 container.appendChild(emptyDiv);
             }
+            
+            if (window.Logger) {
+                window.Logger.info('✅ Conditions rendered successfully', { 
+                    conditionsCount: conditions ? conditions.length : 0,
+                    page: 'ticker-dashboard' 
+                });
+            }
         } catch (error) {
             if (window.Logger) {
-                window.Logger.error('❌ Error rendering conditions', { error, page: 'ticker-dashboard' });
+                window.Logger.error('❌ Error rendering conditions', { 
+                    error: error.message, 
+                    stack: error.stack,
+                    tickerId,
+                    page: 'ticker-dashboard' 
+                });
+            }
+            console.error('renderConditions error:', error);
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה', `שגיאה בתצוגת תנאים: ${error.message}`);
             }
         }
     }
@@ -667,12 +965,27 @@
      */
     function showChartPlaceholder(message) {
         const chartContainer = document.getElementById('tickerPriceChartContainer');
-        if (chartContainer && !chartContainer.querySelector('.chart-placeholder-message')) {
-            const placeholder = document.createElement('div');
-            placeholder.className = 'chart-placeholder-message text-muted text-center p-4';
-            placeholder.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background: rgba(255, 255, 255, 0.9); border-radius: 8px; padding: 2rem;';
-            placeholder.innerHTML = `<div>${message}</div><div class="small mt-2">הגרף מוכן לטעינת נתונים</div>`;
-            chartContainer.appendChild(placeholder);
+        if (!chartContainer) {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ Chart container not found for placeholder', { page: 'ticker-dashboard' });
+            }
+            return;
+        }
+        
+        // Remove existing placeholder if any
+        const existingPlaceholder = chartContainer.querySelector('.chart-placeholder-message');
+        if (existingPlaceholder) {
+            existingPlaceholder.remove();
+        }
+        
+        const placeholder = document.createElement('div');
+        placeholder.className = 'chart-placeholder-message text-muted text-center p-4';
+        placeholder.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background: rgba(255, 255, 255, 0.9); border-radius: 8px; padding: 2rem;';
+        placeholder.innerHTML = `<div>${message}</div><div class="small mt-2">הגרף מוכן לטעינת נתונים</div>`;
+        chartContainer.appendChild(placeholder);
+        
+        if (window.Logger) {
+            window.Logger.debug('Chart placeholder displayed', { message, page: 'ticker-dashboard' });
         }
     }
 

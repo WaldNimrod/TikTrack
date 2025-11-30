@@ -407,8 +407,11 @@
       this.chartSystem.destroyAll();
       this.chartRegistry.clear();
       if (this.elements.chartsList) {
-        this.elements.chartsList.innerHTML =
-          '<p class="text-muted" data-empty-state>אין גרפים פעילים כרגע</p>';
+        this.elements.chartsList.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted';
+        div.textContent = 'אין גרפים פעילים כרגע';
+        chartsList.innerHTML.appendChild(div);
       }
       this.refreshChartsStatus();
     }

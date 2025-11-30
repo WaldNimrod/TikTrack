@@ -1400,7 +1400,12 @@ class EntityDetailsAPI {
 
             if (!response.ok) {
                 if (response.status === 404 || response.status === 410) {
-                    window.Logger.debug(`No market data found for ticker ${tickerId} (status: ${response.status}, { page: "entity-details-api" })`);
+                    // 404/410 - endpoint not found or resource gone, return null (graceful degradation)
+                    window.Logger.info(`Market data endpoint not available for ticker ${tickerId} (status: ${response.status})`, { 
+                        tickerId,
+                        status: response.status,
+                        page: "entity-details-api" 
+                    });
                     return null;
                 }
                 throw new Error(`שגיאת שרת בקבלת נתוני שוק: ${response.status}`);

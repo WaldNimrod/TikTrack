@@ -1,0 +1,3716 @@
+{
+  "page": "index.html",
+  "js_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/index.js",
+  "html_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/index.html",
+  "categories": {
+    "unified_init": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 1392,
+          "content": "// Note: positions & portfolio system initialization is handled by page-initialization-configs.js",
+          "pattern": "page-initialization-configs\\.js",
+          "match": "page-initialization-configs.js",
+          "file": "js"
+        },
+        {
+          "line": 1396,
+          "content": "// have been removed and replaced by UnifiedPendingActionsWidget which is initialized in page-initia",
+          "pattern": "page-initialization-configs\\.js",
+          "match": "page-initialization-configs.js",
+          "file": "js"
+        },
+        {
+          "line": 1400,
+          "content": "// in unified-app-initializer.js, so we don't need to call it directly here.",
+          "pattern": "unified-app-initializer\\.js",
+          "match": "unified-app-initializer.js",
+          "file": "js"
+        },
+        {
+          "line": 723,
+          "content": "<script src=\"scripts/init-system/package-manifest.js?v=1.0.0\"></script> <!-- Package manifest -->",
+          "pattern": "package-manifest\\.js",
+          "match": "package-manifest.js",
+          "file": "html"
+        },
+        {
+          "line": 725,
+          "content": "<script src=\"scripts/page-initialization-configs.js?v=1.0.0\"></script> <!-- Page initialization conf",
+          "pattern": "page-initialization-configs\\.js",
+          "match": "page-initialization-configs.js",
+          "file": "html"
+        }
+      ],
+      "issue_count": 5,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1392,
+            "content": "// Note: positions & portfolio system initialization is handled by page-initialization-configs.js",
+            "pattern": "page-initialization-configs\\.js",
+            "match": "page-initialization-configs.js"
+          },
+          {
+            "line": 1396,
+            "content": "// have been removed and replaced by UnifiedPendingActionsWidget which is initialized in page-initia",
+            "pattern": "page-initialization-configs\\.js",
+            "match": "page-initialization-configs.js"
+          },
+          {
+            "line": 1400,
+            "content": "// in unified-app-initializer.js, so we don't need to call it directly here.",
+            "pattern": "unified-app-initializer\\.js",
+            "match": "unified-app-initializer.js"
+          }
+        ],
+        "issue_count": 3
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [
+          {
+            "line": 723,
+            "content": "<script src=\"scripts/init-system/package-manifest.js?v=1.0.0\"></script> <!-- Package manifest -->",
+            "pattern": "package-manifest\\.js",
+            "match": "package-manifest.js"
+          },
+          {
+            "line": 725,
+            "content": "<script src=\"scripts/page-initialization-configs.js?v=1.0.0\"></script> <!-- Page initialization conf",
+            "pattern": "page-initialization-configs\\.js",
+            "match": "page-initialization-configs.js"
+          }
+        ],
+        "issue_count": 2
+      }
+    },
+    "section_toggle": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 1277,
+          "content": "// toggleSection function removed - use global window.toggleSection directly",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "js"
+        },
+        {
+          "line": 1277,
+          "content": "// toggleSection function removed - use global window.toggleSection directly",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "js"
+        },
+        {
+          "line": 1408,
+          "content": "// toggleAllSections and toggleSection exports removed - use global functions directly",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "js"
+        },
+        {
+          "line": 22,
+          "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 340,
+          "content": "<div class=\"content-section\" data-section=\"full-portfolio\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 22,
+          "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 22,
+          "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 371,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('full-portfolio')",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        }
+      ],
+      "issue_count": 8,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1277,
+            "content": "// toggleSection function removed - use global window.toggleSection directly",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 1277,
+            "content": "// toggleSection function removed - use global window.toggleSection directly",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 1408,
+            "content": "// toggleAllSections and toggleSection exports removed - use global functions directly",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          }
+        ],
+        "issue_count": 3
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 22,
+            "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 340,
+            "content": "<div class=\"content-section\" data-section=\"full-portfolio\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 22,
+            "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 22,
+            "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 371,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('full-portfolio')",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          }
+        ],
+        "issue_count": 5
+      }
+    },
+    "notifications": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 1609,
+          "content": "window.showSuccessNotification('לוג מפורט הועתק ללוח');",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 759,
+          "content": "} else if (typeof window.showErrorNotification === 'function') {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 760,
+          "content": "window.showErrorNotification('שגיאה', message, 6000, 'system');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1615,
+          "content": "window.showErrorNotification('שגיאה בהעתקת הלוג');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        }
+      ],
+      "issue_count": 4,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1609,
+            "content": "window.showSuccessNotification('לוג מפורט הועתק ללוח');",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 759,
+            "content": "} else if (typeof window.showErrorNotification === 'function') {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 760,
+            "content": "window.showErrorNotification('שגיאה', message, 6000, 'system');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1615,
+            "content": "window.showErrorNotification('שגיאה בהעתקת הלוג');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          }
+        ],
+        "issue_count": 4
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "modals": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "tables": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 378,
+          "content": "<table class=\"table table-hover\" id=\"portfolioTable\" data-table-type=\"portfolio\">",
+          "pattern": "data-table-type",
+          "match": "data-table-type",
+          "file": "html"
+        }
+      ],
+      "issue_count": 1,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 378,
+            "content": "<table class=\"table table-hover\" id=\"portfolioTable\" data-table-type=\"portfolio\">",
+            "pattern": "data-table-type",
+            "match": "data-table-type"
+          }
+        ],
+        "issue_count": 1
+      }
+    },
+    "field_renderer": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 134,
+          "content": "if (window.FieldRendererService?.renderDateShort) {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 136,
+          "content": "return window.FieldRendererService.renderDateShort(resolved) || '';",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 275,
+          "content": "// שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 278,
+          "content": "balanceEl.innerHTML = window.FieldRendererService?.renderAmount",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 279,
+          "content": "? window.FieldRendererService.renderAmount(numericBalance, currencySymbol, 2, true)",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 289,
+          "content": "// שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 292,
+          "content": "totalPnLEl.innerHTML = window.FieldRendererService?.renderAmount",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 293,
+          "content": "? window.FieldRendererService.renderAmount(numericPnL, currencySymbol, 2, true)",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 434,
+          "content": "if (Number.isFinite(numericValue) && window.FieldRendererService?.renderAmount) {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 435,
+          "content": "amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, ",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 517,
+          "content": "// שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 519,
+          "content": "if (side && window.FieldRendererService?.renderSide) {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 520,
+          "content": "const sideHtml = window.FieldRendererService.renderSide(side);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 549,
+          "content": "// שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 551,
+          "content": "if (Number.isFinite(numericValue) && window.FieldRendererService?.renderAmount) {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 552,
+          "content": "amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, ",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 611,
+          "content": "const statusHtml = window.FieldRendererService?.renderStatus?.(alert.status, 'alert');",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 622,
+          "content": "const priorityHtml = window.FieldRendererService?.renderPriority?.(alert.priority);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 707,
+          "content": "// שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 710,
+          "content": "if (Number.isFinite(numericVal) && window.FieldRendererService?.renderAmount) {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 711,
+          "content": "return window.FieldRendererService.renderAmount(numericVal, currencySymbol, 2, true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        }
+      ],
+      "issue_count": 21,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 134,
+            "content": "if (window.FieldRendererService?.renderDateShort) {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 136,
+            "content": "return window.FieldRendererService.renderDateShort(resolved) || '';",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 275,
+            "content": "// שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 278,
+            "content": "balanceEl.innerHTML = window.FieldRendererService?.renderAmount",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 279,
+            "content": "? window.FieldRendererService.renderAmount(numericBalance, currencySymbol, 2, true)",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 289,
+            "content": "// שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 292,
+            "content": "totalPnLEl.innerHTML = window.FieldRendererService?.renderAmount",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 293,
+            "content": "? window.FieldRendererService.renderAmount(numericPnL, currencySymbol, 2, true)",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 434,
+            "content": "if (Number.isFinite(numericValue) && window.FieldRendererService?.renderAmount) {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 435,
+            "content": "amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, ",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 517,
+            "content": "// שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 519,
+            "content": "if (side && window.FieldRendererService?.renderSide) {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 520,
+            "content": "const sideHtml = window.FieldRendererService.renderSide(side);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 549,
+            "content": "// שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 551,
+            "content": "if (Number.isFinite(numericValue) && window.FieldRendererService?.renderAmount) {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 552,
+            "content": "amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, ",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 611,
+            "content": "const statusHtml = window.FieldRendererService?.renderStatus?.(alert.status, 'alert');",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 622,
+            "content": "const priorityHtml = window.FieldRendererService?.renderPriority?.(alert.priority);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 707,
+            "content": "// שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 710,
+            "content": "if (Number.isFinite(numericVal) && window.FieldRendererService?.renderAmount) {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 711,
+            "content": "return window.FieldRendererService.renderAmount(numericVal, currencySymbol, 2, true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          }
+        ],
+        "issue_count": 21
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "crud_handler": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 756,
+          "content": "// Use CRUDResponseHandler for error notification if available",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 757,
+          "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 757,
+          "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 758,
+          "content": "window.CRUDResponseHandler.handleError(error, 'טעינת נתוני דשבורד');",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1019,
+          "content": "// Use CRUDResponseHandler.handleLoadResponse for consistent error handling",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1021,
+          "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleLoadResponse)",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1021,
+          "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleLoadResponse)",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1022,
+          "content": "// Use CRUDResponseHandler for consistent error handling with retry mechanism",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1023,
+          "content": "return window.CRUDResponseHandler.handleLoadResponse(response, {",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1038,
+          "content": "// Use CRUDResponseHandler for error notification if available",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1039,
+          "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1039,
+          "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1040,
+          "content": "window.CRUDResponseHandler.handleError(new Error(errorMessage), `טעינת ${label}`);",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1052,
+          "content": "// CRUDResponseHandler.handleLoadResponse already handled the error and returned []",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1058,
+          "content": "// CRUDResponseHandler.handleLoadResponse already handled the error and returned []",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1063,
+          "content": "// CRUDResponseHandler.handleLoadResponse already handled the error and returned []",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1068,
+          "content": "// CRUDResponseHandler.handleLoadResponse already handled the error and returned []",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1187,
+          "content": "// Use CRUDResponseHandler for error handling if available",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1188,
+          "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1188,
+          "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 1189,
+          "content": "window.CRUDResponseHandler.handleError(error, 'טעינת נתוני דשבורד');",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        }
+      ],
+      "issue_count": 21,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 756,
+            "content": "// Use CRUDResponseHandler for error notification if available",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 757,
+            "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 757,
+            "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 758,
+            "content": "window.CRUDResponseHandler.handleError(error, 'טעינת נתוני דשבורד');",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1019,
+            "content": "// Use CRUDResponseHandler.handleLoadResponse for consistent error handling",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1021,
+            "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleLoadResponse)",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1021,
+            "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleLoadResponse)",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1022,
+            "content": "// Use CRUDResponseHandler for consistent error handling with retry mechanism",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1023,
+            "content": "return window.CRUDResponseHandler.handleLoadResponse(response, {",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1038,
+            "content": "// Use CRUDResponseHandler for error notification if available",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1039,
+            "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1039,
+            "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1040,
+            "content": "window.CRUDResponseHandler.handleError(new Error(errorMessage), `טעינת ${label}`);",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1052,
+            "content": "// CRUDResponseHandler.handleLoadResponse already handled the error and returned []",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1058,
+            "content": "// CRUDResponseHandler.handleLoadResponse already handled the error and returned []",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1063,
+            "content": "// CRUDResponseHandler.handleLoadResponse already handled the error and returned []",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1068,
+            "content": "// CRUDResponseHandler.handleLoadResponse already handled the error and returned []",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1187,
+            "content": "// Use CRUDResponseHandler for error handling if available",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1188,
+            "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1188,
+            "content": "if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 1189,
+            "content": "window.CRUDResponseHandler.handleError(error, 'טעינת נתוני דשבורד');",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          }
+        ],
+        "issue_count": 21
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "select_populator": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "data_collection": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "icons": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 17,
+          "content": "* - replaceIconsWithIconSystem() - Replace all <img> tags with IconSystem.renderIcon()",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 17,
+          "content": "* - replaceIconsWithIconSystem() - Replace all <img> tags with IconSystem.renderIcon()",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1283,
+          "content": "* Replace all <img> tags with IconSystem.renderIcon()",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1286,
+          "content": "async function replaceIconsWithIconSystem() {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1287,
+          "content": "if (!window.IconSystem || !window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1287,
+          "content": "if (!window.IconSystem || !window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1288,
+          "content": "// Wait for IconSystem to be ready",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1289,
+          "content": "if (window.IconSystem && typeof window.IconSystem.initialize === 'function') {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1289,
+          "content": "if (window.IconSystem && typeof window.IconSystem.initialize === 'function') {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1290,
+          "content": "await window.IconSystem.initialize();",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1293,
+          "content": "setTimeout(() => replaceIconsWithIconSystem(), 500);",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1298,
+          "content": "// Icon mapping: img src path -> IconSystem type and name",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1323,
+          "content": "const iconHTML = await window.IconSystem.renderIcon(mapping.type, mapping.name, {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1364,
+          "content": "// Replace icons with IconSystem",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1371,
+          "content": "replaceIconsWithIconSystem().catch(() => {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 17,
+          "content": "* - replaceIconsWithIconSystem() - Replace all <img> tags with IconSystem.renderIcon()",
+          "pattern": "<img.*icon",
+          "match": "<img> tags with IconSystem.renderIcon",
+          "file": "js"
+        },
+        {
+          "line": 1283,
+          "content": "* Replace all <img> tags with IconSystem.renderIcon()",
+          "pattern": "<img.*icon",
+          "match": "<img> tags with IconSystem.renderIcon",
+          "file": "js"
+        },
+        {
+          "line": 21,
+          "content": "<!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "html"
+        },
+        {
+          "line": 22,
+          "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/entities/home.s",
+          "file": "html"
+        },
+        {
+          "line": 102,
+          "content": "<img src=\"images/icons/entities/trades.svg\" alt=\"פעולות ממתינות\" width=\"20\" height=\"20\">",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"images/icon",
+          "file": "html"
+        },
+        {
+          "line": 227,
+          "content": "<img src=\"images/icons/entities/home.svg\" alt=\"תגיות\" class=\"section-icon\">",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"images/icons/entities/home.svg\" alt=\"תגי",
+          "file": "html"
+        },
+        {
+          "line": 345,
+          "content": "<img src=\"/trading-ui/images/icons/entities/trading_accounts.svg\" alt=\"פורטפוליו\" class=\"section-ico",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/entities/tradin",
+          "file": "html"
+        }
+      ],
+      "issue_count": 22,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 17,
+            "content": "* - replaceIconsWithIconSystem() - Replace all <img> tags with IconSystem.renderIcon()",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 17,
+            "content": "* - replaceIconsWithIconSystem() - Replace all <img> tags with IconSystem.renderIcon()",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1283,
+            "content": "* Replace all <img> tags with IconSystem.renderIcon()",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1286,
+            "content": "async function replaceIconsWithIconSystem() {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1287,
+            "content": "if (!window.IconSystem || !window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1287,
+            "content": "if (!window.IconSystem || !window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1288,
+            "content": "// Wait for IconSystem to be ready",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1289,
+            "content": "if (window.IconSystem && typeof window.IconSystem.initialize === 'function') {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1289,
+            "content": "if (window.IconSystem && typeof window.IconSystem.initialize === 'function') {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1290,
+            "content": "await window.IconSystem.initialize();",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1293,
+            "content": "setTimeout(() => replaceIconsWithIconSystem(), 500);",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1298,
+            "content": "// Icon mapping: img src path -> IconSystem type and name",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1323,
+            "content": "const iconHTML = await window.IconSystem.renderIcon(mapping.type, mapping.name, {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1364,
+            "content": "// Replace icons with IconSystem",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1371,
+            "content": "replaceIconsWithIconSystem().catch(() => {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 17,
+            "content": "* - replaceIconsWithIconSystem() - Replace all <img> tags with IconSystem.renderIcon()",
+            "pattern": "<img.*icon",
+            "match": "<img> tags with IconSystem.renderIcon"
+          },
+          {
+            "line": 1283,
+            "content": "* Replace all <img> tags with IconSystem.renderIcon()",
+            "pattern": "<img.*icon",
+            "match": "<img> tags with IconSystem.renderIcon"
+          }
+        ],
+        "issue_count": 17
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 21,
+            "content": "<!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 22,
+            "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/entities/home.s"
+          },
+          {
+            "line": 102,
+            "content": "<img src=\"images/icons/entities/trades.svg\" alt=\"פעולות ממתינות\" width=\"20\" height=\"20\">",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"images/icon"
+          },
+          {
+            "line": 227,
+            "content": "<img src=\"images/icons/entities/home.svg\" alt=\"תגיות\" class=\"section-icon\">",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"images/icons/entities/home.svg\" alt=\"תגי"
+          },
+          {
+            "line": 345,
+            "content": "<img src=\"/trading-ui/images/icons/entities/trading_accounts.svg\" alt=\"פורטפוליו\" class=\"section-ico",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/entities/tradin"
+          }
+        ],
+        "issue_count": 5
+      }
+    },
+    "colors": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "info_summary": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 695,
+          "content": "// summaryStats uses InfoSummarySystem via updateSummaryStats()",
+          "pattern": "InfoSummarySystem",
+          "match": "InfoSummarySystem",
+          "file": "js"
+        }
+      ],
+      "issue_count": 1,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 695,
+            "content": "// summaryStats uses InfoSummarySystem via updateSummaryStats()",
+            "pattern": "InfoSummarySystem",
+            "match": "InfoSummarySystem"
+          }
+        ],
+        "issue_count": 1
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "pagination": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "entity_details": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "conditions": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "page_state": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "logger": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 1502,
+          "content": "const originalError = console.error;",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.error",
+          "file": "js"
+        },
+        {
+          "line": 1503,
+          "content": "const originalWarn = console.warn;",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.warn",
+          "file": "js"
+        },
+        {
+          "line": 1504,
+          "content": "const originalLog = console.log;",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.log",
+          "file": "js"
+        },
+        {
+          "line": 1506,
+          "content": "console.error = function(...args) {",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.error",
+          "file": "js"
+        },
+        {
+          "line": 1507,
+          "content": "logData.console.errors.push(args.join(' '));",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.error",
+          "file": "js"
+        },
+        {
+          "line": 1511,
+          "content": "console.warn = function(...args) {",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.warn",
+          "file": "js"
+        },
+        {
+          "line": 1512,
+          "content": "logData.console.warnings.push(args.join(' '));",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.warn",
+          "file": "js"
+        },
+        {
+          "line": 1516,
+          "content": "console.log = function(...args) {",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.log",
+          "file": "js"
+        },
+        {
+          "line": 1517,
+          "content": "logData.console.logs.push(args.join(' '));",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.log",
+          "file": "js"
+        },
+        {
+          "line": 39,
+          "content": "window.Logger.info('🏠 Index page JavaScript loaded', { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 138,
+          "content": "window.Logger?.warn?.('⚠️ renderDateShort failed', { error: error?.message }, { page: 'index' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 148,
+          "content": "window.Logger?.warn?.('⚠️ formatDateShort fallback failed', { error: error?.message }, { page: 'inde",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 310,
+          "content": "window.Logger?.info?.('📊 Updating RecentItemsWidget', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 330,
+          "content": "window.Logger?.info?.('📊 Calling RecentItemsWidget.render', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 341,
+          "content": "window.Logger?.warn?.('⚠️ RecentItemsWidget not available, falling back to separate widgets', { page",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 755,
+          "content": "window.Logger?.error?.('❌ Error loading dashboard data', { message, stack: error?.stack }, { page: '",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 824,
+          "content": "window.Logger?.info?.('🔍 [index.js] processDashboardData - About to update widget', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 836,
+          "content": "window.Logger?.info?.('🔍 [index.js] processDashboardData - Updating widget with trades', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 842,
+          "content": "window.Logger?.info?.('🔍 [index.js] processDashboardData - No trades, skipping widget update (will u",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 850,
+          "content": "window.Logger?.warn?.('⚠️ Failed to load recent trade plans', { error: error?.message }, { page: 'in",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 855,
+          "content": "window.Logger?.info?.('📊 No trades in dashboard data, attempting to load trades for widget...', { pa",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 867,
+          "content": "window.Logger?.info?.('📊 Loaded trades for widget directly from API', { count: tradesData.length, pa",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 874,
+          "content": "window.Logger?.debug?.('📊 No trades found in API response', { page: 'index' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 878,
+          "content": "window.Logger?.warn?.('⚠️ Failed to load trades for widget from API', { error: error?.message }, { p",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 895,
+          "content": "window.Logger?.info?.('🔍 [index.js] loadRecentTradePlans START', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 910,
+          "content": "window.Logger?.info?.('🔍 [index.js] Using TradePlansDataService to load trade plans', { page: 'index",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 912,
+          "content": "window.Logger?.info?.('🔍 [index.js] TradePlansDataService returned', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 920,
+          "content": "window.Logger?.warn?.('⚠️ [index.js] TradePlansDataService returned non-array, setting to empty', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 927,
+          "content": "window.Logger?.info?.('🔍 [index.js] TradePlansDataService not available, fetching directly from API'",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 934,
+          "content": "window.Logger?.info?.('🔍 [index.js] API response received', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 944,
+          "content": "window.Logger?.info?.('🔍 [index.js] About to update RecentItemsWidget', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 967,
+          "content": "window.Logger?.info?.('🔍 [index.js] Calling RecentItemsWidget.render', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 976,
+          "content": "window.Logger?.info?.('📊 [index.js] Updated RecentItemsWidget with trade plans', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 983,
+          "content": "window.Logger?.warn?.('⚠️ [index.js] RecentItemsWidget not available, falling back to separate widge",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 988,
+          "content": "window.Logger?.error?.('❌ [index.js] Failed to load trade plans for recent widget', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 995,
+          "content": "window.Logger?.info?.('🔍 [index.js] Updating widget with empty trade plans due to error', { page: 'i",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1051,
+          "content": "window.Logger?.error?.('❌ Failed to load trades for dashboard', { error: error?.message }, { page: '",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1057,
+          "content": "window.Logger?.error?.('❌ Failed to load alerts for dashboard', { error: error?.message }, { page: '",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1062,
+          "content": "window.Logger?.error?.('❌ Failed to load trading accounts for dashboard', { error: error?.message },",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1067,
+          "content": "window.Logger?.warn?.('⚠️ Failed to load cash flows for dashboard', { error: error?.message }, { pag",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1092,
+          "content": "window.Logger?.warn?.('⚠️ Failed to invalidate dashboard data cache', { error: error?.message }, { p",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1098,
+          "content": "window.Logger?.warn?.('⚠️ DashboardData service not available, using legacy fetch', { page: 'index' ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1129,
+          "content": "window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1138,
+          "content": "window.Logger?.warn?.('⚠️ Failed to clear dashboard cache', { error: clearError?.message }, { page: ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1147,
+          "content": "window.Logger?.warn?.('⚠️ Failed to clear dashboard cache', { error: clearError?.message }, { page: ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1244,
+          "content": "window.Logger.info('Refreshing overview data...', { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1246,
+          "content": "window.Logger?.error?.('❌ Error refreshing dashboard overview', { message: error?.message }, { page:",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1259,
+          "content": "window.Logger.info('📤 Export overview data - Future feature', { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1272,
+          "content": "window.Logger.info(`⚡ Quick action: ${actionType} - Future feature`, { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1338,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1339,
+          "content": "window.Logger.warn('Failed to render icon', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1357,
+          "content": "window.Logger.info('⚠️ Index page already initialized, skipping...', { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1362,
+          "content": "window.Logger.info('🏠 Index page initialized via unified system', { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1533,
+          "content": "window.Logger.info('🔍 בדיקת מצב Z-Index במערכת ראש הדף', { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1534,
+          "content": "window.Logger.info('=====================================', { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1556,
+          "content": "window.Logger.info(`📍 ${element.name}:`, { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1557,
+          "content": "window.Logger.info(`   Selector: ${element.selector}`, { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1558,
+          "content": "window.Logger.info(`   Z-Index: ${zIndex}`, { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1559,
+          "content": "window.Logger.info(`   Position: ${position}`, { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1560,
+          "content": "window.Logger.info(`   Display: ${display}`, { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1561,
+          "content": "window.Logger.info(`   Visibility: ${visibility}`, { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1562,
+          "content": "window.Logger.info(`   Visible: ${el.offsetParent !== null}`, { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1563,
+          "content": "window.Logger.info('---', { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1565,
+          "content": "window.Logger.info(`❌ ${element.name} (${element.selector}): לא נמצא`, { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1570,
+          "content": "window.Logger.info('🎯 בדיקת תפריטים פתוחים:', { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1572,
+          "content": "window.Logger.info(`תפריטים פתוחים: ${openMenus.length}`, { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1576,
+          "content": "window.Logger.info(`תפריט ${index + 1}: z-index = ${computedStyle.zIndex}`, { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1580,
+          "content": "window.Logger.info('🔘 בדיקת כפתור פילטר:', { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1585,
+          "content": "window.Logger.info(`כפתור פילטר: z-index = ${computedStyle.zIndex}`, { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1586,
+          "content": "window.Logger.info(`כפתור פילטר: position = ${computedStyle.position}`, { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1587,
+          "content": "window.Logger.info(`כפתור פילטר: visible = ${filterToggleBtn.offsetParent !== null}`, { page: \"index",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1591,
+          "content": "window.Logger.info('=====================================', { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1592,
+          "content": "window.Logger.info('✅ בדיקת Z-Index הושלמה', { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1614,
+          "content": "window.Logger.error('שגיאה בהעתקה:', err, { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1630,
+          "content": "window.Logger?.warn?.('⚠️ Dashboard section not found', { page: 'index' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1684,
+          "content": "window.Logger?.debug?.('Widget heights equalized', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1701,
+          "content": "window.Logger?.info?.('✅ Widget heights equalized', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1706,
+          "content": "window.Logger?.error?.('❌ Error equalizing widget heights:', error, { page: 'index' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1745,
+          "content": "window.Logger.info('✅ Index page ready', { page: \"index\" });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 750,
+          "content": "window.Logger?.info?.('🔵🔵🔵 FALLBACK: Attempting direct widget initialization', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "html"
+        },
+        {
+          "line": 765,
+          "content": "window.Logger?.info?.('✅✅✅ FALLBACK: Widget initialized successfully', { page: 'index' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "html"
+        },
+        {
+          "line": 767,
+          "content": "window.Logger?.error?.('🔴🔴🔴 FALLBACK: Error initializing widget', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "html"
+        },
+        {
+          "line": 774,
+          "content": "window.Logger?.warn?.('⚠️⚠️⚠️ FALLBACK: Widget or container not available', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "html"
+        },
+        {
+          "line": 465,
+          "content": "<script src=\"scripts/logger-service.js?v=1.0.0\"></script> <!-- Advanced logging service -->",
+          "pattern": "logger-service\\.js",
+          "match": "logger-service.js",
+          "file": "html"
+        }
+      ],
+      "issue_count": 84,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 1502,
+            "content": "const originalError = console.error;",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.error"
+          },
+          {
+            "line": 1503,
+            "content": "const originalWarn = console.warn;",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.warn"
+          },
+          {
+            "line": 1504,
+            "content": "const originalLog = console.log;",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.log"
+          },
+          {
+            "line": 1506,
+            "content": "console.error = function(...args) {",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.error"
+          },
+          {
+            "line": 1507,
+            "content": "logData.console.errors.push(args.join(' '));",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.error"
+          },
+          {
+            "line": 1511,
+            "content": "console.warn = function(...args) {",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.warn"
+          },
+          {
+            "line": 1512,
+            "content": "logData.console.warnings.push(args.join(' '));",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.warn"
+          },
+          {
+            "line": 1516,
+            "content": "console.log = function(...args) {",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.log"
+          },
+          {
+            "line": 1517,
+            "content": "logData.console.logs.push(args.join(' '));",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.log"
+          },
+          {
+            "line": 39,
+            "content": "window.Logger.info('🏠 Index page JavaScript loaded', { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 138,
+            "content": "window.Logger?.warn?.('⚠️ renderDateShort failed', { error: error?.message }, { page: 'index' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 148,
+            "content": "window.Logger?.warn?.('⚠️ formatDateShort fallback failed', { error: error?.message }, { page: 'inde",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 310,
+            "content": "window.Logger?.info?.('📊 Updating RecentItemsWidget', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 330,
+            "content": "window.Logger?.info?.('📊 Calling RecentItemsWidget.render', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 341,
+            "content": "window.Logger?.warn?.('⚠️ RecentItemsWidget not available, falling back to separate widgets', { page",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 755,
+            "content": "window.Logger?.error?.('❌ Error loading dashboard data', { message, stack: error?.stack }, { page: '",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 824,
+            "content": "window.Logger?.info?.('🔍 [index.js] processDashboardData - About to update widget', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 836,
+            "content": "window.Logger?.info?.('🔍 [index.js] processDashboardData - Updating widget with trades', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 842,
+            "content": "window.Logger?.info?.('🔍 [index.js] processDashboardData - No trades, skipping widget update (will u",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 850,
+            "content": "window.Logger?.warn?.('⚠️ Failed to load recent trade plans', { error: error?.message }, { page: 'in",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 855,
+            "content": "window.Logger?.info?.('📊 No trades in dashboard data, attempting to load trades for widget...', { pa",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 867,
+            "content": "window.Logger?.info?.('📊 Loaded trades for widget directly from API', { count: tradesData.length, pa",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 874,
+            "content": "window.Logger?.debug?.('📊 No trades found in API response', { page: 'index' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 878,
+            "content": "window.Logger?.warn?.('⚠️ Failed to load trades for widget from API', { error: error?.message }, { p",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 895,
+            "content": "window.Logger?.info?.('🔍 [index.js] loadRecentTradePlans START', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 910,
+            "content": "window.Logger?.info?.('🔍 [index.js] Using TradePlansDataService to load trade plans', { page: 'index",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 912,
+            "content": "window.Logger?.info?.('🔍 [index.js] TradePlansDataService returned', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 920,
+            "content": "window.Logger?.warn?.('⚠️ [index.js] TradePlansDataService returned non-array, setting to empty', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 927,
+            "content": "window.Logger?.info?.('🔍 [index.js] TradePlansDataService not available, fetching directly from API'",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 934,
+            "content": "window.Logger?.info?.('🔍 [index.js] API response received', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 944,
+            "content": "window.Logger?.info?.('🔍 [index.js] About to update RecentItemsWidget', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 967,
+            "content": "window.Logger?.info?.('🔍 [index.js] Calling RecentItemsWidget.render', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 976,
+            "content": "window.Logger?.info?.('📊 [index.js] Updated RecentItemsWidget with trade plans', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 983,
+            "content": "window.Logger?.warn?.('⚠️ [index.js] RecentItemsWidget not available, falling back to separate widge",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 988,
+            "content": "window.Logger?.error?.('❌ [index.js] Failed to load trade plans for recent widget', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 995,
+            "content": "window.Logger?.info?.('🔍 [index.js] Updating widget with empty trade plans due to error', { page: 'i",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1051,
+            "content": "window.Logger?.error?.('❌ Failed to load trades for dashboard', { error: error?.message }, { page: '",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1057,
+            "content": "window.Logger?.error?.('❌ Failed to load alerts for dashboard', { error: error?.message }, { page: '",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1062,
+            "content": "window.Logger?.error?.('❌ Failed to load trading accounts for dashboard', { error: error?.message },",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1067,
+            "content": "window.Logger?.warn?.('⚠️ Failed to load cash flows for dashboard', { error: error?.message }, { pag",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1092,
+            "content": "window.Logger?.warn?.('⚠️ Failed to invalidate dashboard data cache', { error: error?.message }, { p",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1098,
+            "content": "window.Logger?.warn?.('⚠️ DashboardData service not available, using legacy fetch', { page: 'index' ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1129,
+            "content": "window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1138,
+            "content": "window.Logger?.warn?.('⚠️ Failed to clear dashboard cache', { error: clearError?.message }, { page: ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1147,
+            "content": "window.Logger?.warn?.('⚠️ Failed to clear dashboard cache', { error: clearError?.message }, { page: ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1244,
+            "content": "window.Logger.info('Refreshing overview data...', { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1246,
+            "content": "window.Logger?.error?.('❌ Error refreshing dashboard overview', { message: error?.message }, { page:",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1259,
+            "content": "window.Logger.info('📤 Export overview data - Future feature', { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1272,
+            "content": "window.Logger.info(`⚡ Quick action: ${actionType} - Future feature`, { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1338,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1339,
+            "content": "window.Logger.warn('Failed to render icon', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1357,
+            "content": "window.Logger.info('⚠️ Index page already initialized, skipping...', { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1362,
+            "content": "window.Logger.info('🏠 Index page initialized via unified system', { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1533,
+            "content": "window.Logger.info('🔍 בדיקת מצב Z-Index במערכת ראש הדף', { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1534,
+            "content": "window.Logger.info('=====================================', { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1556,
+            "content": "window.Logger.info(`📍 ${element.name}:`, { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1557,
+            "content": "window.Logger.info(`   Selector: ${element.selector}`, { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1558,
+            "content": "window.Logger.info(`   Z-Index: ${zIndex}`, { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1559,
+            "content": "window.Logger.info(`   Position: ${position}`, { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1560,
+            "content": "window.Logger.info(`   Display: ${display}`, { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1561,
+            "content": "window.Logger.info(`   Visibility: ${visibility}`, { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1562,
+            "content": "window.Logger.info(`   Visible: ${el.offsetParent !== null}`, { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1563,
+            "content": "window.Logger.info('---', { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1565,
+            "content": "window.Logger.info(`❌ ${element.name} (${element.selector}): לא נמצא`, { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1570,
+            "content": "window.Logger.info('🎯 בדיקת תפריטים פתוחים:', { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1572,
+            "content": "window.Logger.info(`תפריטים פתוחים: ${openMenus.length}`, { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1576,
+            "content": "window.Logger.info(`תפריט ${index + 1}: z-index = ${computedStyle.zIndex}`, { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1580,
+            "content": "window.Logger.info('🔘 בדיקת כפתור פילטר:', { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1585,
+            "content": "window.Logger.info(`כפתור פילטר: z-index = ${computedStyle.zIndex}`, { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1586,
+            "content": "window.Logger.info(`כפתור פילטר: position = ${computedStyle.position}`, { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1587,
+            "content": "window.Logger.info(`כפתור פילטר: visible = ${filterToggleBtn.offsetParent !== null}`, { page: \"index",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1591,
+            "content": "window.Logger.info('=====================================', { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1592,
+            "content": "window.Logger.info('✅ בדיקת Z-Index הושלמה', { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1614,
+            "content": "window.Logger.error('שגיאה בהעתקה:', err, { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1630,
+            "content": "window.Logger?.warn?.('⚠️ Dashboard section not found', { page: 'index' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1684,
+            "content": "window.Logger?.debug?.('Widget heights equalized', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1701,
+            "content": "window.Logger?.info?.('✅ Widget heights equalized', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1706,
+            "content": "window.Logger?.error?.('❌ Error equalizing widget heights:', error, { page: 'index' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1745,
+            "content": "window.Logger.info('✅ Index page ready', { page: \"index\" });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          }
+        ],
+        "issue_count": 79
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 750,
+            "content": "window.Logger?.info?.('🔵🔵🔵 FALLBACK: Attempting direct widget initialization', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 765,
+            "content": "window.Logger?.info?.('✅✅✅ FALLBACK: Widget initialized successfully', { page: 'index' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 767,
+            "content": "window.Logger?.error?.('🔴🔴🔴 FALLBACK: Error initializing widget', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 774,
+            "content": "window.Logger?.warn?.('⚠️⚠️⚠️ FALLBACK: Widget or container not available', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 465,
+            "content": "<script src=\"scripts/logger-service.js?v=1.0.0\"></script> <!-- Advanced logging service -->",
+            "pattern": "logger-service\\.js",
+            "match": "logger-service.js"
+          }
+        ],
+        "issue_count": 5
+      }
+    },
+    "cache": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 1134,
+          "content": "if (window.UnifiedCacheManager?.clearByPattern) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 1136,
+          "content": "await window.UnifiedCacheManager.clearByPattern(DASHBOARD_DATA_KEY);",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 1142,
+          "content": "} else if (window.UnifiedCacheManager?.clearByPattern) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 1145,
+          "content": "await window.UnifiedCacheManager.clearByPattern(DASHBOARD_DATA_KEY);",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 1156,
+          "content": "if (window.CacheTTLGuard?.ensure) {",
+          "pattern": "CacheTTLGuard",
+          "match": "CacheTTLGuard",
+          "file": "js"
+        },
+        {
+          "line": 1157,
+          "content": "const cachedOrFresh = await window.CacheTTLGuard.ensure(",
+          "pattern": "CacheTTLGuard",
+          "match": "CacheTTLGuard",
+          "file": "js"
+        }
+      ],
+      "issue_count": 6,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1134,
+            "content": "if (window.UnifiedCacheManager?.clearByPattern) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 1136,
+            "content": "await window.UnifiedCacheManager.clearByPattern(DASHBOARD_DATA_KEY);",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 1142,
+            "content": "} else if (window.UnifiedCacheManager?.clearByPattern) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 1145,
+            "content": "await window.UnifiedCacheManager.clearByPattern(DASHBOARD_DATA_KEY);",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 1156,
+            "content": "if (window.CacheTTLGuard?.ensure) {",
+            "pattern": "CacheTTLGuard",
+            "match": "CacheTTLGuard"
+          },
+          {
+            "line": 1157,
+            "content": "const cachedOrFresh = await window.CacheTTLGuard.ensure(",
+            "pattern": "CacheTTLGuard",
+            "match": "CacheTTLGuard"
+          }
+        ],
+        "issue_count": 6
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "dom_manipulation": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 278,
+          "content": "balanceEl.innerHTML = window.FieldRendererService?.renderAmount",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 282,
+          "content": "balanceEl.innerHTML = '<span class=\"text-muted\">לא זמין</span>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 292,
+          "content": "totalPnLEl.innerHTML = window.FieldRendererService?.renderAmount",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 296,
+          "content": "totalPnLEl.innerHTML = '<span class=\"text-muted\">לא זמין</span>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 373,
+          "content": "container.innerHTML = '<div class=\"text-muted small\">אין תוכניות זמינות</div>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 435,
+          "content": "amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, ",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 447,
+          "content": "container.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 476,
+          "content": "container.innerHTML = '<div class=\"text-muted small\">אין טריידים זמינים</div>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 523,
+          "content": "sideSpan.innerHTML = sideHtml;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 552,
+          "content": "amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, ",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 564,
+          "content": "container.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 580,
+          "content": "container.innerHTML = '<div class=\"text-muted small\">אין התראות זמינות</div>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 614,
+          "content": "statusSpan.innerHTML = statusHtml;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 625,
+          "content": "prioritySpan.innerHTML = priorityHtml;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 652,
+          "content": "container.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 690,
+          "content": "container.innerHTML = '<div class=\"text-muted small\">אין נתוני פורטפוליו זמינים</div>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 716,
+          "content": "container.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 736,
+          "content": "recentContainer.innerHTML = `<div class=\"text-danger small\">${fallback}</div>`;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 740,
+          "content": "alertsContainer.innerHTML = `<div class=\"text-danger small\">${fallback}</div>`;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1000,
+          "content": "container.innerHTML = '<div class=\"text-muted small\">אין תוכניות זמינות</div>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1331,
+          "content": "tempDiv.innerHTML = iconHTML;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 394,
+          "content": "const list = document.createElement('ul');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 398,
+          "content": "const item = document.createElement('li');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 401,
+          "content": "const mainWrap = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 404,
+          "content": "const title = document.createElement('span');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 409,
+          "content": "const metaRow = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 414,
+          "content": "const symbolSpan = document.createElement('span');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 421,
+          "content": "const dateSpan = document.createElement('span');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 429,
+          "content": "const amountWrapper = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 499,
+          "content": "const list = document.createElement('ul');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 503,
+          "content": "const item = document.createElement('li');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 506,
+          "content": "const mainWrap = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 509,
+          "content": "const title = document.createElement('span');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 514,
+          "content": "const metaRow = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 522,
+          "content": "const sideSpan = document.createElement('span');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 530,
+          "content": "const qtySpan = document.createElement('span');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 537,
+          "content": "const dateSpan = document.createElement('span');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 545,
+          "content": "const amountWrapper = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 592,
+          "content": "const list = document.createElement('ul');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 596,
+          "content": "const item = document.createElement('li');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 599,
+          "content": "const mainWrap = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 602,
+          "content": "const title = document.createElement('span');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 607,
+          "content": "const metaRow = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 612,
+          "content": "const statusSpan = document.createElement('span');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 623,
+          "content": "const prioritySpan = document.createElement('span');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 634,
+          "content": "const symbolSpan = document.createElement('span');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 641,
+          "content": "const dateSpan = document.createElement('span');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 1330,
+          "content": "const tempDiv = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        }
+      ],
+      "issue_count": 48,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 278,
+            "content": "balanceEl.innerHTML = window.FieldRendererService?.renderAmount",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 282,
+            "content": "balanceEl.innerHTML = '<span class=\"text-muted\">לא זמין</span>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 292,
+            "content": "totalPnLEl.innerHTML = window.FieldRendererService?.renderAmount",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 296,
+            "content": "totalPnLEl.innerHTML = '<span class=\"text-muted\">לא זמין</span>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 373,
+            "content": "container.innerHTML = '<div class=\"text-muted small\">אין תוכניות זמינות</div>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 435,
+            "content": "amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, ",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 447,
+            "content": "container.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 476,
+            "content": "container.innerHTML = '<div class=\"text-muted small\">אין טריידים זמינים</div>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 523,
+            "content": "sideSpan.innerHTML = sideHtml;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 552,
+            "content": "amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, ",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 564,
+            "content": "container.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 580,
+            "content": "container.innerHTML = '<div class=\"text-muted small\">אין התראות זמינות</div>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 614,
+            "content": "statusSpan.innerHTML = statusHtml;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 625,
+            "content": "prioritySpan.innerHTML = priorityHtml;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 652,
+            "content": "container.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 690,
+            "content": "container.innerHTML = '<div class=\"text-muted small\">אין נתוני פורטפוליו זמינים</div>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 716,
+            "content": "container.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 736,
+            "content": "recentContainer.innerHTML = `<div class=\"text-danger small\">${fallback}</div>`;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 740,
+            "content": "alertsContainer.innerHTML = `<div class=\"text-danger small\">${fallback}</div>`;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1000,
+            "content": "container.innerHTML = '<div class=\"text-muted small\">אין תוכניות זמינות</div>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1331,
+            "content": "tempDiv.innerHTML = iconHTML;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 394,
+            "content": "const list = document.createElement('ul');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 398,
+            "content": "const item = document.createElement('li');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 401,
+            "content": "const mainWrap = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 404,
+            "content": "const title = document.createElement('span');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 409,
+            "content": "const metaRow = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 414,
+            "content": "const symbolSpan = document.createElement('span');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 421,
+            "content": "const dateSpan = document.createElement('span');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 429,
+            "content": "const amountWrapper = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 499,
+            "content": "const list = document.createElement('ul');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 503,
+            "content": "const item = document.createElement('li');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 506,
+            "content": "const mainWrap = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 509,
+            "content": "const title = document.createElement('span');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 514,
+            "content": "const metaRow = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 522,
+            "content": "const sideSpan = document.createElement('span');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 530,
+            "content": "const qtySpan = document.createElement('span');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 537,
+            "content": "const dateSpan = document.createElement('span');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 545,
+            "content": "const amountWrapper = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 592,
+            "content": "const list = document.createElement('ul');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 596,
+            "content": "const item = document.createElement('li');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 599,
+            "content": "const mainWrap = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 602,
+            "content": "const title = document.createElement('span');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 607,
+            "content": "const metaRow = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 612,
+            "content": "const statusSpan = document.createElement('span');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 623,
+            "content": "const prioritySpan = document.createElement('span');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 634,
+            "content": "const symbolSpan = document.createElement('span');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 641,
+            "content": "const dateSpan = document.createElement('span');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 1330,
+            "content": "const tempDiv = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          }
+        ],
+        "issue_count": 48
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "html_structure": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 1538,
+          "content": "{ selector: '#unified-header', name: 'Header Container' },",
+          "pattern": "unified-header",
+          "match": "unified-header",
+          "file": "js"
+        },
+        {
+          "line": 1550,
+          "content": "const computedStyle = window.getComputedStyle(el);",
+          "pattern": "style\\s*=",
+          "match": "Style =",
+          "file": "js"
+        },
+        {
+          "line": 1575,
+          "content": "const computedStyle = window.getComputedStyle(menu);",
+          "pattern": "style\\s*=",
+          "match": "Style =",
+          "file": "js"
+        },
+        {
+          "line": 1584,
+          "content": "const computedStyle = window.getComputedStyle(filterToggleBtn);",
+          "pattern": "style\\s*=",
+          "match": "Style =",
+          "file": "js"
+        },
+        {
+          "line": 1648,
+          "content": "const computedStyle = window.getComputedStyle(widget);",
+          "pattern": "style\\s*=",
+          "match": "Style =",
+          "file": "js"
+        },
+        {
+          "line": 22,
+          "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 22,
+          "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 22,
+          "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 356,
+          "content": "<button data-button-type=\"FILTER\" data-variant=\"small\" data-icon=\"↕\" data-classes=\"portfolio-side-fi",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 357,
+          "content": "<button data-button-type=\"FILTER\" data-variant=\"small\" data-icon=\"↑\" data-classes=\"portfolio-side-fi",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 358,
+          "content": "<button data-button-type=\"FILTER\" data-variant=\"small\" data-icon=\"↓\" data-classes=\"portfolio-side-fi",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 371,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('full-portfolio')",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 382,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"צד\" data-classes=\"btn-",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 385,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"סימבול\" data-classes=\"",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 388,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"נוכחי\" data-classes=\"b",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 391,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"כמות\" data-classes=\"bt",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 394,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"מחיר ממוצע\" data-class",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 397,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"שווי שוק\" data-classes",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 400,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"P/L\" data-classes=\"btn",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 403,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"חשבון\" data-classes=\"b",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 406,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"% פורטפוליו\" data-clas",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 22,
+          "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 22,
+          "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 22,
+          "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 307,
+          "content": "data-button-type=\"PRIMARY\"",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 356,
+          "content": "<button data-button-type=\"FILTER\" data-variant=\"small\" data-icon=\"↕\" data-classes=\"portfolio-side-fi",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 357,
+          "content": "<button data-button-type=\"FILTER\" data-variant=\"small\" data-icon=\"↑\" data-classes=\"portfolio-side-fi",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 358,
+          "content": "<button data-button-type=\"FILTER\" data-variant=\"small\" data-icon=\"↓\" data-classes=\"portfolio-side-fi",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 371,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('full-portfolio')",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 382,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"צד\" data-classes=\"btn-",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 385,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"סימבול\" data-classes=\"",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 388,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"נוכחי\" data-classes=\"b",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 391,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"כמות\" data-classes=\"bt",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 394,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"מחיר ממוצע\" data-class",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 397,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"שווי שוק\" data-classes",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 400,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"P/L\" data-classes=\"btn",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 403,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"חשבון\" data-classes=\"b",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 406,
+          "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"% פורטפוליו\" data-clas",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 22,
+          "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+          "pattern": "unified-header",
+          "match": "unified-header",
+          "file": "html"
+        }
+      ],
+      "issue_count": 39,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 1538,
+            "content": "{ selector: '#unified-header', name: 'Header Container' },",
+            "pattern": "unified-header",
+            "match": "unified-header"
+          },
+          {
+            "line": 1550,
+            "content": "const computedStyle = window.getComputedStyle(el);",
+            "pattern": "style\\s*=",
+            "match": "Style ="
+          },
+          {
+            "line": 1575,
+            "content": "const computedStyle = window.getComputedStyle(menu);",
+            "pattern": "style\\s*=",
+            "match": "Style ="
+          },
+          {
+            "line": 1584,
+            "content": "const computedStyle = window.getComputedStyle(filterToggleBtn);",
+            "pattern": "style\\s*=",
+            "match": "Style ="
+          },
+          {
+            "line": 1648,
+            "content": "const computedStyle = window.getComputedStyle(widget);",
+            "pattern": "style\\s*=",
+            "match": "Style ="
+          }
+        ],
+        "issue_count": 5
+      },
+      "html_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 22,
+            "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 22,
+            "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 22,
+            "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 356,
+            "content": "<button data-button-type=\"FILTER\" data-variant=\"small\" data-icon=\"↕\" data-classes=\"portfolio-side-fi",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 357,
+            "content": "<button data-button-type=\"FILTER\" data-variant=\"small\" data-icon=\"↑\" data-classes=\"portfolio-side-fi",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 358,
+            "content": "<button data-button-type=\"FILTER\" data-variant=\"small\" data-icon=\"↓\" data-classes=\"portfolio-side-fi",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 371,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('full-portfolio')",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 382,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"צד\" data-classes=\"btn-",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 385,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"סימבול\" data-classes=\"",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 388,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"נוכחי\" data-classes=\"b",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 391,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"כמות\" data-classes=\"bt",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 394,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"מחיר ממוצע\" data-class",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 397,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"שווי שוק\" data-classes",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 400,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"P/L\" data-classes=\"btn",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 403,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"חשבון\" data-classes=\"b",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 406,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"% פורטפוליו\" data-clas",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 22,
+            "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 22,
+            "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 22,
+            "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 307,
+            "content": "data-button-type=\"PRIMARY\"",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 356,
+            "content": "<button data-button-type=\"FILTER\" data-variant=\"small\" data-icon=\"↕\" data-classes=\"portfolio-side-fi",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 357,
+            "content": "<button data-button-type=\"FILTER\" data-variant=\"small\" data-icon=\"↑\" data-classes=\"portfolio-side-fi",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 358,
+            "content": "<button data-button-type=\"FILTER\" data-variant=\"small\" data-icon=\"↓\" data-classes=\"portfolio-side-fi",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 371,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('full-portfolio')",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 382,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"צד\" data-classes=\"btn-",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 385,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"סימבול\" data-classes=\"",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 388,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"נוכחי\" data-classes=\"b",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 391,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"כמות\" data-classes=\"bt",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 394,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"מחיר ממוצע\" data-class",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 397,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"שווי שוק\" data-classes",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 400,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"P/L\" data-classes=\"btn",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 403,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"חשבון\" data-classes=\"b",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 406,
+            "content": "<button data-button-type=\"SORT\" data-variant=\"full\" data-icon=\"↕️\" data-text=\"% פורטפוליו\" data-clas",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 22,
+            "content": "</head><body class=\"index-page\"><div id=\"unified-header\"></div><div class=\"background-wrapper\"><div ",
+            "pattern": "unified-header",
+            "match": "unified-header"
+          }
+        ],
+        "issue_count": 34
+      }
+    }
+  }
+}

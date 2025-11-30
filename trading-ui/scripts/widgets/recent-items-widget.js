@@ -649,7 +649,7 @@
   }
 
   /**
-   * Handle hover on widget items
+   * Handle hover on widget items - position overlay as fixed, not pushing item
    */
   function handleItemHover(event) {
     const item = event.target.closest('.recent-items-widget-item');
@@ -666,8 +666,54 @@
     if (event.type === 'mouseenter') {
       item.classList.add('is-hovered');
       
-      // CSS class .is-hovered will handle showing the details container
-      if (!details) {
+      // Position overlay as fixed - above item, not pushing it
+      if (details) {
+        const itemRect = item.getBoundingClientRect();
+        const isRTL = document.documentElement.dir === 'rtl' || document.documentElement.getAttribute('dir') === 'rtl';
+        
+        // Show overlay temporarily to get dimensions
+        details.style.display = 'block';
+        details.style.visibility = 'hidden';
+        const overlayWidth = Math.max(details.offsetWidth || 300, 280);
+        const overlayHeight = details.offsetHeight || 150;
+        details.style.visibility = '';
+        
+        // Position above item (or below if not enough space)
+        let top = itemRect.bottom + 8;
+        if (top + overlayHeight > window.innerHeight) {
+          // Not enough space below - position above
+          top = itemRect.top - overlayHeight - 8;
+        }
+        
+        // Position horizontally
+        let left = itemRect.left;
+        let right = 'auto';
+        if (isRTL) {
+          right = window.innerWidth - itemRect.right;
+          left = 'auto';
+          // Check if overlay goes beyond viewport
+          if (right + overlayWidth > window.innerWidth) {
+            right = window.innerWidth - overlayWidth - 8;
+          }
+        } else {
+          if (left + overlayWidth > window.innerWidth) {
+            left = window.innerWidth - overlayWidth - 8;
+          }
+        }
+        
+        // Set fixed position
+        details.style.position = 'fixed';
+        details.style.top = `${top}px`;
+        if (isRTL) {
+          details.style.right = `${right}px`;
+          details.style.left = 'auto';
+        } else {
+          details.style.left = `${left}px`;
+          details.style.right = 'auto';
+        }
+        details.style.width = `${overlayWidth}px`;
+        details.style.zIndex = '1050';
+      } else {
         window.Logger?.warn?.('RecentItemsWidget: No details element found', {
           itemId: item.getAttribute('data-entity-id'),
           page: 'recent-items-widget'
@@ -683,12 +729,11 @@
       
       item.classList.remove('is-hovered');
       
-      // Reset overlay positioning
+      // Hide overlay after transition
       if (details) {
-        // CSS class should handle opacity - don't set inline style
-        // Reset to absolute positioning after transition
         setTimeout(() => {
           if (!item.classList.contains('is-hovered')) {
+            details.style.display = 'none';
             details.style.position = '';
             details.style.top = '';
             details.style.left = '';
@@ -780,6 +825,9 @@
       ? FieldRenderer.renderType(investmentType)
       : '';
 
+    // Get trade icon
+    const tradeIconPath = '/trading-ui/images/icons/entities/trades.svg';
+    
     const result = `
       <li class="list-group-item recent-items-widget-item" 
           data-entity-type="trade" 
@@ -789,13 +837,21 @@
         <!-- Header Section - Always Visible -->
         <div class="recent-items-widget-header">
           <div class="recent-items-widget-title">
-            <span class="recent-items-widget-title-main">${symbol}</span>
+            <div class="recent-items-widget-title-main-row">
+              <img src="${tradeIconPath}" alt="טרייד" class="recent-items-widget-icon" width="16" height="16">
+              <span class="recent-items-widget-title-main">${symbol}</span>
+            </div>
             <div class="recent-items-widget-title-meta">
-              ${sideHtml ? `<span>${sideHtml}</span>` : ''}
-              ${dateLabel ? `<span>${dateLabel}</span>` : ''}
+              ${statusDisplay ? `<span class="recent-items-widget-meta-item">${statusDisplay}</span>` : ''}
+              ${dateLabel ? `<span class="recent-items-widget-meta-item">${dateLabel}</span>` : ''}
             </div>
           </div>
-          <div class="recent-items-widget-amount">${amountHtml}</div>
+          <div class="recent-items-widget-amount">
+            ${quantity !== undefined && quantity !== null ? `
+              <div class="recent-items-widget-amount-quantity">${quantityDisplay}</div>
+            ` : ''}
+            <div class="recent-items-widget-amount-value">${amountHtml}</div>
+          </div>
         </div>
         <!-- Details Section - Hidden by default, shown on hover -->
         <div class="recent-items-widget-details-container">
@@ -887,6 +943,9 @@
       ? FieldRenderer.renderSide(side)
       : '';
 
+    // Get trade plan icon
+    const planIconPath = '/trading-ui/images/icons/entities/trade_plans.svg';
+    
     return `
       <li class="list-group-item recent-items-widget-item" 
           data-entity-type="trade_plan" 
@@ -896,13 +955,18 @@
         <!-- Header Section - Always Visible -->
         <div class="recent-items-widget-header">
           <div class="recent-items-widget-title">
-            <span class="recent-items-widget-title-main">${name}</span>
+            <div class="recent-items-widget-title-main-row">
+              <img src="${planIconPath}" alt="תוכנית" class="recent-items-widget-icon" width="16" height="16">
+              <span class="recent-items-widget-title-main">${symbol || name}</span>
+            </div>
             <div class="recent-items-widget-title-meta">
-              ${symbol ? `<span>${symbol}</span>` : ''}
-              ${dateLabel ? `<span>${dateLabel}</span>` : ''}
+              ${statusHtml ? `<span class="recent-items-widget-meta-item">${statusHtml}</span>` : ''}
+              ${dateLabel ? `<span class="recent-items-widget-meta-item">${dateLabel}</span>` : ''}
             </div>
           </div>
-          <div class="recent-items-widget-amount">${amountHtml}</div>
+          <div class="recent-items-widget-amount">
+            <div class="recent-items-widget-amount-value">${amountHtml}</div>
+          </div>
         </div>
         <!-- Details Section - Hidden by default, shown on hover -->
         <div class="recent-items-widget-details-container">
@@ -1576,4 +1640,6 @@
     window.Logger.info('Recent Items Widget loaded successfully', { page: 'recent-items-widget', version: '1.0.0' });
   }
 })();
+
+
 

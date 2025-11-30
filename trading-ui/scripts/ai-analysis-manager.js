@@ -426,6 +426,11 @@
         const variables = template.variables_json?.variables || [];
         
         for (const variable of variables) {
+          // Skip response_language - it's handled by static HTML element
+          if (variable.key === 'response_language') {
+            continue;
+          }
+          
           const col = document.createElement('div');
           col.className = 'col-md-6 mb-3';
 
@@ -900,6 +905,11 @@
       const fieldMap = {};
       if (this.selectedTemplate.variables_json?.variables) {
         this.selectedTemplate.variables_json.variables.forEach((variable) => {
+          // Skip response_language - it's handled by static HTML element
+          if (variable.key === 'response_language') {
+            return;
+          }
+          
           // Check if we're in modal or page
           const fieldId = document.getElementById(`var_modal_${variable.key}`) ? `var_modal_${variable.key}` : `var_${variable.key}`;
           fieldMap[variable.key] = {
@@ -908,6 +918,15 @@
             default: variable.default_value || null
           };
         });
+      }
+      
+      // Add response_language manually (static HTML element)
+      if (document.getElementById('responseLanguageModal') || document.getElementById('responseLanguage')) {
+        fieldMap['response_language'] = {
+          id: document.getElementById('responseLanguageModal') ? 'responseLanguageModal' : 'responseLanguage',
+          type: 'text',
+          default: 'hebrew'
+        };
       }
 
       // Collect variables from form using DataCollectionService
@@ -933,12 +952,6 @@
             }
           }
         });
-        
-        // Always collect response_language from the modal (it's not in fieldMap)
-        const responseLanguageEl = document.getElementById('responseLanguageModal');
-        if (responseLanguageEl) {
-          variables['response_language'] = responseLanguageEl.value || 'hebrew';
-        }
       } else {
         // Fallback to manual collection (for backward compatibility)
         window.Logger?.warn('DataCollectionService not available, using manual collection', { page: 'ai-analysis' });
@@ -1410,16 +1423,19 @@
             <thead>
               <tr>
                 <th>
-                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תבנית" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 0)"></button>
+                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="מזהה" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 0)"></button>
                 </th>
                 <th>
-                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="מנוע" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 1)"></button>
+                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תבנית" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 1)"></button>
                 </th>
                 <th>
-                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="סטטוס" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 2)"></button>
+                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="מנוע" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 2)"></button>
                 </th>
                 <th>
-                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="נוצר ב" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 3)"></button>
+                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="סטטוס" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 3)"></button>
+                </th>
+                <th>
+                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="נוצר ב" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 4)"></button>
                 </th>
                 <th>פעולות</th>
               </tr>
@@ -1489,12 +1505,44 @@
           const cachePromises = analysisIds.map(async (id) => {
             const cacheKey = `ai-analysis-response-${id}`;
             try {
-              const cachedData = await window.UnifiedCacheManager.get(cacheKey);
-              const hasCache = !!(cachedData && cachedData.response_text);
+              // Try to get from indexedDB layer first (where we save it)
+              let cachedData = await window.UnifiedCacheManager.get(cacheKey, 'indexedDB');
+              
+              // If not found, try memory layer
+              if (!cachedData) {
+                cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
+              }
+              
+              // If still not found, try localStorage
+              if (!cachedData) {
+                cachedData = await window.UnifiedCacheManager.get(cacheKey, 'localStorage');
+              }
+              
+              // If still not found, try without layer (default search)
+              if (!cachedData) {
+                cachedData = await window.UnifiedCacheManager.get(cacheKey);
+              }
+              
+              const hasCache = !!(cachedData && (
+                cachedData.response_text || 
+                (typeof cachedData === 'object' && Object.keys(cachedData).length > 0)
+              ));
+              
               if (hasCache) {
-                window.Logger?.debug('Found in cache', { page: 'ai-analysis', id, cacheKey });
+                window.Logger?.debug('Found in cache', { 
+                  page: 'ai-analysis', 
+                  id, 
+                  cacheKey,
+                  hasResponseText: !!cachedData?.response_text,
+                  cacheKeys: cachedData ? Object.keys(cachedData) : []
+                });
               } else {
-                window.Logger?.debug('Not found in cache', { page: 'ai-analysis', id, cacheKey });
+                window.Logger?.debug('Not found in cache', { 
+                  page: 'ai-analysis', 
+                  id, 
+                  cacheKey,
+                  searchedLayers: ['indexedDB', 'memory', 'localStorage', 'default']
+                });
               }
               return {
                 id,
@@ -1503,7 +1551,12 @@
                 note_id: null
               };
             } catch (error) {
-              window.Logger?.warn('Error checking cache', { page: 'ai-analysis', id, cacheKey, error });
+              window.Logger?.warn('Error checking cache', { 
+                page: 'ai-analysis', 
+                id, 
+                cacheKey, 
+                error: error?.message || error 
+              });
               return {
                 id,
                 has_cache: false,
@@ -1584,19 +1637,30 @@
 
         // Store availability info in history items
         let availableCount = 0;
+        let cacheFoundCount = 0;
+        let noteFoundCount = 0;
+        
         for (const item of this.history) {
           if (item.status === 'completed' && cacheChecks[item.id]) {
             item._availability = cacheChecks[item.id];
+            if (cacheChecks[item.id].has_cache) {
+              cacheFoundCount++;
+            }
+            if (cacheChecks[item.id].has_note) {
+              noteFoundCount++;
+            }
             if (cacheChecks[item.id].has_cache || cacheChecks[item.id].has_note) {
               availableCount++;
             }
           } else if (item.status === 'completed') {
+            // For completed items, initialize availability even if not checked
             item._availability = {
               has_cache: false,
               has_note: false,
               note_id: null
             };
           } else {
+            // For non-completed items, no availability
             item._availability = {
               has_cache: false,
               has_note: false,
@@ -1608,9 +1672,12 @@
         window.Logger?.info('✅ Checked availability for all history items', {
           page: 'ai-analysis',
           totalCompleted: analysisIds.length,
+          totalHistoryItems: this.history.length,
           availableCount: availableCount,
-          cacheCount: Object.values(cacheChecks).filter(c => c.has_cache).length,
-          noteCount: Object.values(cacheChecks).filter(c => c.has_note).length
+          cacheFoundCount: cacheFoundCount,
+          noteFoundCount: noteFoundCount,
+          cacheCount: Object.values(cacheChecks).filter(c => c && c.has_cache).length,
+          noteCount: Object.values(cacheChecks).filter(c => c && c.has_note).length
         });
       } catch (error) {
         window.Logger?.error('Error checking availability for all items', error, { page: 'ai-analysis' });
@@ -1703,17 +1770,10 @@
           })
         });
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        
-        if (result.status === 'success' && result.data) {
-          // Use CRUDResponseHandler if available (same flow as handleGenerateAnalysis)
-          if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function') {
-            const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {
+        // Use CRUDResponseHandler if available (same flow as handleGenerateAnalysis)
+        // CRUDResponseHandler will handle error responses too, so don't read response here
+        if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function') {
+          const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {
               modalId: null, // No modal to close for rerun
               successMessage: 'ניתוח נוצר מחדש בהצלחה!',
               entityName: 'ניתוח AI',
@@ -1740,6 +1800,7 @@
               requiresHardReload: false,
             });
 
+            // Use result from CRUDResponseHandler instead of reading response ourselves
             if (crudResult && crudResult.status === 'success' && crudResult.data) {
               const analysisResult = crudResult.data;
               
@@ -1768,10 +1829,13 @@
               // Store result for display after reload
               this.pendingResult = analysisResult;
             }
-          } else {
-            // Fallback to manual handling (same as handleGenerateAnalysis)
-            window.Logger?.warn('CRUDResponseHandler not available for rerun, using manual handling', { page: 'ai-analysis' });
-            
+        } else {
+          // Fallback: CRUDResponseHandler not available, read response manually
+          window.Logger?.warn('CRUDResponseHandler not available for rerun, using manual handling', { page: 'ai-analysis' });
+          
+          const result = await response.json();
+          
+          if (result.status === 'success' && result.data) {
             // Save response_text to cache (not in DB) - same options as handleGenerateAnalysis
             if (result.data.id && result.data.response_text) {
               const cacheKey = `ai-analysis-response-${result.data.id}`;
@@ -1817,9 +1881,9 @@
               const updatedResult = this.history.find(h => h.id === result.data.id) || result.data;
               await this.openResultsModal(updatedResult);
             }
+          } else {
+            throw new Error(result.message || 'Failed to generate analysis');
           }
-        } else {
-          throw new Error(result.message || 'Failed to generate analysis');
         }
       } catch (error) {
         window.Logger?.error('Error re-running analysis', error, { page: 'ai-analysis' });
@@ -1869,6 +1933,12 @@
     renderHistoryRow(item) {
       const row = document.createElement('tr');
       row.setAttribute('data-analysis-id', item.id);
+
+      // ID
+      const idCell = document.createElement('td');
+      idCell.className = 'col-id';
+      idCell.textContent = `#${item.id}`;
+      row.appendChild(idCell);
 
       // Template name
       const templateCell = document.createElement('td');
@@ -2319,6 +2389,82 @@
           spinner.classList.remove('show');
           spinner.classList.remove('btn-spinner');
         }
+      }
+    },
+
+    /**
+     * Delete all analysis records
+     * @returns {Promise<Object>} - Result with deleted_count
+     */
+    async deleteAllAnalyses() {
+      try {
+        if (!window.AIAnalysisData || !window.AIAnalysisData.deleteAllAnalyses) {
+          throw new Error('AIAnalysisData.deleteAllAnalyses not available');
+        }
+
+        // Confirm deletion
+        if (window.NotificationSystem) {
+          const confirmed = await new Promise((resolve) => {
+            if (typeof window.showConfirmDialog === 'function') {
+              window.showConfirmDialog(
+                'מחיקת כל הרשומות',
+                'האם אתה בטוח שברצונך למחוק את כל רשומות הניתוח? פעולה זו אינה ניתנת לביטול.',
+                () => resolve(true),
+                () => resolve(false)
+              );
+            } else {
+              // Fallback: use browser confirm
+              resolve(confirm('האם אתה בטוח שברצונך למחוק את כל רשומות הניתוח? פעולה זו אינה ניתנת לביטול.'));
+            }
+          });
+
+          if (!confirmed) {
+            return { status: 'cancelled', message: 'מחיקה בוטלה' };
+          }
+        }
+
+        // Show loading
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showInfo('מוחק את כל הרשומות...', 'system');
+        }
+
+        // Delete all analyses
+        const result = await window.AIAnalysisData.deleteAllAnalyses();
+
+        // Clear history and re-render
+        this.history = [];
+        this.renderHistory();
+
+        // Update summary stats
+        if (window.updatePageSummaryStats) {
+          window.updatePageSummaryStats('ai-analysis', this.history);
+        }
+
+        // Show success
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showSuccess(
+            `נמחקו ${result.deleted_count || 0} רשומות בהצלחה`,
+            'business'
+          );
+        }
+
+        window.Logger?.info('✅ All analyses deleted successfully', {
+          page: 'ai-analysis',
+          deletedCount: result.deleted_count || 0
+        });
+
+        return result;
+      } catch (error) {
+        window.Logger?.error('Error deleting all analyses', error, { page: 'ai-analysis' });
+        
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showError(
+            `שגיאה במחיקת הרשומות: ${error.message || 'שגיאה לא ידועה'}`,
+            'system'
+          );
+        }
+        
+        throw error;
       }
     },
   };

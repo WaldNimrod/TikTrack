@@ -4178,11 +4178,11 @@ async function openImportUserDataModal() {
             stack: error?.stack,
             page: 'import-user-data' 
         });
-        if (typeof window.showDetailedNotification === 'function') {
-            window.showDetailedNotification(
+        // Show error notification in corner (not modal!)
+        if (typeof window.showErrorNotification === 'function') {
+            await window.showErrorNotification(
                 'שגיאה בפתיחת מודול ייבוא',
                 `לא ניתן לפתוח את מודול הייבוא: ${error?.message || 'שגיאה לא ידועה'}`,
-                'error',
                 10000,
                 'import-user-data'
             );
@@ -8087,23 +8087,53 @@ async function handleSessionReset(sessionId, skipGoToStep = false) {
         showImportUserDataNotification(`שגיאה באיפוס הייבוא: ${errorMessage}`, 'error');
 
         const detailedErrors = Array.isArray(data?.errors) ? data.errors : null;
-        if (detailedErrors?.length && typeof window.showDetailedNotification === 'function') {
-            window.showDetailedNotification(
-                'פרטי שגיאה באיפוס ייבוא',
-                detailedErrors.map((item, idx) => `(${idx + 1}) ${item}`).join('\n'),
-                'error',
-                12000,
-                'import-user-data'
-            );
+        if (detailedErrors?.length) {
+            // Show error notification in corner first
+            if (typeof window.showErrorNotification === 'function') {
+                await window.showErrorNotification(
+                    'שגיאה באיפוס ייבוא',
+                    `נמצאו ${detailedErrors.length} שגיאות. לחץ על "הצג פרטים" לפרטים נוספים.`,
+                    12000,
+                    'import-user-data'
+                );
+                
+                // Add "Show Details" button that opens modal
+                setTimeout(() => {
+                    const notifications = document.querySelectorAll('.notification');
+                    const lastNotification = notifications[notifications.length - 1];
+                    
+                    if (lastNotification) {
+                        const detailsBtn = document.createElement('button');
+                        detailsBtn.className = 'btn btn-sm btn-link notification-details-btn';
+                        detailsBtn.style.cssText = 'padding: 2px 8px; margin-top: 4px; font-size: 0.85em; text-decoration: underline; color: inherit;';
+                        detailsBtn.textContent = 'הצג פרטים';
+                        detailsBtn.onclick = () => {
+                            if (typeof window.showDetailsModal === 'function') {
+                                window.showDetailsModal(
+                                    'פרטי שגיאה באיפוס ייבוא',
+                                    `<div style="white-space: pre-line; font-family: monospace; font-size: 0.9em;">${detailedErrors.map((item, idx) => `(${idx + 1}) ${item}`).join('\n')}</div>`,
+                                    { includeCopyButton: true }
+                                );
+                            }
+                            lastNotification.remove();
+                        };
+                        
+                        const contentDiv = lastNotification.querySelector('.notification-content');
+                        if (contentDiv) {
+                            contentDiv.appendChild(detailsBtn);
+                        }
+                    }
+                }, 100);
+            }
         }
     } catch (error) {
         window.Logger?.error('[Import Modal] Failed to reset import session', { error: error?.message });
         showImportUserDataNotification('שגיאה באיפוס הייבוא', 'error');
-        if (typeof window.showDetailedNotification === 'function') {
-            window.showDetailedNotification(
+        // Show error notification in corner (not modal!)
+        if (typeof window.showErrorNotification === 'function') {
+            await window.showErrorNotification(
                 'שגיאה באיפוס הייבוא',
                 error?.message || 'שגיאה לא ידועה',
-                'error',
                 12000,
                 'import-user-data'
             );
@@ -8140,7 +8170,38 @@ function handleSessionCompletion(status, message, details = null) {
     
     showImportUserDataNotification(finalMessage, statusInfo.type);
     
-    if (details && typeof window.showDetailedNotification === 'function') {
+    // If there are details, add "Show Details" button to notification
+    if (details) {
+        setTimeout(() => {
+            const notifications = document.querySelectorAll('.notification');
+            const lastNotification = notifications[notifications.length - 1];
+            
+            if (lastNotification) {
+                const detailsBtn = document.createElement('button');
+                detailsBtn.className = 'btn btn-sm btn-link notification-details-btn';
+                detailsBtn.style.cssText = 'padding: 2px 8px; margin-top: 4px; font-size: 0.85em; text-decoration: underline; color: inherit;';
+                detailsBtn.textContent = 'הצג פרטים';
+                detailsBtn.onclick = () => {
+                    if (typeof window.showDetailsModal === 'function') {
+                        window.showDetailsModal(
+                            'פרטי ייבוא',
+                            `<div style="white-space: pre-line; font-family: monospace; font-size: 0.9em;">${details}</div>`,
+                            { includeCopyButton: true }
+                        );
+                    }
+                    lastNotification.remove();
+                };
+                
+                const contentDiv = lastNotification.querySelector('.notification-content');
+                if (contentDiv) {
+                    contentDiv.appendChild(detailsBtn);
+                }
+            }
+        }, 100);
+    }
+    
+    // REMOVED: showDetailedNotification - now using corner notification with "Show Details" button
+    if (false && details && typeof window.showDetailedNotification === 'function') {
         window.showDetailedNotification(
             'פרטי ייבוא',
             details,

@@ -126,12 +126,11 @@
     }
 
     // Tab buttons
-    elements.cloudTab = elements.container.querySelector('#tagWidgetCloudTab');
-    elements.searchTab = elements.container.querySelector('#tagWidgetSearchTab');
-
-    // Tab panes
-    elements.cloudPane = elements.container.querySelector('#tagWidgetCloudPane');
-    elements.searchPane = elements.container.querySelector('#tagWidgetSearchPane');
+    // Tabs removed - search is now in header
+    // elements.cloudTab = elements.container.querySelector('#tagWidgetCloudTab');
+    // elements.searchTab = elements.container.querySelector('#tagWidgetSearchTab');
+    // elements.cloudPane = elements.container.querySelector('#tagWidgetCloudPane');
+    // elements.searchPane = elements.container.querySelector('#tagWidgetSearchPane');
 
     // Cloud elements
     elements.cloudLoading = elements.container.querySelector('#tagWidgetCloudLoading');
@@ -249,17 +248,8 @@
    * Bind events
    */
   function bindEvents() {
-    // Tab switching (Bootstrap tabs)
-    if (elements.cloudTab) {
-      elements.cloudTab.addEventListener('shown.bs.tab', () => {
-        state.activeTab = 'cloud';
-      });
-    }
-    if (elements.searchTab) {
-      elements.searchTab.addEventListener('shown.bs.tab', () => {
-        state.activeTab = 'search';
-      });
-    }
+    // Tabs removed - search is now always visible in header
+    // No tab switching needed
 
     // Search form submit
     if (elements.searchForm) {
@@ -1528,11 +1518,8 @@
       initAutocomplete();
       
       // Set active tab from config
-      if (config.defaultTab === 'search' && elements.searchTab && window.bootstrap?.Tab) {
-        const searchTabInstance = new window.bootstrap.Tab(elements.searchTab);
-        searchTabInstance.show();
-        state.activeTab = 'search';
-      }
+      // Tabs removed - search is now always visible in header
+      // No tab switching needed
 
       window.Logger?.info?.('TagWidget: Starting tag cloud refresh...', { page: 'tag-widget' });
       refreshTagCloud().catch((error) => {
@@ -1577,17 +1564,7 @@
         elements.searchFilter = newFilter;
       }
       
-      if (elements.cloudTab) {
-        const newTab = elements.cloudTab.cloneNode(true);
-        elements.cloudTab.parentNode?.replaceChild(newTab, elements.cloudTab);
-        elements.cloudTab = newTab;
-      }
-      
-      if (elements.searchTab) {
-        const newTab = elements.searchTab.cloneNode(true);
-        elements.searchTab.parentNode?.replaceChild(newTab, elements.searchTab);
-        elements.searchTab = newTab;
-      }
+      // Tabs removed - no need to clone
       
       if (elements.searchForm) {
         const newForm = elements.searchForm.cloneNode(true);

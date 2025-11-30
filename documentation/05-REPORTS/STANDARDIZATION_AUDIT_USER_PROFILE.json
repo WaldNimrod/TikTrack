@@ -1,0 +1,1681 @@
+{
+  "page": "user-profile.html",
+  "js_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/user-profile.js",
+  "html_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/user-profile.html",
+  "categories": {
+    "unified_init": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 522,
+          "content": "<script src=\"scripts/init-system/package-manifest.js?v=1.0.0\"></script> <!-- Package manifest -->",
+          "pattern": "package-manifest\\.js",
+          "match": "package-manifest.js",
+          "file": "html"
+        },
+        {
+          "line": 524,
+          "content": "<script src=\"scripts/page-initialization-configs.js?v=1.0.0\"></script> <!-- Page initialization conf",
+          "pattern": "page-initialization-configs\\.js",
+          "match": "page-initialization-configs.js",
+          "file": "html"
+        }
+      ],
+      "issue_count": 2,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [
+          {
+            "line": 522,
+            "content": "<script src=\"scripts/init-system/package-manifest.js?v=1.0.0\"></script> <!-- Package manifest -->",
+            "pattern": "package-manifest\\.js",
+            "match": "package-manifest.js"
+          },
+          {
+            "line": 524,
+            "content": "<script src=\"scripts/page-initialization-configs.js?v=1.0.0\"></script> <!-- Page initialization conf",
+            "pattern": "page-initialization-configs\\.js",
+            "match": "page-initialization-configs.js"
+          }
+        ],
+        "issue_count": 2
+      }
+    },
+    "section_toggle": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 95,
+          "content": "<div class=\"content-section\" id=\"user-profile-top\" data-section=\"top\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 184,
+          "content": "<div class=\"content-section\" id=\"user-profile-ai-analysis\" data-section=\"ai-analysis\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 102,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('top')\" data-text",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 191,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('ai-analysis')\" d",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        }
+      ],
+      "issue_count": 4,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 95,
+            "content": "<div class=\"content-section\" id=\"user-profile-top\" data-section=\"top\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 184,
+            "content": "<div class=\"content-section\" id=\"user-profile-ai-analysis\" data-section=\"ai-analysis\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 102,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('top')\" data-text",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 191,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('ai-analysis')\" d",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          }
+        ],
+        "issue_count": 4
+      }
+    },
+    "notifications": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 7,
+          "content": "* - notification-system.js (NotificationSystem)",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 76,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 77,
+          "content": "window.NotificationSystem.showError('שגיאה באתחול עמוד פרופיל משתמש', 'system');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 154,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 155,
+          "content": "window.NotificationSystem.showError('שגיאה בטעינת פרטי המשתמש', 'system');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 274,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 275,
+          "content": "window.NotificationSystem.showError(errorMessage, 'system');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 281,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 282,
+          "content": "window.NotificationSystem.showError('שגיאה בעדכון פרטי המשתמש: ' + (error.message || 'שגיאה לא ידועה",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 369,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 370,
+          "content": "window.NotificationSystem.showError('הסיסמאות החדשות אינן תואמות', 'system');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 376,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 377,
+          "content": "window.NotificationSystem.showError('סיסמה חדשה חייבת להכיל לפחות 6 תווים', 'system');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 423,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 424,
+          "content": "window.NotificationSystem.showSuccess('סיסמה עודכנה בהצלחה', 'business');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 436,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 437,
+          "content": "window.NotificationSystem.showError(errorMessage, 'system');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 443,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 444,
+          "content": "window.NotificationSystem.showError('שגיאה בעדכון הסיסמה: ' + (error.message || 'שגיאה לא ידועה'), '",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        }
+      ],
+      "issue_count": 19,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 7,
+            "content": "* - notification-system.js (NotificationSystem)",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 76,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 77,
+            "content": "window.NotificationSystem.showError('שגיאה באתחול עמוד פרופיל משתמש', 'system');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 154,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 155,
+            "content": "window.NotificationSystem.showError('שגיאה בטעינת פרטי המשתמש', 'system');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 274,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 275,
+            "content": "window.NotificationSystem.showError(errorMessage, 'system');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 281,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 282,
+            "content": "window.NotificationSystem.showError('שגיאה בעדכון פרטי המשתמש: ' + (error.message || 'שגיאה לא ידועה",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 369,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 370,
+            "content": "window.NotificationSystem.showError('הסיסמאות החדשות אינן תואמות', 'system');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 376,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 377,
+            "content": "window.NotificationSystem.showError('סיסמה חדשה חייבת להכיל לפחות 6 תווים', 'system');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 423,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 424,
+            "content": "window.NotificationSystem.showSuccess('סיסמה עודכנה בהצלחה', 'business');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 436,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 437,
+            "content": "window.NotificationSystem.showError(errorMessage, 'system');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 443,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 444,
+            "content": "window.NotificationSystem.showError('שגיאה בעדכון הסיסמה: ' + (error.message || 'שגיאה לא ידועה'), '",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          }
+        ],
+        "issue_count": 19
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "modals": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "tables": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "field_renderer": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "crud_handler": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 245,
+          "content": "// Use CRUDResponseHandler for response handling",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 246,
+          "content": "if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 246,
+          "content": "if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 247,
+          "content": "const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 400,
+          "content": "// Use CRUDResponseHandler for response handling",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 401,
+          "content": "if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 401,
+          "content": "if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        },
+        {
+          "line": 402,
+          "content": "const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {",
+          "pattern": "CRUDResponseHandler",
+          "match": "CRUDResponseHandler",
+          "file": "js"
+        }
+      ],
+      "issue_count": 8,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 245,
+            "content": "// Use CRUDResponseHandler for response handling",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 246,
+            "content": "if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 246,
+            "content": "if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 247,
+            "content": "const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 400,
+            "content": "// Use CRUDResponseHandler for response handling",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 401,
+            "content": "if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 401,
+            "content": "if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          },
+          {
+            "line": 402,
+            "content": "const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {",
+            "pattern": "CRUDResponseHandler",
+            "match": "CRUDResponseHandler"
+          }
+        ],
+        "issue_count": 8
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "select_populator": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "data_collection": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 213,
+          "content": "// Collect form data using DataCollectionService",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 215,
+          "content": "if (window.DataCollectionService && typeof window.DataCollectionService.collectFormData === 'functio",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 215,
+          "content": "if (window.DataCollectionService && typeof window.DataCollectionService.collectFormData === 'functio",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 216,
+          "content": "formData = window.DataCollectionService.collectFormData({",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 350,
+          "content": "// Collect form data using DataCollectionService",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 352,
+          "content": "if (window.DataCollectionService && typeof window.DataCollectionService.collectFormData === 'functio",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 352,
+          "content": "if (window.DataCollectionService && typeof window.DataCollectionService.collectFormData === 'functio",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 353,
+          "content": "formData = window.DataCollectionService.collectFormData({",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 215,
+          "content": "if (window.DataCollectionService && typeof window.DataCollectionService.collectFormData === 'functio",
+          "pattern": "collectFormData",
+          "match": "collectFormData",
+          "file": "js"
+        },
+        {
+          "line": 216,
+          "content": "formData = window.DataCollectionService.collectFormData({",
+          "pattern": "collectFormData",
+          "match": "collectFormData",
+          "file": "js"
+        },
+        {
+          "line": 352,
+          "content": "if (window.DataCollectionService && typeof window.DataCollectionService.collectFormData === 'functio",
+          "pattern": "collectFormData",
+          "match": "collectFormData",
+          "file": "js"
+        },
+        {
+          "line": 353,
+          "content": "formData = window.DataCollectionService.collectFormData({",
+          "pattern": "collectFormData",
+          "match": "collectFormData",
+          "file": "js"
+        }
+      ],
+      "issue_count": 12,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 213,
+            "content": "// Collect form data using DataCollectionService",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 215,
+            "content": "if (window.DataCollectionService && typeof window.DataCollectionService.collectFormData === 'functio",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 215,
+            "content": "if (window.DataCollectionService && typeof window.DataCollectionService.collectFormData === 'functio",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 216,
+            "content": "formData = window.DataCollectionService.collectFormData({",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 350,
+            "content": "// Collect form data using DataCollectionService",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 352,
+            "content": "if (window.DataCollectionService && typeof window.DataCollectionService.collectFormData === 'functio",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 352,
+            "content": "if (window.DataCollectionService && typeof window.DataCollectionService.collectFormData === 'functio",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 353,
+            "content": "formData = window.DataCollectionService.collectFormData({",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 215,
+            "content": "if (window.DataCollectionService && typeof window.DataCollectionService.collectFormData === 'functio",
+            "pattern": "collectFormData",
+            "match": "collectFormData"
+          },
+          {
+            "line": 216,
+            "content": "formData = window.DataCollectionService.collectFormData({",
+            "pattern": "collectFormData",
+            "match": "collectFormData"
+          },
+          {
+            "line": 352,
+            "content": "if (window.DataCollectionService && typeof window.DataCollectionService.collectFormData === 'functio",
+            "pattern": "collectFormData",
+            "match": "collectFormData"
+          },
+          {
+            "line": 353,
+            "content": "formData = window.DataCollectionService.collectFormData({",
+            "pattern": "collectFormData",
+            "match": "collectFormData"
+          }
+        ],
+        "issue_count": 12
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "icons": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 62,
+          "content": "// Replace icons with IconSystem",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 66,
+          "content": "window.Logger?.debug('✅ Icons replaced with IconSystem', { page: 'user-profile' });",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 98,
+          "content": "<img src=\"images/icons/entities/user.svg\" alt=\"פרופיל משתמש\" class=\"section-icon\">",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"images/icons/entities/user.svg\" alt=\"פרו",
+          "file": "html"
+        },
+        {
+          "line": 187,
+          "content": "<img src=\"images/icons/entities/user.svg\" alt=\"הגדרות AI Analysis\" class=\"section-icon\" onerror=\"thi",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"images/icons/entities/user.svg\" alt=\"הגד",
+          "file": "html"
+        }
+      ],
+      "issue_count": 4,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 62,
+            "content": "// Replace icons with IconSystem",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 66,
+            "content": "window.Logger?.debug('✅ Icons replaced with IconSystem', { page: 'user-profile' });",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          }
+        ],
+        "issue_count": 2
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [
+          {
+            "line": 98,
+            "content": "<img src=\"images/icons/entities/user.svg\" alt=\"פרופיל משתמש\" class=\"section-icon\">",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"images/icons/entities/user.svg\" alt=\"פרו"
+          },
+          {
+            "line": 187,
+            "content": "<img src=\"images/icons/entities/user.svg\" alt=\"הגדרות AI Analysis\" class=\"section-icon\" onerror=\"thi",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"images/icons/entities/user.svg\" alt=\"הגד"
+          }
+        ],
+        "issue_count": 2
+      }
+    },
+    "colors": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "info_summary": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "pagination": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "entity_details": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "conditions": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "page_state": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 296,
+          "content": "window.PageStateManager?.setItem('currentUser', JSON.stringify(updatedUser));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 302,
+          "content": "window.PageStateManager?.setItem('currentUser', JSON.stringify(updatedUser));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        }
+      ],
+      "issue_count": 2,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 296,
+            "content": "window.PageStateManager?.setItem('currentUser', JSON.stringify(updatedUser));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 302,
+            "content": "window.PageStateManager?.setItem('currentUser', JSON.stringify(updatedUser));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          }
+        ],
+        "issue_count": 2
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "logger": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 32,
+          "content": "window.Logger?.warn('UserProfilePage already initialized', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 37,
+          "content": "window.Logger?.info('🚀 Initializing User Profile Page...', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 41,
+          "content": "window.Logger?.info('Waiting for TikTrackAuth to load...', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 51,
+          "content": "window.Logger?.warn('User not authenticated, redirecting to login', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 66,
+          "content": "window.Logger?.debug('✅ Icons replaced with IconSystem', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 68,
+          "content": "window.Logger?.warn('Failed to replace icons', { error: iconError, page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 73,
+          "content": "window.Logger?.info('✅ User Profile Page initialized successfully', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 75,
+          "content": "window.Logger?.error('❌ Error initializing User Profile Page', error, { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 88,
+          "content": "window.Logger?.info('Loading user profile data...', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 103,
+          "content": "window.Logger?.debug('✅ Loaded user profile from cache', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 106,
+          "content": "window.Logger?.warn('Cache read failed, fetching from API', { error: cacheError, page: 'user-profile",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 136,
+          "content": "window.Logger?.warn('Cache save failed', { error: cacheError, page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 144,
+          "content": "window.Logger?.warn('User not authenticated, redirecting to login', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 153,
+          "content": "window.Logger?.error('Error loading user profile', error, { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 176,
+          "content": "window.Logger?.info('Profile form populated successfully', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 178,
+          "content": "window.Logger?.error('Error populating profile form', error, { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 234,
+          "content": "window.Logger?.info('Updating user profile...', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 273,
+          "content": "window.Logger?.error('Failed to update user profile', { message: errorMessage }, { page: 'user-profi",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 280,
+          "content": "window.Logger?.error('Error updating user profile', error, { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 314,
+          "content": "window.Logger?.debug('✅ User profile saved to cache', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 316,
+          "content": "window.Logger?.warn('Cache save failed', { error: cacheError, page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 324,
+          "content": "window.Logger?.debug('✅ Cache invalidated via CacheSyncManager', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 326,
+          "content": "window.Logger?.warn('CacheSyncManager invalidation failed', { error: syncError, page: 'user-profile'",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 333,
+          "content": "window.Logger?.debug('✅ Header user display updated', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 386,
+          "content": "window.Logger?.info('Changing user password...', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 422,
+          "content": "window.Logger?.info('Password changed successfully', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 435,
+          "content": "window.Logger?.error('Failed to change password', { message: errorMessage }, { page: 'user-profile' ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 442,
+          "content": "window.Logger?.error('Error changing password', error, { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 487,
+          "content": "window.Logger?.info('✅ UserProfilePage loaded successfully', { page: 'user-profile' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 8,
+          "content": "* - logger-service.js (Logger)",
+          "pattern": "logger-service\\.js",
+          "match": "logger-service.js",
+          "file": "js"
+        },
+        {
+          "line": 352,
+          "content": "<script src=\"scripts/logger-service.js?v=1.0.0\"></script> <!-- Advanced logging service -->",
+          "pattern": "logger-service\\.js",
+          "match": "logger-service.js",
+          "file": "html"
+        }
+      ],
+      "issue_count": 31,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 32,
+            "content": "window.Logger?.warn('UserProfilePage already initialized', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 37,
+            "content": "window.Logger?.info('🚀 Initializing User Profile Page...', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 41,
+            "content": "window.Logger?.info('Waiting for TikTrackAuth to load...', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 51,
+            "content": "window.Logger?.warn('User not authenticated, redirecting to login', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 66,
+            "content": "window.Logger?.debug('✅ Icons replaced with IconSystem', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 68,
+            "content": "window.Logger?.warn('Failed to replace icons', { error: iconError, page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 73,
+            "content": "window.Logger?.info('✅ User Profile Page initialized successfully', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 75,
+            "content": "window.Logger?.error('❌ Error initializing User Profile Page', error, { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 88,
+            "content": "window.Logger?.info('Loading user profile data...', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 103,
+            "content": "window.Logger?.debug('✅ Loaded user profile from cache', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 106,
+            "content": "window.Logger?.warn('Cache read failed, fetching from API', { error: cacheError, page: 'user-profile",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 136,
+            "content": "window.Logger?.warn('Cache save failed', { error: cacheError, page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 144,
+            "content": "window.Logger?.warn('User not authenticated, redirecting to login', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 153,
+            "content": "window.Logger?.error('Error loading user profile', error, { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 176,
+            "content": "window.Logger?.info('Profile form populated successfully', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 178,
+            "content": "window.Logger?.error('Error populating profile form', error, { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 234,
+            "content": "window.Logger?.info('Updating user profile...', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 273,
+            "content": "window.Logger?.error('Failed to update user profile', { message: errorMessage }, { page: 'user-profi",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 280,
+            "content": "window.Logger?.error('Error updating user profile', error, { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 314,
+            "content": "window.Logger?.debug('✅ User profile saved to cache', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 316,
+            "content": "window.Logger?.warn('Cache save failed', { error: cacheError, page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 324,
+            "content": "window.Logger?.debug('✅ Cache invalidated via CacheSyncManager', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 326,
+            "content": "window.Logger?.warn('CacheSyncManager invalidation failed', { error: syncError, page: 'user-profile'",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 333,
+            "content": "window.Logger?.debug('✅ Header user display updated', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 386,
+            "content": "window.Logger?.info('Changing user password...', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 422,
+            "content": "window.Logger?.info('Password changed successfully', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 435,
+            "content": "window.Logger?.error('Failed to change password', { message: errorMessage }, { page: 'user-profile' ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 442,
+            "content": "window.Logger?.error('Error changing password', error, { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 487,
+            "content": "window.Logger?.info('✅ UserProfilePage loaded successfully', { page: 'user-profile' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 8,
+            "content": "* - logger-service.js (Logger)",
+            "pattern": "logger-service\\.js",
+            "match": "logger-service.js"
+          }
+        ],
+        "issue_count": 30
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 352,
+            "content": "<script src=\"scripts/logger-service.js?v=1.0.0\"></script> <!-- Advanced logging service -->",
+            "pattern": "logger-service\\.js",
+            "match": "logger-service.js"
+          }
+        ],
+        "issue_count": 1
+      }
+    },
+    "cache": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 90,
+          "content": "// Try to get from cache first (UnifiedCacheManager)",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 94,
+          "content": "if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 94,
+          "content": "if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 96,
+          "content": "const cachedUser = await window.UnifiedCacheManager.get(cacheKey, {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 128,
+          "content": "if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 128,
+          "content": "if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 130,
+          "content": "await window.UnifiedCacheManager.save(cacheKey, user, {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 305,
+          "content": "// Update UnifiedCacheManager cache",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 306,
+          "content": "if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 306,
+          "content": "if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 309,
+          "content": "await window.UnifiedCacheManager.save(cacheKey, updatedUser, {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        }
+      ],
+      "issue_count": 11,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 90,
+            "content": "// Try to get from cache first (UnifiedCacheManager)",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 94,
+            "content": "if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 94,
+            "content": "if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 96,
+            "content": "const cachedUser = await window.UnifiedCacheManager.get(cacheKey, {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 128,
+            "content": "if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 128,
+            "content": "if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 130,
+            "content": "await window.UnifiedCacheManager.save(cacheKey, user, {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 305,
+            "content": "// Update UnifiedCacheManager cache",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 306,
+            "content": "if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 306,
+            "content": "if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 309,
+            "content": "await window.UnifiedCacheManager.save(cacheKey, updatedUser, {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          }
+        ],
+        "issue_count": 11
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "dom_manipulation": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "html_structure": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 102,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('top')\" data-text",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 191,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('ai-analysis')\" d",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 246,
+          "content": "<button type=\"button\" data-button-type=\"SECONDARY\" data-variant=\"small\" data-onclick=\"window.AIAnaly",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 267,
+          "content": "<button type=\"button\" data-button-type=\"SECONDARY\" data-variant=\"small\" data-onclick=\"window.AIAnaly",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 277,
+          "content": "<button type=\"button\" data-button-type=\"PRIMARY\" data-variant=\"full\" data-onclick=\"window.AIAnalysis",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 102,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('top')\" data-text",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 191,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('ai-analysis')\" d",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 246,
+          "content": "<button type=\"button\" data-button-type=\"SECONDARY\" data-variant=\"small\" data-onclick=\"window.AIAnaly",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 267,
+          "content": "<button type=\"button\" data-button-type=\"SECONDARY\" data-variant=\"small\" data-onclick=\"window.AIAnaly",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 277,
+          "content": "<button type=\"button\" data-button-type=\"PRIMARY\" data-variant=\"full\" data-onclick=\"window.AIAnalysis",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 86,
+          "content": "<div id=\"unified-header\"></div>",
+          "pattern": "unified-header",
+          "match": "unified-header",
+          "file": "html"
+        }
+      ],
+      "issue_count": 11,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 102,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('top')\" data-text",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 191,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('ai-analysis')\" d",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 246,
+            "content": "<button type=\"button\" data-button-type=\"SECONDARY\" data-variant=\"small\" data-onclick=\"window.AIAnaly",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 267,
+            "content": "<button type=\"button\" data-button-type=\"SECONDARY\" data-variant=\"small\" data-onclick=\"window.AIAnaly",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 277,
+            "content": "<button type=\"button\" data-button-type=\"PRIMARY\" data-variant=\"full\" data-onclick=\"window.AIAnalysis",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 102,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('top')\" data-text",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 191,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('ai-analysis')\" d",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 246,
+            "content": "<button type=\"button\" data-button-type=\"SECONDARY\" data-variant=\"small\" data-onclick=\"window.AIAnaly",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 267,
+            "content": "<button type=\"button\" data-button-type=\"SECONDARY\" data-variant=\"small\" data-onclick=\"window.AIAnaly",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 277,
+            "content": "<button type=\"button\" data-button-type=\"PRIMARY\" data-variant=\"full\" data-onclick=\"window.AIAnalysis",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 86,
+            "content": "<div id=\"unified-header\"></div>",
+            "pattern": "unified-header",
+            "match": "unified-header"
+          }
+        ],
+        "issue_count": 11
+      }
+    }
+  }
+}

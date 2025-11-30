@@ -1,0 +1,4205 @@
+{
+  "page": "notifications-center.html",
+  "js_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/notifications-center.js",
+  "html_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/notifications-center.html",
+  "categories": {
+    "unified_init": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 466,
+          "content": "<script src=\"scripts/init-system/package-manifest.js?v=1.0.0\"></script> <!-- Package manifest -->",
+          "pattern": "package-manifest\\.js",
+          "match": "package-manifest.js",
+          "file": "html"
+        },
+        {
+          "line": 468,
+          "content": "<script src=\"scripts/page-initialization-configs.js?v=1.0.0\"></script> <!-- Page initialization conf",
+          "pattern": "page-initialization-configs\\.js",
+          "match": "page-initialization-configs.js",
+          "file": "html"
+        }
+      ],
+      "issue_count": 2,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [
+          {
+            "line": 466,
+            "content": "<script src=\"scripts/init-system/package-manifest.js?v=1.0.0\"></script> <!-- Package manifest -->",
+            "pattern": "package-manifest\\.js",
+            "match": "package-manifest.js"
+          },
+          {
+            "line": 468,
+            "content": "<script src=\"scripts/page-initialization-configs.js?v=1.0.0\"></script> <!-- Page initialization conf",
+            "pattern": "page-initialization-configs\\.js",
+            "match": "page-initialization-configs.js"
+          }
+        ],
+        "issue_count": 2
+      }
+    },
+    "section_toggle": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 1910,
+          "content": "const unifiedLogsSection = document.querySelector('[data-section=\"unified-logs\"]');",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "js"
+        },
+        {
+          "line": 1729,
+          "content": "// toggleSection function removed - using global version from ui-utils.js",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "js"
+        },
+        {
+          "line": 1730,
+          "content": "// Use window.toggleSection('top') instead",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "js"
+        },
+        {
+          "line": 1807,
+          "content": "// window.toggleSection removed - using global version from ui-utils.js",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "js"
+        },
+        {
+          "line": 1809,
+          "content": "// window.toggleSection export removed - using global version from ui-utils.js",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "js"
+        },
+        {
+          "line": 73,
+          "content": "<div class=\"main-content\" data-section=\"notifications-center\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 75,
+          "content": "<div class=\"top-section\" data-section=\"top\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 170,
+          "content": "<div class=\"content-section\" id=\"notification-modes-testing\" data-section=\"notification-modes-testin",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 280,
+          "content": "<div class=\"content-section\" id=\"section1\" data-section=\"section1\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 326,
+          "content": "<div class=\"content-section\" id=\"section2\" data-section=\"section2\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 94,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('top')\" data-text",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 173,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('notification-mod",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 283,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section1')\" data",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 331,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section2')\" data",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        }
+      ],
+      "issue_count": 14,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1910,
+            "content": "const unifiedLogsSection = document.querySelector('[data-section=\"unified-logs\"]');",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 1729,
+            "content": "// toggleSection function removed - using global version from ui-utils.js",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 1730,
+            "content": "// Use window.toggleSection('top') instead",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 1807,
+            "content": "// window.toggleSection removed - using global version from ui-utils.js",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 1809,
+            "content": "// window.toggleSection export removed - using global version from ui-utils.js",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          }
+        ],
+        "issue_count": 5
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 73,
+            "content": "<div class=\"main-content\" data-section=\"notifications-center\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 75,
+            "content": "<div class=\"top-section\" data-section=\"top\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 170,
+            "content": "<div class=\"content-section\" id=\"notification-modes-testing\" data-section=\"notification-modes-testin",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 280,
+            "content": "<div class=\"content-section\" id=\"section1\" data-section=\"section1\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 326,
+            "content": "<div class=\"content-section\" id=\"section2\" data-section=\"section2\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 94,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('top')\" data-text",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 173,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('notification-mod",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 283,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section1')\" data",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 331,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section2')\" data",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          }
+        ],
+        "issue_count": 9
+      }
+    },
+    "notifications": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 1503,
+          "content": "if (typeof window.showSuccessNotification === 'function') {",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 1504,
+          "content": "window.showSuccessNotification('הצלחה', 'היסטוריה מסוננת הועתקה ללוח בהצלחה!');",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 1582,
+          "content": "if (typeof window.showSuccessNotification === 'function') {",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 1583,
+          "content": "window.showSuccessNotification('בדיקת הצלחה', 'זוהי הודעת הצלחה לבדיקה - הכל עובד תקין!', 4000);",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 1585,
+          "content": "window.Logger?.error('❌ showSuccessNotification לא זמין');",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 1636,
+          "content": "window.showSuccessNotification('אישור', 'המשתמש אישר את הפעולה', 3000, 'system');",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 1686,
+          "content": "window.showSuccessNotification('לוג מפורט הועתק ללוח');",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 1716,
+          "content": "window.showSuccessNotification('היסטוריית התראות הועתקה ללוח');",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 1506,
+          "content": "window.showErrorNotification('היסטוריה מסוננת הועתקה ללוח בהצלחה!', \"שגיאה\");",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1510,
+          "content": "if (typeof window.showErrorNotification === 'function') {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1511,
+          "content": "window.showErrorNotification('שגיאה', 'לא ניתן להעתיק ללוח: ' + err.message);",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1513,
+          "content": "window.showErrorNotification('שגיאה בהעתקה: ' + err.message, \"שגיאה\");",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1520,
+          "content": "if (typeof window.showErrorNotification === 'function') {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1521,
+          "content": "window.showErrorNotification('שגיאה', 'שגיאה בהעתקת היסטוריה מסוננת: ' + error.message);",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1523,
+          "content": "window.showErrorNotification('שגיאה בהעתקת היסטוריה מסוננת: ' + error.message, \"שגיאה\");",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1593,
+          "content": "if (typeof window.showErrorNotification === 'function') {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1594,
+          "content": "window.showErrorNotification('בדיקת שגיאה', 'זוהי הודעת שגיאה לבדיקה - הכל עובד תקין!', 6000);",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1596,
+          "content": "window.Logger?.error('❌ showErrorNotification לא זמין');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1692,
+          "content": "window.showErrorNotification('שגיאה בהעתקת הלוג');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1721,
+          "content": "window.showErrorNotification('פונקציית איסוף התראות לא זמינה');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1725,
+          "content": "window.showErrorNotification('שגיאה בהעתקת התראות');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        }
+      ],
+      "issue_count": 21,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1503,
+            "content": "if (typeof window.showSuccessNotification === 'function') {",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 1504,
+            "content": "window.showSuccessNotification('הצלחה', 'היסטוריה מסוננת הועתקה ללוח בהצלחה!');",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 1582,
+            "content": "if (typeof window.showSuccessNotification === 'function') {",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 1583,
+            "content": "window.showSuccessNotification('בדיקת הצלחה', 'זוהי הודעת הצלחה לבדיקה - הכל עובד תקין!', 4000);",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 1585,
+            "content": "window.Logger?.error('❌ showSuccessNotification לא זמין');",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 1636,
+            "content": "window.showSuccessNotification('אישור', 'המשתמש אישר את הפעולה', 3000, 'system');",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 1686,
+            "content": "window.showSuccessNotification('לוג מפורט הועתק ללוח');",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 1716,
+            "content": "window.showSuccessNotification('היסטוריית התראות הועתקה ללוח');",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 1506,
+            "content": "window.showErrorNotification('היסטוריה מסוננת הועתקה ללוח בהצלחה!', \"שגיאה\");",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1510,
+            "content": "if (typeof window.showErrorNotification === 'function') {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1511,
+            "content": "window.showErrorNotification('שגיאה', 'לא ניתן להעתיק ללוח: ' + err.message);",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1513,
+            "content": "window.showErrorNotification('שגיאה בהעתקה: ' + err.message, \"שגיאה\");",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1520,
+            "content": "if (typeof window.showErrorNotification === 'function') {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1521,
+            "content": "window.showErrorNotification('שגיאה', 'שגיאה בהעתקת היסטוריה מסוננת: ' + error.message);",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1523,
+            "content": "window.showErrorNotification('שגיאה בהעתקת היסטוריה מסוננת: ' + error.message, \"שגיאה\");",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1593,
+            "content": "if (typeof window.showErrorNotification === 'function') {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1594,
+            "content": "window.showErrorNotification('בדיקת שגיאה', 'זוהי הודעת שגיאה לבדיקה - הכל עובד תקין!', 6000);",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1596,
+            "content": "window.Logger?.error('❌ showErrorNotification לא זמין');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1692,
+            "content": "window.showErrorNotification('שגיאה בהעתקת הלוג');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1721,
+            "content": "window.showErrorNotification('פונקציית איסוף התראות לא זמינה');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1725,
+            "content": "window.showErrorNotification('שגיאה בהעתקת התראות');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          }
+        ],
+        "issue_count": 21
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "modals": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 2044,
+          "content": "// Show modal via ModalManagerV2 (supports dynamic modals)",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2045,
+          "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2045,
+          "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2047,
+          "content": "await window.ModalManagerV2.showModal('exportAllLogsModal', 'view');",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2049,
+          "content": "// Fallback to Bootstrap if ModalManagerV2 fails - עם backdrop: false וניקוי",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2050,
+          "content": "window.Logger?.warn('exportAllLogsModal not available in ModalManagerV2, using Bootstrap fallback', ",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2053,
+          "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2054,
+          "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2056,
+          "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2059,
+          "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2061,
+          "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2076,
+          "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2077,
+          "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2079,
+          "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2082,
+          "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2084,
+          "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 2056,
+          "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+          "pattern": "openModal",
+          "match": "openModal",
+          "file": "js"
+        },
+        {
+          "line": 2079,
+          "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+          "pattern": "openModal",
+          "match": "openModal",
+          "file": "js"
+        }
+      ],
+      "issue_count": 18,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 2044,
+            "content": "// Show modal via ModalManagerV2 (supports dynamic modals)",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2045,
+            "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2045,
+            "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2047,
+            "content": "await window.ModalManagerV2.showModal('exportAllLogsModal', 'view');",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2049,
+            "content": "// Fallback to Bootstrap if ModalManagerV2 fails - עם backdrop: false וניקוי",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2050,
+            "content": "window.Logger?.warn('exportAllLogsModal not available in ModalManagerV2, using Bootstrap fallback', ",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2053,
+            "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2054,
+            "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2056,
+            "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2059,
+            "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2061,
+            "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2076,
+            "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2077,
+            "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2079,
+            "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2082,
+            "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2084,
+            "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 2056,
+            "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+            "pattern": "openModal",
+            "match": "openModal"
+          },
+          {
+            "line": 2079,
+            "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+            "pattern": "openModal",
+            "match": "openModal"
+          }
+        ],
+        "issue_count": 18
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "tables": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "field_renderer": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "crud_handler": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "select_populator": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "data_collection": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 1277,
+          "content": "// Use DataCollectionService to get values if available",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1279,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1279,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1280,
+          "content": "typeFilter = window.DataCollectionService.getValue('historyFilter', 'text', '') || '';",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1281,
+          "content": "pageFilter = window.DataCollectionService.getValue('pageFilter', 'text', '') || '';",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1282,
+          "content": "period = window.DataCollectionService.getValue('historyPeriod', 'text', '24h') || '24h';",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1429,
+          "content": "// Use DataCollectionService to get values if available",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1431,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1431,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1432,
+          "content": "typeFilter = window.DataCollectionService.getValue('historyFilter', 'text', '') || '';",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1433,
+          "content": "pageFilter = window.DataCollectionService.getValue('pageFilter', 'text', '') || '';",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1434,
+          "content": "period = window.DataCollectionService.getValue('historyPeriod', 'text', '24h') || '24h';",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1876,
+          "content": "// Use DataCollectionService to get values if available",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1878,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1878,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1879,
+          "content": "typeFilterValue = window.DataCollectionService.getValue('historyFilter', 'text', '') || 'כל ההתראות'",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1880,
+          "content": "pageFilterValue = window.DataCollectionService.getValue('pageFilter', 'text', '') || 'כל העמודים';",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        }
+      ],
+      "issue_count": 17,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1277,
+            "content": "// Use DataCollectionService to get values if available",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1279,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1279,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1280,
+            "content": "typeFilter = window.DataCollectionService.getValue('historyFilter', 'text', '') || '';",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1281,
+            "content": "pageFilter = window.DataCollectionService.getValue('pageFilter', 'text', '') || '';",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1282,
+            "content": "period = window.DataCollectionService.getValue('historyPeriod', 'text', '24h') || '24h';",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1429,
+            "content": "// Use DataCollectionService to get values if available",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1431,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1431,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1432,
+            "content": "typeFilter = window.DataCollectionService.getValue('historyFilter', 'text', '') || '';",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1433,
+            "content": "pageFilter = window.DataCollectionService.getValue('pageFilter', 'text', '') || '';",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1434,
+            "content": "period = window.DataCollectionService.getValue('historyPeriod', 'text', '24h') || '24h';",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1876,
+            "content": "// Use DataCollectionService to get values if available",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1878,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1878,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1879,
+            "content": "typeFilterValue = window.DataCollectionService.getValue('historyFilter', 'text', '') || 'כל ההתראות'",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1880,
+            "content": "pageFilterValue = window.DataCollectionService.getValue('pageFilter', 'text', '') || 'כל העמודים';",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          }
+        ],
+        "issue_count": 17
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "icons": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 132,
+          "content": "// Use IconSystem to render category icon",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 134,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 134,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 136,
+          "content": "iconHTML = await window.IconSystem.renderIcon('category', category.icon, {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 143,
+          "content": "// Fallback if IconSystem fails",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 147,
+          "content": "// Fallback if IconSystem not available",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 231,
+          "content": "// Render icons using IconSystem",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 236,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 236,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 238,
+          "content": "slidersIcon = await window.IconSystem.renderIcon('button', 'sliders', { size: '16', alt: 'settings',",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 239,
+          "content": "layersIcon = await window.IconSystem.renderIcon('button', 'layers', { size: '16', alt: 'categories',",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 240,
+          "content": "terminalIcon = await window.IconSystem.renderIcon('button', 'terminal', { size: '16', alt: 'terminal",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 650,
+          "content": "// Render icon using IconSystem",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 652,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 652,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 654,
+          "content": "clockHistoryIcon = await window.IconSystem.renderIcon('button', 'clock-history', { size: '32', alt: ",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 693,
+          "content": "// Render icon using IconSystem",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 695,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 695,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 697,
+          "content": "filterIcon = await window.IconSystem.renderIcon('button', 'filter', { size: '32', alt: 'filter', cla",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 862,
+          "content": "// Render icon using IconSystem",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 864,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 864,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 866,
+          "content": "iconHTML = await window.IconSystem.renderIcon('button', iconClass, { size: '16', alt: iconClass, cla",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1327,
+          "content": "// Render icon using IconSystem",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1329,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1329,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1331,
+          "content": "filterIcon = await window.IconSystem.renderIcon('button', 'filter', { size: '32', alt: 'filter', cla",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2231,
+          "content": "// Render icon using IconSystem",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2233,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2233,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2235,
+          "content": "categoryIconHTML = await window.IconSystem.renderIcon('button', category.icon, {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 144,
+          "content": "iconHTML = `<img src=\"/trading-ui/images/icons/tabler/${category.icon}.svg\" width=\"32\" height=\"32\" a",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/${catego",
+          "file": "js"
+        },
+        {
+          "line": 148,
+          "content": "iconHTML = `<img src=\"/trading-ui/images/icons/tabler/${category.icon}.svg\" width=\"32\" height=\"32\" a",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/${catego",
+          "file": "js"
+        },
+        {
+          "line": 232,
+          "content": "let slidersIcon = '<img src=\"/trading-ui/images/icons/tabler/sliders.svg\" width=\"16\" height=\"16\" alt",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/sliders.",
+          "file": "js"
+        },
+        {
+          "line": 233,
+          "content": "let layersIcon = '<img src=\"/trading-ui/images/icons/tabler/layers.svg\" width=\"16\" height=\"16\" alt=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/layers.s",
+          "file": "js"
+        },
+        {
+          "line": 234,
+          "content": "let terminalIcon = '<img src=\"/trading-ui/images/icons/tabler/terminal.svg\" width=\"16\" height=\"16\" a",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/terminal",
+          "file": "js"
+        },
+        {
+          "line": 651,
+          "content": "let clockHistoryIcon = '<img src=\"/trading-ui/images/icons/tabler/clock-history.svg\" width=\"32\" heig",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/clock-hi",
+          "file": "js"
+        },
+        {
+          "line": 694,
+          "content": "let filterIcon = '<img src=\"/trading-ui/images/icons/tabler/filter.svg\" width=\"32\" height=\"32\" alt=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/filter.s",
+          "file": "js"
+        },
+        {
+          "line": 863,
+          "content": "let iconHTML = `<img src=\"/trading-ui/images/icons/tabler/${iconClass}.svg\" width=\"16\" height=\"16\" a",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/${iconCl",
+          "file": "js"
+        },
+        {
+          "line": 1328,
+          "content": "let filterIcon = '<img src=\"/trading-ui/images/icons/tabler/filter.svg\" width=\"32\" height=\"32\" alt=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/filter.s",
+          "file": "js"
+        },
+        {
+          "line": 2232,
+          "content": "let categoryIconHTML = `<img src=\"/trading-ui/images/icons/tabler/${category.icon}.svg\" width=\"32\" h",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/${catego",
+          "file": "js"
+        },
+        {
+          "line": 152,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/chart-bar.svg\" width=\"16\" height=\"16\" alt=\"chart-bar\" clas",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/chart-ba",
+          "file": "html"
+        },
+        {
+          "line": 182,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/settings.svg\" width=\"16\" height=\"16\" alt=\"settings\" class=",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/settings",
+          "file": "html"
+        },
+        {
+          "line": 222,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/chart-bar.svg\" width=\"16\" height=\"16\" alt=\"chart-bar\" clas",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/chart-ba",
+          "file": "html"
+        },
+        {
+          "line": 238,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"info\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 245,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/briefcase.svg\" width=\"16\" height=\"16\" alt=\"briefcase\" clas",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/briefcas",
+          "file": "html"
+        },
+        {
+          "line": 293,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/tags.svg\" width=\"16\" height=\"16\" alt=\"tags\" class=\"icon te",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/tags.svg",
+          "file": "html"
+        },
+        {
+          "line": 308,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/settings.svg\" width=\"16\" height=\"16\" alt=\"settings\" class=",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/settings",
+          "file": "html"
+        }
+      ],
+      "issue_count": 49,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 132,
+            "content": "// Use IconSystem to render category icon",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 134,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 134,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 136,
+            "content": "iconHTML = await window.IconSystem.renderIcon('category', category.icon, {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 143,
+            "content": "// Fallback if IconSystem fails",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 147,
+            "content": "// Fallback if IconSystem not available",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 231,
+            "content": "// Render icons using IconSystem",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 236,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 236,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 238,
+            "content": "slidersIcon = await window.IconSystem.renderIcon('button', 'sliders', { size: '16', alt: 'settings',",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 239,
+            "content": "layersIcon = await window.IconSystem.renderIcon('button', 'layers', { size: '16', alt: 'categories',",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 240,
+            "content": "terminalIcon = await window.IconSystem.renderIcon('button', 'terminal', { size: '16', alt: 'terminal",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 650,
+            "content": "// Render icon using IconSystem",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 652,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 652,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 654,
+            "content": "clockHistoryIcon = await window.IconSystem.renderIcon('button', 'clock-history', { size: '32', alt: ",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 693,
+            "content": "// Render icon using IconSystem",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 695,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 695,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 697,
+            "content": "filterIcon = await window.IconSystem.renderIcon('button', 'filter', { size: '32', alt: 'filter', cla",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 862,
+            "content": "// Render icon using IconSystem",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 864,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 864,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 866,
+            "content": "iconHTML = await window.IconSystem.renderIcon('button', iconClass, { size: '16', alt: iconClass, cla",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1327,
+            "content": "// Render icon using IconSystem",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1329,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1329,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1331,
+            "content": "filterIcon = await window.IconSystem.renderIcon('button', 'filter', { size: '32', alt: 'filter', cla",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2231,
+            "content": "// Render icon using IconSystem",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2233,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2233,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2235,
+            "content": "categoryIconHTML = await window.IconSystem.renderIcon('button', category.icon, {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 144,
+            "content": "iconHTML = `<img src=\"/trading-ui/images/icons/tabler/${category.icon}.svg\" width=\"32\" height=\"32\" a",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/${catego"
+          },
+          {
+            "line": 148,
+            "content": "iconHTML = `<img src=\"/trading-ui/images/icons/tabler/${category.icon}.svg\" width=\"32\" height=\"32\" a",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/${catego"
+          },
+          {
+            "line": 232,
+            "content": "let slidersIcon = '<img src=\"/trading-ui/images/icons/tabler/sliders.svg\" width=\"16\" height=\"16\" alt",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/sliders."
+          },
+          {
+            "line": 233,
+            "content": "let layersIcon = '<img src=\"/trading-ui/images/icons/tabler/layers.svg\" width=\"16\" height=\"16\" alt=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/layers.s"
+          },
+          {
+            "line": 234,
+            "content": "let terminalIcon = '<img src=\"/trading-ui/images/icons/tabler/terminal.svg\" width=\"16\" height=\"16\" a",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/terminal"
+          },
+          {
+            "line": 651,
+            "content": "let clockHistoryIcon = '<img src=\"/trading-ui/images/icons/tabler/clock-history.svg\" width=\"32\" heig",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/clock-hi"
+          },
+          {
+            "line": 694,
+            "content": "let filterIcon = '<img src=\"/trading-ui/images/icons/tabler/filter.svg\" width=\"32\" height=\"32\" alt=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/filter.s"
+          },
+          {
+            "line": 863,
+            "content": "let iconHTML = `<img src=\"/trading-ui/images/icons/tabler/${iconClass}.svg\" width=\"16\" height=\"16\" a",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/${iconCl"
+          },
+          {
+            "line": 1328,
+            "content": "let filterIcon = '<img src=\"/trading-ui/images/icons/tabler/filter.svg\" width=\"32\" height=\"32\" alt=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/filter.s"
+          },
+          {
+            "line": 2232,
+            "content": "let categoryIconHTML = `<img src=\"/trading-ui/images/icons/tabler/${category.icon}.svg\" width=\"32\" h",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/${catego"
+          }
+        ],
+        "issue_count": 42
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [
+          {
+            "line": 152,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/chart-bar.svg\" width=\"16\" height=\"16\" alt=\"chart-bar\" clas",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/chart-ba"
+          },
+          {
+            "line": 182,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/settings.svg\" width=\"16\" height=\"16\" alt=\"settings\" class=",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/settings"
+          },
+          {
+            "line": 222,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/chart-bar.svg\" width=\"16\" height=\"16\" alt=\"chart-bar\" clas",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/chart-ba"
+          },
+          {
+            "line": 238,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"info\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 245,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/briefcase.svg\" width=\"16\" height=\"16\" alt=\"briefcase\" clas",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/briefcas"
+          },
+          {
+            "line": 293,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/tags.svg\" width=\"16\" height=\"16\" alt=\"tags\" class=\"icon te",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/tags.svg"
+          },
+          {
+            "line": 308,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/settings.svg\" width=\"16\" height=\"16\" alt=\"settings\" class=",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/settings"
+          }
+        ],
+        "issue_count": 7
+      }
+    },
+    "colors": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "info_summary": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "pagination": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "entity_details": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "conditions": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "page_state": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "logger": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 30,
+          "content": "window.Logger?.debug('🚀 Initializing Notifications Center...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 42,
+          "content": "window.Logger?.debug('✅ Notification log loaded after page initialization');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 44,
+          "content": "window.Logger?.error('❌ Failed to load notification log:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 48,
+          "content": "window.Logger?.debug('✅ Notifications Center initialized successfully');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 50,
+          "content": "window.Logger?.error('❌ Failed to initialize Notifications Center:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 165,
+          "content": "window.Logger?.debug('✅ Categories overview loaded with statistics');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 167,
+          "content": "window.Logger?.error('❌ Error loading categories overview:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 196,
+          "content": "window.Logger?.warn('Failed to get notification preferences from system');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 199,
+          "content": "window.Logger?.error('Error loading notification preferences:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 283,
+          "content": "window.Logger?.error('❌ Error loading preferences overview:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 323,
+          "content": "window.Logger?.error('❌ שגיאה באתחול מרכז התראות:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 328,
+          "content": "window.Logger?.debug('🚀 אתחול מרכז התראות... (1.1.0 - Connected to Global Preferences System)');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 344,
+          "content": "window.Logger?.debug('✅ היסטוריה נטענה בהצלחה');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 354,
+          "content": "window.Logger?.warn('⚠️ שגיאה בטעינת היסטוריה:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 363,
+          "content": "window.Logger?.debug('✅ מרכז התראות אותחל בהצלחה (1.0.9 - Fixed + Debug + Settings + Filter + Stats ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 382,
+          "content": "window.Logger?.warn('⚠️ Error in WebSocket connection check:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 462,
+          "content": "window.Logger?.warn('Failed to detect category in addNotification, using default:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 818,
+          "content": "window.Logger?.debug('🔧 טעינת העדפות התראות מהמערכת הגלובלית...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 824,
+          "content": "window.Logger?.debug('✅ העדפות התראות נטענו:', this.preferences);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 826,
+          "content": "window.Logger?.warn('⚠️ מערכת ההעדפות הגלובלית לא זמינה, שימוש בברירות מחדל');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 841,
+          "content": "window.Logger?.error('❌ שגיאה בטעינת העדפות התראות:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 934,
+          "content": "// window.Logger?.warn('שגיאה בהמרת תאריך:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1020,
+          "content": "window.Logger?.debug('📄 רשימת עמודים לסינון נטענה:', uniquePages.length, 'עמודים');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1022,
+          "content": "window.Logger?.warn('שגיאה בטעינת רשימת עמודים:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1077,
+          "content": "window.Logger?.debug('🔧 טוען היסטוריה מהמערכת החדשה (UnifiedCacheManager)...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1079,
+          "content": "window.Logger?.debug('📚 היסטוריה גלובלית נטענה:', globalHistory ? 1 : 0, 'התראות');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1088,
+          "content": "window.Logger?.debug('✅ היסטוריה מוזגה:', this.history.length, 'התראות');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1092,
+          "content": "window.Logger?.debug('📚 היסטוריה גלובלית נטענה:', globalHistory.length, 'התראות');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1098,
+          "content": "window.Logger?.debug('✅ היסטוריה מוזגה:', this.history.length, 'התראות');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1104,
+          "content": "window.Logger?.debug('📊 סטטיסטיקות גלובליות נטענו:', globalStats);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1115,
+          "content": "window.Logger?.warn('שגיאה בטעינת היסטוריה גלובלית:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1158,
+          "content": "window.Logger?.debug('📝 הוספת התראות בדיקה...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1164,
+          "content": "window.Logger?.debug('✅ התראות בדיקה נוספו');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1174,
+          "content": "window.Logger?.debug('🔍 בדיקת חיבור WebSocket:', isConnected ? 'מחובר' : 'לא מחובר');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1207,
+          "content": "// window.Logger?.warn('לא ניתן לשמור בקובץ לוג:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1210,
+          "content": "// window.Logger?.warn('שגיאה בשמירה לקובץ לוג:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1228,
+          "content": "window.Logger?.debug('✅ היסטוריית ההתראות נוקתה בהצלחה');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1237,
+          "content": "() => window.Logger?.debug('❌ ניקוי היסטוריה - משתמש ביטל')",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1259,
+          "content": "window.Logger?.debug('❌ ניקוי היסטוריה - משתמש ביטל');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1271,
+          "content": "// window.Logger?.debug('✅ ההתראות רועננו בהצלחה');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1402,
+          "content": "// window.Logger?.warn('שגיאה בעדכון זמן חיבור:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1417,
+          "content": "// window.Logger?.warn('שגיאה בקבלת סטטוס חיבור נוכחי:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1426,
+          "content": "window.Logger?.debug('📋 העתקת היסטוריה מסוננת ללוח...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1494,
+          "content": "window.Logger?.warn('⚠️ Error loading global notification history:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1508,
+          "content": "window.Logger?.debug('✅ היסטוריה מסוננת הועתקה ללוח');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1515,
+          "content": "window.Logger?.error('❌ שגיאה בהעתקה ללוח:', err);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1519,
+          "content": "window.Logger?.error('❌ שגיאה בהעתקת היסטוריה מסוננת:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1579,
+          "content": "window.Logger?.debug('🧪 Testing success notification...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1585,
+          "content": "window.Logger?.error('❌ showSuccessNotification לא זמין');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1590,
+          "content": "window.Logger?.debug('🧪 Testing error notification...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1596,
+          "content": "window.Logger?.error('❌ showErrorNotification לא זמין');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1601,
+          "content": "window.Logger?.debug('🧪 Testing warning notification...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1607,
+          "content": "window.Logger?.error('❌ showWarningNotification לא זמין');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1612,
+          "content": "window.Logger?.debug('🧪 Testing info notification...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1618,
+          "content": "window.Logger?.error('❌ showInfoNotification לא זמין');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1624,
+          "content": "window.Logger?.debug('🧪 Testing confirmation dialog...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1625,
+          "content": "window.Logger?.debug('🔍 showConfirmationDialog type:', typeof window.showConfirmationDialog);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1626,
+          "content": "window.Logger?.debug('🔍 showConfirmationDialog function:', window.showConfirmationDialog);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1629,
+          "content": "window.Logger?.debug('✅ Calling showConfirmationDialog...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1635,
+          "content": "window.Logger?.debug('✅ User confirmed');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1639,
+          "content": "window.Logger?.debug('❌ User cancelled');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1643,
+          "content": "window.Logger?.debug('✅ showConfirmationDialog called successfully');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1645,
+          "content": "window.Logger?.error('❌ Error calling showConfirmationDialog:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1648,
+          "content": "window.Logger?.error('❌ showConfirmationDialog לא זמין');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1654,
+          "content": "window.Logger?.debug('🧪 Testing details modal...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1655,
+          "content": "window.Logger?.debug('🔍 showDetailsModal type:', typeof window.showDetailsModal);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1656,
+          "content": "window.Logger?.debug('🔍 showDetailsModal function:', window.showDetailsModal);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1659,
+          "content": "window.Logger?.debug('✅ Calling showDetailsModal...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1672,
+          "content": "window.Logger?.debug('✅ showDetailsModal called successfully');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1674,
+          "content": "window.Logger?.error('❌ Error calling showDetailsModal:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1677,
+          "content": "window.Logger?.error('❌ showDetailsModal לא זמין');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1691,
+          "content": "window.Logger?.error('שגיאה בהעתקה:', err);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1724,
+          "content": "window.Logger?.error('שגיאה בהעתקת התראות:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1750,
+          "content": "window.Logger?.warn('❌ מרכז התראות לא זמין להוספת התראה');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1759,
+          "content": "window.Logger?.debug('📬 Loading Notifications Center...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1764,
+          "content": "window.Logger?.debug('✅ Notifications Center loaded successfully');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1766,
+          "content": "window.Logger?.error('❌ Error loading Notifications Center:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1774,
+          "content": "//   window.Logger?.debug('🚀 טעינת דף מרכז התראות... (1.0.9 - Fixed + Debug + Settings + Filter + St",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1779,
+          "content": "//       window.Logger?.debug('⚠️ Unified system not available, using direct initialization');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1790,
+          "content": "window.Logger?.debug('🔍 בדיקת זמינות פונקציות:');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1791,
+          "content": "window.Logger?.debug('🔍 testSuccessNotification:', typeof testSuccessNotification);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1792,
+          "content": "window.Logger?.debug('🔍 testErrorNotification:', typeof testErrorNotification);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1793,
+          "content": "window.Logger?.debug('🔍 testWarningNotification:', typeof testWarningNotification);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1794,
+          "content": "window.Logger?.debug('🔍 testInfoNotification:', typeof testInfoNotification);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1795,
+          "content": "window.Logger?.debug('🔍 window.testSuccessNotification:', typeof window.testSuccessNotification);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1796,
+          "content": "window.Logger?.debug('🔍 window.testErrorNotification:', typeof window.testErrorNotification);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1797,
+          "content": "window.Logger?.debug('🔍 window.testWarningNotification:', typeof window.testWarningNotification);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1798,
+          "content": "window.Logger?.debug('🔍 window.testInfoNotification:', typeof window.testInfoNotification);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1811,
+          "content": "window.Logger?.debug('✅ דף מרכז התראות נטען בהצלחה (1.0.9 - Fixed + Debug + Settings + Filter + Stat",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1907,
+          "content": "window.Logger?.debug('🚀 Activating Unified Log System...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1927,
+          "content": "window.Logger?.debug('✅ Unified Log System activated successfully');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1929,
+          "content": "window.Logger?.error('❌ Failed to activate Unified Log System:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1941,
+          "content": "window.Logger?.debug('📊 Showing notification log in new system...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1953,
+          "content": "window.Logger?.error('❌ Failed to show notification log:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1965,
+          "content": "window.Logger?.debug('📊 Showing system logs in new system...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1976,
+          "content": "window.Logger?.error('❌ Failed to show system logs:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1988,
+          "content": "window.Logger?.debug('📊 Showing error reports in new system...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1999,
+          "content": "window.Logger?.error('❌ Failed to show error reports:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2011,
+          "content": "window.Logger?.debug('📊 Exporting all logs...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2050,
+          "content": "window.Logger?.warn('exportAllLogsModal not available in ModalManagerV2, using Bootstrap fallback', ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2110,
+          "content": "window.Logger?.error(`❌ Failed to export as ${format}:`, error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2126,
+          "content": "window.Logger?.error('❌ Failed to export all logs:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2138,
+          "content": "window.Logger?.debug('📊 Loading notification log automatically...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2146,
+          "content": "window.Logger?.debug('✅ Notification log loaded successfully');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2148,
+          "content": "window.Logger?.error('❌ Failed to load notification log:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2157,
+          "content": "window.Logger?.debug('🧪 Testing Unified Log System...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2186,
+          "content": "window.Logger?.error('❌ Failed to test Unified Log System:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2260,
+          "content": "window.Logger?.debug('✅ Categories overview loaded with statistics');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2262,
+          "content": "window.Logger?.error('❌ Error loading categories overview:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2268,
+          "content": "window.Logger?.debug('📊 Unified Log System integration loaded successfully');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 396,
+          "content": "<script src=\"scripts/logger-service.js?v=1.0.0\"></script> <!-- Advanced logging service -->",
+          "pattern": "logger-service\\.js",
+          "match": "logger-service.js",
+          "file": "html"
+        }
+      ],
+      "issue_count": 111,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 30,
+            "content": "window.Logger?.debug('🚀 Initializing Notifications Center...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 42,
+            "content": "window.Logger?.debug('✅ Notification log loaded after page initialization');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 44,
+            "content": "window.Logger?.error('❌ Failed to load notification log:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 48,
+            "content": "window.Logger?.debug('✅ Notifications Center initialized successfully');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 50,
+            "content": "window.Logger?.error('❌ Failed to initialize Notifications Center:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 165,
+            "content": "window.Logger?.debug('✅ Categories overview loaded with statistics');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 167,
+            "content": "window.Logger?.error('❌ Error loading categories overview:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 196,
+            "content": "window.Logger?.warn('Failed to get notification preferences from system');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 199,
+            "content": "window.Logger?.error('Error loading notification preferences:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 283,
+            "content": "window.Logger?.error('❌ Error loading preferences overview:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 323,
+            "content": "window.Logger?.error('❌ שגיאה באתחול מרכז התראות:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 328,
+            "content": "window.Logger?.debug('🚀 אתחול מרכז התראות... (1.1.0 - Connected to Global Preferences System)');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 344,
+            "content": "window.Logger?.debug('✅ היסטוריה נטענה בהצלחה');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 354,
+            "content": "window.Logger?.warn('⚠️ שגיאה בטעינת היסטוריה:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 363,
+            "content": "window.Logger?.debug('✅ מרכז התראות אותחל בהצלחה (1.0.9 - Fixed + Debug + Settings + Filter + Stats ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 382,
+            "content": "window.Logger?.warn('⚠️ Error in WebSocket connection check:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 462,
+            "content": "window.Logger?.warn('Failed to detect category in addNotification, using default:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 818,
+            "content": "window.Logger?.debug('🔧 טעינת העדפות התראות מהמערכת הגלובלית...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 824,
+            "content": "window.Logger?.debug('✅ העדפות התראות נטענו:', this.preferences);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 826,
+            "content": "window.Logger?.warn('⚠️ מערכת ההעדפות הגלובלית לא זמינה, שימוש בברירות מחדל');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 841,
+            "content": "window.Logger?.error('❌ שגיאה בטעינת העדפות התראות:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 934,
+            "content": "// window.Logger?.warn('שגיאה בהמרת תאריך:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1020,
+            "content": "window.Logger?.debug('📄 רשימת עמודים לסינון נטענה:', uniquePages.length, 'עמודים');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1022,
+            "content": "window.Logger?.warn('שגיאה בטעינת רשימת עמודים:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1077,
+            "content": "window.Logger?.debug('🔧 טוען היסטוריה מהמערכת החדשה (UnifiedCacheManager)...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1079,
+            "content": "window.Logger?.debug('📚 היסטוריה גלובלית נטענה:', globalHistory ? 1 : 0, 'התראות');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1088,
+            "content": "window.Logger?.debug('✅ היסטוריה מוזגה:', this.history.length, 'התראות');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1092,
+            "content": "window.Logger?.debug('📚 היסטוריה גלובלית נטענה:', globalHistory.length, 'התראות');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1098,
+            "content": "window.Logger?.debug('✅ היסטוריה מוזגה:', this.history.length, 'התראות');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1104,
+            "content": "window.Logger?.debug('📊 סטטיסטיקות גלובליות נטענו:', globalStats);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1115,
+            "content": "window.Logger?.warn('שגיאה בטעינת היסטוריה גלובלית:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1158,
+            "content": "window.Logger?.debug('📝 הוספת התראות בדיקה...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1164,
+            "content": "window.Logger?.debug('✅ התראות בדיקה נוספו');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1174,
+            "content": "window.Logger?.debug('🔍 בדיקת חיבור WebSocket:', isConnected ? 'מחובר' : 'לא מחובר');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1207,
+            "content": "// window.Logger?.warn('לא ניתן לשמור בקובץ לוג:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1210,
+            "content": "// window.Logger?.warn('שגיאה בשמירה לקובץ לוג:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1228,
+            "content": "window.Logger?.debug('✅ היסטוריית ההתראות נוקתה בהצלחה');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1237,
+            "content": "() => window.Logger?.debug('❌ ניקוי היסטוריה - משתמש ביטל')",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1259,
+            "content": "window.Logger?.debug('❌ ניקוי היסטוריה - משתמש ביטל');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1271,
+            "content": "// window.Logger?.debug('✅ ההתראות רועננו בהצלחה');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1402,
+            "content": "// window.Logger?.warn('שגיאה בעדכון זמן חיבור:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1417,
+            "content": "// window.Logger?.warn('שגיאה בקבלת סטטוס חיבור נוכחי:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1426,
+            "content": "window.Logger?.debug('📋 העתקת היסטוריה מסוננת ללוח...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1494,
+            "content": "window.Logger?.warn('⚠️ Error loading global notification history:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1508,
+            "content": "window.Logger?.debug('✅ היסטוריה מסוננת הועתקה ללוח');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1515,
+            "content": "window.Logger?.error('❌ שגיאה בהעתקה ללוח:', err);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1519,
+            "content": "window.Logger?.error('❌ שגיאה בהעתקת היסטוריה מסוננת:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1579,
+            "content": "window.Logger?.debug('🧪 Testing success notification...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1585,
+            "content": "window.Logger?.error('❌ showSuccessNotification לא זמין');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1590,
+            "content": "window.Logger?.debug('🧪 Testing error notification...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1596,
+            "content": "window.Logger?.error('❌ showErrorNotification לא זמין');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1601,
+            "content": "window.Logger?.debug('🧪 Testing warning notification...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1607,
+            "content": "window.Logger?.error('❌ showWarningNotification לא זמין');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1612,
+            "content": "window.Logger?.debug('🧪 Testing info notification...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1618,
+            "content": "window.Logger?.error('❌ showInfoNotification לא זמין');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1624,
+            "content": "window.Logger?.debug('🧪 Testing confirmation dialog...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1625,
+            "content": "window.Logger?.debug('🔍 showConfirmationDialog type:', typeof window.showConfirmationDialog);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1626,
+            "content": "window.Logger?.debug('🔍 showConfirmationDialog function:', window.showConfirmationDialog);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1629,
+            "content": "window.Logger?.debug('✅ Calling showConfirmationDialog...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1635,
+            "content": "window.Logger?.debug('✅ User confirmed');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1639,
+            "content": "window.Logger?.debug('❌ User cancelled');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1643,
+            "content": "window.Logger?.debug('✅ showConfirmationDialog called successfully');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1645,
+            "content": "window.Logger?.error('❌ Error calling showConfirmationDialog:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1648,
+            "content": "window.Logger?.error('❌ showConfirmationDialog לא זמין');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1654,
+            "content": "window.Logger?.debug('🧪 Testing details modal...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1655,
+            "content": "window.Logger?.debug('🔍 showDetailsModal type:', typeof window.showDetailsModal);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1656,
+            "content": "window.Logger?.debug('🔍 showDetailsModal function:', window.showDetailsModal);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1659,
+            "content": "window.Logger?.debug('✅ Calling showDetailsModal...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1672,
+            "content": "window.Logger?.debug('✅ showDetailsModal called successfully');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1674,
+            "content": "window.Logger?.error('❌ Error calling showDetailsModal:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1677,
+            "content": "window.Logger?.error('❌ showDetailsModal לא זמין');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1691,
+            "content": "window.Logger?.error('שגיאה בהעתקה:', err);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1724,
+            "content": "window.Logger?.error('שגיאה בהעתקת התראות:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1750,
+            "content": "window.Logger?.warn('❌ מרכז התראות לא זמין להוספת התראה');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1759,
+            "content": "window.Logger?.debug('📬 Loading Notifications Center...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1764,
+            "content": "window.Logger?.debug('✅ Notifications Center loaded successfully');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1766,
+            "content": "window.Logger?.error('❌ Error loading Notifications Center:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1774,
+            "content": "//   window.Logger?.debug('🚀 טעינת דף מרכז התראות... (1.0.9 - Fixed + Debug + Settings + Filter + St",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1779,
+            "content": "//       window.Logger?.debug('⚠️ Unified system not available, using direct initialization');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1790,
+            "content": "window.Logger?.debug('🔍 בדיקת זמינות פונקציות:');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1791,
+            "content": "window.Logger?.debug('🔍 testSuccessNotification:', typeof testSuccessNotification);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1792,
+            "content": "window.Logger?.debug('🔍 testErrorNotification:', typeof testErrorNotification);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1793,
+            "content": "window.Logger?.debug('🔍 testWarningNotification:', typeof testWarningNotification);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1794,
+            "content": "window.Logger?.debug('🔍 testInfoNotification:', typeof testInfoNotification);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1795,
+            "content": "window.Logger?.debug('🔍 window.testSuccessNotification:', typeof window.testSuccessNotification);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1796,
+            "content": "window.Logger?.debug('🔍 window.testErrorNotification:', typeof window.testErrorNotification);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1797,
+            "content": "window.Logger?.debug('🔍 window.testWarningNotification:', typeof window.testWarningNotification);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1798,
+            "content": "window.Logger?.debug('🔍 window.testInfoNotification:', typeof window.testInfoNotification);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1811,
+            "content": "window.Logger?.debug('✅ דף מרכז התראות נטען בהצלחה (1.0.9 - Fixed + Debug + Settings + Filter + Stat",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1907,
+            "content": "window.Logger?.debug('🚀 Activating Unified Log System...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1927,
+            "content": "window.Logger?.debug('✅ Unified Log System activated successfully');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1929,
+            "content": "window.Logger?.error('❌ Failed to activate Unified Log System:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1941,
+            "content": "window.Logger?.debug('📊 Showing notification log in new system...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1953,
+            "content": "window.Logger?.error('❌ Failed to show notification log:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1965,
+            "content": "window.Logger?.debug('📊 Showing system logs in new system...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1976,
+            "content": "window.Logger?.error('❌ Failed to show system logs:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1988,
+            "content": "window.Logger?.debug('📊 Showing error reports in new system...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1999,
+            "content": "window.Logger?.error('❌ Failed to show error reports:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2011,
+            "content": "window.Logger?.debug('📊 Exporting all logs...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2050,
+            "content": "window.Logger?.warn('exportAllLogsModal not available in ModalManagerV2, using Bootstrap fallback', ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2110,
+            "content": "window.Logger?.error(`❌ Failed to export as ${format}:`, error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2126,
+            "content": "window.Logger?.error('❌ Failed to export all logs:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2138,
+            "content": "window.Logger?.debug('📊 Loading notification log automatically...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2146,
+            "content": "window.Logger?.debug('✅ Notification log loaded successfully');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2148,
+            "content": "window.Logger?.error('❌ Failed to load notification log:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2157,
+            "content": "window.Logger?.debug('🧪 Testing Unified Log System...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2186,
+            "content": "window.Logger?.error('❌ Failed to test Unified Log System:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2260,
+            "content": "window.Logger?.debug('✅ Categories overview loaded with statistics');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2262,
+            "content": "window.Logger?.error('❌ Error loading categories overview:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2268,
+            "content": "window.Logger?.debug('📊 Unified Log System integration loaded successfully');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          }
+        ],
+        "issue_count": 110
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 396,
+            "content": "<script src=\"scripts/logger-service.js?v=1.0.0\"></script> <!-- Advanced logging service -->",
+            "pattern": "logger-service\\.js",
+            "match": "logger-service.js"
+          }
+        ],
+        "issue_count": 1
+      }
+    },
+    "cache": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 1076,
+          "content": "if (window.UnifiedCacheManager) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 1077,
+          "content": "window.Logger?.debug('🔧 טוען היסטוריה מהמערכת החדשה (UnifiedCacheManager)...');",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 1078,
+          "content": "const globalHistory = await window.UnifiedCacheManager.get('notification_history');",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        }
+      ],
+      "issue_count": 3,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1076,
+            "content": "if (window.UnifiedCacheManager) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 1077,
+            "content": "window.Logger?.debug('🔧 טוען היסטוריה מהמערכת החדשה (UnifiedCacheManager)...');",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 1078,
+            "content": "const globalHistory = await window.UnifiedCacheManager.get('notification_history');",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          }
+        ],
+        "issue_count": 3
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "dom_manipulation": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 164,
+          "content": "container.innerHTML = html;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 281,
+          "content": "container.innerHTML = preferencesHtml;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 530,
+          "content": "popup.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 660,
+          "content": "container.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 703,
+          "content": "container.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 716,
+          "content": "container.innerHTML = notificationHTMLs.join('');",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1010,
+          "content": "pageFilterSelect.innerHTML = '<option value=\"\">כל העמודים</option>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1323,
+          "content": "historyContainer.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1337,
+          "content": "historyContainer.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1350,
+          "content": "notificationElement.innerHTML = notificationHTML;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2016,
+          "content": "modal.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2259,
+          "content": "container.innerHTML = html;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 528,
+          "content": "const popup = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 1014,
+          "content": "const option = document.createElement('option');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 1349,
+          "content": "const notificationElement = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 2014,
+          "content": "const modal = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        }
+      ],
+      "issue_count": 16,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 164,
+            "content": "container.innerHTML = html;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 281,
+            "content": "container.innerHTML = preferencesHtml;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 530,
+            "content": "popup.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 660,
+            "content": "container.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 703,
+            "content": "container.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 716,
+            "content": "container.innerHTML = notificationHTMLs.join('');",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1010,
+            "content": "pageFilterSelect.innerHTML = '<option value=\"\">כל העמודים</option>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1323,
+            "content": "historyContainer.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1337,
+            "content": "historyContainer.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1350,
+            "content": "notificationElement.innerHTML = notificationHTML;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2016,
+            "content": "modal.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2259,
+            "content": "container.innerHTML = html;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 528,
+            "content": "const popup = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 1014,
+            "content": "const option = document.createElement('option');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 1349,
+            "content": "const notificationElement = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 2014,
+            "content": "const modal = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          }
+        ],
+        "issue_count": 16
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "html_structure": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 533,
+          "content": "<button data-button-type=\"CLOSE\" data-size=\"small\" data-variant=\"small\" data-onclick=\"this.parentEle",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "js"
+        },
+        {
+          "line": 2021,
+          "content": "<button data-button-type=\"CLOSE\" data-size=\"large\" data-variant=\"small\" data-onclick=\"data-bs-dismis",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "js"
+        },
+        {
+          "line": 2035,
+          "content": "<button data-button-type=\"CANCEL\" data-onclick=\"data-bs-dismiss='modal'\" data-text=\"ביטול\" title=\"בי",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "js"
+        },
+        {
+          "line": 533,
+          "content": "<button data-button-type=\"CLOSE\" data-size=\"small\" data-variant=\"small\" data-onclick=\"this.parentEle",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "js"
+        },
+        {
+          "line": 2021,
+          "content": "<button data-button-type=\"CLOSE\" data-size=\"large\" data-variant=\"small\" data-onclick=\"data-bs-dismis",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "js"
+        },
+        {
+          "line": 2026,
+          "content": "<button data-button-type=\"EXPORT\" data-format=\"csv\" data-text=\"ייצוא CSV\" title=\"ייצוא ל-CSV\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "js"
+        },
+        {
+          "line": 2028,
+          "content": "<button data-button-type=\"EXPORT\" data-format=\"json\" data-text=\"ייצוא JSON\" title=\"ייצוא ל-JSON\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "js"
+        },
+        {
+          "line": 2030,
+          "content": "<button data-button-type=\"COPY\" data-format=\"clipboard\" data-text=\"העתקה ללוח\" title=\"העתקה ללוח\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "js"
+        },
+        {
+          "line": 2035,
+          "content": "<button data-button-type=\"CANCEL\" data-onclick=\"data-bs-dismiss='modal'\" data-text=\"ביטול\" title=\"בי",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "js"
+        },
+        {
+          "line": 144,
+          "content": "iconHTML = `<img src=\"/trading-ui/images/icons/tabler/${category.icon}.svg\" width=\"32\" height=\"32\" a",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 148,
+          "content": "iconHTML = `<img src=\"/trading-ui/images/icons/tabler/${category.icon}.svg\" width=\"32\" height=\"32\" a",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 156,
+          "content": "<h4 class=\"mb-1\" style=\"color: ${category.color};\">${categoryCount.toLocaleString()}</h4>",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 2232,
+          "content": "let categoryIconHTML = `<img src=\"/trading-ui/images/icons/tabler/${category.icon}.svg\" width=\"32\" h",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 2250,
+          "content": "<h4 class=\"mb-1\" style=\"color: ${category.color};\">${count.toLocaleString()}</h4>",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 80,
+          "content": "<button data-button-type=\"COPY\" data-onclick=\"copyNotificationsToClipboard()\" data-text=\"העתק ללוח\" ",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 82,
+          "content": "<button data-button-type=\"CHECK\" data-onclick=\"testSuccessNotification()\" data-text=\"הצלחה\" title=\"ב",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 84,
+          "content": "<button data-button-type=\"REJECT\" data-onclick=\"testErrorNotification()\" data-text=\"שגיאה\" title=\"בד",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 86,
+          "content": "<button data-button-type=\"PAUSE\" data-onclick=\"testWarningNotification()\" data-text=\"אזהרה\" title=\"ב",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 88,
+          "content": "<button data-button-type=\"VIEW\" data-onclick=\"testInfoNotification()\" data-text=\"מידע\" title=\"בדיקת ",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 90,
+          "content": "<button data-button-type=\"APPROVE\" data-onclick=\"testConfirmationDialog()\" data-text=\"אישור\" title=\"",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 92,
+          "content": "<button data-button-type=\"VIEW\" data-onclick=\"testDetailsModal()\" data-text=\"פרטים\" title=\"בדיקת מוד",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 94,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('top')\" data-text",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 173,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('notification-mod",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 194,
+          "content": "<button data-button-type=\"VIEW\" data-onclick=\"testNotificationMode('debug')\" data-text=\"בדוק מצב דיב",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 198,
+          "content": "<button data-button-type=\"VIEW\" data-onclick=\"testNotificationMode('development')\" data-text=\"בדוק מ",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 202,
+          "content": "<button data-button-type=\"PLAY\" data-onclick=\"testNotificationMode('work')\" data-text=\"בדוק מצב עבוד",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 206,
+          "content": "<button data-button-type=\"STOP\" data-onclick=\"testNotificationMode('silent')\" data-text=\"בדוק מצב מו",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 214,
+          "content": "<button data-button-type=\"PLAY\" data-onclick=\"runFullNotificationModeTest()\" data-text=\"הרץ בדיקה מל",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 283,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section1')\" data",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 331,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section2')\" data",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 80,
+          "content": "<button data-button-type=\"COPY\" data-onclick=\"copyNotificationsToClipboard()\" data-text=\"העתק ללוח\" ",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 82,
+          "content": "<button data-button-type=\"CHECK\" data-onclick=\"testSuccessNotification()\" data-text=\"הצלחה\" title=\"ב",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 84,
+          "content": "<button data-button-type=\"REJECT\" data-onclick=\"testErrorNotification()\" data-text=\"שגיאה\" title=\"בד",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 86,
+          "content": "<button data-button-type=\"PAUSE\" data-onclick=\"testWarningNotification()\" data-text=\"אזהרה\" title=\"ב",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 88,
+          "content": "<button data-button-type=\"VIEW\" data-onclick=\"testInfoNotification()\" data-text=\"מידע\" title=\"בדיקת ",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 90,
+          "content": "<button data-button-type=\"APPROVE\" data-onclick=\"testConfirmationDialog()\" data-text=\"אישור\" title=\"",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 92,
+          "content": "<button data-button-type=\"VIEW\" data-onclick=\"testDetailsModal()\" data-text=\"פרטים\" title=\"בדיקת מוד",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 94,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('top')\" data-text",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 173,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('notification-mod",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 194,
+          "content": "<button data-button-type=\"VIEW\" data-onclick=\"testNotificationMode('debug')\" data-text=\"בדוק מצב דיב",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 198,
+          "content": "<button data-button-type=\"VIEW\" data-onclick=\"testNotificationMode('development')\" data-text=\"בדוק מ",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 202,
+          "content": "<button data-button-type=\"PLAY\" data-onclick=\"testNotificationMode('work')\" data-text=\"בדוק מצב עבוד",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 206,
+          "content": "<button data-button-type=\"STOP\" data-onclick=\"testNotificationMode('silent')\" data-text=\"בדוק מצב מו",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 214,
+          "content": "<button data-button-type=\"PLAY\" data-onclick=\"runFullNotificationModeTest()\" data-text=\"הרץ בדיקה מל",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 283,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section1')\" data",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 331,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section2')\" data",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 68,
+          "content": "<div id=\"unified-header\"></div>",
+          "pattern": "unified-header",
+          "match": "unified-header",
+          "file": "html"
+        }
+      ],
+      "issue_count": 47,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 533,
+            "content": "<button data-button-type=\"CLOSE\" data-size=\"small\" data-variant=\"small\" data-onclick=\"this.parentEle",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 2021,
+            "content": "<button data-button-type=\"CLOSE\" data-size=\"large\" data-variant=\"small\" data-onclick=\"data-bs-dismis",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 2035,
+            "content": "<button data-button-type=\"CANCEL\" data-onclick=\"data-bs-dismiss='modal'\" data-text=\"ביטול\" title=\"בי",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 533,
+            "content": "<button data-button-type=\"CLOSE\" data-size=\"small\" data-variant=\"small\" data-onclick=\"this.parentEle",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 2021,
+            "content": "<button data-button-type=\"CLOSE\" data-size=\"large\" data-variant=\"small\" data-onclick=\"data-bs-dismis",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 2026,
+            "content": "<button data-button-type=\"EXPORT\" data-format=\"csv\" data-text=\"ייצוא CSV\" title=\"ייצוא ל-CSV\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 2028,
+            "content": "<button data-button-type=\"EXPORT\" data-format=\"json\" data-text=\"ייצוא JSON\" title=\"ייצוא ל-JSON\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 2030,
+            "content": "<button data-button-type=\"COPY\" data-format=\"clipboard\" data-text=\"העתקה ללוח\" title=\"העתקה ללוח\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 2035,
+            "content": "<button data-button-type=\"CANCEL\" data-onclick=\"data-bs-dismiss='modal'\" data-text=\"ביטול\" title=\"בי",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 144,
+            "content": "iconHTML = `<img src=\"/trading-ui/images/icons/tabler/${category.icon}.svg\" width=\"32\" height=\"32\" a",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 148,
+            "content": "iconHTML = `<img src=\"/trading-ui/images/icons/tabler/${category.icon}.svg\" width=\"32\" height=\"32\" a",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 156,
+            "content": "<h4 class=\"mb-1\" style=\"color: ${category.color};\">${categoryCount.toLocaleString()}</h4>",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 2232,
+            "content": "let categoryIconHTML = `<img src=\"/trading-ui/images/icons/tabler/${category.icon}.svg\" width=\"32\" h",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 2250,
+            "content": "<h4 class=\"mb-1\" style=\"color: ${category.color};\">${count.toLocaleString()}</h4>",
+            "pattern": "style\\s*=",
+            "match": "style="
+          }
+        ],
+        "issue_count": 14
+      },
+      "html_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 80,
+            "content": "<button data-button-type=\"COPY\" data-onclick=\"copyNotificationsToClipboard()\" data-text=\"העתק ללוח\" ",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 82,
+            "content": "<button data-button-type=\"CHECK\" data-onclick=\"testSuccessNotification()\" data-text=\"הצלחה\" title=\"ב",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 84,
+            "content": "<button data-button-type=\"REJECT\" data-onclick=\"testErrorNotification()\" data-text=\"שגיאה\" title=\"בד",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 86,
+            "content": "<button data-button-type=\"PAUSE\" data-onclick=\"testWarningNotification()\" data-text=\"אזהרה\" title=\"ב",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 88,
+            "content": "<button data-button-type=\"VIEW\" data-onclick=\"testInfoNotification()\" data-text=\"מידע\" title=\"בדיקת ",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 90,
+            "content": "<button data-button-type=\"APPROVE\" data-onclick=\"testConfirmationDialog()\" data-text=\"אישור\" title=\"",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 92,
+            "content": "<button data-button-type=\"VIEW\" data-onclick=\"testDetailsModal()\" data-text=\"פרטים\" title=\"בדיקת מוד",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 94,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('top')\" data-text",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 173,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('notification-mod",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 194,
+            "content": "<button data-button-type=\"VIEW\" data-onclick=\"testNotificationMode('debug')\" data-text=\"בדוק מצב דיב",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 198,
+            "content": "<button data-button-type=\"VIEW\" data-onclick=\"testNotificationMode('development')\" data-text=\"בדוק מ",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 202,
+            "content": "<button data-button-type=\"PLAY\" data-onclick=\"testNotificationMode('work')\" data-text=\"בדוק מצב עבוד",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 206,
+            "content": "<button data-button-type=\"STOP\" data-onclick=\"testNotificationMode('silent')\" data-text=\"בדוק מצב מו",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 214,
+            "content": "<button data-button-type=\"PLAY\" data-onclick=\"runFullNotificationModeTest()\" data-text=\"הרץ בדיקה מל",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 283,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section1')\" data",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 331,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section2')\" data",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 80,
+            "content": "<button data-button-type=\"COPY\" data-onclick=\"copyNotificationsToClipboard()\" data-text=\"העתק ללוח\" ",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 82,
+            "content": "<button data-button-type=\"CHECK\" data-onclick=\"testSuccessNotification()\" data-text=\"הצלחה\" title=\"ב",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 84,
+            "content": "<button data-button-type=\"REJECT\" data-onclick=\"testErrorNotification()\" data-text=\"שגיאה\" title=\"בד",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 86,
+            "content": "<button data-button-type=\"PAUSE\" data-onclick=\"testWarningNotification()\" data-text=\"אזהרה\" title=\"ב",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 88,
+            "content": "<button data-button-type=\"VIEW\" data-onclick=\"testInfoNotification()\" data-text=\"מידע\" title=\"בדיקת ",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 90,
+            "content": "<button data-button-type=\"APPROVE\" data-onclick=\"testConfirmationDialog()\" data-text=\"אישור\" title=\"",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 92,
+            "content": "<button data-button-type=\"VIEW\" data-onclick=\"testDetailsModal()\" data-text=\"פרטים\" title=\"בדיקת מוד",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 94,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('top')\" data-text",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 173,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('notification-mod",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 194,
+            "content": "<button data-button-type=\"VIEW\" data-onclick=\"testNotificationMode('debug')\" data-text=\"בדוק מצב דיב",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 198,
+            "content": "<button data-button-type=\"VIEW\" data-onclick=\"testNotificationMode('development')\" data-text=\"בדוק מ",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 202,
+            "content": "<button data-button-type=\"PLAY\" data-onclick=\"testNotificationMode('work')\" data-text=\"בדוק מצב עבוד",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 206,
+            "content": "<button data-button-type=\"STOP\" data-onclick=\"testNotificationMode('silent')\" data-text=\"בדוק מצב מו",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 214,
+            "content": "<button data-button-type=\"PLAY\" data-onclick=\"runFullNotificationModeTest()\" data-text=\"הרץ בדיקה מל",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 283,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section1')\" data",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 331,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section2')\" data",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 68,
+            "content": "<div id=\"unified-header\"></div>",
+            "pattern": "unified-header",
+            "match": "unified-header"
+          }
+        ],
+        "issue_count": 33
+      }
+    }
+  }
+}

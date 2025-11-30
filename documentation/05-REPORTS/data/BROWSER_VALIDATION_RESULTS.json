@@ -1,0 +1,362 @@
+[
+  {
+    "pageName": "index",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "trades",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "trade_plans",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "alerts",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "tickers",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "trading_accounts",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "executions",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "cash_flows",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "notes",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "research",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "data_import",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "preferences",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "db_display",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "db_extradata",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "constraints",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "designs",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "login",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "register",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "forgot-password",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "reset-password",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "button-color-mapping",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "button-color-mapping-simple",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "conditions-modals",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "tooltip-editor",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "preferences-groups-management",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "daily-snapshots-comparative-analysis-page",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "daily-snapshots-date-comparison-modal",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "daily-snapshots-economic-calendar-page",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "daily-snapshots-emotional-tracking-widget",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "daily-snapshots-heatmap-visual-example",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "daily-snapshots-history-widget",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "daily-snapshots-portfolio-state-page",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "daily-snapshots-price-history-page",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "daily-snapshots-strategy-analysis-page",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "daily-snapshots-trade-history-page",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  },
+  {
+    "pageName": "daily-snapshots-trading-journal-page",
+    "status": "pending",
+    "timestamp": null,
+    "isValid": null,
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "monitoringResults": null,
+    "healthCheck": null
+  }
+]

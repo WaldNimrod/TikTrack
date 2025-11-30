@@ -1,0 +1,93 @@
+{
+  "page": "ai-analysis.html",
+  "timestamp": "2025-11-30T02:53:23.726222",
+  "checks": {
+    "page_exists": true,
+    "page_size": 26506,
+    "bootstrap_css": true,
+    "icon_system": {
+      "mappings": true,
+      "system": true,
+      "helper": true,
+      "complete": true
+    },
+    "css_file": {
+      "exists": true,
+      "path": "styles-new/07-pages/_ai-analysis.css"
+    },
+    "inline_styles": {
+      "count": 0,
+      "issues": []
+    },
+    "modules": {
+      "ai-analysis-manager": {
+        "exists": true,
+        "function_index": true,
+        "jsdoc_coverage": 15.0,
+        "function_index_issues": [],
+        "jsdoc_issues": [
+          "Low JSDoc coverage: 15.0%"
+        ],
+        "line_count": 1414
+      },
+      "ai-template-selector": {
+        "exists": true,
+        "function_index": true,
+        "jsdoc_coverage": 22.22222222222222,
+        "function_index_issues": [],
+        "jsdoc_issues": [
+          "Low JSDoc coverage: 22.2%"
+        ],
+        "line_count": 235
+      },
+      "ai-result-renderer": {
+        "exists": true,
+        "function_index": true,
+        "jsdoc_coverage": 28.57142857142857,
+        "function_index_issues": [],
+        "jsdoc_issues": [
+          "Low JSDoc coverage: 28.6%"
+        ],
+        "line_count": 94
+      },
+      "ai-export-service": {
+        "exists": true,
+        "function_index": true,
+        "jsdoc_coverage": 42.857142857142854,
+        "function_index_issues": [],
+        "jsdoc_issues": [
+          "Low JSDoc coverage: 42.9%"
+        ],
+        "line_count": 76
+      },
+      "ai-notes-integration": {
+        "exists": true,
+        "function_index": true,
+        "jsdoc_coverage": 12.5,
+        "function_index_issues": [],
+        "jsdoc_issues": [
+          "Low JSDoc coverage: 12.5%"
+        ],
+        "line_count": 405
+      },
+      "ai-analysis-data": {
+        "exists": true,
+        "function_index": true,
+        "jsdoc_coverage": 0.0,
+        "function_index_issues": [],
+        "jsdoc_issues": [
+          "Low JSDoc coverage: 0.0%"
+        ],
+        "line_count": 618
+      }
+    },
+    "central_systems": {
+      "DataCollectionService": true,
+      "CRUDResponseHandler": true,
+      "IconSystem": true,
+      "ModalManagerV2": true,
+      "createAndShowModal": true,
+      "Logger": true
+    }
+  }
+}

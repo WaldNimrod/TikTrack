@@ -262,3 +262,4 @@ tab.addEventListener('shown.bs.tab', async () => {
 **מקור:** `documentation/02-ARCHITECTURE/FRONTEND/TAB_SYSTEM_GUIDE.md`  
 **עודכן:** 21 ינואר 2025
 
+

@@ -77,8 +77,9 @@
  * 12. MANAGEMENT (5 scripts) - Management
  * 13. INIT (3 scripts) - Initialization
  *
- * @version 2.0.0
+ * @version 1.5.0
  * @created October 2025
+ * @updated November 2025
  * @author TikTrack Development Team
  */
 
@@ -88,7 +89,7 @@ const PACKAGE_MANIFEST = {
     id: 'base',
     name: 'Base Package',
     description: 'Core systems required for all pages',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: true,
     loadOrder: 1,
     dependencies: [],
@@ -279,7 +280,7 @@ const PACKAGE_MANIFEST = {
     id: 'services',
     name: 'Services Package',
     description: 'General services',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 2,
     dependencies: ['base'],
@@ -478,10 +479,10 @@ const PACKAGE_MANIFEST = {
     id: 'ui-advanced',
     name: 'UI Advanced Package',
     description: 'Advanced user interface',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 3,
-    dependencies: ['base', 'services'],
+    dependencies: ['base', 'services', 'modules'],
     scripts: [
       {
         file: 'table-mappings.js',
@@ -523,14 +524,14 @@ const PACKAGE_MANIFEST = {
     initTime: '~50ms'
   },
 
-  // 3.5. MODULES PACKAGE - Modules
+  // 2.5. MODULES PACKAGE - Modules (loads before ui-advanced because tables.js uses ModalManagerV2)
   modules: {
     id: 'modules',
     name: 'Modules Package',
     description: 'General modules',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
-    loadOrder: 3.5,
+    loadOrder: 2.5,
     dependencies: ['base', 'services'],
     scripts: [
       {
@@ -740,7 +741,7 @@ const PACKAGE_MANIFEST = {
     id: 'crud',
     name: 'CRUD Operations Package',
     description: 'Data and table management systems',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 4,
     dependencies: ['base', 'services'],
@@ -798,7 +799,7 @@ const PACKAGE_MANIFEST = {
     id: 'preferences',
     name: 'Preferences Package',
     description: 'User preferences system v2.0 (10 files)',
-    version: '2.1.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 5,
     dependencies: ['base', 'services'], // Added 'services' dependency for preferences-data.js
@@ -925,7 +926,7 @@ const PACKAGE_MANIFEST = {
     id: 'validation',
     name: 'Validation Package',
     description: 'Validation systems',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 6,
     dependencies: ['base'],
@@ -946,7 +947,7 @@ const PACKAGE_MANIFEST = {
     id: 'conditions',
     name: 'Conditions Package',
     description: 'Condition systems',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 6.5,
     dependencies: ['base', 'validation'],
@@ -1017,7 +1018,7 @@ const PACKAGE_MANIFEST = {
     id: 'external-data',
     name: 'External Data Package',
     description: 'External data systems',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 7,
     dependencies: ['base', 'services'],
@@ -1050,7 +1051,7 @@ const PACKAGE_MANIFEST = {
     id: 'charts',
     name: 'Charts Package',
     description: 'Chart and graph systems',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 8,
     dependencies: ['base', 'services'],
@@ -1115,7 +1116,7 @@ const PACKAGE_MANIFEST = {
     id: 'logs',
     name: 'Logs Package',
     description: 'Log systems',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 9,
     dependencies: ['base', 'services'],
@@ -1151,7 +1152,7 @@ const PACKAGE_MANIFEST = {
     id: 'cache',
     name: 'Cache Package',
     description: 'Cache systems',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 9.5, // Changed from 9 to 9.5 to differentiate from logs (9)
     dependencies: ['base', 'services'],
@@ -1180,7 +1181,7 @@ const PACKAGE_MANIFEST = {
     id: 'entity-services',
     name: 'Entity Services Package',
     description: 'Entity services',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 10,
     dependencies: ['base', 'services'],
@@ -1321,7 +1322,7 @@ const PACKAGE_MANIFEST = {
     id: 'helper',
     name: 'Helper Package',
     description: 'Helper systems',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 11,
     dependencies: ['base', 'services'],
@@ -1378,7 +1379,7 @@ const PACKAGE_MANIFEST = {
     id: 'system-management',
     name: 'System Management Package',
     description: 'Advanced system management',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 12,
     dependencies: ['base', 'services'],
@@ -1489,7 +1490,7 @@ const PACKAGE_MANIFEST = {
     id: 'management',
     name: 'Management Package',
     description: 'Management systems',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 13,
     dependencies: ['base', 'services'],
@@ -1518,7 +1519,7 @@ const PACKAGE_MANIFEST = {
     id: 'dev-tools',
     name: 'Development Tools Package',
     description: 'Development and debugging tools',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 14,
     dependencies: ['base', 'services'],
@@ -1558,7 +1559,7 @@ const PACKAGE_MANIFEST = {
     id: 'filters',
     name: 'Filters Package',
     description: 'Integrated filter system (embedded in header-system.js)',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 15,
     dependencies: ['base', 'ui-advanced'],
@@ -1576,7 +1577,7 @@ const PACKAGE_MANIFEST = {
     id: 'advanced-notifications',
     name: 'Advanced Notifications Package',
     description: '⚠️ DEPRECATED: Scripts already in base package. Use base package instead.',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 16,
     dependencies: ['base'],
@@ -1593,7 +1594,7 @@ const PACKAGE_MANIFEST = {
     id: 'entity-details',
     name: 'Entity Details Package',
     description: 'Entity details systems',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 17,
     dependencies: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services'],
@@ -1809,7 +1810,7 @@ const PACKAGE_MANIFEST = {
     id: 'init-system',
     name: 'Initialization Package',
     description: 'Initialization and monitoring systems',
-    version: '2.0.0',
+    version: '1.5.0',
     critical: false,
     loadOrder: 22, // Changed from 20 to 22 to load after all other packages (dashboard-widgets 19.5, tradingview-charts 19, tradingview-widgets 21, watch-lists 20)
     dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'advanced-notifications', 'entity-details', 'info-summary', 'dashboard-widgets', 'tradingview-widgets', 'tradingview-charts', 'watch-lists', 'ai-analysis'],

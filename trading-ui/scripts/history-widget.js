@@ -358,7 +358,11 @@
             // Show error message in container
             const container = document.getElementById('weeklyPLChartContainer');
             if (container) {
-                container.innerHTML = '<div class="text-muted text-center p-3">שגיאה בטעינת הגרף</div>';
+                container.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted text-center p-3';
+        div.textContent = 'שגיאה בטעינת הגרף';
+        container.innerHTML.appendChild(div);
             }
         }
     }

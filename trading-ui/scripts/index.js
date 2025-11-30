@@ -275,11 +275,21 @@ function updateSummaryStats(data, currencySymbol) {
         // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
         const numericBalance = toNumber(balance);
         if (Number.isFinite(numericBalance)) {
-            balanceEl.innerHTML = window.FieldRendererService?.renderAmount
+            const htmlContent = window.FieldRendererService?.renderAmount
                 ? window.FieldRendererService.renderAmount(numericBalance, currencySymbol, 2, true)
                 : '<span class="text-muted">לא זמין</span>';
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            balanceEl.textContent = '';
+            while (tempDiv.firstChild) {
+                balanceEl.appendChild(tempDiv.firstChild);
+            }
         } else {
-            balanceEl.innerHTML = '<span class="text-muted">לא זמין</span>';
+            balanceEl.textContent = '';
+            const span = document.createElement('span');
+            span.className = 'text-muted';
+            span.textContent = 'לא זמין';
+            balanceEl.appendChild(span);
         }
     }
 
@@ -289,11 +299,21 @@ function updateSummaryStats(data, currencySymbol) {
         // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
         const numericPnL = toNumber(totalPnL);
         if (Number.isFinite(numericPnL)) {
-            totalPnLEl.innerHTML = window.FieldRendererService?.renderAmount
+            const htmlContent = window.FieldRendererService?.renderAmount
                 ? window.FieldRendererService.renderAmount(numericPnL, currencySymbol, 2, true)
                 : '<span class="text-muted">לא זמין</span>';
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            totalPnLEl.textContent = '';
+            while (tempDiv.firstChild) {
+                totalPnLEl.appendChild(tempDiv.firstChild);
+            }
         } else {
-            totalPnLEl.innerHTML = '<span class="text-muted">לא זמין</span>';
+            totalPnLEl.textContent = '';
+            const span = document.createElement('span');
+            span.className = 'text-muted';
+            span.textContent = 'לא זמין';
+            totalPnLEl.appendChild(span);
         }
     }
 }
@@ -370,7 +390,11 @@ function updateRecentTradePlans(tradePlans = [], currencySymbol) {
     }
 
     if (!Array.isArray(tradePlans) || tradePlans.length === 0) {
-        container.innerHTML = '<div class="text-muted small">אין תוכניות זמינות</div>';
+        container.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'אין תוכניות זמינות';
+        container.appendChild(div);
         return;
     }
 
@@ -432,7 +456,13 @@ function updateRecentTradePlans(tradePlans = [], currencySymbol) {
         if (value !== undefined && value !== null) {
             const numericValue = toNumber(value);
             if (Number.isFinite(numericValue) && window.FieldRendererService?.renderAmount) {
-                amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, true);
+                const htmlContent = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, true);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlContent;
+                amountWrapper.textContent = '';
+                while (tempDiv.firstChild) {
+                    amountWrapper.appendChild(tempDiv.firstChild);
+                }
             } else {
                 amountWrapper.textContent = 'לא זמין';
             }
@@ -444,7 +474,7 @@ function updateRecentTradePlans(tradePlans = [], currencySymbol) {
         list.appendChild(item);
     });
 
-    container.innerHTML = '';
+    container.textContent = '';
     container.appendChild(list);
 }
 
@@ -473,7 +503,11 @@ function updateRecentTrades(trades = [], currencySymbol) {
     }
 
     if (!Array.isArray(trades) || trades.length === 0) {
-        container.innerHTML = '<div class="text-muted small">אין טריידים זמינים</div>';
+        container.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'אין טריידים זמינים';
+        container.appendChild(div);
         return;
     }
 
@@ -520,7 +554,11 @@ function updateRecentTrades(trades = [], currencySymbol) {
             const sideHtml = window.FieldRendererService.renderSide(side);
             if (sideHtml) {
                 const sideSpan = document.createElement('span');
-                sideSpan.innerHTML = sideHtml;
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = sideHtml;
+                while (tempDiv.firstChild) {
+                    sideSpan.appendChild(tempDiv.firstChild);
+                }
                 metaRow.appendChild(sideSpan);
             }
         }
@@ -549,7 +587,13 @@ function updateRecentTrades(trades = [], currencySymbol) {
             // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
             const numericValue = toNumber(value);
             if (Number.isFinite(numericValue) && window.FieldRendererService?.renderAmount) {
-                amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, true);
+                const htmlContent = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, true);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlContent;
+                amountWrapper.textContent = '';
+                while (tempDiv.firstChild) {
+                    amountWrapper.appendChild(tempDiv.firstChild);
+                }
             } else {
                 amountWrapper.textContent = 'לא זמין';
             }
@@ -561,7 +605,7 @@ function updateRecentTrades(trades = [], currencySymbol) {
         list.appendChild(item);
     });
 
-    container.innerHTML = '';
+    container.textContent = '';
     container.appendChild(list);
 }
 
@@ -577,7 +621,11 @@ function updateActiveAlerts(alerts = []) {
     }
 
     if (!Array.isArray(alerts) || alerts.length === 0) {
-        container.innerHTML = '<div class="text-muted small">אין התראות זמינות</div>';
+        container.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'אין התראות זמינות';
+        container.appendChild(div);
         return;
     }
 
@@ -611,7 +659,11 @@ function updateActiveAlerts(alerts = []) {
             const statusHtml = window.FieldRendererService?.renderStatus?.(alert.status, 'alert');
             const statusSpan = document.createElement('span');
             if (statusHtml && statusHtml.includes('<')) {
-                statusSpan.innerHTML = statusHtml;
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = statusHtml;
+                while (tempDiv.firstChild) {
+                    statusSpan.appendChild(tempDiv.firstChild);
+                }
             } else {
                 statusSpan.textContent = statusHtml || alert.status;
             }
@@ -622,7 +674,11 @@ function updateActiveAlerts(alerts = []) {
             const priorityHtml = window.FieldRendererService?.renderPriority?.(alert.priority);
             const prioritySpan = document.createElement('span');
             if (priorityHtml && priorityHtml.includes('<')) {
-                prioritySpan.innerHTML = priorityHtml;
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = priorityHtml;
+                while (tempDiv.firstChild) {
+                    prioritySpan.appendChild(tempDiv.firstChild);
+                }
             } else {
                 prioritySpan.textContent = alert.priority;
             }
@@ -649,7 +705,7 @@ function updateActiveAlerts(alerts = []) {
         list.appendChild(item);
     });
 
-    container.innerHTML = '';
+    container.textContent = '';
     container.appendChild(list);
 }
 
@@ -687,7 +743,11 @@ function updatePortfolioSummary({ accounts = [], trades = [], cashFlows = [] }, 
     }
 
     if (!accounts.length) {
-        container.innerHTML = '<div class="text-muted small">אין נתוני פורטפוליו זמינים</div>';
+        container.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'אין נתוני פורטפוליו זמינים';
+        container.appendChild(div);
         return;
     }
 
@@ -713,15 +773,46 @@ function updatePortfolioSummary({ accounts = [], trades = [], cashFlows = [] }, 
         return '<span class="text-muted">לא זמין</span>';
     };
     
-    container.innerHTML = `
-        <div class="d-flex flex-wrap gap-3 text-muted small">
-            <span>חשבונות פעילים: ${activeAccounts.length.toLocaleString('he-IL')} מתוך ${accounts.length.toLocaleString('he-IL')}</span>
-            <span>שווי כולל: ${renderAmountHelper(totalValue)}</span>
-            <span>שווי ממוצע לחשבון: ${renderAmountHelper(avgValue)}</span>
-            <span>טריידים פתוחים: ${openTrades.length.toLocaleString('he-IL')}</span>
-            <span>P/L כולל: ${renderAmountHelper(pnl)}</span>
-        </div>
-    `;
+    container.textContent = '';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'd-flex flex-wrap gap-3 text-muted small';
+    
+    const span1 = document.createElement('span');
+    span1.textContent = `חשבונות פעילים: ${activeAccounts.length.toLocaleString('he-IL')} מתוך ${accounts.length.toLocaleString('he-IL')}`;
+    wrapper.appendChild(span1);
+    
+    const span2 = document.createElement('span');
+    const totalValueHtml = renderAmountHelper(totalValue);
+    const tempDiv2 = document.createElement('div');
+    tempDiv2.innerHTML = `שווי כולל: ${totalValueHtml}`;
+    while (tempDiv2.firstChild) {
+        span2.appendChild(tempDiv2.firstChild);
+    }
+    wrapper.appendChild(span2);
+    
+    const span3 = document.createElement('span');
+    const avgValueHtml = renderAmountHelper(avgValue);
+    const tempDiv3 = document.createElement('div');
+    tempDiv3.innerHTML = `שווי ממוצע לחשבון: ${avgValueHtml}`;
+    while (tempDiv3.firstChild) {
+        span3.appendChild(tempDiv3.firstChild);
+    }
+    wrapper.appendChild(span3);
+    
+    const span4 = document.createElement('span');
+    span4.textContent = `טריידים פתוחים: ${openTrades.length.toLocaleString('he-IL')}`;
+    wrapper.appendChild(span4);
+    
+    const span5 = document.createElement('span');
+    const pnlHtml = renderAmountHelper(pnl);
+    const tempDiv5 = document.createElement('div');
+    tempDiv5.innerHTML = `P/L כולל: ${pnlHtml}`;
+    while (tempDiv5.firstChild) {
+        span5.appendChild(tempDiv5.firstChild);
+    }
+    wrapper.appendChild(span5);
+    
+    container.appendChild(wrapper);
 }
 
 /**
@@ -733,11 +824,19 @@ function showDashboardError(message) {
     const fallback = message || 'שגיאה בטעינת נתוני הדשבורד';
     const recentContainer = document.getElementById('recentTrades');
     if (recentContainer) {
-        recentContainer.innerHTML = `<div class="text-danger small">${fallback}</div>`;
+        recentContainer.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-danger small';
+        div.textContent = fallback;
+        recentContainer.appendChild(div);
     }
     const alertsContainer = document.getElementById('activeAlerts');
     if (alertsContainer) {
-        alertsContainer.innerHTML = `<div class="text-danger small">${fallback}</div>`;
+        alertsContainer.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-danger small';
+        div.textContent = fallback;
+        alertsContainer.appendChild(div);
     }
     const countEl = document.getElementById('dashboardCount');
     if (countEl) {
@@ -997,7 +1096,11 @@ async function loadRecentTradePlans(currencySymbol, currentTrades = []) {
         } else {
             const container = document.getElementById('recentTradePlans');
             if (container) {
-                container.innerHTML = '<div class="text-muted small">אין תוכניות זמינות</div>';
+                container.textContent = '';
+                const div = document.createElement('div');
+                div.className = 'text-muted small';
+                div.textContent = 'אין תוכניות זמינות';
+                container.appendChild(div);
             }
         }
     }

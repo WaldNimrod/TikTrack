@@ -1,0 +1,1732 @@
+{
+  "page": "history-widget.html",
+  "js_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/history-widget.js",
+  "html_file": null,
+  "categories": {
+    "unified_init": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "section_toggle": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "notifications": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 349,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 349,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 350,
+          "content": "window.NotificationSystem.showError('שגיאה בטעינת גרף P/L',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 874,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 875,
+          "content": "window.NotificationSystem.showInfo('מרענן נתונים...', 'רענון ווידג\\'ט היסטוריה');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 892,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 893,
+          "content": "window.NotificationSystem.showSuccess('נתונים עודכנו', 'ווידג\\'ט היסטוריה');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 906,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 907,
+          "content": "window.NotificationSystem.showError('שגיאה ברענון', 'לא ניתן לרענן את הנתונים');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 977,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 977,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 978,
+          "content": "window.NotificationSystem.showError('שגיאה באתחול ווידג\\'ט',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        }
+      ],
+      "issue_count": 12,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 349,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 349,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 350,
+            "content": "window.NotificationSystem.showError('שגיאה בטעינת גרף P/L',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 874,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 875,
+            "content": "window.NotificationSystem.showInfo('מרענן נתונים...', 'רענון ווידג\\'ט היסטוריה');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 892,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 893,
+            "content": "window.NotificationSystem.showSuccess('נתונים עודכנו', 'ווידג\\'ט היסטוריה');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 906,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 907,
+            "content": "window.NotificationSystem.showError('שגיאה ברענון', 'לא ניתן לרענן את הנתונים');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 977,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 977,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 978,
+            "content": "window.NotificationSystem.showError('שגיאה באתחול ווידג\\'ט',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          }
+        ],
+        "issue_count": 12
+      },
+      "html_result": null
+    },
+    "modals": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "tables": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "field_renderer": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 156,
+          "content": "if (totalValueElement && typeof window.FieldRendererService !== 'undefined') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 157,
+          "content": "totalValueElement.innerHTML = window.FieldRendererService.renderNumericValue(",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 171,
+          "content": "if (changePercentElement && typeof window.FieldRendererService !== 'undefined') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 172,
+          "content": "changePercentElement.innerHTML = window.FieldRendererService.renderNumericValue(",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 402,
+          "content": "if (typeof window.FieldRendererService !== 'undefined') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 403,
+          "content": "plHtml = window.FieldRendererService.renderNumericValue(item.dailyPL, '$', true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 404,
+          "content": "changeHtml = window.FieldRendererService.renderNumericValue(item.change, '$', true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 947,
+          "content": "// Wait for FieldRendererService",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 949,
+          "content": "() => typeof window.FieldRendererService !== 'undefined',",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 950,
+          "content": "'FieldRendererService'",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        }
+      ],
+      "issue_count": 10,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 156,
+            "content": "if (totalValueElement && typeof window.FieldRendererService !== 'undefined') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 157,
+            "content": "totalValueElement.innerHTML = window.FieldRendererService.renderNumericValue(",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 171,
+            "content": "if (changePercentElement && typeof window.FieldRendererService !== 'undefined') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 172,
+            "content": "changePercentElement.innerHTML = window.FieldRendererService.renderNumericValue(",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 402,
+            "content": "if (typeof window.FieldRendererService !== 'undefined') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 403,
+            "content": "plHtml = window.FieldRendererService.renderNumericValue(item.dailyPL, '$', true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 404,
+            "content": "changeHtml = window.FieldRendererService.renderNumericValue(item.change, '$', true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 947,
+            "content": "// Wait for FieldRendererService",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 949,
+            "content": "() => typeof window.FieldRendererService !== 'undefined',",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 950,
+            "content": "'FieldRendererService'",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          }
+        ],
+        "issue_count": 10
+      },
+      "html_result": null
+    },
+    "crud_handler": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "select_populator": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "data_collection": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "icons": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 669,
+          "content": "// Get icon HTML (async for IconSystem)",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 671,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 671,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 674,
+          "content": "iconHtml = await window.IconSystem.renderIcon('button', iconName, { size: '16', alt: text, class: 'i",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 670,
+          "content": "let iconHtml = `<img src=\"${iconPath}\" width=\"16\" height=\"16\" alt=\"${text}\" class=\"icon me-1\">`;",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"${iconPath}\" width=\"16\" height=\"16\" alt=",
+          "file": "js"
+        }
+      ],
+      "issue_count": 5,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 669,
+            "content": "// Get icon HTML (async for IconSystem)",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 671,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 671,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 674,
+            "content": "iconHtml = await window.IconSystem.renderIcon('button', iconName, { size: '16', alt: text, class: 'i",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 670,
+            "content": "let iconHtml = `<img src=\"${iconPath}\" width=\"16\" height=\"16\" alt=\"${text}\" class=\"icon me-1\">`;",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"${iconPath}\" width=\"16\" height=\"16\" alt="
+          }
+        ],
+        "issue_count": 5
+      },
+      "html_result": null
+    },
+    "colors": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "info_summary": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "pagination": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "entity_details": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "conditions": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "page_state": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "logger": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 726,
+          "content": "console.warn('⚠️ [createQuickLinksActionsMenu] window.createActionsMenu not available, using fallbac",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.warn",
+          "file": "js"
+        },
+        {
+          "line": 28,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 29,
+          "content": "window.Logger.info('✅ Header System initialized', { page: 'history-widget' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 32,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 33,
+          "content": "window.Logger.error('Error initializing Header System', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 44,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 45,
+          "content": "window.Logger.error('Error initializing Header System (retry)', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 52,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 53,
+          "content": "window.Logger.warn('HeaderSystem not available after retry', { page: 'history-widget' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 127,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 128,
+          "content": "window.Logger.info('Chart date range selected', { page: 'history-widget', dateRange });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 183,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 184,
+          "content": "window.Logger.info('✅ Chart labels updated', { page: 'history-widget', totalValue, changePercent });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 187,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 188,
+          "content": "window.Logger.error('Error updating chart labels', { page: 'history-widget', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 253,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 254,
+          "content": "window.Logger.warn('Weekly P/L chart container not found', { page: 'history-widget' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 261,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 262,
+          "content": "window.Logger.warn('TradingViewChartAdapter not available, retrying...', { page: 'history-widget' })",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 344,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 345,
+          "content": "window.Logger.info('✅ P/L chart initialized', { page: 'history-widget', dateRange: currentChartDateR",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 352,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 353,
+          "content": "window.Logger.error('Error initializing P/L chart', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 429,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 430,
+          "content": "window.Logger.info('✅ Daily stats updated', { page: 'history-widget' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 433,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 434,
+          "content": "window.Logger.error('Error updating daily stats', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 506,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 507,
+          "content": "window.Logger.info('✅ P/L stats updated', { page: 'history-widget' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 510,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 511,
+          "content": "window.Logger.error('Error updating P/L stats', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 571,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 572,
+          "content": "window.Logger.info('✅ Market value stats updated', { page: 'history-widget' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 575,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 576,
+          "content": "window.Logger.error('Error updating market value stats', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 594,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 595,
+          "content": "window.Logger.warn('Tabs elements not found', { page: 'history-widget' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 635,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 636,
+          "content": "window.Logger.info('✅ Tabs initialized', { page: 'history-widget' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 639,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 640,
+          "content": "window.Logger.error('Error initializing tabs', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 795,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 796,
+          "content": "window.Logger.warn('Quick links container not found', { page: 'history-widget' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 849,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 850,
+          "content": "window.Logger.info('✅ Quick links actions menu setup completed', { page: 'history-widget' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 853,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 854,
+          "content": "window.Logger.error('Error setting up quick links', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 896,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 897,
+          "content": "window.Logger.info('✅ Widget refreshed', { page: 'history-widget' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 900,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 901,
+          "content": "window.Logger.error('Error refreshing widget', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 972,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 973,
+          "content": "window.Logger.info('✅ All widgets initialized', { page: 'history-widget' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 980,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 981,
+          "content": "window.Logger.error('Error initializing widgets', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 999,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1000,
+          "content": "window.Logger.warn('Preferences initialization failed (non-critical)', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        }
+      ],
+      "issue_count": 57,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 726,
+            "content": "console.warn('⚠️ [createQuickLinksActionsMenu] window.createActionsMenu not available, using fallbac",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.warn"
+          },
+          {
+            "line": 28,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 29,
+            "content": "window.Logger.info('✅ Header System initialized', { page: 'history-widget' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 32,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 33,
+            "content": "window.Logger.error('Error initializing Header System', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 44,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 45,
+            "content": "window.Logger.error('Error initializing Header System (retry)', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 52,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 53,
+            "content": "window.Logger.warn('HeaderSystem not available after retry', { page: 'history-widget' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 127,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 128,
+            "content": "window.Logger.info('Chart date range selected', { page: 'history-widget', dateRange });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 183,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 184,
+            "content": "window.Logger.info('✅ Chart labels updated', { page: 'history-widget', totalValue, changePercent });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 187,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 188,
+            "content": "window.Logger.error('Error updating chart labels', { page: 'history-widget', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 253,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 254,
+            "content": "window.Logger.warn('Weekly P/L chart container not found', { page: 'history-widget' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 261,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 262,
+            "content": "window.Logger.warn('TradingViewChartAdapter not available, retrying...', { page: 'history-widget' })",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 344,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 345,
+            "content": "window.Logger.info('✅ P/L chart initialized', { page: 'history-widget', dateRange: currentChartDateR",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 352,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 353,
+            "content": "window.Logger.error('Error initializing P/L chart', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 429,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 430,
+            "content": "window.Logger.info('✅ Daily stats updated', { page: 'history-widget' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 433,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 434,
+            "content": "window.Logger.error('Error updating daily stats', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 506,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 507,
+            "content": "window.Logger.info('✅ P/L stats updated', { page: 'history-widget' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 510,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 511,
+            "content": "window.Logger.error('Error updating P/L stats', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 571,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 572,
+            "content": "window.Logger.info('✅ Market value stats updated', { page: 'history-widget' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 575,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 576,
+            "content": "window.Logger.error('Error updating market value stats', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 594,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 595,
+            "content": "window.Logger.warn('Tabs elements not found', { page: 'history-widget' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 635,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 636,
+            "content": "window.Logger.info('✅ Tabs initialized', { page: 'history-widget' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 639,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 640,
+            "content": "window.Logger.error('Error initializing tabs', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 795,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 796,
+            "content": "window.Logger.warn('Quick links container not found', { page: 'history-widget' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 849,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 850,
+            "content": "window.Logger.info('✅ Quick links actions menu setup completed', { page: 'history-widget' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 853,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 854,
+            "content": "window.Logger.error('Error setting up quick links', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 896,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 897,
+            "content": "window.Logger.info('✅ Widget refreshed', { page: 'history-widget' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 900,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 901,
+            "content": "window.Logger.error('Error refreshing widget', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 972,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 973,
+            "content": "window.Logger.info('✅ All widgets initialized', { page: 'history-widget' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 980,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 981,
+            "content": "window.Logger.error('Error initializing widgets', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 999,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1000,
+            "content": "window.Logger.warn('Preferences initialization failed (non-critical)', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          }
+        ],
+        "issue_count": 57
+      },
+      "html_result": null
+    },
+    "cache": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "dom_manipulation": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 157,
+          "content": "totalValueElement.innerHTML = window.FieldRendererService.renderNumericValue(",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 172,
+          "content": "changePercentElement.innerHTML = window.FieldRendererService.renderNumericValue(",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 361,
+          "content": "container.innerHTML = '<div class=\"text-muted text-center p-3\">שגיאה בטעינת הגרף</div>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 387,
+          "content": "tbody.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 394,
+          "content": "instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class=\"text-muted small\">",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 416,
+          "content": "plChangeCell.innerHTML = `<div>${plHtml}</div><div class=\"small\">${changeHtml}</div>`;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 423,
+          "content": "lastPriceCell.innerHTML = `<div class=\"${priceColor}\"><strong>${item.lastPrice.toFixed(2)}</strong><",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 474,
+          "content": "tbody.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 481,
+          "content": "instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class=\"text-muted small\">",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 490,
+          "content": "plMktValCell.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 500,
+          "content": "lastPriceCell.innerHTML = `<div class=\"${priceColor}\"><strong>${item.lastPrice.toFixed(2)}</strong><",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 540,
+          "content": "tbody.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 547,
+          "content": "instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class=\"text-muted small\">",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 555,
+          "content": "mktValPositionCell.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 565,
+          "content": "lastPriceCell.innerHTML = `<div class=\"${priceColor}\"><strong>${item.lastPrice.toFixed(2)}</strong><",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 696,
+          "content": "tempDiv.innerHTML = menuHtml;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 702,
+          "content": "menuButtons[index].innerHTML = `${button._iconHtml} ${button._text}`;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 835,
+          "content": "container.innerHTML = actionsMenuHTML;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 390,
+          "content": "const row = document.createElement('tr');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 393,
+          "content": "const instrumentCell = document.createElement('td');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 398,
+          "content": "const plChangeCell = document.createElement('td');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 420,
+          "content": "const lastPriceCell = document.createElement('td');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 477,
+          "content": "const row = document.createElement('tr');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 480,
+          "content": "const instrumentCell = document.createElement('td');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 485,
+          "content": "const plMktValCell = document.createElement('td');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 497,
+          "content": "const lastPriceCell = document.createElement('td');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 543,
+          "content": "const row = document.createElement('tr');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 546,
+          "content": "const instrumentCell = document.createElement('td');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 551,
+          "content": "const mktValPositionCell = document.createElement('td');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 562,
+          "content": "const lastPriceCell = document.createElement('td');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 695,
+          "content": "const tempDiv = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        }
+      ],
+      "issue_count": 31,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 157,
+            "content": "totalValueElement.innerHTML = window.FieldRendererService.renderNumericValue(",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 172,
+            "content": "changePercentElement.innerHTML = window.FieldRendererService.renderNumericValue(",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 361,
+            "content": "container.innerHTML = '<div class=\"text-muted text-center p-3\">שגיאה בטעינת הגרף</div>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 387,
+            "content": "tbody.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 394,
+            "content": "instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class=\"text-muted small\">",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 416,
+            "content": "plChangeCell.innerHTML = `<div>${plHtml}</div><div class=\"small\">${changeHtml}</div>`;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 423,
+            "content": "lastPriceCell.innerHTML = `<div class=\"${priceColor}\"><strong>${item.lastPrice.toFixed(2)}</strong><",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 474,
+            "content": "tbody.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 481,
+            "content": "instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class=\"text-muted small\">",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 490,
+            "content": "plMktValCell.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 500,
+            "content": "lastPriceCell.innerHTML = `<div class=\"${priceColor}\"><strong>${item.lastPrice.toFixed(2)}</strong><",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 540,
+            "content": "tbody.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 547,
+            "content": "instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class=\"text-muted small\">",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 555,
+            "content": "mktValPositionCell.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 565,
+            "content": "lastPriceCell.innerHTML = `<div class=\"${priceColor}\"><strong>${item.lastPrice.toFixed(2)}</strong><",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 696,
+            "content": "tempDiv.innerHTML = menuHtml;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 702,
+            "content": "menuButtons[index].innerHTML = `${button._iconHtml} ${button._text}`;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 835,
+            "content": "container.innerHTML = actionsMenuHTML;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 390,
+            "content": "const row = document.createElement('tr');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 393,
+            "content": "const instrumentCell = document.createElement('td');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 398,
+            "content": "const plChangeCell = document.createElement('td');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 420,
+            "content": "const lastPriceCell = document.createElement('td');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 477,
+            "content": "const row = document.createElement('tr');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 480,
+            "content": "const instrumentCell = document.createElement('td');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 485,
+            "content": "const plMktValCell = document.createElement('td');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 497,
+            "content": "const lastPriceCell = document.createElement('td');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 543,
+            "content": "const row = document.createElement('tr');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 546,
+            "content": "const instrumentCell = document.createElement('td');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 551,
+            "content": "const mktValPositionCell = document.createElement('td');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 562,
+            "content": "const lastPriceCell = document.createElement('td');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 695,
+            "content": "const tempDiv = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          }
+        ],
+        "issue_count": 31
+      },
+      "html_result": null
+    },
+    "html_structure": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    }
+  }
+}

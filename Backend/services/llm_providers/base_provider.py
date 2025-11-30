@@ -82,3 +82,4 @@ class BaseLLMProvider(ABC):
             'error_type': type(error).__name__
         }
 
+

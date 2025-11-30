@@ -1007,7 +1007,12 @@ class NotificationsCenter {
       const uniquePages = [...new Set(this.history.map(n => n.page).filter(page => page))];
       
       // ניקוי אפשרויות קיימות (למעט "כל העמודים")
-      pageFilterSelect.innerHTML = '<option value="">כל העמודים</option>';
+      pageFilterSelect.innerHTML.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = '\'<option value="">כל העמודים</option>\'';
+        while (tempDiv.firstChild) {
+            pageFilterSelect.innerHTML.appendChild(tempDiv.firstChild);
+        }
       
       // הוספת עמודים ייחודיים
       uniquePages.sort().forEach(page => {

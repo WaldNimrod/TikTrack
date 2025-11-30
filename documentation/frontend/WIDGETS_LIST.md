@@ -1,6 +1,6 @@
 # רשימת ווידג'טים במערכת - TikTrack
 
-**תאריך עדכון:** 21 ינואר 2025  
+**תאריך עדכון:** 29 ינואר 2025  
 **גרסה:** 1.0.0  
 **מטרה:** רשימה מרכזית של כל הווידג'טים במערכת עם מיקומי קבצים, דוקומנטציה וסטטוס
 
@@ -23,12 +23,13 @@
 
 | שם ווידג'ט | קובץ(ים) עיקריים | דוקומנטציה | סטטוס | הערות |
 |------------|-------------------|-------------|-------|-------|
-| **Recent Items Widget (מאוחד)** | `trading-ui/scripts/widgets/recent-items-widget.js`<br>`trading-ui/styles-new/06-components/_recent-items-widget.css` | - | ✅ פעיל | ווידג'ט מאוחד: טריידים אחרונים + תוכניות אחרונות עם Bootstrap Tabs |
+| **Recent Items Widget (מאוחד)** | `trading-ui/scripts/widgets/recent-items-widget.js`<br>`trading-ui/styles-new/06-components/_recent-items-widget.css` | [RECENT_ITEMS_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/RECENT_ITEMS_WIDGET_DEVELOPER_GUIDE.md) | ✅ פעיל | ווידג'ט מאוחד: טריידים אחרונים + תוכניות אחרונות עם Bootstrap Tabs |
 | **Recent Trades Widget** | `trading-ui/scripts/widgets/recent-trades-widget.js` | - | ⚠️ Deprecated | הוחלף ב-Recent Items Widget |
 | **Recent Trade Plans Widget** | `trading-ui/scripts/widgets/recent-trade-plans-widget.js` | - | ⚠️ Deprecated | הוחלף ב-Recent Items Widget |
-| **Pending Executions Highlights Widget** | `trading-ui/scripts/pending-executions-widget.js` | - | ✅ פעיל | המלצות שיוך בולטות לביצועים |
-| **Pending Execution Trade Creation Widget** | `trading-ui/scripts/pending-execution-trade-creation.js` | - | ✅ פעיל | ממשק יצירת טרייד מביצועים |
-| **Pending Trade Plan Widget** | `trading-ui/scripts/pending-trade-plan-widget.js` | [PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md) | ✅ פעיל | ווידג'ט שיוך/יצירת תוכניות מתוך טריידים |
+| **Unified Pending Actions Widget (מאוחד)** | `trading-ui/scripts/widgets/unified-pending-actions-widget.js`<br>`trading-ui/styles-new/06-components/_unified-pending-actions-widget.css` | [UNIFIED_PENDING_ACTIONS_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/UNIFIED_PENDING_ACTIONS_WIDGET_DEVELOPER_GUIDE.md) | ✅ פעיל | ווידג'ט מאוחד: שיוך ויצירת טריידים ותוכניות מרשומות ביצוע (nested tabs) |
+| **Pending Executions Highlights Widget** | `trading-ui/scripts/pending-executions-widget.js` | - | ⚠️ Deprecated | הוחלף ב-Unified Pending Actions Widget |
+| **Pending Execution Trade Creation Widget** | `trading-ui/scripts/pending-execution-trade-creation.js` | - | ⚠️ Deprecated | הוחלף ב-Unified Pending Actions Widget |
+| **Pending Trade Plan Widget** | `trading-ui/scripts/pending-trade-plan-widget.js` | [PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md) | ⚠️ Deprecated | הוחלף ב-Unified Pending Actions Widget |
 | **Active Alerts Component** | `trading-ui/scripts/active-alerts-component.js` | [ACTIVE_ALERTS_COMPONENT.md](ACTIVE_ALERTS_COMPONENT.md) | ✅ פעיל | קומפוננטת התראות פעילות (Web Component) |
 | **Tag Widget (מאוחד)** | `trading-ui/scripts/widgets/tag-widget.js`<br>`trading-ui/styles-new/06-components/_tag-widget.css` | [TAG_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TAG_WIDGET_DEVELOPER_GUIDE.md) | ✅ פעיל | ענן תגיות + חיפוש מהיר עם Bootstrap Tabs |
 
@@ -96,6 +97,8 @@
 ### מדריכים ספציפיים
 
 - **Tag Widget:** [TAG_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TAG_WIDGET_DEVELOPER_GUIDE.md)
+- **Recent Items Widget:** [RECENT_ITEMS_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/RECENT_ITEMS_WIDGET_DEVELOPER_GUIDE.md)
+- **Unified Pending Actions Widget:** [UNIFIED_PENDING_ACTIONS_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/UNIFIED_PENDING_ACTIONS_WIDGET_DEVELOPER_GUIDE.md)
 - **Pending Trade Plan Widget:** [PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md)
 - **History Widget:** [HISTORY_WIDGET_DEVELOPER_GUIDE.md](HISTORY_WIDGET_DEVELOPER_GUIDE.md)
 - **Emotional Tracking Widget:** [EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md](EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md)
@@ -165,6 +168,13 @@
 
 ## 🔄 עדכונים אחרונים
 
+**29 ינואר 2025:**
+- ✅ סטנדרטיזציה מלאה של 3 ווידג'טים לדף הבית
+- ✅ יצירת תעוד מפתח ל-Recent Items Widget
+- ✅ יצירת תעוד מפתח ל-Unified Pending Actions Widget
+- ✅ עדכון תעוד Tag Widget
+- ✅ יצירת דוח פערים ובעיות
+
 **21 ינואר 2025:**
 - ✅ נוסף Tag Widget מאוחד (ענן + חיפוש)
 - ✅ הועבר מ-tag-search-controller לווידג'ט מאוחד
@@ -192,5 +202,5 @@
 ---
 
 **מקור:** `documentation/frontend/WIDGETS_LIST.md`  
-**עודכן:** 21 ינואר 2025
+**עודכן:** 29 ינואר 2025
 

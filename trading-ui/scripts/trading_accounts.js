@@ -713,7 +713,14 @@ function updateTradingAccountsTable(trading_accounts) {
     }
 
     if (trading_accounts.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין חשבונות מסחר להצגה</td></tr>';
+      tbody.textContent = '';
+      const emptyRow = document.createElement('tr');
+      const emptyCell = document.createElement('td');
+      emptyCell.colSpan = 8;
+      emptyCell.className = 'text-center';
+      emptyCell.textContent = 'אין חשבונות מסחר להצגה';
+      emptyRow.appendChild(emptyCell);
+      tbody.appendChild(emptyRow);
       const countElement = document.getElementById('accountsCount');
       // Update count using generic function
       if (window.updateTableCount) {
@@ -730,7 +737,9 @@ function updateTradingAccountsTable(trading_accounts) {
       return;
     }
 
-    tbody.innerHTML = trading_accounts.map(tradingAccount => {
+    // Build table rows using tempDiv for complex HTML
+    tbody.textContent = '';
+    const tableRowsHTML = trading_accounts.map(tradingAccount => {
       const balanceValue = typeof tradingAccount.cash_balance === 'number' ? tradingAccount.cash_balance : 0;
       const currencySymbol = getCurrencySymbol(tradingAccount.base_currency_symbol || tradingAccount.currency_symbol || tradingAccount.currency || '$');
 
@@ -866,6 +875,15 @@ function updateTradingAccountsTable(trading_accounts) {
       `;
     }).join('');
 
+    // Insert rows using tempDiv
+    if (tableRowsHTML) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = tableRowsHTML;
+      while (tempDiv.firstChild) {
+        tbody.appendChild(tempDiv.firstChild);
+      }
+    }
+
     // עדכון מונה הטבלה - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
     const countElement = document.getElementById('accountsCount');
     if (window.updateTableCount) {
@@ -894,7 +912,15 @@ function updateTradingAccountsTable(trading_accounts) {
     }
     const tbody = document.querySelector('#accountsTable tbody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #dc3545;">⚠️ שגיאה בעדכון הטבלה: ${error.message}</td></tr>`;
+      tbody.textContent = '';
+      const errorRow = document.createElement('tr');
+      const errorCell = document.createElement('td');
+      errorCell.colSpan = 8;
+      errorCell.className = 'text-center';
+      errorCell.style.color = '#dc3545';
+      errorCell.textContent = `⚠️ שגיאה בעדכון הטבלה: ${error.message}`;
+      errorRow.appendChild(errorCell);
+      tbody.appendChild(errorRow);
     }
   } finally {
     isUpdatingTradingAccountsTable = false;
@@ -1102,16 +1128,20 @@ window.updateTradingAccountFilterMenuDirectly = function (trading_accounts) {
   }
 
   // ניקוי התפריט הקיים
-  tradingAccountMenu.innerHTML = '';
+  tradingAccountMenu.textContent = '';
 
   // הוספת אופציית "כל החשבונות"
   const allTradingAccountsItem = document.createElement('div');
   allTradingAccountsItem.className = 'trading-account-filter-item selected';
   allTradingAccountsItem.setAttribute('data-account', 'all');
-  allTradingAccountsItem.innerHTML = `
-    <span class="option-text">כל החשבונות</span>
-    <span class="check-mark">✓</span>
-  `;
+      const optionText = document.createElement('span');
+      optionText.className = 'option-text';
+      optionText.textContent = 'כל החשבונות';
+      allTradingAccountsItem.appendChild(optionText);
+      const checkMark = document.createElement('span');
+      checkMark.className = 'check-mark';
+      checkMark.textContent = '✓';
+      allTradingAccountsItem.appendChild(checkMark);
   tradingAccountMenu.appendChild(allTradingAccountsItem);
 
   // הוספת החשבונות מהשרת
@@ -1120,10 +1150,14 @@ window.updateTradingAccountFilterMenuDirectly = function (trading_accounts) {
       const tradingAccountItem = document.createElement('div');
       tradingAccountItem.className = 'trading-account-filter-item';
       tradingAccountItem.setAttribute('data-account', tradingAccount.id || tradingAccount.name);
-      tradingAccountItem.innerHTML = `
-        <span class="option-text">${tradingAccount.name || tradingAccount.account_name || 'Unknown'}</span>
-        <span class="check-mark">✓</span>
-      `;
+      const optionText = document.createElement('span');
+      optionText.className = 'option-text';
+      optionText.textContent = tradingAccount.name || tradingAccount.account_name || 'Unknown';
+      tradingAccountItem.appendChild(optionText);
+      const checkMark = document.createElement('span');
+      checkMark.className = 'check-mark';
+      checkMark.textContent = '✓';
+      tradingAccountItem.appendChild(checkMark);
       tradingAccountMenu.appendChild(tradingAccountItem);
     });
   }
@@ -1669,16 +1703,20 @@ function updateTradingAccountFilterMenu(trading_accounts) {
   }
 
   // ניקוי התפריט הקיים
-  tradingAccountMenu.innerHTML = '';
+  tradingAccountMenu.textContent = '';
 
   // הוספת אופציית "כל החשבונות"
   const allTradingAccountsItem = document.createElement('div');
   allTradingAccountsItem.className = 'trading-account-filter-item selected';
   allTradingAccountsItem.setAttribute('data-account', 'all');
-  allTradingAccountsItem.innerHTML = `
-    <span class="option-text">כל החשבונות</span>
-    <span class="check-mark">✓</span>
-  `;
+      const optionText = document.createElement('span');
+      optionText.className = 'option-text';
+      optionText.textContent = 'כל החשבונות';
+      allTradingAccountsItem.appendChild(optionText);
+      const checkMark = document.createElement('span');
+      checkMark.className = 'check-mark';
+      checkMark.textContent = '✓';
+      allTradingAccountsItem.appendChild(checkMark);
   tradingAccountMenu.appendChild(allTradingAccountsItem);
 
   // הוספת החשבונות מהשרת
@@ -1687,10 +1725,14 @@ function updateTradingAccountFilterMenu(trading_accounts) {
       const tradingAccountItem = document.createElement('div');
       tradingAccountItem.className = 'trading-account-filter-item';
       tradingAccountItem.setAttribute('data-account', tradingAccount.id || tradingAccount.name);
-      tradingAccountItem.innerHTML = `
-        <span class="option-text">${tradingAccount.name || tradingAccount.account_name || 'Unknown'}</span>
-        <span class="check-mark">✓</span>
-      `;
+      const optionText = document.createElement('span');
+      optionText.className = 'option-text';
+      optionText.textContent = tradingAccount.name || tradingAccount.account_name || 'Unknown';
+      tradingAccountItem.appendChild(optionText);
+      const checkMark = document.createElement('span');
+      checkMark.className = 'check-mark';
+      checkMark.textContent = '✓';
+      tradingAccountItem.appendChild(checkMark);
       tradingAccountMenu.appendChild(tradingAccountItem);
     });
   }

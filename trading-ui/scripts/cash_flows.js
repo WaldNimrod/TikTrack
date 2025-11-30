@@ -2125,7 +2125,11 @@ function setCurrencyExchangeSummary(summary) {
   if (!container) return;
 
   if (!summary || !window.FieldRendererService || typeof window.FieldRendererService.renderExchangePairCards !== 'function') {
-    container.innerHTML = '<div class="text-muted small">הצמד יוצג לאחר שמירה.</div>';
+    container.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'הצמד יוצג לאחר שמירה.';
+        container.innerHTML.appendChild(div);
     return;
   }
 
@@ -2152,13 +2156,21 @@ function hydrateCashFlowExchangeDisplay(cashFlowId) {
   if (!container) return;
 
   if (!window.FieldRendererService || typeof window.FieldRendererService.renderExchangePairCards !== 'function') {
-    container.innerHTML = '<div class="text-muted small">הצמד יוצג לאחר שמירה.</div>';
+    container.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'הצמד יוצג לאחר שמירה.';
+        container.innerHTML.appendChild(div);
     return;
   }
 
   const numericId = Number(cashFlowId);
   if (!Number.isFinite(numericId)) {
-    container.innerHTML = '<div class="text-muted small">תזרים זה אינו חלק מהמרת מטבע.</div>';
+    container.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'תזרים זה אינו חלק מהמרת מטבע.';
+        container.innerHTML.appendChild(div);
     return;
   }
 
@@ -2167,7 +2179,11 @@ function hydrateCashFlowExchangeDisplay(cashFlowId) {
     : null;
 
   if (!record || !record.exchange_pair_summary) {
-    container.innerHTML = '<div class="text-muted small">תזרים זה אינו חלק מהמרת מטבע.</div>';
+    container.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'תזרים זה אינו חלק מהמרת מטבע.';
+        container.innerHTML.appendChild(div);
     return;
   }
 

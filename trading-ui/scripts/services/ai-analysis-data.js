@@ -774,6 +774,56 @@
     }
   }
 
+  /**
+   * Delete all AI analysis records
+   * @returns {Promise<Object>} - Result with deleted_count
+   */
+  async function deleteAllAnalyses() {
+    try {
+      const apiUrl = buildUrl('/api/ai-analysis/delete-all');
+      
+      window.Logger?.info?.('🗑️ Deleting all analyses...', PAGE_LOG_CONTEXT);
+      
+      const response = await fetch(apiUrl, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || errorData.error?.message || `HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.status === 'success') {
+        window.Logger?.info?.('✅ All analyses deleted successfully', {
+          ...PAGE_LOG_CONTEXT,
+          deletedCount: result.deleted_count || 0
+        });
+        
+        // Clear cache for AI analysis history
+        await invalidateCache('ai-analysis-history');
+        if (window.UnifiedCacheManager) {
+          await window.UnifiedCacheManager.clearByPattern('ai-analysis-*');
+        }
+        
+        return result;
+      } else {
+        throw new Error(result.message || 'Failed to delete analyses');
+      }
+    } catch (error) {
+      window.Logger?.error?.('❌ Error deleting all analyses', {
+        ...PAGE_LOG_CONTEXT,
+        error: error?.message || error,
+      });
+      throw error;
+    }
+  }
+
   // Expose to global scope
   window.AIAnalysisData = {
     loadTemplates,
@@ -787,6 +837,7 @@
     exportToHTML,
     validateAnalysisRequest,
     validateVariables,
+    deleteAllAnalyses,
   };
 
   window.Logger?.info?.('✅ AI Analysis Data Service loaded', PAGE_LOG_CONTEXT);

@@ -2,7 +2,8 @@
 ## Unified Initialization System
 
 **תאריך יצירה:** 24 בנובמבר 2025  
-**גרסה:** 2.0.0  
+**גרסה:** 1.5.0  
+**עודכן:** 30 בנובמבר 2025  
 **סטטוס:** ✅ פעיל ומתועד  
 **נקודת כניסה:** `trading-ui/scripts/modules/core-systems.js`
 
@@ -211,9 +212,9 @@ class UnifiedAppInitializer {
 | # | ID | שם | loadOrder | תלויות | סקריפטים |
 |---|----|----|-----------|--------|----------|
 | 1 | `base` | Base Package | 1 | - | 25 scripts |
-| 2 | `services` | Services Package | 2 | base | 17 scripts |
-| 3 | `ui-advanced` | UI Advanced Package | 3 | base, services | 5 scripts |
-| 4 | `modules` | Modules Package | 3.5 | base, services | 25 scripts |
+| 2 | `services` | Services Package | 2 | base | 19 scripts |
+| 2.5 | `modules` | Modules Package | 2.5 | base, services | 26 scripts |
+| 3 | `ui-advanced` | UI Advanced Package | 3 | base, services, modules | 5 scripts |
 | 5 | `crud` | CRUD Operations Package | 4 | base, services | 3 scripts |
 | 6 | `tag-management` | Tag Management Package | 4.2 | base, services, modules, ui-advanced, crud, preferences | 1 script |
 | 7 | `preferences` | Preferences Package | 5 | base, services | 10 scripts |
@@ -223,7 +224,7 @@ class UnifiedAppInitializer {
 | 11 | `charts` | Charts Package | 8 | base, services | 7 scripts |
 | 12 | `logs` | Logs Package | 9 | base, services | 3 scripts |
 | 13 | `cache` | Cache Package | 9 | base, services | 2 scripts |
-| 14 | `entity-services` | Entity Services Package | 10 | base, services | 18 scripts |
+| 14 | `entity-services` | Entity Services Package | 10 | base, services | 19 scripts |
 | 15 | `helper` | Helper Package | 11 | base, services | 6 scripts |
 | 16 | `system-management` | System Management Package | 12 | base, services | 12 scripts |
 | 17 | `management` | Management Package | 13 | base, services | 2 scripts |
@@ -251,6 +252,54 @@ class UnifiedAppInitializer {
 
 **גודל משוער:** ~280KB  
 **זמן איתחול:** ~150ms
+
+---
+
+### Services Package
+
+**תפקיד:** שירותים כלליים למערכת
+
+**סקריפטים מרכזיים:**
+- `services/field-renderer-service.js` - רינדור שדות
+- `services/crud-response-handler.js` - טיפול בתגובות CRUD
+- `https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js` - **jsPDF library** (נדרש ל-AI analysis PDF export)
+- `services/ai-analysis-data.js` - **AI Analysis data service** (נדרש לעמודי AI analysis)
+- `services/preferences-data.js` - שירות העדפות
+- `services/statistics-calculator.js` - מחשבון סטטיסטיקות
+
+**גודל משוער:** ~180KB  
+**זמן איתחול:** ~100ms
+
+---
+
+### Modules Package
+
+**תפקיד:** מודולים כלליים למערכת
+
+**סקריפטים מרכזיים:**
+- `modal-navigation-manager.js` - ניהול ניווט מודלים
+- `modal-z-index-manager.js` - **ניהול z-index דינמי למודלים מקוננים**
+- `modal-manager-v2.js` - מנהל מודלים V2
+- `tag-ui-manager.js` - ניהול תגיות UI
+
+**גודל משוער:** ~250KB  
+**זמן איתחול:** ~140ms
+
+---
+
+### Entity Services Package
+
+**תפקיד:** שירותי ישויות
+
+**סקריפטים מרכזיים:**
+- `services/trades-data.js` - שירות נתוני טריידים
+- `services/trade-plans-data.js` - **שירות נתוני תכניות מסחר**
+- `services/notes-data.js` - שירות נתוני הערות
+- `services/alerts-data.js` - שירות נתוני התראות
+- `account-service.js` - שירות חשבונות
+
+**גודל משוער:** ~180KB  
+**זמן איתחול:** ~110ms
 
 ---
 
@@ -337,9 +386,9 @@ Packages נטענים לפי `loadOrder`:
 
 1. **Base** (loadOrder: 1) - חובה לכל עמוד
 2. **Services** (loadOrder: 2) - תלוי ב-base
-3. **UI-Advanced** (loadOrder: 3) - תלוי ב-base, services
-4. **Modules** (loadOrder: 3.5) - תלוי ב-base, services
-5. **CRUD** (loadOrder: 4) - תלוי ב-base, services
+2.5. **Modules** (loadOrder: 2.5) - תלוי ב-base, services (נטען לפני ui-advanced כי tables.js משתמש ב-ModalManagerV2)
+3. **UI-Advanced** (loadOrder: 3) - תלוי ב-base, services, modules
+4. **CRUD** (loadOrder: 4) - תלוי ב-base, services
 6. **Preferences** (loadOrder: 5) - תלוי ב-base, services
 7. ... (כל החבילות לפי loadOrder)
 
@@ -352,8 +401,8 @@ Packages נטענים לפי `loadOrder`:
 ```
 base (1)
 ├── services (2)
-│   ├── ui-advanced (3)
-│   ├── modules (3.5)
+│   ├── modules (2.5)
+│   │   └── ui-advanced (3) [תלוי גם ב-modules]
 │   ├── crud (4)
 │   ├── preferences (5)
 │   ├── external-data (7)

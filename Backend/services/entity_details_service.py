@@ -526,6 +526,24 @@ class EntityDetailsService:
                             except Exception as atr_error:
                                 logger.warning(f"Error calculating ATR for ticker {entity.ticker.id}: {atr_error}")
                         
+                        # Calculate 52W range
+                        try:
+                            from services.external_data.week52_calculator import Week52Calculator
+                            
+                            week52_calculator = Week52Calculator(db)
+                            week52_result = week52_calculator.calculate_52w_range(
+                                ticker_id=entity.ticker.id,
+                                db_session=db
+                            )
+                            
+                            if week52_result:
+                                entity_dict['ticker']['week52_high'] = week52_result.high
+                                entity_dict['ticker']['week52_low'] = week52_result.low
+                                if week52_result.warnings:
+                                    entity_dict['ticker']['week52_warnings'] = week52_result.warnings
+                        except Exception as week52_error:
+                            logger.warning(f"Error calculating 52W range for ticker {entity.ticker.id}: {week52_error}")
+                        
                         logger.debug(f"Added market data to ticker {entity.ticker.id} for {entity_type} {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%, change_from_open={latest_quote.change_pct_from_open}%, ATR={entity_dict['ticker'].get('atr')}")
                     else:
                         logger.debug(f"No market data found for ticker {entity.ticker.id} in {entity_type} {entity_id}")

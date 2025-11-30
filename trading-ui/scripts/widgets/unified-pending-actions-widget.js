@@ -478,10 +478,10 @@
     
     elements.title = elements.container.querySelector('#unifiedPendingActionsWidgetTitle');
     elements.badge = elements.container.querySelector('#unifiedPendingActionsWidgetBadge');
-    elements.actionTabs = elements.container.querySelector('#unifiedPendingActionsActionTabs');
+    // All tabs are now in a single row
+    elements.allTabs = elements.container.querySelector('#unifiedPendingActionsAllTabs');
     elements.actionTabAssign = elements.container.querySelector('#actionTabAssign');
     elements.actionTabCreate = elements.container.querySelector('#actionTabCreate');
-    elements.entityTabs = elements.container.querySelector('#unifiedPendingActionsEntityTabs');
     elements.entityTabPlans = elements.container.querySelector('#entityTabPlans');
     elements.entityTabTrades = elements.container.querySelector('#entityTabTrades');
     
@@ -698,8 +698,33 @@
   async function updateCount(combination, count) {
     const countEl = elements.count[combination];
     if (countEl) {
-      countEl.textContent = String(count);
-      countEl.classList.toggle('d-none', count === 0);
+      // Display 4 data points per pair with title
+      const isAssign = combination.startsWith('assign');
+      const isPlans = combination.endsWith('Plans');
+      const title = isAssign ? 'שיוך' : 'חדש';
+      const entityLabel = isPlans ? 'תוכניות' : 'טריידים';
+      
+      // Get counts for the pair
+      const pairCount = isPlans 
+        ? (isAssign ? (await getDataForCombination('assignPlans')).length : (await getDataForCombination('createPlans')).length)
+        : (isAssign ? (await getDataForCombination('assignTrades')).length : (await getDataForCombination('createTrades')).length);
+      
+      // Display: [title] [entity] [count]
+      countEl.innerHTML = `<span class="unified-count-title">${title}</span> <span class="unified-count-entity">${entityLabel}</span> <span class="unified-count-value">${pairCount}</span>`;
+      countEl.classList.toggle('d-none', pairCount === 0);
+      
+      // Apply color based on tab type
+      countEl.classList.remove('unified-count-assign', 'unified-count-create', 'unified-count-entity-primary', 'unified-count-entity-secondary');
+      if (isAssign) {
+        countEl.classList.add('unified-count-assign'); // Secondary color
+      } else {
+        countEl.classList.add('unified-count-create'); // Secondary color
+      }
+      if (isPlans) {
+        countEl.classList.add('unified-count-entity-primary'); // Primary color for plans
+      } else {
+        countEl.classList.add('unified-count-entity-secondary'); // Secondary color for trades
+      }
     }
     
     // Update total badge
@@ -715,13 +740,11 @@
   }
   
   function hideAllTabs() {
-    if (elements.actionTabs) elements.actionTabs.style.display = 'none';
-    if (elements.entityTabs) elements.entityTabs.style.display = 'none';
+    if (elements.allTabs) elements.allTabs.style.display = 'none';
   }
   
   function showAllTabs() {
-    if (elements.actionTabs) elements.actionTabs.style.display = '';
-    if (elements.entityTabs) elements.entityTabs.style.display = '';
+    if (elements.allTabs) elements.allTabs.style.display = '';
   }
   
   function showGeneralMessage(message) {

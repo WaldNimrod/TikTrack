@@ -141,7 +141,12 @@ class ConstraintsMonitor {
 
     populateFilters() {
         const tableFilter = document.getElementById('table-filter');
-        tableFilter.innerHTML = '<option value="">כל הטבלאות</option>';
+        tableFilter.innerHTML.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = '\'<option value="">כל הטבלאות</option>\'';
+        while (tempDiv.firstChild) {
+            tableFilter.innerHTML.appendChild(tempDiv.firstChild);
+        }
         
         this.tables.forEach(table => {
             const option = document.createElement('option');

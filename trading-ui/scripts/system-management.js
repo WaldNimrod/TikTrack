@@ -1512,9 +1512,17 @@ class SystemManagement {
 
         if (backupStatusElement) {
           if (isRecentBackup) {
-            backupStatusElement.innerHTML = '<span class="text-success">✅ גיבוי עדכני</span>';
+            backupStatusElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-success';
+        div.textContent = '✅ גיבוי עדכני';
+        backupStatusElement.innerHTML.appendChild(div);
           } else {
-            backupStatusElement.innerHTML = '<span class="text-warning">⚠️ גיבוי ישן</span>';
+            backupStatusElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-warning';
+        div.textContent = '⚠️ גיבוי ישן';
+        backupStatusElement.innerHTML.appendChild(div);
           }
         }
 
@@ -1523,7 +1531,11 @@ class SystemManagement {
         // No backups found
         const backupStatusElement = document.getElementById('backupStatus');
         if (backupStatusElement) {
-          backupStatusElement.innerHTML = '<span class="text-danger">❌ אין גיבויים</span>';
+          backupStatusElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-danger';
+        div.textContent = '❌ אין גיבויים';
+        backupStatusElement.innerHTML.appendChild(div);
         }
 
         const lastBackupDateElement = document.getElementById('lastBackupDate');
@@ -1537,7 +1549,11 @@ class SystemManagement {
       window.Logger?.error('❌ Error updating backup status:', error);
       const backupStatusElement = document.getElementById('backupStatus');
       if (backupStatusElement) {
-        backupStatusElement.innerHTML = '<span class="text-danger">❌ שגיאה בבדיקה</span>';
+        backupStatusElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-danger';
+        div.textContent = '❌ שגיאה בבדיקה';
+        backupStatusElement.innerHTML.appendChild(div);
       }
     }
   }

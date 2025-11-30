@@ -118,16 +118,38 @@
         : '';
       const body = developerSection ? `${userMessage}\n\n${developerSection}` : userMessage;
 
-      if (typeof window.showDetailedNotification === 'function') {
-        window.showDetailedNotification(
-          title,
-          body,
-          'error',
-          options.duration ?? 0,
-          options.category ?? 'system'
-        );
-      } else if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification(title, body);
+      // Show error notification in corner (not modal!)
+      // If detailed info needed, user can expand via button
+      if (typeof window.showErrorNotification === 'function') {
+        await window.showErrorNotification(title, userMessage, options.duration ?? 6000, options.category ?? 'system');
+        
+        // If there's developer details, add "Show Details" button that opens modal
+        if (developerSection) {
+          setTimeout(() => {
+            const notifications = document.querySelectorAll('.notification');
+            const lastNotification = notifications[notifications.length - 1];
+            
+            if (lastNotification) {
+              const detailsBtn = document.createElement('button');
+              detailsBtn.className = 'btn btn-sm btn-link notification-details-btn';
+              detailsBtn.style.cssText = 'padding: 2px 8px; margin-top: 4px; font-size: 0.85em; text-decoration: underline; color: inherit;';
+              detailsBtn.textContent = 'הצג פרטים למפתח';
+              detailsBtn.onclick = () => {
+                if (typeof window.showDetailsModal === 'function') {
+                  window.showDetailsModal(title, `<div style="white-space: pre-line; font-family: monospace; font-size: 0.9em;">${body}</div>`, {
+                    includeCopyButton: true
+                  });
+                }
+                lastNotification.remove();
+              };
+              
+              const contentDiv = lastNotification.querySelector('.notification-content');
+              if (contentDiv) {
+                contentDiv.appendChild(detailsBtn);
+              }
+            }
+          }, 100);
+        }
       }
     }
   };
@@ -953,7 +975,11 @@
       const detailsElement = getElement('yahoo-details');
       if (detailsElement) {
         if (!yahooProvider) {
-          detailsElement.innerHTML = '<div class="status-detail">לא נמצאו נתונים עבור Yahoo Finance</div>';
+          detailsElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'status-detail';
+        div.textContent = 'לא נמצאו נתונים עבור Yahoo Finance';
+        detailsElement.innerHTML.appendChild(div);
           return;
         }
         const records = this.statusData?.cache?.total_quotes ?? 0;
@@ -983,7 +1009,11 @@
       }
 
       if (!cacheData) {
-        detailsElement.innerHTML = '<div class="status-detail">נתוני מטמון לא זמינים</div>';
+        detailsElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'status-detail';
+        div.textContent = 'נתוני מטמון לא זמינים';
+        detailsElement.innerHTML.appendChild(div);
         return;
       }
 
@@ -1020,7 +1050,11 @@
       }
 
       if (!hasData) {
-        detailsElement.innerHTML = '<div class="status-detail">נתוני ספקים לא זמינים</div>';
+        detailsElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'status-detail';
+        div.textContent = 'נתוני ספקים לא זמינים';
+        detailsElement.innerHTML.appendChild(div);
         return;
       }
 
@@ -1044,7 +1078,11 @@
         return;
       }
       if (!data) {
-        detailsElement.innerHTML = '<div class="status-detail">נתוני API לא זמינים</div>';
+        detailsElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'status-detail';
+        div.textContent = 'נתוני API לא זמינים';
+        detailsElement.innerHTML.appendChild(div);
         return;
       }
       detailsElement.innerHTML = [
@@ -1233,7 +1271,11 @@
       }
 
       if (!this.providers.length) {
-        providersGrid.innerHTML = '<div class="col-12 text-center text-muted py-4">לא נמצאו ספקים פעילים</div>';
+        providersGrid.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'col-12 text-center text-muted py-4';
+        div.textContent = 'לא נמצאו ספקים פעילים';
+        providersGrid.innerHTML.appendChild(div);
         return;
       }
 
@@ -1358,7 +1400,11 @@
       }
 
       if (!stats) {
-        cacheStatsElement.innerHTML = '<div class="text-muted text-center p-3">נתוני מטמון לא זמינים</div>';
+        cacheStatsElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted text-center p-3';
+        div.textContent = 'נתוני מטמון לא זמינים';
+        cacheStatsElement.innerHTML.appendChild(div);
         return;
       }
 
@@ -1656,7 +1702,11 @@
       }
 
       if (!history.length) {
-        container.innerHTML = '<div class="text-center text-muted p-4">אין היסטוריית עדכונים קבוצתיים</div>';
+        container.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-center text-muted p-4';
+        div.textContent = 'אין היסטוריית עדכונים קבוצתיים';
+        container.innerHTML.appendChild(div);
         return;
       }
 

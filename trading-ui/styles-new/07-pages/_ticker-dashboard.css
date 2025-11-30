@@ -1,0 +1,138 @@
+/**
+ * Ticker Dashboard Page Styles
+ * 
+ * Styles for the extended ticker dashboard page
+ * 
+ * Documentation: See documentation/04-FEATURES/WIREFRAMES/ticker-dashboard-wireframe.md
+ */
+
+/* ===== KPI CARDS ===== */
+.ticker-dashboard-page .kpi-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.ticker-dashboard-page .kpi-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.ticker-dashboard-page .kpi-label {
+    font-size: 0.875rem;
+    color: var(--text-muted, #666);
+    margin-bottom: 0.5rem;
+}
+
+.ticker-dashboard-page .kpi-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-color, #333);
+}
+
+/* ===== CHART CONTAINER ===== */
+.ticker-dashboard-page #tickerPriceChartContainer {
+    height: 50vh;
+    min-height: 300px;
+    max-height: 80vh;
+    width: 100%;
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    .ticker-dashboard-page #tickerPriceChartContainer {
+        height: 40vh;
+        min-height: 300px;
+    }
+}
+
+/* ===== TECHNICAL INDICATORS ===== */
+.ticker-dashboard-page .technical-indicator-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.ticker-dashboard-page .indicator-label {
+    font-size: 0.875rem;
+    color: var(--text-muted, #666);
+    margin-bottom: 0.5rem;
+}
+
+.ticker-dashboard-page .indicator-value {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--text-color, #333);
+}
+
+/* ===== USER ACTIVITY ===== */
+.ticker-dashboard-page #tickerUserActivity {
+    min-height: 200px;
+}
+
+/* ===== CONDITIONS ===== */
+.ticker-dashboard-page .condition-item {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.ticker-dashboard-page .condition-item:last-child {
+    border-bottom: none;
+}
+
+.ticker-dashboard-page .condition-description {
+    color: var(--text-color, #333);
+}
+
+/* ===== RESPONSIVE ===== */
+/* Desktop (> 768px) - Default: 5 KPI Cards, 3 Technical Indicators */
+@media (min-width: 1025px) {
+    .ticker-dashboard-page .kpi-card {
+        /* 5 cards per row - handled by col-md-2 */
+    }
+    
+    .ticker-dashboard-page .technical-indicator-card {
+        /* 3 cards per row - handled by col-md-4 */
+    }
+}
+
+/* Tablet (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .ticker-dashboard-page .kpi-card {
+        /* 3 cards per row - handled by col-sm-4 */
+    }
+    
+    .ticker-dashboard-page .technical-indicator-card {
+        /* 2 cards per row - handled by col-md-6 */
+    }
+    
+    .ticker-dashboard-page #tickerPriceChartContainer {
+        height: 40vh;
+        min-height: 300px;
+    }
+}
+
+/* Mobile (< 768px) */
+@media (max-width: 767px) {
+    .ticker-dashboard-page .kpi-card {
+        margin-bottom: 1rem;
+        /* 2 cards per row - handled by col-6 */
+    }
+    
+    .ticker-dashboard-page .technical-indicator-card {
+        margin-bottom: 1rem;
+        /* 1 card per row - handled by col-12 */
+    }
+    
+    .ticker-dashboard-page #tickerPriceChartContainer {
+        height: 30vh;
+        min-height: 250px;
+    }
+}
+
+

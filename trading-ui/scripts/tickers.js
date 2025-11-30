@@ -416,16 +416,34 @@ async function updateCurrencyOptions(ticker = null) {
 
     if (addSelect) {
       const addOptions = generateTickerCurrencyOptions();
-      addSelect.innerHTML = currenciesAvailable
-        ? '<option value="">בחר מטבע...</option>' + addOptions
-        : addOptions;
+      addSelect.textContent = '';
+      if (currenciesAvailable) {
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'בחר מטבע...';
+        addSelect.appendChild(defaultOption);
+      }
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = addOptions;
+      while (tempDiv.firstChild) {
+        addSelect.appendChild(tempDiv.firstChild);
+      }
     }
 
     if (editSelect) {
       const editOptions = generateTickerCurrencyOptions(ticker);
-      editSelect.innerHTML = currenciesAvailable
-        ? '<option value="">בחר מטבע...</option>' + editOptions
-        : editOptions;
+      editSelect.textContent = '';
+      if (currenciesAvailable) {
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'בחר מטבע...';
+        editSelect.appendChild(defaultOption);
+      }
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = editOptions;
+      while (tempDiv.firstChild) {
+        editSelect.appendChild(tempDiv.firstChild);
+      }
     }
   } catch (error) {
     window.Logger.error('updateCurrencyOptions failed', { page: 'tickers', error: error?.message || error });
@@ -679,11 +697,14 @@ async function loadProviderSymbolFields() {
   }
 
   // Show loading state
-  fieldsContainer.innerHTML = `
-    <div class="text-center text-muted py-3">
-      <i class="fas fa-spinner fa-spin me-2"></i>טוען רשימת ספקים...
-    </div>
-  `;
+  fieldsContainer.textContent = '';
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'text-center text-muted py-3';
+  const spinner = document.createElement('i');
+  spinner.className = 'fas fa-spinner fa-spin me-2';
+  loadingDiv.appendChild(spinner);
+  loadingDiv.appendChild(document.createTextNode('טוען רשימת ספקים...'));
+  fieldsContainer.appendChild(loadingDiv);
 
   try {
     // Load providers from API
@@ -696,12 +717,16 @@ async function loadProviderSymbolFields() {
     const providers = (result.data || []).filter(p => p.is_active);
 
     if (providers.length === 0) {
-      fieldsContainer.innerHTML = `
-        <div class="alert alert-info mb-0">
-          <i class="fas fa-info-circle me-2"></i>
-          <small>אין ספקי נתונים פעילים במערכת</small>
-        </div>
-      `;
+      fieldsContainer.textContent = '';
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-info mb-0';
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-info-circle me-2';
+      alertDiv.appendChild(icon);
+      const small = document.createElement('small');
+      small.textContent = 'אין ספקי נתונים פעילים במערכת';
+      alertDiv.appendChild(small);
+      fieldsContainer.appendChild(alertDiv);
       return;
     }
 
@@ -727,7 +752,12 @@ async function loadProviderSymbolFields() {
       </div>
     `).join('');
 
-    fieldsContainer.innerHTML = fieldsHTML;
+    fieldsContainer.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = fieldsHTML;
+    while (tempDiv.firstChild) {
+      fieldsContainer.appendChild(tempDiv.firstChild);
+    }
     
     if (window.Logger) {
       window.Logger.debug('Provider symbol fields loaded', { 
@@ -737,12 +767,16 @@ async function loadProviderSymbolFields() {
     }
   } catch (error) {
     window.Logger?.error('Error loading providers:', error);
-    fieldsContainer.innerHTML = `
-      <div class="alert alert-danger mb-0">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        <small>שגיאה בטעינת ספקי נתונים. נסה לרענן את הדף.</small>
-      </div>
-    `;
+    fieldsContainer.textContent = '';
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-danger mb-0';
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-exclamation-triangle me-2';
+    alertDiv.appendChild(icon);
+    const small = document.createElement('small');
+    small.textContent = 'שגיאה בטעינת ספקי נתונים. נסה לרענן את הדף.';
+    alertDiv.appendChild(small);
+    fieldsContainer.appendChild(alertDiv);
     
     if (window.Logger) {
       window.Logger.error('Failed to load provider symbol fields', { 
@@ -1998,11 +2032,12 @@ function updateTickersSummaryStats(tickers) {
       // מערכת סיכום נתונים לא זמינה
       const summaryStatsElement = document.getElementById('summaryStats');
       if (summaryStatsElement) {
-        summaryStatsElement.innerHTML = `
-          <div style="color: #dc3545; font-weight: bold;">
-            ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
-          </div>
-        `;
+        summaryStatsElement.textContent = '';
+        const div = document.createElement('div');
+        div.style.color = '#dc3545';
+        div.style.fontWeight = 'bold';
+        div.textContent = '⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף';
+        summaryStatsElement.appendChild(div);
       }
     }
   } catch (error) {
@@ -2058,7 +2093,14 @@ function renderTickersTableRows(tickers) {
 
     // בדיקה אם יש נתונים
     if (!tickers || tickers.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="10" class="text-center">לא נמצאו טיקרים</td></tr>';
+      tbody.textContent = '';
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 10;
+      td.className = 'text-center';
+      td.textContent = 'לא נמצאו טיקרים';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
       return;
     }
 
@@ -2242,8 +2284,12 @@ function renderTickersTableRows(tickers) {
 
     // עדכון הטבלה עם כפיית רענון DOM
     const finalHTML = tableRows.join('');
-    tbody.innerHTML = '';  // ניקוי מלא
-    tbody.innerHTML = finalHTML;  // הוספת התוכן החדש
+    tbody.textContent = '';  // ניקוי מלא
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = finalHTML;
+    while (tempDiv.firstChild) {
+      tbody.appendChild(tempDiv.firstChild);
+    }
     
     // כפיית reflow של הדפדפן
     tbody.offsetHeight;
@@ -2414,16 +2460,29 @@ async function checkTickerExternalData() {
         // Disable button and show loading
         checkBtn.disabled = true;
         // Use IconSystem to render loader icon
+        checkBtn.textContent = '';
         if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
             const loaderIcon = await window.IconSystem.renderIcon('button', 'refresh', {
                 size: '16',
                 alt: 'loading',
                 class: 'icon fa-spin'
             });
-            checkBtn.innerHTML = loaderIcon + ' בודק...';
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = loaderIcon;
+            while (tempDiv.firstChild) {
+                checkBtn.appendChild(tempDiv.firstChild);
+            }
+            checkBtn.appendChild(document.createTextNode(' בודק...'));
         } else {
             // Fallback if IconSystem not available
-            checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> בודק...';
+            const img = document.createElement('img');
+            img.src = '/trading-ui/images/icons/tabler/loader.svg';
+            img.width = 16;
+            img.height = 16;
+            img.alt = 'loading';
+            img.className = 'icon fa-spin';
+            checkBtn.appendChild(img);
+            checkBtn.appendChild(document.createTextNode(' בודק...'));
         }
         resultDiv.style.display = 'none';
         warningDiv.style.display = 'none';
@@ -2495,21 +2554,46 @@ async function checkTickerExternalData() {
                 `;
             }
             
-            const currencyNotice = currencyResolution.hasCurrency
-                ? ''
-                : `<div class="text-warning small mt-2">לא התקבל מטבע מהספק, המחיר מוצג ללא סמל מטבע.</div>`;
-
-            resultDiv.innerHTML = `
-                <div class="alert alert-success mb-0">
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <i class="fas fa-check-circle"></i>
-                        <strong>נתונים נמצאו עבור ${internalSymbol}</strong>
-                    </div>
-                    ${tickerInfoHTML}
-                    ${currencyNotice}
-                    ${providerSymbolNote}
-                </div>
-            `;
+            // Clear and build result div using createElement
+            resultDiv.textContent = '';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success mb-0';
+            
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'd-flex align-items-center gap-2 mb-2';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-check-circle';
+            headerDiv.appendChild(icon);
+            const strong = document.createElement('strong');
+            strong.textContent = `נתונים נמצאו עבור ${internalSymbol}`;
+            headerDiv.appendChild(strong);
+            alertDiv.appendChild(headerDiv);
+            
+            // Add ticker info HTML using tempDiv
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = tickerInfoHTML;
+            while (tempDiv.firstChild) {
+                alertDiv.appendChild(tempDiv.firstChild);
+            }
+            
+            // Add currency notice if needed
+            if (!currencyResolution.hasCurrency) {
+                const noticeDiv = document.createElement('div');
+                noticeDiv.className = 'text-warning small mt-2';
+                noticeDiv.textContent = 'לא התקבל מטבע מהספק, המחיר מוצג ללא סמל מטבע.';
+                alertDiv.appendChild(noticeDiv);
+            }
+            
+            // Add provider symbol note if needed
+            if (providerSymbolNote) {
+                const tempDiv2 = document.createElement('div');
+                tempDiv2.innerHTML = providerSymbolNote;
+                while (tempDiv2.firstChild) {
+                    alertDiv.appendChild(tempDiv2.firstChild);
+                }
+            }
+            
+            resultDiv.appendChild(alertDiv);
             resultDiv.style.display = 'block';
             warningDiv.style.display = 'none';
             
@@ -2521,17 +2605,32 @@ async function checkTickerExternalData() {
     } catch (error) {
         window.Logger?.error('Error checking external data', { page: 'tickers', symbol, error: error?.message || error });
         
-        // Show warning
-        warningDiv.innerHTML = `
-            <div class="d-flex align-items-start">
-                <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
-                <div>
-                    <strong>לא ניתן לטעון נתונים חיצוניים</strong>
-                    <p class="mb-0 small">${error.message || 'שגיאה בטעינת נתונים מהשרת'}</p>
-                    <p class="mb-0 small mt-1">ניתן להמשיך בהוספת הטיקר ללא נתונים חיצוניים.</p>
-                </div>
-            </div>
-        `;
+        // Show warning using createElement
+        warningDiv.textContent = '';
+        const warningContainer = document.createElement('div');
+        warningContainer.className = 'd-flex align-items-start';
+        
+        const warningIcon = document.createElement('i');
+        warningIcon.className = 'fas fa-exclamation-triangle me-2 mt-1';
+        warningContainer.appendChild(warningIcon);
+        
+        const warningContent = document.createElement('div');
+        const strong = document.createElement('strong');
+        strong.textContent = 'לא ניתן לטעון נתונים חיצוניים';
+        warningContent.appendChild(strong);
+        
+        const errorP = document.createElement('p');
+        errorP.className = 'mb-0 small';
+        errorP.textContent = error.message || 'שגיאה בטעינת נתונים מהשרת';
+        warningContent.appendChild(errorP);
+        
+        const noticeP = document.createElement('p');
+        noticeP.className = 'mb-0 small mt-1';
+        noticeP.textContent = 'ניתן להמשיך בהוספת הטיקר ללא נתונים חיצוניים.';
+        warningContent.appendChild(noticeP);
+        
+        warningContainer.appendChild(warningContent);
+        warningDiv.appendChild(warningContainer);
         warningDiv.style.display = 'block';
         resultDiv.style.display = 'none';
         
@@ -2545,16 +2644,29 @@ async function checkTickerExternalData() {
         // Re-enable button
         checkBtn.disabled = false;
         // Use IconSystem to render refresh icon
+        checkBtn.textContent = '';
         if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
             const refreshIcon = await window.IconSystem.renderIcon('button', 'refresh', {
                 size: '16',
                 alt: 'refresh',
                 class: 'icon me-1'
             });
-            checkBtn.innerHTML = refreshIcon + ' בדוק נתונים חיצוניים';
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = refreshIcon;
+            while (tempDiv.firstChild) {
+                checkBtn.appendChild(tempDiv.firstChild);
+            }
+            checkBtn.appendChild(document.createTextNode(' בדוק נתונים חיצוניים'));
         } else {
             // Fallback if IconSystem not available
-            checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1"> בדוק נתונים חיצוניים';
+            const img = document.createElement('img');
+            img.src = '/trading-ui/images/icons/tabler/refresh.svg';
+            img.width = 16;
+            img.height = 16;
+            img.alt = 'refresh';
+            img.className = 'icon me-1';
+            checkBtn.appendChild(img);
+            checkBtn.appendChild(document.createTextNode(' בדוק נתונים חיצוניים'));
         }
     }
 }

@@ -91,6 +91,17 @@
                     forceRefresh: forceRefresh
                 });
                 
+                // Market data might be null if endpoint is not available - this is OK, continue with ticker data
+                if (tickerData && !tickerData.marketData) {
+                    if (window.Logger) {
+                        window.Logger.info('Market data not available - continuing with ticker data only', { 
+                            tickerId,
+                            hasTickerData: !!tickerData,
+                            page: 'ticker-dashboard-data' 
+                        });
+                    }
+                }
+                
                 // Save to cache
                 if (window.UnifiedCacheManager && tickerData) {
                     await window.UnifiedCacheManager.save(cacheKey, tickerData, 'memory', { ttl: 300 }); // 5 minutes
@@ -346,18 +357,29 @@
                 if (window.Logger) {
                     window.Logger.info('Historical data endpoint not implemented (501) - feature pending', { tickerId, page: 'ticker-dashboard-data' });
                 }
-                return null;
+                return []; // Return empty array instead of null for graceful degradation
             }
             
             if (!response.ok) {
+                if (response.status === 404) {
+                    // 404 - endpoint not found, return empty array (graceful degradation)
+                    if (window.Logger) {
+                        window.Logger.info('Historical data endpoint not found (404) - returning empty array', { 
+                            tickerId, 
+                            page: 'ticker-dashboard-data' 
+                        });
+                    }
+                    return [];
+                }
+                // For other errors, return empty array instead of null
                 if (window.Logger) {
-                    window.Logger.warn('⚠️ Failed to load historical data', { 
+                    window.Logger.info('Historical data not available', { 
                         tickerId, 
                         status: response.status, 
                         page: 'ticker-dashboard-data' 
                     });
                 }
-                return null;
+                return [];
             }
             
             const data = await response.json();

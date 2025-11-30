@@ -810,7 +810,11 @@
         if (!container) return;
 
         if (!state.savedEvents || state.savedEvents.length === 0) {
-            container.innerHTML = '<div class="text-muted text-center py-3">אין אירועים שמורים</div>';
+            container.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted text-center py-3';
+        div.textContent = 'אין אירועים שמורים';
+        container.innerHTML.appendChild(div);
             return;
         }
 

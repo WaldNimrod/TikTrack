@@ -260,7 +260,12 @@ function populateAccountFilterMenu() {
 function loadInvestmentTypes() {
     const investmentSelect = document.getElementById('filterInvestmentType');
     if (investmentSelect) {
-        investmentSelect.innerHTML = '<option value="">הכל</option>';
+        investmentSelect.innerHTML.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = '\'<option value="">הכל</option>\'';
+        while (tempDiv.firstChild) {
+            investmentSelect.innerHTML.appendChild(tempDiv.firstChild);
+        }
         INVESTMENT_TYPES.forEach(type => {
             const option = document.createElement('option');
             option.value = type.value;
@@ -1432,7 +1437,11 @@ function updateSummaryCards(data) {
     const plPercentEl = document.getElementById('pl-percentage');
     if (plPercentEl) {
     if (plPercent === '-') {
-            plPercentEl.innerHTML = '<span class="numeric-value-zero">(-)</span>';
+            plPercentEl.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'numeric-value-zero';
+        div.textContent = '(-)';
+        plPercentEl.innerHTML.appendChild(div);
     } else {
         const plPercentNum = parseFloat(plPercent);
             if (window.FieldRendererService) {

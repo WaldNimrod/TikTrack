@@ -1,0 +1,3501 @@
+{
+  "page": "strategy-analysis-page.html",
+  "js_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/strategy-analysis-page.js",
+  "html_file": null,
+  "categories": {
+    "unified_init": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "section_toggle": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "notifications": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 153,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 153,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 154,
+          "content": "window.NotificationSystem.showError('שגיאה בטעינת גרפים',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 164,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 164,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 165,
+          "content": "window.NotificationSystem.showError('שגיאה בטעינת גרפים',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2053,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2053,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2054,
+          "content": "window.NotificationSystem.showError('שגיאה בטעינת גרף ביצועי אסטרטגיות',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2243,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2243,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2244,
+          "content": "window.NotificationSystem.showError('שגיאה בעדכון גרף ביצועי אסטרטגיות',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2931,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2931,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2932,
+          "content": "window.NotificationSystem.showError('שגיאה באתחול עמוד ניתוח אסטרטגיות',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        }
+      ],
+      "issue_count": 15,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 153,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 153,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 154,
+            "content": "window.NotificationSystem.showError('שגיאה בטעינת גרפים',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 164,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 164,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 165,
+            "content": "window.NotificationSystem.showError('שגיאה בטעינת גרפים',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2053,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2053,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2054,
+            "content": "window.NotificationSystem.showError('שגיאה בטעינת גרף ביצועי אסטרטגיות',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2243,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2243,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2244,
+            "content": "window.NotificationSystem.showError('שגיאה בעדכון גרף ביצועי אסטרטגיות',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2931,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2931,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2932,
+            "content": "window.NotificationSystem.showError('שגיאה באתחול עמוד ניתוח אסטרטגיות',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          }
+        ],
+        "issue_count": 15
+      },
+      "html_result": null
+    },
+    "modals": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "tables": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 2855,
+          "content": "const table = document.querySelector('table[data-table-type=\"strategy-list\"]');",
+          "pattern": "data-table-type",
+          "match": "data-table-type",
+          "file": "js"
+        }
+      ],
+      "issue_count": 1,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 2855,
+            "content": "const table = document.querySelector('table[data-table-type=\"strategy-list\"]');",
+            "pattern": "data-table-type",
+            "match": "data-table-type"
+          }
+        ],
+        "issue_count": 1
+      },
+      "html_result": null
+    },
+    "field_renderer": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 1291,
+          "content": "// Use FieldRendererService if available",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1293,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1293,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1294,
+          "content": "plFormatted = window.FieldRendererService.renderAmount(plValue, '$', 2, true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1306,
+          "content": "// Add percentage if available - using FieldRendererService",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1309,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1309,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1310,
+          "content": "percentHtml = window.FieldRendererService.renderNumericValue(plPercent, '%', true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1328,
+          "content": "// Use FieldRendererService if available",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1330,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1330,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1331,
+          "content": "valueFormatted = window.FieldRendererService.renderAmount(value, '$', 0, false);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1341,
+          "content": "// Add percentage if available - using FieldRendererService",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1344,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1344,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1345,
+          "content": "percentHtml = window.FieldRendererService.renderNumericValue(percent, '%', true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        }
+      ],
+      "issue_count": 16,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1291,
+            "content": "// Use FieldRendererService if available",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1293,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1293,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1294,
+            "content": "plFormatted = window.FieldRendererService.renderAmount(plValue, '$', 2, true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1306,
+            "content": "// Add percentage if available - using FieldRendererService",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1309,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1309,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1310,
+            "content": "percentHtml = window.FieldRendererService.renderNumericValue(plPercent, '%', true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1328,
+            "content": "// Use FieldRendererService if available",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1330,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1330,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1331,
+            "content": "valueFormatted = window.FieldRendererService.renderAmount(value, '$', 0, false);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1341,
+            "content": "// Add percentage if available - using FieldRendererService",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1344,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1344,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1345,
+            "content": "percentHtml = window.FieldRendererService.renderNumericValue(percent, '%', true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          }
+        ],
+        "issue_count": 16
+      },
+      "html_result": null
+    },
+    "crud_handler": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "select_populator": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "data_collection": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 459,
+          "content": "// Use DataCollectionService to clear fields if available",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 460,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 460,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 461,
+          "content": "if (fromInput) window.DataCollectionService.setValue(fromInput.id, '', 'dateOnly');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 462,
+          "content": "if (toInput) window.DataCollectionService.setValue(toInput.id, '', 'dateOnly');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 746,
+          "content": "// Use DataCollectionService to clear field if available",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 747,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 747,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 748,
+          "content": "window.DataCollectionService.setValue(select.id, '', 'text');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2494,
+          "content": "// Use DataCollectionService to set value if available",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2496,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2496,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2497,
+          "content": "window.DataCollectionService.setValue(fromInput.id, savedState.dateRangeStart, 'dateOnly');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2505,
+          "content": "// Use DataCollectionService to set value if available",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2507,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2507,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2508,
+          "content": "window.DataCollectionService.setValue(toInput.id, savedState.dateRangeEnd, 'dateOnly');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        }
+      ],
+      "issue_count": 17,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 459,
+            "content": "// Use DataCollectionService to clear fields if available",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 460,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 460,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 461,
+            "content": "if (fromInput) window.DataCollectionService.setValue(fromInput.id, '', 'dateOnly');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 462,
+            "content": "if (toInput) window.DataCollectionService.setValue(toInput.id, '', 'dateOnly');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 746,
+            "content": "// Use DataCollectionService to clear field if available",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 747,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 747,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 748,
+            "content": "window.DataCollectionService.setValue(select.id, '', 'text');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2494,
+            "content": "// Use DataCollectionService to set value if available",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2496,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2496,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2497,
+            "content": "window.DataCollectionService.setValue(fromInput.id, savedState.dateRangeStart, 'dateOnly');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2505,
+            "content": "// Use DataCollectionService to set value if available",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2507,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2507,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2508,
+            "content": "window.DataCollectionService.setValue(toInput.id, savedState.dateRangeEnd, 'dateOnly');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          }
+        ],
+        "issue_count": 17
+      },
+      "html_result": null
+    },
+    "icons": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 2063,
+          "content": "// Use IconSystem if available",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2065,
+          "content": "if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2065,
+          "content": "if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2066,
+          "content": "alertIcon = await window.IconSystem.renderIcon('tabler', 'alert-triangle', { size: '16', alt: 'alert",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2070,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2070,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2072,
+          "content": "alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2281,
+          "content": "// Use IconSystem if available",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2283,
+          "content": "if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2283,
+          "content": "if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2284,
+          "content": "noteIcon = await window.IconSystem.renderIcon('tabler', 'note', { size: '16', alt: 'icon', class: 'i",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2289,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2289,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2291,
+          "content": "noteIcon = await window.IconSystem.renderIcon('button', 'note', { size: '16', alt: 'icon', class: 'i",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2292,
+          "content": "alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2324,
+          "content": "${window.IconSystem && typeof window.IconSystem.renderIcon === 'function'",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2324,
+          "content": "${window.IconSystem && typeof window.IconSystem.renderIcon === 'function'",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2325,
+          "content": "? await window.IconSystem.renderIcon('tabler', 'note', { size: '16', alt: 'icon', class: 'icon' })",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2333,
+          "content": "${window.IconSystem && typeof window.IconSystem.renderIcon === 'function'",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2333,
+          "content": "${window.IconSystem && typeof window.IconSystem.renderIcon === 'function'",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2334,
+          "content": "? await window.IconSystem.renderIcon('tabler', 'info-circle', { size: '16', alt: 'info-circle', clas",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2345,
+          "content": "${window.IconSystem && typeof window.IconSystem.renderIcon === 'function'",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2345,
+          "content": "${window.IconSystem && typeof window.IconSystem.renderIcon === 'function'",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2346,
+          "content": "? await window.IconSystem.renderIcon('tabler', 'alert-triangle', { size: '16', alt: 'alert-triangle'",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2068,
+          "content": "alertIcon = '<img src=\"../../images/icons/tabler/alert-triangle.svg\" width=\"16\" height=\"16\" alt=\"ale",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/alert-triangle",
+          "file": "js"
+        },
+        {
+          "line": 2286,
+          "content": "noteIcon = '<img src=\"../../images/icons/tabler/note.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"i",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/note.svg\" widt",
+          "file": "js"
+        },
+        {
+          "line": 2288,
+          "content": "let alertIcon = '<img src=\"../../images/icons/tabler/alert-triangle.svg\" width=\"16\" height=\"16\" alt=",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/alert-triangle",
+          "file": "js"
+        },
+        {
+          "line": 2326,
+          "content": ": '<img src=\"../../images/icons/tabler/note.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">'}",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/note.svg\" widt",
+          "file": "js"
+        },
+        {
+          "line": 2335,
+          "content": ": '<img src=\"../../images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"info-circle\" cla",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/info-circle.sv",
+          "file": "js"
+        },
+        {
+          "line": 2347,
+          "content": ": '<img src=\"../../images/icons/tabler/alert-triangle.svg\" width=\"16\" height=\"16\" alt=\"alert-triangl",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/alert-triangle",
+          "file": "js"
+        }
+      ],
+      "issue_count": 30,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 2063,
+            "content": "// Use IconSystem if available",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2065,
+            "content": "if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2065,
+            "content": "if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2066,
+            "content": "alertIcon = await window.IconSystem.renderIcon('tabler', 'alert-triangle', { size: '16', alt: 'alert",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2070,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2070,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2072,
+            "content": "alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2281,
+            "content": "// Use IconSystem if available",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2283,
+            "content": "if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2283,
+            "content": "if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2284,
+            "content": "noteIcon = await window.IconSystem.renderIcon('tabler', 'note', { size: '16', alt: 'icon', class: 'i",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2289,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2289,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2291,
+            "content": "noteIcon = await window.IconSystem.renderIcon('button', 'note', { size: '16', alt: 'icon', class: 'i",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2292,
+            "content": "alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2324,
+            "content": "${window.IconSystem && typeof window.IconSystem.renderIcon === 'function'",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2324,
+            "content": "${window.IconSystem && typeof window.IconSystem.renderIcon === 'function'",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2325,
+            "content": "? await window.IconSystem.renderIcon('tabler', 'note', { size: '16', alt: 'icon', class: 'icon' })",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2333,
+            "content": "${window.IconSystem && typeof window.IconSystem.renderIcon === 'function'",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2333,
+            "content": "${window.IconSystem && typeof window.IconSystem.renderIcon === 'function'",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2334,
+            "content": "? await window.IconSystem.renderIcon('tabler', 'info-circle', { size: '16', alt: 'info-circle', clas",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2345,
+            "content": "${window.IconSystem && typeof window.IconSystem.renderIcon === 'function'",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2345,
+            "content": "${window.IconSystem && typeof window.IconSystem.renderIcon === 'function'",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2346,
+            "content": "? await window.IconSystem.renderIcon('tabler', 'alert-triangle', { size: '16', alt: 'alert-triangle'",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2068,
+            "content": "alertIcon = '<img src=\"../../images/icons/tabler/alert-triangle.svg\" width=\"16\" height=\"16\" alt=\"ale",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/alert-triangle"
+          },
+          {
+            "line": 2286,
+            "content": "noteIcon = '<img src=\"../../images/icons/tabler/note.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"i",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/note.svg\" widt"
+          },
+          {
+            "line": 2288,
+            "content": "let alertIcon = '<img src=\"../../images/icons/tabler/alert-triangle.svg\" width=\"16\" height=\"16\" alt=",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/alert-triangle"
+          },
+          {
+            "line": 2326,
+            "content": ": '<img src=\"../../images/icons/tabler/note.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">'}",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/note.svg\" widt"
+          },
+          {
+            "line": 2335,
+            "content": ": '<img src=\"../../images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"info-circle\" cla",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/info-circle.sv"
+          },
+          {
+            "line": 2347,
+            "content": ": '<img src=\"../../images/icons/tabler/alert-triangle.svg\" width=\"16\" height=\"16\" alt=\"alert-triangl",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/alert-triangle"
+          }
+        ],
+        "issue_count": 30
+      },
+      "html_result": null
+    },
+    "colors": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 23,
+          "content": "// ⚠️ REMOVED: Local getEntityColor() function - use centralized Color Scheme System",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 24,
+          "content": "// Use window.getEntityColor() directly instead",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 34,
+          "content": "const color = (typeof window.getEntityColor === 'function')",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 35,
+          "content": "? window.getEntityColor(series.entityType)",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 1959,
+          "content": "const color = (typeof window.getEntityColor === 'function')",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 1960,
+          "content": "? window.getEntityColor(seriesConfig.entityType)",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 1987,
+          "content": "const color = (typeof window.getEntityColor === 'function')",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 1988,
+          "content": "? window.getEntityColor(seriesConfig.entityType)",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2095,
+          "content": "const color = (typeof window.getEntityColor === 'function')",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2096,
+          "content": "? window.getEntityColor(seriesConfig.entityType)",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2160,
+          "content": "const color = (typeof window.getEntityColor === 'function')",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2161,
+          "content": "? window.getEntityColor(seriesConfig.entityType)",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2188,
+          "content": "const color = (typeof window.getEntityColor === 'function')",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2189,
+          "content": "? window.getEntityColor(seriesConfig.entityType)",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2983,
+          "content": "getEntityColor,",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        }
+      ],
+      "issue_count": 15,
+      "js_result": {
+        "status": "missing",
+        "issues": [
+          {
+            "line": 23,
+            "content": "// ⚠️ REMOVED: Local getEntityColor() function - use centralized Color Scheme System",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 24,
+            "content": "// Use window.getEntityColor() directly instead",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 34,
+            "content": "const color = (typeof window.getEntityColor === 'function')",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 35,
+            "content": "? window.getEntityColor(series.entityType)",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 1959,
+            "content": "const color = (typeof window.getEntityColor === 'function')",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 1960,
+            "content": "? window.getEntityColor(seriesConfig.entityType)",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 1987,
+            "content": "const color = (typeof window.getEntityColor === 'function')",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 1988,
+            "content": "? window.getEntityColor(seriesConfig.entityType)",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2095,
+            "content": "const color = (typeof window.getEntityColor === 'function')",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2096,
+            "content": "? window.getEntityColor(seriesConfig.entityType)",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2160,
+            "content": "const color = (typeof window.getEntityColor === 'function')",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2161,
+            "content": "? window.getEntityColor(seriesConfig.entityType)",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2188,
+            "content": "const color = (typeof window.getEntityColor === 'function')",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2189,
+            "content": "? window.getEntityColor(seriesConfig.entityType)",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2983,
+            "content": "getEntityColor,",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          }
+        ],
+        "issue_count": 15
+      },
+      "html_result": null
+    },
+    "info_summary": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 1643,
+          "content": "// Consider using InfoSummarySystem if this page becomes production-ready",
+          "pattern": "InfoSummarySystem",
+          "match": "InfoSummarySystem",
+          "file": "js"
+        }
+      ],
+      "issue_count": 1,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1643,
+            "content": "// Consider using InfoSummarySystem if this page becomes production-ready",
+            "pattern": "InfoSummarySystem",
+            "match": "InfoSummarySystem"
+          }
+        ],
+        "issue_count": 1
+      },
+      "html_result": null
+    },
+    "pagination": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "entity_details": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "conditions": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "page_state": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 2379,
+          "content": "if (!window.PageStateManager) {",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 2410,
+          "content": "await window.PageStateManager.savePageState('strategy-analysis', state);",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 2427,
+          "content": "if (!window.PageStateManager) {",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 2436,
+          "content": "const state = await window.PageStateManager.loadPageState('strategy-analysis');",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 2901,
+          "content": "// Load saved state or set defaults (fallback if PageStateManager not available)",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        }
+      ],
+      "issue_count": 5,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 2379,
+            "content": "if (!window.PageStateManager) {",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 2410,
+            "content": "await window.PageStateManager.savePageState('strategy-analysis', state);",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 2427,
+            "content": "if (!window.PageStateManager) {",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 2436,
+            "content": "const state = await window.PageStateManager.loadPageState('strategy-analysis');",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 2901,
+            "content": "// Load saved state or set defaults (fallback if PageStateManager not available)",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          }
+        ],
+        "issue_count": 5
+      },
+      "html_result": null
+    },
+    "logger": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 71,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 72,
+          "content": "window.Logger.warn('UnifiedCacheManager not available, cannot save series visibility state', { page:",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 76,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 77,
+          "content": "window.Logger.warn('Failed to save series visibility state', { page: 'strategy-analysis-page', error",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 99,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 100,
+          "content": "window.Logger.warn('Failed to load series visibility state, using defaults', { page: 'strategy-analy",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 156,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 157,
+          "content": "window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'strategy-analysis-page', tim",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 167,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 168,
+          "content": "window.Logger.error('❌ LightweightCharts not available', { page: 'strategy-analysis-page', timeout: ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 173,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 174,
+          "content": "window.Logger.info('✅ TradingView libraries loaded', { page: 'strategy-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 184,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 185,
+          "content": "window.Logger.info('✅ Header System initialized', { page: 'strategy-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 188,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 189,
+          "content": "window.Logger.error('Error initializing Header System', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 200,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 201,
+          "content": "window.Logger.error('Error initializing Header System (retry)', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 208,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 209,
+          "content": "window.Logger.warn('HeaderSystem not available after retry', { page: 'strategy-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 674,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 675,
+          "content": "window.Logger.warn('Failed to get default trading account from preferences, using first account', { ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 824,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 825,
+          "content": "window.Logger.info('✅ Default comparison parameters set (Trading Methods - first)', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 920,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 921,
+          "content": "window.Logger.info('🔍 Creating strategy comparison categories', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 988,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 989,
+          "content": "window.Logger.warn('⚠️ No comparison parameters enabled - returning empty categories', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 997,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 998,
+          "content": "window.Logger.info('✅ Creating categories from enabled parameters', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1020,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1021,
+          "content": "window.Logger.info('📊 Generated category combinations', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1847,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1848,
+          "content": "window.Logger.warn('Strategy performance chart container not found', { page: 'strategy-analysis-page",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1859,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1860,
+          "content": "window.Logger.warn('Strategy performance chart container has zero dimensions, waiting...', { page: '",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1879,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1880,
+          "content": "window.Logger.warn('Error removing existing strategy performance chart', { page: 'strategy-analysis-",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1936,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1937,
+          "content": "window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: errorMessage })",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2047,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2048,
+          "content": "window.Logger.info('✅ Strategy performance chart initialized', { page: 'strategy-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2056,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2057,
+          "content": "window.Logger.error('Error initializing strategy performance chart', { page: 'strategy-analysis-page",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2116,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2117,
+          "content": "window.Logger.warn('Chart initialization failed, skipping update', { page: 'strategy-analysis-page' ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2137,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2138,
+          "content": "window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: errorMessage })",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2246,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2247,
+          "content": "window.Logger.error('Error updating strategy performance chart', { page: 'strategy-analysis-page', e",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2366,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2367,
+          "content": "window.Logger.warn('UnifiedCacheManager not available, cannot save record filter state', { page: 'st",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2371,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2372,
+          "content": "window.Logger.warn('Failed to save record filter state', { page: 'strategy-analysis-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2411,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2412,
+          "content": "window.Logger.debug('✅ Saved page state', { page: 'strategy-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2415,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2416,
+          "content": "window.Logger.warn('Failed to save page state', { error, page: 'strategy-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2458,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2459,
+          "content": "window.Logger.debug('✅ Restored page state', { page: 'strategy-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2462,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2463,
+          "content": "window.Logger.warn('Failed to restore page state, using fallback', { error, page: 'strategy-analysis",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2557,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2558,
+          "content": "window.Logger.warn('Failed to load record filter state', { page: 'strategy-analysis-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2574,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2575,
+          "content": "window.Logger.warn('UnifiedCacheManager not available, cannot save comparison parameter state', { pa",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2579,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2580,
+          "content": "window.Logger.warn('Failed to save comparison parameter state', { page: 'strategy-analysis-page', er",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2662,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2663,
+          "content": "window.Logger.warn('Failed to load comparison parameter state', { page: 'strategy-analysis-page', er",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2727,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2728,
+          "content": "window.Logger.warn('Failed to get default trading account, using first account', { page: 'strategy-a",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2849,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2850,
+          "content": "window.Logger.warn('createActionsMenu not available, cannot replace action buttons', { page: 'strate",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2925,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2926,
+          "content": "window.Logger.info('✅ Strategy analysis page initialized', { page: 'strategy-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2934,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2935,
+          "content": "window.Logger.error('Error initializing strategy analysis page', { page: 'strategy-analysis-page', e",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        }
+      ],
+      "issue_count": 78,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 71,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 72,
+            "content": "window.Logger.warn('UnifiedCacheManager not available, cannot save series visibility state', { page:",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 76,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 77,
+            "content": "window.Logger.warn('Failed to save series visibility state', { page: 'strategy-analysis-page', error",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 99,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 100,
+            "content": "window.Logger.warn('Failed to load series visibility state, using defaults', { page: 'strategy-analy",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 156,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 157,
+            "content": "window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'strategy-analysis-page', tim",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 167,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 168,
+            "content": "window.Logger.error('❌ LightweightCharts not available', { page: 'strategy-analysis-page', timeout: ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 173,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 174,
+            "content": "window.Logger.info('✅ TradingView libraries loaded', { page: 'strategy-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 184,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 185,
+            "content": "window.Logger.info('✅ Header System initialized', { page: 'strategy-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 188,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 189,
+            "content": "window.Logger.error('Error initializing Header System', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 200,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 201,
+            "content": "window.Logger.error('Error initializing Header System (retry)', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 208,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 209,
+            "content": "window.Logger.warn('HeaderSystem not available after retry', { page: 'strategy-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 674,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 675,
+            "content": "window.Logger.warn('Failed to get default trading account from preferences, using first account', { ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 824,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 825,
+            "content": "window.Logger.info('✅ Default comparison parameters set (Trading Methods - first)', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 920,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 921,
+            "content": "window.Logger.info('🔍 Creating strategy comparison categories', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 988,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 989,
+            "content": "window.Logger.warn('⚠️ No comparison parameters enabled - returning empty categories', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 997,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 998,
+            "content": "window.Logger.info('✅ Creating categories from enabled parameters', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1020,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1021,
+            "content": "window.Logger.info('📊 Generated category combinations', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1847,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1848,
+            "content": "window.Logger.warn('Strategy performance chart container not found', { page: 'strategy-analysis-page",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1859,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1860,
+            "content": "window.Logger.warn('Strategy performance chart container has zero dimensions, waiting...', { page: '",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1879,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1880,
+            "content": "window.Logger.warn('Error removing existing strategy performance chart', { page: 'strategy-analysis-",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1936,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1937,
+            "content": "window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: errorMessage })",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2047,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2048,
+            "content": "window.Logger.info('✅ Strategy performance chart initialized', { page: 'strategy-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2056,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2057,
+            "content": "window.Logger.error('Error initializing strategy performance chart', { page: 'strategy-analysis-page",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2116,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2117,
+            "content": "window.Logger.warn('Chart initialization failed, skipping update', { page: 'strategy-analysis-page' ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2137,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2138,
+            "content": "window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: errorMessage })",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2246,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2247,
+            "content": "window.Logger.error('Error updating strategy performance chart', { page: 'strategy-analysis-page', e",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2366,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2367,
+            "content": "window.Logger.warn('UnifiedCacheManager not available, cannot save record filter state', { page: 'st",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2371,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2372,
+            "content": "window.Logger.warn('Failed to save record filter state', { page: 'strategy-analysis-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2411,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2412,
+            "content": "window.Logger.debug('✅ Saved page state', { page: 'strategy-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2415,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2416,
+            "content": "window.Logger.warn('Failed to save page state', { error, page: 'strategy-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2458,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2459,
+            "content": "window.Logger.debug('✅ Restored page state', { page: 'strategy-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2462,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2463,
+            "content": "window.Logger.warn('Failed to restore page state, using fallback', { error, page: 'strategy-analysis",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2557,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2558,
+            "content": "window.Logger.warn('Failed to load record filter state', { page: 'strategy-analysis-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2574,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2575,
+            "content": "window.Logger.warn('UnifiedCacheManager not available, cannot save comparison parameter state', { pa",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2579,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2580,
+            "content": "window.Logger.warn('Failed to save comparison parameter state', { page: 'strategy-analysis-page', er",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2662,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2663,
+            "content": "window.Logger.warn('Failed to load comparison parameter state', { page: 'strategy-analysis-page', er",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2727,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2728,
+            "content": "window.Logger.warn('Failed to get default trading account, using first account', { page: 'strategy-a",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2849,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2850,
+            "content": "window.Logger.warn('createActionsMenu not available, cannot replace action buttons', { page: 'strate",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2925,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2926,
+            "content": "window.Logger.info('✅ Strategy analysis page initialized', { page: 'strategy-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2934,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2935,
+            "content": "window.Logger.error('Error initializing strategy analysis page', { page: 'strategy-analysis-page', e",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          }
+        ],
+        "issue_count": 78
+      },
+      "html_result": null
+    },
+    "cache": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 61,
+          "content": "// Save series visibility state using UnifiedCacheManager",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 64,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 64,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 64,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 65,
+          "content": "await window.UnifiedCacheManager.save(CACHE_KEY_SERIES_VISIBILITY, seriesVisibility, {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 72,
+          "content": "window.Logger.warn('UnifiedCacheManager not available, cannot save series visibility state', { page:",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 82,
+          "content": "// Load series visibility state using UnifiedCacheManager",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 85,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 85,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 85,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 86,
+          "content": "const savedState = await window.UnifiedCacheManager.get(CACHE_KEY_SERIES_VISIBILITY);",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 121,
+          "content": "// Cache keys for saving state (using UnifiedCacheManager, not PreferencesCore)",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2355,
+          "content": "// Save record filter state using UnifiedCacheManager",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2359,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2359,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2359,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2360,
+          "content": "await window.UnifiedCacheManager.save(CACHE_KEY_RECORD_FILTERS, recordFilters, {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2367,
+          "content": "window.Logger.warn('UnifiedCacheManager not available, cannot save record filter state', { page: 'st",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2472,
+          "content": "// Load record filter state using UnifiedCacheManager",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2476,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2476,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2476,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2477,
+          "content": "savedState = await window.UnifiedCacheManager.get(CACHE_KEY_RECORD_FILTERS);",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2563,
+          "content": "// Save comparison parameter state using UnifiedCacheManager",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2567,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2567,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2567,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2568,
+          "content": "await window.UnifiedCacheManager.save(CACHE_KEY_COMPARISON_PARAMS, comparisonParams, {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2575,
+          "content": "window.Logger.warn('UnifiedCacheManager not available, cannot save comparison parameter state', { pa",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2585,
+          "content": "// Load comparison parameter state using UnifiedCacheManager",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2589,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2589,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2589,
+          "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2590,
+          "content": "savedState = await window.UnifiedCacheManager.get(CACHE_KEY_COMPARISON_PARAMS);",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        }
+      ],
+      "issue_count": 34,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 61,
+            "content": "// Save series visibility state using UnifiedCacheManager",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 64,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 64,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 64,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 65,
+            "content": "await window.UnifiedCacheManager.save(CACHE_KEY_SERIES_VISIBILITY, seriesVisibility, {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 72,
+            "content": "window.Logger.warn('UnifiedCacheManager not available, cannot save series visibility state', { page:",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 82,
+            "content": "// Load series visibility state using UnifiedCacheManager",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 85,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 85,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 85,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 86,
+            "content": "const savedState = await window.UnifiedCacheManager.get(CACHE_KEY_SERIES_VISIBILITY);",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 121,
+            "content": "// Cache keys for saving state (using UnifiedCacheManager, not PreferencesCore)",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2355,
+            "content": "// Save record filter state using UnifiedCacheManager",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2359,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2359,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2359,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2360,
+            "content": "await window.UnifiedCacheManager.save(CACHE_KEY_RECORD_FILTERS, recordFilters, {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2367,
+            "content": "window.Logger.warn('UnifiedCacheManager not available, cannot save record filter state', { page: 'st",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2472,
+            "content": "// Load record filter state using UnifiedCacheManager",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2476,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2476,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2476,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2477,
+            "content": "savedState = await window.UnifiedCacheManager.get(CACHE_KEY_RECORD_FILTERS);",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2563,
+            "content": "// Save comparison parameter state using UnifiedCacheManager",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2567,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2567,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2567,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2568,
+            "content": "await window.UnifiedCacheManager.save(CACHE_KEY_COMPARISON_PARAMS, comparisonParams, {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2575,
+            "content": "window.Logger.warn('UnifiedCacheManager not available, cannot save comparison parameter state', { pa",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2585,
+            "content": "// Load comparison parameter state using UnifiedCacheManager",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2589,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2589,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2589,
+            "content": "if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheMana",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2590,
+            "content": "savedState = await window.UnifiedCacheManager.get(CACHE_KEY_COMPARISON_PARAMS);",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          }
+        ],
+        "issue_count": 34
+      },
+      "html_result": null
+    },
+    "dom_manipulation": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 32,
+          "content": "container.innerHTML = AVAILABLE_SERIES.map(series => {",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1517,
+          "content": "thead.innerHTML = headerHTML;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1627,
+          "content": "tbody.innerHTML = dataRows + summaryRow;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1644,
+          "content": "summary.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1660,
+          "content": "filterInfo.innerHTML = `<strong>פרמטרי סינון:</strong> ${filterText}`;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1671,
+          "content": "comparisonInfo.innerHTML = `<strong>פרמטרי השוואה:</strong> ${comparisonText}`;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1684,
+          "content": "tbody.innerHTML = data.map((item, index) => {",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1780,
+          "content": "grid.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1821,
+          "content": "cell.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2077,
+          "content": "loading.innerHTML = alertIcon + ' שגיאה בטעינת גרף';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2107,
+          "content": "legend.innerHTML = legendItems.join('');",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2297,
+          "content": "if (bestStrategy) bestStrategy.innerHTML = noteIcon + '<strong>אסטרטגיה הטובה ביותר:</strong> אין נת",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2298,
+          "content": "if (bestSuccessRate) bestSuccessRate.innerHTML = noteIcon + '<strong>אחוז הצלחה הגבוה ביותר:</strong",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2299,
+          "content": "if (recommendation) recommendation.innerHTML = alertIcon + '<strong>המלצה:</strong> אין נתונים להצגה",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2323,
+          "content": "bestStrategyEl.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2332,
+          "content": "bestSuccessRateEl.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2344,
+          "content": "recommendationEl.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2683,
+          "content": "select.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2750,
+          "content": "select.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2773,
+          "content": "select.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2802,
+          "content": "tagsSelect.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2831,
+          "content": "tagsSelect.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2873,
+          "content": "cell.innerHTML = actionsMenuHtml;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1803,
+          "content": "const cell = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 2689,
+          "content": "const option = document.createElement('option');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 2752,
+          "content": "const option = document.createElement('option');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 2775,
+          "content": "const option = document.createElement('option');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 2804,
+          "content": "const option = document.createElement('option');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 2833,
+          "content": "const option = document.createElement('option');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        }
+      ],
+      "issue_count": 29,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 32,
+            "content": "container.innerHTML = AVAILABLE_SERIES.map(series => {",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1517,
+            "content": "thead.innerHTML = headerHTML;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1627,
+            "content": "tbody.innerHTML = dataRows + summaryRow;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1644,
+            "content": "summary.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1660,
+            "content": "filterInfo.innerHTML = `<strong>פרמטרי סינון:</strong> ${filterText}`;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1671,
+            "content": "comparisonInfo.innerHTML = `<strong>פרמטרי השוואה:</strong> ${comparisonText}`;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1684,
+            "content": "tbody.innerHTML = data.map((item, index) => {",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1780,
+            "content": "grid.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1821,
+            "content": "cell.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2077,
+            "content": "loading.innerHTML = alertIcon + ' שגיאה בטעינת גרף';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2107,
+            "content": "legend.innerHTML = legendItems.join('');",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2297,
+            "content": "if (bestStrategy) bestStrategy.innerHTML = noteIcon + '<strong>אסטרטגיה הטובה ביותר:</strong> אין נת",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2298,
+            "content": "if (bestSuccessRate) bestSuccessRate.innerHTML = noteIcon + '<strong>אחוז הצלחה הגבוה ביותר:</strong",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2299,
+            "content": "if (recommendation) recommendation.innerHTML = alertIcon + '<strong>המלצה:</strong> אין נתונים להצגה",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2323,
+            "content": "bestStrategyEl.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2332,
+            "content": "bestSuccessRateEl.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2344,
+            "content": "recommendationEl.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2683,
+            "content": "select.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2750,
+            "content": "select.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2773,
+            "content": "select.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2802,
+            "content": "tagsSelect.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2831,
+            "content": "tagsSelect.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2873,
+            "content": "cell.innerHTML = actionsMenuHtml;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1803,
+            "content": "const cell = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 2689,
+            "content": "const option = document.createElement('option');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 2752,
+            "content": "const option = document.createElement('option');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 2775,
+            "content": "const option = document.createElement('option');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 2804,
+            "content": "const option = document.createElement('option');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 2833,
+            "content": "const option = document.createElement('option');",
+            "pattern": "createElement",
+            "match": "createElement"
+          }
+        ],
+        "issue_count": 29
+      },
+      "html_result": null
+    },
+    "html_structure": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 46,
+          "content": "<div class=\"series-color-indicator\" style=\"background-color: ${color};\"></div>",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 912,
+          "content": "return `<span class=\"badge rounded-pill bg-light text-dark border me-1 mb-1 compact-stat-label-small",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 1703,
+          "content": "<td style=\"${getColorStyle(item.tradesPercentile, item.trades)}\" data-value=\"${item.trades}\">${item.",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 1704,
+          "content": "<td style=\"${getColorStyle(item.avgPLPercentile, item.avgPL)}\" data-value=\"${item.avgPL}\">${formatPL",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 1705,
+          "content": "<td style=\"${getColorStyle(item.plPercentile, item.totalPL)}\" data-value=\"${item.totalPL}\">${formatP",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 1706,
+          "content": "<td style=\"${getColorStyle(item.successPercentile, item.successRate)}\" data-value=\"${item.successRat",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 1707,
+          "content": "<td class=\"text-end\" style=\"${getColorStyle(item.maxInvestmentPercentile, item.maxInvestmentAtPoint ",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 1708,
+          "content": "<td class=\"text-end\" style=\"${getColorStyle(item.totalPurchasesPercentile, item.totalPurchases || 0)",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 2100,
+          "content": "<div class=\"series-legend-color\" style=\"background-color: ${color};\"></div>",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        }
+      ],
+      "issue_count": 9,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 46,
+            "content": "<div class=\"series-color-indicator\" style=\"background-color: ${color};\"></div>",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 912,
+            "content": "return `<span class=\"badge rounded-pill bg-light text-dark border me-1 mb-1 compact-stat-label-small",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 1703,
+            "content": "<td style=\"${getColorStyle(item.tradesPercentile, item.trades)}\" data-value=\"${item.trades}\">${item.",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 1704,
+            "content": "<td style=\"${getColorStyle(item.avgPLPercentile, item.avgPL)}\" data-value=\"${item.avgPL}\">${formatPL",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 1705,
+            "content": "<td style=\"${getColorStyle(item.plPercentile, item.totalPL)}\" data-value=\"${item.totalPL}\">${formatP",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 1706,
+            "content": "<td style=\"${getColorStyle(item.successPercentile, item.successRate)}\" data-value=\"${item.successRat",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 1707,
+            "content": "<td class=\"text-end\" style=\"${getColorStyle(item.maxInvestmentPercentile, item.maxInvestmentAtPoint ",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 1708,
+            "content": "<td class=\"text-end\" style=\"${getColorStyle(item.totalPurchasesPercentile, item.totalPurchases || 0)",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 2100,
+            "content": "<div class=\"series-legend-color\" style=\"background-color: ${color};\"></div>",
+            "pattern": "style\\s*=",
+            "match": "style="
+          }
+        ],
+        "issue_count": 9
+      },
+      "html_result": null
+    }
+  }
+}

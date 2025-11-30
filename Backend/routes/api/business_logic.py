@@ -9,7 +9,7 @@ Documentation:
 - documentation/02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md
 """
 
-from flask import Blueprint, jsonify, request, g
+from flask import Blueprint, jsonify, request, g, session
 from typing import Dict, Any
 from sqlalchemy.orm import Session
 import logging
@@ -1376,6 +1376,10 @@ def validate_ai_analysis():
     """Validate AI analysis request data."""
     try:
         data = request.get_json() or {}
+        
+        # Get user_id from session/g and add to data for validation
+        user_id = session.get('user_id') or getattr(g, 'user_id', None) or 1
+        data['user_id'] = user_id
         
         # Set db_session for business service
         ai_analysis_business_service.db_session = g.db

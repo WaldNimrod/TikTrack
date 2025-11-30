@@ -138,7 +138,13 @@ await window.TagWidget.refreshTagCloud({ force: true });
 
 ### `TagWidget.destroy()`
 
-מנקה את הווידג'ט.
+מנקה את הווידג'ט ומסיר את כל ה-event listeners.
+
+**מה זה עושה:**
+- מנקה את ה-state
+- מסיר event listeners מכל ה-elements
+- מנקה את ה-autocomplete
+- מנקה את ה-metadata cache
 
 **Example:**
 ```javascript

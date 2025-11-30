@@ -47,12 +47,59 @@
 
             try {
                 // Load mappings - retry if not available
-                if (typeof window.IconMappings !== 'undefined') {
-                    this.mappings = window.IconMappings;
-                } else {
-                    // Retry after a short delay
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    if (typeof window.IconMappings !== 'undefined') {
+                let retries = 0;
+                const maxRetries = 5;
+                const retryDelay = 100;
+                
+                while (retries < maxRetries) {
+                    if (typeof window.IconMappings !== 'undefined' && window.IconMappings) {
+                        // Deep copy to avoid reference issues
+                        this.mappings = JSON.parse(JSON.stringify(window.IconMappings));
+                        
+                        // Verify that buttons mapping exists
+                        if (this.mappings.buttons && Object.keys(this.mappings.buttons).length > 0) {
+                            if (window.Logger) {
+                                window.Logger.debug('✅ IconMappings loaded successfully', { 
+                                    buttonsCount: Object.keys(this.mappings.buttons).length,
+                                    hasToggle: !!this.mappings.buttons.toggle,
+                                    toggleValue: this.mappings.buttons.toggle,
+                                    page: 'icon-system' 
+                                });
+                            }
+                            break;
+                        } else {
+                            // Mappings object exists but buttons is empty or missing
+                            if (window.Logger && retries < maxRetries - 1) {
+                                window.Logger.warn('⚠️ IconMappings.buttons is empty, retrying...', { 
+                                    retry: retries + 1,
+                                    mappingsExists: !!this.mappings,
+                                    buttonsExists: !!this.mappings.buttons,
+                                    windowIconMappingsButtons: window.IconMappings.buttons ? Object.keys(window.IconMappings.buttons) : [],
+                                    page: 'icon-system' 
+                                });
+                            }
+                        }
+                    }
+                    
+                    retries++;
+                    if (retries < maxRetries) {
+                        await new Promise(resolve => setTimeout(resolve, retryDelay));
+                    }
+                }
+                
+                // Final check - if still no mappings, use empty object
+                if (!this.mappings || !this.mappings.buttons || Object.keys(this.mappings.buttons).length === 0) {
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ IconMappings.buttons not loaded after retries, using fallback', { 
+                            mappingsExists: !!this.mappings,
+                            buttonsExists: !!this.mappings?.buttons,
+                            windowIconMappingsExists: typeof window.IconMappings !== 'undefined',
+                            windowIconMappingsButtons: window.IconMappings?.buttons ? Object.keys(window.IconMappings.buttons) : [],
+                            page: 'icon-system' 
+                        });
+                    }
+                    // Try to reload from window.IconMappings one more time
+                    if (typeof window.IconMappings !== 'undefined' && window.IconMappings) {
                         this.mappings = window.IconMappings;
                     } else {
                         this.mappings = {};
@@ -68,6 +115,9 @@
 
                 return true;
             } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('❌ Error initializing IconSystem', { error: error.message, stack: error.stack, page: 'icon-system' });
+                }
                 return false;
             }
         }
@@ -121,19 +171,98 @@
                 }
             } else {
                 // For other types (button, category, chart, page), use Tabler Icons
-                const mapping = this.mappings?.[type]?.[name];
+                // Debug: Check if mappings are loaded correctly
+                if (window.Logger && name === 'toggle' && type === 'button') {
+                    window.Logger.debug('🔍 IconSystem: Looking for toggle mapping', { 
+                        type, 
+                        name,
+                        mappingsExists: !!this.mappings,
+                        buttonMappingsExists: !!this.mappings?.button,
+                        buttonMappingsKeys: this.mappings?.button ? Object.keys(this.mappings.button) : [],
+                        toggleMapping: this.mappings?.button?.toggle,
+                        windowIconMappingsButtons: window.IconMappings?.button ? Object.keys(window.IconMappings.button) : [],
+                        windowToggleMapping: window.IconMappings?.button?.toggle,
+                        page: 'icon-system' 
+                    });
+                }
+                
+                // Try to get mapping from this.mappings first
+                let mapping = this.mappings?.[type]?.[name];
+                
+                // If mapping not found and this.mappings[type] is empty, try window.IconMappings directly
+                if (!mapping && typeof window.IconMappings !== 'undefined' && window.IconMappings && window.IconMappings[type] && window.IconMappings[type][name]) {
+                    mapping = window.IconMappings[type][name];
+                    // Reload this.mappings from window.IconMappings for future calls
+                    this.mappings = window.IconMappings;
+                    if (window.Logger && name === 'toggle') {
+                        window.Logger.debug('✅ Icon mapping found via window.IconMappings fallback', { 
+                            type, 
+                            name,
+                            mapping,
+                            page: 'icon-system' 
+                        });
+                    }
+                }
                 
                 if (mapping) {
                     // Check if it's already a path
                     if (mapping.startsWith('/')) {
                         iconPath = mapping;
                     } else {
-                        // Tabler icon name
+                        // Tabler icon name - use the mapped name (e.g., 'chevron-down' for 'toggle')
                         iconPath = `${this.tablerPath}${mapping}.svg`;
                     }
                 } else {
-                    // Try direct Tabler name
-                    iconPath = `${this.tablerPath}${name}.svg`;
+                    // Try to reload mappings from window.IconMappings if available (fallback)
+                    // Use direct access to window.IconMappings to avoid reference issues
+                    if (typeof window.IconMappings !== 'undefined' && window.IconMappings && window.IconMappings[type] && window.IconMappings[type][name]) {
+                        const fallbackMapping = window.IconMappings[type][name];
+                        // Reload this.mappings from window.IconMappings for future calls
+                        this.mappings = window.IconMappings;
+                        if (fallbackMapping) {
+                            if (fallbackMapping.startsWith('/')) {
+                                iconPath = fallbackMapping;
+                            } else {
+                                iconPath = `${this.tablerPath}${fallbackMapping}.svg`;
+                            }
+                            if (window.Logger && name === 'toggle') {
+                                window.Logger.debug('✅ Icon mapping found via fallback mechanism', { 
+                                    type, 
+                                    name,
+                                    mapping: fallbackMapping,
+                                    page: 'icon-system' 
+                                });
+                            }
+                        } else {
+                            // Still no mapping found, try direct Tabler name
+                            if (window.Logger && name === 'toggle') {
+                                window.Logger.warn('⚠️ Icon mapping missing for toggle, trying direct name', { 
+                                    type, 
+                                    name, 
+                                    mappingsAvailable: !!this.mappings,
+                                    buttonMappings: this.mappings?.button ? Object.keys(this.mappings.button) : [],
+                                    iconMappingsGlobal: typeof window.IconMappings !== 'undefined',
+                                    iconMappingsButton: window.IconMappings?.button ? Object.keys(window.IconMappings.button) : [],
+                                    page: 'icon-system' 
+                                });
+                            }
+                            iconPath = `${this.tablerPath}${name}.svg`;
+                        }
+                    } else {
+                        // Try direct Tabler name - but log warning if mapping is missing
+                        if (window.Logger && name === 'toggle') {
+                            window.Logger.warn('⚠️ Icon mapping missing for toggle, trying direct name', { 
+                                type, 
+                                name, 
+                                mappingsAvailable: !!this.mappings,
+                                buttonMappings: this.mappings?.button ? Object.keys(this.mappings.button) : [],
+                                iconMappingsGlobal: typeof window.IconMappings !== 'undefined',
+                                iconMappingsButton: window.IconMappings?.button ? Object.keys(window.IconMappings.button) : [],
+                                page: 'icon-system' 
+                            });
+                        }
+                        iconPath = `${this.tablerPath}${name}.svg`;
+                    }
                 }
             }
 

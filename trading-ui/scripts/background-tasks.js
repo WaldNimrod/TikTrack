@@ -137,7 +137,7 @@ const utils = {
       element.disabled = false;
       // Restore original content based on element type
       if (elementId.includes('start-scheduler')) {
-        element.innerHTML = '▶️ הפעל Scheduler';
+        element.innerHTML.textContent = ';
       } else if (elementId.includes('stop-scheduler')) {
         // Use IconSystem to render stop icon
         // Use IconSystem if available
@@ -348,13 +348,13 @@ const uiManager = {
         // Scheduler is running - show only stop button
         startBtn.style.setProperty('display', 'none', 'important');
         stopBtn.style.setProperty('display', 'inline-block', 'important');
-        stopBtn.innerHTML = '⏹️ עצור Scheduler';
+        stopBtn.innerHTML.textContent = ';
         stopBtn.disabled = false;
       } else {
         // Scheduler is stopped - show only start button
         startBtn.style.setProperty('display', 'inline-block', 'important');
         stopBtn.style.setProperty('display', 'none', 'important');
-        startBtn.innerHTML = '▶️ הפעל Scheduler';
+        startBtn.innerHTML.textContent = ';
         startBtn.disabled = false;
       }
     }
@@ -450,7 +450,11 @@ const uiManager = {
     if (!chartContainer) {return;}
 
     if (Object.keys(taskPerformance).length === 0) {
-      chartContainer.innerHTML = '<div class="no-data">אין נתוני ביצועים זמינים</div>';
+      chartContainer.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'no-data';
+        div.textContent = 'אין נתוני ביצועים זמינים';
+        chartContainer.innerHTML.appendChild(div);
       return;
     }
 

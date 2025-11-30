@@ -95,7 +95,7 @@
 | **trade_plans.html** | תכניות מסחר | `http://localhost:5000/trade_plans.html` | `/api/trade-plans/*` | ✅ TradePlanBusinessService | ✅ מוכן |
 | **alerts.html** | מערכת התראות | `http://localhost:5000/alerts.html` | `/api/alerts/*` | ✅ AlertBusinessService | ✅ מוכן |
 | **tickers.html** | ניהול טיקרים | `http://localhost:5000/tickers.html` | `/api/tickers/*` | ✅ TickerBusinessService | ✅ מוכן |
-| **ticker-dashboard.html** | דשבורד טיקר מורחב | `http://localhost:5000/ticker-dashboard.html` | `/api/tickers/{id}/*` | ✅ TickerBusinessService | ✅ מוכן |
+| **ticker-dashboard.html** | דשבורד טיקר מורחב | `http://localhost:5000/ticker-dashboard.html` | `/api/tickers/{id}/*` | ✅ TickerBusinessService | ✅ מוכן - בדיקות הושלמו 30.01.2025 |
 | **trading_accounts.html** | חשבונות מסחר | `http://localhost:5000/trading_accounts.html` | `/api/trading-accounts/*` | ✅ TradingAccountBusinessService | ✅ מוכן |
 | **executions.html** | ביצועי עסקאות | `http://localhost:5000/executions.html` | `/api/executions/*` | ✅ ExecutionBusinessService | ✅ מוכן |
 | **data_import.html** | ייבוא נתונים | `http://localhost:5000/data_import.html` | `/api/user-data-import/*` | ❌ חסר | ⏳ צריך Business Service |
@@ -144,6 +144,57 @@
 | **test_external_data.html** | בדיקת נתונים חיצוניים | `http://localhost:5000/external_data_integration_client/pages/test_external_data.html` |
 | **test_models.html** | בדיקת מודלים | `http://localhost:5000/external_data_integration_client/pages/test_models.html` |
 
+### עמודי אימות
+| עמוד | תיאור | גישה |
+|------|--------|------|
+| **login.html** | כניסה למערכת | `http://localhost:8080/login.html` |
+| **register.html** | הרשמה למערכת | `http://localhost:8080/register.html` |
+| **forgot-password.html** | שחזור סיסמה | `http://localhost:8080/forgot-password.html` |
+| **reset-password.html** | איפוס סיסמה | `http://localhost:8080/reset-password.html` |
+
+### עמודי כלים לפיתוח
+| עמוד | תיאור | גישה |
+|------|--------|------|
+| **button-color-mapping.html** | מיפוי צבעי כפתורים | `http://localhost:8080/button-color-mapping.html` |
+| **button-color-mapping-simple.html** | מיפוי צבעי כפתורים - פשוט | `http://localhost:8080/button-color-mapping-simple.html` |
+| **conditions-modals.html** | מודלים של תנאים | `http://localhost:8080/conditions-modals.html` |
+| **tooltip-editor.html** | עורך טולטיפים | `http://localhost:8080/tooltip-editor.html` |
+| **preferences-groups-management.html** | ניהול קבוצות העדפות | `http://localhost:8080/preferences-groups-management.html` |
+| **tag-management.html** | ניהול תגיות | `http://localhost:8080/tag-management.html` |
+| **cache-management.html** | ניהול מטמון | `http://localhost:8080/cache-management.html` |
+| **code-quality-dashboard.html** | דשבורד איכות קוד | `http://localhost:8080/code-quality-dashboard.html` |
+| **init-system-management.html** | ניהול מערכת אתחול | `http://localhost:8080/init-system-management.html` |
+| **conditions-test.html** | בדיקת תנאים | `http://localhost:8080/conditions-test.html` |
+
+### עמודי רשימות מעקב
+| עמוד | תיאור | גישה |
+|------|--------|------|
+| **watch-lists-page.html** | ניהול רשימות צפייה | `http://localhost:8080/watch-lists-page.html` |
+| **watch-list-modal.html** | מודל רשימת צפייה | `http://localhost:8080/watch-list-modal.html` |
+| **add-ticker-modal.html** | מודל הוספת טיקר | `http://localhost:8080/add-ticker-modal.html` |
+| **flag-quick-action.html** | פעולה מהירה - דגל | `http://localhost:8080/flag-quick-action.html` |
+
+### עמודי מוקאפים (Daily Snapshots)
+| עמוד | תיאור | גישה |
+|------|--------|------|
+| **daily-snapshots-comparative-analysis-page.html** | ניתוח השוואתי - מוקאפ | `http://localhost:8080/daily-snapshots-comparative-analysis-page.html` |
+| **daily-snapshots-date-comparison-modal.html** | השוואת תאריכים - מוקאפ | `http://localhost:8080/daily-snapshots-date-comparison-modal.html` |
+| **daily-snapshots-economic-calendar-page.html** | לוח שנה כלכלי - מוקאפ | `http://localhost:8080/daily-snapshots-economic-calendar-page.html` |
+| **daily-snapshots-emotional-tracking-widget.html** | ווידג'ט מעקב רגשי - מוקאפ | `http://localhost:8080/daily-snapshots-emotional-tracking-widget.html` |
+| **daily-snapshots-heatmap-visual-example.html** | דוגמת מפת חום - מוקאפ | `http://localhost:8080/daily-snapshots-heatmap-visual-example.html` |
+| **daily-snapshots-history-widget.html** | ווידג'ט היסטוריה - מוקאפ | `http://localhost:8080/daily-snapshots-history-widget.html` |
+| **daily-snapshots-portfolio-state-page.html** | מצב תיק השקעות - מוקאפ | `http://localhost:8080/daily-snapshots-portfolio-state-page.html` |
+| **daily-snapshots-price-history-page.html** | היסטוריית מחירים - מוקאפ | `http://localhost:8080/daily-snapshots-price-history-page.html` |
+| **daily-snapshots-strategy-analysis-page.html** | ניתוח אסטרטגיה - מוקאפ | `http://localhost:8080/daily-snapshots-strategy-analysis-page.html` |
+| **daily-snapshots-trade-history-page.html** | היסטוריית טריידים - מוקאפ | `http://localhost:8080/daily-snapshots-trade-history-page.html` |
+| **daily-snapshots-trading-journal-page.html** | יומן מסחר - מוקאפ | `http://localhost:8080/daily-snapshots-trading-journal-page.html` |
+
+### עמודים נוספים
+| עמוד | תיאור | גישה |
+|------|--------|------|
+| **tradingview-widgets-showcase.html** | תצוגת ווידג'טים TradingView | `http://localhost:8080/tradingview-widgets-showcase.html` |
+| **trades_formatted.html** | טריידים מעוצבים | `http://localhost:8080/trades_formatted.html` |
+
 ---
 
 ## 🔗 קישורים רלוונטיים
@@ -166,7 +217,12 @@
 - **עמודים מרכזיים:** 12 עמודים
 - **עמודים טכניים:** 12 עמודים
 - **עמודים משניים:** 5 עמודים
-- **סה"כ עמודים:** 29 עמודים
+- **עמודי אימות:** 4 עמודים
+- **עמודי כלים לפיתוח:** 10 עמודים
+- **עמודי רשימות מעקב:** 4 עמודים
+- **עמודי מוקאפים:** 11 עמודים
+- **עמודים נוספים:** 2 עמודים
+- **סה"כ עמודים:** 59 עמודים
 
 ---
 

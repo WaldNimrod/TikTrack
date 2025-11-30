@@ -335,7 +335,11 @@
         datesList.innerHTML = '';
 
         if (selectedDates.length === 0) {
-            datesList.innerHTML = '<div class="text-muted text-center py-2">אין תאריכים נבחרים. הוסף תאריכים להשוואה.</div>';
+            datesList.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted text-center py-2';
+        div.textContent = 'אין תאריכים נבחרים. הוסף תאריכים להשוואה.';
+        datesList.innerHTML.appendChild(div);
             return;
         }
 

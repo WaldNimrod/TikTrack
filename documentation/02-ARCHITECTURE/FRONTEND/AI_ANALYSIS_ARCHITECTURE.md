@@ -291,3 +291,4 @@ AIAnalysisState.history.unshift(result);
 **תאריך עדכון אחרון:** 28 בינואר 2025  
 **גרסה:** 1.0.0
 
+

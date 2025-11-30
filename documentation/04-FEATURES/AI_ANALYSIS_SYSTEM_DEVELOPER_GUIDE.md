@@ -29,6 +29,7 @@
 2. **אבטחה** - API keys מוצפנים ב-DB
 3. **גמישות** - תמיכה במספר מנועי LLM
 4. **היסטוריה** - שמירת כל הניתוחים להיסטוריה
+5. **תמיכה בשפות** - תמיכה מלאה בעברית ואנגלית עם Option 10 (74%+ עברית)
 
 ---
 
@@ -429,9 +430,29 @@ def generate_analysis(template_id, variables, user_id):
 - Debouncing של validation requests
 - שימוש ב-CacheSyncManager לניקוי מטמון אוטומטי
 
+### 10. Language Support (Option 10)
+- תמיכה מלאה בעברית ואנגלית
+- מימוש Option 10 לעברית (74%+ עברית)
+- תמיכה בשני המנועים (Gemini ו-Perplexity)
+- מונחים פיננסיים ושמות חברות יכולים להיות באנגלית
+
+**מימוש:**
+```python
+# build_prompt automatically applies Option 10 for Hebrew
+variables = {
+    'stock_ticker': 'AAPL',
+    'response_language': 'hebrew'  # או 'english'
+}
+prompt = PromptTemplateService.build_prompt(template, variables)
+```
+
+**תיעוד נוסף:** ראה `AI_ANALYSIS_HEBREW_RESPONSE_TEST_RESULTS.md`
+
 ---
 
 ## 🔧 Troubleshooting
+
+> **⚠️ חשוב:** למידע מפורט על בעיות מזוהות ותיקונים נדרשים, ראה: [AI_ANALYSIS_SYSTEM_ISSUES_AND_FIXES.md](AI_ANALYSIS_SYSTEM_ISSUES_AND_FIXES.md)
 
 ### בעיה: API key לא עובד
 **פתרון:**

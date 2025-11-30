@@ -126,6 +126,20 @@ class AIAnalysisService:
 
 ### PromptTemplateService
 
+**Option 10 Implementation (November 2025):**
+- Full Hebrew translation support with explicit English prohibition
+- Achieves 74%+ Hebrew content for professional financial analysis
+- Supports both Hebrew and English responses
+- Works with all LLM providers (Gemini, Perplexity)
+
+**Key Methods:**
+- `build_prompt()` - Builds final prompt with Option 10 for Hebrew
+- `_translate_structure_to_hebrew()` - Translates structure section to Hebrew
+
+**See:** `AI_ANALYSIS_HEBREW_RESPONSE_TEST_RESULTS.md` for full details
+
+### PromptTemplateService
+
 **קובץ:** `Backend/services/ai_analysis_service.py`
 
 **תפקידים:**

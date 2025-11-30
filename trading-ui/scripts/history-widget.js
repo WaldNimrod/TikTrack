@@ -154,11 +154,17 @@
             // Update total value label
             const totalValueElement = document.getElementById('chartTotalValue');
             if (totalValueElement && typeof window.FieldRendererService !== 'undefined') {
-                totalValueElement.innerHTML = window.FieldRendererService.renderNumericValue(
+                const htmlContent = window.FieldRendererService.renderNumericValue(
                     totalValue,
                     '$',
                     false
                 );
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlContent;
+                totalValueElement.textContent = '';
+                while (tempDiv.firstChild) {
+                    totalValueElement.appendChild(tempDiv.firstChild);
+                }
                 // Update color based on value
                 totalValueElement.className = 'chart-label-value ' + (totalValue >= 0 ? 'text-success' : 'text-danger');
             } else if (totalValueElement) {
@@ -169,11 +175,17 @@
             // Update change percent label - use finalChangePercent that has consistent sign
             const changePercentElement = document.getElementById('chartChangePercent');
             if (changePercentElement && typeof window.FieldRendererService !== 'undefined') {
-                changePercentElement.innerHTML = window.FieldRendererService.renderNumericValue(
+                const htmlContent = window.FieldRendererService.renderNumericValue(
                     finalChangePercent,
                     '%',
                     true
                 );
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlContent;
+                changePercentElement.textContent = '';
+                while (tempDiv.firstChild) {
+                    changePercentElement.appendChild(tempDiv.firstChild);
+                }
                 changePercentElement.className = 'chart-label-value ' + (finalChangePercent >= 0 ? 'text-success' : 'text-danger');
             } else if (changePercentElement) {
                 changePercentElement.textContent = finalChangePercent > 0 ? `+${finalChangePercent.toFixed(2)}%` : `${finalChangePercent.toFixed(2)}%`;

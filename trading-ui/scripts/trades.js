@@ -442,7 +442,14 @@ async function loadTradesData() {
       // Fallback to direct DOM manipulation if CRUDResponseHandler not available
       const tbody = document.querySelector('#tradesTable tbody');
       if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="11" class="text-center text-danger">שגיאה בטעינת נתונים: ' + error.message + '</td></tr>';
+        tbody.textContent = '';
+        const errorRow = document.createElement('tr');
+        const errorCell = document.createElement('td');
+        errorCell.colSpan = 11;
+        errorCell.className = 'text-center text-danger';
+        errorCell.textContent = 'שגיאה בטעינת נתונים: ' + error.message;
+        errorRow.appendChild(errorCell);
+        tbody.appendChild(errorRow);
       } else {
         if (typeof handleElementNotFound === 'function') {
           handleElementNotFound('#tradesTable tbody', 'CRITICAL');
@@ -687,7 +694,12 @@ async function displayTradeTickerInfo(ticker) {
   // Use the new global renderTickerInfo function
   if (window.renderTickerInfo) {
     const tickerInfoHtml = await window.renderTickerInfo(ticker, 'ticker-info-display');
-    tickerInfoDiv.innerHTML = tickerInfoHtml;
+    tickerInfoDiv.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = tickerInfoHtml;
+    while (tempDiv.firstChild) {
+      tickerInfoDiv.appendChild(tempDiv.firstChild);
+    }
   } else {
     // Fallback if renderTickerInfo not available
     const currentPrice = typeof ticker.current_price === 'number' ? `$${ticker.current_price.toFixed(2)}` : 'לא זמין';

@@ -300,12 +300,84 @@
       }
       
       if (combination === 'assignTrades') {
-        // Use ExecutionAssignmentService data structure
-        // For now, fallback to old widget rendering
-        const widget = window.PendingExecutionsHighlights;
-        if (widget?.renderHighlightItem) {
-          return widget.renderHighlightItem(item);
-        }
+        // Render highlight item using ExecutionAssignmentService data
+        const execution = item.execution || {};
+        const executionId = execution.id;
+        const suggestions = item.suggestions || [];
+        const ticker = execution.ticker || {};
+        const account = execution.trading_account || execution.account || {};
+        
+        const FieldRenderer = window.FieldRendererService;
+        const tickerBadge = ticker.symbol 
+          ? `<span class="badge entity-ticker">${FieldRenderer?.escapeHtml?.(ticker.symbol) || ticker.symbol}</span>`
+          : '';
+        const accountBadge = account.name || account.display_name
+          ? `<span class="badge entity-account">${FieldRenderer?.escapeHtml?.(account.name || account.display_name) || account.name || account.display_name}</span>`
+          : '';
+        
+        const suggestionsText = suggestions.length > 0 
+          ? `${suggestions.length} הצעות שיוך`
+          : 'אין הצעות שיוך';
+        
+        return `
+          <li class="list-group-item unified-pending-list-item" data-execution-id="${executionId}">
+            <div class="unified-pending-item-header">
+              <div class="unified-pending-item-title">
+                <span class="text-muted small">ביצוע #${executionId}</span>
+                <span class="text-muted small">${suggestionsText}</span>
+              </div>
+              <div class="unified-pending-item-actions">
+                <button
+                  data-button-type="APPROVE"
+                  data-variant="small"
+                  data-execution-id="${executionId}"
+                  data-text="אשר"
+                  title="פתח מודול שיוך">
+                </button>
+                <button
+                  data-button-type="REJECT"
+                  data-variant="small"
+                  data-execution-id="${executionId}"
+                  data-text="התעלם"
+                  title="הסר מהרשימה">
+                </button>
+              </div>
+            </div>
+            <div class="unified-pending-item-meta d-flex flex-wrap align-items-center gap-2 mt-2">
+              ${tickerBadge ? `
+                <span class="entity-icon-circle entity-icon-circle-sm d-flex align-items-center justify-content-center">
+                  <img src="images/icons/entities/tickers.svg" alt="טיקר" width="12" height="12" />
+                </span>
+                ${tickerBadge}
+              ` : ''}
+              ${accountBadge ? `
+                <span class="entity-icon-circle entity-icon-circle-sm d-flex align-items-center justify-content-center">
+                  <img src="images/icons/entities/trading_accounts.svg" alt="חשבון" width="12" height="12" />
+                </span>
+                ${accountBadge}
+              ` : ''}
+            </div>
+            <div class="unified-pending-details" data-role="widget-detail" data-execution-id="${executionId}">
+              <div class="details-stats text-muted small mb-2">
+                ${suggestions.length > 0 ? `
+                  <div class="d-flex flex-column gap-1">
+                    ${suggestions.slice(0, 3).map(suggestion => {
+                      const trade = suggestion.trade || {};
+                      const matchScore = suggestion.match_score || 0;
+                      return `
+                        <div class="d-flex justify-content-between align-items-center">
+                          <span>טרייד #${trade.id || suggestion.trade_id || '-'}</span>
+                          <span class="badge bg-body-secondary">${matchScore}% התאמה</span>
+                        </div>
+                      `;
+                    }).join('')}
+                    ${suggestions.length > 3 ? `<span class="text-muted">+${suggestions.length - 3} עוד</span>` : ''}
+                  </div>
+                ` : '<span>אין הצעות שיוך זמינות</span>'}
+              </div>
+            </div>
+          </li>
+        `;
       }
       
       if (combination === 'assignPlans') {
@@ -597,10 +669,11 @@
       elements.entityTabTrades.addEventListener('click', () => setActiveEntity('trades'));
     }
     
-    // Listen for clicks on action buttons
+    // Listen for clicks on action buttons and handle hover
     const allLists = Object.values(elements.list);
     allLists.forEach(list => {
       if (list) {
+        // Click handlers
         list.addEventListener('click', async (event) => {
           const createBtn = event.target.closest('[data-role="create-trade"]');
           if (createBtn) {
@@ -629,6 +702,27 @@
             return;
           }
 
+          // Handle APPROVE button (which button)
+          const approveBtn = event.target.closest('[data-button-type="APPROVE"]');
+          if (approveBtn) {
+            // Get item data from closest list item
+            const item = approveBtn.closest('.unified-pending-list-item, .trade-create-widget-item, .list-group-item');
+            if (item) {
+              await handleApproveAction(item, event);
+            }
+            return;
+          }
+
+          // Handle REJECT/DISMISS button
+          const rejectBtn = event.target.closest('[data-button-type="REJECT"], [data-button-type="DISMISS"]');
+          if (rejectBtn) {
+            const item = rejectBtn.closest('.unified-pending-list-item, .trade-create-widget-item, .list-group-item');
+            if (item) {
+              await handleRejectAction(item, event);
+            }
+            return;
+          }
+
           // For other buttons, refresh after action
           if (event.target.closest('[data-button-type]')) {
             setTimeout(async () => {
@@ -637,8 +731,140 @@
             }, 500);
           }
         });
+
+        // Hover handlers for overlay positioning
+        list.addEventListener('mouseenter', handleItemHover, true);
+        list.addEventListener('mouseleave', handleItemHover, true);
       }
     });
+  }
+
+  /**
+   * Handle hover on widget items - simple relative positioning
+   */
+  function handleItemHover(event) {
+    const item = event.target.closest('.unified-pending-list-item, .trade-create-widget-item');
+    if (!item) {
+      return;
+    }
+
+    if (event.type === 'mouseenter') {
+      item.classList.add('is-hovered');
+      // CSS handles positioning - no JavaScript needed for relative positioning
+    } else if (event.type === 'mouseleave') {
+      // Check if mouse is moving to overlay
+      const details = item.querySelector('.unified-pending-details, .trade-create-widget-details, [data-role="widget-detail"]');
+      const relatedTarget = event.relatedTarget;
+      if (details && relatedTarget && details.contains(relatedTarget)) {
+        // Mouse is moving to overlay, keep it visible
+        return;
+      }
+      
+      item.classList.remove('is-hovered');
+    }
+  }
+
+  /**
+   * Handle APPROVE action - open modal for creation/assignment
+   */
+  async function handleApproveAction(item, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const combination = getCombinationKey(state.activeAction, state.activeEntity);
+    window.Logger?.info?.('Handling APPROVE action', { combination, page: 'index' });
+    
+    if (combination === 'createTrades') {
+      // Handle trade creation from cluster
+      const clusterId = item.dataset.clusterId;
+      if (clusterId && window.ExecutionClusteringService && window.ExecutionClusterHelpers) {
+        const clusters = await window.ExecutionClusteringService.getCachedClusters() || [];
+        const cluster = clusters.find(c => c.cluster_id === clusterId);
+        if (cluster) {
+          const selectedIds = window.ExecutionClusteringService.getSelection?.(clusterId) || new Set(cluster.execution_ids.map(id => Number(id)));
+          await window.ExecutionClusterHelpers.openTradeModalFromCluster(clusterId, cluster, selectedIds, {
+            handleTradeCreated: async (result) => {
+              await window.ExecutionClusterHelpers.handleTradeCreated(result, clusterId, Array.from(selectedIds));
+              await loadCombinationData(state.activeAction, state.activeEntity);
+            }
+          });
+        }
+      }
+    } else if (combination === 'assignTrades') {
+      // Handle execution assignment to trade
+      const executionId = item.dataset.executionId;
+      if (executionId && window.ExecutionAssignmentService) {
+        // Get suggested trades and open assignment modal
+        const highlights = await window.ExecutionAssignmentService.getCachedHighlights() || [];
+        const highlight = highlights.find(h => h.execution?.id === Number(executionId));
+        if (highlight && highlight.suggested_trades && highlight.suggested_trades.length > 0) {
+          // Open assignment modal with first suggestion or let user choose
+          // This should use ExecutionAssignmentService to open modal
+          window.Logger?.warn?.('Execution assignment modal not yet implemented', { executionId, page: 'index' });
+        }
+      }
+    } else if (combination === 'createPlans' || combination === 'assignPlans') {
+      // Handle plan creation/assignment
+      const tradeId = item.dataset.tradeId;
+      if (tradeId && window.TradePlanAssignmentService) {
+        if (combination === 'createPlans') {
+          // Open plan creation modal with trade prefill
+          if (window.ModalManagerV2?.showModal) {
+            await window.ModalManagerV2.showModal('tradePlanModal', 'add', { 
+              trade_id: Number(tradeId),
+              // Add other prefill data from trade
+            });
+            await loadCombinationData(state.activeAction, state.activeEntity);
+          }
+        } else {
+          // Open plan assignment modal
+          const assignments = await window.TradePlanAssignmentService.getCachedAssignments() || [];
+          const assignment = assignments.find(a => a.trade?.id === Number(tradeId));
+          if (assignment && assignment.suggested_plans && assignment.suggested_plans.length > 0) {
+            // Open assignment modal
+            window.Logger?.warn?.('Plan assignment modal not yet implemented', { tradeId, page: 'index' });
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Handle REJECT/DISMISS action - remove item from list
+   */
+  async function handleRejectAction(item, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const combination = getCombinationKey(state.activeAction, state.activeEntity);
+    window.Logger?.info?.('Handling REJECT action', { combination, page: 'index' });
+    
+    if (combination === 'createTrades') {
+      const clusterId = item.dataset.clusterId;
+      if (clusterId) {
+        await window.PendingActionsCacheService.dismissItem('trade-creation-clusters', clusterId);
+        await loadCombinationData(state.activeAction, state.activeEntity);
+      }
+    } else if (combination === 'assignTrades') {
+      const executionId = item.dataset.executionId;
+      if (executionId && window.ExecutionAssignmentService) {
+        await window.ExecutionAssignmentService.dismissItem(executionId);
+        await loadCombinationData(state.activeAction, state.activeEntity);
+      }
+    } else if (combination === 'createPlans' || combination === 'assignPlans') {
+      const tradeId = item.dataset.tradeId;
+      if (tradeId && window.TradePlanAssignmentService) {
+        if (combination === 'createPlans') {
+          await window.TradePlanAssignmentService.dismissItem('creation', tradeId);
+        } else {
+          const planId = item.dataset.planId;
+          if (planId) {
+            await window.TradePlanAssignmentService.dismissItem('assignment', tradeId, planId);
+          }
+        }
+        await loadCombinationData(state.activeAction, state.activeEntity);
+      }
+    }
   }
   
   /**
@@ -696,45 +922,20 @@
   }
   
   async function updateCount(combination, count) {
+    // Update the specific count element for this combination
     const countEl = elements.count[combination];
     if (countEl) {
-      // Display 4 data points per pair with title
-      const isAssign = combination.startsWith('assign');
-      const isPlans = combination.endsWith('Plans');
-      const title = isAssign ? 'שיוך' : 'חדש';
-      const entityLabel = isPlans ? 'תוכניות' : 'טריידים';
-      
-      // Get counts for the pair
-      const pairCount = isPlans 
-        ? (isAssign ? (await getDataForCombination('assignPlans')).length : (await getDataForCombination('createPlans')).length)
-        : (isAssign ? (await getDataForCombination('assignTrades')).length : (await getDataForCombination('createTrades')).length);
-      
-      // Display: [title] [entity] [count]
-      countEl.innerHTML = `<span class="unified-count-title">${title}</span> <span class="unified-count-entity">${entityLabel}</span> <span class="unified-count-value">${pairCount}</span>`;
-      countEl.classList.toggle('d-none', pairCount === 0);
-      
-      // Apply color based on tab type
-      countEl.classList.remove('unified-count-assign', 'unified-count-create', 'unified-count-entity-primary', 'unified-count-entity-secondary');
-      if (isAssign) {
-        countEl.classList.add('unified-count-assign'); // Secondary color
-      } else {
-        countEl.classList.add('unified-count-create'); // Secondary color
-      }
-      if (isPlans) {
-        countEl.classList.add('unified-count-entity-primary'); // Primary color for plans
-      } else {
-        countEl.classList.add('unified-count-entity-secondary'); // Secondary color for trades
-      }
+      countEl.textContent = String(count);
+      countEl.classList.toggle('d-none', count === 0);
     }
     
-    // Update total badge
+    // Update total badge with sum of all 4 combinations
     if (elements.badge) {
-      const totalCount = (
-        (await getDataForCombination('assignPlans')).length +
-        (await getDataForCombination('assignTrades')).length +
-        (await getDataForCombination('createPlans')).length +
-        (await getDataForCombination('createTrades')).length
-      );
+      const assignPlansCount = (await getDataForCombination('assignPlans')).length;
+      const assignTradesCount = (await getDataForCombination('assignTrades')).length;
+      const createPlansCount = (await getDataForCombination('createPlans')).length;
+      const createTradesCount = (await getDataForCombination('createTrades')).length;
+      const totalCount = assignPlansCount + assignTradesCount + createPlansCount + createTradesCount;
       elements.badge.textContent = String(totalCount);
     }
   }
@@ -851,7 +1052,14 @@
       // Wait for required services
       const servicesAvailable = await waitForRequiredServices();
       if (!servicesAvailable) {
-        window.Logger?.warn?.('UnifiedPendingActionsWidget: Some required services not available', { page: 'index' });
+        window.Logger?.warn?.('UnifiedPendingActionsWidget: Some required services not available', { 
+          hasClusteringService: !!window.ExecutionClusteringService,
+          hasAssignmentService: !!window.ExecutionAssignmentService,
+          hasTradePlanService: !!window.TradePlanAssignmentService,
+          hasCacheService: !!window.PendingActionsCacheService,
+          hasClusterHelpers: !!window.ExecutionClusterHelpers,
+          page: 'index' 
+        });
         // Continue anyway - we'll handle missing services gracefully
       }
       

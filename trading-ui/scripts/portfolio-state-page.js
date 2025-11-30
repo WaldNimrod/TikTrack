@@ -219,7 +219,10 @@ function populateAccountFilterMenu() {
                 // Use account ID as data-value (same as header system)
                 accountItem.setAttribute('data-value', account.id.toString());
                 accountItem.setAttribute('data-onclick', `window.portfolioStatePage.selectAccountOption('${account.id.toString()}')`);
-                accountItem.innerHTML = `<span class="option-text">${account.name}</span>`;
+                const optionText = document.createElement('span');
+                optionText.className = 'option-text';
+                optionText.textContent = account.name;
+                accountItem.appendChild(optionText);
                 accountMenu.appendChild(accountItem);
                 if (window.Logger) {
                     window.Logger.info(`✅ Added account to menu: ${account.name} (ID: ${account.id})`, { page: 'portfolio-state-page' });
@@ -949,7 +952,14 @@ function showLoadingState(componentId) {
         if (!component.querySelector('.loading-spinner')) {
             const spinner = document.createElement('div');
             spinner.className = 'loading-spinner';
-            spinner.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">טוען...</span></div>';
+            const spinnerInner = document.createElement('div');
+            spinnerInner.className = 'spinner-border spinner-border-sm';
+            spinnerInner.setAttribute('role', 'status');
+            const spinnerText = document.createElement('span');
+            spinnerText.className = 'visually-hidden';
+            spinnerText.textContent = 'טוען...';
+            spinnerInner.appendChild(spinnerText);
+            spinner.appendChild(spinnerInner);
             component.appendChild(spinner);
         }
     }

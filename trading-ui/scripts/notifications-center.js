@@ -161,7 +161,13 @@ async function loadCategoriesOverview() {
     });
     html += '</div>';
 
-    container.innerHTML = html;
+    // Insert using tempDiv
+    container.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    while (tempDiv.firstChild) {
+      container.appendChild(tempDiv.firstChild);
+    }
     window.Logger?.debug('✅ Categories overview loaded with statistics');
   } catch (error) {
     window.Logger?.error('❌ Error loading categories overview:', error);
@@ -278,7 +284,13 @@ async function loadPreferencesOverview() {
       </div>
     `;
 
-    container.innerHTML = preferencesHtml;
+    // Insert using tempDiv
+    container.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = preferencesHtml;
+    while (tempDiv.firstChild) {
+      container.appendChild(tempDiv.firstChild);
+    }
   } catch (error) {
     window.Logger?.error('❌ Error loading preferences overview:', error);
   }

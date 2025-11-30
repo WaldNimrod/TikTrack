@@ -403,7 +403,14 @@ function renderAlertsTableRows(alerts) {
     // בדיקה שהנתונים קיימים
     if (!alerts || !Array.isArray(alerts)) {
       window.Logger.warn('⚠️ alerts parameter is not available or not an array', { page: "alerts" });
-      tbody.innerHTML = '<tr><td colspan="11" class="text-center">אין התראות להצגה</td></tr>';
+      tbody.textContent = '';
+      const emptyRow = document.createElement('tr');
+      const emptyCell = document.createElement('td');
+      emptyCell.colSpan = 11;
+      emptyCell.className = 'text-center';
+      emptyCell.textContent = 'אין התראות להצגה';
+      emptyRow.appendChild(emptyCell);
+      tbody.appendChild(emptyRow);
       return;
     }
 
@@ -975,7 +982,13 @@ function renderAlertsTableRows(alerts) {
       `;
     }).join('');
 
-    tbody.innerHTML = tableHTML;
+    // Insert rows using tempDiv
+    tbody.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = tableHTML;
+    while (tempDiv.firstChild) {
+      tbody.appendChild(tempDiv.firstChild);
+    }
 
     // עדכון ספירת רשומות - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
     if (window.updateTableCount) {

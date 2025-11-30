@@ -129,7 +129,13 @@ const utils = {
           // Fallback already set
         }
       }
-      element.innerHTML = loaderIcon + ' טוען...';
+      element.textContent = '';
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = loaderIcon;
+      while (tempDiv.firstChild) {
+        element.appendChild(tempDiv.firstChild);
+      }
+      element.appendChild(document.createTextNode(' טוען...'));
       element.classList.add('loading');
       element.disabled = true;
     } else {
@@ -158,7 +164,13 @@ const utils = {
             // Fallback already set
           }
         }
-        element.innerHTML = stopIcon + ' עצור Scheduler';
+        element.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = stopIcon;
+        while (tempDiv.firstChild) {
+          element.appendChild(tempDiv.firstChild);
+        }
+        element.appendChild(document.createTextNode(' עצור Scheduler'));
       } else if (elementId.includes('refresh-')) {
         // Use IconSystem to render refresh icon
         // Use IconSystem if available

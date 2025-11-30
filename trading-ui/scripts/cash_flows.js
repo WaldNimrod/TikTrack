@@ -1332,7 +1332,7 @@ async function renderCashFlowsTable() {
   const tbody = document.querySelector('#cashFlowsContainer table tbody');
   if (!tbody) {return;}
 
-  tbody.innerHTML = '';
+  tbody.textContent = '';
 
   // Use filtered data if available, otherwise use cashFlowsData
   const dataToRender = Array.isArray(window.filteredCashFlowsData) && window.filteredCashFlowsData.length > 0
@@ -1382,7 +1382,14 @@ async function renderCashFlowsTable() {
     }
     
     // Show message in table as well
-    tbody.innerHTML = `<tr><td colspan="9" class="text-center">${message}</td></tr>`;
+    tbody.textContent = '';
+    const messageRow = document.createElement('tr');
+    const messageCell = document.createElement('td');
+    messageCell.colSpan = 9;
+    messageCell.className = 'text-center';
+    messageCell.textContent = message;
+    messageRow.appendChild(messageCell);
+    tbody.appendChild(messageRow);
     return;
   }
 

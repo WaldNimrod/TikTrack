@@ -202,10 +202,34 @@
       // Setup handler for modal form
       const formModal = document.getElementById('aiAnalysisFormModal');
       if (formModal) {
-        formModal.addEventListener('submit', async (e) => {
+        // Remove any existing event listeners by removing and re-adding
+        const formClone = formModal.cloneNode(true);
+        formModal.parentNode.replaceChild(formClone, formModal);
+        
+        // Add submit handler to form
+        formClone.addEventListener('submit', async (e) => {
           e.preventDefault();
+          e.stopPropagation();
+          window.Logger?.info('📝 Form submit event triggered', { page: 'ai-analysis' });
           await this.handleGenerateAnalysis();
         });
+        
+        // Also add click handler directly to button as backup
+        const btn = document.getElementById('generateAnalysisBtnModal');
+        if (btn) {
+          // Remove old listener by cloning button
+          const btnClone = btn.cloneNode(true);
+          btn.parentNode.replaceChild(btnClone, btn);
+          
+          btnClone.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.Logger?.info('🖱️ Button click event triggered', { page: 'ai-analysis' });
+            await this.handleGenerateAnalysis();
+          });
+        }
+      } else {
+        window.Logger?.warn('⚠️ aiAnalysisFormModal not found in DOM', { page: 'ai-analysis' });
       }
 
       // Setup handler for page form (legacy - kept for compatibility)
@@ -213,6 +237,7 @@
       if (form) {
         form.addEventListener('submit', async (e) => {
           e.preventDefault();
+          e.stopPropagation();
           await this.handleGenerateAnalysis();
         });
       }
@@ -310,6 +335,11 @@
           // Fallback to page version
           manager.updateProviderSelect();
         }
+        
+        // Setup form handler when modal is opened (to ensure it's connected)
+        if (typeof manager.setupFormHandler === 'function') {
+          manager.setupFormHandler();
+        }
 
         // Show modal using ModalManagerV2 if available, otherwise Bootstrap
         let modalShown = false;
@@ -338,6 +368,14 @@
             throw new Error('Bootstrap Modal not available');
           }
         }
+        
+        // Setup form handler again after modal is shown (to ensure DOM is ready)
+        setTimeout(() => {
+          if (typeof manager.setupFormHandler === 'function') {
+            manager.setupFormHandler();
+            window.Logger?.debug('Form handler setup after modal shown', { page: 'ai-analysis' });
+          }
+        }, 200);
 
         window.Logger?.info('Variables modal opened', { page: 'ai-analysis' });
       } catch (error) {
@@ -995,15 +1033,31 @@
       // Set loading state - check both modal and page
       const isModal = document.getElementById('generateAnalysisBtnModal');
       if (isModal) {
-        this.setLoadingState(true, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal');
+        this.setLoadingState(true, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal', 'מתחיל...');
       } else {
-        this.setLoadingState(true, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner');
+        this.setLoadingState(true, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner', 'מתחיל...');
+      }
+
+      // Show initial loading notification
+      if (window.NotificationSystem) {
+        window.NotificationSystem.showInfo('🚀 מתחיל תהליך יצירת הניתוח...', 'system', { duration: 3000 });
       }
 
       // Validate request before generating analysis using Business Logic Layer
       if (window.AIAnalysisData?.validateAnalysisRequest) {
         try {
+          // Update loading state for validation
+          if (isModal) {
+            this.setLoadingState(true, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal', 'מאמת נתונים...');
+          } else {
+            this.setLoadingState(true, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner', 'מאמת נתונים...');
+          }
+          
           window.Logger?.info?.('🔍 Validating analysis request...', { page: 'ai-analysis' });
+          
+          if (window.NotificationSystem) {
+            window.NotificationSystem.showInfo('🔍 מאמת נתונים...', 'system', { duration: 2000 });
+          }
           
           const validationResult = await window.AIAnalysisData.validateAnalysisRequest({
             template_id: this.selectedTemplate.id,
@@ -1036,6 +1090,17 @@
           }
           
           window.Logger?.info?.('✅ Validation passed', { page: 'ai-analysis' });
+          
+          // Update loading state after validation passes
+          if (isModal) {
+            this.setLoadingState(true, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal', 'יוצר ניתוח...');
+          } else {
+            this.setLoadingState(true, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner', 'יוצר ניתוח...');
+          }
+          
+          if (window.NotificationSystem) {
+            window.NotificationSystem.showInfo('✅ אימות הצליח - יוצר ניתוח... זה עלול לקחת דקה-שתיים', 'system', { duration: 5000 });
+          }
         } catch (validationError) {
           // Reset loading state on validation error
           if (isModal) {
@@ -1060,17 +1125,35 @@
       }
 
       try {
+        // Update loading state for API call
+        if (isModal) {
+          this.setLoadingState(true, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal', 'שולח בקשה...');
+        } else {
+          this.setLoadingState(true, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner', 'שולח בקשה...');
+        }
+        
         window.Logger?.info('Generating analysis...', {
           page: 'ai-analysis',
           templateId: this.selectedTemplate.id,
           provider,
         });
 
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showInfo('📤 שולח בקשה לשרת... ממתין לתגובת המנוע', 'system', { duration: 3000 });
+        }
+
         // Build API URL
         const apiUrl = window.API_BASE_URL 
           ? (window.API_BASE_URL.endsWith('/') ? window.API_BASE_URL : `${window.API_BASE_URL}/`) + 'api/ai-analysis/generate'
           : '/api/ai-analysis/generate';
 
+        // Update loading state - waiting for response
+        if (isModal) {
+          this.setLoadingState(true, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal', 'ממתין לתגובה...');
+        } else {
+          this.setLoadingState(true, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner', 'ממתין לתגובה...');
+        }
+        
         // Make API call directly to use CRUDResponseHandler
         const response = await fetch(apiUrl, {
           method: 'POST',
@@ -1332,16 +1415,82 @@
         return;
       }
 
-      // Try to get response_text from cache if not in result
+      // Try to get response_text from result first
       let responseText = analysisResult.response_text;
+      
+      // If not in result, try cache
       if (!responseText && analysisResult.id && window.UnifiedCacheManager) {
         const cacheKey = `ai-analysis-response-${analysisResult.id}`;
+        window.Logger?.debug('Checking cache for analysis response', { 
+          page: 'ai-analysis', 
+          requestId: analysisResult.id,
+          cacheKey
+        });
+        
         const cachedData = await window.UnifiedCacheManager.get(cacheKey);
         if (cachedData && cachedData.response_text) {
           responseText = cachedData.response_text;
-          window.Logger?.debug('Retrieved AI analysis response from cache', { 
+          window.Logger?.info('✅ Retrieved AI analysis response from cache', { 
             page: 'ai-analysis', 
-            requestId: analysisResult.id 
+            requestId: analysisResult.id,
+            responseLength: responseText?.length || 0
+          });
+        } else {
+          window.Logger?.warn('⚠️ Analysis response not found in cache', { 
+            page: 'ai-analysis', 
+            requestId: analysisResult.id,
+            cacheKey,
+            cachedDataExists: !!cachedData
+          });
+        }
+      }
+      
+      // If still no response_text, try to load from API
+      if (!responseText && analysisResult.id && analysisResult.status === 'completed') {
+        window.Logger?.info('🔄 Loading analysis response from API...', { 
+          page: 'ai-analysis', 
+          requestId: analysisResult.id
+        });
+        
+        try {
+          const response = await fetch(`/api/ai-analysis/history/${analysisResult.id}`, {
+            credentials: 'include',
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.status === 'success' && data.data && data.data.response_text) {
+              responseText = data.data.response_text;
+              window.Logger?.info('✅ Retrieved AI analysis response from API', { 
+                page: 'ai-analysis', 
+                requestId: analysisResult.id,
+                responseLength: responseText?.length || 0
+              });
+              
+              // Save to cache for future use
+              if (window.UnifiedCacheManager && analysisResult.id) {
+                const cacheKey = `ai-analysis-response-${analysisResult.id}`;
+                await window.UnifiedCacheManager.save(cacheKey, {
+                  response_text: responseText,
+                  response_json: data.data.response_json || null,
+                  cached_at: new Date().toISOString()
+                }, {
+                  ttl: 7200000, // 2 hours
+                  layer: 'indexedDB',
+                  compress: true
+                });
+                window.Logger?.info('💾 Saved analysis response to cache', { 
+                  page: 'ai-analysis', 
+                  requestId: analysisResult.id
+                });
+              }
+            }
+          }
+        } catch (apiError) {
+          window.Logger?.error('❌ Error loading analysis from API', { 
+            page: 'ai-analysis', 
+            requestId: analysisResult.id,
+            error: apiError?.message || apiError
           });
         }
       }
@@ -1358,11 +1507,6 @@
       }
 
       try {
-        
-        if (!responseText) {
-          container.innerHTML = '<div class="alert alert-warning">אין תוצאות להצגה</div>';
-          return;
-        }
 
         // Convert markdown to HTML
         let htmlContent;
@@ -2359,8 +2503,13 @@
     /**
      * Set loading state
      * Uses CSS classes instead of inline styles for ITCSS compliance
+     * @param {boolean} loading - Whether loading state is active
+     * @param {string} btnId - Button element ID
+     * @param {string} textId - Text element ID
+     * @param {string} spinnerId - Spinner element ID
+     * @param {string} loadingMessage - Optional custom loading message
      */
-    setLoadingState(loading, btnId, textId, spinnerId) {
+    setLoadingState(loading, btnId, textId, spinnerId, loadingMessage = null) {
       const btn = document.getElementById(btnId);
       const text = document.getElementById(textId);
       const spinner = document.getElementById(spinnerId);
@@ -2385,9 +2534,17 @@
         if (loading) {
           spinner.classList.add('show');
           spinner.classList.add('btn-spinner');
+          // Update spinner text if loadingMessage provided
+          if (loadingMessage && spinner.textContent) {
+            spinner.textContent = loadingMessage;
+          }
         } else {
           spinner.classList.remove('show');
           spinner.classList.remove('btn-spinner');
+          // Reset spinner text to default
+          if (spinner.textContent && spinner.id.includes('Modal')) {
+            spinner.textContent = '⏳ יוצר ניתוח...';
+          }
         }
       }
     },

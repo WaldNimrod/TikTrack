@@ -304,10 +304,16 @@ function populateAccountActivityTable(data) {
   const tbody = document.querySelector('#accountActivityTable tbody');
   if (!tbody) {return;}
 
-  tbody.innerHTML = '';
+  tbody.textContent = '';
 
   if (!data.currencies || data.currencies.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין תנועות לחשבון זה</td></tr>';
+    const emptyRow = document.createElement('tr');
+    const emptyCell = document.createElement('td');
+    emptyCell.colSpan = 8;
+    emptyCell.className = 'text-center';
+    emptyCell.textContent = 'אין תנועות לחשבון זה';
+    emptyRow.appendChild(emptyCell);
+    tbody.appendChild(emptyRow);
     syncAccountActivityPagination([]);
     updateCurrencyBalancesFooter(data);
     updateActivityStatistics();
@@ -456,7 +462,12 @@ function renderMovementRow(movement, runningBalance) {
   dateCell.className = 'col-date';
   dateCell.setAttribute('data-date', movementDateValue);
   if (window.FieldRendererService && window.FieldRendererService.renderDate) {
-    dateCell.innerHTML = window.FieldRendererService.renderDate(movementDateEnvelope || movement.date);
+    const dateHTML = window.FieldRendererService.renderDate(movementDateEnvelope || movement.date);
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = dateHTML;
+    while (tempDiv.firstChild) {
+      dateCell.appendChild(tempDiv.firstChild);
+    }
   } else {
     if (movementDateEnvelope && window.dateUtils?.formatDate) {
       dateCell.textContent = window.dateUtils.formatDate(movementDateEnvelope);
@@ -517,7 +528,12 @@ function renderMovementRow(movement, runningBalance) {
   if (movement.type === 'cash_flow') {
     // Use renderType for cash flow subtypes (deposit, withdrawal, fee, etc.)
     if (window.FieldRendererService && window.FieldRendererService.renderType) {
-      subtypeCell.innerHTML = window.FieldRendererService.renderType(subTypeValue, normalizedAmountForColor);
+      const typeHTML = window.FieldRendererService.renderType(subTypeValue, normalizedAmountForColor);
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = typeHTML;
+      while (tempDiv.firstChild) {
+        subtypeCell.appendChild(tempDiv.firstChild);
+      }
     } else {
       subtypeCell.textContent = getSubtypeDisplay(movement.sub_type || movement.subtype);
     }

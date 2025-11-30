@@ -135,8 +135,9 @@
   min-height: 0;
 }
 
-.unified-pending-list-item {
-  position: relative;
+.unified-pending-list-item,
+.trade-create-widget-item {
+  position: relative; /* Relative positioning for overlay */
   border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 12px;
   background: var(--bs-body-bg, #fff);
@@ -146,38 +147,48 @@
   transition: box-shadow 0.2s ease, z-index 0s;
 }
 
-.unified-pending-list-item.is-hovered {
+.unified-pending-list-item.is-hovered,
+.trade-create-widget-item.is-hovered {
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
   z-index: 10;
 }
 
-.unified-pending-list-item:last-child {
+.unified-pending-list-item:last-child,
+.trade-create-widget-item:last-child {
   margin-bottom: 0;
 }
 
-/* ===== Expandable Details ===== */
-.unified-pending-details {
-  position: absolute;
-  inset-inline-end: 0;
-  top: calc(100% + 0.5rem);
-  inline-size: 100%;
-  min-inline-size: 260px;
-  background: var(--bs-body-bg, #fff);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.16);
-  padding: 0.75rem 0.9rem;
-  opacity: 0;
-  transform: translateY(-6px);
-  pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.24s ease;
-  z-index: 12;
+/* ===== Expandable Details (Relative Position Overlay) ===== */
+.unified-pending-details,
+.trade-create-widget-details {
+  display: none; /* Hidden by default */
+  position: absolute; /* Relative to item - simple positioning */
+  z-index: 10; /* Above item content */
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.375rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  padding: 0.75rem;
+  min-width: 280px;
+  max-width: 400px;
+  /* Position relative to item */
+  top: 100%;
+  left: 0;
+  margin-top: 0.5rem;
+  /* Allow overlay to extend beyond container */
+  overflow: visible;
 }
 
-.unified-pending-list-item.is-hovered .unified-pending-details {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+/* RTL support */
+[dir="rtl"] .unified-pending-details,
+[dir="rtl"] .trade-create-widget-details {
+  left: auto;
+  right: 0;
+}
+
+.unified-pending-list-item.is-hovered .unified-pending-details,
+.trade-create-widget-item.is-hovered .trade-create-widget-details {
+  display: block;
 }
 
 .unified-pending-details .details-stats {
@@ -302,34 +313,53 @@
 
 /* ===== Count Display ===== */
 /* Display 4 data points per pair with title and color coding */
+.unified-count-pair {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.unified-count-pair:last-child {
+  margin-bottom: 0;
+}
+
 .unified-count-title {
   font-weight: 600;
-  margin-inline-end: 0.25rem;
+  font-size: 0.9rem;
+  min-width: 50px;
+}
+
+.unified-count-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .unified-count-entity {
+  font-size: 0.85rem;
   margin-inline-end: 0.25rem;
 }
 
 .unified-count-value {
   font-weight: 600;
-  font-size: 1.1em;
+  font-size: 1em;
 }
 
 /* Color coding based on action and entity */
-.unified-count-assign .unified-count-title {
+.unified-count-assign {
   color: var(--brand-secondary-color, #fc5a06);
 }
 
-.unified-count-create .unified-count-title {
+.unified-count-create {
   color: var(--brand-secondary-color, #fc5a06);
 }
 
-.unified-count-entity-primary .unified-count-entity {
+.unified-count-entity-primary {
   color: var(--brand-primary-color, #26baac);
 }
 
-.unified-count-entity-secondary .unified-count-entity {
+.unified-count-entity-secondary {
   color: var(--brand-secondary-color, #fc5a06);
 }
 

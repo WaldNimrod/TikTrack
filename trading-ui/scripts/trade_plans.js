@@ -255,10 +255,15 @@ async function displayTradePlanTickerInfo(ticker) {
   // Use the new global renderTickerInfo function
   if (window.renderTickerInfo) {
     const tickerInfoHtml = await window.renderTickerInfo(ticker, 'ticker-info-display');
-    tickerInfoDiv.innerHTML = tickerInfoHtml;
+    tickerInfoDiv.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = tickerInfoHtml;
+    while (tempDiv.firstChild) {
+      tickerInfoDiv.appendChild(tempDiv.firstChild);
+    }
   } else {
     // Fallback if renderTickerInfo not available
-    tickerInfoDiv.innerHTML = `
+    const fallbackHTML = `
       <div class="ticker-info-display">
         <div class="row">
           <div class="col-md-6">
@@ -710,10 +715,14 @@ async function updateEditTickerInfo() {
         // Create element if it doesn't exist
         const changeFromOpenRow = document.createElement('div');
         changeFromOpenRow.className = 'mb-3';
-        changeFromOpenRow.innerHTML = `
-          <label class="form-label">שינוי מפתיחה</label>
-          <div id="editTradePlanChangeFromOpen" class="form-control-plaintext"></div>
-        `;
+        const label = document.createElement('label');
+        label.className = 'form-label';
+        label.textContent = 'שינוי מפתיחה';
+        changeFromOpenRow.appendChild(label);
+        const changeDiv = document.createElement('div');
+        changeDiv.id = 'editTradePlanChangeFromOpen';
+        changeDiv.className = 'form-control-plaintext';
+        changeFromOpenRow.appendChild(changeDiv);
         // Insert after change display
         if (changeDisplay && changeDisplay.parentElement) {
           changeDisplay.parentElement.parentElement.insertAdjacentElement('afterend', changeFromOpenRow);

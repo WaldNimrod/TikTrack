@@ -983,7 +983,9 @@
           return;
         }
         const records = this.statusData?.cache?.total_quotes ?? 0;
-        detailsElement.innerHTML = [
+        // Build details using createElement
+        detailsElement.textContent = '';
+        const detailsHTML = [
           `<div class="status-detail">📊 ספק: ${safeText(yahooProvider.display_name || yahooProvider.name)}</div>`,
           `<div class="status-detail">📈 רשומות: ${formatNumber(records)}</div>`,
           `<div class="status-detail">🕒 עדכון אחרון: ${formatRelativeFromPayload(yahooProvider.last_successful_request)}</div>`,
@@ -991,6 +993,12 @@
             ? `<div class="status-detail error">⚠️ שגיאה אחרונה: ${safeText(yahooProvider.last_error)}</div>`
             : ''
         ].join('');
+        // Insert using tempDiv
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = detailsHTML;
+        while (tempDiv.firstChild) {
+          detailsElement.appendChild(tempDiv.firstChild);
+        }
       }
     }
 
@@ -1024,7 +1032,8 @@
         ? `${formatDecimal(cacheData.ttl_minutes.warm, 1)} דקות`
         : NOT_AVAILABLE_TEXT;
 
-      detailsElement.innerHTML = [
+      // Build details HTML and insert using tempDiv
+      const detailsHTML = [
         `<div class="status-detail">💾 ציטוטים: ${formatNumber(cacheData.total_quotes)}</div>`,
         `<div class="status-detail">📈 אחוז פגיעות: ${formatPercent(cacheData.cache_hit_rate)}</div>`,
         `<div class="status-detail">🗓️ נתונים פגומים: ${formatNumber(cacheData.stale_data_count)}</div>`,
@@ -1032,6 +1041,12 @@
         `<div class="status-detail">🔥 TTL חם: ${ttlHot}</div>`,
         `<div class="status-detail">🌤️ TTL חמים: ${ttlWarm}</div>`
       ].join('');
+      detailsElement.textContent = '';
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = detailsHTML;
+      while (tempDiv.firstChild) {
+        detailsElement.appendChild(tempDiv.firstChild);
+      }
     }
 
     /**

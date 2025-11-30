@@ -591,7 +591,12 @@ async function updateNotesTable(notes, options = {}) {
           render: async (pageData, context) => {
             // Render with additional data
             const rows = renderNotesTableRows(pageData, additionalData);
-            tbody.innerHTML = rows;
+            tbody.textContent = '';
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = rows;
+            while (tempDiv.firstChild) {
+              tbody.appendChild(tempDiv.firstChild);
+            }
             
             // Update buttons
             if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {

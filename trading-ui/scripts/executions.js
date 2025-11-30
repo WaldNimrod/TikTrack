@@ -758,7 +758,13 @@ function displayLinkedItems(linkedItems) {
   }
 
   if (contentDiv) {
-    contentDiv.innerHTML = html;
+    // Insert using tempDiv
+    contentDiv.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    while (tempDiv.firstChild) {
+      contentDiv.appendChild(tempDiv.firstChild);
+    }
   }
   
   } catch (error) {
@@ -1103,11 +1109,12 @@ function updateExecutionsSummary(filteredDataOverride = null) {
     } else {
       const summaryStatsElement = document.getElementById('summaryStats');
       if (summaryStatsElement) {
-        summaryStatsElement.innerHTML = `
-          <div class="text-danger" style="font-weight: bold;">
-            ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
-          </div>
-        `;
+        summaryStatsElement.textContent = '';
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'text-danger';
+        errorDiv.style.fontWeight = 'bold';
+        errorDiv.textContent = '⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף';
+        summaryStatsElement.appendChild(errorDiv);
       }
     }
   } catch (error) {
@@ -1181,7 +1188,14 @@ async function updateExecutionsTableMain(executions, options = {}) {
     .filter(id => !existingExecutionIds.has(id));
 
   if (executions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="12" class="text-center">לא נמצאו ביצועים</td></tr>';
+    tbody.textContent = '';
+    const emptyRow = document.createElement('tr');
+    const emptyCell = document.createElement('td');
+    emptyCell.colSpan = 12;
+    emptyCell.className = 'text-center';
+    emptyCell.textContent = 'לא נמצאו ביצועים';
+    emptyRow.appendChild(emptyCell);
+    tbody.appendChild(emptyRow);
     return;
   }
 

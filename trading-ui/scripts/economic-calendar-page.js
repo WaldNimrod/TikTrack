@@ -561,7 +561,7 @@
                 // Clear summary if no events
                 const summaryContainer = document.getElementById('economic-calendar-summary');
                 if (summaryContainer) {
-                    summaryContainer.innerHTML = '';
+                    summaryContainer.textContent = '';
                 }
             }
         }

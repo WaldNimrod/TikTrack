@@ -396,13 +396,8 @@
       </div>
     `;
 
-    // Add hover handlers
-    card.addEventListener('mouseenter', () => {
-      card.classList.add('is-hovered');
-    });
-    card.addEventListener('mouseleave', () => {
-      card.classList.remove('is-hovered');
-    });
+    // Hover handlers are now managed by unified-pending-actions-widget.js
+    // No need to add them here - the widget handles all hover events
 
     // Setup button handlers
     setupClusterCardButtons(card, cluster, selectedIds, options);

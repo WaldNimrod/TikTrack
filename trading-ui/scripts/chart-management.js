@@ -167,7 +167,8 @@
       const card = document.createElement('div');
       card.className = 'card mb-3';
       card.dataset.chartCard = chartId;
-      card.innerHTML = `
+      // Build card HTML and insert using tempDiv
+      const cardHTML = `
         <div class="card-header d-flex justify-content-between align-items-center">
             <h6 class="mb-0">${title}</h6>
             <button class="btn btn-sm btn-outline-danger" data-chart-remove="${chartId}">
@@ -178,6 +179,11 @@
             <canvas id="${canvasId}" height="320"></canvas>
         </div>
       `;
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = cardHTML;
+      while (tempDiv.firstChild) {
+        card.appendChild(tempDiv.firstChild);
+      }
       this.elements.chartsList.appendChild(card);
 
       const removeBtn = card.querySelector('[data-chart-remove]');

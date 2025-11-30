@@ -594,7 +594,8 @@ class SystemManagement {
     const container = document.createElement('div');
     container.id = 'system-check-results';
     container.className = 'system-check-results-container';
-    container.innerHTML = `
+    // Build container HTML and insert using tempDiv
+    const containerHTML = `
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h5 class="mb-0">
@@ -623,6 +624,11 @@ class SystemManagement {
         </div>
       </div>
     `;
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = containerHTML;
+    while (tempDiv.firstChild) {
+      container.appendChild(tempDiv.firstChild);
+    }
 
     // Insert after the Quick Actions section (in the top section)
     const quickActions = document.querySelector('.quick-actions');
@@ -681,8 +687,8 @@ class SystemManagement {
 
     // Build results content
     // Note: This innerHTML is for system check results display (cards + accordion), not a standard summary element
-    // Consider refactoring to use createElement for better security if this becomes a security concern
-    resultsContent.innerHTML = `
+    // Using tempDiv for complex HTML structure
+    const resultsHTML = `
       <!-- Summary Cards -->
       <div class="row mb-4">
         <div class="col-md-3">
@@ -763,6 +769,13 @@ class SystemManagement {
         <small>זמן בדיקה: ${new Date(checkResults.timestamp).toLocaleString('he-IL')}</small>
       </div>
     `;
+    // Insert using tempDiv
+    resultsContent.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = resultsHTML;
+    while (tempDiv.firstChild) {
+      resultsContent.appendChild(tempDiv.firstChild);
+    }
 
     // Store results globally for copying
     window.lastCheckResults = checkResults;

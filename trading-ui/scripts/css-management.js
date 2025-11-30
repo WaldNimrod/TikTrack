@@ -534,7 +534,13 @@ function displaySearchResults(results, searchTerm) {
             `;
         });
         
-        container.innerHTML = html;
+        // Insert using tempDiv
+        container.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        while (tempDiv.firstChild) {
+          container.appendChild(tempDiv.firstChild);
+        }
     }
 }
 

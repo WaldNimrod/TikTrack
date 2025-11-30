@@ -29,7 +29,8 @@ function initializeSeriesControls() {
     const container = document.getElementById('series-checkboxes-container');
     if (!container) return;
     
-    container.innerHTML = AVAILABLE_SERIES.map(series => {
+    // Build checkboxes HTML and insert using tempDiv
+    const checkboxesHTML = AVAILABLE_SERIES.map(series => {
         // Use centralized Color Scheme System directly - no local function
         const color = (typeof window.getEntityColor === 'function') 
             ? window.getEntityColor(series.entityType) 
@@ -46,9 +47,17 @@ function initializeSeriesControls() {
                     <div class="series-color-indicator" ${color ? `style="--series-color: ${color};"` : ''}></div>
                     <span class="form-label-small">${series.label}</span>
                 </label>
-            </div>
-        `;
+                </div>
+            `;
     }).join('');
+    
+    // Insert using tempDiv
+    container.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = checkboxesHTML;
+    while (tempDiv.firstChild) {
+        container.appendChild(tempDiv.firstChild);
+    }
 }
 
 // Toggle series visibility
@@ -1485,7 +1494,13 @@ function updateComparisonTable(filters) {
         '<th class="text-end">מקס בנקודה</th>' +
         '<th class="text-end">סה"כ קניות</th>';
     
-    thead.innerHTML = headerHTML;
+    // Insert header using tempDiv
+    thead.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = headerHTML;
+    while (tempDiv.firstChild) {
+        thead.appendChild(tempDiv.firstChild);
+    }
     
     // Calculate colspan for summary and info rows
     const summaryColspan = paramHeaders.length + 6; // param columns + 6 data columns (trades, avgPL, totalPL, successRate, maxInvestment, totalPurchases)
@@ -1597,7 +1612,13 @@ function updateComparisonTable(filters) {
             </tr>
         `;
         
-        tbody.innerHTML = dataRows + summaryRow;
+        // Insert rows using tempDiv
+        tbody.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = dataRows + summaryRow;
+        while (tempDiv.firstChild) {
+            tbody.appendChild(tempDiv.firstChild);
+        }
         
         // Fade in
         tbody.style.opacity = '1';
@@ -1614,12 +1635,11 @@ function updateComparisonTable(filters) {
         setTimeout(() => {
             // Note: This is a mockup page summary display, not a standard summary element
             // Consider using InfoSummarySystem if this page becomes production-ready
-            summary.innerHTML = `
-                <strong>סיכום:</strong>
-                סה"כ קטגוריות: ${totalCategories} |
-                סה"כ טריידים: ${totalTrades} |
-                P/L כולל: ${formatCurrency(totalPL)}
-            `;
+            summary.textContent = '';
+            const strong = document.createElement('strong');
+            strong.textContent = 'סיכום:';
+            summary.appendChild(strong);
+            summary.appendChild(document.createTextNode(` סה"כ קטגוריות: ${totalCategories} | סה"כ טריידים: ${totalTrades} | P/L כולל: ${formatCurrency(totalPL)}`));
             summary.style.opacity = '1';
         }, 150);
     }

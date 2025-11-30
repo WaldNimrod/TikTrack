@@ -88,7 +88,16 @@
                         // Fallback already set
                     }
                 }
-                validationMessage.innerHTML = `<div class="alert alert-warning">${alertIcon} נדרשים לפחות 2 תאריכים להשוואה</div>`;
+                validationMessage.textContent = '';
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-warning';
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = alertIcon;
+                while (tempDiv.firstChild) {
+                  alertDiv.appendChild(tempDiv.firstChild);
+                }
+                alertDiv.appendChild(document.createTextNode(' נדרשים לפחות 2 תאריכים להשוואה'));
+                validationMessage.appendChild(alertDiv);
             }
             if (window.showNotification) {
                 window.showNotification('נדרשים לפחות 2 תאריכים להשוואה', 'warning');
@@ -108,7 +117,16 @@
                         // Fallback already set
                     }
                 }
-                validationMessage.innerHTML = `<div class="alert alert-danger">${alertIcon2} יש תאריכים כפולים ברשימה</div>`;
+                validationMessage.textContent = '';
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger';
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = alertIcon2;
+                while (tempDiv.firstChild) {
+                  alertDiv.appendChild(tempDiv.firstChild);
+                }
+                alertDiv.appendChild(document.createTextNode(' יש תאריכים כפולים ברשימה'));
+                validationMessage.appendChild(alertDiv);
             }
             if (window.showNotification) {
                 window.showNotification('יש תאריכים כפולים ברשימה', 'error');

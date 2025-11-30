@@ -389,6 +389,8 @@
             const changePercent = tickerData.daily_change_percent || tickerData.change_percent || 0;
             const volume = tickerData.volume || 0;
             const atr = tickerData.atr || null;
+            const week52High = tickerData.week52_high || null;
+            const week52Low = tickerData.week52_low || null;
             const currencySymbol = tickerData.currency_symbol || (tickerData.currency && tickerData.currency.symbol) || '$';
             
             // Format ATR - use FieldRendererService.renderATR() only (no fallback)
@@ -437,12 +439,18 @@
                 priceHtml = `<span dir="ltr">${currencySymbol}${parseFloat(price).toFixed(2)}</span>`;
             }
             
-            // Format 52W range
-            const week52Low = tickerData['52w_low'] || tickerData.fifty_two_week_low || null;
-            const week52High = tickerData['52w_high'] || tickerData.fifty_two_week_high || null;
+            // Format 52W range - use week52_high and week52_low from backend
             let week52Html = 'N/A';
-            if (week52Low !== null && week52High !== null) {
-                week52Html = `${parseFloat(week52Low).toFixed(2)} - ${parseFloat(week52High).toFixed(2)}`;
+            if (week52High !== null && week52Low !== null) {
+                let highFormatted, lowFormatted;
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
+                    highFormatted = window.FieldRendererService.renderAmount(week52High, currencySymbol, 2, false);
+                    lowFormatted = window.FieldRendererService.renderAmount(week52Low, currencySymbol, 2, false);
+                } else {
+                    highFormatted = `${currencySymbol}${parseFloat(week52High).toFixed(2)}`;
+                    lowFormatted = `${currencySymbol}${parseFloat(week52Low).toFixed(2)}`;
+                }
+                week52Html = `${lowFormatted} - ${highFormatted}`;
             }
             
             // Clear container
@@ -470,8 +478,7 @@
                 { label: 'ATR', value: atrHtml || 'N/A', dir: '' },
                 { label: '52W Range', value: week52Html, dir: 'ltr' },
                 { label: 'נפח', value: formattedVolume, dir: 'ltr' },
-                { label: 'תנודתיות', value: volatilityHtml, dir: 'ltr' },
-                { label: '52W', value: week52Html, dir: 'ltr' }
+                { label: 'תנודתיות', value: volatilityHtml, dir: 'ltr' }
             ];
             
             kpiCards.forEach(kpi => {
@@ -483,7 +490,14 @@
                 
                 const labelDiv = document.createElement('div');
                 labelDiv.className = 'kpi-label';
-                labelDiv.textContent = kpi.label;
+                
+                // Add help icon for technical indicators
+                if (window.TechnicalIndicatorsHelp && (kpi.label === 'ATR' || kpi.label === '52W Range' || kpi.label === 'תנודתיות' || kpi.label === 'נפח')) {
+                    const helpIcon = window.TechnicalIndicatorsHelp.renderHelpIcon(kpi.label);
+                    labelDiv.innerHTML = helpIcon + kpi.label;
+                } else {
+                    labelDiv.textContent = kpi.label;
+                }
                 
                 const valueDiv = document.createElement('div');
                 valueDiv.className = 'kpi-value';
@@ -1037,7 +1051,7 @@
             updatePageTitle();
             await renderKPICards();
             await initPriceChart();
-            await renderTechnicalIndicators();
+            // Technical indicators are now displayed in KPI Cards - no separate section needed
             await renderUserActivity();
             await renderConditions();
             

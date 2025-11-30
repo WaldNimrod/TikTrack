@@ -213,7 +213,13 @@ class ConstraintsMonitor {
         });
         
         html += '</div>';
-        content.innerHTML = html;
+        // Insert using tempDiv
+        content.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        while (tempDiv.firstChild) {
+          content.appendChild(tempDiv.firstChild);
+        }
     }
 
     renderByTableLayer() {

@@ -198,3 +198,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-30T09:58:49+00:00 | 1.3.46.0 | 1.3.45.0 | ad90288a91c8378c6544384b3418f7a033036908 | 8c488739e25d67865f51038ea9de730e3fa1366f | patch | בדיקות מקיפות לעמודי מוקאפ - כל העמודים עברו בהצלחה |
 | 2025-11-30T19:58:10+00:00 | 1.3.46.1 | 1.3.46.0 | aa451e1e846e68871cc4c7c6e5c5500f567127ef | ad90288a91c8378c6544384b3418f7a033036908 | build | Fix user_id filtering and complete widget testing |
 | 2025-11-30T20:45:40+00:00 | 1.3.47.0 | 1.3.46.1 | 722a398eed3438aae49d6df4bdc564bb328b272e | aa451e1e846e68871cc4c7c6e5c5500f567127ef | patch | Fix load order for all pages - modules before ui-advanced |
+| 2025-11-30T20:57:24+00:00 | 1.3.48.0 | 1.3.47.0 | bb4966802ee54425a502854b5d1d2d915ff82cc6 | 722a398eed3438aae49d6df4bdc564bb328b272e | patch | Add package dependencies validator script |

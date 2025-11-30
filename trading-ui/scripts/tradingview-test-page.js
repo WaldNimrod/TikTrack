@@ -29,12 +29,18 @@
                         status.textContent = '✅ הספרייה נטענה בהצלחה';
                         
                         info.style.display = 'block';
-                        info.innerHTML = `
+                        info.textContent = '';
+                        const infoHTML = `
                             <strong>Global Name:</strong> ${hasLightweightCharts ? 'window.LightweightCharts' : 'window.lightweightCharts'}<br>
                             <strong>Version:</strong> ${version}<br>
                             <strong>createChart:</strong> ${typeof lib?.createChart === 'function' ? '✅' : '❌'}<br>
                             <strong>LineSeries:</strong> ${lib?.LineSeries ? '✅' : '❌'}
                         `;
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = infoHTML;
+                        while (tempDiv.firstChild) {
+                            info.appendChild(tempDiv.firstChild);
+                        }
                         
                         return true;
                     } else {
@@ -73,10 +79,16 @@
                     status.textContent = '✅ מערכת Theme עובדת';
                     
                     info.style.display = 'block';
-                    info.innerHTML = `
+                    const infoHTML = `
                         <strong>Theme Options:</strong> ${JSON.stringify(themeOptions, null, 2).substring(0, 200)}...<br>
                         <strong>Colors:</strong> ${JSON.stringify(colors, null, 2)}
                     `;
+                    info.textContent = '';
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = infoHTML;
+                    while (tempDiv.firstChild) {
+                        info.appendChild(tempDiv.firstChild);
+                    }
                     
                     return true;
                 } catch (error) {
@@ -108,7 +120,7 @@
                     status.textContent = '✅ מערכת Adapter עובדת';
                     
                     info.style.display = 'block';
-                    info.innerHTML = `
+                    const infoHTML = `
                         <strong>Methods:</strong><br>
                         - createChart: ${typeof adapter.createChart === 'function' ? '✅' : '❌'}<br>
                         - addLineSeries: ${typeof adapter.addLineSeries === 'function' ? '✅' : '❌'}<br>
@@ -117,6 +129,12 @@
                         - destroyChart: ${typeof adapter.destroyChart === 'function' ? '✅' : '❌'}<br>
                         - applyTheme: ${typeof adapter.applyTheme === 'function' ? '✅' : '❌'}
                     `;
+                    info.textContent = '';
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = infoHTML;
+                    while (tempDiv.firstChild) {
+                        info.appendChild(tempDiv.firstChild);
+                    }
                     
                     return true;
                 } catch (error) {
@@ -494,11 +512,17 @@
                     status.textContent = '✅ אינטגרציה עם צבעים עובדת';
                     
                     info.style.display = 'block';
-                    info.innerHTML = `
+                    const infoHTML = `
                         <strong>Primary Color:</strong> ${primaryColor}<br>
                         <strong>Success Color:</strong> ${successColor}<br>
                         <strong>All Colors:</strong> ${JSON.stringify(colors, null, 2)}
                     `;
+                    info.textContent = '';
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = infoHTML;
+                    while (tempDiv.firstChild) {
+                        info.appendChild(tempDiv.firstChild);
+                    }
                     
                     return true;
                 } catch (error) {
@@ -535,11 +559,17 @@
                         : '⚠️ העדפות לא נטענו (אולי PreferencesData לא זמין)';
                     
                     info.style.display = 'block';
-                    info.innerHTML = `
+                    const infoHTML = `
                         <strong>Preferences Loaded:</strong> ${hasPreferences ? '✅' : '❌'}<br>
                         <strong>PreferencesData Available:</strong> ${typeof window.PreferencesData !== 'undefined' ? '✅' : '❌'}<br>
                         <strong>Preferences:</strong> ${JSON.stringify(theme.preferences, null, 2)}
                     `;
+                    info.textContent = '';
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = infoHTML;
+                    while (tempDiv.firstChild) {
+                        info.appendChild(tempDiv.firstChild);
+                    }
                     
                     return hasPreferences;
                 } catch (error) {
@@ -583,11 +613,17 @@
                     status.textContent = '✅ תמיכה ב-RTL נבדקה';
                     
                     info.style.display = 'block';
-                    info.innerHTML = `
+                    const infoHTML = `
                         <strong>Document Direction:</strong> ${isRTL ? 'RTL ✅' : 'LTR'}<br>
                         <strong>Chart Creation:</strong> ${chartCreated ? '✅' : '❌'}<br>
                         <strong>Note:</strong> הגרפים תמיד משמאל לימין - זה בסדר. רק טקסט צריך להיות RTL.
                     `;
+                    info.textContent = '';
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = infoHTML;
+                    while (tempDiv.firstChild) {
+                        info.appendChild(tempDiv.firstChild);
+                    }
                     
                     return true;
                 } catch (error) {

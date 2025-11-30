@@ -649,7 +649,7 @@
   }
 
   /**
-   * Handle hover on widget items - position overlay as fixed, not pushing item
+   * Handle hover on widget items - simple relative positioning
    */
   function handleItemHover(event) {
     const item = event.target.closest('.recent-items-widget-item');
@@ -665,60 +665,7 @@
     
     if (event.type === 'mouseenter') {
       item.classList.add('is-hovered');
-      
-      // Position overlay as fixed - above item, not pushing it
-      if (details) {
-        const itemRect = item.getBoundingClientRect();
-        const isRTL = document.documentElement.dir === 'rtl' || document.documentElement.getAttribute('dir') === 'rtl';
-        
-        // Show overlay temporarily to get dimensions
-        details.style.display = 'block';
-        details.style.visibility = 'hidden';
-        const overlayWidth = Math.max(details.offsetWidth || 300, 280);
-        const overlayHeight = details.offsetHeight || 150;
-        details.style.visibility = '';
-        
-        // Position above item (or below if not enough space)
-        let top = itemRect.bottom + 8;
-        if (top + overlayHeight > window.innerHeight) {
-          // Not enough space below - position above
-          top = itemRect.top - overlayHeight - 8;
-        }
-        
-        // Position horizontally
-        let left = itemRect.left;
-        let right = 'auto';
-        if (isRTL) {
-          right = window.innerWidth - itemRect.right;
-          left = 'auto';
-          // Check if overlay goes beyond viewport
-          if (right + overlayWidth > window.innerWidth) {
-            right = window.innerWidth - overlayWidth - 8;
-          }
-        } else {
-          if (left + overlayWidth > window.innerWidth) {
-            left = window.innerWidth - overlayWidth - 8;
-          }
-        }
-        
-        // Set fixed position
-        details.style.position = 'fixed';
-        details.style.top = `${top}px`;
-        if (isRTL) {
-          details.style.right = `${right}px`;
-          details.style.left = 'auto';
-        } else {
-          details.style.left = `${left}px`;
-          details.style.right = 'auto';
-        }
-        details.style.width = `${overlayWidth}px`;
-        details.style.zIndex = '1050';
-      } else {
-        window.Logger?.warn?.('RecentItemsWidget: No details element found', {
-          itemId: item.getAttribute('data-entity-id'),
-          page: 'recent-items-widget'
-        });
-      }
+      // CSS handles positioning - no JavaScript needed for relative positioning
     } else if (event.type === 'mouseleave') {
       // Check if mouse is moving to overlay
       const relatedTarget = event.relatedTarget;
@@ -728,21 +675,6 @@
       }
       
       item.classList.remove('is-hovered');
-      
-      // Hide overlay after transition
-      if (details) {
-        setTimeout(() => {
-          if (!item.classList.contains('is-hovered')) {
-            details.style.display = 'none';
-            details.style.position = '';
-            details.style.top = '';
-            details.style.left = '';
-            details.style.right = '';
-            details.style.width = '';
-            details.style.zIndex = '';
-          }
-        }, 200); // Match transition duration
-      }
     }
   }
 

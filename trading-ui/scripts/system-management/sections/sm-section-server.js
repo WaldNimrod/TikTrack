@@ -211,7 +211,7 @@ class SMServerSection extends SMBaseSection {
         <!-- System Information -->
         <div class="row">
           <div class="col-12">
-            ${this.createSystemInfoCard(status, resources, overview)}
+            ${this.createSystemInfoCard(status, resources, overview, data.systemInfo)}
           </div>
         </div>
       </div>

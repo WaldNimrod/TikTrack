@@ -29,7 +29,7 @@ from .ticker_business_service import TickerBusinessService
 from .currency_business_service import CurrencyBusinessService
 from .tag_business_service import TagBusinessService
 from .preferences_business_service import PreferencesBusinessService
-from .ai_analysis_business_service import AIAnalysisBusinessService
+# from .ai_analysis_business_service import AIAnalysisBusinessService  # File not found - commented out
 
 __all__ = [
     'BaseBusinessService',
@@ -48,6 +48,6 @@ __all__ = [
     'CurrencyBusinessService',
     'TagBusinessService',
     'PreferencesBusinessService',
-    'AIAnalysisBusinessService',
+    # 'AIAnalysisBusinessService',  # File not found - commented out
 ]
 

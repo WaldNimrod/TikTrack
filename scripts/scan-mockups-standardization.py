@@ -313,3 +313,4 @@ if __name__ == "__main__":
     print(f"   Critical: {report['issues_by_severity']['critical']}")
     print(f"   High: {report['issues_by_severity']['high']}")
 
+

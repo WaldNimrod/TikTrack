@@ -51,13 +51,16 @@ class CashFlowService:
     def __init__(self):
         self.model = CashFlow
     
-    def get_all(self, db: Session, filters=None):
-        cash_flows = db.query(CashFlow).options(
+    def get_all(self, db: Session, filters=None, user_id=None):
+        query = db.query(CashFlow).options(
             joinedload(CashFlow.account),
             joinedload(CashFlow.currency)
             # Removed joinedload(CashFlow.trade) - causes errors when Trade model has columns not in DB
             # Trade data will be loaded lazily if needed, or trade_id will be used from to_dict()
-        ).all()
+        )
+        if user_id is not None:
+            query = query.filter(CashFlow.user_id == user_id)
+        cash_flows = query.all()
         
         # Enhance data with account and currency names
         enhanced_flows = []
@@ -72,13 +75,16 @@ class CashFlowService:
         
         return enhanced_flows
     
-    def get_by_id(self, db: Session, cash_flow_id: int):
-        return db.query(CashFlow).options(
+    def get_by_id(self, db: Session, cash_flow_id: int, user_id=None):
+        query = db.query(CashFlow).options(
             joinedload(CashFlow.account),
             joinedload(CashFlow.currency)
             # Removed joinedload(CashFlow.trade) - causes errors when Trade model has columns not in DB
             # Trade data will be loaded lazily if needed, or trade_id will be used from to_dict()
-        ).filter(CashFlow.id == cash_flow_id).first()
+        ).filter(CashFlow.id == cash_flow_id)
+        if user_id is not None:
+            query = query.filter(CashFlow.user_id == user_id)
+        return query.first()
 
 # Initialize base API
 cash_flow_service = CashFlowService()
@@ -665,14 +671,7 @@ def delete_cash_flow(cash_flow_id: int):
         cash_flow = db.query(CashFlow).filter(CashFlow.id == cash_flow_id).first()
         
         if cash_flow:
-            try:
-                TagService.remove_all_tags_for_entity(db, 'cash_flow', cash_flow_id)
-            except ValueError as tag_error:
-                logger.warning(
-                    "Failed to remove tags for cash_flow %s before deletion: %s",
-                    cash_flow_id,
-                    tag_error,
-                )
+            # Tag cleanup is handled automatically by SQLAlchemy event listeners
             db.delete(cash_flow)
             # CRITICAL: Must commit here to make deletion visible to subsequent queries
             db.commit()

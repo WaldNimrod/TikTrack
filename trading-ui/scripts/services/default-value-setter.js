@@ -95,8 +95,13 @@ class DefaultValueSetter {
             const cachedPrefs = window.PreferencesSystem?.manager?.currentPreferences;
             const cachedValue = cachedPrefs ? cachedPrefs[preferenceName] : null;
             if (cachedValue) {
+              // Use DataCollectionService to set value if available
+              if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue(element.id, cachedValue, 'text');
+              } else {
                 element.value = cachedValue;
-                return cachedValue;
+              }
+              return cachedValue;
             }
             // 2) אם אין ערך במטמון – לא לקרוא ל-API כאן כדי להימנע משגיאות 500 על העדפות חסרות
             return null;
@@ -127,7 +132,12 @@ class DefaultValueSetter {
         if (element.type === 'checkbox') {
             element.checked = Boolean(defaultValue);
         } else {
+          // Use DataCollectionService to set value if available
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(element.id, defaultValue, 'text');
+          } else {
             element.value = defaultValue;
+          }
         }
         
         return defaultValue;

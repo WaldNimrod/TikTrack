@@ -1,0 +1,14 @@
+/* ========================================
+   Cash Flows Page Styles
+   ======================================== */
+
+/* Filter label font size */
+.cash-flows-page #cashFlowTypeFilterDropdown label.form-label {
+    font-size: 0.875rem;
+}
+
+/* Filter select min width */
+.cash-flows-page #cashFlowTypeFilter {
+    min-width: 200px;
+}
+

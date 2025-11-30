@@ -87,7 +87,10 @@ def get_ticker_quote(ticker_id):
                 'asof_utc': quote.asof_utc.isoformat() if quote.asof_utc else None,
                 'fetched_at': quote.fetched_at.isoformat(),
                 'is_stale': quote.is_stale,
-                'quality_score': quote.quality_score
+                'quality_score': quote.quality_score,
+                # Technical indicators
+                'atr': quote.atr,
+                'atr_period': quote.atr_period or 14
             }
             
             # Add timezone info if user_id provided
@@ -206,7 +209,10 @@ def get_batch_quotes():
                         'asof_utc': quote.asof_utc.isoformat() if quote.asof_utc else None,
                         'fetched_at': quote.fetched_at.isoformat(),
                         'is_stale': quote.is_stale,
-                        'quality_score': quote.quality_score
+                        'quality_score': quote.quality_score,
+                        # Technical indicators
+                        'atr': quote.atr,
+                        'atr_period': quote.atr_period or 14
                     }
                     
                     # Add timezone info if user_id provided

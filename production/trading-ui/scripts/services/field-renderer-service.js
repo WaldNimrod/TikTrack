@@ -143,6 +143,129 @@ class FieldRendererService {
     }
 
     /**
+     * Render ATR (Average True Range) with traffic light system
+     * 
+     * @param {number|string} atrValue - ערך ATR מוחלט
+     * @param {number|string} atrPercent - ערך ATR באחוזים
+     * @param {Object} options - אפשרויות
+     * @param {number} options.highThreshold - גבול גבוה (default: מהעדפות או 3.0)
+     * @param {number} options.dangerThreshold - גבול מסוכן (default: מהעדפות או 5.0)
+     * @param {boolean} options.showValue - להציג את הערך (default: true)
+     * @param {boolean} options.showBadge - להציג badge רמזור (default: true)
+     * @returns {string} - HTML עם רמזור ATR
+     * 
+     * @example
+     * const html = FieldRendererService.renderATR(2.5, 2.5);
+     * // Output: '<span class="atr-value atr-green" dir="ltr"><span class="atr-number">2.5%</span><span class="badge bg-success">נמוך</span></span>'
+     */
+    static async renderATR(atrValue, atrPercent, options = {}) {
+        // Default values
+        const {
+            highThreshold = null,
+            dangerThreshold = null,
+            showValue = true,
+            showBadge = true
+        } = options;
+
+        // Validate inputs
+        if (atrValue === null || atrValue === undefined || atrValue === '' || isNaN(atrValue)) {
+            return '<span class="atr-value">-</span>';
+        }
+
+        const numAtrValue = typeof atrValue === 'string' ? parseFloat(atrValue) : Number(atrValue);
+        const numAtrPercent = atrPercent !== null && atrPercent !== undefined && !isNaN(atrPercent)
+            ? (typeof atrPercent === 'string' ? parseFloat(atrPercent) : Number(atrPercent))
+            : null;
+
+        // Calculate atrPercent if not provided
+        let finalAtrPercent = numAtrPercent;
+        if (finalAtrPercent === null || isNaN(finalAtrPercent)) {
+            // If we can't calculate, return basic display
+            if (showValue) {
+                return `<span class="atr-value" dir="ltr">${numAtrValue.toFixed(2)}</span>`;
+            }
+            return '<span class="atr-value">-</span>';
+        }
+
+        // Load thresholds from preferences if not provided
+        let finalHighThreshold = highThreshold;
+        let finalDangerThreshold = dangerThreshold;
+
+        if (finalHighThreshold === null || finalHighThreshold === undefined) {
+            try {
+                if (typeof window.getCurrentPreference === 'function') {
+                    finalHighThreshold = await window.getCurrentPreference('atr_high_threshold');
+                } else if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                    finalHighThreshold = await window.PreferencesCore.getPreference('atr_high_threshold');
+                }
+            } catch (e) {
+                // Ignore errors
+            }
+            if (finalHighThreshold === null || finalHighThreshold === undefined || isNaN(finalHighThreshold)) {
+                finalHighThreshold = 3.0; // Default
+            } else {
+                finalHighThreshold = typeof finalHighThreshold === 'string' ? parseFloat(finalHighThreshold) : Number(finalHighThreshold);
+            }
+        }
+
+        if (finalDangerThreshold === null || finalDangerThreshold === undefined) {
+            try {
+                if (typeof window.getCurrentPreference === 'function') {
+                    finalDangerThreshold = await window.getCurrentPreference('atr_danger_threshold');
+                } else if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                    finalDangerThreshold = await window.PreferencesCore.getPreference('atr_danger_threshold');
+                }
+            } catch (e) {
+                // Ignore errors
+            }
+            if (finalDangerThreshold === null || finalDangerThreshold === undefined || isNaN(finalDangerThreshold)) {
+                finalDangerThreshold = 5.0; // Default
+            } else {
+                finalDangerThreshold = typeof finalDangerThreshold === 'string' ? parseFloat(finalDangerThreshold) : Number(finalDangerThreshold);
+            }
+        }
+
+        // Determine traffic light level
+        let level, label, badgeClass;
+        if (finalAtrPercent < finalHighThreshold) {
+            // Green - Low
+            level = 'green';
+            label = 'נמוך';
+            badgeClass = 'bg-success';
+        } else if (finalAtrPercent < finalDangerThreshold) {
+            // Yellow - Medium
+            level = 'yellow';
+            label = 'בינוני';
+            badgeClass = 'bg-warning';
+        } else {
+            // Red - High
+            level = 'red';
+            label = 'גבוה';
+            badgeClass = 'bg-danger';
+        }
+
+        // Build HTML
+        const formattedPercent = finalAtrPercent.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+
+        let html = `<span class="atr-value atr-${level}" dir="ltr">`;
+        
+        if (showValue) {
+            html += `<span class="atr-number">${formattedPercent}%</span>`;
+        }
+        
+        if (showBadge) {
+            html += ` <span class="badge ${badgeClass}">${label}</span>`;
+        }
+        
+        html += '</span>';
+
+        return html;
+    }
+
+    /**
      * Render duration since last update with optional tooltip
      * @param {Date|string|object} value
      * @param {Object} options
@@ -835,12 +958,10 @@ class FieldRendererService {
         // Short format: return simple text without full badge structure
         if (isShort) {
             if (type === 'trade_plan') {
-                console.log('🔍 renderLinkedEntity DEBUG:', { metaObj, planned_amount: metaObj?.planned_amount, date: metaObj?.date });
                 const amount = metaObj && metaObj.planned_amount ? `$${Number(metaObj.planned_amount).toLocaleString('en-US', { maximumFractionDigits: 0 })}` : '';
                 // Force DD/MM format for testing
                 const dateValue = metaObj && metaObj.date ? metaObj.date : null;
                 const date = dateValue ? FieldRendererService._formatDateDdMm(dateValue) : '';
-                console.log('🔍 renderLinkedEntity RESULT:', { amount, date, result: `${amount} ${date}`.trim() });
                 return `<a href="#" onclick="if (window.showEntityDetails) { showEntityDetails('trade_plan', ${relatedId}); } return false;" class="plan-link" data-plan-id="${relatedId}">${amount} ${date}</a>`.trim();
             }
             // For other types, return simple text
@@ -1584,7 +1705,7 @@ class FieldRendererService {
      *   volume: 45000000
      * });
      */
-    static renderTickerInfo(ticker, cssClass = '') {
+    static async renderTickerInfo(ticker, cssClass = '') {
         if (!ticker) {
             return '';
         }
@@ -1595,6 +1716,11 @@ class FieldRendererService {
         const change = ticker.daily_change || 0;
         const changePercent = ticker.daily_change_percent || 0;
         const volume = ticker.volume || 0;
+        const atr = ticker.atr || null;
+        
+        // Open price data
+        const changeFromOpen = ticker.change_from_open !== null && ticker.change_from_open !== undefined ? ticker.change_from_open : null;
+        const changeFromOpenPercent = ticker.change_from_open_percent !== null && ticker.change_from_open_percent !== undefined ? ticker.change_from_open_percent : null;
         
         // סמל מטבע דינמי
         const currencySymbol = ticker.currency_symbol || '$';
@@ -1603,19 +1729,64 @@ class FieldRendererService {
         const changeColor = change >= 0 ? 'text-success' : 'text-danger';
         const changeIcon = change >= 0 ? '↗' : '↘';
         
+        // צבעים לשינוי מפתיחה
+        const changeFromOpenColor = changeFromOpen !== null && changeFromOpen >= 0 ? 'text-success' : 'text-danger';
+        const changeFromOpenIcon = changeFromOpen !== null && changeFromOpen >= 0 ? '↗' : '↘';
+        
         // פורמט נפח
         const formattedVolume = volume > 0 ? volume.toLocaleString('he-IL') : 'N/A';
         
+        // חישוב ATR באחוזים ורנדור עם רמזור
+        let atrHtml = '';
+        if (atr !== null && price && price > 0) {
+            const atrPercent = (parseFloat(atr) / parseFloat(price)) * 100;
+            if (this.renderATR && typeof this.renderATR === 'function') {
+                try {
+                    atrHtml = await this.renderATR(atr, atrPercent);
+                } catch (e) {
+                    // Fallback אם renderATR נכשל
+                    atrHtml = `<span class="atr-value" dir="ltr">${atrPercent.toFixed(2)}%</span>`;
+                }
+            } else {
+                // Fallback אם renderATR לא זמין
+                atrHtml = `<span class="atr-value" dir="ltr">${atrPercent.toFixed(2)}%</span>`;
+            }
+        }
+        
         // תצוגה קומפקטית בשורה אחת (כפי שיצרנו עבור trade_plan ו-trade)
-        const compactDisplay = `
+        let compactDisplay = `
             <div class="ticker-info-display-inline ${cssClass}" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: center;">
                 <span class="fw-bold">${currencySymbol}${price.toFixed(2)}</span>
                 <span class="${changeColor}">
                     ${changeIcon} ${change >= 0 ? '+' : ''}${change.toFixed(2)} (${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%)
                 </span>
+        `;
+        
+        // הוספת שינוי מפתיחה אם זמין
+        if (changeFromOpen !== null && changeFromOpenPercent !== null) {
+            compactDisplay += `
+                <span class="${changeFromOpenColor} small">
+                    ${changeFromOpenIcon} מפתיחה: ${changeFromOpen >= 0 ? '+' : ''}${changeFromOpen.toFixed(2)} (${changeFromOpenPercent >= 0 ? '+' : ''}${changeFromOpenPercent.toFixed(2)}%)
+                </span>
+            `;
+        }
+        
+        compactDisplay += `
                 <span class="text-muted small">
                     נפח: ${formattedVolume}
                 </span>
+        `;
+        
+        // הוספת ATR עם רמזור אם זמין
+        if (atrHtml) {
+            compactDisplay += `
+                <span class="text-muted small">
+                    ATR: ${atrHtml}
+                </span>
+            `;
+        }
+        
+        compactDisplay += `
             </div>
         `;
         
@@ -1706,7 +1877,7 @@ class FieldRendererService {
             ].filter(Boolean).join(' ');
 
             return `
-                <span class="badge rounded-pill bg-light text-dark border me-1 mb-1"
+                <span class="badge rounded-pill bg-light text-muted border entity-tag-badge"
                       style="border-color: ${normalizedColor};"
                       ${dataAttrs}>
                     ${displayLabel}
@@ -1824,9 +1995,7 @@ window.renderDate = (date, includeTime) => FieldRendererService.renderDate(date,
 window.renderShares = (shares, cssClass) => FieldRendererService.renderShares(shares, cssClass);
 window.renderPosition = (quantity, averagePrice, currencySymbol) => FieldRendererService.renderPosition(quantity, averagePrice, currencySymbol);
 window.renderBoolean = (value, size) => FieldRendererService.renderBoolean(value, size);
-window.renderTickerInfo = (ticker, cssClass) => FieldRendererService.renderTickerInfo(ticker, cssClass);
+window.renderTickerInfo = async (ticker, cssClass) => await FieldRendererService.renderTickerInfo(ticker, cssClass);
 window.renderVolume = (volume, showMillions) => FieldRendererService.renderVolume(volume, showMillions);
 window.renderExecutionDate = (date) => FieldRendererService.renderExecutionDate(date);
 window.renderUpdatedTimestamp = (value, options) => FieldRendererService.renderUpdatedTimestamp(value, options);
-
-console.log('✅ field-renderer-service.js v=1.4.0 loaded - added renderTickerInfo() for ticker price display');

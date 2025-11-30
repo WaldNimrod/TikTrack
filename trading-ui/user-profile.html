@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="user-profile-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ניהול פרופיל משתמש במערכת TikTrack">
+    <meta name="keywords" content="TikTrack, פרופיל משתמש, הגדרות משתמש, שינוי סיסמה">
+    <meta name="author" content="TikTrack">
+    <title>פרופיל משתמש - TikTrack</title>
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@300;400;500;600;700&display=swap">
+
+    <!-- Bootstrap CSS (חובה ראשון) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906">
+
+    <!-- LOCK: DO NOT MODIFY - ITCSS Loading Order -->
+    <!-- ITCSS Layer 1: Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_color-variables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_breakpoints.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 2: Tools -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 3: Generic -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 4: Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 5: Objects -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 6: Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_bootstrap-overrides.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_info-summary.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_linked-items.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_actions-menu.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_pagination-system.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 7: Pages -->
+    <link rel="stylesheet" href="styles-new/07-pages/_user-profile.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 8: Themes -->
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/08-themes/_high-contrast.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 9: Utilities -->
+    <link rel="stylesheet" href="styles-new/07-utilities/_common-patterns.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=0da3519a_20251102_104906">
+</head>
+<body class="user-profile-page">
+    <!-- 
+        TikTrack Page Template
+        גרסה: 2.0
+        תאריך: 28 בינואר 2025
+        מערכת: 8 מודולי אתחול + ITCSS מלא
+        מטמון: 4 שכבות מאוחדות
+    -->
+    <!-- LOCK: DO NOT MODIFY - Page Structure -->
+    <div class="container-fluid page-container">
+        <header class="row g-0">
+            <div class="col-12">
+                <div id="unified-header"></div>
+            </div>
+        </header>
+
+        <main class="row g-0">
+            <div class="col-12">
+                <div class="background-wrapper">
+                    <div class="page-body">
+                        <div class="main-content">
+                            <div class="content-section" id="user-profile-top" data-section="top">
+                                <div class="section-header">
+                                    <div class="table-title">
+                                        <img src="images/icons/entities/user.svg" alt="פרופיל משתמש" class="section-icon">
+                                        <span>פרופיל משתמש</span>
+                                    </div>
+                                    <div class="section-actions">
+                                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                                    </div>
+                                </div>
+                                <div class="section-body">
+                                    <div class="row">
+                                        <!-- User Info Column -->
+                                        <div class="col-md-6">
+                                            <div class="card h-100">
+                                                <div class="card-header bg-light">
+                                                    <h6 class="mb-0 text-muted">פרטי משתמש</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <form id="userInfoForm">
+                                                        <div class="row g-3">
+                                                            <div class="col-12">
+                                                                <label class="form-label" for="profileUsername">שם משתמש</label>
+                                                                <input type="text" id="profileUsername" class="form-control" readonly>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="form-label" for="profileEmail">אימייל</label>
+                                                                <input type="email" id="profileEmail" class="form-control" placeholder="הכנס כתובת אימייל">
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="form-label" for="profileFirstName">שם פרטי</label>
+                                                                <input type="text" id="profileFirstName" class="form-control" placeholder="הכנס שם פרטי">
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="form-label" for="profileLastName">שם משפחה</label>
+                                                                <input type="text" id="profileLastName" class="form-control" placeholder="הכנס שם משפחה">
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <button type="submit" class="btn btn-primary" id="updateInfoBtn">
+                                                                    <span id="updateInfoBtnText">עדכן פרטים</span>
+                                                                    <span id="updateInfoBtnSpinner" class="btn-spinner">⏳ מעדכן...</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Password Change Column -->
+                                        <div class="col-md-6">
+                                            <div class="card h-100">
+                                                <div class="card-header bg-light">
+                                                    <h6 class="mb-0 text-muted">שינוי סיסמה</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <form id="passwordForm">
+                                                        <div class="row g-3">
+                                                            <div class="col-12">
+                                                                <label class="form-label" for="currentPassword">סיסמה נוכחית</label>
+                                                                <input type="password" id="currentPassword" class="form-control" placeholder="הכנס סיסמה נוכחית" required>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="form-label" for="newPassword">סיסמה חדשה</label>
+                                                                <input type="password" id="newPassword" class="form-control" placeholder="הכנס סיסמה חדשה (מינימום 6 תווים)" required minlength="6">
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="form-label" for="confirmNewPassword">אימות סיסמה חדשה</label>
+                                                                <input type="password" id="confirmNewPassword" class="form-control" placeholder="אמת סיסמה חדשה" required minlength="6">
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <button type="submit" class="btn btn-warning" id="updatePasswordBtn">
+                                                                    <span id="updatePasswordBtnText">עדכן סיסמה</span>
+                                                                    <span id="updatePasswordBtnSpinner" class="btn-spinner">⏳ מעדכן...</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SMTP Settings moved to System Management page -->
+                            <!-- הגדרות SMTP הועברו לעמוד מנהל מערכת -->
+
+                            <!-- AI Analysis Settings Section -->
+                            <div class="content-section" id="user-profile-ai-analysis" data-section="ai-analysis">
+                                <div class="section-header">
+                                    <div class="table-title">
+                                        <img src="images/icons/entities/user.svg" alt="הגדרות AI Analysis" class="section-icon" onerror="this.style.display='none'">
+                                        <span>הגדרות AI Analysis</span>
+                                    </div>
+                                    <div class="section-actions">
+                                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('ai-analysis')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                                    </div>
+                                </div>
+                                <div class="section-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <form id="aiAnalysisSettingsForm">
+                                                        <div class="row g-3">
+                                                            <!-- Row 1: Default Provider + Help Panel -->
+                                                            <div class="col-md-6">
+                                                                <label class="form-label" for="aiDefaultProvider">מנוע AI ברירת מחדל</label>
+                                                                <select id="aiDefaultProvider" class="form-select" required>
+                                                                    <option value="gemini">Gemini (מומלץ למתחילים)</option>
+                                                                    <option value="perplexity">Perplexity</option>
+                                                                </select>
+                                                                <small class="form-text text-muted">בחר מנוע AI שישמש כברירת מחדל לניתוחים</small>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="form-label">איפה להשיג מפתח API?</label>
+                                                                <div class="alert alert-info mb-0">
+                                                                    <div class="mb-2">
+                                                                        <strong>Gemini:</strong><br>
+                                                                        <small>
+                                                                            1. עבור ל-<a href="https://aistudio.google.com/" target="_blank" class="alert-link">Google AI Studio</a><br>
+                                                                            2. לחץ על "Get API Key"<br>
+                                                                            3. העתק את המפתח
+                                                                        </small>
+                                                                    </div>
+                                                                    <div>
+                                                                        <strong>Perplexity:</strong><br>
+                                                                        <small>
+                                                                            1. עבור ל-<a href="https://www.perplexity.ai/api" target="_blank" class="alert-link">Perplexity API</a><br>
+                                                                            2. לחץ על "Create API Key"<br>
+                                                                            3. העתק את המפתח
+                                                                        </small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Row 2: Gemini API Key -->
+                                                            <div class="col-md-6">
+                                                                <label class="form-label" for="geminiApiKey">Gemini API Key</label>
+                                                                <div class="input-group">
+                                                                    <input type="password" id="geminiApiKey" class="form-control" placeholder="הכנס Gemini API Key">
+                                                                    <button class="btn btn-outline-secondary" type="button" id="toggleGeminiKeyBtn" title="הצג/הסתר מפתח">
+                                                                        <span id="toggleGeminiKeyIcon">👁️</span>
+                                                                    </button>
+                                                                </div>
+                                                                <small class="form-text text-muted">המפתח יישמר מוצפן במסד הנתונים</small>
+                                                                
+                                                                <!-- Status and Validate Button for Gemini -->
+                                                                <div class="d-flex align-items-center gap-2 mt-2">
+                                                                    <div id="geminiKeyStatus" class="status-display flex-grow-1"></div>
+                                                                    <button type="button" data-button-type="SECONDARY" data-variant="small" data-onclick="window.AIAnalysisManager?.validateGeminiKey()" data-text="בדוק" data-id="validateGeminiBtn" id="validateGeminiBtn">
+                                                                        <span id="validateGeminiBtnText">בדוק</span>
+                                                                        <span id="validateGeminiBtnSpinner" class="btn-spinner d-none">⏳</span>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Row 2: Perplexity API Key -->
+                                                            <div class="col-md-6">
+                                                                <label class="form-label" for="perplexityApiKey">Perplexity API Key</label>
+                                                                <div class="input-group">
+                                                                    <input type="password" id="perplexityApiKey" class="form-control" placeholder="הכנס Perplexity API Key">
+                                                                    <button class="btn btn-outline-secondary" type="button" id="togglePerplexityKeyBtn" title="הצג/הסתר מפתח">
+                                                                        <span id="togglePerplexityKeyIcon">👁️</span>
+                                                                    </button>
+                                                                </div>
+                                                                <small class="form-text text-muted">המפתח יישמר מוצפן במסד הנתונים</small>
+                                                                
+                                                                <!-- Status and Validate Button for Perplexity -->
+                                                                <div class="d-flex align-items-center gap-2 mt-2">
+                                                                    <div id="perplexityKeyStatus" class="status-display flex-grow-1"></div>
+                                                                    <button type="button" data-button-type="SECONDARY" data-variant="small" data-onclick="window.AIAnalysisManager?.validatePerplexityKey()" data-text="בדוק" data-id="validatePerplexityBtn" id="validatePerplexityBtn">
+                                                                        <span id="validatePerplexityBtnText">בדוק</span>
+                                                                        <span id="validatePerplexityBtnSpinner" class="btn-spinner d-none">⏳</span>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Row 3: Save Button (aligned to left/end) -->
+                                                            <div class="col-12">
+                                                                <div class="d-flex justify-content-start">
+                                                                    <button type="button" data-button-type="PRIMARY" data-variant="full" data-onclick="window.AIAnalysisManager?.saveSettings()" data-text="שמור הגדרות" data-id="saveAiAnalysisBtn" id="saveAiAnalysisBtn">
+                                                                        <span id="saveAiAnalysisBtnText">שמור הגדרות</span>
+                                                                        <span id="saveAiAnalysisBtnSpinner" class="btn-spinner d-none">⏳ שומר...</span>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="page-bottom-spacing"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="row g-0" aria-hidden="true">
+            <div class="col-12"><!-- Space reserved for global footer system --></div>
+        </footer>
+    </div>
+
+    <!-- LOCK: DO NOT MODIFY - Cache System Integration -->
+    <div class="notification-container" id="notificationContainer"></div>
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <!-- LOCK: DO NOT MODIFY - JavaScript Module Loading -->
+    <!-- =============================================================== -->
+        <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: user-profile | Generated: 2025-11-29T19:33:03.771Z -->
+    <!-- 📦 Packages: base, services, validation, modules, ui-advanced, preferences, init-system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/7: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: Core systems required for all pages -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 2.0.0 -->
+
+    <!-- [1] Load Order: 1 -->
+    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- Central API configuration -->
+    <!-- [2] Load Order: 2 -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- Favicon management -->
+    <!-- [3] Load Order: 3 -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- Notification system -->
+    <!-- [4] Load Order: 4 -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- Cache synchronization manager -->
+    <!-- [5] Load Order: 5 -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- UI utilities -->
+    <!-- [6] Load Order: 6 -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- Warning system -->
+    <!-- [7] Load Order: 7 -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- Error handling system -->
+    <!-- [8] Load Order: 8 -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- Unified cache manager -->
+    <!-- [9] Load Order: 9 -->
+    <script src="scripts/icon-mappings.js?v=1.0.0"></script> <!-- Central icon mappings -->
+    <!-- [10] Load Order: 10 -->
+    <script src="scripts/icon-system.js?v=1.0.0"></script> <!-- Central icon system -->
+    <!-- [11] Load Order: 11 -->
+    <script src="scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- Icon replacement helper for standardizing icon usage -->
+    <!-- [12] Load Order: 12 -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- Cache clearing control (Stage B-Lite) -->
+    <!-- [13] Load Order: 13 -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
+    <!-- [14] Load Order: 14 -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- Advanced logging service -->
+    <!-- [15] Load Order: 15 -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- Header system -->
+    <!-- [16] Load Order: 16 -->
+    <script src="scripts/page-state-manager.js?v=1.0.0"></script> <!-- Unified page state manager -->
+    <!-- [17] Load Order: 17 -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- Page utilities -->
+    <!-- [18] Load Order: 18 -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- Translations -->
+    <!-- [19] Load Order: 19 -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- Icon and button system -->
+    <!-- [20] Load Order: 20 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- Central event management system -->
+    <!-- [22] Load Order: 22 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- Button system -->
+    <!-- [23] Load Order: 23 -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- Dynamic color system -->
+    <!-- [24] Load Order: 24 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- Unified initialization system - single entry point (required for all pages) -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/7: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2 | Description: General services -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [25] Load Order: 25 -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script> <!-- Data collection service -->
+    <!-- [26] Load Order: 26 -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script> <!-- Field rendering service -->
+    <!-- [27] Load Order: 27 -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script> <!-- Select box population service -->
+    <!-- [28] Load Order: 28 -->
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- Statistics calculator -->
+    <!-- [29] Load Order: 29 -->
+    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- Default value service -->
+    <!-- [30] Load Order: 30 -->
+    <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- Preferences data service (API + Cache) -->
+    <!-- [31] Load Order: 31 -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- CRUD response handler -->
+    <!-- [32] Load Order: 32 -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0"></script> <!-- Unified CRUD service for all entities -->
+    <!-- [33] Load Order: 33 -->
+    <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- Investment form amount ↔ quantity calculations -->
+    <!-- [34] Load Order: 34 -->
+    <script src="scripts/services/tag-service.js?v=1.0.0"></script> <!-- Central tag service (tag management and retrieval) -->
+    <!-- [35] Load Order: 35 -->
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
+    <!-- [36] Load Order: 36 -->
+    <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- Unified linter status service (API reading and data conversion) -->
+    <!-- [37] Load Order: 37 -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [38] Load Order: 38 -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
+    <!-- [39] Load Order: 39 -->
+    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- Rich text editor service -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/7: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3 | Description: Advanced user interface -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [40] Load Order: 40 -->
+    <script src="scripts/table-mappings.js?v=1.0.0"></script> <!-- Table mappings -->
+    <!-- [41] Load Order: 41 -->
+    <script src="scripts/tables.js?v=1.0.0"></script> <!-- Table system -->
+    <!-- [42] Load Order: 42 -->
+    <script src="scripts/table-data-registry.js?v=1.0.0"></script> <!-- Table data registry -->
+    <!-- [43] Load Order: 43 -->
+    <script src="scripts/pagination-system.js?v=1.0.0"></script> <!-- Pagination system -->
+    <!-- [44] Load Order: 44 -->
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- Actions menu system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/7: MODULES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3.5 | Description: General modules -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [45] Load Order: 45 -->
+    <script src="scripts/modal-navigation-manager.js?v=1.0.0"></script> <!-- Nested modal navigation system -->
+    <!-- [46] Load Order: 46 -->
+    <script src="scripts/modal-manager-v2.js?v=1.0.0"></script> <!-- Modal manager V2 -->
+    <!-- [47] Load Order: 47 -->
+    <script src="scripts/tag-ui-manager.js?v=1.0.0"></script> <!-- Tag selection management in modals -->
+    <!-- [48] Load Order: 48 -->
+    <script src="scripts/tag-events.js?v=1.0.0"></script> <!-- Global tag events system -->
+    <!-- [49] Load Order: 49 -->
+    <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- Basic data -->
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/modules/ui-basic.js?v=1.0.0"></script> <!-- Basic interface -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/modules/data-advanced.js?v=1.0.0"></script> <!-- Advanced data -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/modules/ui-advanced.js?v=1.0.0"></script> <!-- Advanced interface -->
+    <!-- [53] Load Order: 53 -->
+    <script src="scripts/modules/communication-module.js?v=1.0.0"></script> <!-- Communication module -->
+    <!-- [54] Load Order: 54 -->
+    <script src="scripts/modules/business-module.js?v=1.0.0"></script> <!-- Business module -->
+    <!-- [55] Load Order: 55 -->
+    <script src="scripts/modules/localstorage-sync.js?v=1.0.0"></script> <!-- localStorage synchronization -->
+    <!-- [56] Load Order: 56 -->
+    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script> <!-- Dynamic loader configuration -->
+    <!-- [57] Load Order: 57 -->
+    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- Execution data import modal -->
+    <!-- [58] Load Order: 58 -->
+    <script src="scripts/modal-configs/trades-config.js?v=1.0.0"></script> <!-- Trades modal configuration -->
+    <!-- [59] Load Order: 59 -->
+    <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script> <!-- Trade plans modal configuration -->
+    <!-- [60] Load Order: 60 -->
+    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script> <!-- Tag system modal configuration -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/7: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: User preferences system v2.0 (10 files) -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.1.0 -->
+
+    <!-- [61] Load Order: 61 -->
+    <script src="scripts/preferences-cache.js?v=1.0.0"></script> <!-- Preferences cache management layer -->
+    <!-- [62] Load Order: 62 -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
+    <!-- [63] Load Order: 63 -->
+    <script src="scripts/preferences-events.js?v=1.0.0"></script> <!-- Preferences event system -->
+    <!-- [64] Load Order: 64 -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- Preferences core (without colors) -->
+    <!-- [65] Load Order: 65 -->
+    <script src="scripts/preferences-ui-layer.js?v=1.0.0"></script> <!-- Preferences UI layer -->
+    <!-- [66] Load Order: 66 -->
+    <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- Color system (60+ preferences) -->
+    <!-- [67] Load Order: 67 -->
+    <script src="scripts/preferences-manager.js?v=1.0.0"></script> <!-- Preferences manager (central) -->
+    <!-- [68] Load Order: 68 -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- Profile management -->
+    <!-- [69] Load Order: 69 -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
+    <!-- [70] Load Order: 70 -->
+    <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
+    <!-- [71] Load Order: 71 -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- User interface V4 (Group-First) -->
+    <!-- [72] Load Order: 72 -->
+    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- User interface -->
+    <!-- [73] Load Order: 73 -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- Preferences group manager -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 6/7: VALIDATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 6 | Description: Validation systems -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [74] Load Order: 74 -->
+    <script src="scripts/validation-utils.js?v=1.0.0"></script> <!-- Validation utilities -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 7/7: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary, dashboard-widgets, tradingview-widgets, tradingview-charts, watch-lists, ai-analysis -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [75] Load Order: 75 -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- Package manifest -->
+    <!-- [76] Load Order: 76 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- Page initialization configurations -->
+    <!-- [77] Load Order: 77 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- Initialization system check -->
+    <!-- [78] Load Order: 78 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- Page monitoring functions -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- [79] Load Order: 79 -->
+    <script src="scripts/auth.js?v=2.2"></script> <!-- Authentication system (required for user-profile) -->
+    <!-- [80] Load Order: 80 -->
+    <script src="scripts/user-profile.js?v=1.0.0"></script> <!-- User profile page manager -->
+    <!-- [81] Load Order: 81 -->
+    <script src="scripts/user-profile-ai-analysis.js?v=1.0.0"></script> <!-- AI Analysis settings manager for user profile -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 81 | Unique Scripts Loaded: 81 -->
+    <!-- ✅ Page-specific scripts: user-profile.js, user-profile-ai-analysis.js -->
+    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
+</body>
+</html>

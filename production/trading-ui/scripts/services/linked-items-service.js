@@ -209,23 +209,26 @@ class LinkedItemsService {
             throw new Error('entityType is required');
         }
         
+        // First, try provided entity colors
         if (options.entityColors && options.entityColors[entityType]) {
             return options.entityColors[entityType];
         }
         
-        const defaultColors = {
-            'trade': '#26baac',
-            'trade_plan': '#26baac',
-            'execution': '#28a745',
-            'trading_account': '#28a745',
-            'ticker': '#17a2b8',
-            'alert': '#ffc107',
-            'cash_flow': '#6c757d',
-            'position': '#0d6efd',
-            'note': '#343a40'
-        };
+        // Use centralized Color Scheme System
+        if (typeof window.getEntityColor === 'function') {
+            const color = window.getEntityColor(entityType);
+            if (color) {
+                return color;
+            }
+        }
         
-        return defaultColors[entityType] || '#6c757d';
+        // No hardcoded fallback - return empty string to force system to load from preferences
+        if (window.Logger && window.Logger.warn) {
+            window.Logger.warn(`⚠️ No color found for entity type: ${entityType} - Color Scheme System should load from preferences`, {
+                page: 'linked-items-service'
+            });
+        }
+        return '';
     }
     
     /**

@@ -695,7 +695,9 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       };
 
       this.performanceMetrics.stageTimes.prepare = Date.now() - stageStart;
-      console.log('✅ Stage 2 Complete:', config);
+      if (window.Logger?.debug) {
+        window.Logger.debug('Stage 2 Complete', { config }, { page: 'core-systems' });
+      }
 
       return config;
     }
@@ -741,7 +743,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         HeaderSystem: {
           available: typeof window.HeaderSystem !== 'undefined' && window.HeaderSystem !== null,
           initialized: true, // HeaderSystem doesn't have explicit initialized flag
-          optional: false,
+          optional: true, // HeaderSystem is optional - page can work without it
         },
         toggleSection: {
           available: typeof window.toggleSection === 'function',
@@ -776,7 +778,9 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
      * Stage 3: Execute initialization
      */
     async executeInitialization(config) {
-      console.log('🚀 Stage 3: Executing initialization...');
+      if (window.Logger?.debug) {
+        window.Logger.debug('Stage 3: Executing initialization', {}, { page: 'core-systems' });
+      }
       const stageStart = Date.now();
 
       try {
@@ -786,10 +790,14 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         }
 
         // Static loading - all modules already loaded
-        console.log('✅ Static loading - all modules already loaded');
+        if (window.Logger?.debug) {
+          window.Logger.debug('Static loading - all modules already loaded', {}, { page: 'core-systems' });
+        }
 
         // Validate required dependencies BEFORE initialization
-        console.log('🔍 Validating required dependencies...');
+        if (window.Logger?.debug) {
+          window.Logger.debug('Validating required dependencies', {}, { page: 'core-systems' });
+        }
         const dependencyCheck = this._validateRequiredDependencies();
 
         if (!dependencyCheck.allAvailable) {
@@ -805,7 +813,9 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           // Continue with fallback - don't throw, but log warning
           console.warn('⚠️ Continuing with missing dependencies - some features may not work');
         } else {
-          console.log('✅ All required dependencies available');
+          if (window.Logger?.debug) {
+            window.Logger.debug('All required dependencies available', {}, { page: 'core-systems' });
+          }
         }
 
         if (!dependencyCheck.allInitialized && dependencyCheck.notInitialized.length > 0) {
@@ -822,11 +832,14 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         await new Promise(resolve => setTimeout(resolve, 50));
 
         // Verify cache system is ready
-        console.log('🔍 Verifying cache system readiness...');
-        console.log('UnifiedCacheManager available:', !!window.UnifiedCacheManager);
+        if (window.Logger?.debug) {
+          window.Logger.debug('Verifying cache system readiness', { 
+            available: !!window.UnifiedCacheManager,
+            initialized: window.UnifiedCacheManager?.initialized 
+          }, { page: 'core-systems' });
+        }
 
         if (window.UnifiedCacheManager) {
-          console.log('UnifiedCacheManager initialized:', window.UnifiedCacheManager.initialized);
         } else if (!dependencyCheck.details.UnifiedCacheManager.optional) {
           console.error(
             '❌ UnifiedCacheManager is required but not available - using localStorage fallback'
@@ -838,9 +851,13 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           window.UnifiedCacheManager && window.UnifiedCacheManager.initialized;
 
         if (window.cacheSystemReady) {
-          console.log('✅ Cache system ready (4-layer architecture)');
+          if (window.Logger?.debug) {
+            window.Logger.debug('Cache system ready (4-layer architecture)', {}, { page: 'core-systems' });
+          }
         } else {
-          console.log('⚠️ Cache system not ready, using localStorage fallback');
+          if (window.Logger?.warn) {
+            window.Logger.warn('Cache system not ready, using localStorage fallback', {}, { page: 'core-systems' });
+          }
         }
 
         // Initialize preferences system (standardized loading for all pages)
@@ -893,15 +910,21 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
      * Called when window.initializeApplication is not available
      */
     async manualInitialization(config) {
-      console.log('🔧 Manual initialization fallback...');
+      if (window.Logger?.debug) {
+        window.Logger.debug('Manual initialization fallback', {}, { page: 'core-systems' });
+      }
 
       // Initialize Header + Notifications + Actions Menu System in parallel (all independent of cache)
-      console.log('🎯 Initializing UI Systems in parallel...');
+      if (window.Logger?.debug) {
+        window.Logger.debug('Initializing UI Systems in parallel', {}, { page: 'core-systems' });
+      }
       await Promise.all([
         // Header System - has localStorage fallback, doesn't need cache
         (async () => {
           if (typeof window.initializeHeaderSystem === 'function') {
-            console.log('🎯 Initializing Header System...');
+            if (window.Logger?.debug) {
+              window.Logger.debug('Initializing Header System', {}, { page: 'core-systems' });
+            }
             window.initializeHeaderSystem();
           } else {
             console.warn('⚠️ initializeHeaderSystem not available');
@@ -965,9 +988,13 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
      */
     async initializePreferencesForPage(config) {
       // Check if page has preferences package
-      console.log('📦 Checking packages for preferences:', config.packages);
+      if (window.Logger?.debug) {
+        window.Logger.debug('Checking packages for preferences', { packages: config.packages }, { page: 'core-systems' });
+      }
       if (!config.packages || !config.packages.includes('preferences')) {
-        console.log('⏭️ Page does not require preferences package, skipping initialization');
+        if (window.Logger?.debug) {
+          window.Logger.debug('Page does not require preferences package, skipping initialization', {}, { page: 'core-systems' });
+        }
         return; // Page doesn't need preferences
       }
 
@@ -1150,7 +1177,9 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
      * Stage 4: Finalize initialization
      */
     async finalizeInitialization(config) {
-      console.log('🎯 Stage 4: Finalizing...');
+      if (window.Logger?.debug) {
+        window.Logger.debug('Stage 4: Finalizing', {}, { page: 'core-systems' });
+      }
       const stageStart = Date.now();
 
       // Restore page state
@@ -1338,7 +1367,9 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       const filename = path.split('/').pop() || 'index';
       const pageName = filename.replace('.html', '');
 
-      console.log('🔍 Page detection:', { path, filename, pageName });
+      if (window.Logger?.debug) {
+        window.Logger.debug('Page detection', { path, filename, pageName }, { page: 'core-systems' });
+      }
 
       const pageInfo = {
         name: pageName,
@@ -1353,7 +1384,9 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         },
       };
 
-      console.log('📊 Detected page info:', pageInfo);
+      if (window.Logger?.debug) {
+        window.Logger.debug('Detected page info', { pageInfo }, { page: 'core-systems' });
+      }
       return pageInfo;
     }
 
@@ -1389,7 +1422,9 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
      */
     analyzePageRequirements() {
       // This is already done in detectPageInfo, but can be extended
-      console.log('📊 Page requirements analyzed');
+      if (window.Logger?.debug) {
+        window.Logger.debug('Page requirements analyzed', {}, { page: 'core-systems' });
+      }
     }
 
     /**
@@ -1476,13 +1511,17 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
      * Initialize Unified Cache System
      */
     async initializeCacheSystem() {
-      console.log('🔧 Initializing Unified Cache System...');
+      if (window.Logger?.debug) {
+        window.Logger.debug('Initializing Unified Cache System', {}, { page: 'core-systems' });
+      }
 
       // Initialize UnifiedCacheManager with timeout
       if (typeof window.UnifiedCacheManager !== 'undefined') {
         try {
           if (!window.UnifiedCacheManager.initialized) {
-            console.log('🔧 Initializing UnifiedCacheManager...');
+            if (window.Logger?.debug) {
+              window.Logger.debug('Initializing UnifiedCacheManager', {}, { page: 'core-systems' });
+            }
 
             // Add timeout to prevent hanging
             const initPromise = window.UnifiedCacheManager.initialize();
@@ -1495,12 +1534,16 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
             const initResult = await Promise.race([initPromise, timeoutPromise]);
             if (initResult) {
-              console.log('✅ UnifiedCacheManager initialized successfully');
+              if (window.Logger?.debug) {
+                window.Logger.debug('UnifiedCacheManager initialized successfully', {}, { page: 'core-systems' });
+              }
             } else {
               throw new Error('UnifiedCacheManager initialization returned false');
             }
           } else {
-            console.log('✅ UnifiedCacheManager already initialized');
+            if (window.Logger?.debug) {
+              window.Logger.debug('UnifiedCacheManager already initialized', {}, { page: 'core-systems' });
+            }
           }
         } catch (error) {
           if (typeof window.Logger !== 'undefined' && window.Logger.error) {
@@ -1609,7 +1652,9 @@ function detectPageInfo() {
   const filename = path.split('/').pop() || 'index';
   const pageName = filename.replace('.html', '');
 
-  console.log('🔍 Page detection:', { path, filename, pageName });
+  if (window.Logger?.debug) {
+    window.Logger.debug('Page detection (legacy)', { path, filename, pageName }, { page: 'core-systems' });
+  }
 
   // Use global helper functions (defined below) instead of local duplicates
   const pageInfo = {
@@ -1625,7 +1670,9 @@ function detectPageInfo() {
     },
   };
 
-  console.log('📊 Detected page info:', pageInfo);
+  if (window.Logger?.debug) {
+    window.Logger.debug('Detected page info (legacy)', { pageInfo }, { page: 'core-systems' });
+  }
   return pageInfo;
 }
 
@@ -1662,7 +1709,9 @@ function detectAvailableSystems() {
  */
 function analyzePageRequirements() {
   // This is already done in detectPageInfo, but can be extended
-  console.log('📊 Page requirements analyzed');
+  if (window.Logger?.debug) {
+    window.Logger.debug('Page requirements analyzed (legacy)', {}, { page: 'core-systems' });
+  }
 }
 
 /**
@@ -1749,7 +1798,9 @@ function requiresCharts(pageName) {
  * Initialize Unified Cache System (Legacy - moved outside class)
  */
 async function initializeCacheSystem() {
-  console.log('🔧 Initializing Unified Cache System...');
+  if (window.Logger?.debug) {
+    window.Logger.debug('Initializing Unified Cache System (legacy)', {}, { page: 'core-systems' });
+  }
 
   // Initialize UnifiedCacheManager with timeout - only if not already initialized
   if (
@@ -1757,7 +1808,9 @@ async function initializeCacheSystem() {
     !window.UnifiedCacheManager.initialized
   ) {
     try {
-      console.log('🔧 Initializing UnifiedCacheManager...');
+      if (window.Logger?.debug) {
+        window.Logger.debug('Initializing UnifiedCacheManager (legacy)', {}, { page: 'core-systems' });
+      }
 
       // Add timeout to prevent hanging
       const initPromise = window.UnifiedCacheManager.initialize();
@@ -1767,20 +1820,28 @@ async function initializeCacheSystem() {
 
       const initResult = await Promise.race([initPromise, timeoutPromise]);
       if (initResult) {
-        console.log('✅ UnifiedCacheManager initialized successfully');
+        if (window.Logger?.debug) {
+          window.Logger.debug('UnifiedCacheManager initialized successfully (legacy)', {}, { page: 'core-systems' });
+        }
       } else {
         throw new Error('UnifiedCacheManager initialization returned false');
       }
     } catch (error) {
       console.error('❌ UnifiedCacheManager initialization failed:', error);
-      console.log('⚠️ Using localStorage fallback');
+      if (window.Logger?.warn) {
+        window.Logger.warn('Using localStorage fallback', {}, { page: 'core-systems' });
+      }
       // Set a flag to indicate cache system is not available
       window.UnifiedCacheManager = null;
     }
   } else if (window.UnifiedCacheManager?.initialized) {
-    console.log('✅ UnifiedCacheManager already initialized');
+    if (window.Logger?.debug) {
+      window.Logger.debug('UnifiedCacheManager already initialized (legacy)', {}, { page: 'core-systems' });
+    }
   } else {
-    console.log('⚠️ UnifiedCacheManager not available, using localStorage fallback');
+    if (window.Logger?.warn) {
+      window.Logger.warn('UnifiedCacheManager not available, using localStorage fallback', {}, { page: 'core-systems' });
+    }
   }
 
   // Advanced cache systems (CacheSyncManager, CachePolicyManager, MemoryOptimizer)
@@ -1792,7 +1853,9 @@ async function initializeCacheSystem() {
     await window.UnifiedInitializationSystem.initializeCoreSystems();
     window.coreSystemsInitialized = true;
   } else if (window.coreSystemsInitialized) {
-    console.log('✅ Core systems already initialized, skipping...');
+    if (window.Logger?.debug) {
+      window.Logger.debug('Core systems already initialized, skipping', {}, { page: 'core-systems' });
+    }
   }
 
   // Final verification and reporting - removed reportCacheSystemStatus call (not available as standalone function)
@@ -1831,7 +1894,9 @@ window.clearGlobalInitializationState = function () {
     pageInitializers: new Set(),
     customInitializers: new Map(),
   };
-  console.log('🧹 Global initialization state cleared');
+  if (window.Logger?.debug) {
+    window.Logger.debug('Global initialization state cleared', {}, { page: 'core-systems' });
+  }
 };
 
 /**
@@ -1974,22 +2039,30 @@ window.UnifiedInitializationSystem = {
   coreSystems: new Map(),
 
   addCoreSystem(name, initFunction) {
-    console.log(`📝 Registering core system: ${name}`);
+    if (window.Logger?.debug) {
+      window.Logger.debug(`Registering core system: ${name}`, {}, { page: 'core-systems' });
+    }
     this.coreSystems.set(name, initFunction);
   },
 
   async initializeCoreSystems() {
-    console.log('🔧 Initializing registered core systems...');
+    if (window.Logger?.debug) {
+      window.Logger.debug('Initializing registered core systems', {}, { page: 'core-systems' });
+    }
     for (const [name, initFunction] of this.coreSystems) {
       try {
         // בדיקה אם המערכת כבר מאותחלת
         const systemKey = name.toLowerCase().replace(/\s+/g, '');
         if (window[`${systemKey}Initialized`] || (window[name] && window[name].initialized)) {
-          console.log(`✅ ${name} already initialized, skipping...`);
+          if (window.Logger?.debug) {
+            window.Logger.debug(`${name} already initialized, skipping`, {}, { page: 'core-systems' });
+          }
           continue;
         }
 
-        console.log(`🔧 Initializing ${name}...`);
+        if (window.Logger?.debug) {
+          window.Logger.debug(`Initializing ${name}`, {}, { page: 'core-systems' });
+        }
         await initFunction();
         // console.log(`✅ ${name} initialized successfully`);
       } catch (error) {
@@ -2058,7 +2131,7 @@ async function createAlert(alertData) {
     // עדכון היסטוריית התראות
     await updateNotificationHistory('alert-created', alertData);
 
-    console.log('✅ Alert created successfully');
+    // Alert created - success logged via notification system
   } catch (error) {
     console.error('❌ Failed to create alert:', error);
     throw error;
@@ -2179,7 +2252,7 @@ function getNotificationIcon(type) {
 async function shouldShowNotification(category) {
   try {
     const preferenceName = `notifications_${category}_enabled`;
-    console.log(`🔍 Checking preference: ${preferenceName}`);
+    // Preference check - debug only
 
     if (typeof window.getPreference !== 'function') {
       // Preferences system not loaded yet - show notifications by default (this is normal during initialization)
@@ -2385,13 +2458,14 @@ async function showSimpleErrorNotification(title, message, duration = 6000, cate
 /**
  * Helper function: Create and show Bootstrap modal without ARIA warnings
  * MODAL SYSTEM - Creates dynamic modal and shows it properly
+ * Uses ModalManagerV2 when available, falls back to Bootstrap
  *
  * @param {string} modalHtml - HTML string of the modal
  * @param {string} modalId - ID of the modal element
  * @param {Object} options - Bootstrap modal options (optional)
- * @returns {Object} Bootstrap modal instance
+ * @returns {Object} Bootstrap modal instance (for backwards compatibility)
  */
-window.createAndShowModal = function (modalHtml, modalId, options = {}) {
+window.createAndShowModal = async function (modalHtml, modalId, options = {}) {
   // Remove ALL existing modals with this ID (in case of duplicates)
   // querySelectorAll catches all instances, not just the first one
   const existingModals = document.querySelectorAll(`#${modalId}`);
@@ -2415,6 +2489,55 @@ window.createAndShowModal = function (modalHtml, modalId, options = {}) {
     return null;
   }
 
+  // Try to use ModalManagerV2 first (supports dynamic modals)
+  // ModalManagerV2 כבר מטפל ב-Modal Navigation System
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    try {
+      await window.ModalManagerV2.showModal(modalId, 'view');
+      // Return Bootstrap instance for backwards compatibility (if available)
+      if (bootstrap?.Modal) {
+        return bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement, { backdrop: false });
+      }
+      return null;
+    } catch (error) {
+      // Fallback to Bootstrap if ModalManagerV2 fails
+      window.Logger?.warn(`createAndShowModal: ${modalId} not available in ModalManagerV2, using Bootstrap fallback`, { page: 'core-systems' });
+    }
+  }
+
+  // Fallback to Bootstrap modal (original implementation)
+  // Modal Navigation System - רק למודלים מקוננים (nested modals)
+  // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
+  const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
+  
+  if (hasStack) {
+    // רישום במערכת רק אם זה מודל מקונן
+    const navigationMetadata = {
+      modalId,
+      modalType: 'dynamic-modal',
+      title: modalElement.querySelector(`#${modalId}Label`)?.textContent || modalElement.querySelector('.modal-title')?.textContent || '',
+    };
+
+    if (window.ModalNavigationService?.registerModalOpen) {
+      await window.ModalNavigationService.registerModalOpen(modalElement, navigationMetadata);
+    } else if (window.pushModalToNavigation) {
+      await window.pushModalToNavigation(modalElement, navigationMetadata);
+    }
+
+    // עדכון UI (breadcrumb וכפתור חזרה) רק במודלים מקוננים
+    if (window.modalNavigationManager?.updateModalNavigation) {
+      window.modalNavigationManager.updateModalNavigation(modalElement);
+    }
+
+    // רישום סגירה
+    modalElement.addEventListener('hidden.bs.modal', () => {
+      if (window.ModalNavigationService?.registerModalClose) {
+        window.ModalNavigationService.registerModalClose(modalId);
+      } else if (window.registerModalNavigationClose) {
+        window.registerModalNavigationClose(modalId);
+      }
+    }, { once: true });
+  }
   // Fix ARIA accessibility: Use MutationObserver to prevent aria-hidden
   // Bootstrap keeps adding aria-hidden, we need to remove it continuously
   const observer = new MutationObserver(mutations => {
@@ -2463,7 +2586,7 @@ window.createAndShowModal = function (modalHtml, modalId, options = {}) {
  * @param {string} category - Category of notification (default: 'system')
  */
 async function showFinalSuccessNotification(title, message, details = {}, category = 'system') {
-  console.log('🎉 Final success notification:', { title, message, details, category });
+  // Final success notification - logged via notification system
 
   // Collect detailed success information
   const successInfo = {
@@ -2530,7 +2653,7 @@ async function showFinalSuccessNotification(title, message, details = {}, catego
  * @param {string} category - Category of notification (default: 'system')
  */
 async function showCriticalErrorNotification(title, message, details = {}, category = 'system') {
-  console.log('🚨 Critical error notification:', { title, message, details, category });
+  // Critical error notification - logged via error modal
 
   // Collect detailed error information
   const errorInfo = {
@@ -2786,7 +2909,7 @@ window.showClearCacheConfirmation = async function (level, currentStats) {
  * @param {Object} successInfo - Success information object
  */
 function showFinalSuccessModal(successInfo) {
-  console.log('🔍 showFinalSuccessModal called:', { successInfo });
+  // Modal shown - success notification displayed
   const headerColors = getBlockingModalColors('success');
   const headerStyle = `direction: rtl; background-color: ${headerColors.backgroundColor}; color: ${headerColors.textColor}; border-bottom: 1px solid ${headerColors.borderColor};`;
 
@@ -2889,12 +3012,7 @@ async function showFinalSuccessNotificationWithReload(
   details = {},
   category = 'system'
 ) {
-  console.log('🎉 Final success notification with reload option:', {
-    title,
-    message,
-    details,
-    category,
-  });
+  // Final success notification with reload option
 
   // Collect detailed success information
   const successInfo = {
@@ -2946,7 +3064,7 @@ async function showFinalSuccessNotificationWithReload(
  * Show final success modal with reload button
  */
 function showFinalSuccessModalWithReload(successInfo) {
-  console.log('🔍 showFinalSuccessModalWithReload called:', { successInfo });
+  // Modal with reload option shown
   const headerColors = getBlockingModalColors('success');
   const headerStyle = `direction: rtl; background-color: ${headerColors.backgroundColor}; color: ${headerColors.textColor}; border-bottom: 1px solid ${headerColors.borderColor};`;
 
@@ -3096,7 +3214,7 @@ function showFinalSuccessModalWithReload(successInfo) {
 }
 
 async function showCriticalErrorModal(errorInfo, detailedMessage) {
-  console.log('🔍 showCriticalErrorModal called:', { errorInfo, detailedMessage });
+  // Critical error modal shown
   const headerColors = getBlockingModalColors('error');
   const headerStyle = `direction: rtl; background-color: ${headerColors.backgroundColor}; color: ${headerColors.textColor}; border-bottom: 1px solid ${headerColors.borderColor};`;
 
@@ -3201,7 +3319,7 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
     });
   }
 
-  console.log('✅ Critical error modal shown:', modalId);
+  // Critical error modal displayed
 }
 
 /**
@@ -3289,7 +3407,7 @@ function withCriticalErrorHandling(
  * @param {Object} options - Additional options
  */
 async function showDetailsModal(title, content, options = {}) {
-  console.log('🔍 showDetailsModal called:', { title, content, options });
+  // Details modal shown
 
   // סגירת כל החלונות הקודמים
   closeAllDetailsModals();
@@ -3411,7 +3529,7 @@ async function showDetailsModal(title, content, options = {}) {
     });
   }
 
-  console.log('✅ Details modal shown:', modalId);
+  // Details modal displayed
 }
 
 // Helper function to hide modal
@@ -3826,52 +3944,58 @@ async function loadGlobalNotificationStats() {
   };
 }
 
-const BLOCKING_MODAL_COLOR_FALLBACK = {
-  success: '#28a745',
-  error: '#dc3545',
-  warning: '#ffc107',
-  info: '#17a2b8',
-};
+// ⚠️ REMOVED: BLOCKING_MODAL_COLOR_FALLBACK - use centralized Color Scheme System instead
+// No hardcoded fallbacks - system must load colors from preferences
 
 function getBlockingModalColors(type) {
-  let backgroundColor =
-    BLOCKING_MODAL_COLOR_FALLBACK[type] || BLOCKING_MODAL_COLOR_FALLBACK.success;
+  let backgroundColor = '';
 
   try {
+    // Try notification color system first
     if (typeof window.getNotificationColor === 'function') {
       backgroundColor = window.getNotificationColor(type);
-    } else if (typeof window.getEntityColor === 'function') {
+    }
+    
+    // Fallback to entity colors from centralized system
+    if (!backgroundColor && typeof window.getEntityColor === 'function') {
       switch (type) {
         case 'success':
-          backgroundColor = window.getEntityColor('account') || backgroundColor;
+          backgroundColor = window.getEntityColor('account') || '';
           break;
         case 'error':
-          backgroundColor = window.getEntityColor('ticker') || backgroundColor;
+          backgroundColor = window.getEntityColor('ticker') || '';
           break;
         case 'warning':
-          backgroundColor = window.getEntityColor('alert') || backgroundColor;
+          backgroundColor = window.getEntityColor('alert') || '';
           break;
         case 'info':
-          backgroundColor = window.getEntityColor('execution') || backgroundColor;
+          backgroundColor = window.getEntityColor('execution') || '';
           break;
         default:
-          backgroundColor = window.getEntityColor(type) || backgroundColor;
+          backgroundColor = window.getEntityColor(type) || '';
+      }
+    }
+    
+    // If still no color, log warning but don't use hardcoded fallback
+    if (!backgroundColor) {
+      if (window.Logger && window.Logger.warn) {
+        window.Logger.warn(`⚠️ No color found for blocking modal type: ${type} - Color Scheme System should load from preferences`, {
+          page: 'core-systems',
+        });
       }
     }
   } catch (error) {
     if (window.Logger && window.Logger.warn) {
-      window.Logger.warn('⚠️ Failed to resolve blocking modal color, using fallback', error, {
+      window.Logger.warn('⚠️ Failed to resolve blocking modal color from Color Scheme System', error, {
         page: 'core-systems',
       });
-    } else {
-      console.warn('⚠️ Failed to resolve blocking modal color, using fallback:', error);
     }
   }
 
   return {
-    backgroundColor,
-    borderColor: backgroundColor,
-    textColor: '#ffffff',
+    backgroundColor: backgroundColor || '',
+    borderColor: backgroundColor || '',
+    textColor: '#ffffff', // White text is acceptable as it's not a dynamic color
   };
 }
 
@@ -4269,8 +4393,6 @@ window.setDynamicLoading = function (enabled) {
     console.error('❌ UnifiedAppInitializer not available');
   }
 };
-
-console.log('✅ Core Systems module loaded successfully (Static Loading)');
 
 // ===== PAGE INITIALIZATION CONFIGURATIONS =====
 // NOTE: PAGE_CONFIGS is now defined in page-initialization-configs.js

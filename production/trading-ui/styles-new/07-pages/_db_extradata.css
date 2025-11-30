@@ -1,0 +1,14 @@
+/* ========================================
+   DB ExtraData Page Styles
+   ======================================== */
+
+/* Bottom page spacing */
+.db-extradata-page .bottom-spacer {
+    height: 3rem;
+}
+
+/* Toast container z-index override */
+.db-extradata-page #toastContainer {
+    z-index: 1000000002;
+}
+

@@ -10,18 +10,29 @@ logger = logging.getLogger(__name__)
 
 class TradeService:
     @staticmethod
-    def get_all(db: Session) -> List[Trade]:
-        """Get all trades"""
+    def get_all(db: Session, user_id: Optional[int] = None) -> List[Trade]:
+        """Get all trades (filtered by user_id if provided)"""
         import logging
         logger = logging.getLogger(__name__)
         
         logger.info("Loading trades with joinedload for account and ticker")
         
-        trades = db.query(Trade).options(
+        # Ensure transaction is in clean state before query
+        try:
+            from sqlalchemy import text
+            db.execute(text("SELECT 1"))
+        except Exception as tx_error:
+            logger.warning(f"Transaction aborted detected, rolling back: {str(tx_error)}")
+            db.rollback()
+        
+        query = db.query(Trade).options(
             joinedload(Trade.account),
             joinedload(Trade.ticker),
             joinedload(Trade.trade_plan)
-        ).all()
+        )
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        trades = query.all()
         
         logger.info(f"Loaded {len(trades)} trades")
         if trades:
@@ -41,27 +52,39 @@ class TradeService:
         return trades
     
     @staticmethod
-    def get_by_id(db: Session, trade_id: int) -> Optional[Trade]:
-        """Get trade by ID"""
-        return db.query(Trade).options(
+    def get_by_id(db: Session, trade_id: int, user_id: Optional[int] = None) -> Optional[Trade]:
+        """Get trade by ID (with user_id check)"""
+        query = db.query(Trade).options(
             joinedload(Trade.account),
             joinedload(Trade.ticker)
-        ).filter(Trade.id == trade_id).first()
+        ).filter(Trade.id == trade_id)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        return query.first()
     
     @staticmethod
-    def get_by_account(db: Session, trading_account_id: int) -> List[Trade]:
-        """Get trades by account"""
-        return db.query(Trade).filter(Trade.trading_account_id == trading_account_id).all()
+    def get_by_account(db: Session, trading_account_id: int, user_id: Optional[int] = None) -> List[Trade]:
+        """Get trades by account (filtered by user_id if provided)"""
+        query = db.query(Trade).filter(Trade.trading_account_id == trading_account_id)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        return query.all()
     
     @staticmethod
-    def get_by_ticker(db: Session, ticker_id: int) -> List[Trade]:
-        """Get trades by ticker"""
-        return db.query(Trade).filter(Trade.ticker_id == ticker_id).all()
+    def get_by_ticker(db: Session, ticker_id: int, user_id: Optional[int] = None) -> List[Trade]:
+        """Get trades by ticker (filtered by user_id if provided)"""
+        query = db.query(Trade).filter(Trade.ticker_id == ticker_id)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        return query.all()
     
     @staticmethod
-    def get_open_trades(db: Session) -> List[Trade]:
-        """Get open trades"""
-        return db.query(Trade).filter(Trade.status == 'open').all()
+    def get_open_trades(db: Session, user_id: Optional[int] = None) -> List[Trade]:
+        """Get open trades (filtered by user_id if provided)"""
+        query = db.query(Trade).filter(Trade.status == 'open')
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        return query.all()
     
     @staticmethod
     def get_trades_without_plan(
@@ -69,6 +92,7 @@ class TradeService:
         status_filter: Optional[List[str]] = None,
         *,
         load_relationships: bool = False,
+        user_id: Optional[int] = None,
     ) -> List[Trade]:
         """
         Get trades without an associated trade plan.
@@ -87,6 +111,9 @@ class TradeService:
             )
 
         query = query.filter(Trade.trade_plan_id.is_(None))
+        
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
 
         statuses = status_filter or ['open']
         if statuses:
@@ -95,12 +122,15 @@ class TradeService:
         return query.order_by(Trade.created_at.desc()).all()
     
     @staticmethod
-    def get_by_status(db: Session, status: str) -> List[Trade]:
-        """Get trades by status"""
-        return db.query(Trade).filter(Trade.status == status).all()
+    def get_by_status(db: Session, status: str, user_id: Optional[int] = None) -> List[Trade]:
+        """Get trades by status (filtered by user_id if provided)"""
+        query = db.query(Trade).filter(Trade.status == status)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        return query.all()
     
     @staticmethod
-    def get_by_account_and_status(db: Session, trading_account_id: int, status: str) -> List[Trade]:
+    def get_by_account_and_status(db: Session, trading_account_id: int, status: str, user_id: Optional[int] = None) -> List[Trade]:
         """Get trades by account and status"""
         import logging
         logger = logging.getLogger(__name__)
@@ -119,18 +149,21 @@ class TradeService:
         status_trades = db.query(Trade).filter(Trade.status == status).all()
         logger.info(f"Trades with status {status}: {len(status_trades)}")
         
-        # Combined filtering
-        filtered_trades = db.query(Trade).filter(
+        # Combined filtering (with user_id if provided)
+        query = db.query(Trade).filter(
             Trade.trading_account_id == trading_account_id,
             Trade.status == status
-        ).all()
+        )
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        filtered_trades = query.all()
         
         logger.info(f"Filtered trades for account {trading_account_id} with status {status}: {len(filtered_trades)}")
         
         return filtered_trades
     
     @staticmethod
-    def create(db: Session, data: Dict[str, Any]) -> Trade:
+    def create(db: Session, data: Dict[str, Any], user_id: Optional[int] = None) -> Trade:
         """
         Create a new trade with snapshot support for planning fields.
         
@@ -227,6 +260,10 @@ class TradeService:
                 except ValueError:
                     raise ValueError(f"Invalid date format for closed_at: {data['closed_at']}")
         
+        # Set user_id if provided and not in data
+        if user_id is not None and 'user_id' not in data:
+            data['user_id'] = user_id
+        
         # Validate data against dynamic constraints
         logger.info("About to call ValidationService.validate_data")
         logger.info(f"Data to validate: {data}")
@@ -243,9 +280,12 @@ class TradeService:
         return trade
     
     @staticmethod
-    def update(db: Session, trade_id: int, data: Dict[str, Any]) -> Optional[Trade]:
-        """Update trade"""
-        trade = db.query(Trade).filter(Trade.id == trade_id).first()
+    def update(db: Session, trade_id: int, data: Dict[str, Any], user_id: Optional[int] = None) -> Optional[Trade]:
+        """Update trade (with user_id check)"""
+        query = db.query(Trade).filter(Trade.id == trade_id)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        trade = query.first()
         if not trade:
             return None
         
@@ -282,11 +322,14 @@ class TradeService:
         return trade
     
     @staticmethod
-    def delete(db: Session, trade_id: int) -> bool:
-        """Delete trade"""
+    def delete(db: Session, trade_id: int, user_id: Optional[int] = None) -> bool:
+        """Delete trade (with user_id check)"""
         from models.execution import Execution
         
-        trade = db.query(Trade).filter(Trade.id == trade_id).first()
+        query = db.query(Trade).filter(Trade.id == trade_id)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        trade = query.first()
         if not trade:
             return False
         

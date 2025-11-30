@@ -48,6 +48,9 @@ class PreferencesGroupManager {
       'section7': 'chart_settings_unified',
       'section8': 'ui_settings',
     };
+    
+    // Initialize user modification tracking for preference fields
+    this._initializeUserModificationTracking();
     this.currentUserId = 1;
     this.currentProfileId = null;
     // מיפוי שמות מפתח קנוניים ↔ מזהי שדות/שמות ישנים ב-DOM
@@ -155,10 +158,50 @@ class PreferencesGroupManager {
   }
 
   /**
-     * בניית מיפוי הפוך לזיהוי מהיר של קלטי UI והשלכתם למפתח הקנוני
-     * @param {Object} aliases - map of canonicalKey -> string[]
-     * @returns {Object} reverse map uiName/id -> canonicalKey
-     */
+   * Initialize event listeners to track user modifications to preference fields
+   * This prevents populateGroupFields from overwriting user input
+   */
+  _initializeUserModificationTracking() {
+    // Use event delegation on the preferences form
+    const form = document.getElementById('preferencesForm');
+    if (!form) {
+      // Form might not exist yet, try again later
+      setTimeout(() => this._initializeUserModificationTracking(), 500);
+      return;
+    }
+
+    // Mark fields as user-modified when user types or changes them
+    const markAsUserModified = (event) => {
+      const field = event.target;
+      if (field && (field.tagName === 'INPUT' || field.tagName === 'SELECT' || field.tagName === 'TEXTAREA')) {
+        // Only mark if field is in a preferences section
+        const section = field.closest('[id^="section"]');
+        if (section && Object.keys(this.groupsMap).includes(section.id)) {
+          field.dataset.userModified = 'true';
+          window.Logger?.debug?.('✅ Marked field as user-modified', {
+            page: 'preferences-group-manager',
+            fieldId: field.id,
+            fieldName: field.name,
+            value: field.value
+          });
+        }
+      }
+    };
+
+    // Add event listeners using delegation
+    form.addEventListener('input', markAsUserModified, true);
+    form.addEventListener('change', markAsUserModified, true);
+    
+    window.Logger?.debug?.('✅ Initialized user modification tracking for preference fields', {
+      page: 'preferences-group-manager'
+    });
+  }
+
+  /**
+   * בניית מיפוי הפוך לזיהוי מהיר של קלטי UI והשלכתם למפתח הקנוני
+   * @param {Object} aliases - map of canonicalKey -> string[]
+   * @returns {Object} reverse map uiName/id -> canonicalKey
+   */
   _buildReverseAliases(aliases) {
     const reverse = {};
     Object.keys(aliases).forEach(canonical => {
@@ -264,7 +307,9 @@ class PreferencesGroupManager {
         return;
       }
 
-      const preferences = await window.PreferencesCore.loadGroupPreferences(groupName);
+      // CRITICAL: Force refresh to ensure we get latest data from server, not stale cache
+      // This is especially important after saving preferences
+      const preferences = await window.PreferencesCore.loadGroupPreferences(groupName, null, null, true); // forceRefresh = true
       const populatedStats = this.populateGroupFields(sectionId, preferences);
       this.markGroupAsLoaded(sectionId);
 
@@ -285,7 +330,12 @@ class PreferencesGroupManager {
       });
     } catch (error) {
       window.Logger?.error(`Failed to load group ${groupName}:`, error, { page: 'preferences-group-manager' });
-      window.showErrorNotification?.(`שגיאה בטעינת קבוצה ${this.getGroupDisplayName(groupName)}`);
+      // Use CRUDResponseHandler for error notification if available
+      if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {
+        window.CRUDResponseHandler.handleError(error, `טעינת קבוצת העדפות ${this.getGroupDisplayName(groupName)}`);
+      } else if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification?.(`שגיאה בטעינת קבוצה ${this.getGroupDisplayName(groupName)}`);
+      }
     }
   }
 
@@ -336,6 +386,36 @@ class PreferencesGroupManager {
 
       const field = section.querySelector(selectorParts.join(', '));
       if (field) {
+        // CRITICAL: Check if field was modified by user before overwriting
+        // If field has focus or was recently modified, preserve user's input
+        const fieldHasFocus = document.activeElement === field;
+        const cachedValue = normalizedPreferences[rawKey];
+        const currentValue = field.type === 'checkbox' ? field.checked : field.value;
+        
+        // Check if value actually differs from cached value
+        const valueDiffers = field.type === 'checkbox' 
+          ? (currentValue !== (cachedValue === 'true' || cachedValue === true))
+          : (currentValue !== '' && currentValue !== cachedValue && cachedValue !== undefined && cachedValue !== null);
+        
+        const fieldWasModified = field.dataset.userModified === 'true' || valueDiffers;
+        
+        // Skip population if field is currently being edited or was modified by user
+        // UNLESS explicitly allowed to repopulate (e.g., after save)
+        if (fieldHasFocus || (fieldWasModified && !field.dataset.allowRepopulate)) {
+          window.Logger?.debug?.('⏭️ Skipping field population - user is editing or field was modified', {
+            page: 'preferences-group-manager',
+            fieldId: field.id,
+            fieldName: field.name,
+            currentValue: currentValue,
+            cachedValue: cachedValue,
+            hasFocus: fieldHasFocus,
+            wasModified: fieldWasModified,
+            valueDiffers: valueDiffers
+          });
+          // Don't increment populatedCount for skipped fields
+          return; // Continue to next field
+        }
+        
         if (field.type === 'checkbox') {
           const v = normalizedPreferences[rawKey];
           field.checked = v === 'true' || v === true;
@@ -343,17 +423,45 @@ class PreferencesGroupManager {
           const sourceValue = normalizedPreferences[rawKey];
           const normalizedValue = this.normalizePreferenceValue(canonicalKey, sourceValue, 'toEnglish');
           const previousValue = field.value;
-          field.value = normalizedValue;
-
-          // If direct assignment failed (option not found), try fallback to original value
-          if (field.value !== normalizedValue && sourceValue !== undefined && sourceValue !== null) {
-            field.value = sourceValue;
+          
+          // Only update if value actually changed
+          if (field.value === normalizedValue || field.value === sourceValue) {
+            // Value already matches, no need to update
+            populatedCount++;
+            return; // Continue to next field
           }
-
-          // If still empty and there was a previous value, restore it to avoid blank selection
-          if (field.value === '' && previousValue !== '') {
-            field.value = previousValue;
+          
+          // Use DataCollectionService to set value if available
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(field.id, normalizedValue, 'text');
+            // Check if assignment succeeded (for selects)
+            if (field.tagName === 'SELECT') {
+              const currentValue = window.DataCollectionService.getValue(field.id, 'text', '');
+              if (currentValue !== normalizedValue && sourceValue !== undefined && sourceValue !== null) {
+                window.DataCollectionService.setValue(field.id, sourceValue, 'text');
+              } else if (currentValue === '' && previousValue !== '') {
+                // Only restore previous value if it's not empty and current is empty
+                // But don't restore if user was editing
+                if (!fieldHasFocus && !fieldWasModified) {
+                  window.DataCollectionService.setValue(field.id, previousValue, 'text');
+                }
+              }
+            }
+          } else {
+            field.value = normalizedValue;
+            // If direct assignment failed (option not found), try fallback to original value
+            if (field.value !== normalizedValue && sourceValue !== undefined && sourceValue !== null) {
+              field.value = sourceValue;
+            }
+            // If still empty and there was a previous value, restore it to avoid blank selection
+            // BUT: Only if user is not currently editing
+            if (field.value === '' && previousValue !== '' && !fieldHasFocus && !fieldWasModified) {
+              field.value = previousValue;
+            }
           }
+          
+          // Clear user modification flag after successful population
+          delete field.dataset.userModified;
         }
         populatedCount++;
       } else {
@@ -409,7 +517,12 @@ class PreferencesGroupManager {
     if (!sectionId) {
       const error = new Error(`Group ${groupName} not found in mapping`);
       window.Logger?.error(error.message, { page: 'preferences-group-manager' });
-      window.showErrorNotification?.('קבוצה לא נמצאה');
+      // Use CRUDResponseHandler for error notification if available
+      if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {
+        window.CRUDResponseHandler.handleError(error, 'שמירת קבוצת העדפות');
+      } else if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification?.('קבוצה לא נמצאה');
+      }
       throw error;
     }
 
@@ -417,6 +530,10 @@ class PreferencesGroupManager {
     if (!section) {
       const error = new Error(`Section ${sectionId} not found`);
       window.Logger?.error(error.message, { page: 'preferences-group-manager' });
+      // Use CRUDResponseHandler for error notification if available
+      if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {
+        window.CRUDResponseHandler.handleError(error, 'שמירת קבוצת העדפות');
+      }
       throw error;
     }
 
@@ -435,7 +552,12 @@ class PreferencesGroupManager {
       if (!window.PreferencesCore || !window.PreferencesCore.saveGroupPreferences) {
         const error = new Error('PreferencesCore.saveGroupPreferences not available');
         window.Logger?.error(error.message, { page: 'preferences-group-manager' });
-        window.showErrorNotification?.('מערכת העדפות לא זמינה');
+        // Use CRUDResponseHandler for error notification if available
+        if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {
+          window.CRUDResponseHandler.handleError(error, 'שמירת קבוצת העדפות');
+        } else if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification?.('מערכת העדפות לא זמינה');
+        }
         throw error;
       }
 
@@ -445,6 +567,45 @@ class PreferencesGroupManager {
       const profileId = window.PreferencesCore?.currentProfileId || window.PreferencesUI?.currentProfileId || this.currentProfileId || 0;
       const savedKeys = Object.keys(formData);
 
+      // OPTIMIZED: Use PreferencesManager for optimistic updates
+      // No need to refresh/reload after save - use saved values directly
+      if (window.PreferencesManager && typeof window.PreferencesManager.saveGroup === 'function') {
+        // Use PreferencesManager which handles optimistic updates
+        const saveResults = await window.PreferencesManager.saveGroup(groupName, formData, {
+          userId,
+          profileId,
+          optimisticUpdate: true, // Update UI immediately without reload
+        });
+
+        // Only invalidate cache (don't reload)
+        if (window.PreferencesCache) {
+          await window.PreferencesCache.clearGroup(groupName, userId, profileId);
+        }
+
+        // Update UI with saved values (optimistic update already done by PreferencesManager)
+        const sectionId = Object.keys(this.groupsMap).find(id => this.groupsMap[id] === groupName);
+        if (sectionId && window.PreferencesUI && typeof window.PreferencesUI.updateFields === 'function') {
+          // Mark fields as allowRepopulate to allow update
+          const section = document.getElementById(sectionId);
+          if (section) {
+            const fields = section.querySelectorAll('input, select, textarea');
+            fields.forEach(field => {
+              field.dataset.allowRepopulate = 'true';
+            });
+            // Update fields with saved values
+            window.PreferencesUI.updateFields(formData);
+            // Clear allowRepopulate flag
+            fields.forEach(field => {
+              delete field.dataset.allowRepopulate;
+              delete field.dataset.userModified;
+            });
+          }
+        }
+
+        return saveResults;
+      }
+
+      // FALLBACK: Original flow (for backward compatibility)
       // ניקוי cache של הקבוצה
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.refreshUserPreferences) {
         await window.UnifiedCacheManager.refreshUserPreferences(profileId, groupName, {
@@ -455,9 +616,18 @@ class PreferencesGroupManager {
 
       await this.refreshGroupState(groupName, savedKeys);
 
-      // הודעת הצלחה
-      const displayName = this.getGroupDisplayName(groupName);
-      window.showSuccessNotification?.(`✅ ${displayName} נשמרו בהצלחה`);
+      // Note: Success notification is handled by CRUDResponseHandler in PreferencesData.savePreferences()
+      // Only show additional notification if save was successful but CRUDResponseHandler didn't show one
+      if (results.saved > 0 && typeof window.showSuccessNotification === 'function') {
+        const displayName = this.getGroupDisplayName(groupName);
+        // Only show if CRUDResponseHandler didn't already show a notification
+        // (CRUDResponseHandler shows notification automatically, so this is a fallback)
+        window.Logger?.debug?.('Preferences group saved successfully', {
+          page: 'preferences-group-manager',
+          groupName,
+          savedCount: results.saved,
+        });
+      }
 
       window.Logger?.info(`✅ Saved ${results.saved} preferences for group ${groupName}`, { page: 'preferences-group-manager' });
 
@@ -475,7 +645,12 @@ class PreferencesGroupManager {
       return results;
     } catch (error) {
       window.Logger?.error(`Failed to save group ${groupName}:`, error, { page: 'preferences-group-manager' });
-      window.showErrorNotification?.('שגיאה בשמירת הגדרות');
+      // Error notification is handled by CRUDResponseHandler in PreferencesData.savePreferences()
+      // Only show additional notification if CRUDResponseHandler didn't show one
+      if (typeof window.showErrorNotification === 'function' && 
+          typeof window.CRUDResponseHandler === 'undefined') {
+        window.showErrorNotification?.('שגיאה בשמירת הגדרות');
+      }
       throw error; // Re-throw to allow caller to handle
     }
   }
@@ -660,10 +835,37 @@ class PreferencesGroupManager {
         }
       }
 
-      // Re-populate UI fields with refreshed values
+      // OPTIMIZED: Only populate if explicitly requested (not after save)
+      // After save, we use optimistic updates, so no need to reload
       const sectionId = Object.keys(this.groupsMap).find(id => this.groupsMap[id] === groupName);
       if (sectionId) {
-        this.populateGroupFields(sectionId, refreshedGroup);
+        const section = document.getElementById(sectionId);
+        if (section) {
+          // Only populate if this is a manual refresh, not after save
+          // Check if we have savedKeys - if yes, this is after save, skip population
+          if (savedKeys.length === 0) {
+            // Manual refresh - populate fields
+            const fields = section.querySelectorAll('input, select, textarea');
+            fields.forEach(field => {
+              field.dataset.allowRepopulate = 'true';
+            });
+            
+            // Populate fields
+            this.populateGroupFields(sectionId, refreshedGroup);
+            
+            // Clear allowRepopulate flag after population
+            fields.forEach(field => {
+              delete field.dataset.allowRepopulate;
+              delete field.dataset.userModified;
+            });
+          } else {
+            // After save - optimistic update already done, just update cache
+            window.Logger?.debug?.('Skipping population after save (optimistic update already done)', {
+              page: 'preferences-group-manager',
+              groupName,
+            });
+          }
+        }
       }
 
       if (groupName === 'basic_settings' && typeof window.loadAccountsForPreferences === 'function') {

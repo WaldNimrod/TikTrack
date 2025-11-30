@@ -434,6 +434,149 @@
     }
   }
 
+  /**
+   * Get all tickers (for search/adding to user list)
+   * All tickers are shared across users
+   */
+  async function getAllTickers(options = {}) {
+    const { force = false, signal } = options;
+    return await loadTickersData({ force, signal });
+  }
+
+  /**
+   * Get tickers for the current authenticated user
+   */
+  async function getUserTickers(options = {}) {
+    const { force = false, signal } = options;
+    const USER_TICKERS_KEY = 'user-tickers-data';
+    const ttl = options.ttl ?? TICKERS_TTL;
+
+    try {
+      if (force) {
+        await clearTickersCache(true);
+      }
+
+      // Check cache first
+      if (!force && window.UnifiedCacheManager?.get) {
+        const cached = await window.UnifiedCacheManager.get(USER_TICKERS_KEY, { ttl });
+        if (cached && Array.isArray(cached)) {
+          window.Logger?.debug?.('User tickers served from cache', { ...PAGE_LOG_CONTEXT, count: cached.length });
+          return cached;
+        }
+      }
+
+      // Fetch from API
+      const base = resolveBaseUrl();
+      const separator = base.endsWith('/') ? '' : '/';
+      const url = `${base}${separator}api/tickers/my?_ts=${Date.now()}`;
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: DEFAULT_HEADERS,
+        credentials: 'include', // Include session cookie
+        signal
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Authentication required');
+        }
+        const error = new Error(`Failed to load user tickers (${response.status})`);
+        notifyLoadError(error.message, error);
+        throw error;
+      }
+
+      const payload = await response.json();
+      const normalized = normalizeTickersPayload(payload);
+      
+      // Save to cache
+      if (window.UnifiedCacheManager?.save) {
+        await window.UnifiedCacheManager.save(USER_TICKERS_KEY, normalized, { ttl });
+      }
+      
+      return normalized;
+    } catch (error) {
+      notifyLoadError('שגיאה בטעינת טיקרים של המשתמש', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Add a ticker to the current user's list
+   */
+  async function addTickerToUser(tickerId, options = {}) {
+    const { signal } = options;
+    
+    try {
+      const base = resolveBaseUrl();
+      const separator = base.endsWith('/') ? '' : '/';
+      const url = `${base}${separator}api/tickers/${tickerId}/add-to-user`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        credentials: 'include',
+        signal
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `Failed to add ticker to user list (${response.status})`);
+      }
+
+      // Invalidate user tickers cache
+      if (window.UnifiedCacheManager?.invalidate) {
+        await window.UnifiedCacheManager.invalidate('user-tickers-data').catch(() => {});
+      }
+      await invalidateTickersCache();
+
+      const result = await response.json();
+      window.Logger?.info?.('✅ Ticker added to user list', { ...PAGE_LOG_CONTEXT, tickerId });
+      return result;
+    } catch (error) {
+      window.Logger?.error?.('❌ Error adding ticker to user list', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      throw error;
+    }
+  }
+
+  /**
+   * Remove a ticker from the current user's list
+   */
+  async function removeTickerFromUser(tickerId, options = {}) {
+    const { signal } = options;
+    
+    try {
+      const base = resolveBaseUrl();
+      const separator = base.endsWith('/') ? '' : '/';
+      const url = `${base}${separator}api/tickers/${tickerId}/remove-from-user`;
+      
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: DEFAULT_HEADERS,
+        credentials: 'include',
+        signal
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `Failed to remove ticker from user list (${response.status})`);
+      }
+
+      // Invalidate user tickers cache
+      if (window.UnifiedCacheManager?.invalidate) {
+        await window.UnifiedCacheManager.invalidate('user-tickers-data').catch(() => {});
+      }
+      await invalidateTickersCache();
+
+      const result = await response.json();
+      window.Logger?.info?.('✅ Ticker removed from user list', { ...PAGE_LOG_CONTEXT, tickerId });
+      return result;
+    } catch (error) {
+      window.Logger?.error?.('❌ Error removing ticker from user list', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      throw error;
+    }
+  }
+
   window.TickersData = {
     KEY: TICKERS_DATA_KEY,
     TTL: TICKERS_TTL,
@@ -448,6 +591,11 @@
     fetchTickerDetails,
     validateTicker,
     validateTickerSymbol,
+    // Multi-user functions
+    getAllTickers,
+    getUserTickers,
+    addTickerToUser,
+    removeTickerFromUser,
   };
 
   window.Logger?.info?.('✅ Tickers Data Service initialized', PAGE_LOG_CONTEXT);

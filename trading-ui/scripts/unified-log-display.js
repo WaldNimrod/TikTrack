@@ -57,6 +57,11 @@ class UnifiedLogDisplay {
         this.paginationInstance = null;
         this.autoRefreshInterval = null;
         
+        // Store instance reference on container for event handlers
+        if (this.container) {
+            this.container._logDisplayInstance = this;
+        }
+        
         // Initialize if container exists
         if (this.container) {
             this.initialize();
@@ -530,12 +535,28 @@ class UnifiedLogDisplay {
             <td class="category-cell">${categoryDisplay}</td>
             <td class="page-cell">${pageDisplay}</td>
             <td class="actions-cell">
-                <button data-button-type="VIEW" data-variant="small" data-text="" title="פרטים"></button>
-                <button data-button-type="COPY" data-variant="small" data-text="" title="העתקה"></button>
+                ${(() => {
+                  if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+                  const containerId = this.containerId;
+                  const logMessage = message || '';
+                  const itemData = JSON.stringify(item);
+                  return window.createActionsMenu([
+                    { 
+                      type: 'VIEW', 
+                      onclick: `(function() { const container = document.getElementById('${containerId}'); if (container && container._logDisplayInstance && container._logDisplayInstance.showItemDetails) { const item = ${itemData}; container._logDisplayInstance.showItemDetails(item); } else { window.showInfoNotification?.('פרטי לוג', ${JSON.stringify(logMessage)}); } })()`, 
+                      title: 'פרטים' 
+                    },
+                    { 
+                      type: 'COPY', 
+                      onclick: `(function() { const message = ${JSON.stringify(logMessage)}; if (navigator.clipboard) { navigator.clipboard.writeText(message).then(() => window.showSuccessNotification?.('הועתק ללוח')).catch(() => console.error('Failed to copy')); } })()`, 
+                      title: 'העתקה' 
+                    }
+                  ]) || '';
+                })()}
             </td>
         `;
-
-        // Add event listeners for action buttons
+        
+        // Add event listeners for action buttons (if needed for fallback)
         const viewBtn = row.querySelector('.view-details-btn');
         const copyBtn = row.querySelector('.copy-btn');
         
@@ -593,6 +614,7 @@ class UnifiedLogDisplay {
             // Check for CSS conflicts
             const testBtn = document.createElement('button');
             testBtn.className = 'btn btn-action';
+            // Use sync fallback for icon (debug code doesn't need async)
             testBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info" class="icon">';
             testBtn.style.position = 'absolute';
             testBtn.style.top = '-1000px';
@@ -729,10 +751,31 @@ class UnifiedLogDisplay {
         // Get page icon based on page type (async)
         const pageIcon = await this.getPageIcon(pageName);
         
-        // Check if pageIcon is a path (starts with /) or emoji
-        const iconHTML = pageIcon.startsWith('/') 
-            ? `<img src="${pageIcon}" width="16" height="16" alt="${pageName}" class="icon">`
-            : pageIcon;
+        // Render icon using IconSystem if it's a path
+        let iconHTML = '';
+        if (pageIcon.startsWith('/')) {
+          // Use IconSystem to render icon
+          if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+              // Extract icon name from path (e.g., '/trading-ui/images/icons/tabler/home.svg' -> 'home')
+              const iconName = pageIcon.split('/').pop().replace('.svg', '');
+              iconHTML = await window.IconSystem.renderIcon('page', iconName, {
+                size: '16',
+                alt: pageName,
+                class: 'icon'
+              });
+            } catch (error) {
+              // Fallback to img tag
+              iconHTML = `<img src="${pageIcon}" width="16" height="16" alt="${pageName}" class="icon">`;
+            }
+          } else {
+            // Fallback if IconSystem not available
+            iconHTML = `<img src="${pageIcon}" width="16" height="16" alt="${pageName}" class="icon">`;
+          }
+        } else {
+          // Already HTML or emoji
+          iconHTML = pageIcon;
+        }
         
         return `
             <span class="page-display" title="${page}">
@@ -748,7 +791,8 @@ class UnifiedLogDisplay {
         // Use IconSystem if available
         if (typeof window.IconSystem !== 'undefined' && window.IconSystem.getPageIcon) {
             try {
-                return await window.IconSystem.getPageIcon(pageName);
+                const iconPath = await window.IconSystem.getPageIcon(pageName);
+                if (iconPath) return iconPath;
             } catch (error) {
                 if (typeof window.Logger !== 'undefined') {
                     window.Logger.warn('⚠️ Error getting page icon from IconSystem, using fallback', { pageName, error, page: 'unified-log-display' });

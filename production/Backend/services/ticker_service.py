@@ -176,7 +176,11 @@ class TickerService:
                 ticker.volume = latest_quote.volume
                 ticker.yahoo_updated_at = latest_quote.fetched_at
                 ticker.data_source = latest_quote.source
-                logger.debug(f"Added market data to {ticker.symbol}: price={latest_quote.price}")
+                # Open price data
+                ticker.open_price = latest_quote.open_price
+                ticker.change_from_open = latest_quote.change_amount_from_open
+                ticker.change_from_open_percent = latest_quote.change_pct_from_open
+                logger.debug(f"Added market data to {ticker.symbol}: price={latest_quote.price}, change_from_open={latest_quote.change_pct_from_open}%")
             else:
                 logger.debug(f"No market data found for {ticker.symbol}")
         
@@ -201,11 +205,35 @@ class TickerService:
         # Use optimized query with lazy loading
         try:
             from services.query_optimizer import QueryOptimizer
-            return QueryOptimizer.get_ticker_with_full_data(db, ticker_id)
+            ticker = QueryOptimizer.get_ticker_with_full_data(db, ticker_id)
         except ImportError:
             # Fallback to original query if optimizer not available
             logger.warning("QueryOptimizer not available, using fallback query")
-            return db.query(Ticker).filter(Ticker.id == ticker_id).first()
+            ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
+        
+        # Add market data fields if ticker exists
+        if ticker:
+            try:
+                latest_quote = db.query(MarketDataQuote).filter(
+                    MarketDataQuote.ticker_id == ticker.id
+                ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                
+                if latest_quote:
+                    # Add market data fields to ticker object
+                    ticker.current_price = latest_quote.price
+                    ticker.change_percent = latest_quote.change_pct_day
+                    ticker.change_amount = latest_quote.change_amount_day
+                    ticker.volume = latest_quote.volume
+                    ticker.yahoo_updated_at = latest_quote.fetched_at
+                    ticker.data_source = latest_quote.source
+                    # Open price data
+                    ticker.open_price = latest_quote.open_price
+                    ticker.change_from_open = latest_quote.change_amount_from_open
+                    ticker.change_from_open_percent = latest_quote.change_pct_from_open
+            except Exception as e:
+                logger.warning(f"Error adding market data to ticker {ticker_id}: {str(e)}")
+        
+        return ticker
     
     @staticmethod
     def get_by_symbol(db: Session, symbol: str) -> Optional[Ticker]:
@@ -1069,3 +1097,115 @@ class TickerService:
     def update_open_status(db: Session, ticker_id: int) -> bool:
         """Update ticker open status (legacy function - kept for compatibility)"""
         return TickerService.update_active_trades_status(db, ticker_id)
+    
+    # ------------------------------------------------------------------
+    # User Tickers Management (Many-to-Many)
+    # ------------------------------------------------------------------
+    
+    @staticmethod
+    def get_user_tickers(db: Session, user_id: int) -> List[Ticker]:
+        """
+        Get all tickers for a specific user (through user_tickers junction table)
+        
+        Args:
+            db: Database session
+            user_id: User ID
+            
+        Returns:
+            List[Ticker]: List of tickers for the user
+        """
+        from models.user_ticker import UserTicker
+        return db.query(Ticker).join(
+            UserTicker, Ticker.id == UserTicker.ticker_id
+        ).filter(
+            UserTicker.user_id == user_id
+        ).all()
+    
+    @staticmethod
+    def get_all_tickers(db: Session) -> List[Ticker]:
+        """
+        Get all tickers in the system (for search/adding to user list)
+        Tickers are shared across all users.
+        
+        Args:
+            db: Database session
+            
+        Returns:
+            List[Ticker]: All tickers in the system
+        """
+        return db.query(Ticker).all()
+    
+    @staticmethod
+    def add_ticker_to_user(db: Session, user_id: int, ticker_id: int) -> bool:
+        """
+        Add a ticker to a user's list
+        
+        Args:
+            db: Database session
+            user_id: User ID
+            ticker_id: Ticker ID
+            
+        Returns:
+            bool: True if added successfully, False if already exists or error
+        """
+        from models.user_ticker import UserTicker
+        from sqlalchemy.exc import IntegrityError
+        
+        # Check if ticker exists
+        ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
+        if not ticker:
+            logger.warning(f"Ticker {ticker_id} not found")
+            return False
+        
+        # Check if already in user's list
+        existing = db.query(UserTicker).filter(
+            UserTicker.user_id == user_id,
+            UserTicker.ticker_id == ticker_id
+        ).first()
+        if existing:
+            logger.info(f"Ticker {ticker_id} already in user {user_id}'s list")
+            return False
+        
+        # Add to user's list
+        try:
+            user_ticker = UserTicker(
+                user_id=user_id,
+                ticker_id=ticker_id
+            )
+            db.add(user_ticker)
+            db.commit()
+            logger.info(f"Added ticker {ticker_id} to user {user_id}'s list")
+            return True
+        except IntegrityError:
+            db.rollback()
+            logger.warning(f"Failed to add ticker {ticker_id} to user {user_id}'s list (integrity error)")
+            return False
+    
+    @staticmethod
+    def remove_ticker_from_user(db: Session, user_id: int, ticker_id: int) -> bool:
+        """
+        Remove a ticker from a user's list
+        
+        Args:
+            db: Database session
+            user_id: User ID
+            ticker_id: Ticker ID
+            
+        Returns:
+            bool: True if removed successfully, False if not found
+        """
+        from models.user_ticker import UserTicker
+        
+        user_ticker = db.query(UserTicker).filter(
+            UserTicker.user_id == user_id,
+            UserTicker.ticker_id == ticker_id
+        ).first()
+        
+        if not user_ticker:
+            logger.warning(f"Ticker {ticker_id} not found in user {user_id}'s list")
+            return False
+        
+        db.delete(user_ticker)
+        db.commit()
+        logger.info(f"Removed ticker {ticker_id} from user {user_id}'s list")
+        return True

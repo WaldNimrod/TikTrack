@@ -148,3 +148,51 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-24T22:55:46+00:00 | 1.3.29.0 | 1.3.28.0 | 039ffe4ab43348eccc67021205b2424e7cc5aa97 | e56308ac67095f8717c6b9496c73869ddea5896e | patch | Complete standardization of all 10 mockup pages with general systems integration |
 | 2025-11-24T23:21:59+00:00 | 1.3.30.0 | 1.3.29.0 | 9d8404fd87f2bf1d17f6faf9b47ac098dbfa6c8e | 039ffe4ab43348eccc67021205b2424e7cc5aa97 | patch | Optimize Economic Calendar page: faster widget loading and clean console |
 | 2025-11-24T23:34:16+00:00 | 1.3.31.0 | 1.3.30.0 | 11d83e5e75174bcc9cb4b25b2e0ac09d151d47be | 9d8404fd87f2bf1d17f6faf9b47ac098dbfa6c8e | patch | Complete sections toggle system standardization across all pages (39 pages, 128 sections) |
+| 2025-11-25T21:44:19+00:00 | 1.3.32.0 | 1.3.31.0 | f0499983ec95949afb4244600052d3fe93104613 | 11d83e5e75174bcc9cb4b25b2e0ac09d151d47be | patch | Add price change from market open feature |
+| 2025-11-25T21:54:50+00:00 | 1.3.33.0 | 1.3.32.0 | 85d788a4f69a8db4dde7629497106c0fa421df2e | f0499983ec95949afb4244600052d3fe93104613 | patch | Add price change from market open feature |
+| 2025-11-25T22:28:04+00:00 | 1.3.34.0 | 1.3.33.0 | 0ecfccd43f785ce052e2e74141f52d92180a8909 | 85d788a4f69a8db4dde7629497106c0fa421df2e | patch | Notification System standardization completed - all 36 pages using centralized system, 8 direct usages fixed |
+| 2025-11-25T22:31:01+00:00 | 1.3.35.0 | 1.3.34.0 | 0ecfccd43f785ce052e2e74141f52d92180a8909 | 0ecfccd43f785ce052e2e74141f52d92180a8909 | patch | Sync local changes with production updates |
+| 2025-11-26T03:17:54+00:00 | 1.3.36.0 | 1.3.35.0 | 964533cafceefb62c989c9fbb0eb1c4b27f1d18d | 0ecfccd43f785ce052e2e74141f52d92180a8909 | patch | Complete Icon System standardization: fix async calls, add package-manifest to heatmap page, improve test script (40/40 pages pass) |
+| 2025-11-26T03:19:50+00:00 | 1.3.37.0 | 1.3.36.0 | 6facf5b5ab005cddd469ee732a046f5e4f7f8eb1 | 964533cafceefb62c989c9fbb0eb1c4b27f1d18d | patch | Color Scheme System standardization - Phase 3 fixes and Phase 4 automated tests completed |
+| 2025-11-26T13:17:05+00:00 | 1.3.38.0 | 1.3.37.0 | 4270e4a0f88575e8b52574ac6a56308be09e4a03 | 6facf5b5ab005cddd469ee732a046f5e4f7f8eb1 | patch | Event Handler Manager v2.0.0 - Advanced debugging and monitoring system with comprehensive testing (29/29 tests passed) |
+| 2025-11-29T00:26:24+00:00 | 1.3.39.0 | 1.3.38.0 | 2cd10e34a400514cbd9a66ea05a2f19db718f775 | 4270e4a0f88575e8b52574ac6a56308be09e4a03 | patch | הוספת מערכת רמזור ATR - מימוש מלא עם תמיכה בכל המקומות |
+| 2025-11-29T06:40:24+00:00 | 1.3.40.0 | 1.3.39.0 | 50d675f0e020d2ffdd30cac1bc6689fc4161d52a | 2cd10e34a400514cbd9a66ea05a2f19db718f775 | patch | השלמת בדיקות ותיקונים - כל העמודים הטכניים והמשניים (14 עמודים מושלמים, 3 תוקנו) |
+| 2025-11-29T08:00:43+00:00 | 1.3.41.0 | 1.3.40.0 | 48a408ff686e8f80802b174f321872e1f334263c | 50d675f0e020d2ffdd30cac1bc6689fc4161d52a | patch | קונסולה נקייה 100% - השלמת בדיקות ותיקונים לכל 36 העמודים
+
+תיקונים עיקריים:
+- הוחלפו כל console.* calls ב-Logger Service (0 console calls)
+- נוסף Bootstrap CSS ישירות לכל העמודים החסרים
+- הושלם IconSystem בכל העמודים
+- הועברו style tags ל-CSS files
+- תוקן סדר טעינה (logger-service לפני header-system)
+- תוקנו 36/36 עמודים (100% מושלמים)
+
+שיפורים:
+- 24 → 36 עמודים מושלמים (67% → 100%)
+- 0 console calls (לפני: 9+ בעמוד)
+- 0 שגיאות קריטיות
+- קונסולה נקייה לחלוטין |
+| 2025-11-29T15:53:58+00:00 | 1.3.42.0 | 1.3.41.0 | f8c7fd01a0225ea70aedb8797b309e1b5c7c15cd | 48a408ff686e8f80802b174f321872e1f334263c | patch | תיקון: תיקון תצוגת ראש הדף בכל המערכת
+
+תיקונים עיקריים:
+- תיקון template literal ב-header-system.js שגרם לשגיאת תחביר
+- הוספת filter-toggle-main שחסר (כפתור טוגל ראשי)
+- הוספת header-styles.css ל-research.html
+- הסתרת פילטרים בעמוד research (דשבורד עתידי)
+
+שיפורים:
+- Header נטען כראוי בכל העמודים
+- research.html: header ללא פילטרים (כמבוקש)
+- trades.html: header עם פילטרים (כמבוקש)
+- תיקון שגיאת תחביר שגרמה ל-header לא להיטען במלואו |
+| 2025-11-29T16:31:38+00:00 | 1.3.43.0 | 1.3.42.0 | ef44ce88126eda61f160956ec90c1dbf3ad80de8 | f8c7fd01a0225ea70aedb8797b309e1b5c7c15cd | patch | תיקון: שיפורים נוספים במערכת
+
+תיקונים עיקריים:
+- שיפורים במערכת אימות (auth.js, auth.py)
+- עדכוני icon mappings
+- שיפורי עיצוב (layout.css)
+- עדכוני עמודים (index.html, user-profile.html)
+- שיפורים נוספים במערכת |
+| 2025-11-29T21:14:17+00:00 | 1.3.44.0 | 1.3.43.0 | 3d63fafb46fe4c856588afd3bb78ed46ba1ec497 | ef44ce88126eda61f160956ec90c1dbf3ad80de8 | patch | Implement SMTP service and Multi-User system with comprehensive documentation |
+| 2025-11-30T09:57:25+00:00 | 1.3.45.0 | 1.3.44.0 | 8c488739e25d67865f51038ea9de730e3fa1366f | 3d63fafb46fe4c856588afd3bb78ed46ba1ec497 | patch | Implement Option 10 for optimal Hebrew feedback (74%+ Hebrew) in AI Analysis system |
+| 2025-11-30T09:58:49+00:00 | 1.3.46.0 | 1.3.45.0 | ad90288a91c8378c6544384b3418f7a033036908 | 8c488739e25d67865f51038ea9de730e3fa1366f | patch | בדיקות מקיפות לעמודי מוקאפ - כל העמודים עברו בהצלחה |

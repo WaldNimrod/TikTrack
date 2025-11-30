@@ -1,0 +1,38 @@
+/* ========================================
+   Preferences Groups Management Page Styles
+   ======================================== */
+
+/* Search input max width */
+.preferences-groups-management-page #searchPreferencesInput {
+    max-width: 300px;
+}
+
+/* Table column widths */
+.preferences-groups-management-page #preferencesTable th:nth-child(1) {
+    width: 50px;
+}
+
+.preferences-groups-management-page #preferencesTable th:nth-child(2) {
+    width: 200px;
+}
+
+.preferences-groups-management-page #preferencesTable th:nth-child(3) {
+    width: 150px;
+}
+
+.preferences-groups-management-page #preferencesTable th:nth-child(4) {
+    width: 200px;
+}
+
+.preferences-groups-management-page #preferencesTable th:nth-child(5) {
+    width: 200px;
+}
+
+.preferences-groups-management-page #preferencesTable th:nth-child(6) {
+    width: 150px;
+}
+
+.preferences-groups-management-page #preferencesTable th:nth-child(7) {
+    width: 100px;
+}
+

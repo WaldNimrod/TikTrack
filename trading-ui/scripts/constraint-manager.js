@@ -462,13 +462,38 @@ class ConstraintManager {
    * @returns {void}
    */
   handleAddConstraint() {
-    const formData = {
-      table_name: document.getElementById('table-name').value,
-      column_name: document.getElementById('column-name').value,
-      constraint_type: document.getElementById('constraint-type').value,
-      constraint_name: document.getElementById('constraint-name').value,
-      constraint_definition: document.getElementById('constraint-definition').value,
-    };
+    let formData;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.collectFormData) {
+      // Use DataCollectionService to collect form data
+      const fieldMap = {
+        table_name: { id: 'table-name', type: 'text' },
+        column_name: { id: 'column-name', type: 'text' },
+        constraint_type: { id: 'constraint-type', type: 'text' },
+        constraint_name: { id: 'constraint-name', type: 'text' },
+        constraint_definition: { id: 'constraint-definition', type: 'text' }
+      };
+      formData = window.DataCollectionService.collectFormData(fieldMap);
+    } else {
+      // Fallback if DataCollectionService is not available
+      formData = {
+        // Use DataCollectionService to get values if available
+        table_name: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('table-name', 'text', '') 
+          : (document.getElementById('table-name')?.value || ''),
+        column_name: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('column-name', 'text', '') 
+          : (document.getElementById('column-name')?.value || ''),
+        constraint_type: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('constraint-type', 'text', '') 
+          : (document.getElementById('constraint-type')?.value || ''),
+        constraint_name: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('constraint-name', 'text', '') 
+          : (document.getElementById('constraint-name')?.value || ''),
+        constraint_definition: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('constraint-definition', 'text', '') 
+          : (document.getElementById('constraint-definition')?.value || '')
+      };
+    }
 
     // Add enum values if it's an ENUM constraint
     if (formData.constraint_type === 'ENUM') {
@@ -522,13 +547,38 @@ class ConstraintManager {
    * @returns {void}
    */
   handleModalAddConstraint() {
-    const formData = {
-      table_name: document.getElementById('modal-table-name').value,
-      column_name: document.getElementById('modal-column-name').value,
-      constraint_type: document.getElementById('modal-constraint-type').value,
-      constraint_name: document.getElementById('modal-constraint-name').value,
-      constraint_definition: document.getElementById('modal-constraint-definition').value,
-    };
+    let formData;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.collectFormData) {
+      // Use DataCollectionService to collect form data
+      const fieldMap = {
+        table_name: { id: 'modal-table-name', type: 'text' },
+        column_name: { id: 'modal-column-name', type: 'text' },
+        constraint_type: { id: 'modal-constraint-type', type: 'text' },
+        constraint_name: { id: 'modal-constraint-name', type: 'text' },
+        constraint_definition: { id: 'modal-constraint-definition', type: 'text' }
+      };
+      formData = window.DataCollectionService.collectFormData(fieldMap);
+    } else {
+      // Fallback if DataCollectionService is not available
+      formData = {
+        // Use DataCollectionService to get values if available
+        table_name: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('modal-table-name', 'text', '') 
+          : (document.getElementById('modal-table-name')?.value || ''),
+        column_name: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('modal-column-name', 'text', '') 
+          : (document.getElementById('modal-column-name')?.value || ''),
+        constraint_type: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('modal-constraint-type', 'text', '') 
+          : (document.getElementById('modal-constraint-type')?.value || ''),
+        constraint_name: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('modal-constraint-name', 'text', '') 
+          : (document.getElementById('modal-constraint-name')?.value || ''),
+        constraint_definition: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('modal-constraint-definition', 'text', '') 
+          : (document.getElementById('modal-constraint-definition')?.value || '')
+      };
+    }
 
     // Add enum values if it's an ENUM constraint
     if (formData.constraint_type === 'ENUM') {

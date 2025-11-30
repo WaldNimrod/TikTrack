@@ -1,8 +1,5 @@
 // ===== LOADING TRACKING =====
-console.log('🟡 [data-basic.js] FILE LOADING STARTED');
-console.log('🟡 [data-basic.js] window.TABLE_COLUMN_MAPPINGS exists:', !!window.TABLE_COLUMN_MAPPINGS);
-console.log('🟡 [data-basic.js] window.getColumnValue exists:', typeof window.getColumnValue === 'function');
-console.log('🟡 [data-basic.js] window.tableMappings exists:', !!window.tableMappings);
+// Loading tracking removed for cleaner console
 
 // ===== מיפוי עמודות לכל הטבלאות באתר =====
 // Table Column Mappings for All Tables
@@ -1307,7 +1304,6 @@ if (typeof window.getColumnValue !== 'function') {
   }
 } else {
   // table-mappings.js already loaded - preserve its mappings
-  console.log('✅ [data-basic.js] table-mappings.js already loaded - preserving existing window.getColumnValue');
 }
 
 // Table Mappings loaded successfully

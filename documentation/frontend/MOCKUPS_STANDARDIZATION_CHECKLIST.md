@@ -463,3 +463,4 @@ window.LinkedItemsService?.getLinkedItems(entityType, entityId);
 **עדכון אחרון:** 25 בנובמבר 2025  
 **מחבר:** TikTrack Development Team
 
+

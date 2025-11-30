@@ -358,7 +358,7 @@
             }
 
             this.initialized = true;
-            logger.info('✅ CacheControlMenu initialized', { version: VERSION, options: this.options });
+            logger.debug('CacheControlMenu initialized', { version: VERSION, options: this.options });
 
             if (this.options.autoAttachHeader) {
                 attachHeaderMenu(this);

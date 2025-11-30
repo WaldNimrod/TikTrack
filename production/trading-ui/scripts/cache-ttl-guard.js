@@ -46,7 +46,11 @@
     'business:validate-tag-category': { ttl: 120 * 1000 }, // Increased from 60s
     'business:validate-cash-flow': { ttl: 120 * 1000 }, // Increased from 60s
     'business:calculate-cash-flow-balance': { ttl: 60 * 1000 }, // Increased from 30s
-    'business:calculate-currency-conversion': { ttl: 60 * 1000 } // Increased from 30s
+    'business:calculate-currency-conversion': { ttl: 60 * 1000 }, // Increased from 30s
+    // AI Analysis cache configs
+    'ai-analysis-templates': { ttl: 60 * 60 * 1000 }, // 1 hour - stable data
+    'ai-analysis-history': { ttl: 5 * 60 * 1000 },   // 5 minutes - frequently updated
+    'ai-analysis-providers': { ttl: 5 * 60 * 1000 } // 5 minutes - user settings
   };
 
   async function ensure(key, loaderFn, options = {}) {
@@ -108,6 +112,6 @@
     setConfig,
   };
 
-  window.Logger?.info?.('✅ CacheTTLGuard initialized', { page: 'cache-ttl-guard' });
+  window.Logger?.debug?.('CacheTTLGuard initialized', { page: 'cache-ttl-guard' });
 })();
 

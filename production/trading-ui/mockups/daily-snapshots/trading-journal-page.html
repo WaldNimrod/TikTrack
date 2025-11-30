@@ -13,6 +13,9 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     
+    <!-- Bootstrap CSS (חובה ראשון) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../../styles-new/master.css">
     
@@ -57,6 +60,7 @@
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script> <!-- Central icon mappings -->
     <!-- [10] Load Order: 10 -->
     <script src="../../scripts/icon-system.js?v=1.0.0"></script> <!-- Central icon system -->
+    <script src="../../scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- Icon replacement helper -->
     <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script> <!-- Mockups icon initializer -->
     <!-- [11] Load Order: 11 -->
     <script src="../../scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- Cache clearing control (Stage B-Lite) -->
@@ -65,7 +69,31 @@
     <!-- [13] Load Order: 13 -->
     <script src="../../scripts/logger-service.js?v=1.0.0"></script> <!-- Advanced logging service -->
     <!-- [14] Load Order: 14 -->
-    <script src="../../scripts/header-system.js?v=1.0.0"></script> <!-- Header system -->
+    <script src="../../scripts/header-system.js?v=1.0.0"></script>
+    <script>
+        // Auto-initialize HeaderSystem when DOM is ready
+        (function() {
+            function initHeader() {
+                if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+                    try {
+                        window.HeaderSystem.initialize();
+                    } catch (error) {
+                        if (window.Logger?.error) {
+                            window.Logger.error('Error initializing HeaderSystem', error, { page: 'trading-journal-page' });
+                        }
+                    }
+                } else {
+                    setTimeout(initHeader, 100);
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initHeader);
+            } else {
+                setTimeout(initHeader, 100);
+            }
+        })();
+    </script> <!-- Header system -->
     <!-- [15] Load Order: 15 -->
     <script src="../../scripts/page-state-manager.js?v=1.0.0"></script> <!-- Unified page state manager -->
     <!-- [16] Load Order: 16 -->
@@ -224,7 +252,22 @@
     <script src="../../scripts/monitoring-functions.js?v=1.0.0"></script> <!-- Page monitoring functions -->
 
     <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [50] Load Order: 50 -->
+    <script src="../../scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [51] Load Order: 51 -->
+    <script src="../../scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <!-- [52] Load Order: 52 -->
+    <script src="../../scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+
+<!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [69] Page-specific: trading-journal-page -->
@@ -237,40 +280,23 @@
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("trading-journal-page") -->
 </head>
 <body class="trading-journal-page">
-    <!-- Header System -->
-    <div id="unified-header"></div>
+    <!-- Notification container -->
+    <div class="notification-container" id="notificationContainer"></div>
     
-    <!-- Mockups Navigation -->
-        <!-- Mockups Navigation -->
-    <div class="mockups-navigation">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-12">
-                    <div class="mockups-navigation-content">
-                        <span class="mockups-navigation-label">
-                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
-                        </span>
-                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
-                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
-                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
-                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
-                        <a href="trading-journal-page.html" class="mockups-navigation-link active">יומן מסחר</a>
-                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
-                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
-                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
-                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
-                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                </div>
-            </div>
-        </div>
+
+    <!-- Header System -->
     </div>
     </div>
     
     <!-- Page Content -->
-    <div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+<div class="background-wrapper">
         <div class="page-body">
             <div class="main-content">
-                <!-- Header Section -->
+                <!-- Heade
+        <div id="unified-header"></div>
+
+r Section -->
                 <div class="top-section"  data-section="trading_journal_page_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
@@ -280,8 +306,8 @@
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
                             <button data-button-type="ADD" data-variant="full" data-text="הוסף רשומה" id="add-entry-btn" title="הוסף רשומת יומן חדשה"></button>
                             <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
-                            <button data-button-type="SETTINGS" data-variant="small" data-icon="settings" title="הגדרות תצוגה"></button>
-                        </div><button class="filter-toggle-btn" data-onclick="toggleSection('trading_journal_page_top_section')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                            <button data-button-type="SETTINGS" data-variant="small" data-icon="/trading-ui/images/icons/tabler/settings.svg" title="הגדרות תצוגה"></button>
+                        </div><button class="filter-toggle-btn" data-onclick="toggleSection('trading_journal_page_top_section')" title="הצג/הסתר סקשן" data-button-type="FILTER"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
@@ -290,7 +316,7 @@
                     <div class="section-header">
                                 <h2><span class="icon-placeholder icon" data-icon="calendar" data-size="16" data-alt="calendar" aria-label="calendar"></span> תצוגה חודשית</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('trading_journal_page-תצוגה-חודשית')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('trading_journal_page-תצוגה-חודשית')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -319,9 +345,12 @@
                         </div>
 
                                 <div class="mb-3 d-flex justify-content-between align-items-center">
-                                    <button data-button-type="NAVIGATE" data-variant="small" data-text="חודש קודם" data-icon="chevron-right" data-action="prev-month" title="חודש קודם" id="prev-month-btn"></button>
                                     <h6 class="mb-0" id="current-month-display">ינואר 2025</h6>
-                                    <button data-button-type="NAVIGATE" data-variant="small" data-text="חודש הבא" data-icon="chevron-left" data-action="next-month" title="חודש הבא" id="next-month-btn"></button>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button data-button-type="NAVIGATE" data-variant="full" data-onclick="tradingJournalPage.navigateMonth('prev')" data-icon="/trading-ui/images/icons/tabler/chevron-right.svg" data-text="חודש קודם" title="חודש קודם" id="prev-month-btn"></button>
+                                        <button data-button-type="NAVIGATE" data-variant="full" data-onclick="tradingJournalPage.navigateToToday()" data-icon="/trading-ui/images/icons/tabler/calendar.svg" data-text="היום" title="עבור לחודש הנוכחי" id="today-btn"></button>
+                                        <button data-button-type="NAVIGATE" data-variant="full" data-onclick="tradingJournalPage.navigateMonth('next')" data-icon="/trading-ui/images/icons/tabler/chevron-left.svg" data-text="חודש הבא" title="חודש הבא" id="next-month-btn"></button>
+                                    </div>
                                 </div>
                                 <div class="calendar-grid">
                                     <!-- Calendar Headers -->
@@ -539,7 +568,7 @@
                                         data-tooltip-trigger="hover">
                                     </button>
                                 </div>
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('journal-entries-list-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('journal-entries-list-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -570,7 +599,7 @@
                                             </div>
                                         </div>
                                         <div class="journal-entry-actions">
-                                            <button data-button-type="VIEW" data-variant="small" data-icon="eye" title="צפה בביצוע"></button>
+                                            <button data-button-type="VIEW" data-variant="small" data-icon="/trading-ui/images/icons/tabler/eye.svg" title="צפה בביצוע"></button>
                                         </div>
                                     </div>
                                 </div>
@@ -599,7 +628,7 @@
                                             </div>
                                         </div>
                                         <div class="journal-entry-actions">
-                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בתזרים מזומן"></button>
+                                            <button data-button-type="VIEW" data-variant="small" data-icon="/trading-ui/images/icons/tabler/eye.svg" title="צפה בתזרים מזומן"></button>
                                         </div>
                                     </div>
                                 </div>
@@ -634,7 +663,7 @@
                                             </div>
                                         </div>
                                         <div class="journal-entry-actions">
-                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בטרייד"></button>
+                                            <button data-button-type="VIEW" data-variant="small" data-icon="/trading-ui/images/icons/tabler/eye.svg" title="צפה בטרייד"></button>
                                         </div>
                                     </div>
                                 </div>
@@ -669,7 +698,7 @@
                                             </div>
                                         </div>
                                         <div class="journal-entry-actions">
-                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בתוכנית"></button>
+                                            <button data-button-type="VIEW" data-variant="small" data-icon="/trading-ui/images/icons/tabler/eye.svg" title="צפה בתוכנית"></button>
                                         </div>
                                     </div>
                                 </div>
@@ -704,7 +733,7 @@
                                             </div>
                                         </div>
                                         <div class="journal-entry-actions">
-                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בטרייד"></button>
+                                            <button data-button-type="VIEW" data-variant="small" data-icon="/trading-ui/images/icons/tabler/eye.svg" title="צפה בטרייד"></button>
                                         </div>
                                     </div>
                                 </div>
@@ -733,7 +762,7 @@
                                             </div>
                                         </div>
                                         <div class="journal-entry-actions">
-                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בתוכנית"></button>
+                                            <button data-button-type="VIEW" data-variant="small" data-icon="/trading-ui/images/icons/tabler/eye.svg" title="צפה בתוכנית"></button>
                                         </div>
                                     </div>
                                 </div>
@@ -759,8 +788,8 @@
                                             </div>
                                         </div>
                                         <div class="journal-entry-actions">
-                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בהערה"></button>
-                                            <button data-button-type="EDIT" data-variant="small" data-icon="pencil" title="ערוך הערה"></button>
+                                            <button data-button-type="VIEW" data-variant="small" data-icon="/trading-ui/images/icons/tabler/eye.svg" title="צפה בהערה"></button>
+                                            <button data-button-type="EDIT" data-variant="small" data-icon="/trading-ui/images/icons/tabler/pencil.svg" title="ערוך הערה"></button>
                                         </div>
                                     </div>
                                 </div>
@@ -789,7 +818,7 @@
                                             </div>
                                         </div>
                                         <div class="journal-entry-actions">
-                                            <button data-button-type="VIEW" data-variant="small" data-text="צפה" data-icon="eye" title="צפה בהתראה"></button>
+                                            <button data-button-type="VIEW" data-variant="small" data-icon="/trading-ui/images/icons/tabler/eye.svg" title="צפה בהתראה"></button>
                                         </div>
                                     </div>
                                 </div>
@@ -809,10 +838,15 @@
     <div class="notification-container" id="notification-container"></div>
     
     <!-- Toast container for notifications -->
-    <div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1000000002;"></div>
+    <div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3" ></div>
+    
+    <!-- Calendar modules (loaded before trading-journal-page.js) -->
+    <script src="../../scripts/calendar/calendar-date-utils.js?v=1.0.0"></script> <!-- Calendar date utilities -->
+    <script src="../../scripts/calendar/calendar-data-loader.js?v=1.0.0"></script> <!-- Calendar data loader -->
+    <script src="../../scripts/calendar/calendar-renderer.js?v=1.0.0"></script> <!-- Calendar renderer -->
     
     <!-- Page-specific script -->
-    <script src="../../scripts/trading-journal-page.js" defer></script>
+    <script src="../../scripts/trading-journal-page.js?v=1.0.0" defer></script>
     
     <!-- Journal Filter Script -->
     <script>

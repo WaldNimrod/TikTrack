@@ -48,6 +48,7 @@
 @import "06-components/_constraints.css";
 @import "06-components/_chart-management.css";
 @import "06-components/_icons.css";
+@import "06-components/_mockups-common.css";
 
 /* 07 - TRUMPS (High Specificity Overrides) */
 @import "07-trumps/chart-management.css";

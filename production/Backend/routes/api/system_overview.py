@@ -1132,6 +1132,44 @@ def not_found(error):
         ]
     }), 404
 
+@system_overview_bp.route('/environment', methods=['GET'])
+@api_endpoint(cache_ttl=300, rate_limit=60)
+def get_environment_info():
+    """
+    Get current environment information
+    
+    Returns:
+        JSON: Environment information including environment type, port, and database details
+    """
+    try:
+        import os
+        from config.settings import IS_PRODUCTION, PORT, POSTGRES_DB, POSTGRES_HOST, POSTGRES_PORT
+        
+        environment = 'production' if IS_PRODUCTION else 'development'
+        
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'environment': environment,
+                'port': PORT,
+                'database': {
+                    'name': POSTGRES_DB,
+                    'host': POSTGRES_HOST,
+                    'port': POSTGRES_PORT,
+                    'type': 'PostgreSQL'
+                },
+                'timestamp': datetime.now().isoformat()
+            }
+        }), 200
+    except Exception as e:
+        logger.error(f"Error getting environment info: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Failed to get environment info: {str(e)}'
+        }), 500
+
 @system_overview_bp.errorhandler(500)
 def internal_error(error):
     logger.error(f"Internal error in system overview API: {error}")

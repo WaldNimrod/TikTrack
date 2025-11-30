@@ -13,6 +13,9 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     
+    <!-- Bootstrap CSS (חובה ראשון) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../../styles-new/master.css">
     
@@ -24,81 +27,102 @@
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
     
+    <!-- Error Handlers (Must load first) -->
+    <script src="../../scripts/error-handlers.js?v=1.0.0"></script>
+    <!-- API Config -->
+    <script src="../../scripts/api-config.js?v=1.0.0"></script>
+    <!-- Logger Service (Load first before other systems) -->
+    <script src="../../scripts/logger-service.js?v=1.0.0"></script>
+    
     <!-- Header System -->
-    <script src="../../scripts/header-system.js" defer></script>
+    <script src="../../scripts/header-system.js?v=1.0.0" defer></script>
+    <script>
+        // Auto-initialize HeaderSystem when DOM is ready
+        (function() {
+            function initHeader() {
+                if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+                    try {
+                        window.HeaderSystem.initialize();
+                    } catch (error) {
+                        if (window.Logger?.error) {
+                            window.Logger.error('Error initializing HeaderSystem', error, { page: 'price-history-page' });
+                        }
+                    }
+                } else {
+                    setTimeout(initHeader, 100);
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initHeader);
+            } else {
+                setTimeout(initHeader, 100);
+            }
+        })();
+    </script>
     
     <!-- Preferences System -->
-    <script src="../../scripts/services/preferences-data.js" defer></script>
-    <script src="../../scripts/preferences-core-new.js" defer></script>
-    <script src="../../scripts/preferences-lazy-loader.js" defer></script>
+    <script src="../../scripts/services/preferences-data.js?v=1.0.0" defer></script>
+    <script src="../../scripts/preferences-core-new.js?v=1.0.0" defer></script>
+    <script src="../../scripts/preferences-lazy-loader.js?v=1.0.0" defer></script>
     
     <!-- Dynamic Colors System -->
-    <script src="../../scripts/color-scheme-system-clean.js" defer></script>
+    <script src="../../scripts/color-scheme-system-clean.js?v=1.0.0" defer></script>
     
     <!-- TradingView Widget (Charting Library) -->
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     
     <!-- Notification System -->
-    <script src="../../scripts/notification-system.js" defer></script>
+    <script src="../../scripts/notification-system.js?v=1.0.0" defer></script>
     
-    <!-- Logger Service -->
-    <script src="../../scripts/logger-service.js" defer></script>
     
     <!-- Field Renderer Service -->
-    <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    <script src="../../scripts/services/field-renderer-service.js?v=1.0.0" defer></script>
     
     <!-- Info Summary System -->
-    <script src="../../scripts/info-summary-configs.js" defer></script>
-    <script src="../../scripts/info-summary-system.js" defer></script>
+    <script src="../../scripts/info-summary-configs.js?v=1.0.0" defer></script>
+    <script src="../../scripts/info-summary-system.js?v=1.0.0" defer></script>
     
+    <!-- [8] Load Order: 8 -->
+    <script src="../../scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- Unified cache manager -->
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- Icon replacement helper -->
     <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Action Buttons System -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
-    <script src="../../scripts/button-system-init.js" defer></script>
+    <script src="../../scripts/button-system-init.js?v=1.0.0" defer></script>
     
     <!-- Linked Items System -->
-    <script src="../../scripts/services/linked-items-service.js" defer></script>
-    <script src="../../scripts/linked-items.js" defer></script>
+    <script src="../../scripts/services/linked-items-service.js?v=1.0.0" defer>
+    <!-- Entity Details System -->
+    <script src="../../scripts/entity-details-api.js?v=1.0.0" defer></script>
+    <script src="../../scripts/entity-details-renderer.js?v=1.0.0" defer></script>
+    <script src="../../scripts/entity-details-modal.js?v=1.0.0" defer></script>
     
-    <!-- Entity Details Renderer (for linked items table) -->
-    <script src="../../scripts/entity-details-renderer.js" defer></script>
+</script>
+    <script src="../../scripts/linked-items.js?v=1.0.0" defer></script>
 </head>
 <body class="price-history-page">
-    <!-- Header System -->
-    <div id="unified-header"></div>
+    <!-- Notification container -->
+    <div class="notification-container" id="notificationContainer"></div>
     
-    <!-- Mockups Navigation -->
-    <div class="mockups-navigation">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-12">
-                    <div class="mockups-navigation-content">
-                        <span class="mockups-navigation-label">
-                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
-                        </span>
-                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
-                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
-                        <a href="price-history-page.html" class="mockups-navigation-link active">היסטוריית מחירים</a>
-                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
-                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
-                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
-                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
-                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
-                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
-                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-</div>
-                </div>
-            </div>
-        </div>
+
+    <!-- Header System -->
+    </div>
     </div>
     
     <!-- Page Content -->
-    <div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+<div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
+        <div id="unified-header"></div>
+
+        <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
         <div class="page-body">
+            <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
             <div class="main-content">
                 <!-- Header Section -->
                 <div class="top-section"  data-section="price_history_page_top_section">
@@ -110,7 +134,7 @@
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
                             <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
                             <button data-button-type="SETTINGS" data-variant="small" data-icon="settings" title="הגדרות תצוגה"></button>
-                        </div><button class="filter-toggle-btn" data-onclick="toggleSection('price_history_page_top_section')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                        </div><button class="filter-toggle-btn" data-onclick="toggleSection('price_history_page_top_section')" title="הצג/הסתר סקשן" data-button-type="FILTER"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
@@ -156,7 +180,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="chart-bar" data-size="16" data-alt="chart-bar" aria-label="chart-bar"></span> סטטיסטיקות שינוי</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('change-statistics-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('change-statistics-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -201,7 +225,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="chart-line" data-size="16" data-alt="chart" aria-label="chart"></span> גרף מחירים - TradingView (Original)</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('tradingview-widget-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('tradingview-widget-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -219,7 +243,7 @@
                             </select>
                         </div>
                         <!-- TradingView Widget Container -->
-                        <div id="tradingview_widget_chart" style="height: 600px; width: 100%;"></div>
+                        <div id="tradingview_widget_chart" ></div>
                     </div>
                 </div>
                 
@@ -229,7 +253,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> פריטים מקושרים לטיקר</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('linked-items-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('linked-items-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
             </div>
@@ -255,7 +279,7 @@
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
     <!-- Price History Page Script -->
-    <script src="../../scripts/price-history-page.js" defer></script>
+    <script src="../../scripts/price-history-page.js?v=1.0.0" defer></script>
     
     <!-- Initialize Preferences System and Dynamic Colors -->
     <script>

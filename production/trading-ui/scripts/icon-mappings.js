@@ -44,7 +44,8 @@ const IconMappings = {
         development: '/trading-ui/images/icons/entities/development.svg',
         info: '/trading-ui/images/icons/tabler/info-circle.svg',
         position: '/trading-ui/images/icons/entities/trades.svg',
-        home: '/trading-ui/images/icons/entities/home.svg'
+        home: '/trading-ui/images/icons/entities/home.svg',
+        user: '/trading-ui/images/icons/entities/user.svg'
     },
 
     /**
@@ -84,7 +85,33 @@ const IconMappings = {
         back: 'arrow-right', // RTL - חץ ימינה
         'info-circle': 'info-circle',
         'bookmark': 'bookmark',
-        'alert-circle': 'alert-circle'
+        'alert-circle': 'alert-circle',
+        loader: 'loader', // Loading/spinner icon
+        loading: 'loader', // Alias for loader
+        spinner: 'loader', // Alias for loader
+        sliders: 'sliders', // Settings sliders
+        layers: 'layers', // Layers/categories
+        terminal: 'terminal', // Terminal/console
+        'clock-history': 'clock-history', // History/clock with history
+        wallet: 'wallet', // Wallet icon
+        paperclip: 'paperclip', // Paperclip/attachment icon
+        'arrows-left-right': 'arrows-left-right', // Left-right arrows
+        'currency-dollar': 'currency-dollar', // Currency/dollar icon
+        tag: 'tag', // Tag icon
+        'check-circle': 'check-circle', // Check circle icon
+        'x-circle': 'x-circle', // X circle icon
+        'plus-circle': 'plus-circle', // Plus circle icon
+        book: 'book', // Book icon
+        calendar: 'calendar', // Calendar icon
+        list: 'list', // List icon
+        activity: 'activity', // Activity icon
+        cash: 'cash', // Cash icon
+        'chart-pie': 'chart-pie', // Chart pie icon
+        'chevron-up': 'chevron-up', // Chevron up icon
+        circle: 'circle', // Circle icon
+        'file-text': 'file-text', // File text icon
+        hourglass: 'hourglass', // Hourglass icon
+        tags: 'tags' // Tags icon (plural)
     },
 
     /**
@@ -112,7 +139,7 @@ const IconMappings = {
     charts: {
         'type-line': 'chart-line',
         'type-bar': 'chart-bar',
-        'type-candlestick': 'chart-candle',
+        'type-candlestick': 'chart-candle', // Note: Tabler uses 'chart-candle' not 'chart-candlestick'
         'scale-linear': 'line',
         'scale-log': 'chart-line',
         'volume-toggle': 'volume',
@@ -167,9 +194,11 @@ const IconMappings = {
         'system-management.html': 'settings',
         'notifications-center.html': 'inbox',
         'preferences.html': 'settings',
+        'user-profile.html': 'user',
         'tickers.html': 'currency-dollar',
         'executions.html': 'bolt',
         'cash_flows.html': 'currency-dollar',
+        'trading-journal-page.html': 'notebook', // notebook icon for trading journal
         'notes.html': 'note',
         'research.html': 'search',
         'trade_plans.html': 'clipboard-list',
@@ -188,10 +217,8 @@ const IconMappings = {
 // Export to global
 window.IconMappings = IconMappings;
 
-// Log initialization
+// Log initialization (debug only)
 if (typeof window.Logger !== 'undefined') {
-    window.Logger.info('✅ Icon Mappings loaded successfully', { page: 'icon-mappings' });
-} else {
-    console.log('✅ Icon Mappings loaded successfully');
+    window.Logger.debug('Icon Mappings loaded', { page: 'icon-mappings' });
 }
 

@@ -4,9 +4,10 @@
  * 
  * Dashboard section for system overview and KPIs
  * Shows health score, uptime, response time, and key metrics
+ * Now integrated into top section with small cards organized by topic
  * 
- * @version 1.0.0
- * @lastUpdated October 19, 2025
+ * @version 1.1.0
+ * @lastUpdated January 30, 2025
  * @author TikTrack Development Team
  */
 
@@ -14,6 +15,70 @@ class SMDashboardSection extends SMBaseSection {
   constructor(sectionId, config) {
     super(sectionId, config);
     this.apiEndpoint = '/api/system/overview';
+    // Dashboard is now part of top section, so we use a different container
+    this.dashboardContainerId = 'sm-dashboard-content';
+  }
+  
+  /**
+   * Initialize the section
+   * אתחול הסקשן
+   */
+  async init() {
+    if (this.isInitialized) {
+      console.warn(`⚠️ Section ${this.sectionId} already initialized`);
+      return;
+    }
+
+    try {
+      console.log(`🚀 Initializing section: ${this.sectionId}`);
+      
+      // Dashboard is now part of top section, so find the dashboard content container
+      this.container = document.getElementById(this.dashboardContainerId);
+      if (!this.container) {
+        // Fallback: try to find in top section
+        const topSection = document.querySelector('.top-section[data-section="top"]');
+        if (topSection) {
+          const sectionBody = topSection.querySelector('.section-body');
+          if (sectionBody) {
+            // Create dashboard container if it doesn't exist
+            const dashboardDiv = document.createElement('div');
+            dashboardDiv.id = this.dashboardContainerId;
+            sectionBody.appendChild(dashboardDiv);
+            this.container = dashboardDiv;
+          }
+        }
+      }
+      
+      if (!this.container) {
+        throw new Error(`Dashboard container ${this.dashboardContainerId} not found`);
+      }
+
+      // Show loading state
+      if (this.config.showLoadingState) {
+        this.showLoadingState();
+      }
+
+      // Load initial data
+      await this.loadData();
+
+      // Setup auto-refresh
+      this.setupAutoRefresh();
+
+      // Setup event listeners
+      this.setupEventListeners();
+
+      this.isInitialized = true;
+      console.log(`✅ Section ${this.sectionId} initialized successfully`);
+      
+    } catch (error) {
+      console.error(`❌ Failed to initialize section ${this.sectionId}:`, error);
+      this.handleError(error, {
+        section: this.sectionId,
+        action: 'init',
+        timestamp: new Date().toISOString()
+      });
+      throw error;
+    }
   }
 
   /**
@@ -25,26 +90,77 @@ class SMDashboardSection extends SMBaseSection {
       this.isLoading = true;
       console.log(`📊 Loading dashboard data from ${this.apiEndpoint}`);
 
-      const response = await fetch(this.apiEndpoint, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+      // Load both overview and environment data in parallel
+      const [overviewResponse, envResponse] = await Promise.allSettled([
+        this.fetchWithTimeout(this.apiEndpoint, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }),
+        this.fetchWithTimeout('/api/system/environment', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        })
+      ]);
+
+      // Process overview data
+      let overviewData = null;
+      if (overviewResponse.status === 'fulfilled' && overviewResponse.value.ok) {
+        const result = await overviewResponse.value.json();
+        if (result.status === 'success') {
+          overviewData = result.data;
         }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result = await response.json();
-      
-      if (result.status !== 'success') {
-        throw new Error(result.message || 'Failed to load system overview');
+      // Process environment data
+      let envData = null;
+      if (envResponse.status === 'fulfilled' && envResponse.value.ok) {
+        const result = await envResponse.value.json();
+        if (result.status === 'success') {
+          envData = result.data;
+        }
       }
 
-      this.lastData = result.data;
-      this.render(result.data);
+      // Validate and normalize data
+      let validatedOverview = null;
+      if (overviewData) {
+        const validation = window.SMDataValidators?.validateSystemOverview(overviewData);
+        if (validation && validation.valid) {
+          validatedOverview = validation.data;
+        } else {
+          console.warn('⚠️ System overview validation failed:', validation?.error);
+          validatedOverview = overviewData; // Use original data if validation fails
+        }
+      }
+
+      let validatedEnv = null;
+      if (envData) {
+        const validation = window.SMDataValidators?.validateEnvironmentData(envData);
+        if (validation && validation.valid) {
+          validatedEnv = validation.data;
+        } else {
+          console.warn('⚠️ Environment data validation failed:', validation?.error);
+          validatedEnv = envData; // Use original data if validation fails
+        }
+      }
+
+      // Merge data
+      const mergedData = {
+        ...validatedOverview,
+        environment: validatedEnv
+      };
+
+      if (!mergedData || (!validatedOverview && !validatedEnv)) {
+        throw new Error('Failed to load system data');
+      }
+
+      this.lastData = mergedData;
+      this.render(mergedData);
       this.retryCount = 0; // Reset retry count on success
 
     } catch (error) {
@@ -82,8 +198,8 @@ class SMDashboardSection extends SMBaseSection {
   }
 
   /**
-   * Create dashboard HTML
-   * יצירת HTML של dashboard
+   * Create dashboard HTML with small cards organized by topic
+   * יצירת HTML של dashboard עם כרטיסים קטנים מסודרים לפי נושאים
    */
   createDashboardHTML(data) {
     const {
@@ -108,185 +224,232 @@ class SMDashboardSection extends SMBaseSection {
 
     return `
       <div class="dashboard-overview">
-        <!-- Health Score Card -->
-        <div class="row mb-4">
-          <div class="col-12">
-            <div class="card health-score-card">
+        <!-- Dashboard Cards by Topic - Organized in small cards -->
+        <div class="row g-3 mb-3">
+          <!-- בריאות מערכת -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
               <div class="card-body text-center">
-                <div class="health-score-circle" style="border-color: ${healthScoreColor}">
-                  <div class="health-score-value" style="color: ${healthScoreColor}">
-                    ${system_score}%
-                  </div>
-                  <div class="health-score-label">בריאות מערכת</div>
-                </div>
-                <div class="health-status mt-3">
+                <div class="h5 mb-2">🏥 בריאות</div>
+                <div class="mb-2">
                   <span class="badge bg-${this.getStatusBadgeColor(overall_status)} fs-6">
                     ${this.getStatusText(overall_status)}
                   </span>
-                  <span class="badge bg-${this.getPerformanceBadgeColor(overall_performance)} fs-6 ms-2">
-                    ${this.getPerformanceText(overall_performance)}
-                  </span>
                 </div>
+                <div class="small text-muted">${this.getPerformanceText(overall_performance)}</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- ציון מערכת -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">📊 ציון</div>
+                <div class="h4 mb-2" style="color: ${healthScoreColor}">${system_score}%</div>
+                <div class="small text-muted">בריאות מערכת</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- זמן תגובה -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">⏱️ תגובה</div>
+                <div class="h4 mb-2 text-success">${formattedResponseTime}</div>
+                <div class="small text-muted">זמן תגובה ממוצע</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- זמן פעילות -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">🔄 פעילות</div>
+                <div class="h4 mb-2 text-primary">${formattedUptime}</div>
+                <div class="small text-muted">זמן פעילות שרת</div>
               </div>
             </div>
           </div>
         </div>
-
-        <!-- Key Metrics Grid -->
-        <div class="row mb-4">
-          <div class="col-md-3">
-            ${SMUIComponents.createMetricCard(
-              'זמן פעילות',
-              formattedUptime,
-              '',
-              null,
-              'fa-clock'
-            )}
+        
+        <!-- משאבי מערכת -->
+        <div class="row g-3 mb-3">
+          <!-- זיכרון -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">💾 זיכרון</div>
+                <div class="h4 mb-2 text-secondary">${this.formatMemoryUsage(summary.memory_usage_percent || 0)}%</div>
+                <div class="small text-muted">שימוש בזיכרון</div>
+              </div>
+            </div>
           </div>
-          <div class="col-md-3">
-            ${SMUIComponents.createMetricCard(
-              'זמן תגובה',
-              formattedResponseTime,
-              '',
-              null,
-              'fa-tachometer-alt'
-            )}
+          
+          <!-- CPU -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">⚡ מעבד</div>
+                <div class="h4 mb-2 text-info">${this.formatCPUUsage(summary.cpu_usage_percent || 0)}%</div>
+                <div class="small text-muted">עומס מעבד</div>
+              </div>
+            </div>
           </div>
-          <div class="col-md-3">
-            ${SMUIComponents.createMetricCard(
-              'זיכרון זמין',
-              this.formatMemoryUsage(summary.memory_usage_percent || 0),
-              '%',
-              null,
-              'fa-memory'
-            )}
+          
+          <!-- מטמון -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">🗄️ מטמון</div>
+                <div class="h4 mb-2 text-primary">${health.cache?.status === 'healthy' ? 'פעיל' : 'בעיה'}</div>
+                <div class="small text-muted">סטטוס מטמון</div>
+              </div>
+            </div>
           </div>
-          <div class="col-md-3">
-            ${SMUIComponents.createMetricCard(
-              'עומס CPU',
-              this.formatCPUUsage(summary.cpu_usage_percent || 0),
-              '%',
-              null,
-              'fa-microchip'
-            )}
+          
+          <!-- דיסק -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">💿 דיסק</div>
+                <div class="h4 mb-2 text-warning">${summary.disk_usage_percent || 0}%</div>
+                <div class="small text-muted">שימוש בדיסק</div>
+              </div>
+            </div>
           </div>
         </div>
-
-        <!-- System Components Status -->
+        
+        <!-- סביבה ושרת -->
+        ${data.environment ? `
+        <div class="row g-3 mb-3">
+          <!-- סביבה -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">🌐 סביבה</div>
+                <div class="h4 mb-2 text-${data.environment.environment === 'production' ? 'danger' : 'info'}">
+                  ${data.environment.environment === 'production' ? 'ייצור' : 'פיתוח'}
+                </div>
+                <div class="small text-muted">סביבת עבודה</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- פורט -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">🔌 פורט</div>
+                <div class="h4 mb-2">${data.environment.port || 'N/A'}</div>
+                <div class="small text-muted">פורט שרת</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- בסיס נתונים -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">🗃️ בסיס נתונים</div>
+                <div class="h6 mb-2">${data.environment.database?.name || 'N/A'}</div>
+                <div class="small text-muted">${data.environment.database?.type || 'PostgreSQL'}</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- גרסה -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">📋 גרסה</div>
+                <div class="h4 mb-2 text-secondary">2.0.5</div>
+                <div class="small text-muted">גרסת מערכת</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        ` : ''}
+        
+        <!-- סטטוס רכיבי מערכת -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">🖥️ שרת</div>
+                <div class="mb-2">
+                  <span class="badge bg-${this.getComponentStatusColor(health.server)}">
+                    ${this.getComponentStatus(health.server)}
+                  </span>
+                </div>
+                <div class="small text-muted">Backend API</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">🗄️ בסיס נתונים</div>
+                <div class="mb-2">
+                  <span class="badge bg-${this.getComponentStatusColor(health.database)}">
+                    ${this.getComponentStatus(health.database)}
+                  </span>
+                </div>
+                <div class="small text-muted">${data.environment?.database?.type || 'PostgreSQL'}</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">🗄️ מטמון</div>
+                <div class="mb-2">
+                  <span class="badge bg-${this.getComponentStatusColor(health.cache)}">
+                    ${this.getComponentStatus(health.cache)}
+                  </span>
+                </div>
+                <div class="small text-muted">Multi-layer Cache</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="h5 mb-2">🌐 נתונים חיצוניים</div>
+                <div class="mb-2">
+                  <span class="badge bg-${this.getComponentStatusColor(health.external_data)}">
+                    ${this.getComponentStatus(health.external_data)}
+                  </span>
+                </div>
+                <div class="small text-muted">Yahoo Finance API</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- קישורים מהירים -->
         <div class="row">
           <div class="col-12">
             <div class="card">
               <div class="card-header">
-                <h5><i class="fas fa-cogs"></i> סטטוס רכיבי מערכת</h5>
+                <h6 class="mb-0">קישורים מהירים</h6>
               </div>
               <div class="card-body">
-                <div class="row">
-                  <div class="col-md-3">
-                    ${SMUIComponents.createStatusCard(
-                      'שרת',
-                      this.getComponentStatus(health.server),
-                      this.getComponentStatusColor(health.server),
-                      'fa-server',
-                      'Backend API'
-                    )}
-                  </div>
-                  <div class="col-md-3">
-                    ${SMUIComponents.createStatusCard(
-                      'בסיס נתונים',
-                      this.getComponentStatus(health.database),
-                      this.getComponentStatusColor(health.database),
-                      'fa-database',
-                      'SQLite Database'
-                    )}
-                  </div>
-                  <div class="col-md-3">
-                    ${SMUIComponents.createStatusCard(
-                      'מטמון',
-                      this.getComponentStatus(health.cache),
-                      this.getComponentStatusColor(health.cache),
-                      'fa-layer-group',
-                      'Multi-layer Cache'
-                    )}
-                  </div>
-                  <div class="col-md-3">
-                    ${SMUIComponents.createStatusCard(
-                      'נתונים חיצוניים',
-                      this.getComponentStatus(health.external_data),
-                      this.getComponentStatusColor(health.external_data),
-                      'fa-globe',
-                      'Yahoo Finance API'
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Performance Indicators -->
-        ${this.createPerformanceIndicators(metrics)}
-      </div>
-    `;
-  }
-
-  /**
-   * Create performance indicators
-   * יצירת אינדיקטורי ביצועים
-   */
-  createPerformanceIndicators(metrics) {
-    if (!metrics || !metrics.performance) {
-      return '';
-    }
-
-    const { performance } = metrics;
-    const { system = {} } = performance;
-
-    return `
-      <div class="row mt-4">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header">
-              <h5><i class="fas fa-chart-line"></i> מדדי ביצועים</h5>
-            </div>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-6">
-                  <h6>זיכרון מערכת</h6>
-                  ${SMUIComponents.createProgressBar(
-                    system.memory_percent || 0,
-                    100,
-                    'זיכרון בשימוש',
-                    this.getProgressColor(system.memory_percent || 0)
-                  )}
-                </div>
-                <div class="col-md-6">
-                  <h6>עומס CPU</h6>
-                  ${SMUIComponents.createProgressBar(
-                    system.cpu_percent || 0,
-                    100,
-                    'עומס מעבד',
-                    this.getProgressColor(system.cpu_percent || 0)
-                  )}
-                </div>
-              </div>
-              <div class="row mt-3">
-                <div class="col-md-6">
-                  <h6>שימוש בדיסק</h6>
-                  ${SMUIComponents.createProgressBar(
-                    system.disk_percent || 0,
-                    100,
-                    'שטח דיסק',
-                    this.getProgressColor(system.disk_percent || 0)
-                  )}
-                </div>
-                <div class="col-md-6">
-                  <h6>חיבורי רשת</h6>
-                  <div class="network-stats">
-                    <div class="stat-item">
-                      <span class="stat-label">חיבורים פעילים:</span>
-                      <span class="stat-value">${system.active_connections || 0}</span>
-                    </div>
-                  </div>
+                <div class="d-flex flex-wrap gap-2">
+                  <a href="/cache-management" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-layer-group me-1"></i> ניהול מטמון מלא
+                  </a>
+                  <a href="/server-monitor" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-server me-1"></i> ניטור שרת מלא
+                  </a>
+                  <a href="/external-data-dashboard" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-globe me-1"></i> דשבורד נתונים חיצוניים
+                  </a>
                 </div>
               </div>
             </div>

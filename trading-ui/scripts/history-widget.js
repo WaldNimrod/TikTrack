@@ -345,7 +345,11 @@
                 window.Logger.info('✅ P/L chart initialized', { page: 'history-widget', dateRange: currentChartDateRange });
             }
         } catch (error) {
-            if (window.Logger) {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת גרף P/L', 
+                    `לא ניתן לטעון את גרף הרווח/הפסד. ${errorMsg}`);
+            } else if (window.Logger) {
                 window.Logger.error('Error initializing P/L chart', { 
                     page: 'history-widget', 
                     error 
@@ -643,34 +647,84 @@
 
     /**
      * Create Quick Links Actions Menu with icons and text
+     * Uses centralized Actions Menu Toolkit (window.createActionsMenu)
+     * 
+     * @param {Array} buttons - Array of button objects with icon, text, title, onclick
+     * @returns {Promise<string>} HTML string for actions menu
      */
-    function createQuickLinksActionsMenu(buttons) {
+    async function createQuickLinksActionsMenu(buttons) {
         if (!buttons || buttons.length === 0) {
             return '';
         }
         
-        const menuButtons = buttons.map((button) => {
-            const icon = button.icon || '../../images/icons/tabler/eye.svg';
-            const text = button.text || '';
-            const title = button.title || '';
-            const onclick = button.onclick || '';
+        // Use centralized Actions Menu Toolkit
+        if (typeof window.createActionsMenu === 'function') {
+            // Convert buttons to format expected by createActionsMenu
+            const formattedButtons = await Promise.all(buttons.map(async (button) => {
+                const iconPath = button.icon || '../../images/icons/tabler/eye.svg';
+                const text = button.text || '';
+                const title = button.title || 'קישור מהיר';
+                const onclick = button.onclick || '';
+                
+                // Get icon HTML (async for IconSystem)
+                let iconHtml = `<img src="${iconPath}" width="16" height="16" alt="${text}" class="icon me-1">`;
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        const iconName = iconPath.split('/').pop().replace('.svg', '');
+                        iconHtml = await window.IconSystem.renderIcon('button', iconName, { size: '16', alt: text, class: 'icon me-1' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                
+                // Store icon and text for later use
+                return {
+                    type: 'LINK',
+                    onclick: onclick,
+                    title: title,
+                    _iconHtml: iconHtml, // Store custom icon HTML
+                    _text: text // Store text
+                };
+            }));
             
-            return `<button class="btn actions-menu-item" data-variant="small" data-button-type="LINK" data-onclick='${onclick}' title="${title}" style="margin-right: 4px;">
-                <img src="${icon}" width="16" height="16" alt="${text}" class="icon me-1"> ${text}
-            </button>`;
-        }).join('');
+            // Use createActionsMenu to create the menu structure
+            const menuHtml = window.createActionsMenu(formattedButtons);
+            
+            if (menuHtml) {
+                // Parse and modify the HTML to add text to buttons
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = menuHtml;
+                
+                const menuButtons = tempDiv.querySelectorAll('.actions-menu-item');
+                formattedButtons.forEach((button, index) => {
+                    if (menuButtons[index] && button._iconHtml && button._text) {
+                        // Replace icon with icon + text
+                        menuButtons[index].innerHTML = `${button._iconHtml} ${button._text}`;
+                    }
+                });
+                
+                // Add ID to wrapper for positioning
+                const wrapper = tempDiv.querySelector('.actions-menu-wrapper');
+                if (wrapper) {
+                    wrapper.id = 'quickLinksActionsMenuWrapper';
+                    const popup = wrapper.querySelector('.actions-menu-popup');
+                    if (popup) {
+                        popup.id = 'quickLinksActionsMenuPopup';
+                    }
+                    // Update tooltip for trigger button
+                    const trigger = wrapper.querySelector('.actions-trigger');
+                    if (trigger) {
+                        trigger.setAttribute('data-tooltip', 'קישורים מהירים');
+                    }
+                }
+                
+                return tempDiv.innerHTML;
+            }
+        }
         
-        // Get menu trigger icon - using ⋮ (three dots) if icon not available
-        const menuIcon = '<span style="font-size: 18px; line-height: 1;">⋮</span>';
-        
-        return `
-            <div class="actions-menu-wrapper" id="quickLinksActionsMenuWrapper">
-                <button class="btn actions-trigger" data-tooltip="קישורים מהירים" data-tooltip-placement="top" data-tooltip-trigger="hover">${menuIcon}</button>
-                <div class="actions-menu-popup" id="quickLinksActionsMenuPopup">
-                    ${menuButtons}
-                </div>
-            </div>
-        `;
+        // Fallback if createActionsMenu is not available
+        console.warn('⚠️ [createQuickLinksActionsMenu] window.createActionsMenu not available, using fallback');
+        return '';
     }
     
     /**
@@ -734,7 +788,7 @@
      * Setup Quick Links
      * Creates actions menu for quick links (like table action menus)
      */
-    function setupQuickLinks() {
+    async function setupQuickLinks() {
         try {
             const container = document.getElementById('quickLinksActionsMenuContainer');
             if (!container) {
@@ -777,7 +831,7 @@
             ];
             
             // Custom create actions menu with icons and text
-            const actionsMenuHTML = createQuickLinksActionsMenu(quickLinksButtons);
+            const actionsMenuHTML = await createQuickLinksActionsMenu(quickLinksButtons);
             container.innerHTML = actionsMenuHTML;
             
             // Setup positioning that checks available space
@@ -811,6 +865,12 @@
      */
     async function refreshWidget() {
         try {
+            // Show loading state
+            const widgetContainer = document.getElementById('history-widget-container') || document.querySelector('.history-widget-container');
+            if (widgetContainer && typeof window.showLoadingState === 'function') {
+                window.showLoadingState(widgetContainer.id || 'history-widget-container');
+            }
+            
             if (window.NotificationSystem) {
                 window.NotificationSystem.showInfo('מרענן נתונים...', 'רענון ווידג\'ט היסטוריה');
             }
@@ -822,6 +882,11 @@
             updateDailyStats();
             updatePLStats();
             updateMarketValueStats();
+            
+            // Hide loading state
+            if (widgetContainer && typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState(widgetContainer.id || 'history-widget-container');
+            }
 
             // Show success notification
             if (window.NotificationSystem) {
@@ -848,6 +913,12 @@
      * Initialize all widgets
      */
     async function initializeWidgets() {
+        // Show loading state
+        const widgetContainer = document.getElementById('history-widget-container') || document.querySelector('.history-widget-container');
+        if (widgetContainer && typeof window.showLoadingState === 'function') {
+            window.showLoadingState(widgetContainer.id || 'history-widget-container');
+        }
+        
         try {
             // Wait for required systems to be available
             let retries = 0;
@@ -892,12 +963,21 @@
 
             // Setup links
             setupQuickLinks();
+            
+            // Hide loading state
+            if (widgetContainer && typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState(widgetContainer.id || 'history-widget-container');
+            }
 
             if (window.Logger) {
                 window.Logger.info('✅ All widgets initialized', { page: 'history-widget' });
             }
         } catch (error) {
-            if (window.Logger) {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה באתחול ווידג\'ט', 
+                    `לא ניתן לאתחל את הווידג'ט. ${errorMsg}`);
+            } else if (window.Logger) {
                 window.Logger.error('Error initializing widgets', { 
                     page: 'history-widget', 
                     error 

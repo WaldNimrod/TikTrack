@@ -443,12 +443,19 @@ function updateTradesTable(trades) {
       <td data-account="${trade.account_id || trade.account_name || ''}"><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
-        <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
-          ${createLinkButton(`viewLinkedItemsForTrade(${trade.id})`)}
-          ${createEditButton(`editTradeRecord('${trade.id}')`)}
-          ${createCancelButton('trade', trade.id, trade.status, 'sm')}
-          ${createDeleteButton(`deleteTradeRecord('${trade.id}')`)}
-        </div>
+        ${(() => {
+          if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+          const buttons = [];
+          buttons.push({ type: 'LINK', onclick: `viewLinkedItemsForTrade(${trade.id})`, title: 'אובייקטים מקושרים' });
+          buttons.push({ type: 'EDIT', onclick: `editTradeRecord('${trade.id}')`, title: 'ערוך' });
+          if (trade.status === 'closed' || trade.status === 'cancelled') {
+            buttons.push({ type: 'REACTIVATE', onclick: `restoreTrade('${trade.id}')`, title: 'שיחזר' });
+          } else {
+            buttons.push({ type: 'CANCEL', onclick: `cancelTradeRecord('${trade.id}')`, title: 'בטל' });
+          }
+          buttons.push({ type: 'DELETE', onclick: `deleteTradeRecord('${trade.id}')`, title: 'מחק' });
+          return window.createActionsMenu(buttons) || '';
+        })()}
       </td>
     </tr>
   `;
@@ -883,21 +890,27 @@ async function _REMOVED_loadEditTradeModalData(trade) {
       if (editForm) {
         // Set form values - using correct field IDs from HTML
         const editTradeId = document.getElementById('editTradeId');
-        if (editTradeId) {editTradeId.value = trade.id;}
-
-        const editTradeType = document.getElementById('editTradeType');
-        if (editTradeType) {editTradeType.value = trade.investment_type || '';}
-
-        const editTradeSide = document.getElementById('editTradeSide');
-        if (editTradeSide) {editTradeSide.value = trade.side || '';}
-
-        const editTradeAccountId = document.getElementById('editTradeAccountId');
-        if (editTradeAccountId) {
-          editTradeAccountId.value = trade.account_id || '';
+        // Use DataCollectionService to set values if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          if (editTradeId) window.DataCollectionService.setValue('editTradeId', trade.id, 'int');
+          window.DataCollectionService.setValue('editTradeType', trade.investment_type || '', 'text');
+          window.DataCollectionService.setValue('editTradeSide', trade.side || '', 'text');
+          window.DataCollectionService.setValue('editTradeAccountId', trade.account_id || '', 'int');
+          window.DataCollectionService.setValue('editTradeNotes', trade.notes || '', 'text');
+        } else {
+          // Fallback if DataCollectionService is not available
+          if (editTradeId) editTradeId.value = trade.id;
+          const editTradeType = document.getElementById('editTradeType');
+          if (editTradeType) editTradeType.value = trade.investment_type || '';
+          const editTradeSide = document.getElementById('editTradeSide');
+          if (editTradeSide) editTradeSide.value = trade.side || '';
+          const editTradeAccountId = document.getElementById('editTradeAccountId');
+          if (editTradeAccountId) {
+            editTradeAccountId.value = trade.account_id || '';
+          }
+          const editTradeNotes = document.getElementById('editTradeNotes');
+          if (editTradeNotes) editTradeNotes.value = trade.notes || '';
         }
-
-        const editTradeNotes = document.getElementById('editTradeNotes');
-        if (editTradeNotes) {editTradeNotes.value = trade.notes || '';}
 
         // Set ticker display and ID - הטרייד מקבל את הטיקר של התוכנית שלו
         const tickerDisplay = document.getElementById('editTradeTickerDisplay');
@@ -927,7 +940,12 @@ async function _REMOVED_loadEditTradeModalData(trade) {
           tickerDisplay.textContent = displayTickerSymbol;
         }
         if (tickerIdInput) {
-          tickerIdInput.value = displayTickerId;
+          // Use DataCollectionService to set value if available
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(tickerIdInput.id, displayTickerId, 'int');
+          } else {
+            tickerIdInput.value = displayTickerId;
+          }
 
           // טעינת מחיר נוכחי ושינוי יומי לטיקר
           if (displayTickerId) {
@@ -987,33 +1005,62 @@ async function _REMOVED_loadEditTradeModalData(trade) {
           const dateStr = closedDate.toISOString().slice(0, 16);
           const closedAtInput = document.getElementById('editTradeClosedAt');
           if (closedAtInput) {
-            closedAtInput.value = dateStr;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(closedAtInput.id, dateStr, 'date');
+            } else {
+              closedAtInput.value = dateStr;
+            }
           }
         }
 
         // Set status
         const statusSelect = document.getElementById('editTradeStatus');
         if (statusSelect) {
-          statusSelect.value = trade.status || 'open';
+          // Use DataCollectionService to set value if available
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(statusSelect.id, trade.status || 'open', 'text');
+          } else {
+            statusSelect.value = trade.status || 'open';
+          }
         }
 
         // בדיקה נוספת - אם השדות לא התמלאו, ננסה שוב אחרי זמן קצר
         setTimeout(() => {
-          const accountValue = document.getElementById('editTradeAccountId')?.value;
-          const tradePlanValue = document.getElementById('editTradeTradePlanId')?.value;
+          // Use DataCollectionService to get values if available
+          let accountValue, tradePlanValue;
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+            accountValue = window.DataCollectionService.getValue('editTradeAccountId', 'int', '');
+            tradePlanValue = window.DataCollectionService.getValue('editTradeTradePlanId', 'int', '');
+          } else {
+            const accountEl = document.getElementById('editTradeAccountId');
+            const tradePlanEl = document.getElementById('editTradeTradePlanId');
+            accountValue = accountEl ? accountEl.value : '';
+            tradePlanValue = tradePlanEl ? tradePlanEl.value : '';
+          }
 
           // אם השדות עדיין ריקים, ננסה למלא שוב
           if (!accountValue && trade.account_id) {
             const editAccountSelect = document.getElementById('editTradeAccountId');
             if (editAccountSelect) {
-              editAccountSelect.value = trade.account_id;
+              // Use DataCollectionService to set value if available
+              if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue(editAccountSelect.id, trade.account_id, 'int');
+              } else {
+                editAccountSelect.value = trade.account_id;
+              }
             }
           }
 
           if (!tradePlanValue && trade.trade_plan_id) {
             const editTradePlanSelectInner = document.getElementById('editTradeTradePlanId');
             if (editTradePlanSelectInner) {
-              editTradePlanSelectInner.value = trade.trade_plan_id;
+              // Use DataCollectionService to set value if available
+              if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue(editTradePlanSelectInner.id, trade.trade_plan_id, 'int');
+              } else {
+                editTradePlanSelectInner.value = trade.trade_plan_id;
+              }
             }
           }
         }, 100);
@@ -1068,19 +1115,39 @@ async function _REMOVED_loadEditTradeModalData(trade) {
  */
 async function _REMOVED_saveEditTradeData() {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - עריכה    // איסוף נתונים מהטופס
-    const formData = {
-      id: document.getElementById('editTradeId').value,
-      investment_type: document.getElementById('editTradeType').value,
-      side: document.getElementById('editTradeSide').value,
-      account_id: document.getElementById('editTradeAccountId').value,
-      trade_plan_id: document.getElementById('editTradeTradePlanId').value || null,
-      notes: document.getElementById('editTradeNotes').value,
-      opened_at: document.getElementById('editTradeOpenedAt').value,
-      status: document.getElementById('editTradeStatus').value,
-      ticker_id: document.getElementById('editTradeTickerId').value,
-      ticker_symbol: document.getElementById('editTradeTickerDisplay').textContent,
-    };
+    // ניקוי מטמון לפני פעולת CRUD - עריכה    // איסוף נתונים מהטופס באמצעות DataCollectionService
+    let formData;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.collectFormData) {
+      const fieldMap = {
+        id: { id: 'editTradeId', type: 'int' },
+        investment_type: { id: 'editTradeType', type: 'text' },
+        side: { id: 'editTradeSide', type: 'text' },
+        account_id: { id: 'editTradeAccountId', type: 'int' },
+        trade_plan_id: { id: 'editTradeTradePlanId', type: 'int', default: null },
+        notes: { id: 'editTradeNotes', type: 'text', default: '' },
+        opened_at: { id: 'editTradeOpenedAt', type: 'date' },
+        status: { id: 'editTradeStatus', type: 'text' },
+        ticker_id: { id: 'editTradeTickerId', type: 'int' },
+      };
+      formData = window.DataCollectionService.collectFormData(fieldMap);
+      // Add ticker_symbol from display element
+      const tickerDisplayEl = document.getElementById('editTradeTickerDisplay');
+      formData.ticker_symbol = tickerDisplayEl ? tickerDisplayEl.textContent : '';
+    } else {
+      // Fallback if DataCollectionService is not available
+      formData = {
+        id: document.getElementById('editTradeId')?.value || '',
+        investment_type: document.getElementById('editTradeType')?.value || '',
+        side: document.getElementById('editTradeSide')?.value || '',
+        account_id: document.getElementById('editTradeAccountId')?.value || '',
+        trade_plan_id: document.getElementById('editTradeTradePlanId')?.value || null,
+        notes: document.getElementById('editTradeNotes')?.value || '',
+        opened_at: document.getElementById('editTradeOpenedAt')?.value || '',
+        status: document.getElementById('editTradeStatus')?.value || '',
+        ticker_id: document.getElementById('editTradeTickerId')?.value || '',
+        ticker_symbol: document.getElementById('editTradeTickerDisplay')?.textContent || '',
+      };
+    }
 
     // עדכון הטיקר לפי התוכנית הנבחרת
     if (formData.trade_plan_id) {
@@ -1557,7 +1624,13 @@ async function updateTickerFromTradePlan(tradePlanId) {
   if (!tradePlanId) {
     // ניקוי שדות אם לא נבחרה תוכנית
     document.getElementById('addTradeTickerDisplay').textContent = 'לא נבחר';
-    document.getElementById('addTradeTickerId').value = '';
+    // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('addTradeTickerId', '', 'text');
+    } else {
+      const tickerIdEl = document.getElementById('addTradeTickerId');
+      if (tickerIdEl) tickerIdEl.value = '';
+    }
     document.getElementById('addTradeCurrentPrice').textContent = '-';
     document.getElementById('addTradeDailyChange').textContent = '-';
 
@@ -1578,7 +1651,13 @@ async function updateTickerFromTradePlan(tradePlanId) {
 
       // עדכון שדות הטיקר
       document.getElementById('addTradeTickerDisplay').textContent = tickerSymbol;
-      document.getElementById('addTradeTickerId').value = tickerId;
+      // Use DataCollectionService to set value if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('addTradeTickerId', tickerId, 'int');
+      } else {
+        const tickerIdEl = document.getElementById('addTradeTickerId');
+        if (tickerIdEl) tickerIdEl.value = tickerId;
+      }
 
       // הוספת אינדיקציה לסטטוס התוכנית
       const tickerDisplayElement = document.getElementById('addTradeTickerDisplay');

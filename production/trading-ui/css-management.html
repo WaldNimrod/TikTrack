@@ -164,7 +164,7 @@
                                             <label class="form-label">Components:</label>
                                             <span class="badge bg-success">פעיל</span>
                                         </div>
-                                        <button class="btn btn-primary">רענן שכבות</button>
+                                        <button class="btn btn-primary" data-button-type="REFRESH">רענן שכבות</button>
                                     </div>
                                 </div>
                             </div>
@@ -183,7 +183,7 @@
                                             <label class="form-label">דחיסה:</label>
                                             <span class="badge bg-success">פעיל</span>
                                         </div>
-                                        <button class="btn btn-secondary">רענן כלים</button>
+                                        <button class="btn btn-secondary" data-button-type="REFRESH">רענן כלים</button>
                                     </div>
                                 </div>
                             </div>
@@ -200,7 +200,7 @@
                             <button data-button-type="REFRESH" data-onclick="loadCssFilesList()" data-classes="btn btn-sm btn-outline-success" data-attributes="title='רענן רשימת קבצים'">
                                 <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רענן
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('section3')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 ${createToggleButton("toggleSection('top')", "הצג/הסתר סקשן")}
                             </button>
                         </div>
@@ -208,7 +208,7 @@
                     <div class="section-body">
                         <!-- טבלת קבצי CSS -->
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover" id="cssFilesTable">
+                            <table class="table table-striped table-hover" id="cssFilesTable" data-table-type="css_files">
                                 <thead class="table-dark">
                                     <tr>
                                         <th>שם קובץ</th>
@@ -232,7 +232,7 @@
                 <div class="content-section" id="section4" data-section="section4">
                     <div class="section-header">
                         <h2>📋 פעולות CSS</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('section4')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -240,17 +240,17 @@
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <button class="btn btn-success w-100" onclick="refreshCssStats()" title="רענן נתוני CSS">
+                                <button class="btn btn-success w-100" data-onclick="refreshCssStats()" title="רענן נתוני CSS" data-button-type="REFRESH">
                                     <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רענן CSS
                                 </button>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <button class="btn btn-info w-100" onclick="minifyCss()" title="דחוס קבצי CSS">
+                                <button class="btn btn-info w-100" data-onclick="minifyCss()" title="דחוס קבצי CSS" data-button-type="PRIMARY">
                                     <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> דחוס קבצים
                                 </button>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <button class="btn btn-warning w-100" onclick="validateCss()" title="בדוק תקינות CSS">
+                                <button class="btn btn-warning w-100" data-onclick="validateCss()" title="בדוק תקינות CSS" data-button-type="CHECK">
                                     <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> בדוק תקינות
                                 </button>
                             </div>
@@ -259,22 +259,22 @@
                         <!-- כפתורי פעולה נוספים -->
                         <div class="row mt-3">
                             <div class="col-md-3 mb-2">
-                                <button class="btn btn-outline-primary w-100" onclick="detectCssDuplicates()" title="זהה כפילויות CSS">
+                                <button class="btn btn-outline-primary w-100" data-onclick="detectCssDuplicates()" title="זהה כפילויות CSS" data-button-type="SEARCH">
                                     <img src="/trading-ui/images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon"> זהה כפילויות
                                 </button>
                             </div>
                             <div class="col-md-3 mb-2">
-                                <button class="btn btn-outline-secondary w-100" onclick="checkArchitectureCompliance()" title="בדוק תאימות ITCSS">
+                                <button class="btn btn-outline-secondary w-100" data-onclick="checkArchitectureCompliance()" title="בדוק תאימות ITCSS" data-button-type="CHECK">
                                     <img src="/trading-ui/images/icons/tabler/check.svg" width="16" height="16" alt="check" class="icon"> בדוק תאימות
                                 </button>
                             </div>
                             <div class="col-md-3 mb-2">
-                                <button class="btn btn-outline-danger w-100" onclick="removeUnusedCss()" title="הסר CSS לא בשימוש">
+                                <button class="btn btn-outline-danger w-100" data-onclick="removeUnusedCss()" title="הסר CSS לא בשימוש" data-button-type="DELETE">
                                     <img src="/trading-ui/images/icons/tabler/trash.svg" width="16" height="16" alt="trash" class="icon"> הסר לא בשימוש
                                 </button>
                             </div>
                             <div class="col-md-3 mb-2">
-                                <button class="btn btn-outline-success w-100" onclick="showAddCssFileModal()" title="הוסף קובץ CSS חדש">
+                                <button class="btn btn-outline-success w-100" data-onclick="showAddCssFileModal()" title="הוסף קובץ CSS חדש" data-button-type="ADD">
                                     <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> הוסף קובץ
                                 </button>
                             </div>
@@ -287,7 +287,7 @@
                 <div class="content-section" id="section5" data-section="section5">
                     <div class="section-header">
                         <h2>🔍 חיפוש CSS</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('section5')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                             ${createToggleButton("toggleSection('section1')", "הצג/הסתר סקשן")}
                         </button>
                     </div>
@@ -300,10 +300,10 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="d-flex gap-2 justify-content-start">
-                                    <button class="btn btn-primary" onclick="searchCssRules()" title="חפש בקבצי CSS">
+                                    <button class="btn btn-primary" data-onclick="searchCssRules()" title="חפש בקבצי CSS" data-button-type="SEARCH">
                                         <img src="/trading-ui/images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon"> חפש
                                     </button>
-                                    <button class="btn btn-outline-secondary" onclick="clearCssSearch()" title="נקה חיפוש">
+                                    <button class="btn btn-outline-secondary" data-onclick="clearCssSearch()" title="נקה חיפוש" data-button-type="SEARCH">
                                         <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> נקה
                                     </button>
                                 </div>
@@ -323,93 +323,97 @@
     
     <!-- =============================================================== -->
         <!-- =============================================================== -->
+        <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
     <!-- =============================================================== -->
-    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
     <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
-    <!-- 🎯 Page: css-management | Generated: 2025-11-15T00:29:03.506Z -->
+    <!-- 🎯 Page: css-management | Generated: 2025-11-29T19:33:03.763Z -->
     <!-- 📦 Packages: base, init-system -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 1/2: BASE PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 1 | Description: מערכות ליבה חובה לכל עמוד -->
+    <!-- Load Order: 1 | Description: Core systems required for all pages -->
     <!-- Dependencies:  -->
     <!-- Critical: YES | Version: 2.0.0 -->
 
     <!-- [1] Load Order: 1 -->
-    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- הגדרות API מרכזיות -->
+    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- Central API configuration -->
     <!-- [2] Load Order: 2 -->
-    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- Favicon management -->
     <!-- [3] Load Order: 3 -->
-    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- Notification system -->
     <!-- [4] Load Order: 4 -->
-    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- Cache synchronization manager -->
     <!-- [5] Load Order: 5 -->
-    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- UI utilities -->
     <!-- [6] Load Order: 6 -->
-    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- Warning system -->
     <!-- [7] Load Order: 7 -->
-    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- Error handling system -->
     <!-- [8] Load Order: 8 -->
-    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- Unified cache manager -->
     <!-- [9] Load Order: 9 -->
-    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
+    <script src="scripts/icon-mappings.js?v=1.0.0"></script> <!-- Central icon mappings -->
     <!-- [10] Load Order: 10 -->
-    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
+    <script src="scripts/icon-system.js?v=1.0.0"></script> <!-- Central icon system -->
     <!-- [11] Load Order: 11 -->
-    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <script src="scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- Icon replacement helper for standardizing icon usage -->
     <!-- [12] Load Order: 12 -->
-    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- Cache clearing control (Stage B-Lite) -->
     <!-- [13] Load Order: 13 -->
-    <script src="scripts/page-state-manager.js?v=1.0.0"></script> <!-- מנהל מצב עמודים מאוחד -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
     <!-- [14] Load Order: 14 -->
-    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- Advanced logging service -->
     <!-- [15] Load Order: 15 -->
-    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- Header system -->
     <!-- [16] Load Order: 16 -->
-    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <script src="scripts/page-state-manager.js?v=1.0.0"></script> <!-- Unified page state manager -->
     <!-- [17] Load Order: 17 -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- Page utilities -->
     <!-- [18] Load Order: 18 -->
-    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- Translations -->
     <!-- [19] Load Order: 19 -->
-    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- Icon and button system -->
     <!-- [20] Load Order: 20 -->
-    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- Central event management system -->
+    <!-- [22] Load Order: 22 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- Button system -->
+    <!-- [23] Load Order: 23 -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- Dynamic color system -->
+    <!-- [24] Load Order: 24 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- Unified initialization system - single entry point (required for all pages) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/2: INITIALIZATION PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
-    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary -->
+    <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary, dashboard-widgets, tradingview-widgets, tradingview-charts, watch-lists, ai-analysis -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [21] Load Order: 21 -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
-    <!-- [22] Load Order: 22 -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
-    <!-- [23] Load Order: 23 -->
-    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
-    <!-- [24] Load Order: 24 -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
     <!-- [25] Load Order: 25 -->
-    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- Package manifest -->
+    <!-- [26] Load Order: 26 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- Page initialization configurations -->
+    <!-- [27] Load Order: 27 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- Initialization system check -->
+    <!-- [28] Load Order: 28 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- Page monitoring functions -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
-    <!-- [26] Page-specific: css-management -->
-    <script src="scripts/css-management.js?v=1.0.0"></script> <!-- Page-specific script for css-management -->
+    <!-- [29] Load Order: 29 -->
+    <script src="scripts/css-management.js?v=1.0.0"></script> <!-- CSS management page logic -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 26 | Unique Scripts Loaded: 26 -->
-    <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("css-management") -->
-
-
-
+    <!-- 📊 Total Scripts Processed: 29 | Unique Scripts Loaded: 29 -->
+    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
 </body>
 </html>

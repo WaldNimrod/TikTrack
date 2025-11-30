@@ -138,10 +138,8 @@ def get_trades():
         except Exception as _e:
             raw_count = None
         logger.info(
-            "Trades API debug: DATABASE_URL=%s, USING_SQLITE=%s, DB_PATH=%s, trades_count=%s",
+            "Trades API debug: DATABASE_URL=%s, trades_count=%s",
             getattr(settings, "DATABASE_URL", None),
-            getattr(settings, "USING_SQLITE", None),
-            getattr(settings, "DB_PATH", None),
             raw_count,
         )
         normalizer = _get_date_normalizer()
@@ -494,16 +492,8 @@ def delete_trade(trade_id: int):
     try:
         normalizer = _get_date_normalizer()
         db: Session = g.db
-        # Remove tag associations before deleting the entity
-        try:
-            TagService.remove_all_tags_for_entity(db, 'trade', trade_id)
-        except ValueError as tag_error:
-            logger.warning(
-                "Failed to remove tags for trade %s before deletion: %s",
-                trade_id,
-                tag_error,
-            )
-
+        # Tag cleanup is handled automatically by SQLAlchemy event listeners
+        
         success = TradeService.delete(db, trade_id)
         if success:
             return jsonify({

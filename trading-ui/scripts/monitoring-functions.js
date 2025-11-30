@@ -138,6 +138,23 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
         });
     }
     
+    // Known dynamic scripts that are expected (page-specific or mockup-specific)
+    const knownDynamicScripts = [
+        'mockups-icon-initializer.js',
+        'trading-journal-page.js',
+        'date-comparison-modal.js',
+        'trade-history-page.js',
+        'portfolio-state-page.js',
+        'price-history-page.js',
+        'comparative-analysis-page.js',
+        'strategy-analysis-page.js',
+        'economic-calendar-page.js',
+        'history-widget.js',
+        'emotional-tracking-widget.js',
+        'tradingview-test-page.js',
+        'heatmap-visual-example.js'
+    ];
+    
     // Check undefined scripts - compare both full paths and filenames
     const undefinedScripts = loadedScripts.filter(loadedScript => {
         // Check if script exists in manifest (by filename or full path)
@@ -149,7 +166,18 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
                    scriptFilename === manifestFilename;
         });
         
+        // Check if it's a known dynamic script
+        const isKnownDynamic = knownDynamicScripts.some(name => 
+            loadedScript.includes(name) || scriptFilename === name
+        );
+        
+        // Check if it's a page-specific script (same name as page)
+        const isPageSpecific = scriptFilename === `${pageName}.js` || 
+                              loadedScript.includes(`${pageName}.js`);
+        
         return !foundInManifest && 
+               !isKnownDynamic &&
+               !isPageSpecific &&
                !loadedScript.includes('bootstrap') && 
                !loadedScript.includes('font-awesome');
     });
@@ -394,7 +422,8 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
             'init-system', 'bootstrap', 'font-awesome', 'monitoring-functions',
             'init-system-check', 'package-manifest', 'page-initialization-configs',
             'unified-app-initializer', 'info-summary-system', 'info-summary-configs',
-            'modal-navigation-manager', 'modal-manager-v2' // These are loaded manually but are valid
+            'modal-navigation-manager', 'modal-manager-v2', // These are loaded manually but are valid
+            'mockups-icon-initializer' // Mockup-specific icon initializer
         ];
         let isAllowedSystemScript = allowedSystemScripts.some(allowed => loadedScript.includes(allowed));
         
@@ -659,6 +688,15 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
  * Run detailed page scan with HTML+DOM comparison
  */
 async function runDetailedPageScan(pageName, pageConfig) {
+    // Validate pageName is a string, not a Promise
+    if (typeof pageName !== 'string') {
+        const error = new Error(`runDetailedPageScan: pageName must be a string, got ${typeof pageName}. If you have a Promise, await it first.`);
+        console.error('❌ runDetailedPageScan invalid pageName type:', error);
+        if (window.Logger?.error) {
+            window.Logger.error('❌ runDetailedPageScan invalid pageName type', error, { page: 'monitoring', pageNameType: typeof pageName });
+        }
+        throw error;
+    }
     
     // Check if we're on the correct page
     const path = window.location.pathname;
@@ -671,9 +709,11 @@ async function runDetailedPageScan(pageName, pageConfig) {
         currentPage = currentPage.replace('.html', '');
     }
     
-    // Handle tag-management specifically (URL might be /tag-management without .html)
+    // Handle specific pages with custom URL mapping (without .html and /trading-ui/)
     if (path.includes('tag-management')) {
         currentPage = 'tag-management';
+    } else if (path.includes('ai-analysis')) {
+        currentPage = 'ai-analysis';
     }
     
     if (currentPage !== pageName) {
@@ -823,10 +863,66 @@ async function runDetailedPageScan(pageName, pageConfig) {
  */
 async function parseHTMLFile(pageName) {
     try {
-        const response = await fetch(`/${pageName}.html`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch HTML file: ${response.status} ${response.statusText}`);
+        // Validate pageName is a string, not a Promise
+        if (typeof pageName !== 'string') {
+            const error = new Error(`parseHTMLFile: pageName must be a string, got ${typeof pageName}. If you have a Promise, await it first.`);
+            console.error('❌ parseHTMLFile invalid pageName type:', error);
+            if (window.Logger?.error) {
+                window.Logger.error('❌ parseHTMLFile invalid pageName type', error, { page: 'monitoring', pageNameType: typeof pageName });
+            }
+            throw error;
         }
+        
+        // Get page config to determine if it's a mockup page
+        const pageConfig = window.PAGE_CONFIGS?.[pageName];
+        const currentPath = window.location.pathname;
+        const isMockup = pageConfig?.pageType === 'mockup' || 
+                        currentPath.includes('/mockups/') ||
+                        currentPath.includes('mockup');
+        
+        // Determine the correct path based on page type
+        let htmlPath;
+        let altPath = null;
+        
+        if (isMockup) {
+            // Mockup pages are in trading-ui/mockups/daily-snapshots/
+            htmlPath = `/trading-ui/mockups/daily-snapshots/${pageName}.html`;
+        } else {
+            // Regular pages - try trading-ui/ first (standard location)
+            htmlPath = `/trading-ui/${pageName}.html`;
+            // Also try root path as fallback
+            altPath = `/${pageName}.html`;
+        }
+        
+        // Try primary path
+        let response = await fetch(htmlPath);
+        
+        // If primary path fails and we have an alternative, try it
+        if (!response.ok && altPath) {
+            response = await fetch(altPath);
+            if (response.ok) {
+                htmlPath = altPath; // Update path for reference
+            }
+        }
+        
+        // If still not ok, try alternative paths
+        if (!response.ok) {
+            // Try mockup path if not already tried
+            if (!htmlPath.includes('/mockups/')) {
+                const mockupPath = `/trading-ui/mockups/daily-snapshots/${pageName}.html`;
+                const mockupResponse = await fetch(mockupPath);
+                if (mockupResponse.ok) {
+                    response = mockupResponse;
+                    htmlPath = mockupPath;
+                }
+            }
+            
+            // If still not ok, throw error
+            if (!response.ok) {
+                throw new Error(`Failed to fetch HTML file: ${response.status} ${response.statusText}`);
+            }
+        }
+        
         const htmlContent = await response.text();
         return {
             htmlContent,
@@ -1008,11 +1104,22 @@ function compareHTMLvsDOM(htmlScripts, domScripts, pageConfig, packageManifest) 
         if (!htmlScriptMap.has(normalized)) {
             // Try to find source - check if it's from a package
             const manifestInfo = getScriptLoadOrder(domScript, packageManifest);
+            
+            // Known dynamic scripts that are expected (page-specific or mockup-specific)
+            const knownDynamicScripts = [
+                'mockups-icon-initializer.js',
+                'trading-journal-page.js'
+            ];
+            const isKnownDynamic = knownDynamicScripts.some(name => 
+                domScript.includes(name) || normalized.includes(name)
+            );
+            
             comparison.extraInDOM.push({
                 file: domScript,
                 domPosition: domScripts.indexOf(domScript),
-                source: manifestInfo ? `package: ${manifestInfo.package}` : 'dynamic',
-                package: manifestInfo?.package || null
+                source: manifestInfo ? `package: ${manifestInfo.package}` : (isKnownDynamic ? 'dynamic' : 'unknown'),
+                package: manifestInfo?.package || null,
+                expected: manifestInfo !== null || isKnownDynamic // Expected if from package or known dynamic
             });
         }
     });

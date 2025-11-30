@@ -16,7 +16,7 @@ from datetime import datetime
 # Add the parent directory to the path so we can import models
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from config.settings import DATABASE_URL, USING_SQLITE
+from config.settings import DATABASE_URL
 from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -37,41 +37,6 @@ def verify_required_tables(engine):
         raise Exception(f"Required tables do not exist: {', '.join(missing_tables)}")
     
     return True
-
-def create_table_sqlite(conn):
-    """Create table for SQLite"""
-    cursor = conn.cursor()
-    
-    cursor.execute("""
-        CREATE TABLE ticker_provider_symbols (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            ticker_id INTEGER NOT NULL,
-            provider_id INTEGER NOT NULL,
-            provider_symbol VARCHAR(50) NOT NULL,
-            is_primary BOOLEAN DEFAULT FALSE NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME,
-            UNIQUE(ticker_id, provider_id),
-            FOREIGN KEY (ticker_id) REFERENCES tickers(id) ON DELETE CASCADE,
-            FOREIGN KEY (provider_id) REFERENCES external_data_providers(id)
-        )
-    """)
-    
-    # Create indexes
-    cursor.execute("""
-        CREATE INDEX IF NOT EXISTS idx_ticker_provider_symbols_ticker_id 
-        ON ticker_provider_symbols(ticker_id)
-    """)
-    cursor.execute("""
-        CREATE INDEX IF NOT EXISTS idx_ticker_provider_symbols_provider_id 
-        ON ticker_provider_symbols(provider_id)
-    """)
-    cursor.execute("""
-        CREATE INDEX IF NOT EXISTS idx_ticker_provider_symbols_provider_symbol 
-        ON ticker_provider_symbols(provider_symbol)
-    """)
-    
-    conn.commit()
 
 def create_table_postgresql(conn):
     """Create table for PostgreSQL"""
@@ -124,13 +89,12 @@ def run_migration(database_url=None):
     if database_url is None:
         database_url = DATABASE_URL
     
-    using_sqlite = database_url.startswith("sqlite")
-    
+    # PostgreSQL only - SQLite is no longer supported
     print("=" * 70)
     print("Create Ticker Provider Symbols Table Migration")
     print("=" * 70)
     print(f"Database: {database_url}")
-    print(f"Type: {'SQLite' if using_sqlite else 'PostgreSQL'}")
+    print(f"Type: PostgreSQL")
     print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print()
     
@@ -161,13 +125,10 @@ def run_migration(database_url=None):
         print("✓ Required tables verified")
         print()
         
-        # Step 3: Create the table
+        # Step 3: Create the table (PostgreSQL only)
         print("[3/4] Creating ticker_provider_symbols table...")
         with engine.connect() as conn:
-            if using_sqlite:
-                create_table_sqlite(conn)
-            else:
-                create_table_postgresql(conn)
+            create_table_postgresql(conn)
         print("✓ Table created")
         print()
         

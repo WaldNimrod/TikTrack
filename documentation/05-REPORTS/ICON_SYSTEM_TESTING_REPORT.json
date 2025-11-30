@@ -1,0 +1,1056 @@
+{
+  "total": 40,
+  "passed": 40,
+  "failed": 0,
+  "warnings": 0,
+  "pages": {
+    "index.html": {
+      "pageName": "index.html",
+      "category": "main",
+      "html": {
+        "pageName": "index.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/index.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 5,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 5,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/entities/home.svg\" alt=\"דף הבית\" class=\"section-icon\">",
+              "<img src=\"/trading-ui/images/icons/entities/executions.svg\" alt=\"ביצועים\" width=\"20\" height=\"20\">",
+              "<img src=\"/trading-ui/images/icons/entities/trades.svg\" alt=\"טריידים\" width=\"20\" height=\"20\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "index.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/index.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": true,
+        "status": "ok"
+      },
+      "status": "auto_fix"
+    },
+    "trades.html": {
+      "pageName": "trades.html",
+      "category": "main",
+      "html": {
+        "pageName": "trades.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/trades.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "trades.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/trades.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "passed"
+    },
+    "trade_plans.html": {
+      "pageName": "trade_plans.html",
+      "category": "main",
+      "html": {
+        "pageName": "trade_plans.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/trade_plans.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "trade_plans.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/trade_plans.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "passed"
+    },
+    "alerts.html": {
+      "pageName": "alerts.html",
+      "category": "main",
+      "html": {
+        "pageName": "alerts.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/alerts.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "alerts.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/alerts.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "passed"
+    },
+    "tickers.html": {
+      "pageName": "tickers.html",
+      "category": "main",
+      "html": {
+        "pageName": "tickers.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/tickers.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "tickers.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/tickers.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": true,
+        "status": "ok"
+      },
+      "status": "passed"
+    },
+    "trading_accounts.html": {
+      "pageName": "trading_accounts.html",
+      "category": "main",
+      "html": {
+        "pageName": "trading_accounts.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/trading_accounts.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "trading_accounts.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/trading_accounts.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "passed"
+    },
+    "executions.html": {
+      "pageName": "executions.html",
+      "category": "main",
+      "html": {
+        "pageName": "executions.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/executions.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 16,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 16,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "executions.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/executions.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": true,
+        "status": "ok"
+      },
+      "status": "auto_fix"
+    },
+    "cash_flows.html": {
+      "pageName": "cash_flows.html",
+      "category": "main",
+      "html": {
+        "pageName": "cash_flows.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/cash_flows.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "cash_flows.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/cash_flows.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "passed"
+    },
+    "notes.html": {
+      "pageName": "notes.html",
+      "category": "main",
+      "html": {
+        "pageName": "notes.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/notes.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "notes.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/notes.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "passed"
+    },
+    "research.html": {
+      "pageName": "research.html",
+      "category": "main",
+      "html": {
+        "pageName": "research.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/research.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "research.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/research.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "passed"
+    },
+    "preferences.html": {
+      "pageName": "preferences.html",
+      "category": "main",
+      "html": {
+        "pageName": "preferences.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/preferences.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 11,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 11,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/settings.svg\" width=\"16\" height=\"16\" alt=\"settings\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "preferences.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/preferences.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "auto_fix"
+    },
+    "db_display.html": {
+      "pageName": "db_display.html",
+      "category": "technical",
+      "html": {
+        "pageName": "db_display.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/db_display.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 9,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 9,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/entities/db_display.svg\" alt=\"בסיס נתונים\" class=\"table-icon\">",
+              "<img src=\"/trading-ui/images/icons/entities/trading_accounts.svg\" alt=\"trading_accounts\" class=\"section-icon\">",
+              "<img src=\"/trading-ui/images/icons/entities/trades.svg\" alt=\"trades\" class=\"section-icon\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "db_display.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/db_display.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "auto_fix"
+    },
+    "db_extradata.html": {
+      "pageName": "db_extradata.html",
+      "category": "technical",
+      "html": {
+        "pageName": "db_extradata.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/db_extradata.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "db_extradata.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/db_extradata.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "passed"
+    },
+    "constraints.html": {
+      "pageName": "constraints.html",
+      "category": "technical",
+      "html": {
+        "pageName": "constraints.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/constraints.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 6,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 6,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/arrows-sort.svg\" width=\"16\" height=\"16\" alt=\"sort\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/arrows-sort.svg\" width=\"16\" height=\"16\" alt=\"sort\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/arrows-sort.svg\" width=\"16\" height=\"16\" alt=\"sort\" class=\"icon\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "constraints.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/constraints.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "auto_fix"
+    },
+    "background-tasks.html": {
+      "pageName": "background-tasks.html",
+      "category": "technical",
+      "html": {
+        "pageName": "background-tasks.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/background-tasks.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "background-tasks.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/background-tasks.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": true,
+        "status": "ok"
+      },
+      "status": "passed"
+    },
+    "server-monitor.html": {
+      "pageName": "server-monitor.html",
+      "category": "technical",
+      "html": {
+        "pageName": "server-monitor.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/server-monitor.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 12,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 12,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/circle.svg\" width=\"16\" height=\"16\" alt=\"circle\" class=\"icon\" id=\"monitoringIcon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/player-play.svg\" width=\"16\" height=\"16\" alt=\"player-play\" class=\"icon\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "server-monitor.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/server-monitor.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "auto_fix"
+    },
+    "notifications-center.html": {
+      "pageName": "notifications-center.html",
+      "category": "technical",
+      "html": {
+        "pageName": "notifications-center.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/notifications-center.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 7,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 7,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/chart-bar.svg\" width=\"16\" height=\"16\" alt=\"chart-bar\" class=\"icon text-success\">",
+              "<img src=\"/trading-ui/images/icons/tabler/settings.svg\" width=\"16\" height=\"16\" alt=\"settings\" class=\"icon text-primary\">",
+              "<img src=\"/trading-ui/images/icons/tabler/chart-bar.svg\" width=\"16\" height=\"16\" alt=\"chart-bar\" class=\"icon me-2\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "notifications-center.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/notifications-center.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": true,
+        "status": "ok"
+      },
+      "status": "auto_fix"
+    },
+    "css-management.html": {
+      "pageName": "css-management.html",
+      "category": "technical",
+      "html": {
+        "pageName": "css-management.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/css-management.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 10,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 10,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "css-management.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/css-management.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "auto_fix"
+    },
+    "system-management.html": {
+      "pageName": "system-management.html",
+      "category": "technical",
+      "html": {
+        "pageName": "system-management.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/system-management.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 5,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 5,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/refresh.svg\" width=\"16\" height=\"16\" alt=\"refresh\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/settings.svg\" width=\"16\" height=\"16\" alt=\"settings\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "system-management.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/system-management.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "auto_fix"
+    },
+    "code-quality-dashboard.html": {
+      "pageName": "code-quality-dashboard.html",
+      "category": "dev_tools",
+      "html": {
+        "pageName": "code-quality-dashboard.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 15,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 15,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "code-quality-dashboard.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/code-quality-dashboard.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": true,
+        "status": "ok"
+      },
+      "status": "auto_fix"
+    },
+    "tag-management.html": {
+      "pageName": "tag-management.html",
+      "category": "dev_tools",
+      "html": {
+        "pageName": "tag-management.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/tag-management.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 3,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 3,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/tags.svg\" width=\"16\" height=\"16\" alt=\"tags\" class=\"icon section-icon text-success\">",
+              "<img src=\"/trading-ui/images/icons/tabler/chart-line.svg\" width=\"16\" height=\"16\" alt=\"chart-line\" class=\"icon section-icon text-primary\">",
+              "<img src=\"/trading-ui/images/icons/tabler/layers.svg\" width=\"16\" height=\"16\" alt=\"layers\" class=\"icon section-icon text-secondary\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": null,
+      "status": "auto_fix"
+    },
+    "init-system-management.html": {
+      "pageName": "init-system-management.html",
+      "category": "dev_tools",
+      "html": {
+        "pageName": "init-system-management.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/init-system-management.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 38,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 38,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "init-system-management.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/init-system-management.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": true,
+        "status": "ok"
+      },
+      "status": "auto_fix"
+    },
+    "conditions-test.html": {
+      "pageName": "conditions-test.html",
+      "category": "dev_tools",
+      "html": {
+        "pageName": "conditions-test.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/conditions-test.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 29,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 29,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/player-play.svg\" width=\"16\" height=\"16\" alt=\"player-play\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/trash.svg\" width=\"16\" height=\"16\" alt=\"trash\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/copy.svg\" width=\"16\" height=\"16\" alt=\"copy\" class=\"icon\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "conditions-test.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/conditions-test.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": true,
+        "status": "ok"
+      },
+      "status": "auto_fix"
+    },
+    "test-header-only.html": {
+      "pageName": "test-header-only.html",
+      "category": "dev_tools",
+      "html": {
+        "pageName": "test-header-only.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/test-header-only.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "test-header-only.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/test-header-only.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "passed"
+    },
+    "external-data-dashboard.html": {
+      "pageName": "external-data-dashboard.html",
+      "category": "dev_tools",
+      "html": {
+        "pageName": "external-data-dashboard.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/external-data-dashboard.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 2,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 2,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/world.svg\" width=\"16\" height=\"16\" alt=\"world\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/chart-bar.svg\" width=\"16\" height=\"16\" alt=\"chart-bar\" class=\"icon\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "external-data-dashboard.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/external-data-dashboard.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "auto_fix"
+    },
+    "chart-management.html": {
+      "pageName": "chart-management.html",
+      "category": "dev_tools",
+      "html": {
+        "pageName": "chart-management.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/chart-management.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 14,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 14,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/download.svg\" width=\"16\" height=\"16\" alt=\"download\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "chart-management.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/chart-management.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "auto_fix"
+    },
+    "crud-testing-dashboard.html": {
+      "pageName": "crud-testing-dashboard.html",
+      "category": "dev_tools",
+      "html": {
+        "pageName": "crud-testing-dashboard.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/crud-testing-dashboard.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 27,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 27,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "crud-testing-dashboard.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/crud-testing-dashboard.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "auto_fix"
+    },
+    "dynamic-colors-display.html": {
+      "pageName": "dynamic-colors-display.html",
+      "category": "dev_tools",
+      "html": {
+        "pageName": "dynamic-colors-display.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/dynamic-colors-display.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 5,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 5,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">",
+              "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"icon\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": {
+        "pageName": "dynamic-colors-display.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/dynamic-colors-display.js",
+        "hasDirectImgCreation": false,
+        "issues": [],
+        "hasIconSystem": false,
+        "status": "needs_attention"
+      },
+      "status": "auto_fix"
+    },
+    "mockups/daily-snapshots/comparative-analysis-page.html": {
+      "pageName": "mockups/daily-snapshots/comparative-analysis-page.html",
+      "category": "mockup",
+      "html": {
+        "pageName": "mockups/daily-snapshots/comparative-analysis-page.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/mockups/daily-snapshots/comparative-analysis-page.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": false,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": null,
+      "status": "passed"
+    },
+    "mockups/daily-snapshots/date-comparison-modal.html": {
+      "pageName": "mockups/daily-snapshots/date-comparison-modal.html",
+      "category": "mockup",
+      "html": {
+        "pageName": "mockups/daily-snapshots/date-comparison-modal.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/mockups/daily-snapshots/date-comparison-modal.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": null,
+      "status": "passed"
+    },
+    "mockups/daily-snapshots/economic-calendar-page.html": {
+      "pageName": "mockups/daily-snapshots/economic-calendar-page.html",
+      "category": "mockup",
+      "html": {
+        "pageName": "mockups/daily-snapshots/economic-calendar-page.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/mockups/daily-snapshots/economic-calendar-page.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": false,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": null,
+      "status": "passed"
+    },
+    "mockups/daily-snapshots/emotional-tracking-widget.html": {
+      "pageName": "mockups/daily-snapshots/emotional-tracking-widget.html",
+      "category": "mockup",
+      "html": {
+        "pageName": "mockups/daily-snapshots/emotional-tracking-widget.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/mockups/daily-snapshots/emotional-tracking-widget.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": false,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": null,
+      "status": "passed"
+    },
+    "mockups/daily-snapshots/heatmap-visual-example.html": {
+      "pageName": "mockups/daily-snapshots/heatmap-visual-example.html",
+      "category": "mockup",
+      "html": {
+        "pageName": "mockups/daily-snapshots/heatmap-visual-example.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/mockups/daily-snapshots/heatmap-visual-example.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": null,
+      "status": "passed"
+    },
+    "mockups/daily-snapshots/history-widget.html": {
+      "pageName": "mockups/daily-snapshots/history-widget.html",
+      "category": "mockup",
+      "html": {
+        "pageName": "mockups/daily-snapshots/history-widget.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/mockups/daily-snapshots/history-widget.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": false,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": null,
+      "status": "passed"
+    },
+    "mockups/daily-snapshots/portfolio-state-page.html": {
+      "pageName": "mockups/daily-snapshots/portfolio-state-page.html",
+      "category": "mockup",
+      "html": {
+        "pageName": "mockups/daily-snapshots/portfolio-state-page.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/mockups/daily-snapshots/portfolio-state-page.html",
+        "hasDirectImgTags": true,
+        "directImgTagCount": 3,
+        "hasIconSystem": true,
+        "hasReplacementHelper": false,
+        "hasIconMappings": true,
+        "issues": [
+          {
+            "type": "direct_img_tag",
+            "count": 3,
+            "examples": [
+              "<img src=\"/trading-ui/images/icons/tabler/chevron-down.svg\" width=\"16\" height=\"16\" alt=\"chevron-down\" class=\"icon\" id=\"cash-balance-chevron\">",
+              "<img src=\"/trading-ui/images/icons/tabler/chevron-down.svg\" width=\"16\" height=\"16\" alt=\"chevron-down\" class=\"icon\" id=\"pl-chevron\">",
+              "<img src=\"/trading-ui/images/icons/tabler/chevron-down.svg\" width=\"16\" height=\"16\" alt=\"chevron-down\" class=\"icon\" id=\"positions-chevron\">"
+            ]
+          }
+        ],
+        "status": "ok"
+      },
+      "js": null,
+      "status": "auto_fix"
+    },
+    "mockups/daily-snapshots/price-history-page.html": {
+      "pageName": "mockups/daily-snapshots/price-history-page.html",
+      "category": "mockup",
+      "html": {
+        "pageName": "mockups/daily-snapshots/price-history-page.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/mockups/daily-snapshots/price-history-page.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": null,
+      "status": "passed"
+    },
+    "mockups/daily-snapshots/strategy-analysis-page.html": {
+      "pageName": "mockups/daily-snapshots/strategy-analysis-page.html",
+      "category": "mockup",
+      "html": {
+        "pageName": "mockups/daily-snapshots/strategy-analysis-page.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/mockups/daily-snapshots/strategy-analysis-page.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": false,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": null,
+      "status": "passed"
+    },
+    "mockups/daily-snapshots/trade-history-page.html": {
+      "pageName": "mockups/daily-snapshots/trade-history-page.html",
+      "category": "mockup",
+      "html": {
+        "pageName": "mockups/daily-snapshots/trade-history-page.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/mockups/daily-snapshots/trade-history-page.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": null,
+      "status": "passed"
+    },
+    "mockups/daily-snapshots/trading-journal-page.html": {
+      "pageName": "mockups/daily-snapshots/trading-journal-page.html",
+      "category": "mockup",
+      "html": {
+        "pageName": "mockups/daily-snapshots/trading-journal-page.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/mockups/daily-snapshots/trading-journal-page.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": true,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": null,
+      "status": "passed"
+    },
+    "mockups/daily-snapshots/tradingview-test-page.html": {
+      "pageName": "mockups/daily-snapshots/tradingview-test-page.html",
+      "category": "mockup",
+      "html": {
+        "pageName": "mockups/daily-snapshots/tradingview-test-page.html",
+        "filePath": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/mockups/daily-snapshots/tradingview-test-page.html",
+        "hasDirectImgTags": null,
+        "directImgTagCount": 0,
+        "hasIconSystem": true,
+        "hasReplacementHelper": false,
+        "hasIconMappings": true,
+        "issues": [],
+        "status": "ok"
+      },
+      "js": null,
+      "status": "passed"
+    }
+  }
+}

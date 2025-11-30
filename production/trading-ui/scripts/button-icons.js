@@ -141,5 +141,3 @@ window.BUTTON_STYLES = {
 window.BUTTON_ICONS = BUTTON_ICONS;
 window.BUTTON_TEXTS = BUTTON_TEXTS;
 window.getButtonClass = getButtonClass;
-
-console.log('🔘 Button Icons Core loaded successfully');

@@ -55,14 +55,34 @@ function getCSSVariableValue(variableName, fallback) {
 }
 
 // Toggle card details
-function toggleCardDetails(cardId) {
+async function toggleCardDetails(cardId) {
     const details = document.getElementById(cardId);
     const chevron = document.getElementById(cardId.replace('-details', '-chevron'));
     if (details) {
         const isVisible = details.style.display !== 'none';
         details.style.display = isVisible ? 'none' : 'block';
-        if (chevron) {
-            // Update icon source instead of className
+        if (chevron && typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            // Use IconSystem to update icon
+            const iconName = isVisible ? 'chevron-down' : 'chevron-up';
+            try {
+                const iconHTML = await window.IconSystem.renderIcon('button', iconName, {
+                    size: chevron.getAttribute('width') || '16',
+                    alt: chevron.getAttribute('alt') || 'toggle',
+                    class: chevron.getAttribute('class') || 'icon'
+                });
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = iconHTML;
+                const newIcon = tempDiv.firstElementChild;
+                if (newIcon) {
+                    chevron.parentNode.replaceChild(newIcon, chevron);
+                }
+            } catch (error) {
+                // Fallback to direct path update
+                const iconPath = isVisible ? '/trading-ui/images/icons/tabler/chevron-down.svg' : '/trading-ui/images/icons/tabler/chevron-up.svg';
+                chevron.src = iconPath;
+            }
+        } else if (chevron) {
+            // Fallback: Update icon source directly
             const iconPath = isVisible ? '/trading-ui/images/icons/tabler/chevron-down.svg' : '/trading-ui/images/icons/tabler/chevron-up.svg';
             chevron.src = iconPath;
         }
@@ -182,7 +202,8 @@ async function loadTradingAccounts() {
 
 // Populate account filter menu (extracted for reuse)
 function populateAccountFilterMenu() {
-    const accountMenu = document.getElementById('accountFilterMenu');
+    try {
+        const accountMenu = document.getElementById('accountFilterMenu');
         if (accountMenu) {
             // Remove all items except "הכול"
             const existingItems = accountMenu.querySelectorAll('.account-filter-item:not([data-value="הכול"])');
@@ -310,10 +331,27 @@ function selectDateRangeOption(dateRange) {
             const fromInput = document.getElementById('customDateFrom');
             const toInput = document.getElementById('customDateTo');
             if (fromInput && !fromInput.value) {
-                fromInput.value = weekAgo.toISOString().split('T')[0];
+                // Use DataCollectionService to set value if available
+                const weekAgoStr = weekAgo.toISOString().split('T')[0];
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(fromInput.id, weekAgoStr, 'dateOnly');
+                } else {
+                  fromInput.value = weekAgoStr;
+                }
             }
             if (toInput && !toInput.value) {
-                toInput.value = today.toISOString().split('T')[0];
+                // Use DefaultValueSetter for current date
+                if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+                    window.DefaultValueSetter.setCurrentDate(toInput.id);
+                } else {
+                    // Fallback if DefaultValueSetter is not available
+                    const todayStr = today.toISOString().split('T')[0];
+                    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                        window.DataCollectionService.setValue(toInput.id, todayStr, 'dateOnly');
+                    } else {
+                        toInput.value = todayStr;
+                    }
+                }
             }
         }
     } else {
@@ -338,8 +376,17 @@ function selectDateRangeOption(dateRange) {
 
 // Handle custom date from change
 function handleCustomDateFromChange() {
-    const fromDate = document.getElementById('customDateFrom')?.value;
-    const toDate = document.getElementById('customDateTo')?.value;
+    // Use DataCollectionService to get values if available
+    let fromDate, toDate;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      fromDate = window.DataCollectionService.getValue('customDateFrom', 'dateOnly', '');
+      toDate = window.DataCollectionService.getValue('customDateTo', 'dateOnly', '');
+    } else {
+      const fromDateEl = document.getElementById('customDateFrom');
+      const toDateEl = document.getElementById('customDateTo');
+      fromDate = fromDateEl ? fromDateEl.value : '';
+      toDate = toDateEl ? toDateEl.value : '';
+    }
     
     // Only apply if both dates are set
     if (fromDate && toDate) {
@@ -349,8 +396,17 @@ function handleCustomDateFromChange() {
 
 // Handle custom date to change
 function handleCustomDateToChange() {
-    const fromDate = document.getElementById('customDateFrom')?.value;
-    const toDate = document.getElementById('customDateTo')?.value;
+    // Use DataCollectionService to get values if available
+    let fromDate, toDate;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      fromDate = window.DataCollectionService.getValue('customDateFrom', 'dateOnly', '');
+      toDate = window.DataCollectionService.getValue('customDateTo', 'dateOnly', '');
+    } else {
+      const fromDateEl = document.getElementById('customDateFrom');
+      const toDateEl = document.getElementById('customDateTo');
+      fromDate = fromDateEl ? fromDateEl.value : '';
+      toDate = toDateEl ? toDateEl.value : '';
+    }
     
     // Only apply if both dates are set
     if (fromDate && toDate) {
@@ -360,8 +416,17 @@ function handleCustomDateToChange() {
 
 // Apply custom date range
 function applyCustomDateRange() {
-    const fromDate = document.getElementById('customDateFrom')?.value;
-    const toDate = document.getElementById('customDateTo')?.value;
+    // Use DataCollectionService to get values if available
+    let fromDate, toDate;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      fromDate = window.DataCollectionService.getValue('customDateFrom', 'dateOnly', '');
+      toDate = window.DataCollectionService.getValue('customDateTo', 'dateOnly', '');
+    } else {
+      const fromDateEl = document.getElementById('customDateFrom');
+      const toDateEl = document.getElementById('customDateTo');
+      fromDate = fromDateEl ? fromDateEl.value : '';
+      toDate = toDateEl ? toDateEl.value : '';
+    }
     
     if (fromDate && toDate) {
         // Update filter text
@@ -761,7 +826,13 @@ function clearFilters() {
     }
     
     // Reset investment type
-    document.getElementById('filterInvestmentType').value = '';
+    // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('filterInvestmentType', '', 'text');
+    } else {
+      const filterEl = document.getElementById('filterInvestmentType');
+      if (filterEl) filterEl.value = '';
+    }
     
     // Update filter texts
     updateAccountFilterText();
@@ -770,14 +841,21 @@ function clearFilters() {
     applyFilters();
 }
 
-// Helper function to render numeric value (fallback)
+/**
+ * Helper function to render numeric value - משתמש ב-FieldRendererService המרכזי
+ * @deprecated - השתמש ישירות ב-window.FieldRendererService.renderNumericValue()
+ * @param {*} value - ערך מספרי
+ * @param {string} suffix - סיומת (%, $, וכו')
+ * @param {boolean} showSign - להציג + לחיובי
+ * @returns {string} HTML מעוצב
+ */
 function renderNumericValue(value, suffix = '%', showSign = true) {
+    // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
     if (window.FieldRendererService?.renderNumericValue) {
         return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
     }
-    const sign = showSign && value >= 0 ? '+' : '';
-    const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
-    return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
+    // Fallback מינימלי למקרה נדיר ביותר שהמערכת לא זמינה
+    return '<span class="numeric-value-zero">-</span>';
 }
 
 // Load chart default period from preferences
@@ -889,7 +967,14 @@ async function loadPortfolioState() {
     const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
     const dateRange = selectedItem ? selectedItem.getAttribute('data-value') : 'היום';
     const selectedAccounts = getSelectedAccounts();
-    const investmentType = document.getElementById('filterInvestmentType').value;
+    // Use DataCollectionService to get value if available
+    let investmentType;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      investmentType = window.DataCollectionService.getValue('filterInvestmentType', 'text', '');
+    } else {
+      const investmentTypeEl = document.getElementById('filterInvestmentType');
+      investmentType = investmentTypeEl ? investmentTypeEl.value : '';
+    }
     
     // Show loading states
     showLoadingState('trades-table-section');
@@ -1174,60 +1259,22 @@ async function calculateSummaryFromTrades(trades) {
 
 // Render trades table row (for UnifiedTableSystem)
 function renderTradeRow(trade) {
-        // Use FieldRendererService if available
-        // במערכת יש רק שלושה סטטוסים: open, closed, cancelled
-        const renderStatus = window.FieldRendererService?.renderStatus 
-            ? window.FieldRendererService.renderStatus(trade.status, 'trade')
-            : (() => {
-                const statusLower = (trade.status || '').toLowerCase();
-                if (statusLower === 'open') {
-                    return '<span class="badge bg-success">פתוח</span>';
-                } else if (statusLower === 'closed') {
-                    return '<span class="badge bg-secondary">סגור</span>';
-                } else if (statusLower === 'cancelled' || statusLower === 'canceled') {
-                    return '<span class="badge bg-danger">מבוטל</span>';
-                }
-                return `<span class="badge bg-secondary">${trade.status || '-'}</span>`;
-            })();
-        
-        const renderType = window.FieldRendererService?.renderType
-            ? window.FieldRendererService.renderType(trade.investment_type)
-            : `<span class="badge">${INVESTMENT_TYPES.find(t => t.value === trade.investment_type)?.label || trade.investment_type}</span>`;
-        
-        const renderSide = window.FieldRendererService?.renderSide
-            ? window.FieldRendererService.renderSide(trade.side)
-            : `<span class="badge bg-${trade.side === 'Long' ? 'success' : 'danger'}">${trade.side}</span>`;
+        // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך SERVICES package
+        const renderStatus = window.FieldRendererService.renderStatus(trade.status, 'trade');
+        const renderType = window.FieldRendererService.renderType(trade.investment_type);
+        const renderSide = window.FieldRendererService.renderSide(trade.side);
         
         const renderAmount = (value, currency = '$') => {
-            if (window.FieldRendererService?.renderAmount) {
-                return window.FieldRendererService.renderAmount(value, currency, 2);
-            }
-            return `${currency}${value.toFixed(2)}`;
+            return window.FieldRendererService.renderAmount(value, currency, 2, true);
         };
         
         const renderNumericValue = (value, suffix = '%', showSign = true) => {
-            if (window.FieldRendererService?.renderNumericValue) {
-                return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
-            }
-            const sign = showSign && value >= 0 ? '+' : '';
-            const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
-            return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
+            return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
         };
         
         const formatDate = (dateStr) => {
             if (!dateStr) return '-';
-            if (window.FieldRendererService?.renderDate) {
-                return window.FieldRendererService.renderDate(dateStr, false);
-            }
-            if (window.dateUtils?.formatDate) {
-                return window.dateUtils.formatDate(dateStr, { includeTime: false });
-            }
-            try {
-                const date = new Date(dateStr);
-                return date.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            } catch {
-                return dateStr;
-            }
+            return window.FieldRendererService.renderDate(dateStr, false);
         };
         
     return `
@@ -1244,7 +1291,22 @@ function renderTradeRow(trade) {
             <td>${trade.account_name || `Account #${trade.trading_account_id}`}</td>
             <td>${formatDate(trade.created_at)}</td>
             <td>${formatDate(trade.closed_at)}</td>
-            <td class="col-actions actions-cell" data-entity-id="${trade.id}" data-entity-type="trade" data-status="${trade.status || 'open'}"></td>
+            <td class="col-actions actions-cell" data-entity-id="${trade.id}" data-entity-type="trade" data-status="${trade.status || 'open'}">
+                ${(() => {
+                  if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+                  const buttons = [];
+                  buttons.push({ type: 'VIEW', onclick: `window.showEntityDetails('trade', ${trade.id}, { mode: 'view' })`, title: 'צפה בפרטים' });
+                  buttons.push({ type: 'LINK', onclick: `viewLinkedItemsForTrade(${trade.id})`, title: 'אובייקטים מקושרים' });
+                  buttons.push({ type: 'EDIT', onclick: `editTradeRecord('${trade.id}')`, title: 'ערוך' });
+                  if (trade.status === 'closed' || trade.status === 'cancelled') {
+                    buttons.push({ type: 'REACTIVATE', onclick: `restoreTrade('${trade.id}')`, title: 'שיחזר' });
+                  } else {
+                    buttons.push({ type: 'CANCEL', onclick: `cancelTradeRecord('${trade.id}')`, title: 'בטל' });
+                  }
+                  // Note: showDelete: false - so no delete button
+                  return window.createActionsMenu(buttons) || '';
+                })()}
+            </td>
         </tr>
     `;
 }
@@ -1269,33 +1331,37 @@ function updateTradesTable() {
     
     tbody.innerHTML = filteredTrades.map(trade => renderTradeRow(trade)).join('');
     
-    // Update summary
-    const totalPL = filteredTrades.reduce((sum, t) => sum + (t.position_pl_value || 0), 0);
-    const summaryElement = document.getElementById('trades-summary');
-    if (summaryElement) {
-        const renderNumericValue = (value, suffix = '%', showSign = true) => {
-            if (window.FieldRendererService?.renderNumericValue) {
-                return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
-            }
-            const sign = showSign && value >= 0 ? '+' : '';
-            const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
-            return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
-        };
-        summaryElement.innerHTML = `
-            <strong>סה"כ טריידים: ${filteredTrades.length}</strong> | 
-            <strong>סה"כ P/L: ${renderNumericValue(totalPL, '$')}</strong>
-        `;
-    }
+                // Update summary using InfoSummarySystem (only if container exists)
+                if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS['portfolio-state-page']) {
+                    const config = window.INFO_SUMMARY_CONFIGS['portfolio-state-page'];
+                    const container = document.getElementById(config.containerId);
+                    if (container) {
+                        window.InfoSummarySystem.calculateAndRender(filteredTrades, config).catch(err => {
+                            window.Logger?.warn('Failed to update portfolio state summary via InfoSummarySystem', { error: err, page: 'portfolio-state-page' });
+                        });
+                    }
+                }
+                
+                // Always update trades-summary element (fallback or primary)
+                const totalPL = filteredTrades.reduce((sum, t) => sum + (t.position_pl_value || 0), 0);
+                const summaryElement = document.getElementById('trades-summary');
+                if (summaryElement) {
+                    const renderNumericValue = (value, suffix = '%', showSign = true) => {
+                        if (window.FieldRendererService?.renderNumericValue) {
+                            return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
+                        }
+                        const sign = showSign && value >= 0 ? '+' : '';
+                        const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
+                        return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
+                    };
+                    summaryElement.innerHTML = `
+                        <strong>סה"כ טריידים: ${filteredTrades.length}</strong> | 
+                        <strong>סה"כ P/L: ${renderNumericValue(totalPL, '$')}</strong>
+                    `;
+                }
     
-    // Load action buttons
-    if (window.loadTableActionButtons) {
-        window.loadTableActionButtons('tradesTable', 'trade', {
-            showDetails: true,
-            showLinked: true,
-            showEdit: true,
-            showDelete: false // Trades shouldn't be deleted from this page
-        });
-    }
+    // Note: Action buttons are now created directly in renderTradeRow() using createActionsMenu()
+    // No need for loadTableActionButtons() anymore
 }
 
 // Update summary cards
@@ -1311,68 +1377,45 @@ function updateSummaryCards(data) {
             cashBalanceTotalEl.innerHTML = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
         }
     } else {
-        // Fallback
-    document.getElementById('total-cash-balance').textContent = formatCurrency(data.total_cash_balance);
-    document.getElementById('cash-balance-total').textContent = formatCurrency(data.total_cash_balance);
+        // Use FieldRendererService directly
+        document.getElementById('total-cash-balance').innerHTML = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
+        document.getElementById('cash-balance-total').innerHTML = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
     }
     
     // Cash balance by account
     const cashByAccount = document.getElementById('cash-balance-by-account');
     if (cashByAccount && data.cash_balance_by_account) {
-        if (window.FieldRendererService) {
         cashByAccount.innerHTML = data.cash_balance_by_account.map(acc => `
                 <div class="d-flex justify-content-between mb-1 text-small">
                     <span>${acc.account_name}:</span>
                     <span>${window.FieldRendererService.renderAmount(acc.balance, '$', 0, false)}</span>
                 </div>
             `).join('');
-        } else {
-            // Fallback
-            cashByAccount.innerHTML = data.cash_balance_by_account.map(acc => `
-                <div class="d-flex justify-content-between mb-1 text-small">
-                <span>${acc.account_name}:</span>
-                <span>${formatCurrency(acc.balance)}</span>
-            </div>
-        `).join('');
-    }
     }
     
     // Portfolio value - using FieldRendererService
     const portfolioValueEl = document.getElementById('total-portfolio-value');
     if (portfolioValueEl) {
-        if (window.FieldRendererService) {
-            portfolioValueEl.innerHTML = window.FieldRendererService.renderAmount(data.total_portfolio_value, '$', 0, false);
-        } else {
-            // Fallback
-            portfolioValueEl.textContent = formatCurrency(data.total_portfolio_value);
-        }
+        portfolioValueEl.innerHTML = window.FieldRendererService.renderAmount(data.total_portfolio_value, '$', 0, false);
     }
     
     // P/L - using FieldRendererService
-    if (window.FieldRendererService) {
-        const totalPlEl = document.getElementById('total-pl');
-        const totalPlDetailEl = document.getElementById('total-pl-detail');
-        const realizedPlEl = document.getElementById('realized-pl');
-        const unrealizedPlEl = document.getElementById('unrealized-pl');
-        
-        if (totalPlEl) {
-            totalPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_pl, '$', 0, true);
-        }
-        if (totalPlDetailEl) {
-            totalPlDetailEl.innerHTML = window.FieldRendererService.renderAmount(data.total_pl, '$', 0, true);
-        }
-        if (realizedPlEl) {
-            realizedPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_realized_pl, '$', 0, true);
-        }
-        if (unrealizedPlEl) {
-            unrealizedPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_unrealized_pl, '$', 0, true);
-        }
-    } else {
-        // Fallback
-    document.getElementById('total-pl').textContent = formatCurrency(data.total_pl);
-    document.getElementById('total-pl-detail').textContent = formatCurrency(data.total_pl);
-    document.getElementById('realized-pl').textContent = formatCurrency(data.total_realized_pl);
-    document.getElementById('unrealized-pl').textContent = formatCurrency(data.total_unrealized_pl);
+    const totalPlEl = document.getElementById('total-pl');
+    const totalPlDetailEl = document.getElementById('total-pl-detail');
+    const realizedPlEl = document.getElementById('realized-pl');
+    const unrealizedPlEl = document.getElementById('unrealized-pl');
+    
+    if (totalPlEl) {
+        totalPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_pl, '$', 0, true);
+    }
+    if (totalPlDetailEl) {
+        totalPlDetailEl.innerHTML = window.FieldRendererService.renderAmount(data.total_pl, '$', 0, true);
+    }
+    if (realizedPlEl) {
+        realizedPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_realized_pl, '$', 0, true);
+    }
+    if (unrealizedPlEl) {
+        unrealizedPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_unrealized_pl, '$', 0, true);
     }
     
     // Calculate P/L percentage with zero-division check
@@ -1397,7 +1440,12 @@ function updateSummaryCards(data) {
             } else {
                 // Fallback
                 plPercentEl.textContent = `(${plPercentNum >= 0 ? '+' : ''}${plPercent}%)`;
-                plPercentEl.style.color = plPercentNum >= 0 ? '#28a745' : '#dc3545';
+                // שימוש במערכת המרכזית לצבעים מספריים
+                const getNumericColorFn = (typeof window.getNumericValueColor === 'function') ? window.getNumericValueColor : null;
+                const numericColor = getNumericColorFn ? getNumericColorFn(plPercentNum, 'medium') : '';
+                if (numericColor) {
+                    plPercentEl.style.color = numericColor;
+                }
             }
         }
     }
@@ -1545,7 +1593,11 @@ async function initPortfolioPerformanceChart() {
     
     try {
         // Use secondary color (orange-red) for performance chart
-        const secondaryColor = getCSSVariableValue('--secondary-color', '#fc5a06');
+        // שימוש במערכת המרכזית לצבע משני
+        const secondaryColor = getCSSVariableValue('--secondary-color', 
+            (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+            (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
+        );
         
         // Get wrapper for width calculation (if exists)
         const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
@@ -1585,16 +1637,24 @@ async function initPortfolioPerformanceChart() {
             crosshair: {
                 mode: 1, // Normal mode - shows crosshair with tooltip
                 vertLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 },
                 horzLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 }
             }
         });
@@ -1631,7 +1691,7 @@ async function initPortfolioPerformanceChart() {
                     markers.push({
                         time: mockData.performance[minIdx].time,
                         position: 'belowBar',
-                        color: '#dc3545',
+                        color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(-1, 'medium') : '') || '',
                         shape: 'arrowUp',
                         text: `${mockData.performance[minIdx].value.toFixed(2)}%`,
                         size: 1
@@ -1645,7 +1705,7 @@ async function initPortfolioPerformanceChart() {
                     markers.push({
                         time: mockData.performance[maxIdx].time,
                         position: 'aboveBar',
-                        color: '#28a745',
+                        color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(1, 'medium') : '') || '',
                         shape: 'arrowDown',
                         text: `${mockData.performance[maxIdx].value.toFixed(2)}%`,
                         size: 1
@@ -1746,7 +1806,11 @@ async function initPortfolioValueChart() {
     }
     
     try {
-        const primaryColor = getCSSVariableValue('--primary-color', '#26baac');
+        // שימוש במערכת המרכזית לצבע ראשי
+        const primaryColor = getCSSVariableValue('--primary-color', 
+            (typeof window.getEntityColor === 'function' ? window.getEntityColor('trade') : '') || 
+            (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_PRIMARY ? window.colorSchemeSystem.BRAND_PRIMARY : '')
+        );
         
         // Get wrapper for width calculation (if exists)
         const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
@@ -1793,16 +1857,24 @@ async function initPortfolioValueChart() {
             crosshair: {
                 mode: 1, // Normal mode - shows crosshair with tooltip
                 vertLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 },
                 horzLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 }
             }
         });
@@ -1857,7 +1929,7 @@ async function initPortfolioValueChart() {
                     markers.push({
                         time: mockData.values[minIdx].time,
                         position: 'belowBar',
-                        color: '#dc3545',
+                        color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(-1, 'medium') : '') || '',
                         shape: 'arrowUp',
                         text: `$${mockData.values[minIdx].value.toLocaleString()}`,
                         size: 1
@@ -1871,7 +1943,7 @@ async function initPortfolioValueChart() {
                     markers.push({
                         time: mockData.values[maxIdx].time,
                         position: 'aboveBar',
-                        color: '#28a745',
+                        color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(1, 'medium') : '') || '',
                         shape: 'arrowDown',
                         text: `$${mockData.values[maxIdx].value.toLocaleString()}`,
                         size: 1
@@ -1904,18 +1976,12 @@ async function initPortfolioValueChart() {
         setupChartSynchronization();
         
     } catch (error) {
+        const errorMsg = `שגיאה ביצירת גרף שווי תיק: ${error.message || 'שגיאה לא ידועה'}`;
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה ביצירת גרף', errorMsg);
+        }
         if (window.Logger) {
-            const errorMsg = `שגיאה ביצירת גרף שווי תיק: ${error.message || 'שגיאה לא ידועה'}`;
-            if (window.NotificationSystem) {
-                window.NotificationSystem.showError('שגיאה ביצירת גרף', errorMsg);
-            }
-            const errorMsg = `שגיאה ביצירת גרף שווי תיק: ${error.message || 'שגיאה לא ידועה'}`;
-            if (window.NotificationSystem) {
-                window.NotificationSystem.showError('שגיאה ביצירת גרף', errorMsg);
-            }
-            if (window.Logger) {
-                window.Logger.error('Error creating portfolio value chart', { page: 'portfolio-state-page', error });
-            }
+            window.Logger.error('Error creating portfolio value chart', { page: 'portfolio-state-page', error });
         }
         portfolioValueChart = null;
     }
@@ -1981,9 +2047,16 @@ async function initPLTrendChart() {
     }
     
     try {
-        const successColor = getCSSVariableValue('--success-color', '#28a745');
-        const warningColor = getCSSVariableValue('--warning-color', '#ffc107');
-        const primaryColor = getCSSVariableValue('--primary-color', '#007bff');
+        // שימוש במערכת המרכזית לצבעים
+        const successColor = getCSSVariableValue('--success-color', 
+            (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(1, 'medium') : '') || ''
+        );
+        const warningColor = getCSSVariableValue('--warning-color', 
+            (typeof window.getStatusColor === 'function' ? window.getStatusColor('warning', 'medium') : '') || ''
+        );
+        const primaryColor = getCSSVariableValue('--primary-color', 
+            (typeof window.getEntityColor === 'function' ? window.getEntityColor('trade') : '') || ''
+        );
         
         // Get wrapper for width calculation (if exists)
         const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
@@ -2030,16 +2103,24 @@ async function initPLTrendChart() {
             crosshair: {
                 mode: 1, // Normal mode - shows crosshair with tooltip
                 vertLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 },
                 horzLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 }
             }
         });
@@ -2150,7 +2231,7 @@ async function initPLTrendChart() {
                     markers.push({
                         time: mockData.total[minIdx].time,
                         position: 'belowBar',
-                        color: '#dc3545',
+                        color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(-1, 'medium') : '') || '',
                         shape: 'arrowUp',
                         text: `$${mockData.total[minIdx].value.toLocaleString()}`,
                         size: 1
@@ -2164,7 +2245,7 @@ async function initPLTrendChart() {
                     markers.push({
                         time: mockData.total[maxIdx].time,
                         position: 'aboveBar',
-                        color: '#28a745',
+                        color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(1, 'medium') : '') || '',
                         shape: 'arrowDown',
                         text: `$${mockData.total[maxIdx].value.toLocaleString()}`,
                         size: 1
@@ -2809,22 +2890,28 @@ function compareDates() {
     
     // For comparison, use the end date (or today if no end)
     const date1 = end1 ? end1.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-    const date2 = document.getElementById('datePicker2').value;
+    // Use DataCollectionService to get value if available
+    let date2;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      date2 = window.DataCollectionService.getValue('datePicker2', 'dateOnly', '');
+    } else {
+      const date2El = document.getElementById('datePicker2');
+      date2 = date2El ? date2El.value : '';
+    }
     
     if (!date1 || !date2) {
         alert('נא לבחור שני תאריכים להשוואה');
         return;
     }
     
-    // Format dates for display
+    // Format dates for display using FieldRendererService
     const formatDate = (dateStr) => {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        return window.FieldRendererService.renderDate(dateStr, false);
     };
     
     // Update headers
-    document.getElementById('comparison-date1-header').textContent = formatDate(date1);
-    document.getElementById('comparison-date2-header').textContent = formatDate(date2);
+    document.getElementById('comparison-date1-header').innerHTML = formatDate(date1);
+    document.getElementById('comparison-date2-header').innerHTML = formatDate(date2);
     
     // Show comparison table and hide placeholder
     document.getElementById('comparison-table-wrapper').style.display = 'block';
@@ -2876,7 +2963,13 @@ function compareDates() {
 
 // Remove comparison date
 function removeComparisonDate() {
-    document.getElementById('datePicker2').value = '';
+    // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('datePicker2', '', 'dateOnly');
+    } else {
+      const datePicker2El = document.getElementById('datePicker2');
+      if (datePicker2El) datePicker2El.value = '';
+    }
     document.getElementById('comparison-table-wrapper').style.display = 'none';
     document.getElementById('comparison-placeholder').style.display = 'block';
     document.getElementById('removeComparisonDate').style.display = 'none';
@@ -3055,7 +3148,18 @@ async function waitForScripts() {
                 
                 tbody.innerHTML = filteredTrades.map(trade => renderTradeRow(trade)).join('');
                 
-                // Update summary
+                // Update summary using InfoSummarySystem (only if container exists)
+                if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS['portfolio-state-page']) {
+                    const config = window.INFO_SUMMARY_CONFIGS['portfolio-state-page'];
+                    const container = document.getElementById(config.containerId);
+                    if (container) {
+                        window.InfoSummarySystem.calculateAndRender(filteredTrades, config).catch(err => {
+                            window.Logger?.warn('Failed to update portfolio state summary via InfoSummarySystem', { error: err, page: 'portfolio-state-page' });
+                        });
+                    }
+                }
+                
+                // Always update trades-summary element (fallback or primary)
                 const totalPL = filteredTrades.reduce((sum, t) => sum + (t.position_pl_value || 0), 0);
                 const summaryElement = document.getElementById('trades-summary');
                 if (summaryElement) {
@@ -3073,15 +3177,8 @@ async function waitForScripts() {
                     `;
                 }
                 
-                // Load action buttons
-                if (window.loadTableActionButtons) {
-                    window.loadTableActionButtons('tradesTable', 'trade', {
-                        showDetails: true,
-                        showLinked: true,
-                        showEdit: true,
-                        showDelete: false // Trades shouldn't be deleted from this page
-                    });
-                }
+                // Note: Action buttons are now created directly in renderTradeRow() using createActionsMenu()
+                // No need for loadTableActionButtons() anymore
             },
             tableSelector: '#tradesTable',
             columns: getColumns(),
@@ -3184,7 +3281,12 @@ async function waitForScripts() {
                 if (state.filters.investmentType) {
                     const investmentSelect = document.getElementById('filterInvestmentType');
                     if (investmentSelect) {
-                        investmentSelect.value = state.filters.investmentType;
+                        // Use DataCollectionService to set value if available
+                        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                          window.DataCollectionService.setValue(investmentSelect.id, state.filters.investmentType, 'text');
+                        } else {
+                          investmentSelect.value = state.filters.investmentType;
+                        }
                     }
                 }
 

@@ -950,14 +950,24 @@
 
       const totalInvestmentField = form.querySelector('#tradeTotalInvestment');
       if (totalInvestmentField) {
-        totalInvestmentField.value = summary.totalValue ? summary.totalValue.toFixed(2) : '';
+        // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(totalInvestmentField.id, summary.totalValue ? summary.totalValue.toFixed(2) : '', 'number');
+        } else {
+          totalInvestmentField.value = summary.totalValue ? summary.totalValue.toFixed(2) : '';
+        }
       }
 
       const entryDateField = form.querySelector('#tradeEntryDate');
       if (entryDateField) {
         const entryValue = this.formatDateForInput(prefill.created_at);
         if (entryValue) {
-          entryDateField.value = entryValue;
+          // Use DataCollectionService to set value if available
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(entryDateField.id, entryValue, 'date');
+          } else {
+            entryDateField.value = entryValue;
+          }
         }
       }
 

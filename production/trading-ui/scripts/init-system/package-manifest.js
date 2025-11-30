@@ -164,6 +164,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 7.6
       },
       {
+        file: 'icon-replacement-helper.js',
+        globalCheck: 'window.replaceIconsInContext',
+        description: 'Icon replacement helper for standardizing icon usage',
+        required: true,
+        loadOrder: 7.7
+      },
+      {
         file: 'cache-clear-menu.js',
         globalCheck: 'window.CacheControlMenu',
         description: 'Cache clearing control (Stage B-Lite)',
@@ -299,6 +306,20 @@ const PACKAGE_MANIFEST = {
         loadOrder: 3
       },
       {
+        file: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+        globalCheck: 'window.jspdf',
+        description: 'jsPDF library (for AI analysis PDF export)',
+        required: true, // Required for ai-analysis-data.js exportToPDF function
+        loadOrder: 3.5
+      },
+      {
+        file: 'services/ai-analysis-data.js',
+        globalCheck: 'window.AIAnalysisData',
+        description: 'AI Analysis data service',
+        required: true,
+        loadOrder: 4
+      },
+      {
         file: 'services/statistics-calculator.js',
         globalCheck: 'window.StatisticsCalculator',
         description: 'Statistics calculator',
@@ -362,6 +383,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 8
       },
       {
+        file: 'services/autocomplete-service.js',
+        globalCheck: 'window.AutocompleteService',
+        description: 'General autocomplete service for reusable suggestions dropdown',
+        required: false,
+        loadOrder: 8.1
+      },
+      {
         file: 'services/table-sort-value-adapter.js',
         globalCheck: 'window.TableSortValueAdapter',
         description: 'Adapter for unified sort values (DateEnvelope, legacy)',
@@ -404,6 +432,34 @@ const PACKAGE_MANIFEST = {
         description: 'Rich text editor service',
         required: true,
         loadOrder: 14
+      },
+      {
+        file: 'services/pending-actions-cache-service.js',
+        globalCheck: 'window.PendingActionsCacheService',
+        description: 'Pending actions cache service (dismissed items management)',
+        required: false,
+        loadOrder: 15
+      },
+      {
+        file: 'services/execution-clustering-service.js',
+        globalCheck: 'window.ExecutionClusteringService',
+        description: 'Execution clustering service (trade creation clusters)',
+        required: false,
+        loadOrder: 16
+      },
+      {
+        file: 'services/execution-assignment-service.js',
+        globalCheck: 'window.ExecutionAssignmentService',
+        description: 'Execution assignment service (highlights/suggestions)',
+        required: false,
+        loadOrder: 17
+      },
+      {
+        file: 'services/trade-plan-assignment-service.js',
+        globalCheck: 'window.TradePlanAssignmentService',
+        description: 'Trade plan assignment service (assignments and creations)',
+        required: false,
+        loadOrder: 18
       }
     ],
     estimatedSize: '~180KB',
@@ -699,12 +755,40 @@ const PACKAGE_MANIFEST = {
   preferences: {
     id: 'preferences',
     name: 'Preferences Package',
-    description: 'User preferences system v2.0 (6 files)',
-    version: '2.0.0',
+    description: 'User preferences system v2.0 (10 files)',
+    version: '2.1.0',
     critical: false,
     loadOrder: 5,
     dependencies: ['base', 'services'], // Added 'services' dependency for preferences-data.js
     scripts: [
+      {
+        file: 'preferences-cache.js',
+        globalCheck: 'window.PreferencesCache',
+        description: 'Preferences cache management layer',
+        required: true,
+        loadOrder: 0
+      },
+      {
+        file: 'preferences-events.js',
+        globalCheck: 'window.PreferencesEvents',
+        description: 'Preferences event system',
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'preferences-ui-layer.js',
+        globalCheck: 'window.PreferencesUILayer',
+        description: 'Preferences UI layer',
+        required: true,
+        loadOrder: 2
+      },
+      {
+        file: 'preferences-manager.js',
+        globalCheck: 'window.PreferencesManager',
+        description: 'Preferences manager (central)',
+        required: true,
+        loadOrder: 3
+      },
       {
         file: 'services/preferences-v4.js',
         globalCheck: 'window.PreferencesV4',
@@ -781,10 +865,17 @@ const PACKAGE_MANIFEST = {
         description: 'Preferences group manager',
         required: true,
         loadOrder: 8
+      },
+      {
+        file: 'testing/automated/preferences-browser-test.js',
+        globalCheck: 'window.runAllPreferenceTests',
+        description: 'Automated browser test suite for preferences',
+        required: false,
+        loadOrder: 9
       }
     ],
-    estimatedSize: '~160KB',
-    initTime: '~90ms'
+    estimatedSize: '~170KB',
+    initTime: '~95ms'
   },
 
   // 6. VALIDATION PACKAGE - Validation
@@ -1020,7 +1111,7 @@ const PACKAGE_MANIFEST = {
     description: 'Cache systems',
     version: '2.0.0',
     critical: false,
-    loadOrder: 9,
+    loadOrder: 9.5, // Changed from 9 to 9.5 to differentiate from logs (9)
     dependencies: ['base', 'services'],
     scripts: [
       {
@@ -1081,18 +1172,18 @@ const PACKAGE_MANIFEST = {
         loadOrder: 4
       },
       {
+        file: 'services/trade-plans-data.js',
+        globalCheck: 'window.TradePlansData',
+        description: 'Trade plans data service',
+        required: true,  // Required for trade-plan-service.js
+        loadOrder: 4.5  // Load BEFORE trade-plan-service.js
+      },
+      {
         file: 'trade-plan-service.js',
         globalCheck: 'window.getTradePlans',
         description: 'Trade plan service',
         required: true,
-        loadOrder: 5
-      },
-      {
-        file: 'services/trade-plans-data.js',
-        globalCheck: 'window.TradePlansData',
-        description: 'Trade plans data service',
-        required: false,
-        loadOrder: 6
+        loadOrder: 5  // Load AFTER trade-plans-data.js
       },
       {
         file: 'services/notes-data.js',
@@ -1269,6 +1360,12 @@ const PACKAGE_MANIFEST = {
         required: true
       },
       {
+        file: 'system-management/core/sm-data-validators.js',
+        globalCheck: 'window.SMDataValidators',
+        description: 'System management data validators',
+        required: true
+      },
+      {
         file: 'system-management/core/sm-ui-components.js',
         globalCheck: 'window.SMUIComponents',
         description: 'System management UI components',
@@ -1326,6 +1423,12 @@ const PACKAGE_MANIFEST = {
         file: 'system-management/sections/sm-section-server.js',
         globalCheck: 'window.SMSectionServer',
         description: 'Server section',
+        required: true
+      },
+      {
+        file: 'system-management/sections/sm-section-system-settings.js',
+        globalCheck: 'window.SMSystemSettingsSection',
+        description: 'System settings section',
         required: true
       }
     ],
@@ -1418,30 +1521,22 @@ const PACKAGE_MANIFEST = {
   },
 
   // 16. ADVANCED-NOTIFICATIONS PACKAGE - Advanced notifications
+  // ⚠️ DEPRECATED: This package contains scripts that are already in base package
+  // notification-system.js and warning-system.js are already loaded in base package
+  // This package is kept for backward compatibility but should not be used
   'advanced-notifications': {
     id: 'advanced-notifications',
     name: 'Advanced Notifications Package',
-    description: 'Advanced notification system',
+    description: '⚠️ DEPRECATED: Scripts already in base package. Use base package instead.',
     version: '2.0.0',
     critical: false,
     loadOrder: 16,
     dependencies: ['base'],
-    scripts: [
-      {
-        file: 'notification-system.js',
-        globalCheck: 'window.NotificationSystem',
-        description: 'Advanced notification system',
-        required: true
-      },
-      {
-        file: 'warning-system.js',
-        globalCheck: 'window.WarningSystem',
-        description: 'Warning system',
-        required: true
-      }
-    ],
-    estimatedSize: '~60KB',
-    initTime: '~35ms'
+    scripts: [], // ⚠️ Scripts removed - already in base package
+    estimatedSize: '~0KB',
+    initTime: '~0ms',
+    deprecated: true,
+    notes: 'This package is deprecated. notification-system.js and warning-system.js are already loaded in base package (loadOrder 2 and 5). Do not use this package.'
   },
 
 
@@ -1510,14 +1605,14 @@ const PACKAGE_MANIFEST = {
     initTime: '~15ms'
   },
 
-  // 20. TRADINGVIEW CHARTS PACKAGE - TradingView charts
+  // 19. TRADINGVIEW CHARTS PACKAGE - TradingView charts
   'tradingview-charts': {
     id: 'tradingview-charts',
     name: 'TradingView Charts Package',
     description: 'TradingView Lightweight Charts system',
     version: '1.0.0',
     critical: false,
-    loadOrder: 20,
+    loadOrder: 19, // Changed from 20 to 19 to load before init-system (22) and after dashboard-widgets (19.5)
     dependencies: ['base'],
     scripts: [
       {
@@ -1546,6 +1641,121 @@ const PACKAGE_MANIFEST = {
     initTime: '~20ms'
   },
 
+  // 20. WATCH LISTS PACKAGE - Watch Lists management system
+  'watch-lists': {
+    id: 'watch-lists',
+    name: 'Watch Lists Package',
+    description: 'Watch lists management system (UI layer only - mockup mode)',
+    version: '1.0.0',
+    critical: false,
+    loadOrder: 20,
+    dependencies: ['base', 'services', 'ui-advanced', 'crud', 'entity-services'],
+    scripts: [
+      {
+        file: 'services/watch-lists-data.js',
+        globalCheck: 'window.WatchListsDataService',
+        description: 'Watch lists data service (mockup mode)',
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'services/watch-lists-ui-service.js',
+        globalCheck: 'window.WatchListsUIService',
+        description: 'Watch lists UI service',
+        required: true,
+        loadOrder: 2
+      },
+      {
+        file: 'watch-lists-page.js',
+        globalCheck: 'window.WatchListsPage',
+        description: 'Watch lists main page',
+        required: true,
+        loadOrder: 3
+      },
+      {
+        file: 'watch-list-modal.js',
+        globalCheck: 'window.WatchListModal',
+        description: 'Watch list modal (Add/Edit)',
+        required: false,
+        loadOrder: 4
+      },
+      {
+        file: 'add-ticker-modal.js',
+        globalCheck: 'window.AddTickerModal',
+        description: 'Add ticker modal',
+        required: false,
+        loadOrder: 5
+      },
+      {
+        file: 'flag-quick-action.js',
+        globalCheck: 'window.FlagQuickAction',
+        description: 'Flag quick action palette',
+        required: false,
+        loadOrder: 6
+      }
+    ],
+    estimatedSize: '~50KB',
+    initTime: '~100ms',
+    notes: 'Mockup mode - UI layer only, no API calls'
+  },
+
+  // 20.5. AI-ANALYSIS PACKAGE - AI Analysis System
+  'ai-analysis': {
+    id: 'ai-analysis',
+    name: 'AI Analysis Package',
+    description: 'AI analysis system with LLM integration',
+    version: '1.0.0',
+    critical: false,
+    loadOrder: 20.5, // After entity-services, before init-system
+    dependencies: ['base', 'services', 'ui-advanced', 'modules', 'preferences', 'entity-services'],
+    scripts: [
+      {
+        file: 'https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js',
+        globalCheck: 'marked',
+        description: 'Markdown parser library (for AI result rendering)',
+        required: true,
+        loadOrder: 0.5
+      },
+      {
+        file: 'ai-analysis-manager.js',
+        globalCheck: 'window.AIAnalysisManager',
+        description: 'AI Analysis UI manager',
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'ai-template-selector.js',
+        globalCheck: 'window.AITemplateSelector',
+        description: 'Template selector component',
+        required: true,
+        loadOrder: 2
+      },
+      {
+        file: 'ai-result-renderer.js',
+        globalCheck: 'window.AIResultRenderer',
+        description: 'AI result renderer with markdown and infographics',
+        required: true,
+        loadOrder: 3
+      },
+      {
+        file: 'ai-notes-integration.js',
+        globalCheck: 'window.AINotesIntegration',
+        description: 'AI analysis notes integration',
+        required: true,
+        loadOrder: 4
+      },
+      {
+        file: 'ai-export-service.js',
+        globalCheck: 'window.AIExportService',
+        description: 'AI analysis export service',
+        required: true,
+        loadOrder: 5
+      }
+    ],
+    estimatedSize: '~80KB',
+    initTime: '~50ms'
+  },
+
   // 21. INIT PACKAGE - Initialization
   'init-system': {
     id: 'init-system',
@@ -1553,8 +1763,8 @@ const PACKAGE_MANIFEST = {
     description: 'Initialization and monitoring systems',
     version: '2.0.0',
     critical: false,
-    loadOrder: 19,
-    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'advanced-notifications', 'entity-details', 'info-summary'],
+    loadOrder: 22, // Changed from 20 to 22 to load after all other packages (dashboard-widgets 19.5, tradingview-charts 19, tradingview-widgets 21, watch-lists 20)
+    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'advanced-notifications', 'entity-details', 'info-summary', 'dashboard-widgets', 'tradingview-widgets', 'tradingview-charts', 'watch-lists', 'ai-analysis'],
     scripts: [
       {
         file: 'init-system/package-manifest.js',
@@ -1626,7 +1836,7 @@ const PACKAGE_MANIFEST = {
     version: '1.0.0',
     critical: false,
     loadOrder: 19.5,
-    dependencies: ['base', 'services', 'ui-advanced', 'entity-services'],
+    dependencies: ['base', 'services', 'ui-advanced', 'entity-services', 'modules', 'entity-details'],
     scripts: [
       {
         file: 'services/dashboard-data.js',
@@ -1636,11 +1846,18 @@ const PACKAGE_MANIFEST = {
         loadOrder: 0
       },
       {
-        file: 'widgets/recent-trades-widget.js',
-        globalCheck: 'window.RecentTradesWidget',
-        description: 'Recent trades widget',
+        file: 'widgets/recent-items-widget.js',
+        globalCheck: 'window.RecentItemsWidget',
+        description: 'Unified recent trades and trade plans widget',
         required: true,
         loadOrder: 1
+      },
+      {
+        file: 'widgets/recent-trades-widget.js',
+        globalCheck: 'window.RecentTradesWidget',
+        description: 'Recent trades widget (deprecated - use RecentItemsWidget)',
+        required: false,
+        loadOrder: 1.5
       },
       {
         file: 'pending-executions-widget.js',
@@ -1664,6 +1881,20 @@ const PACKAGE_MANIFEST = {
         loadOrder: 4
       },
       {
+        file: 'widgets/unified-pending-actions-widget.js',
+        globalCheck: 'window.UnifiedPendingActionsWidget',
+        description: 'Unified widget for pending assignments and creations',
+        required: true,
+        loadOrder: 4.5
+      },
+      {
+        file: 'widgets/tag-widget.js',
+        globalCheck: 'window.TagWidget',
+        description: 'Unified tag widget (cloud + search)',
+        required: true,
+        loadOrder: 5
+      },
+      {
         file: 'active-alerts-component.js',
         globalCheck: 'window.updateActiveAlertsComponent',
         description: 'Active alerts component',
@@ -1673,16 +1904,9 @@ const PACKAGE_MANIFEST = {
       {
         file: 'modal-configs/tag-search-config.js',
         globalCheck: 'window.tagSearchDrawerConfig',
-        description: 'Tag search drawer configuration',
+        description: 'Tag search drawer configuration (for TagWidget)',
         required: true,
         loadOrder: 6
-      },
-      {
-        file: 'tag-search-controller.js',
-        globalCheck: 'window.TagSearchController',
-        description: 'Tag search controller',
-        required: true,
-        loadOrder: 7
       },
       {
         file: 'index.js',

@@ -253,9 +253,65 @@ async function fetchCssFileContent(filename) {
 }
 
 /**
+ * Helper function to show dynamic modal via ModalManagerV2 or Bootstrap fallback
+ * @private
+ */
+async function showDynamicModal(modalId, modalHTML) {
+    // Remove existing modal if any
+    const existingModal = document.getElementById(modalId);
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Show modal via ModalManagerV2 (supports dynamic modals)
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+            try {
+                await window.ModalManagerV2.showModal(modalId, 'view');
+            } catch (error) {
+                // Fallback to Bootstrap if ModalManagerV2 fails
+                window.Logger?.warn(`${modalId} not available in ModalManagerV2, using Bootstrap fallback`, { page: 'css-management' });
+                if (bootstrap?.Modal) {
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                }
+            }
+        } else {
+            // Fallback to Bootstrap modal
+            if (bootstrap?.Modal) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            }
+        }
+    }
+}
+
+/**
+ * Helper function to hide dynamic modal via ModalManagerV2 or Bootstrap fallback
+ * @private
+ */
+function hideDynamicModal(modalId) {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+    } else {
+        // Fallback to Bootstrap modal
+        if (bootstrap?.Modal) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+            if (modal) {
+                modal.hide();
+            }
+        }
+    }
+}
+
+/**
  * הצגת מודל צפייה בקובץ CSS
  */
-function showCssViewerModal(filename, content) {
+async function showCssViewerModal(filename, content) {
     const modalHTML = `
         <div class="modal fade" id="cssViewerModal" tabindex="-1">
             <div class="modal-dialog modal-xl">
@@ -278,23 +334,7 @@ function showCssViewerModal(filename, content) {
         </div>
     `;
     
-    const existingModal = document.getElementById('cssViewerModal');
-    if (existingModal) {
-        existingModal.remove();
-    }
-    
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('cssViewerModal'));
-        modal.show();
-    } else {
-        console.error('Bootstrap Modal לא זמין');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
-        }
-    }
+    await showDynamicModal('cssViewerModal', modalHTML);
 }
 
 /**
@@ -308,7 +348,7 @@ async function deleteCssFile(filename) {
 /**
  * הצגת מודל אישור מחיקה
  */
-function showDeleteConfirmationModal(filename) {
+async function showDeleteConfirmationModal(filename) {
     const modalHTML = `
         <div class="modal fade" id="deleteConfirmationModal" tabindex="-1">
             <div class="modal-dialog">
@@ -330,23 +370,7 @@ function showDeleteConfirmationModal(filename) {
         </div>
     `;
     
-    const existingModal = document.getElementById('deleteConfirmationModal');
-    if (existingModal) {
-        existingModal.remove();
-    }
-    
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
-        modal.show();
-    } else {
-        console.error('Bootstrap Modal לא זמין');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
-        }
-    }
+    await showDynamicModal('deleteConfirmationModal', modalHTML);
 }
 
 /**
@@ -358,10 +382,7 @@ async function confirmDeleteCssFile(filename) {
         const response = { ok: true };
         
         if (response.ok) {
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal'));
-                if (modal) modal.hide();
-            }
+                hideDynamicModal('deleteConfirmationModal');
             
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('מחיקה', `קובץ ${filename} נמחק בהצלחה`);
@@ -387,7 +408,14 @@ async function confirmDeleteCssFile(filename) {
  * חיפוש כללי CSS
  */
 async function searchCssRules() {
-    const searchTerm = document.getElementById('cssSearchInput').value.trim();
+    let searchTerm;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        searchTerm = window.DataCollectionService.getValue('cssSearchInput', 'text', '').trim();
+    } else {
+        // Fallback if DataCollectionService is not available
+        const searchInput = document.getElementById('cssSearchInput');
+        searchTerm = searchInput ? searchInput.value.trim() : '';
+    }
     
     if (!searchTerm) {
         if (typeof window.showWarningNotification === 'function') {
@@ -552,9 +580,21 @@ function clearSearchResults() {
  * ניקוי חיפוש CSS
  */
 function clearCssSearch() {
-    const searchInput = document.getElementById('cssSearchInput');
-    if (searchInput) {
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('cssSearchInput', '', 'text');
+    } else {
+        // Fallback if DataCollectionService is not available
+        const searchInput = document.getElementById('cssSearchInput');
+        if (searchInput) {
+            // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('cssSearchInput', '', 'text');
+    } else {
+      if (searchInput) {
         searchInput.value = '';
+      }
+    }
+        }
     }
     
     clearSearchResults();
@@ -584,7 +624,7 @@ async function performRemoveUnusedCss() {
         const cleanupResults = await removeUnusedCssAPI();
         
         // הצגת מודל בחירה
-        showUnusedCssRemovalModal(cleanupResults);
+        await showUnusedCssRemovalModal(cleanupResults);
         
     } catch (error) {
         console.error('❌ שגיאה בהסרת CSS לא בשימוש:', error);
@@ -597,7 +637,7 @@ async function performRemoveUnusedCss() {
 /**
  * הצגת מודל בחירת הסרת CSS לא בשימוש
  */
-function showUnusedCssRemovalModal(cleanupResults) {
+async function showUnusedCssRemovalModal(cleanupResults) {
     const modalHTML = `
         <div class="modal fade" id="unusedCssRemovalModal" tabindex="-1">
             <div class="modal-dialog modal-xl">
@@ -667,18 +707,7 @@ function showUnusedCssRemovalModal(cleanupResults) {
         existingModal.remove();
     }
     
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('unusedCssRemovalModal'));
-        modal.show();
-    } else {
-        console.error('Bootstrap Modal לא זמין');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
-        }
-    }
+    await showDynamicModal('unusedCssRemovalModal', modalHTML);
 }
 
 /**
@@ -711,10 +740,7 @@ async function executeUnusedCssRemoval() {
         const response = { ok: true, removedRules: totalRemoved, files: selectedFiles };
         
         if (response.ok) {
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('unusedCssRemovalModal'));
-                if (modal) modal.hide();
-            }
+            hideDynamicModal('unusedCssRemovalModal');
             
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הסרה הושלמה', `${response.removedRules} כללים הוסרו מ-${response.files.length} קבצים`);
@@ -1055,7 +1081,7 @@ function createDuplicateResultsContainer() {
 /**
  * הצגת חלון גיבוי לפני פעולות
  */
-function showBackupDialog(actionCallback) {
+async function showBackupDialog(actionCallback) {
     const modalHTML = `
         <div class="modal fade" id="backupDialogModal" tabindex="-1">
             <div class="modal-dialog">
@@ -1093,21 +1119,10 @@ function showBackupDialog(actionCallback) {
         existingModal.remove();
     }
     
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
     // שמירת callback לפעולה
     window.backupActionCallback = actionCallback;
     
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('backupDialogModal'));
-        modal.show();
-    } else {
-        console.error('Bootstrap Modal לא זמין');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
-        }
-    }
+    await showDynamicModal('backupDialogModal', modalHTML);
 }
 
 /**
@@ -1137,10 +1152,7 @@ async function proceedWithBackup() {
         }
         
         // סגירת המודל
-        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('backupDialogModal'));
-            if (modal) modal.hide();
-        }
+        hideDynamicModal('backupDialogModal');
         
         // ביצוע הפעולה המקורית
         if (window.backupActionCallback) {
@@ -1207,7 +1219,7 @@ async function performCleanupDuplicates(selector = null) {
             await cleanupSpecificDuplicate(selector, duplicates);
         } else {
             // ניקוי כללי - הצגת בחירת קובץ איחוד
-            showDuplicateCleanupModal(duplicates);
+            await showDuplicateCleanupModal(duplicates);
         }
         
     } catch (error) {
@@ -1221,7 +1233,7 @@ async function performCleanupDuplicates(selector = null) {
 /**
  * הצגת מודל בחירת קובץ איחוד לכפילויות
  */
-function showDuplicateCleanupModal(duplicates) {
+async function showDuplicateCleanupModal(duplicates) {
     const modalHTML = `
         <div class="modal fade" id="duplicateCleanupModal" tabindex="-1">
             <div class="modal-dialog modal-lg">
@@ -1265,25 +1277,21 @@ function showDuplicateCleanupModal(duplicates) {
         existingModal.remove();
     }
     
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('duplicateCleanupModal'));
-        modal.show();
-    } else {
-        console.error('Bootstrap Modal לא זמין');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
-        }
-    }
+    await showDynamicModal('duplicateCleanupModal', modalHTML);
 }
 
 /**
  * ביצוע איחוד כפילויות
  */
 async function executeDuplicateCleanup() {
-    const targetFile = document.getElementById('mergeTargetFile').value;
+    let targetFile;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        targetFile = window.DataCollectionService.getValue('mergeTargetFile', 'text', '');
+    } else {
+        // Fallback if DataCollectionService is not available
+        const targetFileElement = document.getElementById('mergeTargetFile');
+        targetFile = targetFileElement ? targetFileElement.value : '';
+    }
     
     if (!targetFile) {
         if (typeof window.showWarningNotification === 'function') {
@@ -1305,10 +1313,7 @@ async function executeDuplicateCleanup() {
                 mergedDuplicates.add(dup.selector);
             });
             
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('duplicateCleanupModal'));
-                if (modal) modal.hide();
-            }
+            hideDynamicModal('duplicateCleanupModal');
             
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('איחוד הושלם', `${response.mergedRules} כפילויות אוחדו לקובץ ${targetFile}`);
@@ -1342,13 +1347,13 @@ async function cleanupSpecificDuplicate(selector, duplicates) {
     }
     
     // הצגת בחירת קובץ איחוד לכפילות ספציפית
-    showSpecificDuplicateCleanupModal(selector, duplicate);
+    await showSpecificDuplicateCleanupModal(selector, duplicate);
 }
 
 /**
  * הצגת מודל בחירת קובץ איחוד לכפילות ספציפית
  */
-function showSpecificDuplicateCleanupModal(selector, duplicate) {
+async function showSpecificDuplicateCleanupModal(selector, duplicate) {
     const modalHTML = `
         <div class="modal fade" id="specificDuplicateCleanupModal" tabindex="-1">
             <div class="modal-dialog">
@@ -1389,25 +1394,21 @@ function showSpecificDuplicateCleanupModal(selector, duplicate) {
         existingModal.remove();
     }
     
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('specificDuplicateCleanupModal'));
-        modal.show();
-    } else {
-        console.error('Bootstrap Modal לא זמין');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
-        }
-    }
+    await showDynamicModal('specificDuplicateCleanupModal', modalHTML);
 }
 
 /**
  * ביצוע איחוד כפילות ספציפית
  */
 async function executeSpecificDuplicateCleanup(selector) {
-    const targetFile = document.getElementById('specificMergeTargetFile').value;
+    let targetFile;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        targetFile = window.DataCollectionService.getValue('specificMergeTargetFile', 'text', '');
+    } else {
+        // Fallback if DataCollectionService is not available
+        const targetFileElement = document.getElementById('specificMergeTargetFile');
+        targetFile = targetFileElement ? targetFileElement.value : '';
+    }
     
     if (!targetFile) {
         if (typeof window.showWarningNotification === 'function') {
@@ -1424,10 +1425,7 @@ async function executeSpecificDuplicateCleanup(selector) {
             // הוספת הכפילות לרשימת הכפילויות שאוחדו
             mergedDuplicates.add(selector);
             
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('specificDuplicateCleanupModal'));
-                if (modal) modal.hide();
-            }
+            hideDynamicModal('specificDuplicateCleanupModal');
             
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('איחוד הושלם', `הכפילות ${selector} אוחדה לקובץ ${targetFile}`);
@@ -1464,13 +1462,13 @@ async function removeSpecificDuplicate(selector) {
     }
     
     // הצגת מודל בחירת קובץ למחיקה
-    showDeleteFileSelectionModal(selector, duplicate);
+    await showDeleteFileSelectionModal(selector, duplicate);
 }
 
 /**
  * הצגת מודל בחירת קובץ למחיקה
  */
-function showDeleteFileSelectionModal(selector, duplicate) {
+async function showDeleteFileSelectionModal(selector, duplicate) {
     const modalHTML = `
         <div class="modal fade" id="deleteFileSelectionModal" tabindex="-1">
             <div class="modal-dialog">
@@ -1509,24 +1507,21 @@ function showDeleteFileSelectionModal(selector, duplicate) {
         existingModal.remove();
     }
     
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('deleteFileSelectionModal'));
-        modal.show();
-    } else {
-        console.error('Bootstrap Modal לא זמין');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
-        }
-    }
+    await showDynamicModal('deleteFileSelectionModal', modalHTML);
 }
 
 /**
  * ביצוע מחיקה מקובץ ספציפי
  */
 async function executeDeleteFromFile(selector) {
-    const targetFile = document.getElementById('deleteFromFile').value;
+    let targetFile;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        targetFile = window.DataCollectionService.getValue('deleteFromFile', 'text', '');
+    } else {
+        // Fallback if DataCollectionService is not available
+        const targetFileElement = document.getElementById('deleteFromFile');
+        targetFile = targetFileElement ? targetFileElement.value : '';
+    }
     
     if (!targetFile) {
         if (typeof window.showWarningNotification === 'function') {
@@ -1542,10 +1537,7 @@ async function executeDeleteFromFile(selector) {
             const deleteInfo = `${selector}||${targetFile}`;
             removedDuplicates.add(deleteInfo);
             
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteFileSelectionModal'));
-                if (modal) modal.hide();
-            }
+            hideDynamicModal('deleteFileSelectionModal');
             
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('מחיקה הושלמה', `הכפילות ${selector} נמחקה מהקובץ ${targetFile}`);
@@ -1770,7 +1762,7 @@ function clearComplianceResults() {
 /**
  * הצגת מודל הוספת קובץ CSS
  */
-function showAddCssFileModal() {
+async function showAddCssFileModal() {
     const modalHTML = `
         <div class="modal fade" id="addCssFileModal" tabindex="-1">
             <div class="modal-dialog">
@@ -1823,8 +1815,17 @@ function showAddCssFileModal() {
  * יצירת קובץ CSS חדש מהמודל
  */
 async function createNewCssFileFromModal() {
-    const fileName = document.getElementById('newCssFileName').value.trim();
-    const content = document.getElementById('newCssFileContent').value.trim();
+    let fileName, content;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        fileName = window.DataCollectionService.getValue('newCssFileName', 'text', '').trim();
+        content = window.DataCollectionService.getValue('newCssFileContent', 'text', '').trim();
+    } else {
+        // Fallback if DataCollectionService is not available
+        const fileNameElement = document.getElementById('newCssFileName');
+        const contentElement = document.getElementById('newCssFileContent');
+        fileName = fileNameElement ? fileNameElement.value.trim() : '';
+        content = contentElement ? contentElement.value.trim() : '';
+    }
     
     if (!fileName) {
         if (typeof window.showWarningNotification === 'function') {
@@ -1840,10 +1841,7 @@ async function createNewCssFileFromModal() {
         const response = { ok: true };
         
         if (response.ok) {
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('addCssFileModal'));
-                if (modal) modal.hide();
-            }
+            hideDynamicModal('addCssFileModal');
 
     if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `קובץ ${fullFileName} נוצר בהצלחה`);
@@ -1868,7 +1866,7 @@ async function createNewCssFileFromModal() {
  * יצירת קובץ CSS חדש
  */
 function createNewCssFile() {
-    showAddCssFileModal();
+    await showAddCssFileModal();
 }
 
 /**

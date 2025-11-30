@@ -5,8 +5,13 @@ TagLink Model - TikTrack
 Join table associating tags with entity records. Uses a polymorphic
 entity_type + entity_id pair to support all eight tagged entities.
 
+Tag links are automatically cleaned up when entities are deleted through
+SQLAlchemy event listeners defined in each entity model. See:
+- documentation/02-ARCHITECTURE/BACKEND/TAG_LINKS_CLEANUP_SYSTEM.md
+
 Author: TikTrack Development Team
 Created: November 2025
+Updated: January 2025 - Added automatic cleanup system
 """
 
 from sqlalchemy import (

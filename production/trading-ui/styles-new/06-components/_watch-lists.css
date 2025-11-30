@@ -1,0 +1,286 @@
+/**
+ * Watch Lists - רשימות צפייה
+ * 
+ * קובץ זה מכיל את הסגנונות של מערכת Watch Lists
+ * כולל כרטיסי רשימות, פריטים, דגלים ותצוגות שונות
+ * 
+ * @version 1.0.0
+ * @created 26 בנובמבר 2025
+ */
+
+/* ===== Watch List Card ===== */
+.watch-list-card {
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 8px;
+    transition: all 0.2s;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.watch-list-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.watch-list-card-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color, #dee2e6);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 8px 8px 0 0;
+    /* Background color will be set dynamically via inline style or data attribute */
+}
+
+.watch-list-card-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.watch-list-card-body {
+    padding: 1rem;
+    flex-grow: 1;
+}
+
+.watch-list-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.watch-list-card-stats {
+    font-size: 0.9rem;
+    color: var(--text-muted, #6c757d);
+}
+
+.watch-list-card-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--border-color, #dee2e6);
+}
+
+/* ===== Stat Item ===== */
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.stat-icon {
+    width: 14px;
+    height: 14px;
+}
+
+/* ===== Drag Handle ===== */
+.drag-handle {
+    cursor: move;
+    color: var(--text-muted, #6c757d);
+    font-size: 1.2rem;
+    padding: 0.25rem;
+}
+
+.drag-handle:hover {
+    color: var(--text-color, #495057);
+}
+
+.drag-handle-column {
+    width: 40px;
+}
+
+.flag-column {
+    width: 80px;
+}
+
+.actions-column {
+    width: 120px;
+}
+
+/* ===== Flag Palette Popup ===== */
+.flag-palette-popup {
+    position: absolute;
+    background: white;
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1050;
+}
+
+.flag-palette-header {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.flag-palette-colors {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.flag-color-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--border-color, #dee2e6);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.flag-color-btn:hover {
+    transform: scale(1.1);
+    border-color: var(--text-color, #495057);
+}
+
+/* ===== View Container ===== */
+.view-container {
+    min-height: 200px;
+}
+
+.view-container[style*="display: none"] {
+    display: none !important;
+}
+
+/* ===== View Mode Buttons ===== */
+.btn-view-mode.active {
+    background-color: var(--primary-color, #26baac);
+    color: white;
+    border-color: var(--primary-color, #26baac);
+}
+
+/* ===== Watch List Item Card ===== */
+.watch-list-item-card {
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.2s;
+}
+
+.watch-list-item-card:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Compact List Item ===== */
+.compact-list-item {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-light, #f0f0f0);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.compact-list-item:hover {
+    background-color: var(--background-light, #f8f9fa);
+}
+
+/* ===== Flag Button ===== */
+.btn-flag {
+    border: none;
+    background: none;
+    padding: 0.25rem;
+}
+
+.btn-flag:hover {
+    opacity: 0.8;
+}
+
+/* ===== Search Result Item ===== */
+.search-result-item {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.search-result-item:hover {
+    background-color: var(--background-light, #f8f9fa);
+    border-color: var(--primary-color, #26baac);
+}
+
+.search-result-item.selected {
+    background-color: var(--primary-light, #e7f5f3);
+    border-color: var(--primary-color, #26baac);
+}
+
+/* ===== Badge Small ===== */
+.badge-sm {
+    font-size: 0.7rem;
+}
+
+/* ===== Form Control Color Small ===== */
+.form-control-color-sm {
+    width: 60px;
+    height: 40px;
+}
+
+/* ===== Flag Color Buttons (for filter and palette) ===== */
+.btn-flag-filter {
+    border: none;
+    color: white;
+}
+
+.flag-color-btn-lg {
+    width: 48px;
+    height: 48px;
+}
+
+.flag-color-btn[data-bg-color] {
+    background-color: var(--bg-color);
+}
+
+/* Apply background color from data attribute */
+.flag-color-btn[data-bg-color="#26baac"] { background-color: #26baac; }
+.flag-color-btn[data-bg-color="#0056b3"] { background-color: #0056b3; }
+.flag-color-btn[data-bg-color="#28a745"] { background-color: #28a745; }
+.flag-color-btn[data-bg-color="#20c997"] { background-color: #20c997; }
+.flag-color-btn[data-bg-color="#dc3545"] { background-color: #dc3545; }
+.flag-color-btn[data-bg-color="#fc5a06"] { background-color: #fc5a06; }
+.flag-color-btn[data-bg-color="#6f42c1"] { background-color: #6f42c1; }
+.flag-color-btn[data-bg-color="#17a2b8"] { background-color: #17a2b8; }
+
+.btn-flag-filter[data-flag-color="#26baac"] {
+    background-color: #26baac;
+    border-color: #26baac;
+}
+
+.btn-flag-filter[data-flag-color="#fc5a06"] {
+    background-color: #fc5a06;
+    border-color: #fc5a06;
+}
+
+.btn-flag-filter[data-flag-color="#28a745"] {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-flag-filter[data-flag-color="#20c997"] {
+    background-color: #20c997;
+    border-color: #20c997;
+}
+
+.btn-flag-filter[data-flag-color="#dc3545"] {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-flag-filter[data-flag-color="#6f42c1"] {
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+}
+
+.btn-flag-filter[data-flag-color="#17a2b8"] {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.btn-flag-filter[data-flag-color="#0056b3"] {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+

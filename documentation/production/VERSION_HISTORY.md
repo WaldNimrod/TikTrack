@@ -39,4 +39,21 @@ This log records every production version update, including manual major/minor a
 | 2025-11-24T02:24:58+00:00 | 1.3.7.0 | 1.3.6.0 | c3ff970200899a9198c499bd05188f5c54cb3e1d | 8e35adc94d825b42d6a596f321cbe38c907a9a55 | patch | Add E2E testing and improve production update process v2.0.0 |
 | 2025-11-24T14:13:24+00:00 | 1.3.8.0 | 1.3.7.0 | c52e595f120b222d20fcb05b126fb0b54d73f898 | c3ff970200899a9198c499bd05188f5c54cb3e1d | patch | Add comprehensive bug documentation for execution clustering issue |
 | 2025-11-24T23:55:08+00:00 | 1.3.9.0 | 1.3.8.0 | c944b39c4f2b04e9e22707f98d72b9628946bfe3 | c52e595f120b222d20fcb05b126fb0b54d73f898 | patch | Remove all SQLite references - PostgreSQL only |
-| 2025-11-30T11:55:03+00:00 | 1.3.10.0 | 1.3.9.0 | 672905523781b0f7fe287791e0d3513ea2df646c | c944b39c4f2b04e9e22707f98d72b9628946bfe3 | patch | Add --skip-db flag to production update process |
+| 2025-11-29T00:23:03+00:00 | 1.3.10.0 | 1.3.9.0 | f778ed96d9059408c5426821836c993fe0a6bdab | c944b39c4f2b04e9e22707f98d72b9628946bfe3 | patch | תיקון: עדכון ברירת מחדל - כל סוגי תזרימי המזומן מסומנים בשלב 2 של הייבוא |
+| 2025-11-29T00:26:10+00:00 | 1.3.11.0 | 1.3.10.0 | 2cd10e34a400514cbd9a66ea05a2f19db718f775 | f778ed96d9059408c5426821836c993fe0a6bdab | patch | הוספת מערכת רמזור ATR - מימוש מלא עם תמיכה בכל המקומות |
+| 2025-11-29T06:16:11+00:00 | 1.3.12.0 | 1.3.11.0 | 9ddc904bb9989fac5178b4823650e22a858b937f | 2cd10e34a400514cbd9a66ea05a2f19db718f775 | patch | תיקון: תיקון טבלת המרות מטבע מאוחדות ותיקון ברירת מחדל ייבוא תזרימי מזומן
+
+1. תיקון טבלת המרות מטבע מאוחדות: הטבלה השנייה מציגה כעת את כל ההמרות הרלוונטיות ללא קשר לסינון או חלוקה לעמודים בטבלה הראשונה
+2. תיקון ברירת מחדל ייבוא: כל סוגי תזרימי המזומן מסומנים כברירת מחדל בשלב 2 של הייבוא (במקום רק interest ו-borrow_fee) |
+| 2025-11-29T07:15:29+00:00 | 1.3.13.0 | 1.3.12.0 | 69d6b0878fc858aa8ceb6eb2169b58b004f3ba42 | 9ddc904bb9989fac5178b4823650e22a858b937f | patch | תיקון: ענן תגיות בדף הבית - הוספת תמיכה מלאה
+
+1. הוספת get_tag_cloud_data ב-Backend TagService - מחזיר תגיות עם usage_count
+2. יצירת endpoint /api/tags/cloud ב-Backend routes
+3. הוספת getTagCloudData() ל-frontend TagService עם מטמון
+4. עדכון מטמון - ניקוי אוטומטי של cache ענן התגיות |
+| 2025-11-30T11:23:36+00:00 | 1.3.14.0 | 1.3.13.0 | eb2bcafddc1d05edfcbaa5bbd37c2cf65cecb6f3 | 69d6b0878fc858aa8ceb6eb2169b58b004f3ba42 | patch | Comprehensive code improvements and bug fixes for production release: Fix Python type checking errors, complete UI standardization, console cleanup, AI analysis enhancements, and system improvements |
+| 2025-11-30T11:38:06+00:00 | 1.3.14.1 | 1.3.14.0 | 30b3a3401a92acfca8bed8fd486c6b9ae11edfe1 | eb2bcafddc1d05edfcbaa5bbd37c2cf65cecb6f3 | build | Additional fixes: tag service, preferences loader, system management improvements |
+| 2025-11-30T11:40:36+00:00 | 1.3.14.2 | 1.3.14.1 | f5a67b43b18ceb797e97959702b509c5aeec2b4c | 30b3a3401a92acfca8bed8fd486c6b9ae11edfe1 | build | Final updates: ai-analysis-manager, info-summary-system, sm-section-server |
+| 2025-11-30T11:41:34+00:00 | 1.3.14.3 | 1.3.14.2 | 32f799344a83e17d01be48d4cbb32eb643d91e7d | f5a67b43b18ceb797e97959702b509c5aeec2b4c | build | Additional fixes: ai-analysis-manager, info-summary-system, pagination-system |
+| 2025-11-30T11:41:55+00:00 | 1.3.14.4 | 1.3.14.3 | 0d9d22ce8ecd73c37e9cbe203c044c0820ef6cea | 32f799344a83e17d01be48d4cbb32eb643d91e7d | build | Final fix: sm-section-server improvements |
+| 2025-11-30T11:42:07+00:00 | 1.3.14.5 | 1.3.14.4 | f7825f199ba48d4215a9ed4235d38ea11a13dc08 | 0d9d22ce8ecd73c37e9cbe203c044c0820ef6cea | build | Final sm-section-server fix |

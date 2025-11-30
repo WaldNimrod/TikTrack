@@ -198,7 +198,7 @@ python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
 **תוצאה צפויה:**
 ```
 UI: /path/to/production/trading-ui
-DB: PostgreSQL (TikTrack-db-prodution)
+DB: PostgreSQL (TikTrack-db-production)
 Port: 5001
 Production: True
 ```

@@ -25,21 +25,27 @@ class ExecutionService:
     def __init__(self):
         self.model = Execution
     
-    def get_all(self, db: Session, filters=None):
-        return db.query(Execution).options(
+    def get_all(self, db: Session, filters=None, user_id=None):
+        query = db.query(Execution).options(
             joinedload(Execution.trading_account),
             joinedload(Execution.ticker)
             # Removed joinedload(Execution.trade) - may cause errors when Trade model has columns not in DB
             # Trade data will be loaded lazily if needed, or trade_id will be used from to_dict()
-        ).all()
+        )
+        if user_id is not None:
+            query = query.filter(Execution.user_id == user_id)
+        return query.all()
     
-    def get_by_id(self, db: Session, execution_id: int):
-        return db.query(Execution).options(
+    def get_by_id(self, db: Session, execution_id: int, user_id=None):
+        query = db.query(Execution).options(
             joinedload(Execution.trading_account),
             joinedload(Execution.ticker)
             # Removed joinedload(Execution.trade) - may cause errors when Trade model has columns not in DB
             # Trade data will be loaded lazily if needed, or trade_id will be used from to_dict()
-        ).filter(Execution.id == execution_id).first()
+        ).filter(Execution.id == execution_id)
+        if user_id is not None:
+            query = query.filter(Execution.user_id == user_id)
+        return query.first()
 
 # Initialize base API
 execution_service = ExecutionService()
@@ -203,14 +209,7 @@ def delete_execution(execution_id: int):
         db: Session = g.db
         execution = db.query(Execution).filter(Execution.id == execution_id).first()
         if execution:
-            try:
-                TagService.remove_all_tags_for_entity(db, 'execution', execution_id)
-            except ValueError as tag_error:
-                logger.warning(
-                    "Failed to remove tags for execution %s before deletion: %s",
-                    execution_id,
-                    tag_error,
-                )
+            # Tag cleanup is handled automatically by SQLAlchemy event listeners
             db.delete(execution)
             db.commit()
             normalizer = _get_date_normalizer()

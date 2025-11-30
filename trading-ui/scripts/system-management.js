@@ -512,7 +512,23 @@ class SystemManagement {
       האם אתה בטוח שברצונך להמשיך?
     `;
 
-      if (confirm(confirmMessage)) {
+      let confirmed = false;
+      if (typeof window.showConfirmationDialog === 'function') {
+        confirmed = await new Promise(resolve => {
+          window.showConfirmationDialog(
+            'שחזור מגיבוי',
+            confirmMessage,
+            () => resolve(true),
+            () => resolve(false),
+            'danger'
+          );
+        });
+      } else {
+        // Fallback למקרה שמערכת התראות לא זמינה
+        confirmed = confirm(confirmMessage);
+      }
+
+      if (confirmed) {
       // Show loading notification
         SystemManagement.showNotification('מתחיל שחזור מגיבוי...', 'warning');
 
@@ -636,6 +652,8 @@ class SystemManagement {
     resultsContent.style.display = 'block';
 
     // Calculate summary
+    // Note: This is a system check results display, not a standard summary element
+    // Using filter for counting is acceptable here as it's specific to check results structure
     const successCount = checkResults.checks.filter(c => c.status === 'success').length;
     const warningCount = checkResults.checks.filter(c => c.status === 'warning').length;
     const errorCount = checkResults.checks.filter(c => c.status === 'error').length;
@@ -662,6 +680,8 @@ class SystemManagement {
     };
 
     // Build results content
+    // Note: This innerHTML is for system check results display (cards + accordion), not a standard summary element
+    // Consider refactoring to use createElement for better security if this becomes a security concern
     resultsContent.innerHTML = `
       <!-- Summary Cards -->
       <div class="row mb-4">
@@ -755,7 +775,7 @@ class SystemManagement {
    * Show detailed check results
    * הצגת תוצאות בדיקה מפורטות
    */
-  static showDetailedCheckResults(checkResults) {
+  static async showDetailedCheckResults(checkResults) {
     // Create modal for detailed results
     const modalId = 'system-check-results-modal';
     let modal = document.getElementById(modalId);
@@ -769,6 +789,8 @@ class SystemManagement {
     }
 
     // Calculate summary
+    // Note: This is a system check results display, not a standard summary element
+    // Using filter for counting is acceptable here as it's specific to check results structure
     const successCount = checkResults.checks.filter(c => c.status === 'success').length;
     const warningCount = checkResults.checks.filter(c => c.status === 'warning').length;
     const errorCount = checkResults.checks.filter(c => c.status === 'error').length;
@@ -795,6 +817,8 @@ class SystemManagement {
     };
 
     // Build modal content
+    // Note: This innerHTML is for system check results modal display, not a standard summary element
+    // Consider refactoring to use createElement for better security if this becomes a security concern
     modal.innerHTML = `
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -895,10 +919,26 @@ class SystemManagement {
       </div>
     `;
 
-    // Show modal
-    const bsModal = new bootstrap.Modal(modal);
-    bsModal.show();
-
+    // Show modal via ModalManagerV2 (supports dynamic modals)
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+        try {
+            await window.ModalManagerV2.showModal(modalId, 'view');
+        } catch (error) {
+            // Fallback to Bootstrap if ModalManagerV2 fails
+            window.Logger?.warn('checkResultsModal not available in ModalManagerV2, using Bootstrap fallback', { page: 'system-management' });
+            if (bootstrap?.Modal) {
+                const bsModal = new bootstrap.Modal(modal);
+                bsModal.show();
+            }
+        }
+    } else {
+        // Fallback to Bootstrap modal
+        if (bootstrap?.Modal) {
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+        }
+    }
+    
     // Store results globally for copying
     window.lastCheckResults = checkResults;
   }
@@ -914,6 +954,8 @@ class SystemManagement {
     }
 
     const results = window.lastCheckResults;
+    // Note: This is a system check results report generation, not a standard summary element
+    // Using filter for counting is acceptable here as it's specific to check results structure
     const successCount = results.checks.filter(c => c.status === 'success').length;
     const warningCount = results.checks.filter(c => c.status === 'warning').length;
     const errorCount = results.checks.filter(c => c.status === 'error').length;
@@ -1747,7 +1789,12 @@ class SystemManagement {
         const provider = await window.PreferencesCore.getPreference('primaryDataProvider');
         const select = document.getElementById('primaryDataProvider');
         if (select && provider !== undefined && provider !== null) {
-          select.value = provider;
+          // Use DataCollectionService to set value if available
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(select.id, provider, 'text');
+          } else {
+            select.value = provider;
+          }
           console.log(`✅ Primary data provider loaded: ${provider}`);
         }
       }

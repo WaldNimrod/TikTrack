@@ -1,0 +1,133 @@
+/**
+ * User Profile Page Styles
+ * סגנונות עמוד פרופיל משתמש
+ *
+ * File: trading-ui/styles-new/07-pages/_user-profile.css
+ * Version: 1.0.0
+ * Last Updated: January 28, 2025
+ */
+
+.user-profile-page .section-body .card {
+  border: 1px solid var(--border-color, #dee2e6);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-profile-page .section-body .card-header {
+  background: var(--current-entity-color-light, var(--bg-secondary, #f8f9fa));
+  border-bottom: 2px solid var(--current-entity-color-dark, var(--border-color, #dee2e6));
+  color: var(--current-entity-color-dark, var(--text-primary, #212529));
+  font-weight: 600;
+}
+
+.user-profile-page .section-body .card-body {
+  padding: 1.5rem;
+}
+
+.user-profile-page .form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary, #212529);
+}
+
+.user-profile-page .form-control:read-only {
+  background-color: var(--bg-secondary, #f8f9fa);
+  cursor: not-allowed;
+}
+
+.user-profile-page #updateInfoBtn,
+.user-profile-page #updatePasswordBtn {
+  min-width: 150px;
+}
+
+/* SMTP Settings Section */
+.user-profile-page #smtpStatus {
+  margin-top: 1rem;
+}
+
+.user-profile-page #smtpStatus strong {
+  margin-left: 0.5rem;
+}
+
+.user-profile-page #updateSmtpBtn,
+.user-profile-page #testConnectionBtn,
+.user-profile-page #sendTestEmailBtn {
+  min-width: 150px;
+}
+
+.user-profile-page #togglePasswordBtn {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+}
+
+.user-profile-page .input-group #smtpPassword {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+  direction: ltr; /* Force LTR for password input */
+  text-align: left;
+}
+
+/* SMTP Section - Force LTR for email and password fields */
+.user-profile-page #smtpUser,
+.user-profile-page #smtpFromEmail,
+.user-profile-page #smtpTestEmail,
+.user-profile-page #smtpPassword {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Button Spinner States - Hidden by default, shown when loading */
+.user-profile-page .btn-spinner {
+  display: none;
+}
+
+.user-profile-page .btn-spinner.show {
+  display: inline;
+}
+
+/* Status Display - Hidden by default, shown when needed */
+.user-profile-page .status-display {
+  display: none;
+}
+
+.user-profile-page .status-display.show {
+  display: block;
+}
+
+/* Specific spinner IDs */
+.user-profile-page #updateInfoBtnSpinner,
+.user-profile-page #updatePasswordBtnSpinner,
+.user-profile-page #updateSmtpBtnSpinner,
+.user-profile-page #testConnectionBtnSpinner,
+.user-profile-page #sendTestEmailBtnSpinner,
+.user-profile-page #saveAiAnalysisBtnSpinner,
+.user-profile-page #validateGeminiBtnSpinner,
+.user-profile-page #validatePerplexityBtnSpinner {
+  display: none;
+}
+
+.user-profile-page #updateInfoBtnSpinner.show,
+.user-profile-page #updatePasswordBtnSpinner.show,
+.user-profile-page #updateSmtpBtnSpinner.show,
+.user-profile-page #testConnectionBtnSpinner.show,
+.user-profile-page #sendTestEmailBtnSpinner.show,
+.user-profile-page #saveAiAnalysisBtnSpinner.show,
+.user-profile-page #validateGeminiBtnSpinner.show,
+.user-profile-page #validatePerplexityBtnSpinner.show {
+  display: inline;
+}
+
+/* Specific status display IDs */
+.user-profile-page #smtpStatus,
+.user-profile-page #geminiKeyStatus,
+.user-profile-page #perplexityKeyStatus,
+.user-profile-page #aiAnalysisStatus {
+  display: none;
+}
+
+.user-profile-page #smtpStatus.show,
+.user-profile-page #geminiKeyStatus.show,
+.user-profile-page #perplexityKeyStatus.show,
+.user-profile-page #aiAnalysisStatus.show {
+  display: block;
+}
+

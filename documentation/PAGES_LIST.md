@@ -85,7 +85,7 @@
 
 ---
 
-## 📋 עמודים ראשיים (28 עמודים) ✅ **סטנדרטיזציה מלאה הושלמה**
+## 📋 עמודים ראשיים (29 עמודים) ✅ **סטנדרטיזציה מלאה הושלמה**
 
 ### עמודים מרכזיים
 | עמוד | תיאור | גישה | API | Business Logic Service | סטטוס |
@@ -95,13 +95,16 @@
 | **trade_plans.html** | תכניות מסחר | `http://localhost:5000/trade_plans.html` | `/api/trade-plans/*` | ✅ TradePlanBusinessService | ✅ מוכן |
 | **alerts.html** | מערכת התראות | `http://localhost:5000/alerts.html` | `/api/alerts/*` | ✅ AlertBusinessService | ✅ מוכן |
 | **tickers.html** | ניהול טיקרים | `http://localhost:5000/tickers.html` | `/api/tickers/*` | ✅ TickerBusinessService | ✅ מוכן |
+| **ticker-dashboard.html** | דשבורד טיקר מורחב | `http://localhost:5000/ticker-dashboard.html` | `/api/tickers/{id}/*` | ✅ TickerBusinessService | ✅ מוכן |
 | **trading_accounts.html** | חשבונות מסחר | `http://localhost:5000/trading_accounts.html` | `/api/trading-accounts/*` | ✅ TradingAccountBusinessService | ✅ מוכן |
 | **executions.html** | ביצועי עסקאות | `http://localhost:5000/executions.html` | `/api/executions/*` | ✅ ExecutionBusinessService | ✅ מוכן |
 | **data_import.html** | ייבוא נתונים | `http://localhost:5000/data_import.html` | `/api/user-data-import/*` | ❌ חסר | ⏳ צריך Business Service |
 | **cash_flows.html** | תזרימי מזומן | `http://localhost:5000/cash_flows.html` | `/api/cash-flows/*` | ✅ CashFlowBusinessService | ✅ מוכן |
 | **notes.html** | מערכת הערות | `http://localhost:5000/notes.html` | `/api/notes/*` | ✅ NoteBusinessService | ✅ מוכן |
 | **research.html** | מחקר וניתוח | `http://localhost:5000/research.html` | `/api/research/*` | ❌ חסר | ⏳ צריך Business Service |
+| **ai-analysis.html** | ניתוח AI - יצירת ניתוחים באמצעות מנועי LLM | `http://localhost:8080/ai-analysis` | `/api/ai-analysis/*` | ✅ AIAnalysisService | ✅ מוכן |
 | **preferences.html** | הגדרות מערכת v3.0 | `http://localhost:8080/preferences.html` | `/api/preferences/*` | ❌ חסר (מורכב) | ⏳ אופציונלי |
+| **user-profile.html** | ניהול פרופיל משתמש | `http://localhost:8080/user-profile.html` | `/api/auth/me`, `/api/auth/me/password` | ❌ חסר | ✅ מוכן |
 
 **הערה:** כל העמודים עם Business Logic Service משולבים במלואם עם מערכות מטמון ואיתחול. ראה [Business Logic Layer Documentation](../02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md) לפרטים מלאים.
 
@@ -160,10 +163,10 @@
 ## 📊 סטטיסטיקות
 
 - **סה"כ עמודים ראשיים:** 24 עמודים
-- **עמודים מרכזיים:** 11 עמודים
+- **עמודים מרכזיים:** 12 עמודים
 - **עמודים טכניים:** 12 עמודים
 - **עמודים משניים:** 5 עמודים
-- **סה"כ עמודים:** 28 עמודים
+- **סה"כ עמודים:** 29 עמודים
 
 ---
 

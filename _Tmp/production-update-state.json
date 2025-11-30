@@ -1,31 +1,30 @@
 {
-  "snapshot_id": "pre-update_20251125_014303",
+  "snapshot_id": "pre-update_20251130_135514",
   "step_1": {
     "completed": true,
-    "timestamp": "2025-11-25T01:41:50.247755",
+    "timestamp": "2025-11-30T13:55:16.429548",
     "result": {
       "success": true,
       "commits_count": 15,
-      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251125_014148.log",
+      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251130_135514.log",
       "commits": [
-        "f0499983e feat: Complete sections toggle system standardization across all pages",
-        "11d83e5e7 Optimize Economic Calendar page: faster widget loading and clean console",
-        "9d8404fd8 feat: Complete standardization of all 10 mockup pages with general systems integration",
-        "039ffe4ab Implement date comparison modal with multiple dates support",
-        "58d5f1b2b Fix sections toggle system and add missing info-circle icon"
+        "da66b8fe1 fix: Final sm-section-server fix - Bump version to 1.3.14.5",
+        "f7825f199 fix: Final sm-section-server improvements - Bump version to 1.3.14.4",
+        "0d9d22ce8 fix: Additional fixes - ai-analysis-manager, info-summary-system, pagination-system",
+        "32f799344 fix: Final updates - ai-analysis-manager, info-summary-system, sm-section-server",
+        "f5a67b43b fix: Additional updates - tag service, preferences loader, system management"
       ]
     }
   },
   "step_2": {
     "completed": true,
-    "timestamp": "2025-11-25T01:41:50.320074",
+    "timestamp": "2025-11-30T13:55:16.527406",
     "result": {
       "success": true,
-      "running": true,
+      "running": false,
       "port": 5001,
-      "pid": 28841,
-      "health": "healthy",
-      "uptime": 25306.83203983307
+      "pid": null,
+      "health": "not_running"
     }
   },
   "step_3": {
@@ -39,39 +38,39 @@
   },
   "step_4": {
     "completed": true,
-    "timestamp": "2025-11-25T01:42:39.095858",
+    "timestamp": "2025-11-30T13:55:18.209536",
     "result": {
       "success": true,
       "commits_count": 15,
-      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251125_014237.log",
+      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251130_135516.log",
       "commits": [
-        "f0499983e feat: Complete sections toggle system standardization across all pages",
-        "11d83e5e7 Optimize Economic Calendar page: faster widget loading and clean console",
-        "9d8404fd8 feat: Complete standardization of all 10 mockup pages with general systems integration",
-        "039ffe4ab Implement date comparison modal with multiple dates support",
-        "58d5f1b2b Fix sections toggle system and add missing info-circle icon"
+        "da66b8fe1 fix: Final sm-section-server fix - Bump version to 1.3.14.5",
+        "f7825f199 fix: Final sm-section-server improvements - Bump version to 1.3.14.4",
+        "0d9d22ce8 fix: Additional fixes - ai-analysis-manager, info-summary-system, pagination-system",
+        "32f799344 fix: Final updates - ai-analysis-manager, info-summary-system, sm-section-server",
+        "f5a67b43b fix: Additional updates - tag service, preferences loader, system management"
       ]
     }
   },
   "step_5": {
     "completed": true,
-    "timestamp": "2025-11-25T01:43:06.908151",
+    "timestamp": "2025-11-30T13:55:22.400271",
     "result": {
       "success": true,
-      "conflicts_resolved": 0,
+      "conflicts_resolved": 2,
       "conflicts_unresolved": 0
     }
   },
   "step_6": {
     "completed": true,
-    "timestamp": "2025-11-25T01:43:07.521987",
+    "timestamp": "2025-11-30T13:55:24.383597",
     "result": {
       "success": true
     }
   },
   "step_7": {
     "completed": true,
-    "timestamp": "2025-11-25T01:43:07.522545",
+    "timestamp": "2025-11-30T13:55:24.385730",
     "result": {
       "success": true,
       "stopped": false,
@@ -90,16 +89,16 @@
   "last_failed_step": null,
   "step_9": {
     "completed": true,
-    "timestamp": "2025-11-25T01:43:07.592673",
+    "timestamp": "2025-11-30T13:55:24.395761",
     "result": {
       "success": true,
       "verified": false,
-      "warning": "Settings mismatch"
+      "warning": "DATABASE_URL is not configured. POSTGRES_HOST environment variable is required. SQLite is no longer supported. Please set PostgreSQL environment variables or use start_server.sh which sets them automatically."
     }
   },
   "step_10": {
     "completed": true,
-    "timestamp": "2025-11-25T01:43:11.834812",
+    "timestamp": "2025-11-30T13:55:33.814705",
     "result": {
       "success": true,
       "needs_update": false,
@@ -128,7 +127,11 @@
             "schedule",
             "pytz",
             "yfinance",
-            "bleach"
+            "bleach",
+            "cryptography",
+            "bcrypt",
+            "httpx",
+            "google-generativeai"
           ],
           "missing_packages": [],
           "outdated_packages": []
@@ -139,9 +142,8 @@
           "requirements.txt": true
         },
         "database_structure": {
-          "ready": true,
-          "missing_tables": [],
-          "total_tables": 37
+          "ready": false,
+          "error": "DATABASE_URL is not configured. POSTGRES_HOST environment variable is required. SQLite is no longer supported. Please set PostgreSQL environment variables or use start_server.sh which sets them automatically."
         },
         "ui_files": {
           "ready": true,
@@ -154,7 +156,7 @@
   },
   "step_11": {
     "completed": true,
-    "timestamp": "2025-11-25T01:43:11.835314",
+    "timestamp": "2025-11-30T13:55:33.815312",
     "result": {
       "success": true,
       "updated": false,
@@ -163,7 +165,7 @@
   },
   "step_12": {
     "completed": true,
-    "timestamp": "2025-11-25T01:43:13.657588",
+    "timestamp": "2025-11-30T13:55:35.010901",
     "result": {
       "success": true,
       "results": {
@@ -176,76 +178,85 @@
   },
   "step_13": {
     "completed": true,
-    "timestamp": "2025-11-25T01:43:15.759976",
+    "timestamp": "2025-11-30T13:56:05.200955",
     "result": {
       "success": true,
-      "pid": 23346,
+      "pid": 11864,
       "port": 5001,
       "background": true,
-      "health_check": "passed"
+      "health_check": "failed",
+      "health_error": "Health check did not pass within 30 seconds (elapsed: 30.1s)"
     }
   },
   "step_14": {
     "completed": true,
-    "timestamp": "2025-11-25T01:44:10.912328",
+    "timestamp": "2025-11-30T13:57:00.234009",
     "result": {
       "success": true,
-      "stable": true,
+      "stable": false,
       "report": {
-        "stable": true,
-        "summary": [
-          "All 6 health checks passed",
-          "Process is running"
+        "stable": false,
+        "summary": [],
+        "warnings": [
+          "6 health check(s) failed"
         ],
-        "warnings": [],
-        "errors": []
+        "errors": [
+          "Process not alive: Process not found",
+          "\u001b[0;31m[13:55:36] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
+          "\u001b[0;31m[13:55:36] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
+          "Traceback (most recent call last):"
+        ]
       },
       "stability_result": {
-        "stable": true,
+        "stable": false,
         "health_checks": {
-          "passed": 6,
-          "failed": 0,
+          "passed": 0,
+          "failed": 6,
           "total": 6,
           "results": [
             [
-              true,
-              null
+              false,
+              "<urlopen error [Errno 61] Connection refused>"
             ],
             [
-              true,
-              null
+              false,
+              "<urlopen error [Errno 61] Connection refused>"
             ],
             [
-              true,
-              null
+              false,
+              "<urlopen error [Errno 61] Connection refused>"
             ],
             [
-              true,
-              null
+              false,
+              "<urlopen error [Errno 61] Connection refused>"
             ],
             [
-              true,
-              null
+              false,
+              "<urlopen error [Errno 61] Connection refused>"
             ],
             [
-              true,
-              null
+              false,
+              "<urlopen error [Errno 61] Connection refused>"
             ]
           ]
         },
-        "process_alive": true,
-        "process_error": null,
-        "log_errors": [],
-        "log_errors_count": 0
+        "process_alive": false,
+        "process_error": "Process not found",
+        "log_errors": [
+          "\u001b[0;31m[13:55:36] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
+          "\u001b[0;31m[13:55:36] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
+          "Traceback (most recent call last):"
+        ],
+        "log_errors_count": 3
       }
     }
   },
   "step_15": {
     "completed": true,
-    "timestamp": "2025-11-25T01:44:10.959338",
+    "timestamp": "2025-11-30T13:57:00.302151",
     "result": {
       "success": true,
-      "new_version": "1.2.9.0"
+      "new_version": "1.2.10.0"
     }
   },
   "step_16": {

@@ -14,9 +14,7 @@ class SMAlertsSection extends SMBaseSection {
   constructor(sectionId, config) {
     super(sectionId, config);
     this.apiEndpoints = {
-      summary: '/api/notifications/summary',
-      alerts: '/api/alerts/active',
-      history: '/api/notifications/history'
+      alerts: '/api/alerts/' // Use main alerts endpoint
     };
   }
 
@@ -29,18 +27,14 @@ class SMAlertsSection extends SMBaseSection {
       this.isLoading = true;
       console.log(`🔔 Loading alerts data from multiple endpoints`);
 
-      // Load data from multiple endpoints in parallel
-      const [summaryData, alertsData, historyData] = await Promise.allSettled([
-        this.fetchNotificationsSummary(),
-        this.fetchActiveAlerts(),
-        this.fetchNotificationsHistory()
+      // Load data from alerts endpoint
+      const alertsData = await Promise.allSettled([
+        this.fetchActiveAlerts()
       ]);
 
       // Combine data from all sources
       const combinedData = {
-        summary: summaryData.status === 'fulfilled' ? summaryData.value : null,
-        alerts: alertsData.status === 'fulfilled' ? alertsData.value : null,
-        history: historyData.status === 'fulfilled' ? historyData.value : null,
+        alerts: alertsData[0].status === 'fulfilled' ? alertsData[0].value : null,
         timestamp: new Date().toISOString()
       };
 
@@ -53,32 +47,6 @@ class SMAlertsSection extends SMBaseSection {
       throw error;
     } finally {
       this.isLoading = false;
-    }
-  }
-
-  /**
-   * Fetch notifications summary
-   * קבלת סיכום התראות
-   */
-  async fetchNotificationsSummary() {
-    try {
-      const response = await fetch(this.apiEndpoints.summary, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      return result.status === 'success' ? result.data : null;
-    } catch (error) {
-      console.warn('⚠️ Failed to fetch notifications summary:', error);
-      return null;
     }
   }
 
@@ -104,32 +72,6 @@ class SMAlertsSection extends SMBaseSection {
       return result.status === 'success' ? result.data : null;
     } catch (error) {
       console.warn('⚠️ Failed to fetch active alerts:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Fetch notifications history
-   * קבלת היסטוריית התראות
-   */
-  async fetchNotificationsHistory() {
-    try {
-      const response = await fetch(this.apiEndpoints.history, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      return result.status === 'success' ? result.data : null;
-    } catch (error) {
-      console.warn('⚠️ Failed to fetch notifications history:', error);
       return null;
     }
   }

@@ -1333,6 +1333,31 @@ window.updateTableWithPagination = async function({
     throw new Error('updateTableWithPagination requires render callback');
   }
 
+  // Check if table is in a modal - skip pagination if so
+  if (typeof document !== 'undefined') {
+    const table = document.getElementById(tableId);
+    if (table) {
+      const isInModal = table.closest('.modal, [class*="modal"]');
+      if (isInModal) {
+        console.warn(`⚠️ [updateTableWithPagination] Skipping pagination for table ${tableId} - table is inside a modal`);
+        // Render full dataset without pagination
+        await render(data, {
+          skipPagination: true,
+          pageInfo: {
+            currentPage: 1,
+            totalPages: 1,
+            pageSize: data.length,
+            totalItems: data.length,
+            filteredItems: data.length,
+          },
+          tableId,
+          tableType: tableType || window.TableDataRegistry?.resolveTableType?.(tableId) || null,
+        });
+        return null;
+      }
+    }
+  }
+
   const safeData = Array.isArray(data) ? data : [];
   const resolvedTableType = tableType || window.TableDataRegistry?.resolveTableType?.(tableId) || null;
   const tableIdentifier = resolvedTableType || tableId;

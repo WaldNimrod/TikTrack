@@ -17,7 +17,7 @@
 
 ### 2. בסיסי נתונים נפרדים
 - **פיתוח:** PostgreSQL (`TikTrack-db-development`)
-- **פרודקשן:** PostgreSQL (`TikTrack-db-prodution`)
+- **פרודקשן:** PostgreSQL (`TikTrack-db-production`)
 - ✅ אין שיתוף נתונים - כל שרת עם DB משלו
 
 ### 3. לוגים נפרדים
@@ -132,7 +132,7 @@ sessionStorage.clear();
 | רכיב | פיתוח (8080) | פרודקשן (5001) | משותף? |
 |------|---------------|----------------|---------|
 | **Backend Code** | `Backend/` | `production/Backend/` | ❌ לא |
-| **Database** | PostgreSQL (`TikTrack-db-development`) | PostgreSQL (`TikTrack-db-prodution`) | ❌ לא |
+| **Database** | PostgreSQL (`TikTrack-db-development`) | PostgreSQL (`TikTrack-db-production`) | ❌ לא |
 | **Port** | 8080 | 5001 | ❌ לא |
 | **Logs** | `Backend/logs/` | `production/Backend/logs/` | ❌ לא |
 | **Frontend (UI)** | `trading-ui/` | `trading-ui/` | ✅ כן |

@@ -45,11 +45,14 @@ class SMBaseSection {
     try {
       console.log(`🚀 Initializing section: ${this.sectionId}`);
       
-      // Find container
-      this.container = document.getElementById(this.sectionId);
-      if (!this.container) {
+      // Find container - look for section element first, then find section-body within it
+      const sectionElement = document.getElementById(this.sectionId);
+      if (!sectionElement) {
         throw new Error(`Section container ${this.sectionId} not found`);
       }
+      
+      // Find section-body within the section element, or use the section element itself as fallback
+      this.container = sectionElement.querySelector('.section-body') || sectionElement;
 
       // Show loading state
       if (this.config.showLoadingState) {
@@ -76,6 +79,57 @@ class SMBaseSection {
         timestamp: new Date().toISOString()
       });
       throw error;
+    }
+  }
+
+  /**
+   * Fetch with timeout
+   * קבלת נתונים עם timeout
+   * @param {string} url - URL to fetch
+   * @param {Object} options - Fetch options
+   * @param {number} timeout - Timeout in milliseconds (default: 10000)
+   * @returns {Promise<Response>}
+   */
+  async fetchWithTimeout(url, options = {}, timeout = 10000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        throw new Error(`Request timeout after ${timeout}ms`);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Load data with retry logic
+   * טעינת נתונים עם לוגיקת retry
+   * @param {number} maxRetries - Maximum number of retries (default: 3)
+   * @returns {Promise<void>}
+   */
+  async loadDataWithRetry(maxRetries = 3) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        await this.loadData();
+        this.retryCount = 0; // Reset retry count on success
+        return;
+      } catch (error) {
+        if (attempt === maxRetries) {
+          throw error;
+        }
+        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+        console.warn(`⚠️ Load attempt ${attempt} failed for section ${this.sectionId}, retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
     }
   }
 
@@ -139,9 +193,14 @@ class SMBaseSection {
     this.container.innerHTML = `
       <div class="sm-loading-state">
         <div class="loading-spinner">
-          <i class="fas fa-spinner fa-spin"></i>
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">טוען...</span>
+          </div>
         </div>
-        <p>טוען נתוני ${this.sectionId}...</p>
+        <div class="loading-text">
+          <p class="mb-1">טוען נתוני ${this.sectionId}...</p>
+          <small class="text-muted">אנא המתן</small>
+        </div>
       </div>
     `;
   }

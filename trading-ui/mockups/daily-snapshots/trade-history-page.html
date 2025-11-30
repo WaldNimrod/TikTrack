@@ -13,6 +13,9 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     
+    <!-- Bootstrap CSS (חובה ראשון) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../../styles-new/master.css">
     
@@ -24,8 +27,15 @@
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
     
+    <!-- Error Handlers (Must load first) -->
+    <script src="../../scripts/error-handlers.js?v=1.0.0"></script>
+    <!-- API Config -->
+    <script src="../../scripts/api-config.js?v=1.0.0"></script>
+    <!-- Logger Service (Load first before other systems) -->
+    <script src="../../scripts/logger-service.js?v=1.0.0"></script>
+    
     <!-- Header System (Must load early) -->
-    <script src="../../scripts/header-system.js" defer></script>
+    <script src="../../scripts/header-system.js?v=1.0.0" defer></script>
     <script>
         // Auto-initialize HeaderSystem when DOM is ready
         (function() {
@@ -34,8 +44,8 @@
                     try {
                         window.HeaderSystem.initialize();
                     } catch (error) {
-                        if (window.console && window.console.error) {
-                            window.console.error('Error initializing HeaderSystem:', error);
+                        if (window.Logger?.error) {
+                            window.Logger.error('Error initializing HeaderSystem', error, { page: 'trade-history-page' });
                         }
                     }
                 } else {
@@ -54,83 +64,70 @@
     </script>
     
     <!-- TradingView Lightweight Charts -->
-    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js" defer></script>
-    <script src="../../scripts/charts/tradingview-theme.js" defer></script>
-    <script src="../../scripts/charts/tradingview-adapter.js" defer></script>
+    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js?v=1.0.0" defer></script>
+    <script src="../../scripts/charts/tradingview-theme.js?v=1.0.0" defer></script>
+    <script src="../../scripts/charts/tradingview-adapter.js?v=1.0.0" defer></script>
     
+    <!-- [8] Load Order: 8 -->
+    <script src="../../scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- Unified cache manager -->
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- Icon replacement helper -->
     <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Preferences System -->
-    <script src="../../scripts/services/preferences-data.js" defer></script>
-    <script src="../../scripts/preferences-core-new.js" defer></script>
-    <script src="../../scripts/preferences-lazy-loader.js" defer></script>
+    <script src="../../scripts/services/preferences-data.js?v=1.0.0" defer></script>
+    <script src="../../scripts/preferences-core-new.js?v=1.0.0" defer></script>
+    <script src="../../scripts/preferences-lazy-loader.js?v=1.0.0" defer></script>
     
     <!-- Dynamic Colors System -->
-    <script src="../../scripts/color-scheme-system-clean.js" defer></script>
+    <script src="../../scripts/color-scheme-system-clean.js?v=1.0.0" defer></script>
     
     <!-- Action Buttons System -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
-    <script src="../../scripts/button-system-init.js" defer></script>
+    <script src="../../scripts/button-system-init.js?v=1.0.0" defer></script>
     
-    <!-- Logger Service (Load first before other systems) -->
-    <script src="../../scripts/logger-service.js"></script>
     
     <!-- Notification System -->
-    <script src="../../scripts/notification-system.js" defer></script>
+    <script src="../../scripts/notification-system.js?v=1.0.0" defer></script>
     
     <!-- Linked Items System -->
-    <script src="../../scripts/linked-items.js" defer></script>
-    <script src="../../scripts/services/linked-items-service.js" defer></script>
-    <script src="../../scripts/entity-details-modal.js" defer></script>
+    <script src="../../scripts/linked-items.js?v=1.0.0" defer></script>
+    <script src="../../scripts/services/linked-items-service.js?v=1.0.0" defer></script>
+        <script src="../../scripts/entity-details-api.js?v=1.0.0" defer></script>
+    <script src="../../scripts/entity-details-renderer.js?v=1.0.0" defer></script>
+<script src="../../scripts/entity-details-modal.js?v=1.0.0" defer></script>
     
     <!-- Field Renderer Service -->
-    <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    <script src="../../scripts/services/field-renderer-service.js?v=1.0.0" defer></script>
     
     <!-- Info Summary System -->
-    <script src="../../scripts/info-summary-configs.js" defer></script>
-    <script src="../../scripts/info-summary-system.js" defer></script>
+    <script src="../../scripts/info-summary-configs.js?v=1.0.0" defer></script>
+    <script src="../../scripts/info-summary-system.js?v=1.0.0" defer></script>
     
     <!-- Mock Data -->
-    <script src="../../scripts/mock-data/trade-history-mock-data.js"></script>
+    <script src="../../scripts/mock-data/trade-history-mock-data.js?v=1.0.0"></script>
     
 </head>
 <body class="trade-history-page">
-    <!-- Header System - Created automatically by header-system.js -->
-    <div id="unified-header"></div>
+    <!-- Notification container -->
+    <div class="notification-container" id="notificationContainer"></div>
     
-    <!-- Mockups Navigation -->
-    <div class="mockups-navigation">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-12">
-                    <div class="mockups-navigation-content">
-                        <span class="mockups-navigation-label">
-                    <span data-icon="link" class="icon"></span> ניווט מוקאפים:
-                </span>
-                        <a href="trade-history-page.html" class="mockups-navigation-link active">היסטוריית טרייד</a>
-                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
-                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
-                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
-                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
-                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
-                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
-                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
-                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
-                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+    <!-- Header System - Created automatically by header-system.js -->
+    </div>
     </div>
     
     <!-- Page Content -->
-    <div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+<div class="background-wrapper">
         <div class="page-body">
             <div class="main-content">
-                <!-- Header Section -->
+                <!-- Header Se
+        <div id="unified-header"></div>
+
+ction -->
                 <div class="top-section"  data-section="trade-history-top-section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
@@ -139,14 +136,14 @@
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2">
                         <div class="table-actions">
-                                <button class="btn btn-sm btn-primary" data-onclick="window.tradeHistoryPage.openTradeSelectorModal()" title="בחר טרייד לניתוח">
+                                <button class="btn btn-sm btn-primary" data-onclick="window.tradeHistoryPage.openTradeSelectorModal()" title="בחר טרייד לניתוח" data-button-type="VIEW">
                                     <span data-icon="search" class="icon"></span> בחר טרייד
                                 </button>
-                                <button class="btn btn-sm btn-outline-primary" data-onclick="exportData()" title="ייצא נתונים">
+                                <button class="btn btn-sm btn-outline-primary" data-onclick="exportData()" title="ייצא נתונים" data-button-type="EXPORT">
                                     <span data-icon="download" class="icon"></span> ייצא
                                 </button>
                             </div>
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('trade-history-top-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('trade-history-top-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -160,7 +157,7 @@
                                     <strong>טרייד נבחר:</strong> 
                                     <span id="selectedTradeInfo">-</span>
                                 </div>
-                                <button class="btn btn-sm btn-outline-secondary" data-onclick="window.tradeHistoryPage.clearSelectedTrade()">
+                                <button class="btn btn-sm btn-outline-secondary" data-onclick="window.tradeHistoryPage.clearSelectedTrade()" data-button-type="PRIMARY">
                                     <span data-icon="x" class="icon"></span> נקה בחירה
                                 </button>
                             </div>
@@ -203,7 +200,7 @@
                                 <h5 class="card-title mb-0">
                                     <span data-icon="info-circle" class="icon"></span> פרטי הטרייד
                                 </h5>
-                                <button class="btn btn-sm btn-outline-primary ms-3" data-onclick="showTradeDetailsModal(); return false;" title="פתח מודול פרטים">
+                                <button class="btn btn-sm btn-outline-primary ms-3" data-onclick="showTradeDetailsModal(); return false;" title="פתח מודול פרטים" data-button-type="VIEW">
                                     <span data-icon="external-link" class="icon"></span> פרטים
                                 </button>
                             </div>
@@ -289,7 +286,7 @@
                     <div class="section-header">
                         <h2><span data-icon="list" class="icon"></span> פירוט צעדים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('timeline-absolute-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('timeline-absolute-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                                 </div>
@@ -314,7 +311,7 @@
                     <div class="section-header">
                         <h2><span data-icon="chart-line" class="icon"></span> טיימליין</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('timeline-relative-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('timeline-relative-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -323,19 +320,19 @@
                         <!-- Chart Controls Wrapper (LTR, in section-body, above chart) -->
                         <div class="chart-controls-wrapper">
                             <div class="chart-controls mb-2">
-                            <button class="btn btn-sm btn-outline-secondary" id="timelineZoomIn" title="זום פנימה">
+                            <button class="btn btn-sm btn-outline-secondary" id="timelineZoomIn" title="זום פנימה" data-button-type="VIEW">
                                     <span data-icon="info-circle" class="icon"></span>
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" id="timelineZoomOut" title="זום החוצה">
+                            <button class="btn btn-sm btn-outline-secondary" id="timelineZoomOut" title="זום החוצה" data-button-type="VIEW">
                                     <span data-icon="info-circle" class="icon"></span>
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" id="timelineReset" title="איפוס זום">
+                            <button class="btn btn-sm btn-outline-secondary" id="timelineReset" title="איפוס זום" data-button-type="REFRESH">
                                 <span data-icon="refresh" class="icon"></span>
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" id="timelinePanLeft" title="תזוזה ימינה (לעבר העתיד)">
+                            <button class="btn btn-sm btn-outline-secondary" id="timelinePanLeft" title="תזוזה ימינה (לעבר העתיד)" data-button-type="VIEW">
                                     <span data-icon="info-circle" class="icon"></span>
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" id="timelinePanRight" title="תזוזה שמאלה (לעבר העבר)">
+                            <button class="btn btn-sm btn-outline-secondary" id="timelinePanRight" title="תזוזה שמאלה (לעבר העבר)" data-button-type="VIEW">
                                     <span data-icon="info-circle" class="icon"></span>
                             </button>
                             </div>
@@ -373,7 +370,7 @@
                     <div class="section-header">
                         <h2><span data-icon="info-circle" class="icon"></span> תכנון מול ביצוע</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('plan-vs-execution-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('plan-vs-execution-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -381,7 +378,7 @@
                     <div class="section-body">
                         <div class="plan-vs-execution-comparison">
                             <div class="table-responsive">
-                                <table class="table table-hover" id="planVsExecutionTable">
+                                <table class="table table-hover" id="planVsExecutionTable" data-table-type="plan_vs_execution">
                                     <thead>
                                         <tr>
                                             <th class="table-col-120">קטגוריה</th>
@@ -414,7 +411,7 @@
                     <div class="section-header">
                         <h2><span data-icon="link" class="icon"></span> פריטים מקושרים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('linked-items-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('linked-items-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -1607,7 +1604,8 @@
         // Function to get current trade ID (placeholder - should be set based on selected trade)
         function getCurrentTradeId() {
             // In production, this should get the actual trade ID from the selected trade
-            return 123; // Placeholder
+            // Return null if no trade is selected to avoid errors
+            return null; // No trade selected - return null to prevent errors
         }
         
         // Function to load linked items for the trade
@@ -1616,6 +1614,16 @@
             const container = document.getElementById('linkedItemsContainer');
             
             if (!container) return;
+            
+            // Skip if no trade ID is available
+            if (!tradeId) {
+                container.innerHTML = `
+                    <div class="alert alert-info">
+                        <span data-icon="info-circle" class="icon"></span> בחר טרייד להצגת פריטים מקושרים
+                    </div>
+                `;
+                return;
+            }
             
             try {
                 // Check if linked items API is available
@@ -1626,7 +1634,7 @@
                     // Use the global linked items function
                     container.innerHTML = `
                         <div class="text-center py-4">
-                            <button class="btn btn-primary" data-onclick="window.viewLinkedItemsForTrade(${tradeId})">
+                            <button class="btn btn-primary" data-onclick="window.viewLinkedItemsForTrade(${tradeId})" data-button-type="EDIT">
                                 <span data-icon="link" class="icon"></span> הצג פריטים מקושרים
                             </button>
                         </div>
@@ -1640,12 +1648,18 @@
                     `;
                 }
             } catch (error) {
+                // Better error handling - check if error is an object with message
+                const errorMessage = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
                 if (window.Logger) {
-                    window.Logger.error('Error loading linked items', { page: 'trade-history-page', error });
+                    window.Logger.warn('Error loading linked items for trade', { 
+                        page: 'trade-history-page', 
+                        tradeId: tradeId,
+                        error: errorMessage 
+                    });
                 }
                 container.innerHTML = `
-                    <div class="alert alert-danger">
-                        <span data-icon="alert-triangle" class="icon"></span> שגיאה בטעינת פריטים מקושרים: ${error.message}
+                    <div class="alert alert-warning">
+                        <span data-icon="alert-triangle" class="icon"></span> שגיאה בטעינת פריטים מקושרים: ${errorMessage}
                     </div>
                 `;
             }
@@ -1688,7 +1702,7 @@
             // Render table
             let html = `
                 <div class="table-responsive">
-                    <table class="table table-hover" id="linkedItemsTable">
+                    <table class="table table-hover" id="linkedItemsTable" data-table-type="linked_items">
                         <thead>
                             <tr>
                                 <th>סוג</th>
@@ -1801,7 +1815,7 @@
                     <h5 class="modal-title" id="tradeSelectorModalLabel">
                         <span data-icon="search" class="icon"></span> בחירת טרייד לניתוח
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור" data-button-type="CLOSE"></button>
                             </div>
                 <div class="modal-body">
                     <!-- Filters Section -->
@@ -1848,7 +1862,7 @@
                                 
                                 <!-- Clear Filters Button -->
                                 <div class="col-md-2 d-flex align-items-end">
-                                    <button class="btn btn-outline-secondary btn-sm w-100" data-onclick="window.tradeHistoryPage.clearTradeFilters()">
+                                    <button class="btn btn-outline-secondary btn-sm w-100" data-onclick="window.tradeHistoryPage.clearTradeFilters()" data-button-type="FILTER">
                                         <span data-icon="x" class="icon"></span> נקה
                                     </button>
                                         </div>
@@ -1858,7 +1872,7 @@
                     
                     <!-- Trades Table -->
                     <div class="table-responsive">
-                        <table id="tradeSelectorTable" class="table table-hover table-striped">
+                        <table id="tradeSelectorTable" class="table table-hover table-striped" data-table-type="trade_selector">
                             <thead>
                                 <tr>
                                     <th>מספר טרייד</th>
@@ -1883,7 +1897,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-button-type="CLOSE">ביטול</button>
                 </div>
             </div>
         </div>
@@ -1895,7 +1909,7 @@
     <script src="../../scripts/unified-app-initializer.js?v=1.0.0"></script>
     
     <!-- Page-specific script -->
-    <script src="../../scripts/trade-history-page.js" defer></script>
+    <script src="../../scripts/trade-history-page.js?v=1.0.0" defer></script>
     
     <!-- Notification System Containers -->
     <div class="notification-container" id="notification-container"></div>

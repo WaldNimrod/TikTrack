@@ -37,6 +37,17 @@ class QuoteData:
     long_name: Optional[str] = None
     exchange_name: Optional[str] = None
     exchange_code: Optional[str] = None
+    # Open price data (from market open)
+    open_price: Optional[float] = None
+    change_pct_from_open: Optional[float] = None
+    change_amount_from_open: Optional[float] = None
+    # Daily OHLC data (for ATR calculation and historical analysis)
+    high_price: Optional[float] = None  # Daily high price
+    low_price: Optional[float] = None   # Daily low price
+    close_price: Optional[float] = None  # Daily close price (previous day's close)
+    # ATR (Average True Range) - technical indicator
+    atr: Optional[float] = None
+    atr_period: int = 14  # Default ATR period (typically 14 days)
 
 @dataclass
 class IntradayData:
@@ -700,6 +711,13 @@ class YahooFinanceAdapter:
             logger.info(f"📊 {symbol}: Available meta keys: {list(meta.keys())}")
             logger.info(f"📊 {symbol}: Current price: ${current_price}")
             
+            # Check for regularMarketOpen availability
+            if 'regularMarketOpen' in meta:
+                open_price_value = meta['regularMarketOpen']
+                logger.info(f"📊 {symbol}: regularMarketOpen found in meta: {open_price_value} (type: {type(open_price_value).__name__})")
+            else:
+                logger.warning(f"📊 {symbol}: regularMarketOpen NOT found in meta. Available keys: {list(meta.keys())}")
+            
             # Enhanced daily change calculation with multiple fallback mechanisms
             # First, try to get change data directly from Yahoo
             if 'regularMarketChange' in meta:
@@ -744,9 +762,53 @@ class YahooFinanceAdapter:
                 quote.volume = int(meta['regularMarketVolume'])
                 logger.info(f"📊 {symbol}: volume = {quote.volume}")
             
+            # Extract open price and calculate change from open
+            if 'regularMarketOpen' in meta:
+                try:
+                    open_price = float(meta['regularMarketOpen'])
+                    quote.open_price = open_price
+                    
+                    # Calculate change from open
+                    if open_price > 0:
+                        quote.change_amount_from_open = current_price - open_price
+                        quote.change_pct_from_open = (quote.change_amount_from_open / open_price) * 100
+                        logger.info(f"📊 {symbol}: Open price: ${open_price}, Change from open: ${quote.change_amount_from_open:.2f} ({quote.change_pct_from_open:.2f}%)")
+                    else:
+                        logger.warning(f"📊 {symbol}: Open price is 0 or negative, cannot calculate change from open")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"📊 {symbol}: Error parsing regularMarketOpen: {e}")
+            else:
+                logger.warning(f"📊 {symbol}: regularMarketOpen not available in Yahoo Finance response")
+            
+            # Extract daily OHLC data (high, low, close)
+            # Note: ATR calculation is now handled by ATRCalculator service, not here
+            if 'regularMarketDayHigh' in meta:
+                try:
+                    quote.high_price = float(meta['regularMarketDayHigh'])
+                    logger.info(f"📊 {symbol}: Daily high price: ${quote.high_price}")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"📊 {symbol}: Error parsing regularMarketDayHigh: {e}")
+            
+            if 'regularMarketDayLow' in meta:
+                try:
+                    quote.low_price = float(meta['regularMarketDayLow'])
+                    logger.info(f"📊 {symbol}: Daily low price: ${quote.low_price}")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"📊 {symbol}: Error parsing regularMarketDayLow: {e}")
+            
+            # Close price is typically the previous day's close
+            if 'chartPreviousClose' in meta:
+                try:
+                    quote.close_price = float(meta['chartPreviousClose'])
+                    logger.info(f"📊 {symbol}: Previous day close price: ${quote.close_price}")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"📊 {symbol}: Error parsing chartPreviousClose: {e}")
+            
             change_pct_display = f"{quote.change_pct:.2f}%" if quote.change_pct is not None else "N/A"
             change_amount_display = f"${quote.change_amount:.2f}" if quote.change_amount is not None else "N/A"
-            logger.info(f"📊 {symbol}: Final quote data - price: ${quote.price}, change_pct: {change_pct_display}, change_amount: {change_amount_display}")
+            change_from_open_display = f"${quote.change_amount_from_open:.2f} ({quote.change_pct_from_open:.2f}%)" if quote.change_amount_from_open is not None else "N/A"
+            ohlc_display = f"H:${quote.high_price:.2f} L:${quote.low_price:.2f} C:${quote.close_price:.2f}" if quote.high_price and quote.low_price and quote.close_price else "N/A"
+            logger.info(f"📊 {symbol}: Final quote data - price: ${quote.price}, change_pct: {change_pct_display}, change_amount: {change_amount_display}, change_from_open: {change_from_open_display}, OHLC: {ohlc_display}")
             
             return quote
             
@@ -786,7 +848,18 @@ class YahooFinanceAdapter:
                     volume=quote.volume,
                     currency=quote.currency,
                     asof_utc=quote.asof_utc,
-                    source=quote.source
+                    source=quote.source,
+                    # Open price data
+                    open_price=quote.open_price,
+                    change_pct_from_open=quote.change_pct_from_open,
+                    change_amount_from_open=quote.change_amount_from_open,
+                    # Daily OHLC data
+                    high_price=quote.high_price,
+                    low_price=quote.low_price,
+                    close_price=quote.close_price,
+                    # ATR data
+                    atr=quote.atr,
+                    atr_period=quote.atr_period or 14
                 )
             
             return None
@@ -860,8 +933,19 @@ class YahooFinanceAdapter:
                 currency=quote.currency,
                 source=quote.source,
                 is_stale=False,
-                quality_score=1.0
-            )
+                quality_score=1.0,
+                    # Open price data
+                    open_price=quote.open_price,
+                    change_pct_from_open=quote.change_pct_from_open,
+                    change_amount_from_open=quote.change_amount_from_open,
+                    # Daily OHLC data
+                    high_price=quote.high_price,
+                    low_price=quote.low_price,
+                    close_price=quote.close_price,
+                    # ATR data
+                    atr=quote.atr,
+                    atr_period=quote.atr_period or 14
+                )
             
             logger.info(f"💾 Adding quote to database: {ticker.symbol} = ${quote.price} ({quote.currency})")
             self.db_session.add(db_quote)
@@ -1314,6 +1398,128 @@ class YahooFinanceAdapter:
             logger.error(f"Error getting historical quote for {symbol}: {e}")
             return None
     
+    def _get_historical_ohlc_data(self, symbol: str, days_back: int = 20) -> List[Dict[str, Any]]:
+        """
+        Get historical OHLC (Open, High, Low, Close) data for ATR calculation
+        
+        Args:
+            symbol: Ticker symbol
+            days_back: Number of days to fetch (default 20 to ensure we have enough for ATR 14)
+            
+        Returns:
+            List of dicts with 'date', 'open', 'high', 'low', 'close' keys, sorted by date (oldest first)
+        """
+        try:
+            from datetime import date, timedelta
+            
+            end_date = date.today()
+            start_date = end_date - timedelta(days=days_back + 5)  # Get more data for reliability
+            
+            url = f"{self.base_url}/v8/finance/chart/{symbol}"
+            params = {
+                'interval': '1d',
+                'period1': int(start_date.strftime('%s')),
+                'period2': int(end_date.strftime('%s'))
+            }
+            
+            data = self._make_request(url, params)
+            if not data:
+                return []
+            
+            if 'chart' not in data or 'result' not in data['chart'] or not data['chart']['result']:
+                return []
+            
+            result = data['chart']['result'][0]
+            if 'timestamp' not in result or 'indicators' not in result:
+                return []
+            
+            timestamps = result['timestamp']
+            quotes = result['indicators']['quote'][0]
+            
+            historical_data = []
+            for i in range(len(timestamps)):
+                try:
+                    if (quotes['open'][i] is not None and quotes['high'][i] is not None and 
+                        quotes['low'][i] is not None and quotes['close'][i] is not None):
+                        historical_date = datetime.fromtimestamp(timestamps[i], tz=timezone.utc)
+                        historical_data.append({
+                            'date': historical_date,
+                            'open': float(quotes['open'][i]),
+                            'high': float(quotes['high'][i]),
+                            'low': float(quotes['low'][i]),
+                            'close': float(quotes['close'][i])
+                        })
+                except (ValueError, TypeError, IndexError) as e:
+                    logger.warning(f"Error parsing historical data point {i} for {symbol}: {e}")
+                    continue
+            
+            # Sort by date (oldest first) for ATR calculation
+            historical_data.sort(key=lambda x: x['date'])
+            logger.info(f"📊 {symbol}: Fetched {len(historical_data)} historical OHLC data points")
+            return historical_data
+            
+        except Exception as e:
+            logger.error(f"Error getting historical OHLC data for {symbol}: {e}")
+            return []
+    
+    def _calculate_atr(self, historical_data: List[Dict[str, Any]], period: int = 14) -> Optional[float]:
+        """
+        Calculate Average True Range (ATR) from historical OHLC data
+        
+        ATR formula:
+        1. True Range (TR) = max of:
+           - High - Low
+           - |High - Previous Close|
+           - |Low - Previous Close|
+        2. ATR = Simple Moving Average of TR over the specified period
+        
+        Args:
+            historical_data: List of dicts with 'high', 'low', 'close' keys, sorted by date (oldest first)
+            period: ATR period (default 14)
+            
+        Returns:
+            ATR value or None if insufficient data
+        """
+        try:
+            if len(historical_data) < period + 1:  # Need period+1 because we need previous close
+                logger.warning(f"Insufficient data for ATR calculation: {len(historical_data)} points, need {period + 1}")
+                return None
+            
+            true_ranges = []
+            
+            # Calculate True Range for each period (skip first one as we need previous close)
+            for i in range(1, len(historical_data)):
+                current = historical_data[i]
+                previous = historical_data[i - 1]
+                
+                high = current['high']
+                low = current['low']
+                prev_close = previous['close']
+                
+                # Calculate True Range
+                tr1 = high - low
+                tr2 = abs(high - prev_close)
+                tr3 = abs(low - prev_close)
+                
+                true_range = max(tr1, tr2, tr3)
+                true_ranges.append(true_range)
+            
+            # Calculate ATR as Simple Moving Average of True Ranges
+            if len(true_ranges) < period:
+                logger.warning(f"Insufficient true ranges for ATR: {len(true_ranges)}, need {period}")
+                return None
+            
+            # Use the last 'period' true ranges
+            atr_values = true_ranges[-period:]
+            atr = sum(atr_values) / len(atr_values)
+            
+            logger.info(f"📊 Calculated ATR: {atr:.4f} (period: {period}, data points: {len(historical_data)})")
+            return atr
+            
+        except Exception as e:
+            logger.error(f"Error calculating ATR: {e}")
+            return None
+    
     def _update_quotes_last(self, ticker_id: int, quote: QuoteData):
         """Update quotes_last table as required by specification Section 3.1"""
         try:
@@ -1321,8 +1527,6 @@ class YahooFinanceAdapter:
             
             from models.quotes_last import QuotesLast
             from sqlalchemy.dialects.postgresql import insert
-            from config.settings import USING_SQLITE
-
             asof_utc = quote.asof_utc
             if asof_utc is None:
                 asof_utc = datetime.now(timezone.utc)
@@ -1349,29 +1553,13 @@ class YahooFinanceAdapter:
                 "quality_score": 1.0,
             }
 
-            # Use upsert logic - compatible with both SQLite and PostgreSQL
-            if USING_SQLITE:
-                # SQLite: Use INSERT OR REPLACE
-                existing = self.db_session.query(QuotesLast).filter(
-                    QuotesLast.ticker_id == ticker_id
-                ).first()
-                
-                if existing:
-                    # Update existing record
-                    for key, value in quote_data.items():
-                        setattr(existing, key, value)
-                else:
-                    # Create new record
-                    new_quote = QuotesLast(**quote_data)
-                    self.db_session.add(new_quote)
-            else:
-                # PostgreSQL: Use ON CONFLICT
-                stmt = insert(QuotesLast).values(**quote_data)
-                stmt = stmt.on_conflict_do_update(
-                    index_elements=['ticker_id'],
-                    set_=quote_data
-                )
-                self.db_session.execute(stmt)
+            # PostgreSQL: Use ON CONFLICT for upsert
+            stmt = insert(QuotesLast).values(**quote_data)
+            stmt = stmt.on_conflict_do_update(
+                index_elements=['ticker_id'],
+                set_=quote_data
+            )
+            self.db_session.execute(stmt)
             
             self.db_session.commit()
             logger.debug(f"✅ Updated quotes_last for ticker {ticker_id}")

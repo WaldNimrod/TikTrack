@@ -616,7 +616,15 @@ class ExternalDataService {
       // Reset button state
       if (refreshBtn) {
         refreshBtn.disabled = false;
-        refreshBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1"> רענן מחירים';
+        let refreshIcon = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+          try {
+            refreshIcon = await window.IconSystem.renderIcon('button', 'refresh', { size: '16', alt: 'refresh', class: 'icon me-1' });
+          } catch (error) {
+            // Fallback already set
+          }
+        }
+        refreshBtn.innerHTML = refreshIcon + ' רענן מחירים';
       }
     }
   }

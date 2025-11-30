@@ -164,6 +164,12 @@
      */
     getActionDisplayText(execution) {
       const action = execution.normalized_action || execution.action || 'buy';
+      // Use Translation Utilities if available
+      if (window.translateExecutionAction && typeof window.translateExecutionAction === 'function') {
+        return window.translateExecutionAction(action.toLowerCase());
+      }
+      
+      // Fallback to local implementation
       const actionMap = {
         'buy': 'קניה',
         'sell': 'מכירה',

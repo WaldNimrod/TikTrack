@@ -68,7 +68,11 @@ class PositionPortfolioService:
                 'fetched_at': quote.fetched_at,
                 'asof_utc': quote.asof_utc,
                 'change_pct_day': quote.change_pct_day,
-                'change_amount_day': quote.change_amount_day
+                'change_amount_day': quote.change_amount_day,
+                # Open price data
+                'open_price': quote.open_price,
+                'change_pct_from_open': quote.change_pct_from_open,
+                'change_amount_from_open': quote.change_amount_from_open
             }
         except Exception as e:
             logger.error(f"Error getting market price for ticker {ticker_id}: {str(e)}")

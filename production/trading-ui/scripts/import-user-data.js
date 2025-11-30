@@ -78,7 +78,7 @@ let filePrecheckState = {
     message: ''
 };
 let activeFilePrecheckRequestId = 0;
-let selectedCashflowTypes = {}; // Track selected cashflow types for import (default: all except dividend_accrual)
+let selectedCashflowTypes = {}; // Track selected cashflow types for import (default: all types selected)
 
 /**
  * Helper function to set element display using Bootstrap classes instead of inline styles
@@ -375,7 +375,11 @@ function buildImportNavigationMetadata(overrides = {}) {
 }
 
 async function registerImportModalNavigation(overrides = {}) {
-    if (!window.ModalNavigationService?.registerModalOpen) {
+    // Modal Navigation System - רק למודלים מקוננים (nested modals)
+    // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
+    const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
+    
+    if (!window.ModalNavigationService?.registerModalOpen || !hasStack) {
         importNavigationInstanceId = null;
         return null;
     }
@@ -387,6 +391,12 @@ async function registerImportModalNavigation(overrides = {}) {
         const metadata = buildImportNavigationMetadata(overrides);
         const entry = await window.ModalNavigationService.registerModalOpen(modalElement, metadata);
         importNavigationInstanceId = entry?.instanceId || null;
+        
+        // עדכון UI (breadcrumb וכפתור חזרה) רק במודלים מקוננים
+        if (window.modalNavigationManager?.updateModalNavigation) {
+            window.modalNavigationManager.updateModalNavigation(modalElement);
+        }
+        
         return entry;
     } catch (error) {
         window.Logger?.warn?.('[Import Modal] Failed to register modal navigation entry', { error: error?.message });
@@ -772,7 +782,11 @@ function buildAccountLinkingNavigationUpdatePayload(overrides = {}) {
 }
 
 async function registerAccountLinkingModalNavigation(overrides = {}) {
-    if (!window.ModalNavigationService?.registerModalOpen) {
+    // Modal Navigation System - רק למודלים מקוננים (nested modals)
+    // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
+    const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
+    
+    if (!window.ModalNavigationService?.registerModalOpen || !hasStack) {
         accountLinkingNavigationInstanceId = null;
         return null;
     }
@@ -788,6 +802,12 @@ async function registerAccountLinkingModalNavigation(overrides = {}) {
         const metadata = buildAccountLinkingNavigationMetadata(overrides);
         const entry = await window.ModalNavigationService.registerModalOpen(modalElement, metadata);
         accountLinkingNavigationInstanceId = entry?.instanceId || accountLinkingNavigationInstanceId;
+        
+        // עדכון UI (breadcrumb וכפתור חזרה) רק במודלים מקוננים
+        if (window.modalNavigationManager?.updateModalNavigation) {
+            window.modalNavigationManager.updateModalNavigation(modalElement);
+        }
+        
         return entry;
     } catch (error) {
         window.Logger?.warn?.('[Import Modal] Failed to register account linking modal', { error: error?.message });
@@ -1060,7 +1080,12 @@ async function prepareAccountLinkingSelection() {
     if (preferredAccountId) {
         setSelectValue(select, String(preferredAccountId));
     } else {
-        select.value = '';
+        // Use DataCollectionService to clear field if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(select.id, '', 'text');
+        } else {
+          select.value = '';
+        }
     }
     select.removeEventListener('change', handleAccountLinkingSelectionChange);
     select.addEventListener('change', handleAccountLinkingSelectionChange);
@@ -1521,19 +1546,44 @@ async function showAccountLinkingModal() {
         accountLinkingNavigationInstanceId = null;
     }
 
-    if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
-        accountLinkingModalInstance = bootstrap.Modal.getInstance(modal);
-        if (!accountLinkingModalInstance) {
-            accountLinkingModalInstance = new bootstrap.Modal(modal, {
-                backdrop: true,
-                keyboard: true
-            });
+    // Use ModalManagerV2 if available, fallback to Bootstrap
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+        try {
+            await window.ModalManagerV2.showModal('accountLinkingModal', 'view');
+        } catch (error) {
+            // Fallback to Bootstrap if ModalManagerV2 fails
+            window.Logger?.warn('accountLinkingModal not available in ModalManagerV2, using Bootstrap fallback', { page: 'import-user-data' });
+            if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+                accountLinkingModalInstance = bootstrap.Modal.getInstance(modal);
+                if (!accountLinkingModalInstance) {
+                    accountLinkingModalInstance = new bootstrap.Modal(modal, {
+                        backdrop: true,
+                        keyboard: true
+                    });
+                }
+                accountLinkingModalInstance.show();
+            } else {
+                modal.style.display = 'block';
+                modal.classList.add('show');
+                modal.setAttribute('aria-hidden', 'false');
+            }
         }
-        accountLinkingModalInstance.show();
     } else {
-        modal.style.display = 'block';
-        modal.classList.add('show');
-        modal.setAttribute('aria-hidden', 'false');
+        // Fallback to Bootstrap modal
+        if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+            accountLinkingModalInstance = bootstrap.Modal.getInstance(modal);
+            if (!accountLinkingModalInstance) {
+                accountLinkingModalInstance = new bootstrap.Modal(modal, {
+                    backdrop: true,
+                    keyboard: true
+                });
+            }
+            accountLinkingModalInstance.show();
+        } else {
+            modal.style.display = 'block';
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+        }
     }
 
     if (window.processButtons) {
@@ -1553,7 +1603,10 @@ function hideAccountLinkingModal(options = {}) {
     const { skipNavigation = false } = options;
 
     const fallbackHide = () => {
-        if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+        // Try ModalManagerV2 first
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+            window.ModalManagerV2.hideModal('accountLinkingModal');
+        } else if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
             const instance = bootstrap.Modal.getInstance(modal) || accountLinkingModalInstance;
             instance?.hide();
         } else {
@@ -1911,7 +1964,12 @@ function initializeDataTypeSelector() {
         selectedDataTypeKey = 'executions';
     }
 
-    select.value = selectedDataTypeKey;
+    // Use DataCollectionService to set value if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue(select.id, selectedDataTypeKey, 'text');
+    } else {
+      select.value = selectedDataTypeKey;
+    }
     selectedDataTypeKey = select.value || selectedDataTypeKey;
 
     if (select.dataset.listenerAttached !== 'true') {
@@ -1950,9 +2008,19 @@ function populateDataTypeSelect(select) {
     });
 
     if (previousValue && IMPORT_DATA_TYPE_DEFINITIONS[previousValue]) {
-        select.value = previousValue;
+        // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(select.id, previousValue, 'text');
+        } else {
+          select.value = previousValue;
+        }
     } else if (selectedDataTypeKey && IMPORT_DATA_TYPE_DEFINITIONS[selectedDataTypeKey]) {
-        select.value = selectedDataTypeKey;
+        // Use DataCollectionService to set value if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue(select.id, selectedDataTypeKey, 'text');
+    } else {
+      select.value = selectedDataTypeKey;
+    }
     }
     selectedDataTypeKey = select.value || selectedDataTypeKey;
 }
@@ -2245,19 +2313,19 @@ function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
             // are already filtered out above, so all types here are valid for import
 
             // Initialize selectedCashflowTypes if not already set
-            // Default: select 'interest' and 'borrow_fee' by default
+            // Default: select ALL types by default
             if (Object.keys(selectedCashflowTypes).length === 0) {
                 entries.forEach(([key]) => {
-                    // Select 'interest' and 'borrow_fee' by default
-                    selectedCashflowTypes[key] = (key === 'interest' || key === 'borrow_fee');
+                    // Select ALL types by default
+                    selectedCashflowTypes[key] = true;
                 });
             }
             
             // Get current selection state
-            // Default: select 'interest' and 'borrow_fee' by default
+            // Default: select ALL types by default
             const isSelected = selectedCashflowTypes[typeKey] !== undefined 
                 ? selectedCashflowTypes[typeKey] 
-                : (typeKey === 'interest' || typeKey === 'borrow_fee');
+                : true;
 
             const card = document.createElement('div');
             card.className = 'analysis-card';
@@ -2726,7 +2794,12 @@ function syncTickerRemarksEditorToField(modalElement) {
         const editor = window.RichTextEditorService.getEditorInstance(TICKER_REMARKS_EDITOR_ID);
         if (editor && typeof window.RichTextEditorService.getContent === 'function') {
             const htmlContent = window.RichTextEditorService.getContent(TICKER_REMARKS_EDITOR_ID) || '';
-            textarea.value = htmlContent;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(textarea.id, htmlContent, 'rich-text');
+            } else {
+              textarea.value = htmlContent;
+            }
             textarea.dispatchEvent(new Event('input', { bubbles: true }));
             textarea.dispatchEvent(new Event('change', { bubbles: true }));
         }
@@ -2827,7 +2900,12 @@ function updateActiveSessionInfo(updates = {}) {
     
     const dataTypeSelect = document.getElementById('importDataTypeSelect');
     if (dataTypeSelect) {
-        dataTypeSelect.value = taskType;
+        // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(dataTypeSelect.id, taskType, 'text');
+        } else {
+          dataTypeSelect.value = taskType;
+        }
     }
     updateSelectedDataTypeInfo();
     
@@ -3311,7 +3389,12 @@ function setInputValue(inputElement, value) {
     if (!inputElement || value === undefined || value === null) {
         return;
     }
-    inputElement.value = value;
+    // Use DataCollectionService to set value if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue(inputElement.id, value, 'text');
+    } else {
+      inputElement.value = value;
+    }
     inputElement.dispatchEvent(new Event('input', { bubbles: true }));
     inputElement.dispatchEvent(new Event('change', { bubbles: true }));
 }
@@ -3321,7 +3404,12 @@ function setSelectValue(selectElement, value) {
         return;
     }
     if (selectElement.value !== value) {
-        selectElement.value = value;
+        // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(selectElement.id, value, 'text');
+        } else {
+          selectElement.value = value;
+        }
         selectElement.dispatchEvent(new Event('change', { bubbles: true }));
     }
 }
@@ -3360,7 +3448,12 @@ async function setCurrencySelectValue(selectElement, currencyCode) {
     }
 
     if (option) {
-        selectElement.value = option.value;
+        // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(selectElement.id, option.value, 'text');
+        } else {
+          selectElement.value = option.value;
+        }
         selectElement.dispatchEvent(new Event('change', { bubbles: true }));
     }
 }
@@ -4190,13 +4283,23 @@ function resetImportModal() {
     
     const accountSelect = document.getElementById('tradingAccountSelect');
     if (accountSelect) {
-        accountSelect.value = '';
+        // Use DataCollectionService to clear field if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(accountSelect.id, '', 'text');
+        } else {
+          accountSelect.value = '';
+        }
         window.clearFieldValidation?.(accountSelect);
     }
     
     const connectorSelect = document.getElementById('connectorSelect');
     if (connectorSelect) {
-        connectorSelect.value = '';
+        // Use DataCollectionService to clear field if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(connectorSelect.id, '', 'text');
+        } else {
+          connectorSelect.value = '';
+        }
         window.clearFieldValidation?.(connectorSelect);
     }
     
@@ -7455,7 +7558,12 @@ async function openAddTickerModal(symbol, currency = 'USD') {
                         await setCurrencySelectValue(currencySelect, normalizedCurrency);
                     }
                     if (remarksField) {
-                        remarksField.value = remarksHtml || '';
+                        // Use DataCollectionService to set value if available
+                        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                          window.DataCollectionService.setValue(remarksField.id, remarksHtml || '', 'rich-text');
+                        } else {
+                          remarksField.value = remarksHtml || '';
+                        }
                     }
 
                     const editorId = ensureRichTextEditorForTickerRemarks(modalElement);

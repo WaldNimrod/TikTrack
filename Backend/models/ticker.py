@@ -1,8 +1,11 @@
-from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Text, DateTime, CheckConstraint, UniqueConstraint
+from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Text, DateTime, CheckConstraint, UniqueConstraint, event
 from sqlalchemy.orm import relationship, Mapped
 from .base import BaseModel
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timezone
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Ticker(BaseModel):
     """
@@ -355,3 +358,27 @@ class TickerProviderSymbol(BaseModel):
         """
         result = super().to_dict()
         return result
+
+
+# ========================================
+# SQLAlchemy Event Listeners for Tag Links Cleanup
+# ========================================
+
+@event.listens_for(Ticker, 'after_delete')
+def ticker_deleted(mapper, connection, target):
+    """
+    Event listener for when a ticker is deleted.
+    Automatically removes all associated tag links.
+    """
+    try:
+        from services.tag_service import TagService
+        from sqlalchemy.orm import Session
+        
+        session = Session(bind=connection)
+        TagService.remove_all_tags_for_entity(
+            session, 'ticker', target.id
+        )
+        session.close()
+    except Exception as e:
+        logger.error(f"Error cleaning up tags for ticker {target.id}: {e}")
+        # Don't raise - allow deletion to proceed even if tag cleanup fails

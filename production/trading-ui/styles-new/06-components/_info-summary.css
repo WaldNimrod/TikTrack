@@ -1,7 +1,7 @@
 /* Monitoring Status Styles */
 .monitoring-status {
-    background: var(--color-bg-primary, #ffffff);
-    border: 1px solid var(--color-border-light, #dee2e6);
+    background: var(--color-bg-primary, var(--card-background, var(--background-color, white)));
+    border: 1px solid var(--color-border-light, var(--border-color, var(--color-border)));
     border-radius: var(--spacing-border-radius, 8px);
     padding: var(--spacing-md, 16px);
     margin-bottom: var(--spacing-md, 16px);
@@ -19,12 +19,12 @@
 .status-text {
     font-weight: var(--typography-font-weight-semibold, 600);
     font-size: var(--typography-font-size-lg, 18px);
-    color: var(--color-text-primary, #212529);
+    color: var(--color-text-primary, var(--text-color));
 }
 
 .last-check {
     font-size: var(--typography-font-size-sm, 14px);
-    color: var(--color-text-secondary, #6c757d);
+    color: var(--color-text-secondary, var(--text-muted, var(--color-text-secondary)));
     font-style: italic;
 }
 
@@ -35,10 +35,10 @@
     align-items: center;
     margin-bottom: var(--spacing-md, 16px);
     padding: var(--spacing-md, 16px);
-    background: var(--apple-bg-secondary, #F2F2F7);
-    border: 1px solid var(--apple-border, #C6C6C8);
+    background: var(--apple-bg-secondary, var(--card-background, var(--background-color-light)));
+    border: 1px solid var(--apple-border, var(--border-color, var(--color-border)));
     border-radius: var(--spacing-border-radius, 8px);
-    color: var(--apple-text-primary, #000000);
+    color: var(--apple-text-primary, var(--text-color, var(--color-text-primary)));
 }
 
 .control-group {
@@ -49,7 +49,7 @@
 
 .control-group label {
     font-weight: var(--typography-font-weight-medium, 500);
-    color: var(--apple-text-primary, #000000);
+    color: var(--apple-text-primary, var(--text-color, var(--color-text-primary)));
     font-size: var(--typography-font-size-sm, 14px);
 }
 
@@ -60,19 +60,19 @@
 
 .control-group select {
     padding: var(--spacing-xs, 8px);
-    border: 1px solid var(--apple-border, #C6C6C8);
+    border: 1px solid var(--apple-border, var(--border-color, var(--color-border)));
     border-radius: var(--spacing-border-radius-sm, 6px);
-    background: var(--apple-bg-primary, #FFFFFF);
+    background: var(--apple-bg-primary, var(--card-background, var(--background-color, white)));
     font-size: var(--typography-font-size-sm, 14px);
-    color: var(--apple-text-primary, #000000);
+    color: var(--apple-text-primary, var(--text-color, var(--color-text-primary)));
 }
 
 /* Info Summary Component Styles */
 /* Provides summary information display for various pages */
 
 .info-summary {
-    background: var(--color-bg-secondary, #f8f9fa);
-    border: 1px solid var(--color-border-light, #dee2e6);
+    background: var(--color-bg-secondary, var(--card-background, var(--background-color-light)));
+    border: 1px solid var(--color-border-light, var(--border-color, var(--color-border)));
     border-radius: var(--spacing-border-radius, 8px);
     padding: var(--spacing-md, 16px);
     margin-bottom: var(--spacing-md, 16px);
@@ -88,13 +88,13 @@
     align-items: center;
     justify-content: center; /* יישור למרכז */
     gap: var(--spacing-xs, 8px);
-    color: var(--color-text-secondary, #6c757d);
+    color: var(--color-text-secondary, var(--text-muted, var(--color-text-secondary)));
     text-align: center; /* יישור טקסט למרכז */
     opacity: 0.8; /* שקיפות 0.8 */
 }
 
 .info-summary strong {
-    color: var(--color-text-primary, #212529);
+    color: var(--color-text-primary, var(--text-color));
     font-weight: var(--typography-font-weight-semibold, 600);
 }
 
@@ -120,22 +120,22 @@
 
 [dir="rtl"] .log-entry.success {
     border-left: none;
-    border-right: 4px solid var(--color-success, #28a745);
+    border-right: 4px solid var(--color-success, var(--numeric-positive-medium, var(--color-success)));
 }
 
 [dir="rtl"] .log-entry.error {
     border-left: none;
-    border-right: 4px solid var(--color-error, #dc3545);
+    border-right: 4px solid var(--color-error, var(--numeric-negative-medium, var(--color-danger)));
 }
 
 [dir="rtl"] .log-entry.warning {
     border-left: none;
-    border-right: 4px solid var(--color-warning, #ffc107);
+    border-right: 4px solid var(--color-warning, var(--status-warning-color, var(--color-warning)));
 }
 
 [dir="rtl"] .log-entry.info {
     border-left: none;
-    border-right: 4px solid var(--color-info, #17a2b8);
+    border-right: 4px solid var(--color-info, var(--entity-ticker-color, var(--color-info)));
 }
 
 /* System Info Styles */
@@ -150,26 +150,26 @@
     justify-content: space-between;
     align-items: center;
     padding: var(--spacing-sm, 12px);
-    background: var(--color-bg-primary, #ffffff);
-    border: 1px solid var(--color-border-light, #dee2e6);
+    background: var(--color-bg-primary, var(--card-background, var(--background-color, white)));
+    border: 1px solid var(--color-border-light, var(--border-color, var(--color-border)));
     border-radius: var(--spacing-border-radius-sm, 6px);
     transition: all 0.2s ease;
 }
 
 .info-item:hover {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-color: var(--color-primary, #26baac);
+    box-shadow: 0 2px 4px color-mix(in srgb, var(--text-color, var(--color-text-primary, black)) 10%, transparent);
+    border-color: var(--color-primary, var(--entity-trade-color, var(--brand-primary-color)));
 }
 
 .info-label {
     font-weight: var(--typography-font-weight-medium, 500);
-    color: var(--color-text-secondary, #6c757d);
+    color: var(--color-text-secondary, var(--text-muted, var(--color-text-secondary)));
     font-size: var(--typography-font-size-sm, 14px);
 }
 
 .info-value {
     font-weight: var(--typography-font-weight-semibold, 600);
-    color: var(--color-text-primary, #212529);
+    color: var(--color-text-primary, var(--text-color));
     font-size: var(--typography-font-size-sm, 14px);
     font-family: var(--typography-font-family-mono, 'Courier New', monospace);
 }
@@ -186,14 +186,14 @@
 }
 
 .status-value.success {
-    background: var(--color-success-bg, #d4edda);
-    color: var(--color-success, #155724);
-    border: 1px solid var(--color-success-border, #c3e6cb);
+    background: var(--color-success-bg, var(--numeric-positive-light, var(--color-success-light)));
+    color: var(--color-success, var(--numeric-positive-dark, var(--color-success-dark)));
+    border: 1px solid var(--color-success-border, var(--numeric-positive-border, var(--color-success-border)));
 }
 
 .status-value.error {
-    background: var(--color-error-bg, #f8d7da);
-    color: var(--color-error, #721c24);
+    background: var(--color-error-bg, var(--numeric-negative-light, var(--color-danger-light)));
+    color: var(--color-error, var(--numeric-negative-dark, var(--color-danger-dark)));
     border: 1px solid var(--color-error-border, #f5c6cb);
 }
 
@@ -210,7 +210,7 @@
     gap: var(--spacing-xs, 8px);
     margin-top: var(--spacing-sm, 12px);
     font-size: var(--typography-font-size-sm, 14px);
-    color: var(--color-text-secondary, #6c757d);
+    color: var(--color-text-secondary, var(--text-muted, var(--color-text-secondary)));
 }
 
 .status-details span {
@@ -221,7 +221,7 @@
 
 /* Card Enhancements */
 .card {
-    border: 1px solid var(--color-border-light, #dee2e6);
+    border: 1px solid var(--color-border-light, var(--border-color, var(--color-border)));
     border-radius: var(--spacing-border-radius, 8px);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
@@ -233,8 +233,8 @@
 }
 
 .card-header {
-    background: var(--color-bg-secondary, #f8f9fa);
-    border-bottom: 1px solid var(--color-border-light, #dee2e6);
+    background: var(--color-bg-secondary, var(--card-background, var(--background-color-light)));
+    border-bottom: 1px solid var(--color-border-light, var(--border-color, var(--color-border)));
     padding: var(--spacing-md, 16px);
     border-radius: var(--spacing-border-radius, 8px) var(--spacing-border-radius, 8px) 0 0;
 }
@@ -243,7 +243,7 @@
     margin: 0;
     font-size: var(--typography-font-size-lg, 18px);
     font-weight: var(--typography-font-weight-semibold, 600);
-    color: var(--color-text-primary, #212529);
+    color: var(--color-text-primary, var(--text-color));
 }
 
 .card-body {
@@ -301,15 +301,15 @@
 .logs-container {
     max-height: 400px;
     overflow-y: auto;
-    border: 1px solid var(--color-border-light, #dee2e6);
+    border: 1px solid var(--color-border-light, var(--border-color, var(--color-border)));
     border-radius: var(--spacing-border-radius, 8px);
-    background: var(--color-bg-primary, #ffffff);
+    background: var(--color-bg-primary, var(--card-background, var(--background-color, white)));
     padding: var(--spacing-sm, 12px);
 }
 
 .logs-container:empty::before {
     content: "אין לוגים עדיין...";
-    color: var(--color-text-secondary, #6c757d);
+    color: var(--color-text-secondary, var(--text-muted, var(--color-text-secondary)));
     font-style: italic;
     text-align: center;
     display: block;
@@ -329,24 +329,24 @@
 }
 
 .log-entry:hover {
-    background: var(--color-bg-secondary, #f8f9fa);
-    border-color: var(--color-border-light, #dee2e6);
+    background: var(--color-bg-secondary, var(--card-background, var(--background-color-light)));
+    border-color: var(--color-border-light, var(--border-color, var(--color-border)));
 }
 
 .log-entry.success {
-    border-left: 4px solid var(--color-success, #28a745);
+    border-left: 4px solid var(--color-success, var(--numeric-positive-medium, var(--color-success)));
 }
 
 .log-entry.error {
-    border-left: 4px solid var(--color-error, #dc3545);
+    border-left: 4px solid var(--color-error, var(--numeric-negative-medium, var(--color-danger)));
 }
 
 .log-entry.warning {
-    border-left: 4px solid var(--color-warning, #ffc107);
+    border-left: 4px solid var(--color-warning, var(--status-warning-color, var(--color-warning)));
 }
 
 .log-entry.info {
-    border-left: 4px solid var(--color-info, #17a2b8);
+    border-left: 4px solid var(--color-info, var(--entity-ticker-color, var(--color-info)));
 }
 
 .log-icon {
@@ -361,13 +361,13 @@
 }
 
 .log-entry.success .log-icon {
-    background: var(--color-success-bg, #d4edda);
-    color: var(--color-success, #155724);
+    background: var(--color-success-bg, var(--numeric-positive-light, var(--color-success-light)));
+    color: var(--color-success, var(--numeric-positive-dark, var(--color-success-dark)));
 }
 
 .log-entry.error .log-icon {
-    background: var(--color-error-bg, #f8d7da);
-    color: var(--color-error, #721c24);
+    background: var(--color-error-bg, var(--numeric-negative-light, var(--color-danger-light)));
+    color: var(--color-error, var(--numeric-negative-dark, var(--color-danger-dark)));
 }
 
 .log-entry.warning .log-icon {
@@ -388,11 +388,11 @@
 .log-title {
     font-weight: var(--typography-font-weight-semibold, 600);
     margin-bottom: var(--spacing-xs, 8px);
-    color: var(--color-text-primary, #212529);
+    color: var(--color-text-primary, var(--text-color));
 }
 
 .log-message {
-    color: var(--color-text-secondary, #6c757d);
+    color: var(--color-text-secondary, var(--text-muted, var(--color-text-secondary)));
     margin-bottom: var(--spacing-xs, 8px);
     word-wrap: break-word;
 }

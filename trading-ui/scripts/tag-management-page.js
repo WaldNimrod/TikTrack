@@ -184,7 +184,12 @@
         const options = state.categories.map((category) => `<option value="${category.id}">${window.escapeHtml?.(category.name) || category.name}</option>`);
         select.innerHTML = [defaultOption, ...options].join('');
         if (state.filters.categoryId) {
-            select.value = state.filters.categoryId;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(select.id, state.filters.categoryId, 'text');
+            } else {
+              select.value = state.filters.categoryId;
+            }
         }
     }
 
@@ -275,9 +280,16 @@
     function resetFilters() {
         state.filters = { categoryId: '', search: '' };
         const categorySelect = document.querySelector(selectors.categoryFilter);
-        if (categorySelect) categorySelect.value = '';
-        const searchInput = document.querySelector(selectors.searchInput);
-        if (searchInput) searchInput.value = '';
+        // Use DataCollectionService to clear fields if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          if (categorySelect) window.DataCollectionService.setValue(categorySelect.id, '', 'text');
+          const searchInput = document.querySelector(selectors.searchInput);
+          if (searchInput) window.DataCollectionService.setValue(searchInput.id, '', 'text');
+        } else {
+          if (categorySelect) categorySelect.value = '';
+          const searchInput = document.querySelector(selectors.searchInput);
+          if (searchInput) searchInput.value = '';
+        }
         applyFilters();
     }
 
@@ -371,12 +383,28 @@
         const orderInput = document.getElementById('tagCategoryOrder');
         const activeCheckbox = document.getElementById('tagCategoryActive');
 
-        if (nameInput) nameInput.value = entityData?.name || '';
-        if (descriptionInput) descriptionInput.value = entityData?.description || '';
-        if (orderInput) {
+        // Use DataCollectionService to set values if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          if (nameInput) window.DataCollectionService.setValue(nameInput.id, entityData?.name || '', 'text');
+          if (descriptionInput) window.DataCollectionService.setValue(descriptionInput.id, entityData?.description || '', 'text');
+          if (orderInput) {
+            const orderValue = Number.isFinite(Number(entityData?.order_index)) ? String(entityData.order_index) : '';
+            window.DataCollectionService.setValue(orderInput.id, orderValue, 'text');
+          }
+        } else {
+          // Use DataCollectionService to set values if available
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            if (nameInput) window.DataCollectionService.setValue(nameInput.id, entityData?.name || '', 'text');
+            if (descriptionInput) window.DataCollectionService.setValue(descriptionInput.id, entityData?.description || '', 'text');
+          } else {
+            if (nameInput) nameInput.value = entityData?.name || '';
+            if (descriptionInput) descriptionInput.value = entityData?.description || '';
+          }
+          if (orderInput) {
             orderInput.value = Number.isFinite(Number(entityData?.order_index))
-                ? String(entityData.order_index)
-                : '';
+              ? String(entityData.order_index)
+              : '';
+          }
         }
         if (activeCheckbox) activeCheckbox.checked = entityData ? entityData.is_active !== false : true;
     }
@@ -406,10 +434,19 @@
             });
             options.forEach((option) => categorySelect.appendChild(option));
 
-            if (entityData?.category_id) {
-                categorySelect.value = String(entityData.category_id);
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              if (entityData?.category_id) {
+                window.DataCollectionService.setValue(categorySelect.id, String(entityData.category_id), 'text');
+              } else {
+                window.DataCollectionService.setValue(categorySelect.id, '', 'text');
+              }
             } else {
+              if (entityData?.category_id) {
+                categorySelect.value = String(entityData.category_id);
+              } else {
                 categorySelect.value = '';
+              }
             }
         }
 

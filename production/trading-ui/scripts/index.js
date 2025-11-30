@@ -5,7 +5,7 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 16
+ * Total Functions: 17
  * 
  * DATA MANIPULATION (5)
  * - createTradesStatusChart() - * Export overview data from the index page
@@ -16,6 +16,9 @@
  * 
  * EVENT HANDLING (1)
  * - quickAction() - * Refresh overview data on the index page
+ * 
+ * ICON MANAGEMENT (1)
+ * - replaceIconsWithIconSystem() - Replace all <img> tags with IconSystem.renderIcon()
  * 
  * OTHER (10)
  * - switchTableTab() - switchTableTab function
@@ -216,47 +219,6 @@ function determineCurrencySymbol(accounts = [], trades = []) {
     return '$';
 }
 
-/**
- * Format amount as HTML
- * @param {*} value - Amount value
- * @param {string} [currencySymbol='$'] - Currency symbol
- * @param {number} [decimals=2] - Number of decimal places
- * @returns {string} Formatted HTML string
- */
-function formatAmountHtml(value, currencySymbol = '$', decimals = 2) {
-    const numericValue = toNumber(value);
-    if (!Number.isFinite(numericValue)) {
-        return '<span class="text-muted">לא זמין</span>';
-    }
-    if (window.FieldRendererService?.renderAmount) {
-        try {
-            return window.FieldRendererService.renderAmount(numericValue, currencySymbol, decimals, true);
-        } catch (error) {
-            window.Logger?.warn?.('⚠️ renderAmount failed', { error: error?.message }, { page: 'index' });
-        }
-    }
-    return `${currencySymbol}${numericValue.toFixed(decimals)}`;
-}
-
-/**
- * Translate side value to Hebrew
- * @param {*} side - Side value
- * @returns {string} Translated side or original value
- */
-function translateSide(side) {
-    if (!side && side !== 0) {
-        return '';
-    }
-    const normalized = side.toString().toLowerCase();
-    if (window.FieldRendererService?.renderSide) {
-        try {
-            return window.FieldRendererService.renderSide(normalized);
-        } catch (error) {
-            window.Logger?.warn?.('⚠️ renderSide failed', { error: error?.message }, { page: 'index' });
-        }
-    }
-    return SIDE_LABELS[normalized] || side;
-}
 
 /**
  * Compute portfolio profit and loss
@@ -323,14 +285,180 @@ function updateSummaryStats(data, currencySymbol) {
     }, 0);
     const balanceEl = document.getElementById('currentBalance');
     if (balanceEl) {
-        balanceEl.innerHTML = formatAmountHtml(balance, currencySymbol);
+        // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+        const numericBalance = toNumber(balance);
+        if (Number.isFinite(numericBalance)) {
+            balanceEl.innerHTML = window.FieldRendererService?.renderAmount
+                ? window.FieldRendererService.renderAmount(numericBalance, currencySymbol, 2, true)
+                : '<span class="text-muted">לא זמין</span>';
+        } else {
+            balanceEl.innerHTML = '<span class="text-muted">לא זמין</span>';
+        }
     }
 
     const totalPnL = computePortfolioPnL(trades, accounts, cashFlows);
     const totalPnLEl = document.getElementById('totalPnL');
     if (totalPnLEl) {
-        totalPnLEl.innerHTML = formatAmountHtml(totalPnL, currencySymbol);
+        // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+        const numericPnL = toNumber(totalPnL);
+        if (Number.isFinite(numericPnL)) {
+            totalPnLEl.innerHTML = window.FieldRendererService?.renderAmount
+                ? window.FieldRendererService.renderAmount(numericPnL, currencySymbol, 2, true)
+                : '<span class="text-muted">לא זמין</span>';
+        } else {
+            totalPnLEl.innerHTML = '<span class="text-muted">לא זמין</span>';
+        }
     }
+}
+
+/**
+ * Update unified recent items widget (trades and trade plans)
+ * @param {Array} [trades=[]] - Array of trades
+ * @param {Array} [tradePlans=[]] - Array of trade plans
+ * @param {string} currencySymbol - Currency symbol
+ * @returns {void}
+ */
+function updateRecentItemsWidget(trades = [], tradePlans = [], currencySymbol) {
+    if (window.RecentItemsWidget?.render) {
+        window.Logger?.info?.('📊 Updating RecentItemsWidget', { 
+            tradesCount: Array.isArray(trades) ? trades.length : 0,
+            tradePlansCount: Array.isArray(tradePlans) ? tradePlans.length : 0,
+            currencySymbol,
+            page: 'index'
+        });
+        // Build render data - only include trades/tradePlans if they have data
+        // This matches the test page behavior where we only pass what we have
+        const renderData = {
+            currencySymbol: currencySymbol || '$'
+        };
+        // Only add trades if we have valid data (don't pass empty array - it clears existing)
+        if (Array.isArray(trades) && trades.length > 0) {
+            renderData.trades = trades;
+        }
+        // Only add tradePlans if we have valid data
+        if (Array.isArray(tradePlans) && tradePlans.length > 0) {
+            renderData.tradePlans = tradePlans;
+        }
+        
+        window.Logger?.info?.('📊 Calling RecentItemsWidget.render', {
+            renderDataKeys: Object.keys(renderData),
+            tradesIncluded: renderData.hasOwnProperty('trades'),
+            tradePlansIncluded: renderData.hasOwnProperty('tradePlans'),
+            page: 'index'
+        });
+        
+        window.RecentItemsWidget.render(renderData);
+        return;
+    }
+    
+    window.Logger?.warn?.('⚠️ RecentItemsWidget not available, falling back to separate widgets', { page: 'index' });
+    // Fallback to separate widgets if unified widget not available
+    updateRecentTrades(trades, currencySymbol);
+    if (tradePlans && tradePlans.length > 0) {
+        updateRecentTradePlans(tradePlans, currencySymbol);
+    }
+}
+
+/**
+ * Update recent trade plans section
+ * @param {Array} [tradePlans=[]] - Array of trade plans
+ * @param {string} currencySymbol - Currency symbol
+ * @returns {void}
+ */
+function updateRecentTradePlans(tradePlans = [], currencySymbol) {
+    // Unified widget is updated via updateRecentItemsWidget or loadRecentTradePlans
+    // This function is kept for backward compatibility
+    if (window.RecentItemsWidget?.render) {
+        return; // Will be handled by unified widget
+    }
+    
+    if (window.RecentTradePlansWidget?.render) {
+        window.RecentTradePlansWidget.render(tradePlans, currencySymbol);
+        return;
+    }
+
+    const container = document.getElementById('recentTradePlans');
+    if (!container) {
+        return;
+    }
+
+    if (!Array.isArray(tradePlans) || tradePlans.length === 0) {
+        container.innerHTML = '<div class="text-muted small">אין תוכניות זמינות</div>';
+        return;
+    }
+
+    // Use TableSortValueAdapter for consistent sorting
+    const sorted = [...tradePlans].sort((a, b) => {
+        const dateA = resolveDateValue(a?.created_at || a?.opened_at || a?.entry_date);
+        const dateB = resolveDateValue(b?.created_at || b?.opened_at || b?.entry_date);
+        
+        if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+            const sortValueA = window.TableSortValueAdapter.getSortValue({ value: dateA, type: 'date' });
+            const sortValueB = window.TableSortValueAdapter.getSortValue({ value: dateB, type: 'date' });
+            return (sortValueB || 0) - (sortValueA || 0);
+        }
+        
+        const epochA = dateA ? new Date(dateA).getTime() : 0;
+        const epochB = dateB ? new Date(dateB).getTime() : 0;
+        return epochB - epochA;
+    });
+
+    const topPlans = sorted.slice(0, 5);
+    const list = document.createElement('ul');
+    list.className = 'list-group list-group-flush';
+
+    topPlans.forEach((plan) => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item d-flex justify-content-between align-items-start gap-2';
+
+        const mainWrap = document.createElement('div');
+        mainWrap.className = 'd-flex flex-column';
+
+        const title = document.createElement('span');
+        title.className = 'fw-semibold';
+        title.textContent = plan?.name || plan?.title || (plan?.id ? `תוכנית #${plan.id}` : 'לא זמין');
+        mainWrap.appendChild(title);
+
+        const metaRow = document.createElement('div');
+        metaRow.className = 'd-flex flex-wrap align-items-center gap-2 text-muted small';
+
+        const symbol = plan?.ticker?.symbol || plan?.symbol;
+        if (symbol) {
+            const symbolSpan = document.createElement('span');
+            symbolSpan.textContent = symbol;
+            metaRow.appendChild(symbolSpan);
+        }
+
+        const dateLabel = formatDateShort(plan?.created_at || plan?.opened_at || plan?.entry_date);
+        if (dateLabel) {
+            const dateSpan = document.createElement('span');
+            dateSpan.textContent = dateLabel;
+            metaRow.appendChild(dateSpan);
+        }
+
+        mainWrap.appendChild(metaRow);
+        item.appendChild(mainWrap);
+
+        const amountWrapper = document.createElement('div');
+        amountWrapper.className = 'text-muted small text-end';
+        const value = plan?.amount || plan?.total_amount || plan?.investment_amount;
+        if (value !== undefined && value !== null) {
+            const numericValue = toNumber(value);
+            if (Number.isFinite(numericValue) && window.FieldRendererService?.renderAmount) {
+                amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, true);
+            } else {
+                amountWrapper.textContent = 'לא זמין';
+            }
+        } else {
+            amountWrapper.textContent = 'לא זמין';
+        }
+        item.appendChild(amountWrapper);
+
+        list.appendChild(item);
+    });
+
+    container.innerHTML = '';
+    container.appendChild(list);
 }
 
 /**
@@ -340,6 +468,13 @@ function updateSummaryStats(data, currencySymbol) {
  * @returns {void}
  */
 function updateRecentTrades(trades = [], currencySymbol) {
+    // Try unified widget first - but we need trade plans too, so call updateRecentItemsWidget instead
+    // This function is kept for backward compatibility
+    if (window.RecentItemsWidget?.render) {
+        // Will be updated via updateRecentItemsWidget
+        return;
+    }
+    
     if (window.RecentTradesWidget?.render) {
         window.RecentTradesWidget.render(trades, currencySymbol);
         return;
@@ -355,10 +490,22 @@ function updateRecentTrades(trades = [], currencySymbol) {
         return;
     }
 
+    // Use TableSortValueAdapter for consistent sorting
     const sorted = [...trades].sort((a, b) => {
-        const dateA = new Date(resolveDateValue(a?.created_at || a?.opened_at || a?.entry_date) || 0).getTime();
-        const dateB = new Date(resolveDateValue(b?.created_at || b?.opened_at || b?.entry_date) || 0).getTime();
-        return dateB - dateA;
+        const dateA = resolveDateValue(a?.created_at || a?.opened_at || a?.entry_date);
+        const dateB = resolveDateValue(b?.created_at || b?.opened_at || b?.entry_date);
+        
+        // Use TableSortValueAdapter if available
+        if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+            const sortValueA = window.TableSortValueAdapter.getSortValue({ value: dateA, type: 'date' });
+            const sortValueB = window.TableSortValueAdapter.getSortValue({ value: dateB, type: 'date' });
+            return (sortValueB || 0) - (sortValueA || 0);
+        }
+        
+        // Fallback to manual date comparison
+        const epochA = dateA ? new Date(dateA).getTime() : 0;
+        const epochB = dateB ? new Date(dateB).getTime() : 0;
+        return epochB - epochA;
     });
 
     const topTrades = sorted.slice(0, 5);
@@ -380,15 +527,15 @@ function updateRecentTrades(trades = [], currencySymbol) {
         const metaRow = document.createElement('div');
         metaRow.className = 'd-flex flex-wrap align-items-center gap-2 text-muted small';
 
-        const sideHtml = translateSide(trade?.side || trade?.position?.side || '');
-        if (sideHtml) {
-            const sideSpan = document.createElement('span');
-            if (typeof sideHtml === 'string' && sideHtml.includes('<')) {
+        // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+        const side = trade?.side || trade?.position?.side || '';
+        if (side && window.FieldRendererService?.renderSide) {
+            const sideHtml = window.FieldRendererService.renderSide(side);
+            if (sideHtml) {
+                const sideSpan = document.createElement('span');
                 sideSpan.innerHTML = sideHtml;
-            } else {
-                sideSpan.textContent = sideHtml;
+                metaRow.appendChild(sideSpan);
             }
-            metaRow.appendChild(sideSpan);
         }
 
         const quantity = trade?.position?.quantity ?? trade?.quantity;
@@ -412,7 +559,13 @@ function updateRecentTrades(trades = [], currencySymbol) {
         amountWrapper.className = 'text-muted small text-end';
         const value = trade?.position?.market_value ?? trade?.position?.current_value ?? trade?.entry_price;
         if (value !== undefined && value !== null) {
-            amountWrapper.innerHTML = formatAmountHtml(value, currencySymbol);
+            // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+            const numericValue = toNumber(value);
+            if (Number.isFinite(numericValue) && window.FieldRendererService?.renderAmount) {
+                amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, true);
+            } else {
+                amountWrapper.textContent = 'לא זמין';
+            }
         } else {
             amountWrapper.textContent = 'לא זמין';
         }
@@ -441,7 +594,12 @@ function updateActiveAlerts(alerts = []) {
         return;
     }
 
-    const activeAlerts = alerts.filter((alert) => (alert?.status || '').toLowerCase() === 'active');
+    // Filter for active alerts (is_triggered = 'new')
+    const activeAlerts = alerts.filter((alert) => {
+        const triggered = alert?.is_triggered || alert?.status;
+        return triggered === 'new';
+    });
+    
     const alertSubset = (activeAlerts.length ? activeAlerts : alerts).slice(0, 5);
 
     const list = document.createElement('ul');
@@ -546,6 +704,10 @@ function updatePortfolioSummary({ accounts = [], trades = [], cashFlows = [] }, 
         return;
     }
 
+    // Note: portfolioSummaryStats is a separate container from summaryStats
+    // summaryStats uses InfoSummarySystem via updateSummaryStats()
+    // This function handles portfolioSummaryStats which is a different display
+    // Keeping manual calculation for now as it's a different container with different layout
     const activeAccounts = accounts.filter((account) => (account?.status || '').toLowerCase() === 'open');
     const totalValue = accounts.reduce((sum, account) => {
         const value = account?.total_value ?? account?.opening_balance ?? 0;
@@ -555,13 +717,22 @@ function updatePortfolioSummary({ accounts = [], trades = [], cashFlows = [] }, 
     const openTrades = trades.filter((trade) => (trade?.status || '').toLowerCase() === 'open');
     const pnl = computePortfolioPnL(trades, accounts, cashFlows);
 
+    // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+    const renderAmountHelper = (val) => {
+        const numericVal = toNumber(val);
+        if (Number.isFinite(numericVal) && window.FieldRendererService?.renderAmount) {
+            return window.FieldRendererService.renderAmount(numericVal, currencySymbol, 2, true);
+        }
+        return '<span class="text-muted">לא זמין</span>';
+    };
+    
     container.innerHTML = `
         <div class="d-flex flex-wrap gap-3 text-muted small">
             <span>חשבונות פעילים: ${activeAccounts.length.toLocaleString('he-IL')} מתוך ${accounts.length.toLocaleString('he-IL')}</span>
-            <span>שווי כולל: ${formatAmountHtml(totalValue, currencySymbol)}</span>
-            <span>שווי ממוצע לחשבון: ${formatAmountHtml(avgValue, currencySymbol)}</span>
+            <span>שווי כולל: ${renderAmountHelper(totalValue)}</span>
+            <span>שווי ממוצע לחשבון: ${renderAmountHelper(avgValue)}</span>
             <span>טריידים פתוחים: ${openTrades.length.toLocaleString('he-IL')}</span>
-            <span>P/L כולל: ${formatAmountHtml(pnl, currencySymbol)}</span>
+            <span>P/L כולל: ${renderAmountHelper(pnl)}</span>
         </div>
     `;
 }
@@ -595,7 +766,10 @@ function showDashboardError(message) {
 function handleDashboardError(error) {
     const message = error?.message || 'שגיאה בטעינת נתוני הדשבורד';
     window.Logger?.error?.('❌ Error loading dashboard data', { message, stack: error?.stack }, { page: 'index' });
-    if (typeof window.showErrorNotification === 'function') {
+    // Use CRUDResponseHandler for error notification if available
+    if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {
+        window.CRUDResponseHandler.handleError(error, 'טעינת נתוני דשבורד');
+    } else if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה', message, 6000, 'system');
     }
     showDashboardError(message);
@@ -608,6 +782,13 @@ function handleDashboardError(error) {
  * @returns {void}
  */
 function processDashboardData(data, source = 'network') {
+    // Check authentication before processing data
+    const isAuth = window.TikTrackAuth?.isAuthenticated?.() || false;
+    if (!isAuth) {
+        // User is not authenticated - clear all displayed data
+        data = { trades: [], alerts: [], accounts: [], cashFlows: [] };
+    }
+    
     if (!data) {
         return;
     }
@@ -620,7 +801,7 @@ function processDashboardData(data, source = 'network') {
         const tradesSummary = window.TableDataRegistry.getSummary('trades');
         if (tradesSummary) {
             const registryTrades = window.TableDataRegistry.getFilteredData('trades', { asReference: false });
-            if (Array.isArray(registryTrades)) {
+            if (Array.isArray(registryTrades) && registryTrades.length > 0) {
                 trades = registryTrades;
             }
         }
@@ -649,15 +830,190 @@ function processDashboardData(data, source = 'network') {
     const currencySymbol = determineCurrencySymbol(accounts, trades);
 
     updateSummaryStats({ trades, alerts, accounts, cashFlows }, currencySymbol);
-    updateRecentTrades(trades, currencySymbol);
     updateActiveAlerts(alerts);
     updateDashboardCount({ trades, alerts, accounts });
     updatePortfolioSummary({ accounts, trades, cashFlows }, currencySymbol);
+    
+    window.Logger?.info?.('🔍 [index.js] processDashboardData - About to update widget', {
+        tradesCount: trades.length,
+        alertsCount: alerts.length,
+        accountsCount: accounts.length,
+        currencySymbol,
+        page: 'index'
+    });
+    
+    // Update unified recent items widget with trades (trade plans will be loaded separately)
+    // IMPORTANT: Only pass trades if we have data - don't pass empty array (it clears existing)
+    // This matches the test page behavior
+    if (trades && trades.length > 0) {
+        window.Logger?.info?.('🔍 [index.js] processDashboardData - Updating widget with trades', {
+            tradesCount: trades.length,
+            page: 'index'
+        });
+        updateRecentItemsWidget(trades, [], currencySymbol);
+    } else {
+        window.Logger?.info?.('🔍 [index.js] processDashboardData - No trades, skipping widget update (will update when trades loaded)', {
+            page: 'index'
+        });
+    }
+    
+    // Load and update recent trade plans (will update unified widget with both trades and plans)
+    // Pass trades to loadRecentTradePlans so it can preserve them when updating
+    loadRecentTradePlans(currencySymbol, trades).catch((error) => {
+        window.Logger?.warn?.('⚠️ Failed to load recent trade plans', { error: error?.message }, { page: 'index' });
+    });
+    
+    // If no trades were loaded, try to fetch them directly from API for the widget
+    if (!trades || trades.length === 0) {
+      window.Logger?.info?.('📊 No trades in dashboard data, attempting to load trades for widget...', { page: 'index' });
+      // Try to load trades from API directly (fallback if DashboardData returns empty)
+      fetch('/api/trades/', { headers: { Accept: 'application/json' } })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((payload) => {
+          const tradesData = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+          if (Array.isArray(tradesData) && tradesData.length > 0) {
+            window.Logger?.info?.('📊 Loaded trades for widget directly from API', { count: tradesData.length, page: 'index' });
+            // IMPORTANT: Update widget with trades, but preserve existing trade plans
+            // Don't pass empty array for tradePlans - let widget preserve existing
+            updateRecentItemsWidget(tradesData, [], currencySymbol);
+            // Also reload trade plans with the newly loaded trades to ensure both are displayed
+            loadRecentTradePlans(currencySymbol, tradesData).catch(() => {});
+          } else {
+            window.Logger?.debug?.('📊 No trades found in API response', { page: 'index' });
+          }
+        })
+        .catch((error) => {
+          window.Logger?.warn?.('⚠️ Failed to load trades for widget from API', { error: error?.message }, { page: 'index' });
+        });
+    }
 
     dashboardDataState.lastLoadedAt = Date.now();
     dashboardDataState.source = source;
     dashboardDataState.data = { trades, alerts, accounts, cashFlows };
     window.dashboardData = dashboardDataState.data;
+}
+
+/**
+ * Load and update recent trade plans
+ * @param {string} currencySymbol - Currency symbol
+ * @param {Array} [currentTrades=[]] - Current trades array for unified widget
+ * @returns {Promise<void>}
+ */
+async function loadRecentTradePlans(currencySymbol, currentTrades = []) {
+    window.Logger?.info?.('🔍 [index.js] loadRecentTradePlans START', {
+        currencySymbol,
+        currentTradesCount: Array.isArray(currentTrades) ? currentTrades.length : 0,
+        TradePlansDataServiceExists: !!window.TradePlansDataService,
+        TradePlansDataServiceLoadExists: !!window.TradePlansDataService?.loadTradePlansData,
+        RecentItemsWidgetExists: !!window.RecentItemsWidget,
+        RecentItemsWidgetRenderExists: !!window.RecentItemsWidget?.render,
+        page: 'index'
+    });
+    
+    try {
+        let tradePlans = [];
+        
+        // Try to use trade plans data service if available
+        if (window.TradePlansDataService?.loadTradePlansData) {
+            window.Logger?.info?.('🔍 [index.js] Using TradePlansDataService to load trade plans', { page: 'index' });
+            tradePlans = await window.TradePlansDataService.loadTradePlansData({ force: false });
+            window.Logger?.info?.('🔍 [index.js] TradePlansDataService returned', {
+                isArray: Array.isArray(tradePlans),
+                count: Array.isArray(tradePlans) ? tradePlans.length : 0,
+                firstPlan: tradePlans?.[0],
+                page: 'index'
+            });
+            if (!Array.isArray(tradePlans)) {
+                tradePlans = [];
+                window.Logger?.warn?.('⚠️ [index.js] TradePlansDataService returned non-array, setting to empty', { 
+                    type: typeof tradePlans,
+                    tradePlans,
+                    page: 'index' 
+                });
+            }
+        } else {
+            window.Logger?.info?.('🔍 [index.js] TradePlansDataService not available, fetching directly from API', { page: 'index' });
+            // Fallback: fetch directly from API
+            const response = await fetch('/api/trade-plans/', { headers: { Accept: 'application/json' } });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const payload = await response.json();
+            window.Logger?.info?.('🔍 [index.js] API response received', {
+                hasData: !!payload?.data,
+                isArrayData: Array.isArray(payload?.data),
+                isArrayRoot: Array.isArray(payload),
+                dataCount: Array.isArray(payload?.data) ? payload.data.length : (Array.isArray(payload) ? payload.length : 0),
+                page: 'index'
+            });
+            tradePlans = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+        }
+        
+        window.Logger?.info?.('🔍 [index.js] About to update RecentItemsWidget', {
+            tradePlansCount: tradePlans.length,
+            currentTradesCount: Array.isArray(currentTrades) ? currentTrades.length : 0,
+            willPassTrades: Array.isArray(currentTrades) && currentTrades.length > 0,
+            currencySymbol,
+            page: 'index'
+        });
+        
+        // Update unified widget if available
+        if (window.RecentItemsWidget?.render) {
+            // Update with both trades and trade plans
+            // IMPORTANT: Don't pass trades at all if currentTrades is empty - let widget preserve existing trades from state
+            // This matches the test page behavior where both are passed together
+            const renderData = {
+                tradePlans: tradePlans,
+                currencySymbol: currencySymbol
+            };
+            // Only add trades if we have valid data (don't pass empty array or undefined - it clears existing)
+            if (Array.isArray(currentTrades) && currentTrades.length > 0) {
+                renderData.trades = currentTrades;
+            }
+            // If currentTrades is empty, don't pass it at all - widget will preserve existing trades from state
+            
+            window.Logger?.info?.('🔍 [index.js] Calling RecentItemsWidget.render', {
+                willPassTrades: renderData.hasOwnProperty('trades'),
+                tradesCount: renderData.trades?.length || 0,
+                tradePlansCount: renderData.tradePlans?.length || 0,
+                renderDataKeys: Object.keys(renderData),
+                page: 'index'
+            });
+            
+            window.RecentItemsWidget.render(renderData);
+            window.Logger?.info?.('📊 [index.js] Updated RecentItemsWidget with trade plans', {
+                tradesCount: Array.isArray(currentTrades) ? currentTrades.length : 0,
+                tradePlansCount: tradePlans.length,
+                firstTradePlan: tradePlans[0],
+                page: 'index'
+            });
+        } else {
+            window.Logger?.warn?.('⚠️ [index.js] RecentItemsWidget not available, falling back to separate widget', { page: 'index' });
+            // Fallback to separate widget
+            updateRecentTradePlans(tradePlans, currencySymbol);
+        }
+    } catch (error) {
+        window.Logger?.error?.('❌ [index.js] Failed to load trade plans for recent widget', { 
+            error: error?.message,
+            stack: error?.stack,
+            page: 'index' 
+        });
+        // Update unified widget with empty trade plans if available
+        if (window.RecentItemsWidget?.render) {
+            window.Logger?.info?.('🔍 [index.js] Updating widget with empty trade plans due to error', { page: 'index' });
+            updateRecentItemsWidget(currentTrades, [], currencySymbol);
+        } else {
+            const container = document.getElementById('recentTradePlans');
+            if (container) {
+                container.innerHTML = '<div class="text-muted small">אין תוכניות זמינות</div>';
+            }
+        }
+    }
 }
 
 /**
@@ -672,13 +1028,33 @@ async function legacyFetchDashboardDataFromApi() {
                 'Accept': 'application/json'
             }
         });
+        
+        // Use CRUDResponseHandler.handleLoadResponse for consistent error handling
         if (!response.ok) {
-            throw new Error(`טעינת ${label} נכשלה (${response.status})`);
+            if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleLoadResponse) {
+                // Use CRUDResponseHandler for consistent error handling with retry mechanism
+                return window.CRUDResponseHandler.handleLoadResponse(response, {
+                    tableId: `${label}Table`,
+                    entityName: label,
+                    columns: undefined, // Auto-detect
+                    onRetry: () => fetchJsonList(url, label)
+                });
+            } else {
+                // Fallback to original error handling
+                throw new Error(`טעינת ${label} נכשלה (${response.status})`);
+            }
         }
+        
         const payload = await response.json();
         if (payload?.status && payload.status !== 'success') {
             const errorMessage = payload?.error?.message || payload?.message || `טעינת ${label} נכשלה`;
-            throw new Error(errorMessage);
+            // Use CRUDResponseHandler for error notification if available
+            if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {
+                window.CRUDResponseHandler.handleError(new Error(errorMessage), `טעינת ${label}`);
+                return []; // Return empty array instead of throwing
+            } else {
+                throw new Error(errorMessage);
+            }
         }
         return normalizeArray(payload);
     };
@@ -686,18 +1062,23 @@ async function legacyFetchDashboardDataFromApi() {
     const [trades, alerts, accounts, cashFlows] = await Promise.all([
         fetchJsonList(DASHBOARD_ENDPOINTS.trades, 'טריידים').catch((error) => {
             window.Logger?.error?.('❌ Failed to load trades for dashboard', { error: error?.message }, { page: 'index' });
-            throw error;
+            // CRUDResponseHandler.handleLoadResponse already handled the error and returned []
+            // So we return [] instead of throwing to allow other data to load
+            return [];
         }),
         fetchJsonList(DASHBOARD_ENDPOINTS.alerts, 'התראות').catch((error) => {
             window.Logger?.error?.('❌ Failed to load alerts for dashboard', { error: error?.message }, { page: 'index' });
-            throw error;
+            // CRUDResponseHandler.handleLoadResponse already handled the error and returned []
+            return [];
         }),
         fetchJsonList(DASHBOARD_ENDPOINTS.accounts, 'חשבונות מסחר').catch((error) => {
             window.Logger?.error?.('❌ Failed to load trading accounts for dashboard', { error: error?.message }, { page: 'index' });
-            throw error;
+            // CRUDResponseHandler.handleLoadResponse already handled the error and returned []
+            return [];
         }),
         fetchJsonList(DASHBOARD_ENDPOINTS.cashFlows, 'תזרימי מזומנים').catch((error) => {
             window.Logger?.warn?.('⚠️ Failed to load cash flows for dashboard', { error: error?.message }, { page: 'index' });
+            // CRUDResponseHandler.handleLoadResponse already handled the error and returned []
             return [];
         })
     ]);
@@ -733,6 +1114,19 @@ async function loadDashboardDataFromService(options = {}) {
 
 window.loadDashboardData = async function(options = {}) {
     const { force = false, ttl = DASHBOARD_DATA_TTL } = options;
+
+    // Check authentication before loading data
+    const isAuth = window.TikTrackAuth?.isAuthenticated?.() || false;
+    if (!isAuth) {
+        // User is not authenticated - clear dashboard data and return empty
+        if (window.dashboardDataState) {
+            window.dashboardDataState.data = { trades: [], alerts: [], accounts: [], cashFlows: [] };
+            window.dashboardDataState.lastLoadedAt = null;
+        }
+        // Clear displayed data
+        processDashboardData({ trades: [], alerts: [], accounts: [], cashFlows: [] }, 'network');
+        return { trades: [], alerts: [], accounts: [], cashFlows: [] };
+    }
 
     if (!force && dashboardDataPromise) {
         return dashboardDataPromise;
@@ -803,8 +1197,14 @@ window.loadDashboardData = async function(options = {}) {
 
     dashboardDataPromise = executeLoad()
         .catch((error) => {
-            handleDashboardError(error);
-            throw error;
+            // Use CRUDResponseHandler for error handling if available
+            if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {
+                window.CRUDResponseHandler.handleError(error, 'טעינת נתוני דשבורד');
+            } else {
+                handleDashboardError(error);
+            }
+            // Don't throw - return empty data structure to allow page to continue
+            return { trades: [], alerts: [], accounts: [], cashFlows: [] };
         })
         .finally(() => {
             dashboardDataPromise = null;
@@ -1223,6 +1623,74 @@ async function exportAllCharts() {
     }
 }
 
+/**
+ * Replace all <img> tags with IconSystem.renderIcon()
+ * @returns {Promise<void>}
+ */
+async function replaceIconsWithIconSystem() {
+    if (!window.IconSystem || !window.IconSystem.initialized) {
+        // Wait for IconSystem to be ready
+        if (window.IconSystem && typeof window.IconSystem.initialize === 'function') {
+            await window.IconSystem.initialize();
+        } else {
+            // Retry after delay
+            setTimeout(() => replaceIconsWithIconSystem(), 500);
+            return;
+        }
+    }
+
+    // Icon mapping: img src path -> IconSystem type and name
+    const iconMappings = {
+        // Entity icons
+        'home.svg': { type: 'entity', name: 'home' },
+        'executions.svg': { type: 'entity', name: 'execution' },
+        'trades.svg': { type: 'entity', name: 'trade' },
+        'trade_plans.svg': { type: 'entity', name: 'trade_plan' },
+        'trading_accounts.svg': { type: 'entity', name: 'account' }
+    };
+
+    // Find all img tags with icon paths
+    const imgTags = document.querySelectorAll('img[src*="/trading-ui/images/icons/"]');
+    
+    for (const img of imgTags) {
+        const src = img.getAttribute('src') || '';
+        const alt = img.getAttribute('alt') || '';
+        const size = img.getAttribute('width') || img.getAttribute('height') || '16';
+        const className = img.getAttribute('class') || 'icon';
+        
+        // Extract icon name from path
+        const iconFileName = src.split('/').pop();
+        const mapping = iconMappings[iconFileName];
+        
+        if (mapping) {
+            try {
+                const iconHTML = await window.IconSystem.renderIcon(mapping.type, mapping.name, {
+                    size: size,
+                    alt: alt,
+                    class: className
+                });
+                
+                // Replace img with rendered icon
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = iconHTML;
+                const newIcon = tempDiv.firstElementChild;
+                
+                if (newIcon) {
+                    img.parentNode.replaceChild(newIcon, img);
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Failed to render icon', { 
+                        icon: iconFileName, 
+                        error, 
+                        page: 'index' 
+                    });
+                }
+            }
+        }
+    }
+}
+
 // Initialize index page - integrated with unified system
 // Flag to prevent duplicate initialization
 let indexPageInitialized = false;
@@ -1236,6 +1704,18 @@ window.initializeIndexPage = async function() {
     
     indexPageInitialized = true;
     window.Logger.info('🏠 Index page initialized via unified system', { page: "index" });
+    
+    // Replace icons with IconSystem
+    if (typeof window.replaceIconsInContext === 'function') {
+        window.replaceIconsInContext().catch(() => {
+            // Ignore errors - icons will load when ready
+        });
+    } else {
+        // Fallback to local function
+        replaceIconsWithIconSystem().catch(() => {
+            // Ignore errors - icons will load when ready
+        });
+    }
     
     // Initialize overview data
     refreshOverview();
@@ -1258,32 +1738,11 @@ window.initializeIndexPage = async function() {
         await refreshAllCharts();
     }, 1000);
  
-    // Initialize pending execution trade creation widget
-    if (window.PendingExecutionTradeCreation?.initializeDashboardWidget) {
-        setTimeout(() => {
-            window.PendingExecutionTradeCreation.initializeDashboardWidget({
-                cardSelector: '#pendingExecutionsTradeCreationCard',
-                listSelector: '#pendingTradeCreationWidgetList',
-                countSelector: '#pendingExecutionsTradeCreationCount',
-                loadingSelector: '#pendingExecutionsTradeCreationLoading',
-                emptySelector: '#pendingExecutionsTradeCreationEmpty',
-                errorSelector: '#pendingExecutionsTradeCreationError'
-            });
-        }, 1400);
-    }
-
-    // Initialize pending executions widget
-    if (typeof window.initializePendingExecutionsWidget === 'function') {
-        setTimeout(() => {
-            window.initializePendingExecutionsWidget();
-        }, 1500);
-    }
-
-    if (typeof window.initializePendingTradePlanWidget === 'function') {
-        setTimeout(() => {
-            window.initializePendingTradePlanWidget();
-        }, 1600);
-    }
+    // Note: positions & portfolio system initialization is handled by page-initialization-configs.js
+    // which calls initPositionsPortfolio() after initializeIndexPage()
+    
+    // Note: Old pending widgets (PendingExecutionTradeCreation, PendingExecutionsHighlights, PendingTradePlanWidget)
+    // have been removed and replaced by UnifiedPendingActionsWidget which is initialized in page-initialization-configs.js
 };
 
 // Note: initializeIndexPage() is now called via PAGE_CONFIGS.index.customInitializers
@@ -1473,14 +1932,16 @@ function debugZIndexStatus() {
         window.Logger.info(`תפריט ${index + 1}: z-index = ${computedStyle.zIndex}`, { page: "index" });
     });
     
-    // בדיקת כפתור הפילטר
+    // בדיקת כפתור הפילטר - שימוש ב-API של HeaderSystem במקום direct DOM manipulation
     window.Logger.info('🔘 בדיקת כפתור פילטר:', { page: "index" });
-    const filterBtn = document.querySelector('.header-filter-toggle-btn');
-    if (filterBtn) {
-        const computedStyle = window.getComputedStyle(filterBtn);
-        window.Logger.info(`כפתור פילטר: z-index = ${computedStyle.zIndex}`, { page: "index" });
-        window.Logger.info(`כפתור פילטר: position = ${computedStyle.position}`, { page: "index" });
-        window.Logger.info(`כפתור פילטר: visible = ${filterBtn.offsetParent !== null}`, { page: "index" });
+    if (window.headerSystem && window.headerSystem.filterManager) {
+        const filterToggleBtn = document.getElementById('headerFilterToggleBtnMain') || document.getElementById('headerFilterToggleBtnSecondary');
+        if (filterToggleBtn) {
+            const computedStyle = window.getComputedStyle(filterToggleBtn);
+            window.Logger.info(`כפתור פילטר: z-index = ${computedStyle.zIndex}`, { page: "index" });
+            window.Logger.info(`כפתור פילטר: position = ${computedStyle.position}`, { page: "index" });
+            window.Logger.info(`כפתור פילטר: visible = ${filterToggleBtn.offsetParent !== null}`, { page: "index" });
+        }
     }
     
     window.Logger.info('=====================================', { page: "index" });

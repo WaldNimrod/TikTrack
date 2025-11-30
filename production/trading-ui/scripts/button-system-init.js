@@ -223,13 +223,41 @@ class AdvancedButtonSystem {
             }
         });
 
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-
-        this.observers.push(observer);
-        this.logger.debug('MutationObserver setup completed');
+        // Wait for document.body to be available
+        if (document.body) {
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+            this.observers.push(observer);
+            this.logger.debug('MutationObserver setup completed');
+        } else {
+            // Retry after DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (document.body) {
+                        observer.observe(document.body, {
+                            childList: true,
+                            subtree: true
+                        });
+                        this.observers.push(observer);
+                        this.logger.debug('MutationObserver setup completed (after DOMContentLoaded)');
+                    }
+                });
+            } else {
+                // DOM already loaded but body not available - retry after delay
+                setTimeout(() => {
+                    if (document.body) {
+                        observer.observe(document.body, {
+                            childList: true,
+                            subtree: true
+                        });
+                        this.observers.push(observer);
+                        this.logger.debug('MutationObserver setup completed (after delay)');
+                    }
+                }, 100);
+            }
+        }
     }
 
     setupEntityObserver() {
@@ -254,14 +282,44 @@ class AdvancedButtonSystem {
             });
         });
 
-        observer.observe(document.body, {
-            attributes: true,
-            subtree: true,
-            attributeFilter: ['data-entity-type']
-        });
-
-        this.observers.push(observer);
-        this.logger.debug('Entity observer setup completed');
+        // Wait for document.body to be available
+        if (document.body) {
+            observer.observe(document.body, {
+                attributes: true,
+                subtree: true,
+                attributeFilter: ['data-entity-type']
+            });
+            this.observers.push(observer);
+            this.logger.debug('Entity observer setup completed');
+        } else {
+            // Retry after DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (document.body) {
+                        observer.observe(document.body, {
+                            attributes: true,
+                            subtree: true,
+                            attributeFilter: ['data-entity-type']
+                        });
+                        this.observers.push(observer);
+                        this.logger.debug('Entity observer setup completed (after DOMContentLoaded)');
+                    }
+                });
+            } else {
+                // DOM already loaded but body not available - retry after delay
+                setTimeout(() => {
+                    if (document.body) {
+                        observer.observe(document.body, {
+                            attributes: true,
+                            subtree: true,
+                            attributeFilter: ['data-entity-type']
+                        });
+                        this.observers.push(observer);
+                        this.logger.debug('Entity observer setup completed (after delay)');
+                    }
+                }, 100);
+            }
+        }
     }
 
     debouncedProcessButtons() {
@@ -760,7 +818,13 @@ class AdvancedButtonSystem {
             let content = '';
             if (variant === 'small') {
                 // For small variant, prefer icon, but fallback to text if icon is empty
-                content = icon || buttonText;
+                // CRITICAL: For TOGGLE buttons, always ensure there's content (icon or fallback emoji)
+                if (typeUpper === 'TOGGLE') {
+                    // For TOGGLE buttons, use icon if available, otherwise use chevron emoji as fallback
+                    content = icon || '▼';
+                } else {
+                    content = icon || buttonText;
+                }
             } else if (variant === 'normal') {
                 content = buttonText;
             } else if (variant === 'full') {
@@ -773,7 +837,14 @@ class AdvancedButtonSystem {
             return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${tooltipAttrs}${allAttributes}>${content}</button>`;
         } else {
             this.logger.warn('Button system dependencies not found, using fallback');
-            return this.createFallbackButton(type, onClick, classes, attributes, text, id);
+            // CRITICAL: For TOGGLE buttons, ensure fallback has content
+            const fallbackButton = this.createFallbackButton(type, onClick, classes, attributes, text, id);
+            // If it's a TOGGLE button with small variant and no content, add chevron emoji
+            if (type && type.toUpperCase() === 'TOGGLE' && variant === 'small' && !fallbackButton.includes('>') || fallbackButton.match(/>\s*</)) {
+                // Replace empty content with chevron emoji
+                return fallbackButton.replace(/>\s*</, '>▼<');
+            }
+            return fallbackButton;
         }
     }
 

@@ -170,14 +170,28 @@
             const usageValues = tags.map((tag) => tag.usage_count || 0);
             const maxUsage = Math.max(...usageValues, 1);
 
+            // שמירת מידע על tags עם tier עבור שחזור אחרי עיבוד
+            const tagTierMap = new Map();
+            
             tags.forEach((tag) => {
                 const button = document.createElement('button');
+                const usageRatio = (tag.usage_count || 0) / maxUsage;
+                const tier = this.getTierNumber(usageRatio);
+                
+                // שמירת מידע על ה-tag עם ה-tier
+                tagTierMap.set(tag.tag_id, {
+                    tier: tier,
+                    name: tag.name,
+                    usageCount: tag.usage_count || 0
+                });
+                
                 button.type = 'button';
                 button.dataset.buttonType = 'FILTER';
                 button.dataset.variant = 'full';
                 button.dataset.icon = '🏷️';
                 button.dataset.text = tag.name;
-                button.dataset.classes = `${this.getTierClass((tag.usage_count || 0) / maxUsage)} me-2 mb-2`;
+                button.dataset.classes = `${this.getTierClass(usageRatio)} me-2 mb-2`;
+                button.dataset.tier = tier; // סולם צבעים לפי עוצמת שימוש
                 button.dataset.tooltip = `${tag.name} • ${(tag.usage_count || 0).toLocaleString('he-IL')} שיוכים`;
                 button.dataset.tooltipPlacement = 'top';
                 button.dataset.tooltipTrigger = 'hover';
@@ -186,7 +200,7 @@
                 elements.tagCloudContainer.appendChild(button);
             });
 
-            this.processButtons(elements.tagCloudContainer);
+            this.processButtons(elements.tagCloudContainer, tagTierMap);
         },
 
         getTierClass(ratio) {
@@ -202,9 +216,27 @@
             return 'fs-5';
         },
 
+        getTierNumber(ratio) {
+            if (ratio >= 0.75) {
+                return '1';
+            }
+            if (ratio >= 0.5) {
+                return '2';
+            }
+            if (ratio >= 0.3) {
+                return '3';
+            }
+            return '4';
+        },
+
         applyTagFromCloud(tag) {
             if (elements.quickSearchInput) {
-                elements.quickSearchInput.value = tag.name || '';
+                // Use DataCollectionService to set value if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(elements.quickSearchInput.id, tag.name || '', 'text');
+                } else {
+                  elements.quickSearchInput.value = tag.name || '';
+                }
                 elements.quickSearchInput.focus();
             }
             this.performSearch({
@@ -591,14 +623,49 @@
             window.ModalManagerV2?.closeActiveModal();
         },
 
-        processButtons(container) {
+        processButtons(container, tagTierMap = null) {
             if (!container) {
                 return;
             }
+            
             if (window.ButtonSystem?.processButtons) {
                 window.ButtonSystem.processButtons(container);
             } else if (window.ButtonSystem?.hydrateButtons) {
                 window.ButtonSystem.hydrateButtons(container);
+            }
+            
+            // שחזור של data-tier אחרי עיבוד לפי tagId
+            if (tagTierMap && tagTierMap.size > 0) {
+                setTimeout(() => {
+                    const processedButtons = container.querySelectorAll('button[data-button-type="FILTER"]');
+                    processedButtons.forEach(button => {
+                        // נסה כמה אפשרויות לשם ה-attribute
+                        const tagId = button.getAttribute('data-tag-id') || 
+                                     button.getAttribute('data-tagId') || 
+                                     button.getAttribute('data-tag_id') ||
+                                     button.dataset.tagId;
+                        if (tagId) {
+                            const tagIdNum = parseInt(tagId);
+                            if (!isNaN(tagIdNum) && tagTierMap.has(tagIdNum)) {
+                                const tagInfo = tagTierMap.get(tagIdNum);
+                                button.setAttribute('data-tier', tagInfo.tier);
+                            }
+                        } else {
+                            // נסה לפי תוכן הטקסט כגיבוי
+                            const buttonText = button.textContent?.trim();
+                            if (buttonText) {
+                                for (const [id, tagInfo] of tagTierMap.entries()) {
+                                    if (buttonText.includes(tagInfo.name)) {
+                                        button.setAttribute('data-tier', tagInfo.tier);
+                                        // נשמור את ה-tagId גם כן
+                                        button.setAttribute('data-tag-id', id.toString());
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }, 100);
             }
         }
     };

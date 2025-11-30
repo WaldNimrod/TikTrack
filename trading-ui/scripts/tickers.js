@@ -380,14 +380,38 @@ function generateTickerCurrencyOptions(ticker = null) {
 
 /**
  * Update currency options in add/edit ticker forms
+ * Uses SelectPopulatorService if available, falls back to local implementation
  * @param {Object|null} [ticker=null] - Ticker object for pre-selection in edit mode
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function updateCurrencyOptions(ticker = null) {
+async function updateCurrencyOptions(ticker = null) {
   try {
     const addSelect = document.getElementById('addTickerCurrency');
     const editSelect = document.getElementById('editTickerCurrency');
 
+    // Use SelectPopulatorService if available
+    if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateCurrenciesSelect === 'function') {
+      const defaultValue = ticker?.currency_id || ticker?.currency?.id || null;
+      
+      if (addSelect) {
+        await window.SelectPopulatorService.populateCurrenciesSelect(addSelect, {
+          includeEmpty: true,
+          emptyText: 'בחר מטבע...',
+          defaultValue: null // Don't set default in add mode
+        });
+      }
+
+      if (editSelect) {
+        await window.SelectPopulatorService.populateCurrenciesSelect(editSelect, {
+          includeEmpty: true,
+          emptyText: 'בחר מטבע...',
+          defaultValue: defaultValue
+        });
+      }
+      return;
+    }
+
+    // Fallback to local implementation
     const currenciesAvailable = Array.isArray(window.currenciesData) && window.currenciesData.length > 0;
 
     if (addSelect) {
@@ -772,7 +796,12 @@ function populateProviderSymbolFields(mappings) {
     
     const input = document.getElementById(`providerSymbol_${providerName}`);
     if (input) {
-      input.value = mapping.provider_symbol || '';
+      // Use DataCollectionService to set value if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue(input.id, mapping.provider_symbol || '', 'text');
+      } else {
+        input.value = mapping.provider_symbol || '';
+      }
       if (window.Logger) {
         window.Logger.debug('Populated provider symbol field', {
           providerName,
@@ -1328,7 +1357,7 @@ async function performTickerCancellation(tickerId) {
         const errorData = JSON.parse(errorResponse);
 
         // בדיקה אם השגיאה קשורה לטריידים פעילים
-        if (errorData.error && errorData.error.message &&
+        if (errorData.error && errorData.error.message && typeof errorData.error.message === 'string' &&
                     errorData.error.message.includes('active trades')) {
 
           // הצגת אזהרת פריטים מקושרים
@@ -1353,7 +1382,7 @@ async function performTickerCancellation(tickerId) {
         }
 
         // בדיקה אם הטיקר כבר מבוטל
-        if (errorData.error && errorData.error.message &&
+        if (errorData.error && errorData.error.message && typeof errorData.error.message === 'string' &&
                     errorData.error.message.includes('already cancelled')) {
 
           if (window.showErrorNotification) {
@@ -1563,7 +1592,7 @@ async function performCancelTicker(id) {
         const errorData = JSON.parse(errorResponse);
 
         // בדיקה אם הטיקר כבר מבוטל
-        if (errorData.error && errorData.error.message &&
+        if (errorData.error && errorData.error.message && typeof errorData.error.message === 'string' &&
                     errorData.error.message.includes('already cancelled')) {
 
           if (window.showErrorNotification) {
@@ -2046,11 +2075,23 @@ function renderTickersTableRows(tickers) {
         ? window.renderAmount(priceValue, currencySymbol, 2, false)
         : (priceValue !== null ? `${currencySymbol || ''}${priceValue.toFixed(2)}` : 'N/A');
 
+      // Get change from open values
+      const changeFromOpenValue = toFiniteNumber(ticker.change_from_open);
+      const changeFromOpenPercentValue = toFiniteNumber(ticker.change_from_open_percent);
+      
       const changePercentHtml = (typeof window.renderNumericValue === 'function' && changePercentValue !== null)
         ? window.renderNumericValue(changePercentValue, '%', true)
         : (changePercentValue !== null
             ? `${changePercentValue >= 0 ? '+' : ''}${changePercentValue.toFixed(2)}%`
             : 'N/A');
+      
+      // Build change from open HTML if available
+      let changeFromOpenHtml = '';
+      if (changeFromOpenValue !== null && changeFromOpenPercentValue !== null) {
+        const changeFromOpenColor = changeFromOpenValue >= 0 ? 'text-success' : 'text-danger';
+        const changeFromOpenIcon = changeFromOpenValue >= 0 ? '↗' : '↘';
+        changeFromOpenHtml = `<br><small class="${changeFromOpenColor}">${changeFromOpenIcon} מפתיחה: ${changeFromOpenValue >= 0 ? '+' : ''}${changeFromOpenValue.toFixed(2)} (${changeFromOpenPercentValue >= 0 ? '+' : ''}${changeFromOpenPercentValue.toFixed(2)}%)</small>`;
+      }
 
       // קבלת עיצוב סוג טיקר
       const typeStyle = getTickerTypeStyle(ticker.type);
@@ -2163,8 +2204,8 @@ function renderTickersTableRows(tickers) {
                     <td class="table-cell-center numeric-ltr" title="${priceValue !== null ? `מחיר נוכחי: ${currencySymbol || ''}${priceValue.toFixed(2)}` : 'אין נתוני מחיר'}" dir="ltr">
                         ${priceHtml}
                     </td>
-                    <td class="table-cell-center numeric-ltr" title="${changePercentValue !== null ? `שינוי יומי: ${changePercentValue.toFixed(2)}%` : 'אין נתוני שינוי'}" dir="ltr">
-                        ${changePercentHtml}
+                    <td class="table-cell-center numeric-ltr" title="${changePercentValue !== null ? `שינוי יומי: ${changePercentValue.toFixed(2)}%` : 'אין נתוני שינוי'}${changeFromOpenValue !== null ? ` | שינוי מפתיחה: ${changeFromOpenValue.toFixed(2)} (${changeFromOpenPercentValue.toFixed(2)}%)` : ''}" dir="ltr">
+                        ${changePercentHtml}${changeFromOpenHtml}
                     </td>
                     <td class="table-cell-center numeric-ltr" title="${volumeValue !== null ? `נפח: ${volumeValue.toLocaleString('he-IL')}` : 'אין נתוני נפח'}" dir="ltr">
                         ${window.renderVolume ? window.renderVolume(volumeValue, true) : (volumeValue !== null ? volumeValue.toLocaleString('he-IL') : 'N/A')}
@@ -2187,29 +2228,13 @@ function renderTickersTableRows(tickers) {
                           if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
                           const result = window.createActionsMenu([
                             { type: 'VIEW', onclick: `window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })`, title: 'צפה בפרטי טיקר' },
+                            { type: 'DASHBOARD', onclick: `window.location.href='/ticker-dashboard.html?tickerId=${ticker.id}'`, title: 'דשבורד מורחב' },
                             { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})`, title: 'ערוך' },
                             { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `${ticker.status === 'cancelled' ? 'reactivateTicker' : 'performTickerCancellation'}(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' },
                             { type: 'DELETE', onclick: `deleteTicker(${ticker.id})`, title: 'מחק' }
                           ]);
                           return result || '';
                         })()}
-                        ${!window.createActionsMenu ? `
-                        <div class="btn-group btn-group-sm" role="group">
-                            <button data-button-type="VIEW" data-variant="small" 
-                                    data-onclick="window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })" 
-                                    data-text="" title="צפה בפרטי טיקר"></button>
-                            <button data-button-type="EDIT" data-variant="small" 
-                                    data-onclick="window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})" 
-                                    data-text="" title="ערוך"></button>
-                            ${ticker.status === 'cancelled' ?
-                            `<button data-button-type="REACTIVATE" data-variant="small" 
-                                     data-onclick="reactivateTicker(${ticker.id})" 
-                                     data-text="" title="הפעל מחדש טיקר"></button>` :
-                            `<button data-button-type="CANCEL" data-variant="small" 
-                                     data-onclick="performTickerCancellation(${ticker.id})" 
-                                     data-text="" title="בטל טיקר"></button>`}
-                        </div>
-                        ` : ''}
                     </td>
                 </tr>
             `;
@@ -2388,7 +2413,18 @@ async function checkTickerExternalData() {
     try {
         // Disable button and show loading
         checkBtn.disabled = true;
-        checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> בודק...';
+        // Use IconSystem to render loader icon
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            const loaderIcon = await window.IconSystem.renderIcon('button', 'refresh', {
+                size: '16',
+                alt: 'loading',
+                class: 'icon fa-spin'
+            });
+            checkBtn.innerHTML = loaderIcon + ' בודק...';
+        } else {
+            // Fallback if IconSystem not available
+            checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> בודק...';
+        }
         resultDiv.style.display = 'none';
         warningDiv.style.display = 'none';
         
@@ -2508,7 +2544,18 @@ async function checkTickerExternalData() {
     } finally {
         // Re-enable button
         checkBtn.disabled = false;
-        checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1"> בדוק נתונים חיצוניים';
+        // Use IconSystem to render refresh icon
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            const refreshIcon = await window.IconSystem.renderIcon('button', 'refresh', {
+                size: '16',
+                alt: 'refresh',
+                class: 'icon me-1'
+            });
+            checkBtn.innerHTML = refreshIcon + ' בדוק נתונים חיצוניים';
+        } else {
+            // Fallback if IconSystem not available
+            checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1"> בדוק נתונים חיצוניים';
+        }
     }
 }
 
@@ -2993,9 +3040,17 @@ function filterTickersByType(type) {
  * Get display name for ticker type in Hebrew
  * @param {string} type - Ticker type
  * @returns {string} Display name in Hebrew
+ * @deprecated Use window.translateTickerType() from translation-utils.js instead
+ * This function is kept for backward compatibility but should use the centralized Translation Utilities
  */
 function getTypeDisplayName(type) {
   try {
+    // Use Translation Utilities if available
+    if (window.translateTickerType && typeof window.translateTickerType === 'function') {
+      return window.translateTickerType(type);
+    }
+    
+    // Fallback to local implementation
     const typeNames = {
       'stock': 'מניות',
       'etf': 'ETF',

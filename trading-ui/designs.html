@@ -24,6 +24,9 @@
     <!-- Header Styles - Separate CSS file -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     
+    <!-- Page-specific styles -->
+    <link rel="stylesheet" href="styles-new/07-pages/_designs.css?v=1.0.0">
+    
 </head>
 
 <body class="designs-page" data-entity-type="ticker">
@@ -66,17 +69,17 @@
                             </div>
 
                             <div class="table-responsive mb-4">
-                                <table class="table table-striped table-hover" id="buttonSystemTable">
+                                <table class="table table-striped table-hover" id="buttonSystemTable" data-table-type="button-system">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th style="width: 24%;">דוגמאות חיות</th>
-                                            <th style="width: 14%;">שם הכפתור</th>
-                                            <th style="width: 16%;">תיאור</th>
-                                            <th style="width: 12%;">משתנה צבע</th>
-                                            <th style="width: 10%;">HTML (ישן)</th>
-                                            <th style="width: 10%;">HTML (חדש)</th>
-                                            <th style="width: 10%;">JavaScript</th>
-                                            <th style="width: 4%;">פעולות</th>
+                                            <th class="col-live-examples">דוגמאות חיות</th>
+                                            <th class="col-button-name">שם הכפתור</th>
+                                            <th class="col-description">תיאור</th>
+                                            <th class="col-color-var">משתנה צבע</th>
+                                            <th class="col-html-old">HTML (ישן)</th>
+                                            <th class="col-html-new">HTML (חדש)</th>
+                                            <th class="col-javascript">JavaScript</th>
+                                            <th class="col-actions">פעולות</th>
                                         </tr>
                                     </thead>
                                     <tbody id="buttonTableBody"></tbody>
@@ -102,7 +105,7 @@
                                 </div>
                             </div>
                             
-                            <p style="margin-bottom: 15px; font-size: 14px; line-height: 1.4;">להלן רשימה מלאה של כל הכפתורים הזמינים במערכת המרכזית, עם דוגמאות פעילות וקוד לשילוב:</p>
+                            <p class="button-system-demo-intro">להלן רשימה מלאה של כל הכפתורים הזמינים במערכת המרכזית, עם דוגמאות פעילות וקוד לשילוב:</p>
                             
                             <div class="button-stats mt-4">
                                 <div class="row">
@@ -211,15 +214,15 @@
                             <div class="text-muted small">הערכים מוצגים כפי שהדפדפן מיישם אותם לאחר ההעדפות.</div>
                         </div>
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover" id="colorTokensTable">
+                            <table class="table table-striped table-hover" id="colorTokensTable" data-table-type="color-tokens">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th style="width: 14%;">קבוצה</th>
-                                        <th style="width: 18%;">שם</th>
-                                        <th style="width: 20%;">מזהה / משתנה</th>
-                                        <th style="width: 18%;">ערך נוכחי</th>
-                                        <th style="width: 22%;">פרטים</th>
-                                        <th style="width: 8%;">פעולות</th>
+                                        <th class="col-group">קבוצה</th>
+                                        <th class="col-name">שם</th>
+                                        <th class="col-identifier">מזהה / משתנה</th>
+                                        <th class="col-current-value">ערך נוכחי</th>
+                                        <th class="col-details">פרטים</th>
+                                        <th class="col-actions-color">פעולות</th>
                                     </tr>
                                 </thead>
                                 <tbody id="colorTokensBody"></tbody>
@@ -236,7 +239,7 @@
                     </div>
                     <div class="section-content">
                         <div class="table-responsive">
-                            <table class="table table-striped entity-colors-table">
+                            <table class="table table-striped entity-colors-table" data-table-type="entity-colors">
                                 <thead>
                                     <tr>
                                         <th>כפתור</th>
@@ -289,256 +292,102 @@
     </div>
 
     <!-- Button System Demo Styles -->
-    <style>
-        .section-header.text-center {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            align-items: center;
-        }
-
-        .section-subtitle {
-            font-size: 12px;
-        }
-
-        /* Button System Demo Styles */
-        .button-system-demo {
-            width: 100%;
-        }
-
-        .button-system-demo .table-responsive {
-            overflow-x: auto;
-        }
-
-        .button-system-demo table {
-            min-width: 960px;
-            table-layout: auto;
-        }
-
-        .button-system-demo th,
-        .button-system-demo td {
-            padding: 8px 12px;
-            vertical-align: top;
-        }
-
-        .button-system-demo .live-example-cell {
-            min-width: 240px;
-        }
-
-        .button-system-demo .variant-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-        }
-
-        .variant-grid-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .variant-label {
-            font-size: 12px;
-            color: #6c757d;
-        }
-
-        .entity-variant-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 8px;
-        }
-
-        .button-system-demo .btn {
-            font-size: 14px;
-            padding: 6px 12px;
-            height: 32px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-
-        .code-block {
-            font-size: 11px;
-            background: #f8f9fa;
-            padding: 6px;
-            border-radius: 4px;
-            margin-bottom: 8px;
-            word-break: break-all;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            direction: ltr;
-        }
-
-        .code-actions {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .color-chip {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            border: 1px solid rgba(0, 0, 0, 0.15);
-            display: inline-block;
-        }
-
-        .color-details-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .color-details-list li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 4px;
-            font-size: 12px;
-        }
-
-        .color-details-list code {
-            font-size: 11px;
-        }
-
-        .filter-toggle-group {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .filter-toggle-group .btn {
-            min-width: 110px;
-        }
-
-        .filter-toggle-group .btn.active {
-            background-color: var(--primary-color);
-            color: #ffffff;
-            border-color: var(--primary-color);
-        }
-
-        .button-variants-demo {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .button-variants-demo h5 {
-            color: #495057;
-            margin-bottom: 15px;
-        }
-
-        .button-variants-demo h6 {
-            color: #6c757d;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .button-variants-demo .btn {
-            margin-inline-end: 8px;
-            margin-bottom: 8px;
-        }
-    </style>
 
     
     
     <!-- =============================================================== -->
         <!-- =============================================================== -->
+        <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
     <!-- =============================================================== -->
-    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
     <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
-    <!-- 🎯 Page: designs | Generated: 2025-11-15T00:29:03.497Z -->
+    <!-- 🎯 Page: designs | Generated: 2025-11-29T19:33:03.765Z -->
     <!-- 📦 Packages: base, init-system -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 1/2: BASE PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 1 | Description: מערכות ליבה חובה לכל עמוד -->
+    <!-- Load Order: 1 | Description: Core systems required for all pages -->
     <!-- Dependencies:  -->
     <!-- Critical: YES | Version: 2.0.0 -->
 
     <!-- [1] Load Order: 1 -->
-    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- הגדרות API מרכזיות -->
+    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- Central API configuration -->
     <!-- [2] Load Order: 2 -->
-    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- Favicon management -->
     <!-- [3] Load Order: 3 -->
-    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- Notification system -->
     <!-- [4] Load Order: 4 -->
-    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- Cache synchronization manager -->
     <!-- [5] Load Order: 5 -->
-    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- UI utilities -->
     <!-- [6] Load Order: 6 -->
-    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- Warning system -->
     <!-- [7] Load Order: 7 -->
-    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- Error handling system -->
     <!-- [8] Load Order: 8 -->
-    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- Unified cache manager -->
     <!-- [9] Load Order: 9 -->
-    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
+    <script src="scripts/icon-mappings.js?v=1.0.0"></script> <!-- Central icon mappings -->
     <!-- [10] Load Order: 10 -->
-    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
+    <script src="scripts/icon-system.js?v=1.0.0"></script> <!-- Central icon system -->
     <!-- [11] Load Order: 11 -->
-    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <script src="scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- Icon replacement helper for standardizing icon usage -->
     <!-- [12] Load Order: 12 -->
-    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- Cache clearing control (Stage B-Lite) -->
     <!-- [13] Load Order: 13 -->
-    <script src="scripts/page-state-manager.js?v=1.0.0"></script> <!-- מנהל מצב עמודים מאוחד -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
     <!-- [14] Load Order: 14 -->
-    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- Advanced logging service -->
     <!-- [15] Load Order: 15 -->
-    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- Header system -->
     <!-- [16] Load Order: 16 -->
-    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <script src="scripts/page-state-manager.js?v=1.0.0"></script> <!-- Unified page state manager -->
     <!-- [17] Load Order: 17 -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- Page utilities -->
     <!-- [18] Load Order: 18 -->
-    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- Translations -->
     <!-- [19] Load Order: 19 -->
-    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- Icon and button system -->
     <!-- [20] Load Order: 20 -->
-    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- Central event management system -->
+    <!-- [22] Load Order: 22 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- Button system -->
+    <!-- [23] Load Order: 23 -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- Dynamic color system -->
+    <!-- [24] Load Order: 24 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- Unified initialization system - single entry point (required for all pages) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/2: INITIALIZATION PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
-    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary -->
+    <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary, dashboard-widgets, tradingview-widgets, tradingview-charts, watch-lists, ai-analysis -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [21] Load Order: 21 -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
-    <!-- [22] Load Order: 22 -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
-    <!-- [23] Load Order: 23 -->
-    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
-    <!-- [24] Load Order: 24 -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
     <!-- [25] Load Order: 25 -->
-    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- Package manifest -->
+    <!-- [26] Load Order: 26 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- Page initialization configurations -->
+    <!-- [27] Load Order: 27 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- Initialization system check -->
+    <!-- [28] Load Order: 28 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- Page monitoring functions -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
-    <!-- [26] Page-specific: designs -->
-    <script src="scripts/designs.js?v=1.0.0"></script> <!-- Page-specific script for designs -->
+    <!-- [29] Load Order: 29 -->
+    <script src="scripts/designs.js?v=1.0.0"></script> <!-- Designs page logic -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 26 | Unique Scripts Loaded: 26 -->
-    <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("designs") -->
-
-
-
+    <!-- 📊 Total Scripts Processed: 29 | Unique Scripts Loaded: 29 -->
+    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
 </body>
 </html>

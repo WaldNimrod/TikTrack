@@ -291,7 +291,14 @@ class PagesStandardizationPlan {
      * Filter pages
      */
     filterPages() {
-        const filter = document.getElementById('pagesFilter').value;
+        // Use DataCollectionService to get value if available
+        let filter;
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+          filter = window.DataCollectionService.getValue('pagesFilter', 'text', 'all');
+        } else {
+          const filterEl = document.getElementById('pagesFilter');
+          filter = filterEl ? filterEl.value : 'all';
+        }
         let filteredPages = [];
 
         if (filter === 'all') {

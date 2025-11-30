@@ -28,7 +28,8 @@ from services.business_logic import (
     TickerBusinessService,
     CurrencyBusinessService,
     TagBusinessService,
-    PreferencesBusinessService
+    PreferencesBusinessService,
+    AIAnalysisBusinessService
 )
 
 logger = logging.getLogger(__name__)
@@ -48,6 +49,7 @@ trade_plan_service = TradePlanBusinessService()
 ticker_service = TickerBusinessService()
 currency_service = CurrencyBusinessService()
 tag_service = TagBusinessService()
+ai_analysis_business_service = AIAnalysisBusinessService()
 
 
 # ============================================================================
@@ -515,6 +517,15 @@ def validate_condition_value():
         
         condition_attribute = data.get('condition_attribute')
         condition_number = data.get('condition_number')
+        
+        # Validate that condition_attribute is provided and is a string
+        if not condition_attribute or not isinstance(condition_attribute, str):
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'condition_attribute is required and must be a string'
+                }
+            }), 400
         
         if condition_number is not None:
             try:
@@ -1346,6 +1357,84 @@ def validate_tag_category():
             
     except Exception as e:
         logger.error(f"Error validating tag category: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# AI Analysis Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/ai-analysis/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
+def validate_ai_analysis():
+    """Validate AI analysis request data."""
+    try:
+        data = request.get_json() or {}
+        
+        # Set db_session for business service
+        ai_analysis_business_service.db_session = g.db
+        
+        result = ai_analysis_business_service.validate(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating AI analysis: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/ai-analysis/validate-variables', methods=['POST'])
+def validate_ai_analysis_variables():
+    """Validate AI analysis variables dictionary."""
+    try:
+        data = request.get_json() or {}
+        variables = data.get('variables', {})
+        
+        result = ai_analysis_business_service.validate_variables(variables)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Variables validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating AI analysis variables: {str(e)}")
         return jsonify({
             'status': 'error',
             'error': {

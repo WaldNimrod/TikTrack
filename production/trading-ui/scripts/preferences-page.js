@@ -448,7 +448,12 @@ async function createNewProfile() {
     }
 
     // Clear input
-    nameInput.value = '';
+    // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue(nameInput.id, '', 'text');
+    } else {
+      nameInput.value = '';
+    }
 
     // Reload page after 1.5 seconds
     setTimeout(() => {
@@ -630,6 +635,10 @@ async function copyDetailedLogLocal() {
 // ==========================================================================
 
 const PreferenceTypesAudit = (() => {
+  const state = {
+    preferenceTypes: []
+  };
+
   const escapeSelector = value => {
     if (!value) {
       return '';
@@ -734,6 +743,44 @@ const PreferenceTypesAudit = (() => {
     label.textContent = `${baseText} (ID ${preferenceId})`;
   };
 
+  /**
+   * Register preference_types table with UnifiedTableSystem
+   */
+  const registerPreferenceTypesTable = () => {
+    if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {
+      window.Logger?.warn?.('⚠️ UnifiedTableSystem not available for preference_types registration', { page: 'preferences' });
+      return false;
+    }
+
+    const tableType = 'preference_types';
+
+    if (window.UnifiedTableSystem.registry.isRegistered && window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+      window.Logger?.debug?.('ℹ️ Preference types table already registered', { page: 'preferences' });
+      return true;
+    }
+
+    window.UnifiedTableSystem.registry.register(tableType, {
+      dataGetter: () => {
+        return PreferenceTypesAudit.state?.preferenceTypes || [];
+      },
+      updateFunction: (data) => {
+        // Update state and re-render
+        if (PreferenceTypesAudit.state) {
+          PreferenceTypesAudit.state.preferenceTypes = Array.isArray(data) ? data : [];
+          renderPreferenceTypesAuditTable();
+        }
+      },
+      tableSelector: '#preferenceTypesAuditTable',
+      columns: window.TABLE_COLUMN_MAPPINGS?.preference_types || [],
+      sortable: true,
+      filterable: true,
+      defaultSort: { columnIndex: 0, direction: 'asc' }
+    });
+
+    window.Logger?.info?.('✅ Registered preference_types table with UnifiedTableSystem', { page: 'preferences' });
+    return true;
+  };
+
   const renderPreferenceTypesAuditTable = async () => {
     const container = document.getElementById('preferenceTypesAuditContainer');
     const tableBody = document.getElementById('preferenceTypesAuditTableBody');
@@ -775,6 +822,9 @@ const PreferenceTypesAudit = (() => {
       });
 
       const { types = [] } = result || {};
+      
+      // Update state for UnifiedTableSystem
+      state.preferenceTypes = types;
 
       window.Logger?.info('📋 [Types Table] Preference types audit payload received', {
         page: 'preferences-page',
@@ -894,10 +944,29 @@ const PreferenceTypesAudit = (() => {
 
   return {
     renderPreferenceTypesAuditTable,
+    registerPreferenceTypesTable,
   };
 })();
 
 window.renderPreferenceTypesAuditTable = PreferenceTypesAudit.renderPreferenceTypesAuditTable;
+window.registerPreferenceTypesTable = PreferenceTypesAudit.registerPreferenceTypesTable;
+
+// Auto-register table when page loads
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      if (typeof window.registerPreferenceTypesTable === 'function') {
+        window.registerPreferenceTypesTable();
+      }
+    }, 1000);
+  });
+} else {
+  setTimeout(() => {
+    if (typeof window.registerPreferenceTypesTable === 'function') {
+      window.registerPreferenceTypesTable();
+    }
+  }, 1000);
+}
 
 /**
  * Initialize page-specific functionality

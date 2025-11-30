@@ -830,11 +830,13 @@ const PAGE_TO_ENTITY_MAPPING = {
   'executions-page': 'execution',
   'trade-plans-page': 'trade_plan',
   'planning-page': 'trade_plan', // Alias
+  'trading-journal-page': 'note', // Trading journal page - יומן מסחר
   'preferences-page': 'preference',
   'research-page': 'research',
   'designs-page': 'design',
   'constraints-page': 'constraint',
   'tag-management-page': 'preference', // Tag management page - uses preference colors
+  'ai-analysis-page': 'research', // AI Analysis page - uses research colors
   'db-display-page': null, // Uses fixed gray color
   'db-extradata-page': null, // Uses fixed gray color
   'extra-data-page': null, // Alias

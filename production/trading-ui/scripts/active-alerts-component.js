@@ -259,7 +259,7 @@ class ActiveAlertsComponent extends HTMLElement {
     return Object.prototype.hasOwnProperty.call(mapping, type) ? mapping[type] : null;
   }
 
-  applyFilter(type) {
+  async applyFilter(type) {
     const normalized = this.normalizeFilterType(type);
     if (normalized === this.activeFilterType) {
       return true;
@@ -268,7 +268,7 @@ class ActiveAlertsComponent extends HTMLElement {
     this.activeFilterType = normalized;
     this.resetFilteredAlertsCache();
     this.updateFilterButtons();
-    this.renderAlerts();
+    await this.renderAlerts();
     return true;
   }
 
@@ -418,10 +418,10 @@ class ActiveAlertsComponent extends HTMLElement {
     return Array.isArray(apiData?.data) ? apiData.data : [];
   }
 
-  applyAlertsState(alerts) {
+  async applyAlertsState(alerts) {
     this.alerts = Array.isArray(alerts) ? alerts : [];
     this.resetFilteredAlertsCache();
-    this.renderAlerts();
+    await this.renderAlerts();
     this.updateHeaderState();
     this.updateSectionHeaderAlertIcon();
   }
@@ -441,7 +441,7 @@ class ActiveAlertsComponent extends HTMLElement {
     const finalize = async (alerts, source) => {
       const normalizedAlerts = Array.isArray(alerts) ? alerts : [];
       await this.ensureRelatedData();
-      this.applyAlertsState(normalizedAlerts);
+      await this.applyAlertsState(normalizedAlerts);
       this.log('info', 'Active alerts loaded', { source, count: this.alerts.length });
     };
 
@@ -491,7 +491,7 @@ class ActiveAlertsComponent extends HTMLElement {
     } catch (error) {
       this.alerts = [];
       this.resetFilteredAlertsCache();
-      this.renderAlerts();
+      await this.renderAlerts();
       this.updateHeaderState();
       this.updateSectionHeaderAlertIcon();
       this.handleLoadError(error);
@@ -550,7 +550,7 @@ class ActiveAlertsComponent extends HTMLElement {
     this.updateFilterButtons();
   }
 
-  renderAlerts() {
+  async renderAlerts() {
     const listContainer = this._elements?.list;
     if (!listContainer) {
       return;
@@ -572,8 +572,11 @@ class ActiveAlertsComponent extends HTMLElement {
 
     const fragment = document.createDocumentFragment();
 
-    sortedAlerts.forEach(alert => {
-      const card = this.createAlertCardElement(alert);
+    // Use Promise.all to create all cards in parallel (createAlertCardElement is now async)
+    const cardPromises = sortedAlerts.map(alert => this.createAlertCardElement(alert));
+    const cards = await Promise.all(cardPromises);
+    
+    cards.forEach(card => {
       if (card) {
         fragment.appendChild(card);
       }
@@ -583,7 +586,7 @@ class ActiveAlertsComponent extends HTMLElement {
     this.updateHeaderState();
   }
 
-  createAlertCardElement(alert) {
+  async createAlertCardElement(alert) {
     if (!alert || typeof alert !== 'object') {
       this.log('warn', 'Skipping invalid alert entry', { alert });
       return null;
@@ -612,7 +615,9 @@ class ActiveAlertsComponent extends HTMLElement {
     const header = document.createElement('div');
     header.className = 'active-alerts__card-header';
 
-    header.appendChild(this.createHeaderContent(alert, relatedType, relatedMeta, displayName, symbol));
+    // createHeaderContent is now async, so we need to await it
+    const headerContent = await this.createHeaderContent(alert, relatedType, relatedMeta, displayName, symbol);
+    header.appendChild(headerContent);
     header.appendChild(this.createDetailsButton(alert));
 
     const body = document.createElement('div');
@@ -784,7 +789,7 @@ class ActiveAlertsComponent extends HTMLElement {
     return normalized;
   }
 
-  createHeaderContent(alert, relatedType, relatedMeta, displayName, symbol) {
+  async createHeaderContent(alert, relatedType, relatedMeta, displayName, symbol) {
     const container = document.createElement('div');
     container.className = 'active-alerts__header-linked';
 
@@ -821,17 +826,62 @@ class ActiveAlertsComponent extends HTMLElement {
     const headerLine = document.createElement('div');
     headerLine.className = 'active-alerts__fallback-primary';
 
-    const iconPath = this.getIconPath(relatedType);
     const entityLabel = this.getEntityLabel(relatedType);
 
-    if (iconPath) {
-      const icon = document.createElement('img');
-      icon.className = 'active-alerts__symbol-icon';
-      icon.src = iconPath;
-      icon.alt = entityLabel;
-      icon.width = 20;
-      icon.height = 20;
-      headerLine.appendChild(icon);
+    // Use IconSystem directly (new icon system)
+    if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+      try {
+        // Normalize entity type for IconSystem
+        const entityTypeMap = {
+          'trading_account': 'account',
+          'trading_accounts': 'account',
+          'trade': 'trade',
+          'trades': 'trade',
+          'trade_plan': 'trade_plan',
+          'trade_plans': 'trade_plan',
+          'ticker': 'ticker',
+          'tickers': 'ticker',
+          'alert': 'alert',
+          'alerts': 'alert',
+          'execution': 'execution',
+          'executions': 'execution',
+          'cash_flow': 'cash_flow',
+          'cash_flows': 'cash_flow',
+          'note': 'note',
+          'notes': 'note'
+        };
+        const normalizedEntityType = entityTypeMap[relatedType] || relatedType;
+        
+        const iconHTML = await window.IconSystem.renderIcon('entity', normalizedEntityType, {
+          size: '20',
+          alt: entityLabel,
+          class: 'active-alerts__symbol-icon'
+        });
+        
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = iconHTML;
+        const icon = tempDiv.firstElementChild;
+        if (icon) {
+          headerLine.appendChild(icon);
+        } else {
+          // Fallback to basic icon if renderIcon returns empty
+          this.log('warn', 'IconSystem.renderIcon returned empty HTML', { relatedType, normalizedEntityType });
+        }
+      } catch (error) {
+        this.log('warn', 'Failed to render icon via IconSystem', { relatedType, error: error?.message });
+      }
+    } else {
+      // Fallback if IconSystem not available - use old method
+      const iconPath = this.getIconPathSync(relatedType);
+      if (iconPath) {
+        const icon = document.createElement('img');
+        icon.className = 'active-alerts__symbol-icon';
+        icon.src = iconPath;
+        icon.alt = entityLabel;
+        icon.width = 20;
+        icon.height = 20;
+        headerLine.appendChild(icon);
+      }
     }
 
     const primaryText = document.createElement('span');
@@ -1118,21 +1168,28 @@ class ActiveAlertsComponent extends HTMLElement {
     return fallback[relatedType] || 'פריט';
   }
 
-  getIconPath(relatedType) {
-    if (window.LinkedItemsService && typeof window.LinkedItemsService.getLinkedItemIcon === 'function') {
-      try {
-        return window.LinkedItemsService.getLinkedItemIcon(relatedType);
-      } catch (error) {
-        this.log('warn', 'Failed to resolve icon via LinkedItemsService', { relatedType, error: error?.message });
-      }
-    }
-
+  /**
+   * Get icon path synchronously (fallback only - use IconSystem instead)
+   * @deprecated Use IconSystem.renderIcon() instead
+   */
+  getIconPathSync(relatedType) {
     const iconMap = {
       trading_account: 'images/icons/trading_accounts.svg',
+      trading_accounts: 'images/icons/trading_accounts.svg',
       trade: 'images/icons/trades.svg',
+      trades: 'images/icons/trades.svg',
       trade_plan: 'images/icons/trade_plans.svg',
+      trade_plans: 'images/icons/trade_plans.svg',
       ticker: 'images/icons/tickers.svg',
+      tickers: 'images/icons/tickers.svg',
       alert: 'images/icons/alerts.svg',
+      alerts: 'images/icons/alerts.svg',
+      execution: 'images/icons/executions.svg',
+      executions: 'images/icons/executions.svg',
+      cash_flow: 'images/icons/cash_flows.svg',
+      cash_flows: 'images/icons/cash_flows.svg',
+      note: 'images/icons/notes.svg',
+      notes: 'images/icons/notes.svg',
       default: 'images/icons/alerts.svg',
     };
 
@@ -1184,34 +1241,51 @@ class ActiveAlertsComponent extends HTMLElement {
     return date.toLocaleDateString('he-IL');
   }
 
+  /**
+   * Create status badge - משתמש ב-FieldRendererService המרכזי
+   * @deprecated - השתמש ישירות ב-window.FieldRendererService.renderStatus() (מחזיר HTML string)
+   * @param {string} status - סטטוס
+   * @param {string} relatedType - סוג ישות
+   * @returns {HTMLElement|null} DOM element או null
+   */
   createStatusBadge(status, relatedType) {
     if (!status) {
       return null;
     }
 
-    if (window.FieldRendererService && typeof window.FieldRendererService.renderStatus === 'function') {
+    // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+    if (window.FieldRendererService?.renderStatus) {
       const wrapper = document.createElement('span');
       wrapper.innerHTML = window.FieldRendererService.renderStatus(status, relatedType);
       return wrapper.firstElementChild;
     }
 
+    // Fallback למקרה נדיר ביותר שהמערכת לא זמינה
     const badge = document.createElement('span');
     badge.className = 'active-alerts__fallback-badge';
     badge.textContent = status;
     return badge;
   }
 
+  /**
+   * Create side badge - משתמש ב-FieldRendererService המרכזי
+   * @deprecated - השתמש ישירות ב-window.FieldRendererService.renderSide() (מחזיר HTML string)
+   * @param {string} side - צד (Long/Short)
+   * @returns {HTMLElement|null} DOM element או null
+   */
   createSideBadge(side) {
     if (!side) {
       return null;
     }
 
-    if (window.FieldRendererService && typeof window.FieldRendererService.renderSide === 'function') {
+    // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+    if (window.FieldRendererService?.renderSide) {
       const wrapper = document.createElement('span');
       wrapper.innerHTML = window.FieldRendererService.renderSide(side);
       return wrapper.firstElementChild;
     }
 
+    // Fallback למקרה נדיר ביותר שהמערכת לא זמינה
     const badge = document.createElement('span');
     badge.className = 'active-alerts__fallback-badge';
     badge.textContent = side;

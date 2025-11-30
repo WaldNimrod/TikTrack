@@ -151,6 +151,23 @@ def handle_database_session(auto_commit: bool = True, auto_close: bool = True):
                 g.db = db  # Store in Flask g for access in function
                 logging.info(f"✅ HANDLE_DB_SESSION: Got database session")
                 
+                # CRITICAL: Always start with a clean transaction state
+                # Rollback any existing aborted transaction from previous operations
+                try:
+                    from sqlalchemy import text
+                    db.execute(text("SELECT 1"))
+                except Exception as tx_check_error:
+                    # Transaction is aborted, rollback to start fresh
+                    logging.warning(f"⚠️ HANDLE_DB_SESSION: Transaction aborted detected, rolling back: {str(tx_check_error)}")
+                    try:
+                        db.rollback()
+                        logging.info(f"✅ HANDLE_DB_SESSION: Rollback successful, starting fresh transaction")
+                    except Exception as rollback_error:
+                        logging.error(f"❌ HANDLE_DB_SESSION: Rollback failed: {str(rollback_error)}")
+                else:
+                    # Transaction is OK, but clear any stale state
+                    db.expire_all()
+                
                 # Call the function
                 logging.info(f"🟢 HANDLE_DB_SESSION: Calling {func.__name__}")
                 result = func(*args, **kwargs)
@@ -278,11 +295,12 @@ def monitor_performance(log_slow_queries: bool = True, slow_query_threshold: flo
 def require_authentication(roles: List[str] = None):
     """
     Decorator for authentication and authorization.
-    Currently uses a default user fallback when no authenticated user
-    is attached to the request context.
+    
+    Primary source: g.user_id set by auth middleware from session
+    Fallback: explicit user_id in request (for backward compatibility and tools)
     
     Args:
-        roles: List of required roles (optional)
+        roles: List of required roles (optional - not implemented yet)
     """
     def decorator(func: Callable) -> Callable:
         @wraps(func)
@@ -322,7 +340,7 @@ def require_authentication(roles: List[str] = None):
                     "timestamp": datetime.now().isoformat()
                 }), 401
             
-            # Check roles if specified
+            # Check roles if specified (not implemented yet - for future use)
             if roles:
                 user_roles = getattr(g, 'user_roles', [])
                 if not any(role in user_roles for role in roles):

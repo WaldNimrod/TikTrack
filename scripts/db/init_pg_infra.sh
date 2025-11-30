@@ -3,7 +3,7 @@ set -euo pipefail
 
 # TikTrack - Initialize PostgreSQL infra inside Docker (idempotent)
 # - Ensures role "TikTrakDBAdmin" exists with password and CREATEDB
-# - Ensures databases "TikTrack-db-development" and "TikTrack-db-prodution" exist and owned by TikTrakDBAdmin
+# - Ensures databases "TikTrack-db-development" and "TikTrack-db-production" exist and owned by TikTrakDBAdmin
 # - Safe to re-run
 #
 # Requirements:
@@ -40,7 +40,7 @@ docker exec "${POSTGRES_CONTAINER}" psql -v ON_ERROR_STOP=1 -U "${POSTGRES_USER}
 
 echo ">>> Verifying role and databases..."
 docker exec "${POSTGRES_CONTAINER}" psql -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -tAc "SELECT 'role:'||rolname FROM pg_roles WHERE rolname='TikTrakDBAdmin';"
-docker exec "${POSTGRES_CONTAINER}" psql -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -tAc "SELECT 'db:'||datname FROM pg_database WHERE datname IN ('TikTrack-db-development','TikTrack-db-prodution') ORDER BY datname;"
+docker exec "${POSTGRES_CONTAINER}" psql -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -tAc "SELECT 'db:'||datname FROM pg_database WHERE datname IN ('TikTrack-db-development','TikTrack-db-production') ORDER BY datname;"
 
 echo ">>> Done."
 

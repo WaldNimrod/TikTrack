@@ -169,6 +169,17 @@ class SMCacheSection extends SMBaseSection {
 
     return `
       <div class="cache-overview">
+        <!-- Quick Link -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <div class="d-flex justify-content-end">
+              <a href="/cache-management" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-external-link-alt me-1"></i> ניהול מטמון מלא
+              </a>
+            </div>
+          </div>
+        </div>
+
         <!-- Cache Overview Cards -->
         <div class="row mb-4">
           <div class="col-md-3">

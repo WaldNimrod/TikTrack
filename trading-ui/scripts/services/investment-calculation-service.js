@@ -353,7 +353,17 @@
             }
 
             if (percentValue === null || !Number.isFinite(percentValue)) {
-                input.value = '';
+                // Use DataCollectionService to clear field if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(input.id, '', 'text');
+                } else {
+                  // Use DataCollectionService to clear field if available
+                  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                    window.DataCollectionService.setValue(input.id, '', 'text');
+                  } else {
+                    input.value = '';
+                  }
+                }
                 if (systemGenerated) {
                     delete input.dataset.userModified;
                     delete input.dataset.systemGenerated;
@@ -361,7 +371,12 @@
                 return;
             }
 
-            input.value = formatPercent(percentValue, context.options);
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(input.id, formatPercent(percentValue, context.options), 'text');
+            } else {
+              input.value = formatPercent(percentValue, context.options);
+            }
 
             if (systemGenerated) {
                 input.dataset.systemGenerated = 'true';
@@ -399,7 +414,17 @@
 
         const rawValue = typeof percentInput.value === 'string' ? percentInput.value.trim() : '';
         if (rawValue === '') {
-            priceInput.value = '';
+            // Use DataCollectionService to clear field if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(priceInput.id, '', 'text');
+            } else {
+              // Use DataCollectionService to clear field if available
+              if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue(priceInput.id, '', 'text');
+              } else {
+                priceInput.value = '';
+              }
+            }
             delete priceInput.dataset.systemGenerated;
             return true;
         }
@@ -412,7 +437,12 @@
             return false;
         }
 
-        priceInput.value = computedPrice.toFixed(context.options.amountDecimals ?? DEFAULT_OPTIONS.amountDecimals);
+        // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(priceInput.id, computedPrice.toFixed(context.options.amountDecimals ?? DEFAULT_OPTIONS.amountDecimals), 'number');
+        } else {
+          priceInput.value = computedPrice.toFixed(context.options.amountDecimals ?? DEFAULT_OPTIONS.amountDecimals);
+        }
         markFieldAsSystemGenerated(priceInput);
         return true;
     }
@@ -792,7 +822,12 @@
                 if (force || !stopInput.dataset.userModified) {
                     const stopPrice = price * (1 - stopPercent / 100);
                     if (isPositiveNumber(stopPrice)) {
-                        stopInput.value = stopPrice.toFixed(2);
+                        // Use DataCollectionService to set value if available
+                        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                          window.DataCollectionService.setValue(stopInput.id, stopPrice.toFixed(2), 'number');
+                        } else {
+                          stopInput.value = stopPrice.toFixed(2);
+                        }
                         stopInput.dataset.systemGenerated = 'true';
                         if (force && options.resetUserModified !== false) {
                             delete stopInput.dataset.userModified;
@@ -805,7 +840,12 @@
                 if (force || !targetInput.dataset.userModified) {
                     const targetPrice = price * (1 + targetPercent / 100);
                     if (isPositiveNumber(targetPrice)) {
-                        targetInput.value = targetPrice.toFixed(2);
+                        // Use DataCollectionService to set value if available
+                        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                          window.DataCollectionService.setValue(targetInput.id, targetPrice.toFixed(2), 'number');
+                        } else {
+                          targetInput.value = targetPrice.toFixed(2);
+                        }
                         targetInput.dataset.systemGenerated = 'true';
                         if (force && options.resetUserModified !== false) {
                             delete targetInput.dataset.userModified;
@@ -850,7 +890,12 @@
 
         if (!isPositiveNumber(amountValue)) {
             if (context.quantityInput) {
-                context.quantityInput.value = '';
+                // Use DataCollectionService to clear field if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(context.quantityInput.id, '', 'text');
+                } else {
+                  context.quantityInput.value = '';
+                }
             }
             updateSummary(context);
             return;
@@ -882,7 +927,12 @@
 
         if (!isPositiveNumber(quantityValue)) {
             if (context.amountInput) {
-                context.amountInput.value = '';
+                // Use DataCollectionService to clear field if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(context.amountInput.id, '', 'text');
+                } else {
+                  context.amountInput.value = '';
+                }
             }
             updateSummary(context);
             return;
@@ -896,7 +946,12 @@
                 context.amountInput.value = formatAmount(amount, context.options);
                 markFieldAsSystemGenerated(context.amountInput);
             } else {
-                context.amountInput.value = '';
+                // Use DataCollectionService to clear field if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(context.amountInput.id, '', 'text');
+                } else {
+                  context.amountInput.value = '';
+                }
                 delete context.amountInput.dataset.systemGenerated;
             }
         }

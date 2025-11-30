@@ -46,3 +46,22 @@ yfinance==0.2.18
 # HTML sanitization for rich text content
 bleach==6.1.0
 
+# Password encryption for SMTP settings
+cryptography==41.0.7
+bcrypt==4.1.2
+
+# AI Analysis System Dependencies
+# ==============================================
+# Required for AI Analysis feature (added January 2025)
+# These packages enable LLM integration with Gemini and Perplexity
+httpx==0.28.1                    # HTTP client for Perplexity API
+google-generativeai==0.8.5      # Google Gemini API client
+# Note: google-generativeai automatically installs:
+#   - google-ai-generativelanguage==0.6.15
+#   - google-api-core
+#   - google-api-python-client
+#   - google-auth
+#   - pydantic
+#   - grpcio
+#   - And other dependencies
+

@@ -931,78 +931,19 @@ async function updateTradingAccountsSummary(trading_accounts) {
     // מערכת מאוחדת לסיכום נתונים
     if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
       const config = window.INFO_SUMMARY_CONFIGS.trading_accounts;
-      window.Logger.debug('Using InfoSummarySystem with config', { page: 'trading_accounts', config });
-      await window.InfoSummarySystem.calculateAndRender(accountsArray, config);
+      if (config) {
+        window.Logger.debug('Using InfoSummarySystem with config', { page: 'trading_accounts', config });
+        await window.InfoSummarySystem.calculateAndRender(accountsArray, config);
+      } else {
+        window.Logger.warn('No config found for trading_accounts in INFO_SUMMARY_CONFIGS', { page: 'trading_accounts' });
+      }
     } else {
-      window.Logger.warn('InfoSummarySystem not available, using fallback', { page: 'trading_accounts' });
-      // מערכת סיכום נתונים לא זמינה - חישוב ידני
+      window.Logger.warn('InfoSummarySystem not available', { page: 'trading_accounts' });
+      // Fallback בסיסי - הודעת שגיאה
       const summaryStatsElement = document.getElementById('summaryStats');
-      if (summaryStatsElement && accountsArray) {
-        // חישוב סטטיסטיקות בסיסיות
-        const totalAccounts = accountsArray.length;
-        const activeAccounts = accountsArray.filter(acc => acc.status === 'open').length;
-        const openAccounts = accountsArray.filter(acc => acc.status === 'open').length;
-        
-        // טעינת יתרות מכל החשבונות (עם טיפול בשגיאות)
-        let balancesMap = window.tradingAccountsBalancesMap instanceof Map ? window.tradingAccountsBalancesMap : new Map();
-        if (!(balancesMap instanceof Map)) {
-          balancesMap = new Map();
-        }
-
-        if (balancesMap.size === 0 && accountsArray.length > 0) {
-          const accountIds = accountsArray.map(acc => acc.id);
-          try {
-            if (typeof window.loadAccountBalancesBatch === 'function') {
-              balancesMap = await window.loadAccountBalancesBatch(accountIds);
-            } else if (typeof loadAccountBalancesBatch === 'function') {
-              balancesMap = await loadAccountBalancesBatch(accountIds);
-            } else {
-              window.Logger?.warn('⚠️ loadAccountBalancesBatch לא זמינה, משתמש בערכי ברירת מחדל', { page: "trading_accounts" });
-            }
-          } catch (balanceError) {
-            window.Logger?.error('❌ שגיאה בטעינת יתרות לסיכום:', balanceError, { page: "trading_accounts" });
-            balancesMap = new Map();
-          }
-        }
-        
-        // חישוב סה"כ יתרה במטבע בסיס
-        let totalBaseCurrencyBalance = 0;
-        let baseCurrencySymbol = '$';
-        
-        // Helper function to convert currency code to symbol
-        const getCurrencySymbol = (currencyCode) => {
-          if (!currencyCode || currencyCode.length <= 1) return currencyCode || '$';
-          switch (currencyCode.toUpperCase()) {
-            case 'USD': return '$';
-            case 'ILS': return '₪';
-            case 'EUR': return '€';
-            case 'GBP': return '£';
-            case 'JPY': return '¥';
-            default: return currencyCode; // If already a symbol, return as is
-          }
-        };
-        
-        accountsArray.forEach(account => {
-          const balanceData = balancesMap.get(account.id);
-          if (balanceData) {
-            totalBaseCurrencyBalance += balanceData.base_currency_total || 0;
-            // נשתמש במטבע הבסיס של החשבון הראשון (או USD כברירת מחדל)
-            if (balanceData.base_currency) {
-              baseCurrencySymbol = getCurrencySymbol(balanceData.base_currency);
-            }
-          }
-        });
-        
-        // עדכון התצוגה
+      if (summaryStatsElement) {
         summaryStatsElement.innerHTML = `
-          <div>סה"כ חשבונות: <strong id="totalAccounts">${totalAccounts}</strong></div>
-          <div>חשבונות פעילים: <strong id="activeAccounts">${activeAccounts}</strong></div>
-          <div>חשבונות פתוחים: <strong id="openAccounts">${openAccounts}</strong></div>
-          <div>סה"כ יתרה: <strong id="totalBalance">${window.renderAmount ? window.renderAmount(totalBaseCurrencyBalance, baseCurrencySymbol, 0, false) : `${totalBaseCurrencyBalance.toLocaleString('en-US', { maximumFractionDigits: 0, minimumFractionDigits: 0 })} ${baseCurrencySymbol}`}</strong></div>
-        `;
-      } else if (summaryStatsElement) {
-        summaryStatsElement.innerHTML = `
-          <div class="error-message">
+          <div style="color: #dc3545; font-weight: bold;">
             ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
           </div>
         `;

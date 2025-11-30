@@ -477,13 +477,33 @@ window.loadPreferences = async function(userId = 1, profileId = null) {
                     const boolValue = (value === true || value === 'true' || value === '1' || value === 1);
                     element.checked = boolValue;
                 } else if (element.type === 'number') {
-                    element.value = parseFloat(value) || 0;
+                    // Use DataCollectionService to set value if available
+                    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                      window.DataCollectionService.setValue(element.id, parseFloat(value) || 0, 'number');
+                    } else {
+                      element.value = parseFloat(value) || 0;
+                    }
                 } else if (element.type === 'color') {
-                    element.value = value || '#000000';
+                    // Use DataCollectionService to set value if available
+                    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                      window.DataCollectionService.setValue(element.id, value || '#000000', 'text');
+                    } else {
+                      element.value = value || '#000000';
+                    }
                 } else if (element.tagName === 'SELECT') {
-                    element.value = value || '';
+                    // Use DataCollectionService to set value if available
+                    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                      window.DataCollectionService.setValue(element.id, value || '', 'text');
+                    } else {
+                      element.value = value || '';
+                    }
                 } else {
-                    element.value = value || '';
+                    // Use DataCollectionService to set value if available
+                    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                      window.DataCollectionService.setValue(element.id, value || '', 'text');
+                    } else {
+                      element.value = value || '';
+                    }
                 }
                 
                 window.Logger?.debug('Updated preference field', { page: 'preferences', key, value, type: element.type || element.tagName });

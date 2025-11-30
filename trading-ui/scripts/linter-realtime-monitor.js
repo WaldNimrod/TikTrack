@@ -704,7 +704,7 @@ function loadScanningResultsFromLocalStorage() {
             console.log('✅ Updated window.scanningResults:', window.scanningResults);
             
             // Update UI with loaded data
-            updateRealtimeProgress();
+            await updateRealtimeProgress();
             updateFileTypeStatistics(window.scanningResults.errors.concat(window.scanningResults.warnings));
             updateFileTypeCardsProgress();
             updateProblemFilesTable();
@@ -1103,7 +1103,15 @@ async function startFileScan() {
     const scanButton = document.getElementById('startScan');
     if (scanButton) {
         scanButton.disabled = true;
-        scanButton.innerHTML = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> סורק... 0%';
+        let loaderIcon = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                loaderIcon = await window.IconSystem.renderIcon('button', 'loader', { size: '16', alt: 'loading', class: 'icon fa-spin' });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
+        scanButton.innerHTML = loaderIcon + ' סורק... 0%';
     }
     
     // Reset all counters to 0
@@ -1262,7 +1270,15 @@ async function performScan() {
         const scanButton = document.getElementById('startScan');
         if (scanButton) {
             scanButton.disabled = false;
-            scanButton.innerHTML = '<img src="/trading-ui/images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon me-1"> סרוק קבצים';
+            let searchIcon = '<img src="/trading-ui/images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon me-1">';
+            if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                try {
+                    searchIcon = await window.IconSystem.renderIcon('button', 'search', { size: '16', alt: 'search', class: 'icon me-1' });
+                } catch (error) {
+                    // Fallback already set
+                }
+            }
+            scanButton.innerHTML = searchIcon + ' סרוק קבצים';
         }
         
         return; // Stop the scanning process
@@ -1286,7 +1302,7 @@ async function performScan() {
             
             // Count as scanned to avoid infinite loops
             window.scanningResults.scannedFiles++;
-            updateRealtimeProgress();
+            await updateRealtimeProgress();
         }
         
         // Small delay to prevent overwhelming the system
@@ -1471,17 +1487,17 @@ async function scanSingleFile(fileName) {
         }
         
         // Update UI with real-time progress
-        updateRealtimeProgress();
+        await updateRealtimeProgress();
         
     } catch (error) {
-        if (error.message.includes('404')) {
+        if (error?.message && typeof error.message === 'string' && error.message.includes('404')) {
         } else {
         }
         // Count as scanned to avoid infinite loops
         window.scanningResults.scannedFiles++;
         
         // Update UI with real-time progress
-        updateRealtimeProgress();
+        await updateRealtimeProgress();
     }
 }
 
@@ -1489,7 +1505,7 @@ async function scanSingleFile(fileName) {
 // Real-time Progress Updates
 // ========================================
 
-function updateRealtimeProgress() {
+async function updateRealtimeProgress() {
     try {
         console.log('🔄 updateRealtimeProgress called');
         console.log('📊 Current scanning results:', {
@@ -1557,7 +1573,16 @@ function updateRealtimeProgress() {
         // Update scan button text with progress
         const scanButton = document.getElementById('startScan');
         if (scanButton) {
-            scanButton.innerHTML = `<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> סורק... ${progress}%`;
+            // Render icon using IconSystem
+            let loaderIcon = `<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin">`;
+            if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                try {
+                    loaderIcon = await window.IconSystem.renderIcon('button', 'loader', { size: '16', alt: 'loading', class: 'icon fa-spin' });
+                } catch (error) {
+                    // Fallback already set
+                }
+            }
+            scanButton.innerHTML = `${loaderIcon} סורק... ${progress}%`;
         }
         
         // Add progress log entry every 10 files or at completion
@@ -3048,7 +3073,7 @@ window.viewProgressDetails = function(entryId) {
 // Global Functions (Exposed to window)
 // ========================================
 
-function startMonitoring() {
+async function startMonitoring() {
     isMonitoring = true;
     startAutoRefresh();
     
@@ -3057,21 +3082,39 @@ function startMonitoring() {
     const stopBtn = document.getElementById('stopMonitoringBtn');
     
     if (startBtn) {
-            startBtn.disabled = true;
-        startBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="play" class="icon me-1"> פועל...';
+        startBtn.disabled = true;
+        // Render icon using IconSystem
+        let playIcon = '<img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="play" class="icon me-1">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                playIcon = await window.IconSystem.renderIcon('button', 'player-play', { size: '16', alt: 'play', class: 'icon me-1' });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
+        startBtn.innerHTML = `${playIcon} פועל...`;
         startBtn.className = 'btn btn-success btn-sm';
     }
     
     if (stopBtn) {
         stopBtn.disabled = false;
-        stopBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1"> עצור';
+        // Render icon using IconSystem
+        let stopIcon = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                stopIcon = await window.IconSystem.renderIcon('button', 'player-stop', { size: '16', alt: 'stop', class: 'icon me-1' });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
+        stopBtn.innerHTML = `${stopIcon} עצור`;
         stopBtn.className = 'btn btn-danger btn-sm';
     }
     
     // ניטור הופעל - המערכת תסרוק קבצים אוטומטית
 }
 
-function stopMonitoring() {
+async function stopMonitoring() {
     isMonitoring = false;
     if (autoRefreshInterval) {
         clearInterval(autoRefreshInterval);
@@ -3084,13 +3127,31 @@ function stopMonitoring() {
     
     if (startBtn) {
         startBtn.disabled = false;
-        startBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="play" class="icon me-1"> התחל';
+        // Render icon using IconSystem
+        let playIcon = '<img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="play" class="icon me-1">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                playIcon = await window.IconSystem.renderIcon('button', 'player-play', { size: '16', alt: 'play', class: 'icon me-1' });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
+        startBtn.innerHTML = `${playIcon} התחל`;
         startBtn.className = 'btn btn-success btn-sm';
     }
     
     if (stopBtn) {
-            stopBtn.disabled = true;
-        stopBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1"> עצור';
+        stopBtn.disabled = true;
+        // Render icon using IconSystem
+        let stopIcon = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                stopIcon = await window.IconSystem.renderIcon('button', 'player-stop', { size: '16', alt: 'stop', class: 'icon me-1' });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
+        stopBtn.innerHTML = `${stopIcon} עצור`;
         stopBtn.className = 'btn btn-secondary btn-sm';
     }
     
@@ -3388,7 +3449,7 @@ async function fixAllIssues() {
     window.fixProgress.currentFile = 'הושלם';
     
     // Update UI
-    updateRealtimeProgress();
+    await updateRealtimeProgress();
     updateProblemFilesTable();
     
     // Show final results
@@ -3468,7 +3529,7 @@ async function fixAllErrors() {
     }
     
     // Update UI
-    updateRealtimeProgress();
+    await updateRealtimeProgress();
     updateProblemFilesTable();
     
     const successRate = window.scanningResults.errors.length + fixedCount > 0 ? 
@@ -3545,7 +3606,7 @@ async function fixAllWarnings() {
     }
     
     // Update UI
-    updateRealtimeProgress();
+    await updateRealtimeProgress();
     updateProblemFilesTable();
     
     const successRate = window.scanningResults.warnings.length + fixedCount > 0 ? 

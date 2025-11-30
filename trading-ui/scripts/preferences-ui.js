@@ -190,28 +190,64 @@ class FormManager {
           // Check if it's an 8-digit hex with alpha
           if (/^#[0-9A-Fa-f]{8}$/i.test(value)) {
             // Strip the alpha channel (last 2 characters)
-            input.value = value.substring(0, 7);
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(input.id, value.substring(0, 7), 'text');
+            } else {
+              input.value = value.substring(0, 7);
+            }
           } else if (/^#[0-9A-Fa-f]{6}$/i.test(value)) {
             // Already valid 6-digit hex
-            input.value = value;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(input.id, value, 'text');
+            } else {
+              input.value = value;
+            }
           } else {
             // Try to use ColorPickerManager converter if available
             if (window.ColorPickerManager && typeof window.ColorPickerManager.getInstance === 'function') {
               const colorManager = window.ColorPickerManager.getInstance();
               if (colorManager && typeof colorManager.convertToColorInputFormat === 'function') {
-                input.value = colorManager.convertToColorInputFormat(value);
+                const formattedValue = colorManager.convertToColorInputFormat(value);
+                // Use DataCollectionService to set value if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(input.id, formattedValue, 'text');
+                } else {
+                  input.value = formattedValue;
+                }
+              } else {
+                // Use DataCollectionService to set value if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(input.id, '#000000', 'text');
+                } else {
+                  input.value = '#000000';
+                }
+              }
+            } else {
+              // Use DataCollectionService to set value if available
+              if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue(input.id, '#000000', 'text');
               } else {
                 input.value = '#000000';
               }
-            } else {
-              input.value = '#000000';
             }
           }
         } else {
-          input.value = '#000000';
+          // Use DataCollectionService to set value if available
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(input.id, '#000000', 'text');
+          } else {
+            input.value = '#000000';
+          }
         }
       } else {
-        input.value = value;
+        // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(input.id, value, 'text');
+        } else {
+          input.value = value;
+        }
       }
     });
 
@@ -1282,14 +1318,23 @@ class PreferencesUI {
       }
 
       // Show summary notification
-      if (results.saved > 0) {
+      // Note: Individual group save notifications are handled by CRUDResponseHandler in PreferencesData.savePreferences()
+      // Only show summary if there are mixed results (some saved, some failed)
+      if (results.saved > 0 && results.failed > 0) {
+        // Mixed results - show summary notification
         if (typeof window.showSuccessNotification === 'function') {
-          const message = results.failed > 0
-            ? `נשמרו ${results.saved} קבוצות, ${results.failed} נכשלו`
-            : `כל הקבוצות נשמרו בהצלחה! (${results.saved} קבוצות)`;
+          const message = `נשמרו ${results.saved} קבוצות, ${results.failed} נכשלו`;
           window.showSuccessNotification(message, 3000);
         }
-      } else if (results.failed > 0) {
+      } else if (results.saved > 0 && results.failed === 0) {
+        // All succeeded - CRUDResponseHandler already showed notifications for each group
+        // Optionally show a summary if all groups were saved
+        window.Logger?.info(`✅ All ${results.saved} preference groups saved successfully`, {
+          page: 'preferences-ui',
+        });
+      } else if (results.failed > 0 && results.saved === 0) {
+        // All failed - CRUDResponseHandler already showed error notifications for each group
+        // Optionally show a summary
         if (typeof window.showErrorNotification === 'function') {
           window.showErrorNotification(`כל הקבוצות נכשלו בשמירה (${results.failed} קבוצות)`);
         }
@@ -1305,7 +1350,10 @@ class PreferencesUI {
     } catch (error) {
       window.Logger.error('❌ Error in save all preferences:', error, { page: 'preferences-ui' });
 
-      if (typeof window.showErrorNotification === 'function') {
+      // Use CRUDResponseHandler for error notification if available
+      if (typeof window.CRUDResponseHandler === 'object' && window.CRUDResponseHandler.handleError) {
+        window.CRUDResponseHandler.handleError(error, 'שמירת כל ההעדפות');
+      } else if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification(`שגיאה בשמירת העדפות: ${error.message}`);
       }
 
@@ -1896,7 +1944,12 @@ window.loadProfilesToDropdown = async function(userId = null) {
         const activeOption = profileSelect.querySelector(`option[value="${String(activeProfile.id)}"]`);
         if (activeOption) {
           activeOption.selected = true;
-          profileSelect.value = activeOption.value;
+          // Use DataCollectionService to set value if available
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(profileSelect.id, activeOption.value, 'text');
+          } else {
+            profileSelect.value = activeOption.value;
+          }
           window.Logger.debug(`🔍 Selected active profile in dropdown: ${activeProfile.name}`, { page: 'preferences-ui' });
         } else {
           window.Logger.warn(`⚠️ Active profile option not found in dropdown: ${activeProfile.name}`, { page: 'preferences-ui' });
@@ -1906,7 +1959,12 @@ window.loadProfilesToDropdown = async function(userId = null) {
         const defaultOption = profileSelect.querySelector('option[value="0"]');
         if (defaultOption) {
           defaultOption.selected = true;
-          profileSelect.value = defaultOption.value;
+          // Use DataCollectionService to set value if available
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(profileSelect.id, defaultOption.value, 'text');
+          } else {
+            profileSelect.value = defaultOption.value;
+          }
           window.Logger.debug('🔍 No active profile found, selected default', { page: 'preferences-ui' });
         }
       }
@@ -2140,8 +2198,16 @@ window.disableAllPreferencesInterface = function() {
 
   // Add visual indicator to all save buttons
   const saveButtons = document.querySelectorAll('button[onclick*="saveAllPreferences"], #savePreferencesBtn');
-  saveButtons.forEach(saveButton => {
-    saveButton.innerHTML = '<img src="/trading-ui/images/icons/tabler/lock.svg" width="16" height="16" alt="lock" class="icon me-2"> פרופיל ברירת מחדל - לא ניתן לערוך';
+  saveButtons.forEach(async saveButton => {
+    let lockIcon = '<img src="/trading-ui/images/icons/tabler/lock.svg" width="16" height="16" alt="lock" class="icon me-2">';
+    if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+      try {
+        lockIcon = await window.IconSystem.renderIcon('button', 'lock', { size: '16', alt: 'lock', class: 'icon me-2' });
+      } catch (error) {
+        // Fallback already set
+      }
+    }
+    saveButton.innerHTML = lockIcon + ' פרופיל ברירת מחדל - לא ניתן לערוך';
     saveButton.classList.add('btn-secondary', 'disabled');
     saveButton.classList.remove('btn-success');
     window.Logger.info(`🔒 Disabled save button: ${saveButton.id || 'unnamed'}`, { page: 'preferences-ui' });
@@ -2183,8 +2249,16 @@ window.enableAllPreferencesInterface = function() {
 
   // Restore all save buttons
   const saveButtons = document.querySelectorAll('button[onclick*="saveAllPreferences"], #savePreferencesBtn');
-  saveButtons.forEach(saveButton => {
-    saveButton.innerHTML = '<img src="/trading-ui/images/icons/tabler/device-floppy.svg" width="16" height="16" alt="save" class="icon me-2">שמור העדפות';
+  saveButtons.forEach(async saveButton => {
+    let saveIcon = '<img src="/trading-ui/images/icons/tabler/device-floppy.svg" width="16" height="16" alt="save" class="icon me-2">';
+    if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+      try {
+        saveIcon = await window.IconSystem.renderIcon('button', 'save', { size: '16', alt: 'save', class: 'icon me-2' });
+      } catch (error) {
+        // Fallback already set
+      }
+    }
+    saveButton.innerHTML = saveIcon + 'שמור העדפות';
     saveButton.classList.add('btn-success');
     saveButton.classList.remove('btn-secondary', 'disabled');
     window.Logger.info(`✅ Enabled save button: ${saveButton.id || 'unnamed'}`, { page: 'preferences-ui' });

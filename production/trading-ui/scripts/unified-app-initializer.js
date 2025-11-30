@@ -798,6 +798,18 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         //     customInitializers: config.customInitializers
         // }, { page: "unified-app-initializer" });
       }
+      
+      // Replace icons with IconSystem for all pages
+      if (typeof window.replaceIconsInContext === 'function') {
+        try {
+          await window.replaceIconsInContext();
+        } catch (error) {
+          window.Logger?.warn('Failed to replace icons', { 
+            page: 'unified-app-initializer', 
+            error: error?.message || error 
+          });
+        }
+      }
     }
 
     /**
@@ -1701,6 +1713,7 @@ window.addEventListener('error', event => {
     event.error &&
     event.error.name === 'SyntaxError' &&
     event.message &&
+    typeof event.message === 'string' &&
     event.message.includes('Unexpected end of input')
   ) {
     window.Logger.info('🔧 ===== IGNORING SYNTAX ERROR =====', { page: 'unified-app-initializer' });

@@ -327,7 +327,14 @@
       const ui = window.PreferencesV4.groupCache.get('ui_settings') || {};
       const pageSize = ui['tablePageSize'] ?? ui['ui.page_size'] ?? 25;
       const pageSizeEl = document.querySelector('[data-pref-ui-page-size]');
-      if (pageSizeEl) pageSizeEl.value = pageSize;
+      if (pageSizeEl) {
+        // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(pageSizeEl.id, pageSize, 'int');
+        } else {
+          pageSizeEl.value = pageSize;
+        }
+      }
       const theme = ui['theme'] ?? ui['ui.theme'] ?? 'light';
       document.documentElement.dataset.theme = theme;
     }
@@ -383,6 +390,28 @@
 
         const value = window.currentPreferences[key];
         
+        // CRITICAL: Check if field was modified by user before overwriting
+        // If field has focus or was recently modified, preserve user's input
+        const fieldHasFocus = document.activeElement === input;
+        const fieldWasModified = input.dataset.userModified === 'true' || 
+                                 (input.value !== '' && input.value !== value && value !== undefined && value !== null);
+        
+        // Skip population if field is currently being edited or was modified by user
+        if (fieldHasFocus || (fieldWasModified && !input.dataset.allowRepopulate)) {
+          window.Logger?.debug?.('⏭️ Skipping field population - user is editing or field was modified', {
+            page: 'preferences-ui-v4',
+            fieldId: input.id,
+            fieldName: input.name,
+            currentValue: input.value,
+            cachedValue: value,
+            hasFocus: fieldHasFocus,
+            wasModified: fieldWasModified
+          });
+          skippedCount++;
+          skippedKeys.push(key);
+          return; // Continue to next field
+        }
+        
         // Skip if no value found
         if (value === undefined || value === null) {
           skippedCount++;
@@ -415,11 +444,21 @@
               }
               // Ensure valid 6-digit hex
               if (colorValue.length === 7 && /^#[0-9A-Fa-f]{6}$/i.test(colorValue)) {
-                input.value = colorValue;
+                // Use DataCollectionService to set value if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(input.id, colorValue, 'text');
+                } else {
+                  input.value = colorValue;
+                }
                 populatedCount++;
               } else {
                 // Invalid format - use default black
-                input.value = '#000000';
+                // Use DataCollectionService to set value if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(input.id, '#000000', 'text');
+                } else {
+                  input.value = '#000000';
+                }
                 window.Logger?.debug?.('⚠️ Invalid color format, using default', { 
                   page: 'preferences-ui-v4',
                   key,
@@ -430,21 +469,36 @@
               }
             } else {
               // Try to convert other formats or use default
-              input.value = colorValue || '#000000';
+              // Use DataCollectionService to set value if available
+              if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue(input.id, colorValue || '#000000', 'text');
+              } else {
+                input.value = colorValue || '#000000';
+              }
               populatedCount++;
             }
           } else if (input.type === 'number') {
             // Handle number inputs
             const numValue = parseFloat(value);
             if (!isNaN(numValue)) {
-              input.value = numValue;
+              // Use DataCollectionService to set value if available
+              if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue(input.id, numValue, 'number');
+              } else {
+                input.value = numValue;
+              }
               populatedCount++;
             }
           } else if (input.tagName === 'SELECT') {
             // Handle select dropdowns
             // Try exact match first
             if (input.querySelector(`option[value="${value}"]`)) {
-              input.value = value;
+              // Use DataCollectionService to set value if available
+              if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue(input.id, value, 'text');
+              } else {
+                input.value = value;
+              }
               populatedCount++;
             } else {
               // Try case-insensitive match
@@ -453,7 +507,12 @@
                 String(opt.value).toLowerCase() === String(value).toLowerCase()
               );
               if (matchingOption) {
-                input.value = matchingOption.value;
+                // Use DataCollectionService to set value if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(input.id, matchingOption.value, 'text');
+                } else {
+                  input.value = matchingOption.value;
+                }
                 populatedCount++;
               } else {
                 window.Logger?.debug?.('⚠️ Option not found in select', { 
@@ -466,7 +525,12 @@
             }
           } else {
             // Handle text inputs
-            input.value = String(value);
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(input.id, String(value), 'text');
+            } else {
+              input.value = String(value);
+            }
             populatedCount++;
           }
         } catch (error) {

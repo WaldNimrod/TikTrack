@@ -148,6 +148,23 @@ class InitSystemCheck {
             pageName = 'tag-management';
         }
         
+        // For mockup pages, check if there's a class on html element
+        if (document.documentElement && document.documentElement.className) {
+            const htmlClass = document.documentElement.className;
+            // Check if class matches a known page name pattern (e.g., "trading-journal-page")
+            if (htmlClass && htmlClass.includes('-page') && !htmlClass.includes(' ')) {
+                // Verify it exists in PAGE_CONFIGS
+                if (window.PAGE_CONFIGS && window.PAGE_CONFIGS[htmlClass]) {
+                    return htmlClass;
+                }
+            }
+        }
+        
+        // If pageName exists in PAGE_CONFIGS, use it
+        if (window.PAGE_CONFIGS && window.PAGE_CONFIGS[pageName]) {
+            return pageName;
+        }
+        
         return pageName || 'index';
     }
 

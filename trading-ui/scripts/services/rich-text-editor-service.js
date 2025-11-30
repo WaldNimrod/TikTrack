@@ -522,5 +522,3 @@ window.getRichTextContent = (editorId) => RichTextEditorService.getContent(edito
 window.setRichTextContent = (editorId, html) => RichTextEditorService.setContent(editorId, html);
 window.destroyRichTextEditor = (editorId) => RichTextEditorService.destroyEditor(editorId);
 
-console.log('✅ RichTextEditorService loaded successfully');
-

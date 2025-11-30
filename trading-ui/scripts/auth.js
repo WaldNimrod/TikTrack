@@ -24,15 +24,51 @@ async function login(username, password) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ username, password }),
+    credentials: 'include' // Include cookies for session
   });
 
   const data = await response.json();
 
-  if (!response.ok) {
+  if (!response.ok || data.status !== 'success') {
     throw new Error(data.error?.message || 'שגיאה בהתחברות');
   }
 
+  // Store user in localStorage
+  if (data.data?.user) {
+    currentUser = data.data.user;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  }
+
   return data;
+}
+
+// פונקציית הרשמה
+async function register(username, password, email, first_name, last_name) {
+  const response = await fetch('/api/auth/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      username,
+      password,
+      email: email || undefined,
+      first_name: first_name || undefined,
+      last_name: last_name || undefined
+    }),
+    credentials: 'include' // Include cookies for session
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || data.status !== 'success') {
+    throw new Error(data.error?.message || 'שגיאה בהרשמה');
+  }
+
+  return {
+    success: true,
+    user: data.data?.user
+  };
 }
 
 function showLoginError(message, containerId = 'loginError') {
@@ -106,9 +142,22 @@ function loadSavedCredentials(usernameId = 'username', passwordId = 'password', 
       const passwordField = document.getElementById(passwordId);
       const rememberMeField = document.getElementById(rememberMeId);
 
-      if (usernameField) {usernameField.value = savedUsername;}
-      if (passwordField) {passwordField.value = savedPassword;}
-      if (rememberMeField) {rememberMeField.checked = true;}
+      // Use DataCollectionService to set values if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        if (usernameField) window.DataCollectionService.setValue(usernameId, savedUsername, 'text');
+        if (passwordField) window.DataCollectionService.setValue(passwordId, savedPassword, 'text');
+      } else {
+        if (usernameField) usernameField.value = savedUsername;
+        if (passwordField) passwordField.value = savedPassword;
+      }
+      // Use DefaultValueSetter for logical default
+      if (rememberMeField) {
+        if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setLogicalDefault === 'function') {
+          window.DefaultValueSetter.setLogicalDefault(rememberMeField.id || 'rememberMe', true);
+        } else {
+          rememberMeField.checked = true;
+        }
+      }
     }
   }
 }
@@ -134,24 +183,89 @@ function showLogin(loginSectionId = 'loginSection', dashboardSectionId = 'dashbo
   if (dashboardSection) {dashboardSection.style.display = 'none';}
 }
 
-function logout() {
+async function logout() {
+  try {
+    // Call logout API
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+  } catch (error) {
+    console.warn('Logout API call failed:', error);
+  }
+  
+  // Clear local state
   authToken = null;
   currentUser = null;
   localStorage.removeItem('authToken');
   localStorage.removeItem('currentUser');
 
+  // Clear all cache layers
+  try {
+    // Clear Unified Cache
+    if (window.UnifiedCacheManager?.clearAll) {
+      await window.UnifiedCacheManager.clearAll();
+    }
+    // Clear dashboard data cache
+    if (window.UnifiedCacheManager?.clearByPattern) {
+      await window.UnifiedCacheManager.clearByPattern('dashboard-data');
+    }
+    // Clear CacheSyncManager
+    if (window.CacheSyncManager?.clearAll) {
+      await window.CacheSyncManager.clearAll();
+    }
+    // Clear IndexedDB if available
+    if (window.indexedDB && window.indexedDB.databases) {
+      const databases = await window.indexedDB.databases();
+      for (const db of databases) {
+        if (db.name && db.name.includes('TikTrack')) {
+          const deleteReq = window.indexedDB.deleteDatabase(db.name);
+          deleteReq.onsuccess = () => console.log(`Cleared IndexedDB: ${db.name}`);
+        }
+      }
+    }
+  } catch (error) {
+    console.warn('Error clearing cache during logout:', error);
+  }
+
+  // Update header display before redirect
+  if (window.headerSystem?.updateUserDisplay) {
+    window.headerSystem.updateUserDisplay();
+  }
+
+  // Dispatch logout event
+  window.dispatchEvent(new CustomEvent('logout:success'));
+  window.dispatchEvent(new CustomEvent('user:logged-out'));
+
   // הפעלת פונקציה גלובלית להתנתקות אם קיימת
   if (typeof onLogout === 'function') {
     onLogout();
-  } else {
-    showLogin();
   }
+
+  // Clear dashboard data state if exists
+  if (window.dashboardDataState) {
+    window.dashboardDataState.data = { trades: [], alerts: [], accounts: [], cashFlows: [] };
+    window.dashboardDataState.lastLoadedAt = null;
+  }
+
+  // Small delay to allow UI updates, then redirect
+  setTimeout(() => {
+    window.location.href = 'login.html';
+  }, 100);
 }
 
 function isAuthenticated() {
-  // כרגע יש רק משתמש אחד - נימרוד
-  // מערכת המשתמשים המלאה היא עתידית
-  return true; // תמיד מחובר (נימרוד)
+  // Check if user is in localStorage
+  const storedUser = localStorage.getItem('currentUser');
+  if (storedUser) {
+    try {
+      currentUser = JSON.parse(storedUser);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  return false;
 }
 
 function getAuthToken() {
@@ -159,21 +273,24 @@ function getAuthToken() {
 }
 
 function getCurrentUser() {
-  // כרגע יש רק משתמש אחד - נימרוד
-  // מערכת המשתמשים המלאה היא עתידית
+  // Return cached user if available
   if (currentUser) {
     return currentUser;
   }
   
-  // החזרת משתמש ברירת מחדל (נימרוד)
-  return {
-    id: 1,
-    username: 'nimrod',
-    name: 'נימרוד',
-    email: 'nimrod@tiktrack.com',
-    roles: ['admin', 'user'],
-    isActive: true
-  };
+  // Try to load from localStorage
+  const storedUser = localStorage.getItem('currentUser');
+  if (storedUser) {
+    try {
+      currentUser = JSON.parse(storedUser);
+      return currentUser;
+    } catch (e) {
+      console.warn('Failed to parse stored user:', e);
+    }
+  }
+  
+  // No user found
+  return null;
 }
 
 // פונקציה גלובלית לטיפול בטופס התחברות
@@ -184,8 +301,17 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    const username = document.getElementById('username')?.value;
-    const password = document.getElementById('password')?.value;
+    // Use DataCollectionService to get values if available
+    let username, password;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      username = window.DataCollectionService.getValue('username', 'text', '');
+      password = window.DataCollectionService.getValue('password', 'text', '');
+    } else {
+      const usernameEl = document.getElementById('username');
+      const passwordEl = document.getElementById('password');
+      username = usernameEl ? usernameEl.value : '';
+      password = passwordEl ? passwordEl.value : '';
+    }
 
     if (!username || !password) {
       showLoginError('אנא מלא את כל השדות');
@@ -198,11 +324,13 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
       const loginData = await login(username, password);
 
       // שמירת פרטי התחברות
-      authToken = loginData.data.access_token;
-      currentUser = loginData.data.user;
+      authToken = loginData.data?.access_token || 'session_based';
+      currentUser = loginData.data?.user;
 
-      localStorage.setItem('authToken', authToken);
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      if (currentUser) {
+        localStorage.setItem('authToken', authToken);
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      }
 
       // שמירת פרטי התחברות אם נבחר "זכור אותי"
       saveCredentials(username, password);
@@ -230,22 +358,60 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
 }
 
 // פונקציה לבדיקת התחברות בעת טעינת הדף
-function checkAuthentication(onAuthenticated = null, onNotAuthenticated = null) {
-  // כרגע יש רק משתמש אחד - נימרוד
-  // מערכת המשתמשים המלאה היא עתידית
-  currentUser = {
-    id: 1,
-    username: 'nimrod',
-    name: 'נימרוד',
-    email: 'nimrod@tiktrack.com',
-    roles: ['admin', 'user'],
-    isActive: true
-  };
-
-  if (onAuthenticated && typeof onAuthenticated === 'function') {
-    onAuthenticated();
+async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = null) {
+  // Try to get current user from API
+  try {
+    const response = await fetch('/api/auth/me', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.status === 'success' && data.data?.user) {
+        currentUser = data.data.user;
+        authToken = 'session_based'; // Session-based auth
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        localStorage.setItem('authToken', authToken);
+        
+        if (onAuthenticated && typeof onAuthenticated === 'function') {
+          onAuthenticated();
+        } else {
+          showDashboard();
+        }
+        return;
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to check authentication:', error);
+  }
+  
+  // Not authenticated - try localStorage as fallback
+  const storedUser = localStorage.getItem('currentUser');
+  if (storedUser) {
+    try {
+      currentUser = JSON.parse(storedUser);
+      if (onAuthenticated && typeof onAuthenticated === 'function') {
+        onAuthenticated();
+      } else {
+        showDashboard();
+      }
+      return;
+    } catch (e) {
+      // Invalid stored user
+    }
+  }
+  
+  // Not authenticated
+  currentUser = null;
+  if (onNotAuthenticated && typeof onNotAuthenticated === 'function') {
+    onNotAuthenticated();
   } else {
-    showDashboard();
+    // Redirect to login if not on login/register page
+    if (!window.location.pathname.includes('login.html') && 
+        !window.location.pathname.includes('register.html')) {
+      window.location.href = 'login.html';
+    }
   }
 }
 
@@ -257,9 +423,9 @@ function createLoginInterface(containerId, onSuccess = null) {
   container.innerHTML = `
     <div class="login-container">
       <div class="login-header">
-        <div class="login-logo">📊</div>
-        <h1 class="login-title">ברוכים הבאים ל-TikTrack</h1>
-        <p class="login-subtitle">מערכת ניהול השקעות מתקדמת</p>
+        <div class="login-logo">
+          <img src="images/logo.svg" alt="TikTrack Logo" />
+        </div>
       </div>
       
       <div class="login-error" id="loginError"></div>
@@ -287,10 +453,13 @@ function createLoginInterface(containerId, onSuccess = null) {
         </button>
       </form>
       
+      <div style="text-align: center; margin-top: 1rem;">
+        <a href="forgot-password.html" style="color: var(--apple-blue, #007AFF); text-decoration: none; font-size: 0.9rem;">שכחת סיסמה?</a>
+      </div>
+      
       <div class="demo-credentials">
-        <h6>🔑 פרטי התחברות לבדיקה:</h6>
         <p><strong>מנהל:</strong> username=admin, password=admin123</p>
-        <p><strong>משתמש:</strong> username=test, password=test123</p>
+        <p><strong>משתמש:</strong> username=user, password=user123</p>
       </div>
     </div>
   `;
@@ -326,6 +495,59 @@ function hasRole(role) {
   return currentUser.roles.includes(role);
 }
 
+/**
+ * Update user profile
+ */
+async function updateUserProfile(updates) {
+  const response = await fetch('/api/auth/me', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(updates),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || data.status !== 'success') {
+    throw new Error(data.error?.message || 'שגיאה בעדכון פרופיל');
+  }
+
+  // Update local storage
+  if (data.data?.user) {
+    currentUser = data.data.user;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  }
+
+  return data;
+}
+
+/**
+ * Update user password
+ */
+async function updatePassword(currentPassword, newPassword) {
+  const response = await fetch('/api/auth/me/password', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({
+      current_password: currentPassword,
+      new_password: newPassword,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || data.status !== 'success') {
+    throw new Error(data.error?.message || 'שגיאה בעדכון סיסמה');
+  }
+
+  return data;
+}
+
 // ייצוא פונקציות גלובליות
 window.TikTrackAuth = {
   login,
@@ -333,6 +555,8 @@ window.TikTrackAuth = {
   isAuthenticated,
   getAuthToken,
   getCurrentUser,
+  updateUserProfile,
+  updatePassword,
   setupLoginForm,
   checkAuthentication,
   createLoginInterface,
@@ -343,4 +567,10 @@ window.TikTrackAuth = {
   showDashboard,
   showLoginError,
   showLoginSuccess,
+  setLoadingState,
+  register,
+  loadSavedCredentials,
 };
+
+// Export register function globally
+window.register = register;

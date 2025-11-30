@@ -1,12 +1,17 @@
-from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, Numeric
+from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, Numeric, event
 from sqlalchemy.orm import relationship
 from .base import BaseModel
 from typing import Dict, Any, Optional
 from datetime import datetime, date
+import logging
+
+logger = logging.getLogger(__name__)
 
 class CashFlow(BaseModel):
     __tablename__ = "cash_flows"
     
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True,
+                    comment="User who owns this cash flow")
     trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=False)
     type = Column(
         String(50),
@@ -67,3 +72,26 @@ class CashFlow(BaseModel):
             
         return result
 
+
+# ========================================
+# SQLAlchemy Event Listeners for Tag Links Cleanup
+# ========================================
+
+@event.listens_for(CashFlow, 'after_delete')
+def cash_flow_deleted(mapper, connection, target):
+    """
+    Event listener for when a cash flow is deleted.
+    Automatically removes all associated tag links.
+    """
+    try:
+        from services.tag_service import TagService
+        from sqlalchemy.orm import Session
+        
+        session = Session(bind=connection)
+        TagService.remove_all_tags_for_entity(
+            session, 'cash_flow', target.id
+        )
+        session.close()
+    except Exception as e:
+        logger.error(f"Error cleaning up tags for cash_flow {target.id}: {e}")
+        # Don't raise - allow deletion to proceed even if tag cleanup fails

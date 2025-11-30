@@ -420,6 +420,243 @@ const INFO_SUMMARY_CONFIGS = {
         calculator: 'count'
       }
     ]
+  },
+
+  // Index page (dashboard) configuration
+  index: {
+    containerId: 'summaryStats',
+    tableType: null, // Dashboard doesn't have a single table type
+    stats: [
+      {
+        id: 'totalTrades',
+        label: 'סה"כ טריידים',
+        calculator: 'count',
+        // Note: This will be calculated from trades data passed to updatePageSummaryStats
+      },
+      {
+        id: 'totalAlerts',
+        label: 'סה"כ התראות',
+        calculator: 'count',
+        // Note: This will be calculated from alerts data passed to updatePageSummaryStats
+      },
+      {
+        id: 'currentBalance',
+        label: 'יתרה נוכחית',
+        calculator: 'custom',
+        customCalculator: (data) => {
+          // Calculate from accounts data if available
+          if (data && Array.isArray(data) && data.length > 0) {
+            return data.reduce((sum, item) => {
+              const value = item?.total_value ?? item?.opening_balance ?? 0;
+              return sum + (parseFloat(value) || 0);
+            }, 0);
+          }
+          return 0;
+        },
+        formatter: 'currency'
+      },
+      {
+        id: 'totalPnL',
+        label: 'רווח/הפסד',
+        calculator: 'custom',
+        customCalculator: (data) => {
+          // Calculate P/L from trades data if available
+          if (data && Array.isArray(data) && data.length > 0) {
+            return data.reduce((sum, trade) => {
+              const pl = trade?.position_pl_value ?? trade?.unrealized_pl ?? 0;
+              return sum + (parseFloat(pl) || 0);
+            }, 0);
+          }
+          return 0;
+        },
+        formatter: 'currencyWithColor'
+      }
+    ]
+  },
+
+  // Preferences page configuration
+  preferences: {
+    containerId: 'infoSummary',
+    tableType: null,
+    stats: [
+      {
+        id: 'activeProfileName',
+        label: 'פרופיל פעיל',
+        calculator: 'custom',
+        customCalculator: (data) => {
+          // This will be set by preferences.js directly
+          return data?.activeProfileName || 'לא זמין';
+        }
+      },
+      {
+        id: 'activeUserName',
+        label: 'משתמש פעיל',
+        calculator: 'custom',
+        customCalculator: (data) => {
+          return data?.activeUserName || 'לא זמין';
+        }
+      },
+      {
+        id: 'preferencesCount',
+        label: 'מספר העדפות',
+        calculator: 'custom',
+        customCalculator: (data) => {
+          return data?.preferencesCount || 0;
+        },
+        formatter: 'integer'
+      },
+      {
+        id: 'profilesCount',
+        label: 'מספר פרופילים',
+        calculator: 'custom',
+        customCalculator: (data) => {
+          return data?.profilesCount || 0;
+        },
+        formatter: 'integer'
+      },
+      {
+        id: 'groupsCount',
+        label: 'מספר קבוצות',
+        calculator: 'custom',
+        customCalculator: (data) => {
+          return data?.groupsCount || 0;
+        },
+        formatter: 'integer'
+      }
+    ]
+  },
+
+  // DB Display page configuration
+  db_display: {
+    containerId: 'summaryStats',
+    tableType: null,
+    stats: [
+      {
+        id: 'totalTables',
+        label: 'סה"כ טבלאות',
+        calculator: 'count'
+      },
+      {
+        id: 'totalRecords',
+        label: 'סה"כ רשומות',
+        calculator: 'sumField',
+        params: { field: 'record_count' },
+        formatter: 'integer'
+      }
+    ]
+  },
+
+  // Background Tasks page configuration
+  'background-tasks': {
+    containerId: 'summaryStats',
+    tableType: null,
+    stats: [
+      {
+        id: 'totalTasks',
+        label: 'סה"כ משימות',
+        calculator: 'count'
+      },
+      {
+        id: 'activeTasks',
+        label: 'משימות פעילות',
+        calculator: 'countByStatus',
+        params: { status: 'active' }
+      },
+      {
+        id: 'completedTasks',
+        label: 'משימות הושלמו',
+        calculator: 'countByStatus',
+        params: { status: 'completed' }
+      },
+      {
+        id: 'failedTasks',
+        label: 'משימות נכשלו',
+        calculator: 'countByStatus',
+        params: { status: 'failed' }
+      }
+    ]
+  },
+
+  // Notifications Center page configuration
+  'notifications-center': {
+    containerId: 'overviewStats',
+    tableType: null,
+    stats: [
+      {
+        id: 'totalNotifications',
+        label: 'סה"כ התראות',
+        calculator: 'count'
+      },
+      {
+        id: 'unreadNotifications',
+        label: 'התראות שלא נקראו',
+        calculator: 'countByField',
+        params: { field: 'read', value: false }
+      },
+      {
+        id: 'readNotifications',
+        label: 'התראות נקראו',
+        calculator: 'countByField',
+        params: { field: 'read', value: true }
+      }
+    ]
+  },
+
+  // External Data Dashboard page configuration
+  'external-data-dashboard': {
+    containerId: null, // No specific container - uses custom display
+    tableType: null,
+    stats: [
+      {
+        id: 'totalConnectors',
+        label: 'סה"כ מחברים',
+        calculator: 'count'
+      },
+      {
+        id: 'activeConnectors',
+        label: 'מחברים פעילים',
+        calculator: 'countByStatus',
+        params: { status: 'active' }
+      },
+      {
+        id: 'totalDataPoints',
+        label: 'סה"כ נקודות נתונים',
+        calculator: 'sumField',
+        params: { field: 'data_points' },
+        formatter: 'integer'
+      }
+    ]
+  },
+
+  // AI Analysis page configuration
+  'ai-analysis': {
+    containerId: 'summaryStats',
+    tableType: 'ai_analysis',
+    stats: [
+      {
+        id: 'totalAnalyses',
+        label: 'סה"כ ניתוחים',
+        calculator: 'count'
+      },
+      {
+        id: 'completedAnalyses',
+        label: 'ניתוחים הושלמו',
+        calculator: 'countByField',
+        params: { field: 'status', value: 'completed' }
+      },
+      {
+        id: 'pendingAnalyses',
+        label: 'ניתוחים ממתינים',
+        calculator: 'countByField',
+        params: { field: 'status', value: 'pending' }
+      },
+      {
+        id: 'failedAnalyses',
+        label: 'ניתוחים נכשלו',
+        calculator: 'countByField',
+        params: { field: 'status', value: 'failed' }
+      }
+    ]
   }
 };
 

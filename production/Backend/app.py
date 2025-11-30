@@ -146,7 +146,9 @@ from routes.api import (
 )
 from routes.api.preferences_v4 import preferences_v4_bp
 from routes.api.server_logs import server_logs_bp
+from routes.api.email_logs import email_logs_bp
 from routes.api.cache_changes import cache_changes_bp
+from routes.api.auth import auth_bp
 
 # Import new database display API blueprints
 from routes.api.preference_groups import preference_groups_bp
@@ -155,6 +157,7 @@ from routes.api.external_data_providers import external_data_providers_bp
 from routes.api.quotes_last import quotes_last_bp
 from routes.api.plan_conditions_list import plan_conditions_list_bp
 from routes.api.user_preferences_list import user_preferences_list_bp
+from routes.api.ai_analysis import ai_analysis_bp
 from routes.api.base_entity_utils import BaseEntityUtils
 
 # Patch Flask's Request.get_json to auto-normalize incoming payloads
@@ -255,6 +258,8 @@ from routes.api.quotes_v1 import quotes_bp
 from routes.pages import pages_bp
 
 app = Flask(__name__)
+# Set secret key for session management
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'dev-secret-key-change-in-production')
 CORS(app)
 
 # Legacy SQLAlchemy compatibility layer for tests
@@ -343,6 +348,13 @@ except Exception as e:
     sys.exit(1)
 
 logger.info("✅ Server initialization completed")
+
+# -----------------------------------------------------------------------------
+# Authentication Middleware
+# -----------------------------------------------------------------------------
+from middleware.auth_middleware import setup_auth_middleware
+setup_auth_middleware(app)
+logger.info("✅ Authentication middleware initialized")
 
 # -----------------------------------------------------------------------------
 # Legacy testing compatibility (Flask app + SQLAlchemy-style DB proxy)
@@ -455,6 +467,7 @@ app.register_blueprint(tags_bp)
 app.register_blueprint(preferences_bp)
 app.register_blueprint(preferences_v4_bp)
 app.register_blueprint(users_bp)
+app.register_blueprint(auth_bp)
 app.register_blueprint(background_tasks_bp)
 app.register_blueprint(entity_details_bp)
 
@@ -481,6 +494,7 @@ app.register_blueprint(system_overview_bp)
 app.register_blueprint(css_management_bp)
 app.register_blueprint(wal_bp)
 app.register_blueprint(system_settings_bp)
+app.register_blueprint(email_logs_bp)
 app.register_blueprint(server_logs_bp)
 app.register_blueprint(quality_check_bp, url_prefix='/api/quality-check')
 app.register_blueprint(quality_lint_bp, url_prefix='/api')
@@ -517,6 +531,7 @@ app.register_blueprint(external_data_providers_bp)
 app.register_blueprint(quotes_last_bp)
 app.register_blueprint(plan_conditions_list_bp)
 app.register_blueprint(user_preferences_list_bp)
+app.register_blueprint(ai_analysis_bp)
 
 # Debug logging endpoint
 @app.route('/api/debug/log', methods=['POST'])

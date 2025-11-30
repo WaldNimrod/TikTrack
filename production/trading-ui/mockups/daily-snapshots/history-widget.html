@@ -13,6 +13,9 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     
+    <!-- Bootstrap CSS (חובה ראשון) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../../styles-new/master.css">
     
@@ -24,83 +27,106 @@
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
     
+    <!-- Error Handlers (Must load first) -->
+    <script src="../../scripts/error-handlers.js?v=1.0.0"></script>
+    <!-- API Config -->
+    <script src="../../scripts/api-config.js?v=1.0.0"></script>
+    <!-- Logger Service (Load first before other systems) -->
+    <script src="../../scripts/logger-service.js?v=1.0.0"></script>
+    
     <!-- TradingView Lightweight Charts -->
-    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js" defer></script>
-    <script src="../../scripts/charts/tradingview-theme.js" defer></script>
-    <script src="../../scripts/charts/tradingview-adapter.js" defer></script>
+    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js?v=1.0.0" defer></script>
+    <script src="../../scripts/charts/tradingview-theme.js?v=1.0.0" defer></script>
+    <script src="../../scripts/charts/tradingview-adapter.js?v=1.0.0" defer></script>
     
     <!-- Header System -->
-    <script src="../../scripts/header-system.js" defer></script>
+    <script src="../../scripts/header-system.js?v=1.0.0" defer></script>
+    <script>
+        // Auto-initialize HeaderSystem when DOM is ready
+        (function() {
+            function initHeader() {
+                if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+                    try {
+                        window.HeaderSystem.initialize();
+                    } catch (error) {
+                        if (window.Logger?.error) {
+                            window.Logger.error('Error initializing HeaderSystem', error, { page: 'history-widget' });
+                        }
+                    }
+                } else {
+                    setTimeout(initHeader, 100);
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initHeader);
+            } else {
+                setTimeout(initHeader, 100);
+            }
+        })();
+    </script>
     
+    <!-- [8] Load Order: 8 -->
+    <script src="../../scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- Unified cache manager -->
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- Icon replacement helper -->
     <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Logger Service -->
-    <script src="../../scripts/logger-service.js" defer></script>
+    <!-- Error Handlers (Must load first) -->
+    
+    <!-- API Config -->
+    
+    
     
     <!-- Notification System -->
-    <script src="../../scripts/notification-system.js" defer></script>
+    <script src="../../scripts/notification-system.js?v=1.0.0" defer></script>
     
     <!-- Field Renderer Service -->
-    <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    <script src="../../scripts/services/field-renderer-service.js?v=1.0.0" defer></script>
     
     <!-- Info Summary System -->
-    <script src="../../scripts/info-summary-configs.js" defer></script>
-    <script src="../../scripts/info-summary-system.js" defer></script>
+    <script src="../../scripts/info-summary-configs.js?v=1.0.0" defer></script>
+    <script src="../../scripts/info-summary-system.js?v=1.0.0" defer></script>
     
     <!-- Preferences System -->
-    <script src="../../scripts/services/preferences-data.js" defer></script>
-    <script src="../../scripts/preferences-core-new.js" defer></script>
-    <script src="../../scripts/preferences-lazy-loader.js" defer></script>
+    <script src="../../scripts/services/preferences-data.js?v=1.0.0" defer></script>
+    <script src="../../scripts/preferences-core-new.js?v=1.0.0" defer></script>
+    <script src="../../scripts/preferences-lazy-loader.js?v=1.0.0" defer></script>
     
     <!-- Dynamic Colors System -->
-    <script src="../../scripts/color-scheme-system-clean.js" defer></script>
+    <script src="../../scripts/color-scheme-system-clean.js?v=1.0.0" defer></script>
     
     <!-- UI Utils (includes toggleSection) -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
     
     <!-- Button System -->
-    <script src="../../scripts/button-system-init.js" defer></script>
+    <script src="../../scripts/button-system-init.js?v=1.0.0" defer></script>
     
     <!-- Actions Menu System (for quick links) -->
-    <script src="../../scripts/modules/actions-menu-system.js" defer></script>
+    <script src="../../scripts/modules/actions-menu-system.js?v=1.0.0" defer></script>
 </head>
 <body class="dashboard-page">
-    <!-- Header System -->
-    <div id="unified-header"></div>
+    <!-- Notification container -->
+    <div class="notification-container" id="notificationContainer"></div>
     
-    <!-- Mockups Navigation -->
-        <!-- Mockups Navigation -->
-    <div class="mockups-navigation">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-12">
-                    <div class="mockups-navigation-content">
-                        <span class="mockups-navigation-label">
-                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
-                        </span>
-                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
-                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
-                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
-                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
-                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
-                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
-                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
-                        <a href="history-widget.html" class="mockups-navigation-link active">ווידג'ט היסטוריה</a>
-                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
-                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+    <!-- Header System -->
+    </div>
     </div>
     </div>
     
     <!-- Page Content -->
-    <div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+<div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
+        <div id="unified-header"></div>
+
+        <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
         <div class="page-body">
+            <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
             <div class="main-content">
                 <!-- History Widget Section -->
                 <div class="top-section" id="history_widget_top_section" data-section="history_widget_top_section">
@@ -111,7 +137,7 @@
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2">                            <div class="table-actions">
                             <button data-button-type="REFRESH" data-variant="small" data-icon="🔄" data-text="רענון" data-onclick="window.historyWidget.refreshWidget()" title="רענון נתונים"></button>
-                        </div><button class="filter-toggle-btn" data-onclick="toggleSection(\'history_widget_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                        </div><button class="filter-toggle-btn" data-onclick="toggleSection(\'history_widget_top_section\')" title="הצג/הסתר סקשן" data-button-type="FILTER"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
@@ -142,9 +168,9 @@
                                                 <span class="chart-label-value fw-bold" id="chartChangePercent">-</span>
                                             </div>
                                         </div>
-                                        <div class="filter-group date-range-filter" style="min-width: 150px;">
+                                        <div class="filter-group date-range-filter" >
                                             <div class="filter-dropdown">
-                                                <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="chartDateRangeToggle" data-onclick="window.historyWidget.toggleChartDateRangeMenu()">
+                                                <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="chartDateRangeToggle" data-onclick="window.historyWidget.toggleChartDateRangeMenu()" data-button-type="FILTER">
                                                     <span class="selected-value selected-date-text" id="selectedChartDateRange">השבוע</span>
                                                     <span class="dropdown-arrow">▼</span>
                                                 </button>
@@ -198,17 +224,17 @@
                                 <!-- Tabs -->
                                 <ul class="nav nav-tabs mb-3" id="statsTabs" role="tablist">
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link active" id="daily-tab" data-bs-toggle="tab" data-bs-target="#daily-stats" type="button" role="tab" aria-controls="daily-stats" aria-selected="true">
+                                        <button class="nav-link active" id="daily-tab" data-bs-toggle="tab" data-bs-target="#daily-stats" type="button" role="tab" aria-controls="daily-stats" aria-selected="true" data-button-type="TOGGLE">
                                             <span class="icon-placeholder icon" data-icon="calendar" data-size="16" data-alt="icon" aria-label="icon"></span> יומי
                                         </button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="pl-tab" data-bs-toggle="tab" data-bs-target="#pl-stats" type="button" role="tab" aria-controls="pl-stats" aria-selected="false">
+                                        <button class="nav-link" id="pl-tab" data-bs-toggle="tab" data-bs-target="#pl-stats" type="button" role="tab" aria-controls="pl-stats" aria-selected="false" data-button-type="TOGGLE">
                                             <span class="icon-placeholder icon" data-icon="chart-line" data-size="16" data-alt="icon" aria-label="icon"></span> רווח והפסד כולל
                                         </button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="market-value-tab" data-bs-toggle="tab" data-bs-target="#market-value-stats" type="button" role="tab" aria-controls="market-value-stats" aria-selected="false">
+                                        <button class="nav-link" id="market-value-tab" data-bs-toggle="tab" data-bs-target="#market-value-stats" type="button" role="tab" aria-controls="market-value-stats" aria-selected="false" data-button-type="TOGGLE">
                                             <span class="icon-placeholder icon" data-icon="currency-dollar" data-size="16" data-alt="icon" aria-label="icon"></span> שווי שוק
                                         </button>
                                     </li>
@@ -219,7 +245,7 @@
                                     <!-- Daily Stats Tab -->
                                     <div class="tab-pane fade show active" id="daily-stats" role="tabpanel" aria-labelledby="daily-tab">
                                         <div class="table-responsive">
-                                            <table class="table table-sm table-hover" id="dailyStatsTable">
+                                            <table class="table table-sm table-hover" id="dailyStatsTable" data-table-type="daily_stats">
                                                 <thead>
                                                     <tr>
                                                         <th>Instrument</th>
@@ -237,7 +263,7 @@
                                     <!-- P/L Stats Tab -->
                                     <div class="tab-pane fade" id="pl-stats" role="tabpanel" aria-labelledby="pl-tab">
                                         <div class="table-responsive">
-                                            <table class="table table-sm table-hover" id="plStatsTable">
+                                            <table class="table table-sm table-hover" id="plStatsTable" data-table-type="pl_stats">
                                                 <thead>
                                                     <tr>
                                                         <th>Instrument</th>
@@ -255,7 +281,7 @@
                                     <!-- Market Value Stats Tab -->
                                     <div class="tab-pane fade" id="market-value-stats" role="tabpanel" aria-labelledby="market-value-tab">
                                         <div class="table-responsive">
-                                            <table class="table table-sm table-hover" id="marketValueStatsTable">
+                                            <table class="table table-sm table-hover" id="marketValueStatsTable" data-table-type="market_value_stats">
                                                 <thead>
                                                     <tr>
                                                         <th>Instrument</th>
@@ -291,10 +317,16 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Page-specific script -->
-    <script src="../../scripts/history-widget.js" defer></script>
+    <script src="../../scripts/history-widget.js?v=1.0.0" defer></script>
     
     <!-- Notification System Containers -->
     <div class="notification-container" id="notification-container"></div>
     <div id="toast-container"></div>
+
+    <!-- Entity Details System -->
+    <script src="../../scripts/entity-details-api.js?v=1.0.0" defer></script>
+    <script src="../../scripts/entity-details-renderer.js?v=1.0.0" defer></script>
+    <script src="../../scripts/entity-details-modal.js?v=1.0.0" defer></script>
+    
 </body>
 </html>

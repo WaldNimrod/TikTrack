@@ -5,8 +5,12 @@ Tag Service - TikTrack
 Provides CRUD operations for tag categories and tags, assignment helpers for
 all supported entities, analytics utilities, and suggestion endpoints.
 
+Also provides automatic cleanup of tag links when entities are deleted through
+SQLAlchemy event listeners and periodic cleanup utilities.
+
 Author: TikTrack Development Team
 Created: November 2025
+Updated: January 2025 - Added automatic tag links cleanup system
 """
 
 from __future__ import annotations
@@ -17,7 +21,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Iterable, List, Optional, Sequence, Set
 
 from sqlalchemy import func
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from models import TagCategory, Tag, TagLink
 
@@ -28,7 +32,9 @@ logger = logging.getLogger(__name__)
 # get_categories, create_category, update_category, delete_category
 # get_tags, create_tag, update_tag, delete_tag
 # get_tags_for_entity, replace_tags_for_entity, remove_tag_from_entity
-# get_suggestions and internal validation helpers
+# remove_all_tags_for_entity, cleanup_orphaned_tag_links
+# get_suggestions, search_tags, get_analytics, get_tag_cloud_data
+# Internal validation and helper functions
 
 
 SUPPORTED_ENTITY_TYPES: Set[str] = {
@@ -388,8 +394,12 @@ class TagService:
         """
         Return suggested tags ordered by usage (desc) then name.
         Optionally filter by entity_type (based on historical usage).
+        Includes category relationship for serialization.
         """
-        query = db.query(Tag).filter(Tag.user_id == user_id, Tag.is_active.is_(True))
+        query = db.query(Tag).options(joinedload(Tag.category)).filter(
+            Tag.user_id == user_id, 
+            Tag.is_active.is_(True)
+        )
         if entity_type:
             TagService._validate_entity_type(entity_type)
             query = query.join(TagLink).filter(TagLink.entity_type == entity_type)
@@ -406,6 +416,103 @@ class TagService:
             entity_type or "all",
         )
         return tags
+
+    @staticmethod
+    def search_tags(
+        db: Session,
+        user_id: int,
+        query: str,
+        *,
+        entity_type: Optional[str] = None,
+        limit: int = 25,
+        include_inactive: bool = False,
+    ) -> List[Dict[str, Any]]:
+        """
+        Search tags by name query string and return with assignments.
+        
+        Returns tags matching the query, each with a list of assignments (TagLinks).
+        Optionally filters assignments by entity_type.
+        
+        Args:
+            db: Database session
+            user_id: User ID to filter tags
+            query: Search query string (minimum 2 characters)
+            entity_type: Optional entity type to filter assignments
+            limit: Maximum number of tags to return
+            include_inactive: Whether to include inactive tags
+            
+        Returns:
+            List of dicts with keys: tag (dict), assignments (list of dicts)
+        """
+        if not query or len(query.strip()) < 2:
+            raise ValueError("Query must be at least 2 characters long")
+        
+        query_lower = query.strip().lower()
+        
+        # Build base query for tags
+        tag_query = db.query(Tag).filter(Tag.user_id == user_id)
+        
+        if not include_inactive:
+            tag_query = tag_query.filter(Tag.is_active.is_(True))
+        
+        # Filter by name (case-insensitive partial match)
+        tag_query = tag_query.filter(
+            func.lower(Tag.name).contains(query_lower)
+        )
+        
+        # Limit results
+        tags = tag_query.order_by(Tag.usage_count.desc(), Tag.name.asc()).limit(limit).all()
+        
+        # Build results with assignments
+        results: List[Dict[str, Any]] = []
+        for tag in tags:
+            # Get all assignments for this tag
+            assignment_query = db.query(TagLink).filter(TagLink.tag_id == tag.id)
+            
+            # Filter by entity_type if provided
+            if entity_type:
+                TagService._validate_entity_type(entity_type)
+                assignment_query = assignment_query.filter(TagLink.entity_type == entity_type)
+            
+            assignments = assignment_query.all()
+            
+            # Serialize tag
+            tag_dict = {
+                "id": tag.id,
+                "name": tag.name,
+                "slug": tag.slug,
+                "description": tag.description,
+                "category_id": tag.category_id,
+                "usage_count": tag.usage_count or 0,
+                "last_used_at": tag.last_used_at.isoformat() if tag.last_used_at else None,
+                "is_active": tag.is_active,
+                "created_at": tag.created_at.isoformat() if tag.created_at else None,
+            }
+            
+            # Serialize assignments
+            assignment_dicts = [
+                {
+                    "id": link.id,
+                    "entity_type": link.entity_type,
+                    "entity_id": link.entity_id,
+                    "created_at": link.created_at.isoformat() if link.created_at else None,
+                }
+                for link in assignments
+            ]
+            
+            results.append({
+                "tag": tag_dict,
+                "assignments": assignment_dicts,
+            })
+        
+        logger.debug(
+            "Search returned %s tags with query '%s' (entity_type=%s)",
+            len(results),
+            query,
+            entity_type or "all",
+        )
+        
+        return results
 
     @staticmethod
     def get_analytics(
@@ -498,6 +605,51 @@ class TagService:
             "usage": usage,
         }
 
+    @staticmethod
+    def get_tag_cloud_data(
+        db: Session, user_id: int, *, limit: int = 50
+    ) -> List[Dict[str, Any]]:
+        """
+        Return tag cloud data with usage counts for dashboard display.
+        
+        Returns active tags sorted by usage_count descending, including
+        category name for display.
+        
+        Args:
+            db: Database session
+            user_id: User ID to filter tags
+            limit: Maximum number of tags to return (default: 50)
+            
+        Returns:
+            List of dicts with keys: tag_id, name, usage_count, category_name
+        """
+        cloud_rows = (
+            db.query(
+                Tag.id.label("tag_id"),
+                Tag.name.label("name"),
+                Tag.usage_count,
+                TagCategory.name.label("category_name"),
+            )
+            .outerjoin(TagCategory, Tag.category_id == TagCategory.id)
+            .filter(Tag.user_id == user_id, Tag.is_active.is_(True))
+            .order_by(Tag.usage_count.desc(), Tag.name.asc())
+            .limit(limit)
+            .all()
+        )
+        
+        cloud: List[Dict[str, Any]] = []
+        for row in cloud_rows:
+            cloud.append(
+                {
+                    "tag_id": row.tag_id,
+                    "name": row.name,
+                    "usage_count": row.usage_count or 0,
+                    "category_name": row.category_name,
+                }
+            )
+        
+        return cloud
+
     # --------------------------------------------------------------------- #
     # Internal Helpers
     # --------------------------------------------------------------------- #
@@ -552,6 +704,17 @@ class TagService:
         )
 
     @staticmethod
+    def _decrement_usage(db: Session, tag_id: int, now: Optional[datetime] = None) -> None:
+        """Decrement usage count for a tag."""
+        tag = db.query(Tag).filter(Tag.id == tag_id).first()
+        if tag:
+            tag.usage_count = max(0, (tag.usage_count or 0) - 1)
+            if tag.usage_count == 0:
+                tag.last_used_at = None
+            elif now:
+                tag.last_used_at = now
+
+    @staticmethod
     def _normalize_ids(tag_ids: Sequence[int]) -> Set[int]:
         normalized: Set[int] = set()
         for tag_id in tag_ids:
@@ -561,4 +724,139 @@ class TagService:
                 raise ValueError("Tag IDs must be integers")
             normalized.add(tag_id)
         return normalized
+
+    # --------------------------------------------------------------------- #
+    # Entity Tag Cleanup Operations
+    # --------------------------------------------------------------------- #
+    @staticmethod
+    def remove_all_tags_for_entity(
+        db: Session, entity_type: str, entity_id: int
+    ) -> int:
+        """
+        Remove all tag links for a specific entity.
+        This is automatically called by SQLAlchemy event listeners on entity deletion.
+        Returns the number of links removed.
+        
+        Args:
+            db: Database session
+            entity_type: Type of entity (e.g., 'cash_flow', 'trade')
+            entity_id: ID of the entity
+            
+        Returns:
+            Number of tag links removed
+            
+        Example:
+            >>> count = TagService.remove_all_tags_for_entity(db, 'cash_flow', 123)
+            >>> print(f"Removed {count} tag links")
+        """
+        TagService._validate_entity_type(entity_type)
+        
+        links = (
+            db.query(TagLink)
+            .filter(
+                TagLink.entity_type == entity_type,
+                TagLink.entity_id == entity_id
+            )
+            .all()
+        )
+        
+        count = len(links)
+        if count == 0:
+            return 0
+        
+        # Store tag IDs before deleting links for usage count update
+        tag_ids = [link.tag_id for link in links]
+        
+        # Delete all links
+        for link in links:
+            db.delete(link)
+        
+        # Update tag usage counts (decrement)
+        for tag_id in tag_ids:
+            TagService._decrement_usage(db, tag_id)
+        
+        # Note: Don't commit here - let the caller handle transaction management
+        # This allows event listeners to work within the same transaction
+        
+        logger.info(
+            "Removed %s tag links for %s:%s",
+            count, entity_type, entity_id
+        )
+        
+        return count
+
+    @staticmethod
+    def cleanup_orphaned_tag_links(
+        db: Session, entity_type: Optional[str] = None
+    ) -> Dict[str, int]:
+        """
+        Clean up orphaned tag links (links to non-existent entities).
+        This is useful for periodic maintenance to clean up any orphaned links
+        that may have been created before the automatic cleanup system was implemented.
+        
+        Args:
+            db: Database session
+            entity_type: Optional entity type to clean up (if None, cleans all types)
+            
+        Returns:
+            Dictionary with entity types as keys and counts of removed links as values
+            
+        Example:
+            >>> results = TagService.cleanup_orphaned_tag_links(db, 'cash_flow')
+            >>> print(f"Cleaned {results.get('cash_flow', 0)} orphaned links")
+        """
+        from models.cash_flow import CashFlow
+        from models.trade import Trade
+        from models.trade_plan import TradePlan
+        from models.execution import Execution
+        from models.trading_account import TradingAccount
+        from models.ticker import Ticker
+        from models.alert import Alert
+        from models.note import Note
+        
+        ENTITY_MODELS = {
+            'cash_flow': CashFlow,
+            'trade': Trade,
+            'trade_plan': TradePlan,
+            'execution': Execution,
+            'trading_account': TradingAccount,
+            'ticker': Ticker,
+            'alert': Alert,
+            'note': Note,
+        }
+        
+        entity_types = [entity_type] if entity_type else list(ENTITY_MODELS.keys())
+        results: Dict[str, int] = {}
+        
+        for et in entity_types:
+            if et not in ENTITY_MODELS:
+                continue
+            
+            model = ENTITY_MODELS[et]
+            links = db.query(TagLink).filter(TagLink.entity_type == et).all()
+            orphaned_count = 0
+            
+            # Store tag IDs for usage count update
+            tag_ids_to_update = []
+            
+            for link in links:
+                entity = db.query(model).filter(model.id == link.entity_id).first()
+                if not entity:
+                    tag_ids_to_update.append(link.tag_id)
+                    db.delete(link)
+                    orphaned_count += 1
+            
+            if orphaned_count > 0:
+                # Update tag usage counts
+                for tag_id in tag_ids_to_update:
+                    TagService._decrement_usage(db, tag_id)
+                
+                # Note: Don't commit here - let the caller handle transaction management
+                results[et] = orphaned_count
+                logger.info(
+                    "Cleaned up %s orphaned tag links for %s",
+                    orphaned_count, et
+                )
+        
+        return results
 

@@ -167,8 +167,14 @@ async function updatePricesFromPercentages(formId, currentPrice) {
   const newTargetPrice = await calculateTargetPrice(currentPrice, targetPercentage, side);
 
   // Update form fields
-  stopPriceElement.value = newStopPrice.toFixed(2);
-  targetPriceElement.value = newTargetPrice.toFixed(2);
+  // Use DataCollectionService to set values if available
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+    window.DataCollectionService.setValue(stopPriceElement.id, newStopPrice.toFixed(2), 'number');
+    window.DataCollectionService.setValue(targetPriceElement.id, newTargetPrice.toFixed(2), 'number');
+  } else {
+    stopPriceElement.value = newStopPrice.toFixed(2);
+    targetPriceElement.value = newTargetPrice.toFixed(2);
+  }
 
   // Updated prices from percentages
   // console.log('Updated prices from percentages:', {
@@ -214,8 +220,14 @@ async function updatePercentagesFromPrices(formId, currentPrice) {
   const newTargetPercentage = await calculatePercentageFromPrice(currentPrice, targetPrice, side);
 
   // Update form fields
-  stopPercentageElement.value = newStopPercentage.toFixed(2);
-  targetPercentageElement.value = newTargetPercentage.toFixed(2);
+  // Use DataCollectionService to set values if available
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+    window.DataCollectionService.setValue(stopPercentageElement.id, newStopPercentage.toFixed(2), 'number');
+    window.DataCollectionService.setValue(targetPercentageElement.id, newTargetPercentage.toFixed(2), 'number');
+  } else {
+    stopPercentageElement.value = newStopPercentage.toFixed(2);
+    targetPercentageElement.value = newTargetPercentage.toFixed(2);
+  }
 
   // Updated percentages from prices
   // console.log('Updated percentages from prices:', {
@@ -255,12 +267,34 @@ function formatPrice(price) {
 
 /**
  * פתיחת מודל כללי
- * Show modal by ID
- *
+ * Show modal by ID - Uses ModalManagerV2 when available
+ * 
+ * @deprecated Use window.ModalManagerV2.showModal() directly when possible
  * @param {string} modalId - מזהה המודל
- * @param {Object} options - אפשרויות נוספות
+ * @param {Object} options - אפשרויות נוספות (mode, entityData, etc.)
  */
 function showModal(modalId, options = {}) {
+  // Try to use ModalManagerV2 first
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    const mode = options.mode || 'add';
+    const entityData = options.entityData || null;
+    window.ModalManagerV2.showModal(modalId, mode, entityData, options).catch(error => {
+      window.Logger?.error('Error showing modal via ModalManagerV2', { error, modalId, page: 'ui-utils' });
+      // Fallback to bootstrap if ModalManagerV2 fails
+      fallbackToBootstrapModal(modalId, options);
+    });
+    return;
+  }
+
+  // Fallback to bootstrap.Modal for backwards compatibility
+  fallbackToBootstrapModal(modalId, options);
+}
+
+/**
+ * Fallback to bootstrap.Modal for backwards compatibility
+ * @private
+ */
+function fallbackToBootstrapModal(modalId, options) {
   const modal = document.getElementById(modalId);
   if (!modal) {
     handleElementNotFound('showModal', `Modal ${modalId} not found`);
@@ -277,8 +311,15 @@ function showModal(modalId, options = {}) {
   const modalOptions = { ...defaultOptions, ...options };
 
   // הצגת המודל
-  const bootstrapModal = new bootstrap.Modal(modal, modalOptions);
-  bootstrapModal.show();
+  if (bootstrap && bootstrap.Modal) {
+    const bootstrapModal = new bootstrap.Modal(modal, modalOptions);
+    bootstrapModal.show();
+  } else {
+    window.Logger?.error('Bootstrap Modal not available', { modalId, page: 'ui-utils' });
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+    }
+  }
 }
 
 /**
@@ -1360,15 +1401,35 @@ window.restoreAllSectionStates = async function () {
  * Called on page load to restore previous section states
  * UPDATED: Now uses page-specific localStorage keys consistently
  */
-window.restoreSectionStates = function () {
+window.restoreSectionStates = async function () {
   // if (window.Logger) { window.Logger.debug(`🔧 restoreSectionStates called`, { page: "ui-utils" }); }
   
   // Restore top section state with page-specific key
   const pageName = getCurrentPageName();
   // if (window.Logger) { window.Logger.debug(`🔧 restoreSectionStates called for page: "${pageName}"`, { page: "ui-utils" }); }
   
-  const topSectionHidden = localStorage.getItem(`${pageName}_top-section_collapsed`) === 'true';
-  // if (window.Logger) { window.Logger.debug(`💾 Retrieved top section state for page "${pageName}": collapsed=${topSectionHidden}`, { page: "ui-utils" }); }
+  // טעינת מצב סקשנים דרך PageStateManager אם זמין
+  let sectionsState = {};
+  let topSectionHidden = false;
+  
+  if (window.PageStateManager) {
+    try {
+      if (!window.PageStateManager.initialized) {
+        await window.PageStateManager.initialize();
+      }
+      sectionsState = await window.PageStateManager.loadSections(pageName);
+      topSectionHidden = sectionsState['top-section'] === true;
+      // if (window.Logger) { window.Logger.debug(`💾 Retrieved top section state via PageStateManager for page "${pageName}": collapsed=${topSectionHidden}`, { page: "ui-utils" }); }
+    } catch (err) {
+      // Fallback ל-localStorage
+      topSectionHidden = localStorage.getItem(`${pageName}_top-section_collapsed`) === 'true';
+      // if (window.Logger) { window.Logger.debug(`💾 Retrieved top section state from localStorage for page "${pageName}": collapsed=${topSectionHidden}`, { page: "ui-utils" }); }
+    }
+  } else {
+    // Fallback ל-localStorage רק אם PageStateManager לא זמין
+    topSectionHidden = localStorage.getItem(`${pageName}_top-section_collapsed`) === 'true';
+    // if (window.Logger) { window.Logger.debug(`💾 Retrieved top section state from localStorage (fallback) for page "${pageName}": collapsed=${topSectionHidden}`, { page: "ui-utils" }); }
+  }
   
   const topSection = document.querySelector('.top-section .section-body, .top-section .section-content');
   const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleSection"]');
@@ -1396,8 +1457,16 @@ window.restoreSectionStates = function () {
   sections.forEach((section, index) => {
     const sectionId = section.getAttribute('data-section') || section.id || `section-${index}`;
     if (sectionId) {
-      const sectionHidden = localStorage.getItem(`${pageName}_${sectionId}_SectionHidden`) === 'true';
-      // if (window.Logger) { window.Logger.debug(`💾 Retrieved state for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`, { page: "ui-utils" }); }
+      // בדיקת מצב שמור - קודם מ-PageStateManager, אחר כך fallback ל-localStorage
+      let sectionHidden = false;
+      if (sectionsState && sectionsState.hasOwnProperty(sectionId)) {
+        sectionHidden = sectionsState[sectionId] === true;
+        // if (window.Logger) { window.Logger.debug(`💾 Retrieved state from PageStateManager for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`, { page: "ui-utils" }); }
+      } else {
+        // Fallback ל-localStorage
+        sectionHidden = localStorage.getItem(`${pageName}_${sectionId}_SectionHidden`) === 'true';
+        // if (window.Logger) { window.Logger.debug(`💾 Retrieved state from localStorage (fallback) for section "${sectionId}" on page "${pageName}": hidden=${sectionHidden}`, { page: "ui-utils" }); }
+      }
       
       const sectionBody = section.querySelector('.section-body, .section-content');
       const toggleBtn = section.querySelector('button[onclick*="toggleSection"], button[data-onclick*="toggleSection"]');
@@ -1426,9 +1495,12 @@ window.restoreSectionStates = function () {
 };
 
 // ===== ACTION BUTTONS SYSTEM =====
+// ⚠️ DEPRECATED: This function is deprecated. Use window.createActionsMenu() from actions-menu-system.js instead.
+// This function is kept for backward compatibility only and should not be used in new code.
 
 /**
  * Generate action buttons HTML for table rows
+ * @deprecated Use window.createActionsMenu() from actions-menu-system.js instead
  * @param {string} entityId - Entity ID for the row
  * @param {string} entityType - Entity type (e.g., 'ticker', 'trade', 'account')
  * @param {string} status - Current status (for cancel/restore logic)
@@ -1509,8 +1581,43 @@ function viewTickerDetails(entityType, id) {
     window.showInfoNotification(`🔍 פונקציה: viewTickerDetails - פרמטרים: entityType='${entityType}', id=${id}`);
 }
 
+/**
+ * View linked items - uses centralized Linked Items Service
+ * @deprecated This is a demo function. Use window.viewLinkedItems() or window.showLinkedItemsModal() from linked-items.js instead
+ * @param {string} entityType - Entity type
+ * @param {number|string} id - Entity ID
+ */
 function viewLinkedItems(entityType, id) {
-    window.showInfoNotification(`🔗 פונקציה: viewLinkedItems - פרמטרים: entityType='${entityType}', id=${id}`);
+    // Use centralized Linked Items Service if available
+    if (window.viewLinkedItemsForTrade && typeof window.viewLinkedItemsForTrade === 'function') {
+        // Use appropriate wrapper function based on entity type
+        const wrapperFunctions = {
+            'trade': window.viewLinkedItemsForTrade,
+            'trade_plan': window.viewLinkedItemsForTradePlan,
+            'ticker': window.viewLinkedItemsForTicker,
+            'trading_account': window.viewLinkedItemsForAccount,
+            'account': window.viewLinkedItemsForAccount,
+            'alert': window.viewLinkedItemsForAlert,
+            'cash_flow': window.viewLinkedItemsForCashFlow,
+            'note': window.viewLinkedItemsForNote,
+            'execution': window.viewLinkedItemsForExecution
+        };
+        
+        const wrapperFunction = wrapperFunctions[entityType];
+        if (wrapperFunction) {
+            wrapperFunction(id);
+            return;
+        }
+    }
+    
+    // Fallback to generic function
+    if (window.viewLinkedItems && typeof window.viewLinkedItems === 'function') {
+        window.viewLinkedItems(id, entityType);
+        return;
+    }
+    
+    // Last resort: show notification
+    window.showInfoNotification(`🔗 פונקציה: viewLinkedItems - פרמטרים: entityType='${entityType}', id=${id} (Linked Items Service לא זמין)`);
 }
 
 function editTicker(entityType, id) {
@@ -1552,6 +1659,7 @@ window.generateActionButtons = generateActionButtons;
 
 /**
  * פונקציה לטעינת כפתורי פעולות לכל הטבלה
+ * @deprecated Use window.createActionsMenu() directly in table rendering instead
  * @param {string} tableId - מזהה הטבלה
  * @param {string} entityType - סוג הישות (ticker, trade, etc.)
  * @param {Object} config - הגדרות הכפתורים
@@ -1594,23 +1702,74 @@ function loadTableActionButtons(tableId, entityType, config = {}) {
     // מיזוג עם הגדרות מותאמות אישית
     const finalConfig = { ...defaultConfig, ...config };
 
-    // יצירת הכפתורים
-    const buttonsHtml = generateActionButtons(
-      entityId,
-      entityType,
-      status,
-      finalConfig.detailsFunction,
-      finalConfig.linkedFunction,
-      finalConfig.editFunction,
-      finalConfig.cancelFunction,
-      finalConfig.restoreFunction,
-      finalConfig.deleteFunction,
-      finalConfig.showDetails,
-      finalConfig.showLinked,
-      finalConfig.showEdit,
-      finalConfig.showCancel,
-      finalConfig.showDelete
-    );
+    // יצירת הכפתורים באמצעות Actions Menu Toolkit המרכזי
+    const buttons = [];
+    
+    if (finalConfig.showDetails) {
+      buttons.push({
+        type: 'VIEW',
+        onclick: `${finalConfig.detailsFunction}('${entityType}', ${entityId})`,
+        title: 'פרטים'
+      });
+    }
+    
+    if (finalConfig.showLinked) {
+      buttons.push({
+        type: 'LINK',
+        onclick: `${finalConfig.linkedFunction}('${entityType}', ${entityId})`,
+        title: 'אובייקטים מקושרים'
+      });
+    }
+    
+    if (finalConfig.showEdit) {
+      buttons.push({
+        type: 'EDIT',
+        onclick: `${finalConfig.editFunction}('${entityType}', ${entityId})`,
+        title: 'ערוך'
+      });
+    }
+    
+    if (finalConfig.showCancel) {
+      const isCancelled = status === 'בוטל' || status === 'סגור';
+      buttons.push({
+        type: isCancelled ? 'REACTIVATE' : 'CANCEL',
+        onclick: `${isCancelled ? finalConfig.restoreFunction : finalConfig.cancelFunction}('${entityType}', ${entityId})`,
+        title: isCancelled ? 'שיחזר' : 'בטל'
+      });
+    }
+    
+    if (finalConfig.showDelete) {
+      buttons.push({
+        type: 'DELETE',
+        onclick: `${finalConfig.deleteFunction}('${entityType}', ${entityId})`,
+        title: 'מחק'
+      });
+    }
+    
+    // Use centralized Actions Menu Toolkit
+    let buttonsHtml = '';
+    if (typeof window.createActionsMenu === 'function') {
+      buttonsHtml = window.createActionsMenu(buttons);
+    } else {
+      // Fallback to deprecated generateActionButtons if createActionsMenu is not available
+      console.warn('⚠️ [loadTableActionButtons] window.createActionsMenu not available, using deprecated generateActionButtons');
+      buttonsHtml = generateActionButtons(
+        entityId,
+        entityType,
+        status,
+        finalConfig.detailsFunction,
+        finalConfig.linkedFunction,
+        finalConfig.editFunction,
+        finalConfig.cancelFunction,
+        finalConfig.restoreFunction,
+        finalConfig.deleteFunction,
+        finalConfig.showDetails,
+        finalConfig.showLinked,
+        finalConfig.showEdit,
+        finalConfig.showCancel,
+        finalConfig.showDelete
+      );
+    }
 
     // בדיקה אם כבר יש כפתורים - למנוע כפילות
     if (actionsCell.querySelector('.actions-menu-wrapper')) {
@@ -1762,15 +1921,36 @@ function getCurrentPageName() {
  * Debug function to show all section states for current page
  * Useful for debugging section state management
  */
-window.debugSectionStates = function() {
+window.debugSectionStates = async function() {
   const pageName = getCurrentPageName();
   if (window.Logger) { window.Logger.debug(`🔍 Debug Section States for page: "${pageName}"`, { page: "ui-utils" }); }
   if (window.Logger) { window.Logger.debug('=====================================', { page: "ui-utils" }); }
   
+  // טעינת מצב סקשנים דרך PageStateManager אם זמין
+  let sectionsState = {};
+  if (window.PageStateManager) {
+    try {
+      if (!window.PageStateManager.initialized) {
+        await window.PageStateManager.initialize();
+      }
+      sectionsState = await window.PageStateManager.loadSections(pageName);
+      if (window.Logger) { window.Logger.debug(`📍 PageStateManager sections state:`, sectionsState, { page: "ui-utils" }); }
+    } catch (err) {
+      if (window.Logger) { window.Logger.warn('⚠️ Failed to load sections state from PageStateManager', err, { page: "ui-utils" }); }
+    }
+  }
+  
   // Check top section
   const topSectionKey = `${pageName}_top-section_collapsed`;
-  const topSectionState = localStorage.getItem(topSectionKey);
-  if (window.Logger) { window.Logger.debug(`📍 Top Section: ${topSectionKey} = "${topSectionState}"`, { page: "ui-utils" }); }
+  const topSectionStateFromCache = sectionsState['top-section'] !== undefined ? sectionsState['top-section'] : null;
+  const topSectionStateFromLocalStorage = localStorage.getItem(topSectionKey);
+  if (window.Logger) { 
+    window.Logger.debug(`📍 Top Section: ${topSectionKey}`, { 
+      page: "ui-utils",
+      fromPageStateManager: topSectionStateFromCache,
+      fromLocalStorage: topSectionStateFromLocalStorage
+    }); 
+  }
   
   // Check all content sections
   const sections = document.querySelectorAll('.content-section');
@@ -1778,8 +1958,15 @@ window.debugSectionStates = function() {
     const sectionId = section.getAttribute('data-section') || section.id;
     if (sectionId) {
       const sectionKey = `${pageName}_${sectionId}_SectionHidden`;
-      const sectionState = localStorage.getItem(sectionKey);
-      if (window.Logger) { window.Logger.debug(`📍 Section ${index + 1}: ${sectionKey} = "${sectionState}"`, { page: "ui-utils" }); }
+      const sectionStateFromCache = sectionsState[sectionId] !== undefined ? sectionsState[sectionId] : null;
+      const sectionStateFromLocalStorage = localStorage.getItem(sectionKey);
+      if (window.Logger) { 
+        window.Logger.debug(`📍 Section ${index + 1}: ${sectionKey}`, { 
+          page: "ui-utils",
+          fromPageStateManager: sectionStateFromCache,
+          fromLocalStorage: sectionStateFromLocalStorage
+        }); 
+      }
     }
   });
   
@@ -2000,6 +2187,15 @@ function isScriptInDOM(normalizedKey) {
 function loadScriptOnce(src, options = {}) {
   if (!src) {
     return Promise.reject(new Error('loadScriptOnce: src is required'));
+  }
+  
+  // Validate src is a string, not a Promise or other object
+  if (typeof src !== 'string') {
+    const error = new Error(`loadScriptOnce: src must be a string, got ${typeof src}. If you have a Promise, await it first.`);
+    if (window.Logger?.error) {
+      window.Logger.error('❌ loadScriptOnce invalid src type', error, { page: 'ui-utils', loader: 'loadScriptOnce', srcType: typeof src });
+    }
+    return Promise.reject(error);
   }
 
   const {

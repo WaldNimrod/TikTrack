@@ -13,203 +13,13 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     
+    <!-- Bootstrap CSS (חובה ראשון) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../../styles-new/master.css">
     
-    <!-- Visual Heatmap Styles -->
-    <style>
-        .visual-heatmap-container {
-            margin: 20px 0;
-        }
-        
-        .visual-heatmap-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #212529;
-        }
-        
-        .visual-heatmap-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .visual-heatmap-controls {
-            margin-bottom: 20px;
-        }
-        
-        .visual-heatmap-controls .control-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .visual-heatmap-controls .control-group label {
-            font-size: 14px;
-            color: #495057;
-        }
-        
-        .heatmap-cell {
-            position: relative;
-            aspect-ratio: 1;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 2px solid transparent;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .heatmap-cell:hover {
-            transform: scale(1.05);
-            border-color: #26baac;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-            z-index: 10;
-        }
-        
-        .heatmap-cell-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #212529;
-            margin-bottom: 4px;
-            line-height: 1.2;
-        }
-        
-        .heatmap-cell-value {
-            font-size: 14px;
-            font-weight: 700;
-            color: #212529;
-        }
-        
-        .heatmap-cell-percent {
-            font-size: 11px;
-            color: #6c757d;
-            margin-top: 2px;
-        }
-        
-        .visual-heatmap-legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 6px;
-        }
-        
-        .visual-heatmap-legend .legend-section {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .visual-heatmap-legend .legend-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #212529;
-        }
-        
-        .visual-heatmap-legend .legend-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        
-        .visual-heatmap-legend .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-        }
-        
-        .visual-heatmap-legend .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-        
-        .tooltip {
-            position: absolute;
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-size: 12px;
-            pointer-events: none;
-            z-index: 1000;
-            display: none;
-            white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        
-        .tooltip.show {
-            display: block;
-        }
-        
-        /* Heatmap color classes - Positive values (GREEN only) */
-        .heatmap-excellent {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-        
-        .heatmap-very-good {
-            background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
-        }
-        
-        .heatmap-good {
-            background: linear-gradient(135deg, #17a2b8 0%, #26baac 100%);
-        }
-        
-        .heatmap-average {
-            background: linear-gradient(135deg, #26baac 0%, #6cba9d 100%);
-        }
-        
-        .heatmap-below-avg {
-            background: linear-gradient(135deg, #6cba9d 0%, #a0d4b8 100%);
-        }
-        
-        .heatmap-poor {
-            background: linear-gradient(135deg, #a0d4b8 0%, #c8e6d3 100%);
-        }
-        
-        .heatmap-very-poor {
-            background: linear-gradient(135deg, #c8e6d3 0%, #e8f5ed 100%);
-        }
-        
-        /* Heatmap color classes - Negative values (RED only) */
-        .heatmap-negative-excellent {
-            background: linear-gradient(135deg, #a71e2a 0%, #c82333 100%);
-        }
-        
-        .heatmap-negative-very-poor {
-            background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
-        }
-        
-        .heatmap-negative-poor {
-            background: linear-gradient(135deg, #dc3545 0%, #e85d6a 100%);
-        }
-        
-        .heatmap-negative-average {
-            background: linear-gradient(135deg, #e85d6a 0%, #f28b95 100%);
-        }
-        
-        .heatmap-negative-below-avg {
-            background: linear-gradient(135deg, #f28b95 0%, #f6b3ba 100%);
-        }
-        
-        .heatmap-negative-good {
-            background: linear-gradient(135deg, #f6b3ba 0%, #fad5d9 100%);
-        }
-        
-        .heatmap-negative-very-good {
-            background: linear-gradient(135deg, #fad5d9 0%, #fce8ea 100%);
-        }
-    </style>
+    <!-- Visual Heatmap Styles - Now in _mockups-common.css (loaded via master.css) -->
     
     <!-- External Libraries -->
     <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
@@ -219,92 +29,119 @@
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
     
-    <!-- Header System -->
-    <script src="../../scripts/header-system.js" defer></script>
+    <!-- Error Handlers (Must load first) -->
+    <script src="../../scripts/error-handlers.js?v=1.0.0"></script>
+    <!-- API Config -->
+    <script src="../../scripts/api-config.js?v=1.0.0"></script>
+    <!-- Logger Service (Load first before other systems) -->
+    <script src="../../scripts/logger-service.js?v=1.0.0"></script>
     
+    <!-- Header System -->
+    <script src="../../scripts/header-system.js?v=1.0.0" defer></script>
+    <script>
+        // Auto-initialize HeaderSystem when DOM is ready
+        (function() {
+            function initHeader() {
+                if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+                    try {
+                        window.HeaderSystem.initialize();
+                    } catch (error) {
+                        if (window.Logger?.error) {
+                            window.Logger.error('Error initializing HeaderSystem', error, { page: 'strategy-analysis-page' });
+                        }
+                    }
+                } else {
+                    setTimeout(initHeader, 100);
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initHeader);
+            } else {
+                setTimeout(initHeader, 100);
+            }
+        })();
+    </script>
+    
+    <!-- [8] Load Order: 8 -->
+    <script src="../../scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- Unified cache manager -->
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- Icon replacement helper -->
     <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Logger Service -->
-    <script src="../../scripts/logger-service.js" defer></script>
+    <!-- Error Handlers (Must load first) -->
+    
+    <!-- API Config -->
+    
+    
     
     <!-- Notification System -->
-    <script src="../../scripts/notification-system.js" defer></script>
+    <script src="../../scripts/notification-system.js?v=1.0.0" defer></script>
     
     <!-- Field Renderer Service -->
-    <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    <script src="../../scripts/services/field-renderer-service.js?v=1.0.0" defer></script>
+    
+    <!-- Actions Menu System (required for createActionsMenu) -->
+    <script src="../../scripts/modules/actions-menu-system.js?v=1.0.0"></script>
     
     <!-- Info Summary System -->
-    <script src="../../scripts/info-summary-configs.js" defer></script>
-    <script src="../../scripts/info-summary-system.js" defer></script>
+    <script src="../../scripts/info-summary-configs.js?v=1.0.0" defer></script>
+    <script src="../../scripts/info-summary-system.js?v=1.0.0" defer></script>
     
     <!-- Preferences System -->
-    <script src="../../scripts/services/preferences-data.js" defer></script>
-    <script src="../../scripts/preferences-core-new.js" defer></script>
-    <script src="../../scripts/preferences-lazy-loader.js" defer></script>
+    <script src="../../scripts/services/preferences-data.js?v=1.0.0" defer></script>
+    <script src="../../scripts/preferences-core-new.js?v=1.0.0" defer></script>
+    <script src="../../scripts/preferences-lazy-loader.js?v=1.0.0" defer></script>
     
     <!-- Dynamic Colors System -->
-    <script src="../../scripts/color-scheme-system-clean.js" defer></script>
+    <script src="../../scripts/color-scheme-system-clean.js?v=1.0.0" defer></script>
     
     <!-- TradingView Lightweight Charts -->
-    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js" defer></script>
-    <script src="../../scripts/charts/tradingview-theme.js" defer></script>
-    <script src="../../scripts/charts/tradingview-adapter.js" defer></script>
+    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js?v=1.0.0" defer></script>
+    <script src="../../scripts/charts/tradingview-theme.js?v=1.0.0" defer></script>
+    <script src="../../scripts/charts/tradingview-adapter.js?v=1.0.0" defer></script>
     
     <!-- Core Systems (Must load first) -->
-    <script src="../../scripts/logger-service.js?v=1.0.0"></script>
+    <!-- Logger Service already loaded earlier (line 62) -->
     <script src="../../scripts/button-icons.js?v=1.0.0"></script>
     
     <!-- Tag System -->
-    <script src="../../scripts/services/tag-service.js" defer></script>
-    <script src="../../scripts/tag-ui-manager.js" defer></script>
+    <script src="../../scripts/services/tag-service.js?v=1.0.0" defer></script>
+    <script src="../../scripts/tag-ui-manager.js?v=1.0.0" defer></script>
     
     <!-- Conditions CRUD Manager (for trading methods) -->
-    <script src="../../scripts/conditions/conditions-crud-manager.js" defer></script>
+    <script src="../../scripts/conditions/conditions-crud-manager.js?v=1.0.0" defer></script>
     
     <!-- Action Buttons System -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
-    <script src="../../scripts/button-system-init.js" defer></script>
+    <script src="../../scripts/button-system-init.js?v=1.0.0" defer></script>
 </head>
 <body class="strategy-analysis-page">
-    <!-- Header System -->
-    <div id="unified-header"></div>
+    <!-- Notification container -->
+    <div class="notification-container" id="notificationContainer"></div>
     
-    <!-- Mockups Navigation -->
-        <!-- Mockups Navigation -->
-    <div class="mockups-navigation">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-12">
-                    <div class="mockups-navigation-content">
-                        <span class="mockups-navigation-label">
-                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
-                        </span>
-                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
-                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
-                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
-                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
-                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
-                        <a href="strategy-analysis-page.html" class="mockups-navigation-link active">ניתוח אסטרטגיות</a>
-                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
-                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
-                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
-                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                    </div>
-</div>
-                </div>
-            </div>
-        </div>
+
+    <!-- Header System -->
+    </div>
+    </div>
     </div>
     
     <!-- Page Content -->
-    <div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+<div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
+        <div id="unified-header"></div>
+
+        <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
         <div class="page-body">
+            <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
             <div class="main-content">
                 <!-- Header Section -->
-                <div class="top-section"  data-section="strategy_analysis_page_top_section">
+
+               <div class="top-section"  data-section="strategy_analysis_page_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
                             <span class="icon-placeholder icon" data-icon="chart-bar" data-size="16" data-alt="chart-bar" aria-label="chart-bar"></span>
@@ -315,7 +152,7 @@
                                 <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
                                 <button data-button-type="SETTINGS" data-variant="small" data-icon="settings" title="הגדרות תצוגה"></button>
                             </div>
-                            <button class="filter-toggle-btn" data-onclick="if(typeof window.toggleAllSections === 'function') { window.toggleAllSections(); } else { toggleSection('strategy_analysis_page_top_section'); }" title="פתח/סגור את כל הסקשנים">
+                            <button class="filter-toggle-btn" data-onclick="if(typeof window.toggleAllSections === 'function') { window.toggleAllSections(); } else { toggleSection('strategy_analysis_page_top_section'); }" title="פתח/סגור את כל הסקשנים" data-button-type="CLOSE">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -333,13 +170,13 @@
                             <p class="text-muted small mb-0">בחר איזה אסטרטגיות להכלל בניתוח</p>
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2">
-                            <button class="btn btn-outline-secondary btn-sm" data-onclick="resetRecordFilters()" title="נקה את כל הפילטרים">
+                            <button class="btn btn-outline-secondary btn-sm" data-onclick="resetRecordFilters()" title="נקה את כל הפילטרים" data-button-type="FILTER">
                                 <span class="icon-placeholder icon" data-icon="x" data-size="14" data-alt="x" aria-label="x"></span> נקה
                             </button>
-                            <button class="btn btn-outline-primary btn-sm" data-onclick="resetRecordFiltersToDefaults()" title="איפוס לברירת מחדל">
+                            <button class="btn btn-outline-primary btn-sm" data-onclick="resetRecordFiltersToDefaults()" title="איפוס לברירת מחדל" data-button-type="FILTER">
                                 <span class="icon-placeholder icon" data-icon="refresh" data-size="14" data-alt="refresh" aria-label="refresh"></span> ברירת מחדל
                             </button>
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('record-filter-panel')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('record-filter-panel')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -354,7 +191,7 @@
                                         <label class="form-label form-label-small">טווח מוגדר</label>
                                         <div class="filter-group date-range-filter">
                                             <div class="filter-dropdown">
-                                                <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="dateRangeFilterToggle" data-onclick="toggleDateRangeFilterMenu()">
+                                                <button class="filter-toggle filter-toggle-full-width date-range-filter-toggle" id="dateRangeFilterToggle" data-onclick="toggleDateRangeFilterMenu()" data-button-type="FILTER">
                                                     <span class="selected-value selected-date-text" id="selectedDateRange">השנה</span>
                                                     <span class="dropdown-arrow">▼</span>
                                                 </button>
@@ -424,10 +261,10 @@
                                     <div class="col-md-2">
                                         <div class="d-flex align-items-center gap-1 mb-1">
                                             <label class="form-label mb-0 form-label-small">חשבון מסחר</label>
-                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('recordFilterTradingAccounts')" title="בחר הכל">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('recordFilterTradingAccounts')" title="בחר הכל" data-button-type="FILTER">
                                                 <span class="icon-placeholder icon" data-icon="check" data-size="8" data-alt="check" aria-label="check"></span>
                                             </button>
-                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('recordFilterTradingAccounts')" title="נקה הכל">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('recordFilterTradingAccounts')" title="נקה הכל" data-button-type="FILTER">
                                                 <span class="icon-placeholder icon" data-icon="x" data-size="8" data-alt="x" aria-label="x"></span>
                                             </button>
                                         </div>
@@ -440,10 +277,10 @@
                                     <div class="col-md-2">
                                         <div class="d-flex align-items-center gap-1 mb-1">
                                             <label for="recordFilterTags" class="form-label mb-0 form-label-small">תגיות</label>
-                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('recordFilterTags')" title="בחר הכל">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('recordFilterTags')" title="בחר הכל" data-button-type="FILTER">
                                                 <span class="icon-placeholder icon" data-icon="check" data-size="8" data-alt="check" aria-label="check"></span>
                                             </button>
-                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('recordFilterTags')" title="נקה הכל">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('recordFilterTags')" title="נקה הכל" data-button-type="FILTER">
                                                 <span class="icon-placeholder icon" data-icon="x" data-size="8" data-alt="x" aria-label="x"></span>
                                             </button>
                                         </div>
@@ -457,7 +294,7 @@
                                         <label class="form-label form-label-small">סטטוס</label>
                                         <div class="filter-group status-filter">
                                             <div class="filter-dropdown">
-                                                <button class="filter-toggle filter-toggle-full-width status-filter-toggle" id="statusFilterToggle" data-onclick="toggleStatusFilterMenu()">
+                                                <button class="filter-toggle filter-toggle-full-width status-filter-toggle" id="statusFilterToggle" data-onclick="toggleStatusFilterMenu()" data-button-type="FILTER">
                                                     <span class="selected-value selected-status-text" id="selectedStatus">כל הסטטוסים</span>
                                                     <span class="dropdown-arrow">▼</span>
                                                 </button>
@@ -489,13 +326,13 @@
                             <p class="text-muted small mb-0">בחר לפי מה להשוות את האסטרטגיות (ניתן לבחור מספר פרמטרים במקביל)</p>
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2">
-                            <button class="btn btn-outline-secondary btn-sm" data-onclick="resetComparisonParameters()" title="נקה את כל הפרמטרים">
+                            <button class="btn btn-outline-secondary btn-sm" data-onclick="resetComparisonParameters()" title="נקה את כל הפרמטרים" data-button-type="PRIMARY">
                                 <span class="icon-placeholder icon" data-icon="x" data-size="14" data-alt="x" aria-label="x"></span> נקה
                             </button>
-                            <button class="btn btn-outline-primary btn-sm" data-onclick="resetComparisonParametersToDefaults()" title="איפוס לברירת מחדל">
+                            <button class="btn btn-outline-primary btn-sm" data-onclick="resetComparisonParametersToDefaults()" title="איפוס לברירת מחדל" data-button-type="PRIMARY">
                                 <span class="icon-placeholder icon" data-icon="refresh" data-size="14" data-alt="refresh" aria-label="refresh"></span> ברירת מחדל
                             </button>
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('comparison-parameters-panel')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('comparison-parameters-panel')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -509,10 +346,10 @@
                                         <div class="form-check mb-2 d-flex align-items-center gap-1">
                                             <input type="checkbox" id="compareByTradingMethods" class="form-check-input" data-onchange="toggleComparisonParameter('tradingMethods')">
                                             <label for="compareByTradingMethods" class="form-check-label fw-bold mb-0">שיטות מסחר</label>
-                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('comparisonTradingMethods')" title="בחר הכל" disabled id="btn-select-all-trading-methods">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('comparisonTradingMethods')" title="בחר הכל" disabled id="btn-select-all-trading-methods" data-button-type="LINK">
                                                 <span class="icon-placeholder icon" data-icon="check" data-size="8" data-alt="check" aria-label="check"></span>
                                             </button>
-                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('comparisonTradingMethods')" title="נקה הכל" disabled id="btn-clear-all-trading-methods">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('comparisonTradingMethods')" title="נקה הכל" disabled id="btn-clear-all-trading-methods" data-button-type="LINK">
                                                 <span class="icon-placeholder icon" data-icon="x" data-size="8" data-alt="x" aria-label="x"></span>
                                             </button>
                                         </div>
@@ -526,10 +363,10 @@
                                         <div class="form-check mb-2 d-flex align-items-center gap-1">
                                             <input type="checkbox" id="compareByTicker" class="form-check-input" data-onchange="toggleComparisonParameter('ticker')">
                                             <label for="compareByTicker" class="form-check-label fw-bold mb-0">טיקר</label>
-                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('comparisonTickers')" title="בחר הכל" disabled id="btn-select-all-tickers">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('comparisonTickers')" title="בחר הכל" disabled id="btn-select-all-tickers" data-button-type="LINK">
                                                 <span class="icon-placeholder icon" data-icon="check" data-size="8" data-alt="check" aria-label="check"></span>
                                             </button>
-                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('comparisonTickers')" title="נקה הכל" disabled id="btn-clear-all-tickers">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('comparisonTickers')" title="נקה הכל" disabled id="btn-clear-all-tickers" data-button-type="LINK">
                                                 <span class="icon-placeholder icon" data-icon="x" data-size="8" data-alt="x" aria-label="x"></span>
                                             </button>
                                         </div>
@@ -543,10 +380,10 @@
                                         <div class="form-check mb-2 d-flex align-items-center gap-1">
                                             <input type="checkbox" id="compareByTags" class="form-check-input" data-onchange="toggleComparisonParameter('tags')">
                                             <label for="compareByTags" class="form-check-label fw-bold mb-0">תגיות</label>
-                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('comparisonTags')" title="בחר הכל" disabled id="btn-select-all-comparison-tags">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('comparisonTags')" title="בחר הכל" disabled id="btn-select-all-comparison-tags" data-button-type="LINK">
                                                 <span class="icon-placeholder icon" data-icon="check" data-size="8" data-alt="check" aria-label="check"></span>
                                             </button>
-                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('comparisonTags')" title="נקה הכל" disabled id="btn-clear-all-comparison-tags">
+                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('comparisonTags')" title="נקה הכל" disabled id="btn-clear-all-comparison-tags" data-button-type="LINK">
                                                 <span class="icon-placeholder icon" data-icon="x" data-size="8" data-alt="x" aria-label="x"></span>
                                             </button>
                                         </div>
@@ -565,14 +402,14 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="clipboard-list" data-size="16" data-alt="table" aria-label="table"></span> טבלת השוואות</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('comparison-table-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('comparison-table-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover" data-table-type="comparison-table">
                                 <thead>
                                     <tr>
                                         <!-- Headers will be populated dynamically based on selected comparison parameters -->
@@ -608,14 +445,14 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="chart-dots" data-size="16" data-alt="grid" aria-label="grid"></span> Heatmap - מטריצת השוואות</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('heatmap-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('heatmap-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
                         <div class="table-responsive">
-                            <table class="table table-bordered">
+                            <table class="table table-bordered" data-table-type="heatmap-matrix">
                                 <thead>
                                     <tr>
                                         <th></th>
@@ -662,7 +499,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="chart-dots" data-size="16" data-alt="grid" aria-label="grid"></span> מפת חום ויזואלית</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('visual-heatmap-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('visual-heatmap-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -671,7 +508,7 @@
                         <div class="visual-heatmap-controls mb-3">
                             <div class="control-group">
                                 <label for="visualHeatmapSortBy">מיון לפי:</label>
-                                <select id="visualHeatmapSortBy" class="form-select form-select-sm" style="width: auto; display: inline-block;">
+                                <select id="visualHeatmapSortBy" class="form-select form-select-sm" class="mockup-inline-block mockup-auto-width">
                                     <option value="totalPL">P/L כולל</option>
                                     <option value="successRate">אחוז הצלחה</option>
                                     <option value="trades">מספר טריידים</option>
@@ -761,7 +598,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="chart-bar" data-size="16" data-alt="chart-bar" aria-label="chart-bar"></span> ביצועי אסטרטגיות</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('strategy-performance-chart-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('strategy-performance-chart-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -802,7 +639,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="icon" aria-label="icon"></span> תובנות</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('strategy-insights-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('strategy-insights-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -843,7 +680,7 @@
                         </div>
 
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover" data-table-type="strategy-list">
                                         <thead>
                                             <tr>
                                                 <th>שם אסטרטגיה</th>
@@ -861,9 +698,10 @@
                                                 <td>15</td>
                                                 <td class="text-success">$5,250</td>
                                                 <td>67%</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary">ערוך</button>
-                                                    <button class="btn btn-sm btn-outline-danger">מחק</button>
+                                                <td class="actions-cell" data-strategy-name="RSI + Moving Average">
+                                                    <!-- Actions menu will be replaced by JavaScript -->
+                                                    <button class="btn btn-sm btn-outline-primary" data-button-type="EDIT">ערוך</button>
+                                                    <button class="btn btn-sm btn-outline-danger" data-button-type="DELETE">מחק</button>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -872,9 +710,10 @@
                                                 <td>20</td>
                                                 <td class="text-success">$8,000</td>
                                                 <td>65%</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary">ערוך</button>
-                                                    <button class="btn btn-sm btn-outline-danger">מחק</button>
+                                                <td class="actions-cell" data-strategy-name="Breakout Strategy">
+                                                    <!-- Actions menu will be replaced by JavaScript -->
+                                                    <button class="btn btn-sm btn-outline-primary" data-button-type="EDIT">ערוך</button>
+                                                    <button class="btn btn-sm btn-outline-danger" data-button-type="DELETE">מחק</button>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -883,9 +722,10 @@
                                                 <td>10</td>
                                                 <td class="text-success">$3,500</td>
                                                 <td>70%</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-outline-primary">ערוך</button>
-                                                    <button class="btn btn-sm btn-outline-danger">מחק</button>
+                                                <td class="actions-cell" data-strategy-name="Support Bounce">
+                                                    <!-- Actions menu will be replaced by JavaScript -->
+                                                    <button class="btn btn-sm btn-outline-primary" data-button-type="EDIT">ערוך</button>
+                                                    <button class="btn btn-sm btn-outline-danger" data-button-type="DELETE">מחק</button>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -916,7 +756,7 @@
                             <div class="card-body">
                                 <h5 class="card-title">השוואה בין אסטרטגיות</h5>
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover" data-table-type="strategy-comparison">
                                         <thead>
                                             <tr>
                                                 <th>אסטרטגיה</th>
@@ -997,10 +837,16 @@
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
     <!-- Page-specific script -->
-    <script src="../../scripts/strategy-analysis-page.js" defer></script>
+    <script src="../../scripts/strategy-analysis-page.js?v=1.0.0" defer></script>
     
     <!-- Notification System Containers -->
     <div class="notification-container" id="notification-container"></div>
     <div id="toast-container"></div>
+
+    <!-- Entity Details System -->
+    <script src="../../scripts/entity-details-api.js?v=1.0.0" defer></script>
+    <script src="../../scripts/entity-details-renderer.js?v=1.0.0" defer></script>
+    <script src="../../scripts/entity-details-modal.js?v=1.0.0" defer></script>
+    
 </body>
 </html>

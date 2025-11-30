@@ -185,9 +185,26 @@ class PreferencesAPIClient {
      * @returns {Promise<Object>} All preferences
      */
   async getAllPreferences(userId = null, profileId = null) {
-    if (!window.PreferencesData?.loadAllPreferencesRaw || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
-      window.Logger?.warn?.('[PreferencesAPIClient] loadAllPreferencesRaw API is not available', { page: 'preferences-core-new' });
-      return null;
+    // Wait for PreferencesData to be available (with retry mechanism)
+    let waitCount = 0;
+    const maxWaitAttempts = 20; // 2 seconds total (20 * 100ms)
+    while (!window.PreferencesData?.loadAllPreferencesRaw || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
+      if (waitCount >= maxWaitAttempts) {
+        window.Logger?.warn?.('[PreferencesAPIClient] loadAllPreferencesRaw API is not available after waiting', { 
+          page: 'preferences-core-new',
+          waitTime: `${maxWaitAttempts * 100}ms`,
+        });
+        return null;
+      }
+      await new Promise(resolve => setTimeout(resolve, 100));
+      waitCount++;
+    }
+    
+    if (waitCount > 0) {
+      window.Logger?.debug?.('[PreferencesAPIClient] PreferencesData became available after waiting', {
+        page: 'preferences-core-new',
+        waitTime: `${waitCount * 100}ms`,
+      });
     }
     
     window.Logger?.debug?.('🔍 PreferencesAPIClient.getAllPreferences calling loadAllPreferencesRaw', {
@@ -201,6 +218,16 @@ class PreferencesAPIClient {
       profileId,
       force: true,
     });
+
+    // Handle null payload - PreferencesData.loadAllPreferencesRaw may return null
+    if (!payload) {
+      window.Logger?.warn?.('[PreferencesAPIClient] loadAllPreferencesRaw returned null', {
+        page: 'preferences-core-new',
+        userId: userId || this.defaultUserId,
+        profileId,
+      });
+      return null;
+    }
 
     window.Logger?.debug?.('🔍 PreferencesAPIClient.getAllPreferences received payload', {
       page: 'preferences-core-new',
@@ -516,32 +543,52 @@ class PreferencesCore {
         // Load all preferences at once from API
         // Use force: false to leverage cache - only call API if cache is missing or expired
         // This prevents rate limiting after cache clear or hard refresh
-        const preferencesDataApi = window.PreferencesData;
-        if (preferencesDataApi?.loadAllPreferencesRaw) {
-          try {
-            const payload = await preferencesDataApi.loadAllPreferencesRaw({
-              userId: finalUserId,
-              profileId: finalProfileId,
-              force: false, // Use cache if available - only fetch from API if cache is missing/expired
+        
+        // Wait for PreferencesData to be available (with retry mechanism)
+        let waitCount = 0;
+        const maxWaitAttempts = 20; // 2 seconds total (20 * 100ms)
+        while (!window.PreferencesData?.loadAllPreferencesRaw || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
+          if (waitCount >= maxWaitAttempts) {
+            window.Logger?.warn?.('[PreferencesCore] loadAllPreferencesRaw API is not available after waiting - returning null', { 
+              page: 'preferences-core-new',
+              preferenceName,
+              waitTime: `${maxWaitAttempts * 100}ms`,
             });
-
-            const allPreferences = payload?.preferences || {};
-            const value = allPreferences[preferenceName];
-
-            if (window.UnifiedCacheManager) {
-              await window.UnifiedCacheManager.save(cacheKey, value, {
-                layer: 'localStorage',
-                ttl: 300000,
-              });
-            }
-
-            return value;
-          } catch (error) {
-            window.Logger.error('❌ Error loading preferences:', error, { page: 'preferences-core-new' });
             return null;
           }
-        } else {
-          window.Logger?.warn?.('[PreferencesCore] loadAllPreferencesRaw API is not available - returning null', { page: 'preferences-core-new' });
+          await new Promise(resolve => setTimeout(resolve, 100));
+          waitCount++;
+        }
+        
+        if (waitCount > 0) {
+          window.Logger?.debug?.('[PreferencesCore] PreferencesData became available after waiting', {
+            page: 'preferences-core-new',
+            preferenceName,
+            waitTime: `${waitCount * 100}ms`,
+          });
+        }
+        
+        const preferencesDataApi = window.PreferencesData;
+        try {
+          const payload = await preferencesDataApi.loadAllPreferencesRaw({
+            userId: finalUserId,
+            profileId: finalProfileId,
+            force: false, // Use cache if available - only fetch from API if cache is missing/expired
+          });
+
+          const allPreferences = payload?.preferences || {};
+          const value = allPreferences[preferenceName];
+
+          if (window.UnifiedCacheManager) {
+            await window.UnifiedCacheManager.save(cacheKey, value, {
+              layer: 'localStorage',
+              ttl: 300000,
+            });
+          }
+
+          return value;
+        } catch (error) {
+          window.Logger.error('❌ Error loading preferences:', error, { page: 'preferences-core-new' });
           return null;
         }
       }
@@ -644,6 +691,16 @@ class PreferencesCore {
             finalUserId,
             finalProfileId,
           );
+          
+          // Handle null result - PreferencesAPIClient returns null if PreferencesData is not available
+          if (!apiResult) {
+            window.Logger?.warn?.('⚠️ PreferencesAPIClient.getAllPreferences returned null - PreferencesData not available', {
+              page: 'preferences-core-new',
+              userId: finalUserId,
+              profileId: finalProfileId,
+            });
+            return {};
+          }
           
           window.Logger?.debug?.('🔍 apiClient.getAllPreferences result', {
             page: 'preferences-core-new',
@@ -830,7 +887,12 @@ class PreferencesCore {
       }
 
     } catch (error) {
-      window.Logger.error(`❌ Error saving preference ${preferenceName}:`, error, { page: 'preferences-core-new' });
+      // ValidationError (preference not found in DB) is not a critical error - use warn instead
+      if (error instanceof ValidationError || error?.name === 'ValidationError') {
+        window.Logger.warn(`⚠️ Preference ${preferenceName} validation failed (may not exist in DB):`, error.message, { page: 'preferences-core-new' });
+      } else {
+        window.Logger.error(`❌ Error saving preference ${preferenceName}:`, error, { page: 'preferences-core-new' });
+      }
       return {
         success: false,
         validation: { valid: false, errors: [error] },
@@ -936,15 +998,25 @@ class PreferencesCore {
      * @param {number} profileId - Profile ID
      * @returns {Promise<Object>} Group preferences
      */
-  async loadGroupPreferences(groupName, userId = null, profileId = null) {
+  async loadGroupPreferences(groupName, userId = null, profileId = null, forceRefresh = false) {
     const finalUserId = userId || this.currentUserId;
     const finalProfileId = profileId !== null && profileId !== undefined ? profileId : this.currentProfileId !== null ? this.currentProfileId : 0;
 
     // Cache key for group
     const cacheKey = `preference_group_${groupName}_${finalUserId}_${finalProfileId}`;
 
-    // Check cache
-    if (window.UnifiedCacheManager) {
+    // If forceRefresh is true, clear cache first
+    if (forceRefresh) {
+      window.Logger.info(`🔄 Force refresh: clearing cache for group ${groupName} before loading from server`, { page: 'preferences-core-new' });
+      if (window.UnifiedCacheManager) {
+        await window.UnifiedCacheManager.remove(cacheKey);
+        const prefixedKey = `tiktrack_${cacheKey}`;
+        await window.UnifiedCacheManager.remove(prefixedKey);
+      }
+    }
+
+    // Check cache only if not forcing refresh
+    if (!forceRefresh && window.UnifiedCacheManager) {
       const cached = await window.UnifiedCacheManager.get(cacheKey, {
         layer: 'localStorage',
         ttl: 300000, // 5 minutes

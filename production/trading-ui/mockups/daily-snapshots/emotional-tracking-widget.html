@@ -13,6 +13,9 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     
+    <!-- Bootstrap CSS (חובה ראשון) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../../styles-new/master.css">
     
@@ -24,80 +27,103 @@
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
     
+    <!-- Error Handlers (Must load first) -->
+    <script src="../../scripts/error-handlers.js?v=1.0.0"></script>
+    <!-- API Config -->
+    <script src="../../scripts/api-config.js?v=1.0.0"></script>
+    <!-- Logger Service (Load first before other systems) -->
+    <script src="../../scripts/logger-service.js?v=1.0.0"></script>
+    
     <!-- TradingView Lightweight Charts -->
-    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js" defer></script>
-    <script src="../../scripts/charts/tradingview-theme.js" defer></script>
-    <script src="../../scripts/charts/tradingview-adapter.js" defer></script>
+    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js?v=1.0.0" defer></script>
+    <script src="../../scripts/charts/tradingview-theme.js?v=1.0.0" defer></script>
+    <script src="../../scripts/charts/tradingview-adapter.js?v=1.0.0" defer></script>
     
     <!-- Header System -->
-    <script src="../../scripts/header-system.js" defer></script>
+    <script src="../../scripts/header-system.js?v=1.0.0" defer></script>
+    <script>
+        // Auto-initialize HeaderSystem when DOM is ready
+        (function() {
+            function initHeader() {
+                if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+                    try {
+                        window.HeaderSystem.initialize();
+                    } catch (error) {
+                        if (window.Logger?.error) {
+                            window.Logger.error('Error initializing HeaderSystem', error, { page: 'emotional-tracking-widget' });
+                        }
+                    }
+                } else {
+                    setTimeout(initHeader, 100);
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initHeader);
+            } else {
+                setTimeout(initHeader, 100);
+            }
+        })();
+    </script>
     
+    <!-- [8] Load Order: 8 -->
+    <script src="../../scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- Unified cache manager -->
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- Icon replacement helper -->
     <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Logger Service -->
-    <script src="../../scripts/logger-service.js" defer></script>
+    <!-- Error Handlers (Must load first) -->
+    
+    <!-- API Config -->
+    
+    
     
     <!-- Notification System -->
-    <script src="../../scripts/notification-system.js" defer></script>
+    <script src="../../scripts/notification-system.js?v=1.0.0" defer></script>
     
     <!-- Field Renderer Service -->
-    <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    <script src="../../scripts/services/field-renderer-service.js?v=1.0.0" defer></script>
     
     <!-- Info Summary System -->
-    <script src="../../scripts/info-summary-configs.js" defer></script>
-    <script src="../../scripts/info-summary-system.js" defer></script>
+    <script src="../../scripts/info-summary-configs.js?v=1.0.0" defer></script>
+    <script src="../../scripts/info-summary-system.js?v=1.0.0" defer></script>
     
     <!-- Preferences System -->
-    <script src="../../scripts/services/preferences-data.js" defer></script>
-    <script src="../../scripts/preferences-core-new.js" defer></script>
-    <script src="../../scripts/preferences-lazy-loader.js" defer></script>
+    <script src="../../scripts/services/preferences-data.js?v=1.0.0" defer></script>
+    <script src="../../scripts/preferences-core-new.js?v=1.0.0" defer></script>
+    <script src="../../scripts/preferences-lazy-loader.js?v=1.0.0" defer></script>
     
     <!-- Dynamic Colors System -->
-    <script src="../../scripts/color-scheme-system-clean.js" defer></script>
+    <script src="../../scripts/color-scheme-system-clean.js?v=1.0.0" defer></script>
     
     <!-- UI Utils (includes toggleSection) -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
     
     <!-- Button System -->
-    <script src="../../scripts/button-system-init.js" defer></script>
+    <script src="../../scripts/button-system-init.js?v=1.0.0" defer></script>
 </head>
 <body class="dashboard-page">
-    <!-- Header System -->
-    <div id="unified-header"></div>
+    <!-- Notification container -->
+    <div class="notification-container" id="notificationContainer"></div>
     
-    <!-- Mockups Navigation -->
-        <!-- Mockups Navigation -->
-    <div class="mockups-navigation">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-12">
-                    <div class="mockups-navigation-content">
-                        <span class="mockups-navigation-label">
-                            <span class="icon-placeholder icon" data-icon="link" data-size="16" data-alt="link" aria-label="link"></span> ניווט מוקאפים:
-                        </span>
-                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
-                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
-                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
-                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
-                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
-                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
-                        <a href="economic-calendar-page.html" class="mockups-navigation-link">לוח כלכלי</a>
-                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
-                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link active">תיעוד רגשי</a>
-                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+    <!-- Header System -->
+    </div>
     </div>
     </div>
     
     <!-- Page Content -->
-    <div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+<div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
+        <div id="unified-header"></div>
+
+        <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
         <div class="page-body">
+            <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
             <div class="main-content">
                 <!-- Emotional Tracking Widget Section -->
                 <div class="top-section" id="emotional_tracking_widget_top_section" data-section="emotional_tracking_widget_top_section">
@@ -108,7 +134,7 @@
                         </div>
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
                             <button data-button-type="ADD" data-variant="small" data-text="הוסף תיעוד" title="הוסף תיעוד רגשי חדש"></button>
-                        </div><button class="filter-toggle-btn" data-onclick="toggleSection(\'emotional_tracking_widget_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
+                        </div><button class="filter-toggle-btn" data-onclick="toggleSection(\'emotional_tracking_widget_top_section\')" title="הצג/הסתר סקשן" data-button-type="FILTER"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
@@ -140,25 +166,25 @@
                                 <div class="mb-3">
                                     <label class="form-label">בחר רגש/תחושה:</label>
                                     <div class="d-flex gap-2 flex-wrap" id="emotionButtonsContainer">
-                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="happy">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="happy" data-button-type="PRIMARY">
                                             <span class="emotion-icon"></span> שמח
                                         </button>
-                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="satisfied">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="satisfied" data-button-type="PRIMARY">
                                             <span class="emotion-icon"></span> מרוצה
                                         </button>
-                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="neutral">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="neutral" data-button-type="PRIMARY">
                                             <span class="emotion-icon"></span> ניטרלי
                                         </button>
-                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="sad">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="sad" data-button-type="PRIMARY">
                                             <span class="emotion-icon"></span> עצוב
                                         </button>
-                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="angry">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="angry" data-button-type="PRIMARY">
                                             <span class="emotion-icon"></span> כועס
                                         </button>
-                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="confused">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="confused" data-button-type="PRIMARY">
                                             <span class="emotion-icon"></span> מבולבל
                                         </button>
-                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="stressed">
+                                        <button class="btn btn-outline-secondary emotion-button" data-emotion="stressed" data-button-type="PRIMARY">
                                             <span class="emotion-icon"></span> מתוח
                                         </button>
                                     </div>
@@ -167,7 +193,7 @@
                                     <label for="emotionNotes" class="form-label">הערות (אופציונלי):</label>
                                     <textarea id="emotionNotes" class="form-control" rows="3" placeholder="מה גרם לרגש הזה?"></textarea>
                                 </div>
-                                <button class="btn btn-primary" id="saveEmotionButton">שמור תיעוד</button>
+                                <button class="btn btn-primary" id="saveEmotionButton" data-button-type="SAVE">שמור תיעוד</button>
                             </div>
                         </div>
                         
@@ -217,6 +243,12 @@
     <div id="toast-container"></div>
     
     <!-- Page-specific script -->
-    <script src="../../scripts/emotional-tracking-widget.js" defer></script>
+    <script src="../../scripts/emotional-tracking-widget.js?v=1.0.0" defer></script>
+
+    <!-- Entity Details System -->
+    <script src="../../scripts/entity-details-api.js?v=1.0.0" defer></script>
+    <script src="../../scripts/entity-details-renderer.js?v=1.0.0" defer></script>
+    <script src="../../scripts/entity-details-modal.js?v=1.0.0" defer></script>
+    
 </body>
 </html>

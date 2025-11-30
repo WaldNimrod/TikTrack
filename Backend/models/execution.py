@@ -1,11 +1,16 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, event
 from sqlalchemy.orm import relationship
 from .base import BaseModel
 from typing import Dict, Any, Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Execution(BaseModel):
     __tablename__ = "executions"
     
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True,
+                    comment="User who owns this execution")
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)  # Required - every execution must have a ticker
     trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=True)
     trade_id = Column(Integer, ForeignKey('trades.id'), nullable=True)  # Make nullable - executions can exist without trades
@@ -49,3 +54,27 @@ class Execution(BaseModel):
             result['ticker_symbol'] = symbol_value  # Also include ticker_symbol for frontend compatibility
         
         return result
+
+
+# ========================================
+# SQLAlchemy Event Listeners for Tag Links Cleanup
+# ========================================
+
+@event.listens_for(Execution, 'after_delete')
+def execution_deleted(mapper, connection, target):
+    """
+    Event listener for when an execution is deleted.
+    Automatically removes all associated tag links.
+    """
+    try:
+        from services.tag_service import TagService
+        from sqlalchemy.orm import Session
+        
+        session = Session(bind=connection)
+        TagService.remove_all_tags_for_entity(
+            session, 'execution', target.id
+        )
+        session.close()
+    except Exception as e:
+        logger.error(f"Error cleaning up tags for execution {target.id}: {e}")
+        # Don't raise - allow deletion to proceed even if tag cleanup fails

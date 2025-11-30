@@ -114,8 +114,12 @@ async function populateAccountSelector(autoSelectDefault = false) {
           window.Logger.info(`🔄 Auto-selecting default account from preferences (ID: ${defaultAccountId})`, { page: 'trading_accounts' });
         }
 
-        // Select the account
-        selector.value = defaultAccountId;
+        // Select the account using DataCollectionService if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(selector.id, defaultAccountId, 'int');
+        } else {
+          selector.value = defaultAccountId;
+        }
 
         // Trigger selection change to load activity data
         handleAccountSelection({ target: selector });
@@ -123,7 +127,11 @@ async function populateAccountSelector(autoSelectDefault = false) {
         window.Logger.error('❌ Error getting default account from preferences:', error, { page: 'trading_accounts' });
         // Fallback to first account
         const firstAccountId = selector.options[1].value;
-        selector.value = firstAccountId;
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(selector.id, firstAccountId, 'int');
+        } else {
+          selector.value = firstAccountId;
+        }
         handleAccountSelection({ target: selector });
       }
     } else {
@@ -882,20 +890,19 @@ function openMovementDetails(movementId, movementType) {
     window.Logger.debug('Skipping details for opening balance movement', { movementId, movementType, page: 'trading_accounts' });
     return;
   }
-  if (!window.EntityDetailsModal) {
-    window.Logger.warn('⚠️ EntityDetailsModal not available', { page: 'trading_accounts' });
-    if (window.showNotification) {
-      window.showNotification('מערכת פרטי ישויות לא זמינה', 'warning');
-    }
-    return;
-  }
 
   // Map movement type to entity type
   const entityType = movementType === 'cash_flow' ? 'cash_flow' : 'execution';
 
-  window.Logger.info(`🔍 פתיחת פרטי ${entityType} ${movementId}`, { page: 'trading_accounts' });
-
-  window.EntityDetailsModal.show(entityType, movementId);
+  // שימוש במערכת המרכזית Entity Details Modal
+  if (typeof window.showEntityDetails === 'function') {
+    window.showEntityDetails(entityType, movementId, { mode: 'view' });
+  } else {
+    window.Logger?.error('showEntityDetails לא זמין', { page: 'trading_accounts' });
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'מערכת פרטי ישויות לא זמינה');
+    }
+  }
 }
 
 /**

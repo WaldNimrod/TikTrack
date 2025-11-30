@@ -411,10 +411,14 @@ function renderAlertsTableRows(alerts) {
       // לוג לבדיקת מבנה הנתונים
       // window.Logger.info('🔍 Alert data structure:', alert, { page: "alerts" });
       
-      // קבלת צבעי סטטוס דינמיים - שימוש במערכת הכללית
+      // קבלת צבעי סטטוס דינמיים - שימוש במערכת הכללית ללא fallbacks hardcoded
       // Note: statusClass removed - use window.renderStatus or FieldRendererService.renderStatus instead
-      const statusColor = window.getStatusColor ? window.getStatusColor(alert.status, 'medium') : '#6c757d';
-      const statusBgColor = window.getStatusBackgroundColor ? window.getStatusBackgroundColor(alert.status) : 'rgba(108, 117, 125, 0.1)';
+      const statusColor = (typeof window.getStatusColor === 'function') 
+          ? window.getStatusColor(alert.status, 'medium') 
+          : '';
+      const statusBgColor = (typeof window.getStatusBackgroundColor === 'function') 
+          ? window.getStatusBackgroundColor(alert.status) 
+          : '';
       
       // קביעת האובייקט המקושר באמצעות המערכת הכללית
       const dataSources = {
@@ -735,34 +739,39 @@ function renderAlertsTableRows(alerts) {
       let triggeredBgColor = 'rgba(108, 117, 125, 0.1)';
       let triggeredBorderColor = '#6c757d';
       
+      // קבלת צבעים מהמערכת המרכזית - ללא fallbacks hardcoded
+      const getNumericColorFn = (typeof window.getNumericValueColor === 'function') ? window.getNumericValueColor : null;
+      const getNumericBgColorFn = (typeof window.getNumericValueBackgroundColor === 'function') ? window.getNumericValueBackgroundColor : null;
+      const getNumericBorderColorFn = (typeof window.getNumericValueBorderColor === 'function') ? window.getNumericValueBorderColor : null;
+      
       if (alert.is_triggered === 'true' || alert.is_triggered === true) {
         triggeredDisplay = 'כן';
         triggeredClass = 'triggered-yes';
         // צבע חיובי - הופעל בהצלחה
-        triggeredColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'medium') : '#28a745';
-        triggeredBgColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'light') : 'rgba(40, 167, 69, 0.1)';
-        triggeredBorderColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'border') : 'rgba(40, 167, 69, 0.3)';
+        triggeredColor = getNumericColorFn ? getNumericColorFn(1, 'medium') : '';
+        triggeredBgColor = getNumericBgColorFn ? getNumericBgColorFn(1) : (getNumericColorFn ? getNumericColorFn(1, 'light') : '');
+        triggeredBorderColor = getNumericBorderColorFn ? getNumericBorderColorFn(1) : (getNumericColorFn ? getNumericColorFn(1, 'border') : '');
       } else if (alert.is_triggered === 'false' || alert.is_triggered === false) {
         triggeredDisplay = 'לא';
         triggeredClass = 'triggered-no';
         // צבע שלילי - לא הופעל
-        triggeredColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'medium') : '#dc3545';
-        triggeredBgColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'light') : 'rgba(220, 53, 69, 0.1)';
-        triggeredBorderColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'border') : 'rgba(220, 53, 69, 0.3)';
+        triggeredColor = getNumericColorFn ? getNumericColorFn(-1, 'medium') : '';
+        triggeredBgColor = getNumericBgColorFn ? getNumericBgColorFn(-1) : (getNumericColorFn ? getNumericColorFn(-1, 'light') : '');
+        triggeredBorderColor = getNumericBorderColorFn ? getNumericBorderColorFn(-1) : (getNumericColorFn ? getNumericColorFn(-1, 'border') : '');
       } else if (alert.is_triggered === 'new') {
         triggeredDisplay = 'חדש';
         triggeredClass = 'triggered-new';
         // צבע חיובי - הופעל חדש
-        triggeredColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'medium') : '#28a745';
-        triggeredBgColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'light') : 'rgba(40, 167, 69, 0.1)';
-        triggeredBorderColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'border') : 'rgba(40, 167, 69, 0.3)';
+        triggeredColor = getNumericColorFn ? getNumericColorFn(1, 'medium') : '';
+        triggeredBgColor = getNumericBgColorFn ? getNumericBgColorFn(1) : (getNumericColorFn ? getNumericColorFn(1, 'light') : '');
+        triggeredBorderColor = getNumericBorderColorFn ? getNumericBorderColorFn(1) : (getNumericColorFn ? getNumericColorFn(1, 'border') : '');
       } else {
         triggeredDisplay = 'לא מוגדר';
         triggeredClass = 'triggered-unknown';
-        // צבע נייטרלי
-        triggeredColor = '#6c757d';
-        triggeredBgColor = 'rgba(108, 117, 125, 0.1)';
-        triggeredBorderColor = '#6c757d';
+        // צבע נייטרלי - שימוש במערכת המרכזית
+        triggeredColor = getNumericColorFn ? getNumericColorFn(0, 'medium') : '';
+        triggeredBgColor = getNumericBgColorFn ? getNumericBgColorFn(0) : (getNumericColorFn ? getNumericColorFn(0, 'light') : '');
+        triggeredBorderColor = getNumericBorderColorFn ? getNumericBorderColorFn(0) : (getNumericColorFn ? getNumericColorFn(0, 'border') : '');
       }
 
       const expiryRawEnvelope =
@@ -847,9 +856,7 @@ function renderAlertsTableRows(alerts) {
     return alert.condition || '-';
   })()}</span></td>
           <td class="status-cell" data-status="${alert.status || ''}">
-            ${window.renderStatus ? window.renderStatus(alert.status, 'alert') : 
-              (window.FieldRendererService ? window.FieldRendererService.renderStatus(alert.status, 'alert') : 
-                `<span class="status-badge" data-status-category="unknown">${statusDisplay}</span>`)}
+            ${window.FieldRendererService.renderStatus(alert.status, 'alert')}
           </td>
           <td>
             ${window.renderBoolean ? window.renderBoolean(alert.is_triggered) : 
@@ -1235,20 +1242,55 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
 /**
  * מילוי select עם נתונים
  */
+/**
+ * Populate select element with data
+ * Uses global populateSelect from select-populator-service.js if available and prefix is empty
+ * Falls back to local implementation for custom formatting (with prefix)
+ * @param {string} selectId - ID of the select element
+ * @param {Array} data - Array of data objects
+ * @param {string} field - Field name to use as value
+ * @param {string} prefix - Optional prefix for option text (triggers custom formatting)
+ * @returns {void}
+ */
+/**
+ * Populate select element with data
+ * Uses SelectPopulatorService.populateSelectWithData if available (for existing data)
+ * Falls back to local implementation if service not available
+ * 
+ * @function populateSelect
+ * @param {string} selectId - ID of the select element
+ * @param {Array} data - Array of data objects
+ * @param {string} field - Field name to use as value
+ * @param {string} prefix - Optional prefix for option text
+ * @returns {void}
+ */
 function populateSelect(selectId, data, field, prefix = '') {
   try {
-    // window.Logger.info('🔧 populateSelect called:', { selectId, dataLength: data?.length, field, prefix }, { page: "alerts" });
+    // Use SelectPopulatorService.populateSelectWithData if available (for existing data, not from API)
+    if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateSelectWithData === 'function') {
+      window.SelectPopulatorService.populateSelectWithData(selectId, data, {
+        valueField: field,
+        textField: (item) => {
+          const value = item[field] || item.id || item.name || '';
+          return prefix ? `${prefix}: ${value}` : value;
+        },
+        includeEmpty: true,
+        emptyText: 'בחר אובייקט לשיוך...'
+      });
+      return;
+    }
 
+    // Fallback to local implementation
     const select = document.getElementById(selectId);
     if (!select) {
-      // window.Logger.error('🔧 Select element not found:', selectId, { page: "alerts" });
+      window.Logger?.debug('Select element not found', { selectId, page: "alerts" });
       return;
     }
 
   select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
 
   if (!data || data.length === 0) {
-    // window.Logger.info('🔧 No data available for:', selectId, { page: "alerts" });
+    window.Logger?.debug('No data available for select', { selectId, page: "alerts" });
     const option = document.createElement('option');
     option.value = '';
     option.textContent = 'אין רשומות זמינות';
@@ -1431,7 +1473,13 @@ function toggleConditionFields(enable, mode = 'add') {
           field.classList.remove('disabled-field');
         } else {
           field.classList.add('disabled-field');
-          field.value = '';
+          // Use DataCollectionService if available
+          if (window.DataCollectionService && typeof window.DataCollectionService.setValue === 'function') {
+            window.DataCollectionService.setValue(field.id, '', 'text');
+          } else {
+            // Fallback to direct assignment
+            field.value = '';
+          }
         }
       }
     });
@@ -1452,67 +1500,107 @@ function toggleConditionFields(enable, mode = 'add') {
 /**
  * Enable condition fields for add modal
  * Activates condition fields after relation type selection
- * @deprecated Use toggleConditionFields(true, 'add') instead
+ * @deprecated Use Conditions System (ConditionsFormGenerator or ConditionsUIManager) instead
+ * This function is kept for backward compatibility but should use the centralized Conditions System
  * 
  * @function enableConditionFields
  * @returns {void}
  */
 function enableConditionFields() {
+  // Use Conditions System if available
+  if (window.conditionsFormGenerator || window.ConditionsUIManager) {
+    window.Logger?.info('Using Conditions System for field management', { page: 'alerts' });
+    // Conditions System handles field enabling/disabling automatically
+    return;
+  }
   toggleConditionFields(true, 'add');
 }
 
 /**
  * השבתת שדות התנאי
- * @deprecated Use toggleConditionFields(false, 'add') instead
+ * @deprecated Use Conditions System (ConditionsFormGenerator or ConditionsUIManager) instead
+ * This function is kept for backward compatibility but should use the centralized Conditions System
  */
 function disableConditionFields() {
+  // Use Conditions System if available
+  if (window.conditionsFormGenerator || window.ConditionsUIManager) {
+    window.Logger?.info('Using Conditions System for field management', { page: 'alerts' });
+    // Conditions System handles field enabling/disabling automatically
+    return;
+  }
   toggleConditionFields(false, 'add');
 }
 
 /**
  * הפעלת שדות התנאי במודל העריכה
- * @deprecated Use toggleConditionFields(true, 'edit') instead
+ * @deprecated Use Conditions System (ConditionsFormGenerator or ConditionsUIManager) instead
+ * This function is kept for backward compatibility but should use the centralized Conditions System
  */
 function enableEditConditionFields() {
+  // Use Conditions System if available
+  if (window.conditionsFormGenerator || window.ConditionsUIManager) {
+    window.Logger?.info('Using Conditions System for field management', { page: 'alerts' });
+    // Conditions System handles field enabling/disabling automatically
+    return;
+  }
   toggleConditionFields(true, 'edit');
 }
 
 /**
  * השבתת שדות התנאי במודל העריכה
- * @deprecated Use toggleConditionFields(false, 'edit') instead
+ * @deprecated Use Conditions System (ConditionsFormGenerator or ConditionsUIManager) instead
+ * This function is kept for backward compatibility but should use the centralized Conditions System
  */
 function disableEditConditionFields() {
+  // Use Conditions System if available
+  if (window.conditionsFormGenerator || window.ConditionsUIManager) {
+    window.Logger?.info('Using Conditions System for field management', { page: 'alerts' });
+    // Conditions System handles field enabling/disabling automatically
+    return;
+  }
   toggleConditionFields(false, 'edit');
 }
 
 /**
  * מילוי רשימת אובייקטים לפי סוג השיוך
+ * Uses global populateRelatedObjects from select-populator-service.js if available
+ * Falls back to local implementation if service not available
  * @param {number} relationTypeId - מזהה סוג השיוך
  */
 function populateRelatedObjects(relationTypeId) {
   try {
-    const selectElement = document.getElementById('alertRelatedObjectSelect');
+    const selectId = 'alertRelatedObjectSelect';
+    
+    // Use global populateRelatedObjects from select-populator-service.js if available
+    if (window.populateRelatedObjects && typeof window.populateRelatedObjects === 'function' && 
+        window.populateRelatedObjects.toString().includes('select-populator-service')) {
+      window.populateRelatedObjects(parseInt(relationTypeId), null, selectId);
+      return;
+    }
+
+    // Fallback to local implementation
+    const selectElement = document.getElementById(selectId);
     if (!selectElement) {return;}
 
     // ניקוי הרשימה
     selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
 
   // מילוי לפי סוג השיוך
-  switch (relationTypeId) {
+  switch (parseInt(relationTypeId)) {
   case 1: // חשבון מסחר
-    populateSelect('alertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון מסחר');
+    populateSelect(selectId, window.accountsData || [], 'name', 'חשבון מסחר');
     break;
 
   case 2: // טרייד
-    populateSelect('alertRelatedObjectSelect', window.tradesData || [], 'id', 'טרייד');
+    populateSelect(selectId, window.tradesData || [], 'id', 'טרייד');
     break;
 
   case 3: // תכנון טרייד
-    populateSelect('alertRelatedObjectSelect', window.tradePlansData || [], 'id', 'תכנון');
+    populateSelect(selectId, window.tradePlansData || [], 'id', 'תכנון');
     break;
 
   case 4: // טיקר
-    populateSelect('alertRelatedObjectSelect', window.tickersData || [], 'symbol', '');
+    populateSelect(selectId, window.tickersData || [], 'symbol', '');
     break;
   }
   
@@ -1812,8 +1900,16 @@ window.testAlertPayload = async function() {
   }
   
   // Collect data exactly as saveAlert does
-  const relatedType = form.querySelector('#alertRelatedType')?.value || '';
-  const relatedId = form.querySelector('#alertRelatedObject')?.value || '';
+  // Use DataCollectionService if available
+  let relatedType, relatedId;
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+    relatedType = window.DataCollectionService.getValue('alertRelatedType', 'text', '');
+    relatedId = window.DataCollectionService.getValue('alertRelatedObject', 'text', '');
+  } else {
+    // Fallback if DataCollectionService is not available
+    relatedType = form.querySelector('#alertRelatedType')?.value || '';
+    relatedId = form.querySelector('#alertRelatedObject')?.value || '';
+  }
   
   const alertTypeField = form.querySelector('#alertType');
   const alertConditionField = form.querySelector('#alertCondition');
@@ -1847,16 +1943,23 @@ window.testAlertPayload = async function() {
     message = form.querySelector('#alertName')?.value || '';
   }
   
-  // Get status
-  const statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
-  const statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
-  const isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
+  // Get status - Use DataCollectionService if available
+  let statusCombined, statusHidden, isTriggeredHidden, expiryDate;
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+    statusCombined = window.DataCollectionService.getValue('alertStatusCombined', 'text', 'new');
+    statusHidden = window.DataCollectionService.getValue('alertStatus_hidden', 'text', 'open');
+    isTriggeredHidden = window.DataCollectionService.getValue('alertIsTriggered_hidden', 'text', 'false');
+    expiryDate = window.DataCollectionService.getValue('alertExpiryDate', 'dateOnly', null);
+  } else {
+    // Fallback if DataCollectionService is not available
+    statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
+    statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
+    isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
+    expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
+  }
   
   const status = statusHidden;
   const isTriggered = isTriggeredHidden;
-  
-  // Get expiry_date
-  const expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
   
   // Build payload exactly as saveAlert does
   const finalConditionAttribute = (conditionAttribute && conditionAttribute.trim() !== '') ? conditionAttribute : 'price';
@@ -2043,16 +2146,23 @@ async function saveAlert() {
       message = form.querySelector('#alertName')?.value || '';
     }
     
-    // Get combined status and parse to status + is_triggered
-    const statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
-    const statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
-    const isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
+    // Get combined status and parse to status + is_triggered - Use DataCollectionService if available
+    let statusCombined, statusHidden, isTriggeredHidden;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      statusCombined = window.DataCollectionService.getValue('alertStatusCombined', 'text', 'new');
+      statusHidden = window.DataCollectionService.getValue('alertStatus_hidden', 'text', 'open');
+      isTriggeredHidden = window.DataCollectionService.getValue('alertIsTriggered_hidden', 'text', 'false');
+      expiryDate = window.DataCollectionService.getValue('alertExpiryDate', 'dateOnly', null);
+    } else {
+      // Fallback if DataCollectionService is not available
+      statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
+      statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
+      isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
+      expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
+    }
     
     status = statusHidden;
     isTriggered = isTriggeredHidden;
-    
-    // Get expiry_date
-    expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
     if (expiryDate === '') expiryDate = null;
 
     const tagsSelect = form.querySelector('#alertTags');
@@ -2494,34 +2604,42 @@ function updateStatusAndTriggered() {
   if (!stateSelect || !statusHidden || !triggeredHidden) {return;}
 
   const state = stateSelect.value;
-  const currentTriggered = triggeredHidden.value; // שמירת הערך הנוכחי
+  // Get current triggered value using DataCollectionService if available
+  let currentTriggered = 'false';
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+    const triggeredHiddenId = triggeredHidden.id;
+    currentTriggered = window.DataCollectionService.getValue(triggeredHiddenId, 'text', 'false');
+  } else {
+    // Fallback if DataCollectionService is not available
+    currentTriggered = triggeredHidden.value || 'false';
+  }
 
   // מיפוי המצב לערכי status ו-is_triggered
-  switch (state) {
-  case 'new':
-    statusHidden.value = 'open';
-    triggeredHidden.value = 'false';
-    break;
-  case 'active':
-    statusHidden.value = 'open';
-    // שמירה על הערך הנוכחי של is_triggered
-    triggeredHidden.value = currentTriggered;
-    break;
-  case 'unread':
-    statusHidden.value = 'closed';
-    triggeredHidden.value = 'new';
-    break;
-  case 'read':
-    statusHidden.value = 'closed';
-    triggeredHidden.value = 'true';
-    break;
-  case 'cancelled':
-    statusHidden.value = 'cancelled';
-    triggeredHidden.value = 'false';
-    break;
-  default:
-    statusHidden.value = 'open';
-    triggeredHidden.value = 'false';
+  const statusValues = {
+    'new': { status: 'open', triggered: 'false' },
+    'active': { status: 'open', triggered: currentTriggered },
+    'unread': { status: 'closed', triggered: 'new' },
+    'read': { status: 'closed', triggered: 'true' },
+    'cancelled': { status: 'cancelled', triggered: 'false' }
+  };
+  
+  const mappedValues = statusValues[state] || { status: 'open', triggered: 'false' };
+  
+  // Set values using DataCollectionService if available
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+    window.DataCollectionService.setValue(statusHidden.id, mappedValues.status, 'text');
+    window.DataCollectionService.setValue(triggeredHidden.id, mappedValues.triggered, 'text');
+  } else {
+    // Fallback if DataCollectionService is not available
+    // Use DataCollectionService if available
+    if (window.DataCollectionService && typeof window.DataCollectionService.setValue === 'function') {
+      window.DataCollectionService.setValue('editAlertStatus', mappedValues.status, 'text');
+      window.DataCollectionService.setValue('editAlertTriggered', mappedValues.triggered, 'text');
+    } else {
+      // Fallback to direct assignment
+      statusHidden.value = mappedValues.status;
+      triggeredHidden.value = mappedValues.triggered;
+    }
   }
 }
 
@@ -2662,7 +2780,14 @@ async function updateAlert() {
     return;
   }
 
-  const alertId = document.getElementById('editAlertId').value;
+  let alertId;
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+    alertId = window.DataCollectionService.getValue('editAlertId', 'text', '');
+  } else {
+    // Fallback if DataCollectionService is not available
+    const alertIdElement = document.getElementById('editAlertId');
+    alertId = alertIdElement ? alertIdElement.value : '';
+  }
   const tagsSelect = document.getElementById('editAlertTags');
   let tagIds = [];
   if (tagsSelect) {
@@ -3376,6 +3501,7 @@ window.updateAlertsSummary = updateAlertsSummary;
 
 /**
  * עדכון סטטיסטיקות ההתראות
+ * משתמש ב-InfoSummarySystem עבור סטטיסטיקות בסיסיות
  * @param {Array} alerts - מערך התראות
  */
 function updateAlertsSummary(alerts) {
@@ -3390,9 +3516,16 @@ function updateAlertsSummary(alerts) {
     return;
   }
 
-  // חישוב סטטיסטיקות
-  const totalAlerts = alertsArray.length;
-  const activeAlerts = alertsArray.filter(alert => alert.status === 'open').length;
+  // שימוש ב-InfoSummarySystem עבור סטטיסטיקות בסיסיות
+  if (window.updatePageSummaryStats && typeof window.updatePageSummaryStats === 'function') {
+    window.updatePageSummaryStats('alerts', alertsArray);
+  } else if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS.alerts) {
+    window.InfoSummarySystem.calculateAndRender(alertsArray, window.INFO_SUMMARY_CONFIGS.alerts);
+  } else {
+    window.Logger.warn('⚠️ InfoSummarySystem not available, using fallback', { page: "alerts" });
+  }
+
+  // חישוב סטטיסטיקות נוספות שלא מוגדרות ב-config (newAlerts, todayAlerts, weekAlerts)
   const newAlerts = alertsArray.filter(alert => alert.is_triggered === 'new').length;
   
   // התראות היום
@@ -3455,22 +3588,16 @@ function updateAlertsSummary(alerts) {
     return createdDate >= weekAgo;
   }).length;
 
-  // עדכון האלמנטים
-  const totalElement = document.getElementById('totalAlerts');
-  const activeElement = document.getElementById('activeAlerts');
+  // עדכון האלמנטים הנוספים (שאינם ב-config)
   const newElement = document.getElementById('newAlerts');
   const todayElement = document.getElementById('todayAlerts');
   const weekElement = document.getElementById('weekAlerts');
 
-  if (totalElement) totalElement.textContent = totalAlerts;
-  if (activeElement) activeElement.textContent = activeAlerts;
   if (newElement) newElement.textContent = newAlerts;
   if (todayElement) todayElement.textContent = todayAlerts;
   if (weekElement) weekElement.textContent = weekAlerts;
 
   window.Logger.info('✅ סטטיסטיקות התראות עודכנו:', {
-    total: totalAlerts,
-    active: activeAlerts,
     new: newAlerts,
     today: todayAlerts,
     week: weekAlerts
@@ -3516,7 +3643,14 @@ async function generateDetailedLogForAlerts() {
  * Load conditions from source type (trade_plan or trade)
  */
 function loadConditionsFromSource() {
-    const sourceType = document.getElementById('conditionSourceType').value;
+    let sourceType;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        sourceType = window.DataCollectionService.getValue('conditionSourceType', 'text', '');
+    } else {
+        // Fallback if DataCollectionService is not available
+        const sourceTypeElement = document.getElementById('conditionSourceType');
+        sourceType = sourceTypeElement ? sourceTypeElement.value : '';
+    }
     const sourceIdSelect = document.getElementById('conditionSourceId');
     
     if (!sourceType) {
@@ -3535,55 +3669,98 @@ function loadConditionsFromSource() {
 
 /**
  * Load trade plans for conditions selection
+ * Uses SelectPopulatorService for consistent select population
  */
 async function loadTradePlansForConditions() {
     try {
-        const response = await fetch('/api/trade-plans');
-        if (!response.ok) throw new Error('Failed to load trade plans');
-        
-        const tradePlans = await response.json();
         const sourceIdSelect = document.getElementById('conditionSourceId');
-        
-        sourceIdSelect.innerHTML = '<option value="">בחר תכנית מסחר</option>';
-        tradePlans.forEach(plan => {
-            const option = document.createElement('option');
-            option.value = plan.id;
-            option.textContent = `${plan.name} (${plan.ticker})`;
-            sourceIdSelect.appendChild(option);
-        });
-        
-        sourceIdSelect.disabled = false;
+        if (!sourceIdSelect) {
+            window.Logger?.warn('⚠️ conditionSourceId not found', { page: 'alerts' });
+            return;
+        }
+
+        // Check if SelectPopulatorService is available
+        if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTradePlansSelect === 'function') {
+            await window.SelectPopulatorService.populateTradePlansSelect(sourceIdSelect, {
+                includeEmpty: true,
+                emptyText: 'בחר תכנית מסחר'
+            });
+            sourceIdSelect.disabled = false;
+        } else {
+            // Fallback to direct API call if service not available
+            window.Logger?.warn('⚠️ SelectPopulatorService not available - using fallback', { page: 'alerts' });
+            const response = await fetch('/api/trade-plans');
+            if (!response.ok) throw new Error('Failed to load trade plans');
+            
+            const tradePlansData = await response.json();
+            const tradePlans = Array.isArray(tradePlansData?.data) ? tradePlansData.data : (Array.isArray(tradePlansData) ? tradePlansData : []);
+            
+            sourceIdSelect.innerHTML = '<option value="">בחר תכנית מסחר</option>';
+            tradePlans.forEach(plan => {
+                const option = document.createElement('option');
+                option.value = plan.id;
+                option.textContent = `${plan.name || plan.ticker?.symbol || 'N/A'} (${plan.ticker?.symbol || plan.ticker || 'N/A'})`;
+                sourceIdSelect.appendChild(option);
+            });
+            
+            sourceIdSelect.disabled = false;
+        }
         
     } catch (error) {
         window.Logger.error('Error loading trade plans:', error, { page: "alerts" });
-        showErrorNotification('שגיאה בטעינת תכניות מסחר');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בטעינת תכניות מסחר', error.message);
+        }
     }
 }
 
 /**
  * Load trades for conditions selection
+ * Uses SelectPopulatorService for consistent select population
  */
 async function loadTradesForConditions() {
     try {
-        const response = await fetch('/api/trades');
-        if (!response.ok) throw new Error('Failed to load trades');
-        
-        const trades = await response.json();
         const sourceIdSelect = document.getElementById('conditionSourceId');
-        
-        sourceIdSelect.innerHTML = '<option value="">בחר טרייד</option>';
-        trades.forEach(trade => {
-            const option = document.createElement('option');
-            option.value = trade.id;
-            option.textContent = `${trade.ticker} - ${trade.type} (${trade.status})`;
-            sourceIdSelect.appendChild(option);
-        });
-        
-        sourceIdSelect.disabled = false;
+        if (!sourceIdSelect) {
+            window.Logger?.warn('⚠️ conditionSourceId not found', { page: 'alerts' });
+            return;
+        }
+
+        // Check if SelectPopulatorService is available
+        if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTradesSelect === 'function') {
+            await window.SelectPopulatorService.populateTradesSelect(sourceIdSelect, {
+                includeEmpty: true,
+                emptyText: 'בחר טרייד'
+            });
+            sourceIdSelect.disabled = false;
+        } else {
+            // Fallback to direct API call if service not available
+            window.Logger?.warn('⚠️ SelectPopulatorService not available - using fallback', { page: 'alerts' });
+            const response = await fetch('/api/trades');
+            if (!response.ok) throw new Error('Failed to load trades');
+            
+            const tradesData = await response.json();
+            const trades = Array.isArray(tradesData?.data) ? tradesData.data : (Array.isArray(tradesData) ? tradesData : []);
+            
+            sourceIdSelect.innerHTML = '<option value="">בחר טרייד</option>';
+            trades.forEach(trade => {
+                const option = document.createElement('option');
+                option.value = trade.id;
+                const symbol = trade.ticker?.symbol || trade.ticker_symbol || trade.ticker || 'N/A';
+                const side = trade.side || trade.type || 'N/A';
+                const status = trade.status || 'N/A';
+                option.textContent = `${symbol} - ${side} (${status})`;
+                sourceIdSelect.appendChild(option);
+            });
+            
+            sourceIdSelect.disabled = false;
+        }
         
     } catch (error) {
         window.Logger.error('Error loading trades:', error, { page: "alerts" });
-        showErrorNotification('שגיאה בטעינת טריידים');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בטעינת טריידים', error.message);
+        }
     }
 }
 
@@ -3591,8 +3768,18 @@ async function loadTradesForConditions() {
  * Load conditions from selected item
  */
 async function loadConditionsFromItem() {
-    const sourceType = document.getElementById('conditionSourceType').value;
-    const sourceId = document.getElementById('conditionSourceId').value;
+    // Use DataCollectionService to get values
+    let sourceType, sourceId;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        sourceType = window.DataCollectionService.getValue('conditionSourceType', 'text', '');
+        sourceId = window.DataCollectionService.getValue('conditionSourceId', 'text', '');
+    } else {
+        // Fallback if DataCollectionService is not available
+        const sourceTypeEl = document.getElementById('conditionSourceType');
+        const sourceIdEl = document.getElementById('conditionSourceId');
+        sourceType = sourceTypeEl ? sourceTypeEl.value : '';
+        sourceId = sourceIdEl ? sourceIdEl.value : '';
+    }
     
     if (!sourceType || !sourceId) {
         document.getElementById('availableConditionsList').innerHTML = 
@@ -3684,8 +3871,18 @@ async function createAlertFromCondition() {
         return;
     }
     
-    const message = document.getElementById('alertMessageFromCondition').value;
-    const state = document.getElementById('alertStateFromCondition').value;
+    // Use DataCollectionService to get values
+    let message, state;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        message = window.DataCollectionService.getValue('alertMessageFromCondition', 'text', '');
+        state = window.DataCollectionService.getValue('alertStateFromCondition', 'text', '');
+    } else {
+        // Fallback if DataCollectionService is not available
+        const messageEl = document.getElementById('alertMessageFromCondition');
+        const stateEl = document.getElementById('alertStateFromCondition');
+        message = messageEl ? messageEl.value : '';
+        state = stateEl ? stateEl.value : '';
+    }
     
     if (!message) {
         showErrorNotification('אנא הזן הודעת התראה');
@@ -3805,7 +4002,10 @@ async function evaluateAllConditions() {
         // הצגת אינדיקטור טעינה
         showEvaluationLoading();
         
-        // קריאה לשרת להערכת כל התנאים
+        // Use ConditionsCRUDManager if available for consistency
+        // Note: evaluate-all is a special endpoint that evaluates all conditions system-wide
+        // This is not a standard CRUD operation, so we keep the direct API call
+        // but add a comment noting it should be centralized if Conditions System adds this feature
         const response = await fetch('/api/plan-conditions/evaluate-all', {
             method: 'POST',
             headers: {
@@ -3903,18 +4103,53 @@ function displayEvaluationResults(data) {
         const results = data.data || data;
         const metCount = results.filter(r => r.met).length;
         const notMetCount = results.length - metCount;
+        const evaluationTime = window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'));
         
-        resultsDiv.innerHTML = `
-            <div class="alert alert-info">
-                <h5>📊 תוצאות הערכת תנאים</h5>
-                <div id="evaluationSummary">
-                    <div>סה"כ תנאים: <strong>${results.length}</strong></div>
-                    <div>תנאים שהתקיימו: <strong class="text-success">${metCount}</strong></div>
-                    <div>תנאים שלא התקיימו: <strong class="text-danger">${notMetCount}</strong></div>
-                    <div>זמן הערכה: <strong>${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</strong></div>
-                </div>
-            </div>
-        `;
+        // Use createElement instead of innerHTML for better security
+        resultsDiv.innerHTML = ''; // Clear first
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-info';
+        
+        const title = document.createElement('h5');
+        title.textContent = '📊 תוצאות הערכת תנאים';
+        alertDiv.appendChild(title);
+        
+        const summaryDiv = document.createElement('div');
+        summaryDiv.id = 'evaluationSummary';
+        
+        const totalDiv = document.createElement('div');
+        const totalStrong = document.createElement('strong');
+        totalStrong.textContent = results.length;
+        totalDiv.appendChild(document.createTextNode('סה"כ תנאים: '));
+        totalDiv.appendChild(totalStrong);
+        summaryDiv.appendChild(totalDiv);
+        
+        const metDiv = document.createElement('div');
+        const metStrong = document.createElement('strong');
+        metStrong.className = 'text-success';
+        metStrong.textContent = metCount;
+        metDiv.appendChild(document.createTextNode('תנאים שהתקיימו: '));
+        metDiv.appendChild(metStrong);
+        summaryDiv.appendChild(metDiv);
+        
+        const notMetDiv = document.createElement('div');
+        const notMetStrong = document.createElement('strong');
+        notMetStrong.className = 'text-danger';
+        notMetStrong.textContent = notMetCount;
+        notMetDiv.appendChild(document.createTextNode('תנאים שלא התקיימו: '));
+        notMetDiv.appendChild(notMetStrong);
+        summaryDiv.appendChild(notMetDiv);
+        
+        const timeDiv = document.createElement('div');
+        const timeStrong = document.createElement('strong');
+        timeStrong.textContent = evaluationTime;
+        timeDiv.appendChild(document.createTextNode('זמן הערכה: '));
+        timeDiv.appendChild(timeStrong);
+        summaryDiv.appendChild(timeDiv);
+        
+        alertDiv.appendChild(summaryDiv);
+        resultsDiv.appendChild(alertDiv);
     }
 }
 
@@ -3987,7 +4222,7 @@ async function loadAlertTickerInfo(tickerId) {
     }
     
     // Display ticker info
-    displayAlertTickerInfo(ticker);
+    await displayAlertTickerInfo(ticker);
     window.Logger?.info?.('✅ [loadAlertTickerInfo] Ticker loaded', {
       tickerId,
       symbol: ticker?.symbol
@@ -4001,7 +4236,7 @@ async function loadAlertTickerInfo(tickerId) {
 /**
  * הצגת מידע על הטיקר (למודל החדש)
  */
-function displayAlertTickerInfo(ticker) {
+async function displayAlertTickerInfo(ticker) {
   window.Logger?.info?.('🖥️ [displayAlertTickerInfo] Rendering ticker', {
     tickerId: ticker?.id,
     symbol: ticker?.symbol
@@ -4022,9 +4257,11 @@ function displayAlertTickerInfo(ticker) {
     
     if (tickerInfoDiv) {
       if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
-        tickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
+        const tickerInfoHtml = await window.FieldRendererService.renderTickerInfo(ticker);
+        tickerInfoDiv.innerHTML = tickerInfoHtml;
       } else if (window.renderTickerInfo) {
-        tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+        const tickerInfoHtml = await window.renderTickerInfo(ticker, 'ticker-info-display');
+        tickerInfoDiv.innerHTML = tickerInfoHtml;
       } else {
         tickerInfoDiv.innerHTML = `
           <div class="ticker-info-display">
@@ -4075,11 +4312,13 @@ function displayAlertTickerInfo(ticker) {
   }
   
   if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
-    legacyTickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
+    const tickerInfoHtml = await window.FieldRendererService.renderTickerInfo(ticker);
+    legacyTickerInfoDiv.innerHTML = tickerInfoHtml;
   } else {
-    legacyTickerInfoDiv.innerHTML = window.renderTickerInfo
-      ? window.renderTickerInfo(ticker, 'ticker-info-display')
+    const tickerInfoHtml = window.renderTickerInfo
+      ? await window.renderTickerInfo(ticker, 'ticker-info-display')
       : `<strong>${ticker.symbol || 'N/A'}</strong>`;
+    legacyTickerInfoDiv.innerHTML = tickerInfoHtml;
   }
   window.Logger?.info?.('✅ [displayAlertTickerInfo] Ticker rendered (legacy)', {}, { page: "alerts" });
 }

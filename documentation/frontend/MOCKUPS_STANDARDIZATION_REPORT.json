@@ -1,17 +1,17 @@
 {
-  "timestamp": "2025-11-25T01:25:34.761807",
+  "timestamp": "2025-11-25T02:01:06.751038",
   "total_pages": 12,
   "pages_scanned": 12,
   "pages_with_issues": 12,
-  "total_issues": 218,
+  "total_issues": 212,
   "issues_by_severity": {
     "critical": 11,
-    "high": 193,
+    "high": 187,
     "medium": 14,
     "low": 0
   },
   "issues_by_system": {
-    "unknown": 218
+    "unknown": 212
   },
   "pages": {
     "trading-journal-page.html": {
@@ -1448,7 +1448,7 @@
       "duplicate_scripts": {}
     },
     "date-comparison-modal.html": {
-      "total_issues": 22,
+      "total_issues": 19,
       "issues": {
         "buttons": [
           {
@@ -1456,7 +1456,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 116,
+            "line": 121,
             "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('date-selection-section')\" title=\"הצג/"
           },
           {
@@ -1464,7 +1464,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 128,
+            "line": 133,
             "snippet": "<button class=\"filter-toggle filter-toggle-full-width date-range-filter-toggle\" id=\"dateComparisonRa"
           },
           {
@@ -1472,7 +1472,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 133,
+            "line": 138,
             "snippet": "<div class=\"date-range-filter-item\" data-value=\"אתמול\" data-onclick=\"selectDateComparisonRangeOption"
           },
           {
@@ -1480,7 +1480,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 136,
+            "line": 141,
             "snippet": "<div class=\"date-range-filter-item\" data-value=\"השבוע\" data-onclick=\"selectDateComparisonRangeOption"
           },
           {
@@ -1488,7 +1488,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 139,
+            "line": 144,
             "snippet": "<div class=\"date-range-filter-item\" data-value=\"שבוע\" data-onclick=\"selectDateComparisonRangeOption("
           },
           {
@@ -1496,7 +1496,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 142,
+            "line": 147,
             "snippet": "<div class=\"date-range-filter-item\" data-value=\"שבוע קודם\" data-onclick=\"selectDateComparisonRangeOp"
           },
           {
@@ -1504,7 +1504,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 145,
+            "line": 150,
             "snippet": "<div class=\"date-range-filter-item\" data-value=\"החודש\" data-onclick=\"selectDateComparisonRangeOption"
           },
           {
@@ -1512,7 +1512,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 148,
+            "line": 153,
             "snippet": "<div class=\"date-range-filter-item\" data-value=\"חודש\" data-onclick=\"selectDateComparisonRangeOption("
           },
           {
@@ -1520,7 +1520,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 151,
+            "line": 156,
             "snippet": "<div class=\"date-range-filter-item\" data-value=\"חודש קודם\" data-onclick=\"selectDateComparisonRangeOp"
           },
           {
@@ -1528,7 +1528,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 154,
+            "line": 159,
             "snippet": "<div class=\"date-range-filter-item selected\" data-value=\"השנה\" data-onclick=\"selectDateComparisonRan"
           },
           {
@@ -1536,7 +1536,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 157,
+            "line": 162,
             "snippet": "<div class=\"date-range-filter-item\" data-value=\"שנה\" data-onclick=\"selectDateComparisonRangeOption('"
           },
           {
@@ -1544,7 +1544,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 160,
+            "line": 165,
             "snippet": "<div class=\"date-range-filter-item\" data-value=\"שנה קודמת\" data-onclick=\"selectDateComparisonRangeOp"
           },
           {
@@ -1552,7 +1552,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 171,
+            "line": 176,
             "snippet": "<button data-button-type=\"COMPARE\" data-variant=\"primary\" data-text=\"השווה\" data-onclick=\"compareDat"
           },
           {
@@ -1560,7 +1560,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 188,
+            "line": 193,
             "snippet": "<button data-button-type=\"ADD\" data-variant=\"secondary\" data-text=\"הוסף\" data-onclick=\"addDateFromIn"
           },
           {
@@ -1568,7 +1568,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 208,
+            "line": 213,
             "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('date_comparison_modal-טבלת-השוואות')\""
           },
           {
@@ -1576,7 +1576,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 240,
+            "line": 245,
             "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('date_comparison_modal-גרף-bar-chart--"
           },
           {
@@ -1584,7 +1584,7 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 268,
+            "line": 273,
             "snippet": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('date_comparison_modal-גרף-line-chart-"
           },
           {
@@ -1592,34 +1592,8 @@
             "severity": "high",
             "check": "onclick-attribute",
             "description": "Using onclick instead of data-onclick",
-            "line": 304,
+            "line": 309,
             "snippet": "<button class=\"btn btn-secondary\" data-onclick=\"window.close()\">סגור</button>"
-          }
-        ],
-        "html-structure": [
-          {
-            "type": "missing",
-            "severity": "high",
-            "check": "background-wrapper",
-            "description": "Missing background-wrapper",
-            "line": null,
-            "snippet": null
-          },
-          {
-            "type": "missing",
-            "severity": "high",
-            "check": "page-body",
-            "description": "Missing page-body",
-            "line": null,
-            "snippet": null
-          },
-          {
-            "type": "missing",
-            "severity": "high",
-            "check": "main-content",
-            "description": "Missing main-content",
-            "line": null,
-            "snippet": null
           }
         ],
         "initialization": [
@@ -1803,34 +1777,8 @@
       "duplicate_scripts": {}
     },
     "tradingview-test-page.html": {
-      "total_issues": 5,
+      "total_issues": 2,
       "issues": {
-        "html-structure": [
-          {
-            "type": "missing",
-            "severity": "high",
-            "check": "background-wrapper",
-            "description": "Missing background-wrapper",
-            "line": null,
-            "snippet": null
-          },
-          {
-            "type": "missing",
-            "severity": "high",
-            "check": "page-body",
-            "description": "Missing page-body",
-            "line": null,
-            "snippet": null
-          },
-          {
-            "type": "missing",
-            "severity": "high",
-            "check": "main-content",
-            "description": "Missing main-content",
-            "line": null,
-            "snippet": null
-          }
-        ],
         "initialization": [
           {
             "type": "missing",

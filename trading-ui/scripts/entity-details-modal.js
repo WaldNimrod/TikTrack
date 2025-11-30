@@ -292,9 +292,10 @@ class EntityDetailsModal {
                 }
             }
             
-            // בדיקה אם המודל נפתח כמודל מקונן (יש מודל אחר פתוח)
-            const isNested = options.source?.sourceModal === 'linked-items' || 
-                           (window.ModalNavigationService && window.ModalNavigationService.getStack().length > 0);
+            // Modal Navigation System - רק למודלים מקוננים (nested modals)
+            // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
+            const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
+            const isNested = options.source?.sourceModal === 'linked-items' || hasStack;
             
             // הוספת modal-nested class אם נפתח כמודל מקונן
             if (isNested && this.modal) {
@@ -310,20 +311,30 @@ class EntityDetailsModal {
             // הצגת מצב טעינה
             this.showLoadingState();
 
-            const initialNavigationMetadata = {
-                modalId: this.modalId,
-                modalType: 'entity-details',
-                                entityType,
-                                entityId,
-                title: navigationTitle,
-                allowDuplicateEntries: true
-            };
+            // רישום במערכת רק אם זה מודל מקונן
+            if (hasStack) {
+                const initialNavigationMetadata = {
+                    modalId: this.modalId,
+                    modalType: 'entity-details',
+                    entityType,
+                    entityId,
+                    title: navigationTitle,
+                    allowDuplicateEntries: true
+                };
 
-            if (window.ModalNavigationService?.registerModalOpen) {
-                const navigationEntry = await window.ModalNavigationService.registerModalOpen(this.modal, initialNavigationMetadata);
-                this.navigationInstanceId = navigationEntry?.instanceId || null;
-            } else if (window.pushModalToNavigation) {
-                await window.pushModalToNavigation(this.modal, initialNavigationMetadata);
+                if (window.ModalNavigationService?.registerModalOpen) {
+                    const navigationEntry = await window.ModalNavigationService.registerModalOpen(this.modal, initialNavigationMetadata);
+                    this.navigationInstanceId = navigationEntry?.instanceId || null;
+                } else if (window.pushModalToNavigation) {
+                    await window.pushModalToNavigation(this.modal, initialNavigationMetadata);
+                    this.navigationInstanceId = null;
+                }
+
+                // עדכון UI (breadcrumb וכפתור חזרה) רק במודלים מקוננים
+                if (window.modalNavigationManager?.updateModalNavigation) {
+                    window.modalNavigationManager.updateModalNavigation(this.modal);
+                }
+            } else {
                 this.navigationInstanceId = null;
             }
 
@@ -1095,9 +1106,27 @@ class EntityDetailsModal {
 
         let buttonsHtml = '';
         
-        // עבור ticker - לא מציגים כפתורי פעולות מהירות
+        // עבור ticker - מציגים כפתור "דשבורד מורחב"
         if (entityType === 'ticker') {
-            buttonsHtml = ''; // ריק - לא מציגים כפתורים
+            const tickerId = this.currentEntityId || entityData?.id;
+            if (tickerId) {
+                if (typeof window.createActionsMenu === 'function') {
+                    const dashboardButton = window.createActionsMenu([
+                        { type: 'DASHBOARD', onclick: `window.location.href='/ticker-dashboard.html?tickerId=${tickerId}'`, title: 'דשבורד מורחב' }
+                    ]);
+                    buttonsHtml = dashboardButton || '';
+                } else {
+                    // Fallback: כפתור פשוט
+                    buttonsHtml = `
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-primary" 
+                                onclick="window.location.href='/ticker-dashboard.html?tickerId=${tickerId}'"
+                                title="דשבורד מורחב">
+                            דשבורד מורחב
+                        </button>
+                    `;
+                }
+            }
         }
         
         buttonsContainer.innerHTML = buttonsHtml;
@@ -1826,13 +1855,16 @@ function hideEntityDetails() {
 /**
  * Show linked items - פונקציה גלובלית להצגת פריטים מקושרים
  * 
+ * Wrapper function that uses the centralized Linked Items Service (linked-items.js)
+ * This function is kept for backward compatibility and entity-details-modal integration
+ * 
  * @param {string} entityType - סוג הישות
  * @param {number|string} entityId - מזהה הישות
  * @global
  */
 function showLinkedItems(entityType, entityId) {
     try {
-        // שימוש במנגנון המקושרים הקיים
+        // שימוש במנגנון המקושרים הקיים (Linked Items Service)
         if (window.loadLinkedItemsData && window.showLinkedItemsModal) {
             // טעינת נתונים מקושרים באמצעות המנגנון הקיים
             window.loadLinkedItemsData(entityType, entityId)

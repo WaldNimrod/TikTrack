@@ -424,14 +424,7 @@ class ConstraintsMonitor {
                           { type: 'CHECK', onclick: `window.validateConstraint('${constraint.constraint_name}')`, title: 'בדוק אילוץ' },
                           { type: 'EDIT', onclick: `window.editConstraint('${constraint.constraint_name}')`, title: 'ערוך' },
                           { type: constraint.is_active ? 'PAUSE' : 'PLAY', onclick: `window.toggleConstraint('${constraint.constraint_name}')`, title: constraint.is_active ? 'השבת' : 'הפעל' }
-                        ]) : `
-                        <div class="btn-group btn-group-sm" role="group">
-                            <button data-button-type="VIEW" data-variant="small" data-onclick="window.viewConstraint('${constraint.constraint_name}')" data-text="" title="צפה בפרטים"></button>
-                            <button data-button-type="CHECK" data-variant="small" data-onclick="window.validateConstraint('${constraint.constraint_name}')" data-text="" title="בדוק אילוץ"></button>
-                            <button data-button-type="EDIT" data-variant="small" data-onclick="window.editConstraint('${constraint.constraint_name}')" data-text="" title="ערוך"></button>
-                            <button data-button-type="${constraint.is_active ? 'PAUSE' : 'PLAY'}" data-variant="small" data-onclick="window.toggleConstraint('${constraint.constraint_name}')" data-text="" title="${constraint.is_active ? 'השבת' : 'הפעל'}"></button>
-                        </div>
-                        `}
+                        ]) : '<!-- Actions menu not available -->'}
                     </td>
                 </tr>
             `;
@@ -499,6 +492,29 @@ class ConstraintsMonitor {
             let aVal = a[column];
             let bVal = b[column];
 
+            // Use TableSortValueAdapter if available
+            if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+                // Detect type automatically
+                let sortType = 'auto';
+                if (typeof aVal === 'boolean' || typeof bVal === 'boolean') {
+                    sortType = 'boolean';
+                } else if (typeof aVal === 'number' || typeof bVal === 'number') {
+                    sortType = 'numeric';
+                } else if (typeof aVal === 'string' || typeof bVal === 'string') {
+                    sortType = 'string';
+                }
+                
+                const sortValueA = window.TableSortValueAdapter.getSortValue({ value: aVal, type: sortType });
+                const sortValueB = window.TableSortValueAdapter.getSortValue({ value: bVal, type: sortType });
+                
+                if (direction === 'asc') {
+                    return (sortValueA || 0) > (sortValueB || 0) ? 1 : (sortValueA || 0) < (sortValueB || 0) ? -1 : 0;
+                } else {
+                    return (sortValueA || 0) < (sortValueB || 0) ? 1 : (sortValueA || 0) > (sortValueB || 0) ? -1 : 0;
+                }
+            }
+
+            // Fallback to manual comparison
             // Handle boolean values
             if (typeof aVal === 'boolean') {
                 aVal = aVal ? 1 : 0;
@@ -630,7 +646,7 @@ window.refreshConstraints = function() {
  * View constraint details
  * @param {string} constraintName - Name of the constraint to view
  */
-window.viewConstraint = function(constraintName) {
+window.viewConstraint = async function(constraintName) {
     const constraint = constraintsMonitor.constraints.find(c => c.constraint_name === constraintName);
     if (!constraint) {
         constraintsMonitor.showMessage('אילוץ לא נמצא', 'error');
@@ -686,9 +702,28 @@ window.viewConstraint = function(constraintName) {
     // Add modal to body
     document.body.insertAdjacentHTML('beforeend', modalContent);
     
-    // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('viewConstraintModal'));
-    modal.show();
+    // Show modal via ModalManagerV2 (supports dynamic modals)
+    const modalElement = document.getElementById('viewConstraintModal');
+    if (modalElement) {
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+            try {
+                await window.ModalManagerV2.showModal('viewConstraintModal', 'view');
+            } catch (error) {
+                // Fallback to Bootstrap if ModalManagerV2 fails
+                window.Logger?.warn('viewConstraintModal not available in ModalManagerV2, using Bootstrap fallback', { page: 'constraints' });
+                if (bootstrap?.Modal) {
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                }
+            }
+        } else {
+            // Fallback to Bootstrap modal
+            if (bootstrap?.Modal) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            }
+        }
+    }
 };
 
 /**
@@ -709,7 +744,7 @@ window.editConstraint = function(constraintName) {
  * Toggle constraint active status
  * @param {string} constraintName - Name of the constraint to toggle
  */
-window.toggleConstraint = function(constraintName) {
+window.toggleConstraint = async function(constraintName) {
     const constraint = constraintsMonitor.constraints.find(c => c.constraint_name === constraintName);
     if (!constraint) {
         constraintsMonitor.showMessage('אילוץ לא נמצא', 'error');
@@ -719,7 +754,23 @@ window.toggleConstraint = function(constraintName) {
     const action = constraint.is_active ? 'השבתה' : 'הפעלה';
     const confirmMessage = `האם אתה בטוח שברצונך ${action} את האילוץ "${constraintName}"?`;
     
-    if (confirm(confirmMessage)) {
+    let confirmed = false;
+    if (typeof window.showConfirmationDialog === 'function') {
+      confirmed = await new Promise(resolve => {
+        window.showConfirmationDialog(
+          action + ' אילוץ',
+          confirmMessage,
+          () => resolve(true),
+          () => resolve(false),
+          'warning'
+        );
+      });
+    } else {
+      // Fallback למקרה שמערכת התראות לא זמינה
+      confirmed = confirm(confirmMessage);
+    }
+    
+    if (confirmed) {
         // Simulate API call
         constraint.is_active = !constraint.is_active;
         constraintsMonitor.renderCurrentLayer();
@@ -731,7 +782,7 @@ window.toggleConstraint = function(constraintName) {
  * Validate a single constraint
  * @param {string} constraintName - Name of the constraint to validate
  */
-window.validateConstraint = function(constraintName) {
+window.validateConstraint = async function(constraintName) {
     const constraint = constraintsMonitor.constraints.find(c => c.constraint_name === constraintName);
     if (!constraint) {
         constraintsMonitor.showMessage('אילוץ לא נמצא', 'error');
@@ -739,20 +790,20 @@ window.validateConstraint = function(constraintName) {
     }
     
     // Show validation modal
-    showValidationModal(constraint, false);
+    await showValidationModal(constraint, false);
 };
 
 /**
  * Validate all constraints
  */
-window.validateAllConstraints = function() {
+window.validateAllConstraints = async function() {
     if (constraintsMonitor.constraints.length === 0) {
         constraintsMonitor.showMessage('אין אילוצים לבדיקה', 'warning');
         return;
     }
     
     // Show validation modal for all constraints
-    showValidationModal(null, true);
+    await showValidationModal(null, true);
 };
 
 /**
@@ -760,7 +811,7 @@ window.validateAllConstraints = function() {
  * @param {Object} constraint - Single constraint or null for all
  * @param {boolean} isAll - Whether validating all constraints
  */
-function showValidationModal(constraint, isAll) {
+async function showValidationModal(constraint, isAll) {
     const title = isAll ? 'בדיקת כל האילוצים' : `בדיקת אילוץ: ${constraint.constraint_name}`;
     const targetConstraints = isAll ? constraintsMonitor.constraints : [constraint];
     
@@ -808,9 +859,28 @@ function showValidationModal(constraint, isAll) {
     // Add modal to body
     document.body.insertAdjacentHTML('beforeend', modalContent);
     
-    // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('validationModal'));
-    modal.show();
+    // Show modal via ModalManagerV2 (supports dynamic modals)
+    const modalElement = document.getElementById('validationModal');
+    if (modalElement) {
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+            try {
+                await window.ModalManagerV2.showModal('validationModal', 'view');
+            } catch (error) {
+                // Fallback to Bootstrap if ModalManagerV2 fails
+                window.Logger?.warn('validationModal not available in ModalManagerV2, using Bootstrap fallback', { page: 'constraints' });
+                if (bootstrap?.Modal) {
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                }
+            }
+        } else {
+            // Fallback to Bootstrap modal
+            if (bootstrap?.Modal) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            }
+        }
+    }
     
     // Start validation
     startValidation(targetConstraints, isAll);
@@ -1119,6 +1189,8 @@ function displayValidationResults(results) {
     let html = '<div class="validation-summary mb-4">';
     
     // Summary
+    // Note: This is a validation results summary, not a standard summary element
+    // Using filter for counting is acceptable here as it's specific to validation results structure
     const total = results.length;
     const success = results.filter(r => r.database.status === 'success' && r.data.status === 'success' && r.ui.status === 'success').length;
     const warnings = results.filter(r => r.data.status === 'warning' || r.ui.status === 'warning').length;
@@ -1371,6 +1443,61 @@ function generateDetailedLog() {
 //         }
 //     }, 30000);
 // });
+
+/**
+ * Register constraints table with UnifiedTableSystem
+ */
+window.registerConstraintsTable = function() {
+    if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {
+        window.Logger?.warn('⚠️ UnifiedTableSystem not available for constraints registration', { page: 'constraints' });
+        return false;
+    }
+
+    const tableType = 'constraints';
+
+    if (window.UnifiedTableSystem.registry.isRegistered && window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+        window.Logger?.debug?.('ℹ️ Constraints table already registered', { page: 'constraints' });
+        return true;
+    }
+
+    window.UnifiedTableSystem.registry.register(tableType, {
+        dataGetter: () => {
+            return window.constraintsMonitor?.constraints || [];
+        },
+        updateFunction: (data) => {
+            if (window.constraintsMonitor && typeof window.constraintsMonitor.renderConstraintsTable === 'function') {
+                // Temporarily set constraints to filtered data
+                const originalConstraints = window.constraintsMonitor.constraints;
+                window.constraintsMonitor.constraints = Array.isArray(data) ? data : [];
+                window.constraintsMonitor.renderConstraintsTable();
+                window.constraintsMonitor.constraints = originalConstraints;
+            }
+        },
+        tableSelector: '#constraints-table',
+        columns: window.TABLE_COLUMN_MAPPINGS?.constraints || [],
+        sortable: true,
+        filterable: true,
+        defaultSort: { columnIndex: 0, direction: 'asc' }
+    });
+
+    window.Logger?.info?.('✅ Registered constraints table with UnifiedTableSystem', { page: 'constraints' });
+    return true;
+};
+
+// Auto-register when constraints monitor is initialized
+if (typeof window.initializeConstraints === 'function') {
+    const originalInit = window.initializeConstraints;
+    window.initializeConstraints = function() {
+        const result = originalInit();
+        // Register table after a short delay
+        setTimeout(() => {
+            if (typeof window.registerConstraintsTable === 'function') {
+                window.registerConstraintsTable();
+            }
+        }, 500);
+        return result;
+    };
+}
 
 // ייצוא לגלובל scope
 // window. export removed - using global version from system-management.js

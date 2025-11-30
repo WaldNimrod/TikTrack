@@ -231,11 +231,18 @@ class SelectPopulatorService {
                 console.log(`🔍 [SelectPopulatorService] Filtered ${beforeFilter} → ${tickers.length} tickers`);
             }
             
-            // מילוי ה-select
+            // מילוי ה-select - הצג טיקר + שם חברה
             console.log(`🔍 [SelectPopulatorService] Calling _populateSelect with ${tickers.length} tickers...`);
-            this._populateSelect(select, tickers, {
+            
+            // Format tickers to show symbol + company name
+            const formattedTickers = tickers.map(ticker => ({
+                ...ticker,
+                display_text: ticker.name ? `${ticker.symbol} - ${ticker.name}` : ticker.symbol
+            }));
+            
+            this._populateSelect(select, formattedTickers, {
                 valueField: 'id',
-                textField: 'symbol',
+                textField: 'display_text',
                 includeEmpty: options.includeEmpty !== false,
                 emptyText: options.emptyText || 'בחר טיקר...',
                 defaultValue: options.defaultValue
@@ -608,6 +615,41 @@ class SelectPopulatorService {
         } catch (error) {
             console.error(`❌ שגיאה בטעינת נתונים מ-${endpoint}:`, error);
         }
+    }
+
+    /**
+     * מילוי select box עם נתונים קיימים (לא מ-API)
+     * פונקציה ציבורית למילוי select עם נתונים שכבר נטענו
+     * 
+     * @param {string|HTMLElement} selectIdOrElement - ID של ה-select element או האלמנט עצמו
+     * @param {Array} items - מערך של אובייקטים
+     * @param {Object} config - הגדרות: { valueField, textField, includeEmpty, emptyText, defaultValue }
+     * @returns {void}
+     * 
+     * @example
+     * SelectPopulatorService.populateSelectWithData('mySelect', dataArray, {
+     *   valueField: 'id',
+     *   textField: 'name',
+     *   includeEmpty: true,
+     *   emptyText: 'בחר...'
+     * });
+     */
+    static populateSelectWithData(selectIdOrElement, items, config = {}) {
+        const select = typeof selectIdOrElement === 'string' 
+            ? document.getElementById(selectIdOrElement)
+            : selectIdOrElement;
+        if (!select) {
+            console.warn(`⚠️ Select ${selectIdOrElement} לא נמצא`);
+            return;
+        }
+        
+        this._populateSelect(select, items, {
+            valueField: config.valueField || 'id',
+            textField: config.textField || 'name',
+            includeEmpty: config.includeEmpty !== false,
+            emptyText: config.emptyText || 'בחר...',
+            defaultValue: config.defaultValue
+        });
     }
 
     // ===== PRIVATE HELPER METHOD =====

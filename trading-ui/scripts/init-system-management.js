@@ -966,7 +966,14 @@ function showPackageStats() {
  * Generate page
  */
 function generatePage() {
-    const pageName = document.getElementById('newPageName').value.trim();
+    // Use DataCollectionService to get value if available
+    let pageName;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      pageName = window.DataCollectionService.getValue('newPageName', 'text', '').trim();
+    } else {
+      const pageNameEl = document.getElementById('newPageName');
+      pageName = pageNameEl ? pageNameEl.value.trim() : '';
+    }
     const selectedPackages = getSelectedPackages();
     
     if (!pageName) {
@@ -990,7 +997,14 @@ function generatePage() {
  * Generate complete script section with correct loading order
  */
 function generateCompleteScriptSection() {
-    const pageName = document.getElementById('newPageName').value.trim();
+    // Use DataCollectionService to get value if available
+    let pageName;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      pageName = window.DataCollectionService.getValue('newPageName', 'text', '').trim();
+    } else {
+      const pageNameEl = document.getElementById('newPageName');
+      pageName = pageNameEl ? pageNameEl.value.trim() : '';
+    }
     
     if (!pageName) {
         showNotification('אנא הזן שם עמוד', 'warning');
@@ -1011,7 +1025,14 @@ function generateCompleteScriptSection() {
  * Generate script tags for specific page
  */
 function generateScriptTagsForPage() {
-    const pageName = document.getElementById('newPageName').value.trim();
+    // Use DataCollectionService to get value if available
+    let pageName;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      pageName = window.DataCollectionService.getValue('newPageName', 'text', '').trim();
+    } else {
+      const pageNameEl = document.getElementById('newPageName');
+      pageName = pageNameEl ? pageNameEl.value.trim() : '';
+    }
     
     if (!pageName) {
         showNotification('אנא הזן שם עמוד', 'warning');

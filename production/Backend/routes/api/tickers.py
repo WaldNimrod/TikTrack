@@ -83,6 +83,13 @@ def get_tickers():
                         ticker_dict['yahoo_updated_at'] = ticker.yahoo_updated_at.isoformat() if ticker.yahoo_updated_at else None
                     if hasattr(ticker, 'data_source'):
                         ticker_dict['data_source'] = ticker.data_source
+                    # Open price data
+                    if hasattr(ticker, 'open_price'):
+                        ticker_dict['open_price'] = ticker.open_price
+                    if hasattr(ticker, 'change_from_open'):
+                        ticker_dict['change_from_open'] = ticker.change_from_open
+                    if hasattr(ticker, 'change_from_open_percent'):
+                        ticker_dict['change_from_open_percent'] = ticker.change_from_open_percent
                 except Exception as market_attr_error:
                     # Handle errors when accessing market data attributes
                     logger.warning(f"Error accessing market data attributes for ticker {ticker.id}: {str(market_attr_error)}")
@@ -111,6 +118,75 @@ def get_tickers():
         return jsonify({
             "status": "error",
             "error": {"message": f"Failed to retrieve tickers: {str(e)}"},
+            "version": "1.0"
+        }), 500
+
+@tickers_bp.route('/my', methods=['GET'])
+@handle_database_session()
+@api_endpoint(cache_ttl=60, rate_limit=60)
+def get_my_tickers():
+    """Get tickers for the current authenticated user"""
+    from .base_entity_decorators import require_authentication
+    
+    db: Session = g.db
+    user_id = getattr(g, 'user_id', None)
+    
+    if not user_id:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Authentication required"},
+            "version": "1.0"
+        }), 401
+    
+    try:
+        tickers = TickerService.get_user_tickers(db, user_id)
+        
+        # Convert tickers to dict with market data
+        tickers_data = []
+        for ticker in tickers:
+            try:
+                ticker_dict = ticker.to_dict()
+                
+                # Add market data fields if they exist
+                try:
+                    if hasattr(ticker, 'current_price'):
+                        ticker_dict['current_price'] = ticker.current_price
+                    if hasattr(ticker, 'change_percent'):
+                        ticker_dict['change_percent'] = ticker.change_percent
+                    if hasattr(ticker, 'change_amount'):
+                        ticker_dict['change_amount'] = ticker.change_amount
+                    if hasattr(ticker, 'volume'):
+                        ticker_dict['volume'] = ticker.volume
+                    if hasattr(ticker, 'yahoo_updated_at'):
+                        ticker_dict['yahoo_updated_at'] = ticker.yahoo_updated_at.isoformat() if ticker.yahoo_updated_at else None
+                    if hasattr(ticker, 'data_source'):
+                        ticker_dict['data_source'] = ticker.data_source
+                    if hasattr(ticker, 'open_price'):
+                        ticker_dict['open_price'] = ticker.open_price
+                    if hasattr(ticker, 'change_from_open'):
+                        ticker_dict['change_from_open'] = ticker.change_from_open
+                    if hasattr(ticker, 'change_from_open_percent'):
+                        ticker_dict['change_from_open_percent'] = ticker.change_from_open_percent
+                except Exception as market_attr_error:
+                    logger.warning(f"Error accessing market data attributes for ticker {ticker.id}: {str(market_attr_error)}")
+                    
+                tickers_data.append(ticker_dict)
+            except Exception as ticker_error:
+                logger.warning(f"Error converting ticker {ticker.id if hasattr(ticker, 'id') else 'unknown'} to dict: {str(ticker_error)}")
+        
+        return jsonify({
+            "status": "success",
+            "data": tickers_data,
+            "message": "User tickers retrieved successfully",
+            "version": "1.0"
+        })
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error getting user tickers: {str(e)}\nTraceback:\n{error_trace}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to retrieve user tickers: {str(e)}"},
             "version": "1.0"
         }), 500
 
@@ -574,15 +650,8 @@ def delete_ticker(ticker_id: int):
                 "version": "1.0"
             }), 400
         
-        try:
-            TagService.remove_all_tags_for_entity(db, 'ticker', ticker_id)
-        except ValueError as tag_error:
-            logger.warning(
-                "Failed to remove tags for ticker %s before deletion: %s",
-                ticker_id,
-                tag_error,
-            )
-
+        # Tag cleanup is handled automatically by SQLAlchemy event listeners
+        
         # Delete ticker
         success = TickerService.delete(db, ticker_id)
         if success:
@@ -899,3 +968,91 @@ def cancel_ticker(ticker_id: int):
             db.close()
 
 # Endpoint removed - status updates automatically now
+
+@tickers_bp.route('/<int:ticker_id>/add-to-user', methods=['POST'])
+@handle_database_session()
+@api_endpoint(cache_ttl=0, rate_limit=30)
+def add_ticker_to_user(ticker_id: int):
+    """Add a ticker to the current user's list"""
+    db: Session = g.db
+    user_id = getattr(g, 'user_id', None)
+    
+    if not user_id:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Authentication required"},
+            "version": "1.0"
+        }), 401
+    
+    try:
+        success = TickerService.add_ticker_to_user(db, user_id, ticker_id)
+        
+        if success:
+            return jsonify({
+                "status": "success",
+                "data": {
+                    "ticker_id": ticker_id,
+                    "user_id": user_id
+                },
+                "message": "Ticker added to user list successfully",
+                "version": "1.0"
+            }), 200
+        else:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Ticker already in user list or ticker not found"},
+                "version": "1.0"
+            }), 400
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error adding ticker to user: {str(e)}\nTraceback:\n{error_trace}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to add ticker to user: {str(e)}"},
+            "version": "1.0"
+        }), 500
+
+@tickers_bp.route('/<int:ticker_id>/remove-from-user', methods=['DELETE'])
+@handle_database_session()
+@api_endpoint(cache_ttl=0, rate_limit=30)
+def remove_ticker_from_user(ticker_id: int):
+    """Remove a ticker from the current user's list"""
+    db: Session = g.db
+    user_id = getattr(g, 'user_id', None)
+    
+    if not user_id:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Authentication required"},
+            "version": "1.0"
+        }), 401
+    
+    try:
+        success = TickerService.remove_ticker_from_user(db, user_id, ticker_id)
+        
+        if success:
+            return jsonify({
+                "status": "success",
+                "data": {
+                    "ticker_id": ticker_id,
+                    "user_id": user_id
+                },
+                "message": "Ticker removed from user list successfully",
+                "version": "1.0"
+            }), 200
+        else:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Ticker not found in user list"},
+                "version": "1.0"
+            }), 404
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error removing ticker from user: {str(e)}\nTraceback:\n{error_trace}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to remove ticker from user: {str(e)}"},
+            "version": "1.0"
+        }), 500

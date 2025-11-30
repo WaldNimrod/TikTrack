@@ -179,6 +179,7 @@ const TTL_POLICIES = {
     'user-preferences': 'long',      // 24 hours
     'preference-data': 'medium',
     'preference-single': 'medium',
+    'ai-analysis-response': 'short', // 2 hours - AI analysis responses
     'preference-group': 'medium',
     'preference-multiple': 'medium',
     'preference-groups': 'long',
@@ -256,6 +257,7 @@ class UnifiedCacheManager {
             'ui-state': { layer: 'localStorage', ttl: 3600000, compress: false },
             'filter-state': { layer: 'localStorage', ttl: 3600000, compress: false },
             'notifications-history': { layer: 'indexedDB', ttl: 86400000, compress: true },
+            'ai-analysis-response-*': { layer: 'indexedDB', ttl: 7200000, compress: true }, // 2 hours - AI responses (large data)
             'file-mappings': { layer: 'indexedDB', ttl: null, compress: true },
             'linter-results': { layer: 'indexedDB', ttl: 86400000, compress: true },
             'js-analysis': { layer: 'indexedDB', ttl: 86400000, compress: true },
@@ -284,6 +286,38 @@ class UnifiedCacheManager {
             indexedDB: null, // יאותחל מאוחר יותר
             backend: new BackendCacheLayer()
         };
+    }
+
+    /**
+     * Build cache key with user_id for multi-user support
+     * @param {string} key - Base cache key
+     * @param {number|null} userId - User ID (optional, will try to get from current user)
+     * @returns {string} - Cache key with user_id prefix
+     */
+    buildUserCacheKey(key, userId = null) {
+        // Get user_id if not provided
+        if (userId === null) {
+            try {
+                const currentUser = (typeof window !== 'undefined' && window.getCurrentUser && typeof window.getCurrentUser === 'function')
+                    ? window.getCurrentUser()
+                    : (typeof getCurrentUser === 'function' 
+                        ? getCurrentUser() 
+                        : (typeof window !== 'undefined' && window.TikTrackAuth && typeof window.TikTrackAuth.getCurrentUser === 'function'
+                            ? window.TikTrackAuth.getCurrentUser()
+                            : null));
+                userId = currentUser?.id || currentUser?.user_id || 1; // Default to 1 if no user
+            } catch (e) {
+                userId = 1; // Fallback to default user
+            }
+        }
+        
+        // If key already contains user_id, return as-is
+        if (key.includes(`:u${userId}:`) || key.startsWith(`u${userId}:`)) {
+            return key;
+        }
+        
+        // Add user_id prefix: u{userId}:{original_key}
+        return `u${userId}:${key}`;
     }
 
     /**
@@ -375,6 +409,11 @@ class UnifiedCacheManager {
             window.Logger.warn('⚠️ Unified Cache Manager not initialized', { page: "unified-cache-manager" });
             return false;
         }
+        
+        // Add user_id to cache key for multi-user support (unless explicitly disabled)
+        if (options.includeUserId !== false) {
+            key = this.buildUserCacheKey(key, options.userId);
+        }
 
         const startTime = performance.now();
         
@@ -430,6 +469,11 @@ class UnifiedCacheManager {
         if (!this.initialized) {
             window.Logger.warn('⚠️ Unified Cache Manager not initialized', { page: "unified-cache-manager" });
             return options.fallback ? await options.fallback() : null;
+        }
+        
+        // Add user_id to cache key for multi-user support (unless explicitly disabled)
+        if (options.includeUserId !== false) {
+            key = this.buildUserCacheKey(key, options.userId);
         }
 
         const startTime = performance.now();
@@ -3098,7 +3142,8 @@ UnifiedCacheManager.prototype.getKeyPolicy = function(key) {
  */
 UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProfileId = null, groupName = null, options = {}) {
     const opts = (Array.isArray(options) ? { preferenceNames: options } : (options || {}));
-    console.log('🔍 DEBUG: refreshUserPreferences() called with targetProfileId:', targetProfileId, 'groupName:', groupName, 'options:', opts);
+    // Removed verbose DEBUG log - use Logger.debug with verbose mode if needed
+    // console.log('🔍 DEBUG: refreshUserPreferences() called with targetProfileId:', targetProfileId, 'groupName:', groupName, 'options:', opts);
     
     try {
         const userId =
@@ -3137,7 +3182,8 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
         const profileIdList = Array.from(profileIds);
         const preferenceNames = Array.isArray(opts.preferenceNames) ? opts.preferenceNames : [];
         
-        console.log('🔍 DEBUG: refreshUserPreferences resolved userId:', userId, 'profileIdList:', profileIdList);
+        // Removed verbose DEBUG log - use Logger.debug with verbose mode if needed
+        // console.log('🔍 DEBUG: refreshUserPreferences resolved userId:', userId, 'profileIdList:', profileIdList);
         
         const normalizeKey = (key) =>
             key.startsWith('tiktrack_') ? key.substring('tiktrack_'.length) : key;
@@ -3189,13 +3235,14 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
             matchesPreferenceName(normalizedKey) &&
             matchesProfile(normalizedKey);
         
-        console.log('🔍 DEBUG: Getting all keys from UnifiedCacheManager...');
+        // Removed verbose DEBUG logs - use Logger.debug with verbose mode if needed
+        // console.log('🔍 DEBUG: Getting all keys from UnifiedCacheManager...');
         const keys = await this.getAllKeys();
-        console.log('🔍 DEBUG: getAllKeys() returned:', keys.length, 'keys');
+        // console.log('🔍 DEBUG: getAllKeys() returned:', keys.length, 'keys');
         
-        console.log('🔍 DEBUG: Getting keys directly from localStorage...');
+        // console.log('🔍 DEBUG: Getting keys directly from localStorage...');
         const localStorageKeys = Object.keys(localStorage);
-        console.log('🔍 DEBUG: localStorage has', localStorageKeys.length, 'total keys');
+        // console.log('🔍 DEBUG: localStorage has', localStorageKeys.length, 'total keys');
         
         const keysToRemove = new Set();
         
@@ -3228,34 +3275,53 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
         let removedCount = 0;
         for (const normalizedKey of keysToRemove) {
             try {
-                console.log(`🗑️ DEBUG: Processing normalized key: ${normalizedKey}`);
+                // Removed verbose DEBUG logs - use Logger.debug with verbose mode if needed
+                // console.log(`🗑️ DEBUG: Processing normalized key: ${normalizedKey}`);
                 
                 const prefixedKey = `tiktrack_${normalizedKey}`;
                 
+                // CRITICAL: Remove from ALL layers using UnifiedCacheManager.remove()
+                // This ensures memory, localStorage, and IndexedDB are all cleared
+                // console.log(`🗑️ DEBUG: Removing ${normalizedKey} from all cache layers`);
+                const removed1 = await this.remove(normalizedKey);
+                if (removed1) removedCount++;
+                
+                // Also remove prefixed version
+                // console.log(`🗑️ DEBUG: Removing ${prefixedKey} from all cache layers`);
+                const removed2 = await this.remove(prefixedKey);
+                if (removed2) removedCount++;
+                
+                // Fallback: Direct localStorage cleanup (in case UnifiedCacheManager missed it)
                 if (localStorage.getItem(normalizedKey) !== null) {
                     localStorage.removeItem(normalizedKey);
                     removedCount++;
-                    console.log(`✅ DEBUG: Removed ${normalizedKey} from localStorage`);
-                    window.Logger.debug(`🗑️ Removed ${normalizedKey} from localStorage`, { page: "unified-cache-manager" });
+                    // console.log(`✅ DEBUG: Fallback removed ${normalizedKey} from localStorage`);
                 }
                 
                 if (localStorage.getItem(prefixedKey) !== null) {
                     localStorage.removeItem(prefixedKey);
                     removedCount++;
-                    console.log(`✅ DEBUG: Removed ${prefixedKey} from localStorage`);
-                    window.Logger.debug(`🗑️ Removed ${prefixedKey} from localStorage`, { page: "unified-cache-manager" });
+                    // console.log(`✅ DEBUG: Fallback removed ${prefixedKey} from localStorage`);
                 }
                 
-                console.log(`🗑️ DEBUG: Trying UnifiedCacheManager.remove("${normalizedKey}")`);
-                await this.remove(normalizedKey);
+                // console.log(`✅ DEBUG: Removed ${normalizedKey} from all cache layers`);
             } catch (removeError) {
                 console.error(`❌ DEBUG: Failed to remove key ${normalizedKey}:`, removeError);
                 window.Logger.warn(`⚠️ Failed to remove key ${normalizedKey}:`, removeError, { page: "unified-cache-manager" });
             }
         }
         
-        console.log(`✅ DEBUG: Successfully removed ${removedCount} key entries from localStorage`);
-        console.log('✅ DEBUG: Cache cleared successfully - preferences will be reloaded by caller');
+        // Removed verbose DEBUG log - use Logger.debug with verbose mode if needed
+        // console.log(`✅ DEBUG: Successfully removed ${removedCount} key entries from localStorage`);
+        
+        // OPTIMIZED: Don't reload after cache clear - only clear cache
+        // Reloading should be done explicitly when needed, not automatically
+        // This prevents unnecessary API calls after save operations
+        window.Logger?.info?.('✅ Cache cleared - no automatic reload (use PreferencesManager.refreshGroup() if needed)', {
+            page: "unified-cache-manager",
+            groupName,
+            preferenceNames: preferenceNames.length,
+        });
         
     } catch (error) {
         console.error('❌ DEBUG: Error in refreshUserPreferences:', error);

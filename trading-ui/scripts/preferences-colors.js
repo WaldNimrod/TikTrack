@@ -291,7 +291,8 @@ class ColorManager {
 
       this.colorCache.set(colorName, colorValue);
 
-      if (window.ColorSchemeSystem) {
+      // Sync with ColorSchemeSystem if available
+      if (window.ColorSchemeSystem || window.colorSchemeSystem) {
         await this.syncWithColorScheme(colorName, colorValue);
       }
 
@@ -334,12 +335,35 @@ class ColorManager {
      */
   async syncWithColorScheme(colorName, colorValue) {
     try {
-      if (window.ColorSchemeSystem && window.ColorSchemeSystem.updateColor) {
+      // Try ColorSchemeSystem API (with capital C)
+      if (window.ColorSchemeSystem && typeof window.ColorSchemeSystem.updateColor === 'function') {
         await window.ColorSchemeSystem.updateColor(colorName, colorValue);
         window.Logger.info(`🎨 Synced ${colorName} with ColorSchemeSystem`, { page: 'preferences-colors' });
+        return;
+      }
+      
+      // Fallback to updateEntityColors if ColorSchemeSystem.updateColor not available
+      if (typeof window.updateEntityColors === 'function') {
+        const payload = {
+          colorScheme: {
+            entities: {
+              [colorName]: colorValue,
+            },
+          },
+        };
+        window.updateEntityColors(payload);
+        window.Logger.info(`🎨 Synced ${colorName} with ColorSchemeSystem via updateEntityColors`, { page: 'preferences-colors' });
+        return;
+      }
+      
+      // If no sync method available, log warning
+      if (window.Logger && window.Logger.warn) {
+        window.Logger.warn(`⚠️ ColorSchemeSystem sync not available for ${colorName}`, { page: 'preferences-colors' });
       }
     } catch (error) {
-      window.Logger.warn(`⚠️ Failed to sync ${colorName} with ColorSchemeSystem:`, error, { page: 'preferences-colors' });
+      if (window.Logger && window.Logger.warn) {
+        window.Logger.warn(`⚠️ Failed to sync ${colorName} with ColorSchemeSystem:`, error, { page: 'preferences-colors' });
+      }
     }
   }
 
@@ -518,7 +542,12 @@ class ColorPickerManager {
       if (picker && picker.element) {
         // Convert RGBA to RGB for color inputs (they don't support alpha)
         const cleanValue = this.convertToColorInputFormat(colorValue);
-        picker.element.value = cleanValue;
+        // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(picker.element.id, cleanValue, 'text');
+        } else {
+          picker.element.value = cleanValue;
+        }
         this.updatePreview(picker.element.id, cleanValue);
       }
     });
@@ -552,7 +581,12 @@ class ColorPickerManager {
      */
   resetToDefaults() {
     this.pickers.forEach((picker, id) => {
-      picker.element.value = picker.originalValue;
+      // Use DataCollectionService to set value if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue(picker.element.id, picker.originalValue, 'text');
+      } else {
+        picker.element.value = picker.originalValue;
+      }
       this.updatePreview(id, picker.originalValue);
     });
   }

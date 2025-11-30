@@ -71,9 +71,19 @@ class ModalManagerV2 {
             assignedValue = includeTime
                 ? today.toISOString().slice(0, 16)
                 : today.toISOString().slice(0, 10);
-            inputElement.value = assignedValue;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(inputElement.id, assignedValue, type === 'date' ? 'date' : 'dateOnly');
+            } else {
+              inputElement.value = assignedValue;
+            }
         } else {
-            inputElement.value = assignedValue;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(inputElement.id, assignedValue, 'text');
+            } else {
+              inputElement.value = assignedValue;
+            }
         }
 
         inputElement.dataset.systemGenerated = 'true';
@@ -1169,16 +1179,28 @@ class ModalManagerV2 {
                         throw createError;
                     }
                 } else {
-                    console.error(`❌ [ModalManagerV2] Modal ${modalId} not found and no configuration available`);
-                    console.error(`   Checked: window.${modalId}Config, window.${modalId.replace('Modal', '')}ModalConfig`);
-                    console.error(`   Available window properties:`, Object.keys(window).filter(k => k.includes('Modal') || k.includes('Config')));
-                    if (window.showErrorNotification) {
-                        window.showErrorNotification('שגיאה', `מודל ${modalId} לא נמצא. אנא רענן את הדף.`);
+                    // בדיקה אם המודל קיים ב-DOM (מודל דינמי שנוצר ב-runtime)
+                    const dynamicModal = document.getElementById(modalId);
+                    if (dynamicModal) {
+                        console.log(`✅ [ModalManagerV2] Found dynamic modal in DOM: ${modalId}`);
+                        // רישום המודל הדינמי במפה (ללא config)
+                        this.modals.set(modalId, {
+                            element: dynamicModal,
+                            config: null,
+                            isActive: false,
+                            isDynamic: true
+                        });
+                    } else {
+                        console.error(`❌ [ModalManagerV2] Modal ${modalId} not found and no configuration available`);
+                        console.error(`   Checked: window.${modalId}Config, window.${modalId.replace('Modal', '')}ModalConfig`);
+                        if (window.showErrorNotification) {
+                            window.showErrorNotification('שגיאה', `מודל ${modalId} לא נמצא. אנא רענן את הדף.`);
+                        }
+                        throw new Error(`Modal ${modalId} not found and could not be created - no configuration found`);
                     }
-                    throw new Error(`Modal ${modalId} not found and could not be created - no configuration found`);
                 }
                 
-                // בדיקה שוב שהמודל נוצר
+                // בדיקה שוב שהמודל נוצר או נמצא
                 if (!this.modals.has(modalId)) {
                     console.error(`❌ Modal ${modalId} still not found after creation attempt`);
                     throw new Error(`Modal ${modalId} could not be created`);
@@ -1197,8 +1219,25 @@ class ModalManagerV2 {
                 throw new Error(`Modal ${modalId} element not found`);
             }
             
-            console.log(`✅ [ModalManagerV2] Modal found, proceeding to show:`, { modalId, mode });
+            console.log(`✅ [ModalManagerV2] Modal found, proceeding to show:`, { modalId, mode, isDynamic: modalInfo.isDynamic });
             
+            // אם זה מודל דינמי (ללא config), נשתמש בטיפול מינימלי
+            if (modalInfo.isDynamic) {
+                // למודלים דינמיים - פשוט פתיחה דרך Bootstrap
+                if (!bootstrap || !bootstrap.Modal) {
+                    throw new Error('Bootstrap Modal not available for dynamic modal');
+                }
+                const modal = new bootstrap.Modal(modalElement, {
+                    backdrop: false,
+                    keyboard: true
+                });
+                modal.show();
+                modalInfo.isActive = true;
+                this.activeModal = modalId;
+                return;
+            }
+            
+            // למודלים רגילים עם config - טיפול מלא
             // עדכון כותרת לפי מצב
             this.updateModalTitle(modalElement, modalInfo.config, mode);
             
@@ -1240,7 +1279,8 @@ class ModalManagerV2 {
             
             // מילוי selects (חייב להיות לפני populateForm)
             // Note: populateSelects already handles defaultFromPreferences
-            await this.populateSelects(modalElement, modalInfo.config);
+            // Pass mode to ensure defaultFromPreferences is false in edit mode
+            await this.populateSelects(modalElement, modalInfo.config, mode);
             
             
             if (modalId === 'cashFlowModal' && typeof window.initializeExternalIdFields === 'function') {
@@ -2068,23 +2108,30 @@ class ModalManagerV2 {
                 modalElement.addEventListener('shown.bs.modal', initializeRichTextEditorsHandler, { once: true });
             }
             
-            const navigationMetadata = {
-                modalId,
-                modalType: 'crud-modal',
-                entityType: modalInfo.config.entityType,
-                entityId: mode === 'edit' && entityData ? entityData.id : null,
-                title: modalElement.querySelector(`#${modalId}Label`)?.textContent || modalInfo.config.title[mode] || '',
-                mode
-            };
+            // Modal Navigation System - רק למודלים מקוננים (nested modals)
+            // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
+            const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
+            
+            if (hasStack) {
+                const navigationMetadata = {
+                    modalId,
+                    modalType: 'crud-modal',
+                    entityType: modalInfo.config.entityType,
+                    entityId: mode === 'edit' && entityData ? entityData.id : null,
+                    title: modalElement.querySelector(`#${modalId}Label`)?.textContent || modalInfo.config.title[mode] || '',
+                    mode
+                };
 
-            if (window.ModalNavigationService?.registerModalOpen) {
-                await window.ModalNavigationService.registerModalOpen(modalElement, navigationMetadata);
-            } else if (window.pushModalToNavigation) {
-                await window.pushModalToNavigation(modalElement, navigationMetadata);
-            }
+                if (window.ModalNavigationService?.registerModalOpen) {
+                    await window.ModalNavigationService.registerModalOpen(modalElement, navigationMetadata);
+                } else if (window.pushModalToNavigation) {
+                    await window.pushModalToNavigation(modalElement, navigationMetadata);
+                }
 
-            if (window.modalNavigationManager?.updateModalNavigation) {
-                window.modalNavigationManager.updateModalNavigation(modalElement);
+                // עדכון UI (breadcrumb וכפתור חזרה) רק במודלים מקוננים
+                if (window.modalNavigationManager?.updateModalNavigation) {
+                    window.modalNavigationManager.updateModalNavigation(modalElement);
+                }
             }
             
             // Apply remaining defaults after modal shows (date, source, etc.)
@@ -2269,7 +2316,12 @@ class ModalManagerV2 {
                                 : alertRelatedObjectField.value || (formDataForAlerts && formDataForAlerts.related_id) || null;
                             await this.populateAlertRelatedObjects(form, relatedTypeId, normalizedSelectedId);
                             if (normalizedSelectedId) {
-                                alertRelatedObjectField.value = normalizedSelectedId;
+                                // Use DataCollectionService to set value if available
+                                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                                  window.DataCollectionService.setValue(alertRelatedObjectField.id, normalizedSelectedId, 'int');
+                                } else {
+                                  alertRelatedObjectField.value = normalizedSelectedId;
+                                }
                             }
                             await this.updateAlertTickerDisplay(form, null);
                             this.handleAlertLinkedEntityUpdate(null);
@@ -2710,7 +2762,12 @@ class ModalManagerV2 {
             if (input.type === 'checkbox' || input.type === 'radio') {
                 input.checked = false;
             } else {
-                input.value = '';
+                // Use DataCollectionService to clear field if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(input.id, '', 'text');
+                } else {
+                  input.value = '';
+                }
             }
         });
         
@@ -3053,7 +3110,15 @@ class ModalManagerV2 {
                                 // Populate based on field type - explicitly check for cashFlowAccount
                                 // IMPORTANT: Pass the value as defaultValue so it's set correctly during population
                                 // Convert empty string to null for defaultValue (empty string means "no selection")
-                                const defaultValueForSelect = (selectValue === '' || selectValue === null || selectValue === undefined) ? null : selectValue;
+                                // Ensure proper type conversion for numeric IDs
+                                let defaultValueForSelect = null;
+                                if (selectValue !== '' && selectValue !== null && selectValue !== undefined) {
+                                    // Try to parse as integer for ID fields (accounts, trades, etc.)
+                                    const parsed = parseInt(selectValue);
+                                    defaultValueForSelect = (!isNaN(parsed) && parsed.toString() === String(selectValue).trim()) 
+                                        ? parsed 
+                                        : selectValue;
+                                }
                                 
                                 const isTagMultiSelect = field.classList?.contains?.('tag-multi-select');
 
@@ -4281,8 +4346,15 @@ class ModalManagerV2 {
                     // Handle 'today' special value for datetime-local fields
                     if (field.defaultValue !== undefined && field.defaultValue !== null) {
                         if (field.type === 'datetime-local' && field.defaultValue === 'today') {
-                            const today = new Date();
-                            fieldElement.value = today.toISOString().slice(0, 16);
+                            // Use DefaultValueSetter if available
+                            if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDateTime === 'function') {
+                                window.DefaultValueSetter.setCurrentDateTime(fieldElement.id);
+                            } else {
+                                // Fallback if DefaultValueSetter is not available
+                                const today = new Date();
+                                today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+                                fieldElement.value = today.toISOString().slice(0, 16);
+                            }
                         } else {
                             fieldElement.value = field.defaultValue;
                         }
@@ -4325,8 +4397,15 @@ class ModalManagerV2 {
                 
                 // Apply defaultTime if field is date
                 if (field.type === 'date' && field.defaultTime === 'now') {
-                    const today = new Date();
-                    fieldElement.value = today.toISOString().slice(0, 10);
+                    // Use DefaultValueSetter if available
+                    if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+                        window.DefaultValueSetter.setCurrentDate(fieldElement.id);
+                    } else {
+                        // Fallback if DefaultValueSetter is not available
+                        const today = new Date();
+                        today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+                        fieldElement.value = today.toISOString().slice(0, 10);
+                    }
                     console.log(`Applied default date for ${field.id}`);
                     continue;
                 }
@@ -4393,7 +4472,13 @@ class ModalManagerV2 {
         if (expiryInput && !expiryInput.value) {
             const expiryDate = new Date(now);
             expiryDate.setFullYear(expiryDate.getFullYear() + 1);
-            expiryInput.value = expiryDate.toISOString().slice(0, 10);
+            // Use DefaultValueSetter if available
+            if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+                window.DefaultValueSetter.setCurrentDate(expiryInput.id);
+            } else {
+                // Fallback if DefaultValueSetter is not available
+                expiryInput.value = expiryDate.toISOString().slice(0, 10);
+            }
         }
     }
 
@@ -5204,9 +5289,10 @@ class ModalManagerV2 {
      * 
      * @param {HTMLElement} modalElement - אלמנט המודל
      * @param {Object} config - קונפיגורציה של המודל
+     * @param {string} mode - מצב המודל (add, edit, view) - משפיע על defaultFromPreferences
      * @private
      */
-    async populateSelects(modalElement, config) {
+    async populateSelects(modalElement, config, mode = 'add') {
         // Check dependencies with validation
         const deps = this._checkDependencies();
         
@@ -5265,7 +5351,7 @@ class ModalManagerV2 {
                     }
                     
                     const { fieldConfig } = result;
-                    await this._populateSingleSelect(select, selectId, fieldConfig, config);
+                    await this._populateSingleSelect(select, selectId, fieldConfig, config, mode);
                 }
             }
         } else {
@@ -5286,7 +5372,7 @@ class ModalManagerV2 {
                 }
                 
                 const { fieldConfig } = result;
-                await this._populateSingleSelect(select, selectId, fieldConfig, config);
+                await this._populateSingleSelect(select, selectId, fieldConfig, config, mode);
             }
         }
     }
@@ -5294,11 +5380,19 @@ class ModalManagerV2 {
     /**
      * Populate a single select field
      * @private
+     * @param {HTMLElement} select - אלמנט ה-select
+     * @param {string} selectId - מזהה ה-select
+     * @param {Object} fieldConfig - קונפיגורציה של השדה
+     * @param {Object} config - קונפיגורציה של המודל
+     * @param {string} mode - מצב המודל (add, edit, view) - משפיע על defaultFromPreferences
      */
-    async _populateSingleSelect(select, selectId, fieldConfig, config) {
+    async _populateSingleSelect(select, selectId, fieldConfig, config, mode = 'add') {
         // Check if this field has defaultFromPreferences in config
+        // CRITICAL: In edit mode, never use defaultFromPreferences - always use the existing value
         let shouldUseDefaultFromPrefs = false;
-        if (fieldConfig && fieldConfig.defaultFromPreferences) {
+        if (mode === 'edit') {
+            shouldUseDefaultFromPrefs = false; // Never use preferences in edit mode
+        } else if (fieldConfig && fieldConfig.defaultFromPreferences) {
             shouldUseDefaultFromPrefs = true;
         }
         
@@ -6169,25 +6263,8 @@ class ModalManagerV2 {
         }
 
         if (modalId === 'cashFlowModal') {
-            const form = modalElement.querySelector('#cashFlowModalForm');
-            const mode = form?.dataset?.mode || modalElement.dataset?.mode || 'add';
-
-            if (mode !== 'edit') {
-                if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
-                    window.DefaultValueSetter.setCurrentDate('cashFlowDate');
-                    window.DefaultValueSetter.setCurrentDate('currencyExchangeDate');
-                } else {
-                    const addDateField = document.getElementById('cashFlowDate');
-                    const exchangeDateField = document.getElementById('currencyExchangeDate');
-                    const today = new Date().toISOString().slice(0, 10);
-                    if (addDateField && !addDateField.value) {
-                        addDateField.value = today;
-                    }
-                    if (exchangeDateField && !exchangeDateField.value) {
-                        exchangeDateField.value = today;
-                    }
-                }
-            }
+            // Date fields are now handled by applyRemainingDefaults which processes defaultTime: 'now'
+            // This handler only needs to manage account-currency relationship
             
             // Handle account selection - update currency to account's primary currency
             const accountSelects = [
@@ -7461,9 +7538,9 @@ if (typeof window.showModalSafe === 'undefined') {
             }
         }
     };
-    console.log('✅ [showModalSafe] Helper function created');
+    // Helper function created
 } else {
-    console.log('✅ [showModalSafe] Helper function already exists - skipping duplicate definition');
+    // Helper function already exists - skipping duplicate definition
 }
 
 // אתחול אוטומטי כאשר הדף נטען

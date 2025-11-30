@@ -18,43 +18,63 @@ class SMExternalDataSection extends SMBaseSection {
   }
 
   async ensureDashboard() {
-    if (!window.externalDataDashboard) {
-      if (typeof window.ExternalDataDashboard !== 'function') {
-        throw new Error('ExternalDataDashboard is not available');
+    // Try to get existing dashboard instance
+    if (window.externalDataDashboard) {
+      if (!window.externalDataDashboard.isInitialized) {
+        await window.externalDataDashboard.init();
       }
+      return window.externalDataDashboard;
+    }
+    
+    // Try to create new instance if class is available
+    if (typeof window.ExternalDataDashboard === 'function') {
       window.externalDataDashboard = new window.ExternalDataDashboard();
+      if (!window.externalDataDashboard.isInitialized) {
+        await window.externalDataDashboard.init();
+      }
+      return window.externalDataDashboard;
     }
-
-    if (!window.externalDataDashboard.isInitialized) {
-      await window.externalDataDashboard.init();
-    }
-
-    return window.externalDataDashboard;
+    
+    // If dashboard is not available, return null and handle gracefully
+    console.warn('⚠️ ExternalDataDashboard is not available - section will show limited data');
+    return null;
   }
 
   async loadData() {
-    const dashboard = await this.ensureDashboard();
+    try {
+      const dashboard = await this.ensureDashboard();
+      
+      // If dashboard is not available, show empty state
+      if (!dashboard) {
+        this.showEmptyState('External Data Dashboard לא זמין - נא לטעון את העמוד מחדש');
+        return;
+      }
 
-    if (this.hasFetchedOnce) {
-      await Promise.allSettled([
-        dashboard.loadSystemStatus(),
-        dashboard.loadCacheStats(),
-        dashboard.loadProviders(),
-        dashboard.loadLogs()
-      ]);
-    } else {
-      this.hasFetchedOnce = true;
+      if (this.hasFetchedOnce) {
+        await Promise.allSettled([
+          dashboard.loadSystemStatus(),
+          dashboard.loadCacheStats(),
+          dashboard.loadProviders(),
+          dashboard.loadLogs()
+        ]);
+      } else {
+        this.hasFetchedOnce = true;
+      }
+
+      const data = {
+        status: dashboard.statusData || null,
+        cache: dashboard.cacheStats?.data || dashboard.cacheStats || null,
+        providers: Array.isArray(dashboard.providers) ? dashboard.providers : [],
+        logs: Array.isArray(dashboard.logs) ? dashboard.logs : []
+      };
+
+      this.lastData = data;
+      this.render(data);
+    } catch (error) {
+      console.error('❌ Failed to load external data:', error);
+      this.showEmptyState('שגיאה בטעינת נתוני External Data');
+      throw error;
     }
-
-    const data = {
-      status: dashboard.statusData || null,
-      cache: dashboard.cacheStats?.data || dashboard.cacheStats || null,
-      providers: Array.isArray(dashboard.providers) ? dashboard.providers : [],
-      logs: Array.isArray(dashboard.logs) ? dashboard.logs : []
-    };
-
-    this.lastData = data;
-    this.render(data);
   }
 
   ensureLayout() {
@@ -68,7 +88,11 @@ class SMExternalDataSection extends SMBaseSection {
         <div class="card-body">
           <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
             <h3 class="mb-0">מערכת נתונים חיצוניים</h3>
-            <div class="d-flex flex-wrap gap-2" id="smExtActions">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+              <a href="/external-data-dashboard" class="btn btn-sm btn-outline-primary me-2">
+                <i class="fas fa-external-link-alt me-1"></i> דשבורד מלא
+              </a>
+              <div id="smExtActions">
               <button data-button-type="REFRESH" data-text="רענון סטטוס" data-onclick="ExternalDataDashboardActions.refreshStatus(event)" data-refresh-after-action="true"></button>
               <button data-button-type="REFRESH" data-text="רענון ספקים" data-onclick="ExternalDataDashboardActions.refreshProviders(event)" data-refresh-after-action="true"></button>
               <button data-button-type="PLAY" data-text="רענון מלא" data-onclick="ExternalDataDashboardActions.refreshAllExternalData(event)" data-refresh-after-action="true"></button>
@@ -76,6 +100,7 @@ class SMExternalDataSection extends SMBaseSection {
               <button data-button-type="MENU" data-text="אופטימיזציה" data-onclick="ExternalDataDashboardActions.optimizeExternalCache(event)" data-refresh-after-action="true"></button>
               <button data-button-type="REFRESH" data-text="רענון לוגים" data-onclick="ExternalDataDashboardActions.refreshLogs(event)" data-size="small" data-refresh-after-action="true"></button>
               <button data-button-type="COPY" data-text="העתקת לוג" data-onclick="ExternalDataDashboardActions.copyDetailedLog(event)"></button>
+              </div>
             </div>
           </div>
 

@@ -1446,7 +1446,7 @@ class HeaderSystem {
                 </div>
               </a>
               <button class="auth-toggle-btn" id="filterAuthToggleBtn" 
-                      onclick="if(window.TikTrackAuth?.isAuthenticated && window.TikTrackAuth?.isAuthenticated()) { if(window.TikTrackAuth?.logout) { window.TikTrackAuth.logout(); } else if(window.logout) { window.logout(); } } else { window.location.href='/login.html'; }"
+                      onclick="handleHeaderLogout(event)"
                       style="width: 36px; height: 36px; border: none; background: transparent; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;"
                       title="התחבר/התנתק">
                 <img src="${imagePathPrefix}images/icons/tabler/user.svg" alt="התחבר/התנתק" style="width: 24px; height: 24px; opacity: 0.7;" id="filterAuthIcon">
@@ -1793,6 +1793,30 @@ if (typeof window.addEventListener === 'function') {
     }, 500);
   }
 }
+
+// ===== Global Logout Handler =====
+window.handleHeaderLogout = function(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  // Check if user is authenticated
+  const isAuth = window.TikTrackAuth?.isAuthenticated?.() || false;
+  
+  if (isAuth) {
+    // User is authenticated - perform logout
+    if (window.TikTrackAuth?.logout) {
+      window.TikTrackAuth.logout();
+    } else {
+      // Fallback if TikTrackAuth not available
+      window.location.href = '/login.html';
+    }
+  } else {
+    // User is not authenticated - redirect to login
+    window.location.href = '/login.html';
+  }
+};
 
 window.clearAllFilters = function() {
   window.Logger?.info?.('🧹 clearAllFilters - מוחק את כל הפילטרים', { page: 'header-system' });

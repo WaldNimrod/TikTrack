@@ -200,13 +200,58 @@ async function logout() {
   localStorage.removeItem('authToken');
   localStorage.removeItem('currentUser');
 
-  // Redirect to login page
-  window.location.href = 'login.html';
-  
+  // Clear all cache layers
+  try {
+    // Clear Unified Cache
+    if (window.UnifiedCacheManager?.clearAll) {
+      await window.UnifiedCacheManager.clearAll();
+    }
+    // Clear dashboard data cache
+    if (window.UnifiedCacheManager?.clearByPattern) {
+      await window.UnifiedCacheManager.clearByPattern('dashboard-data');
+    }
+    // Clear CacheSyncManager
+    if (window.CacheSyncManager?.clearAll) {
+      await window.CacheSyncManager.clearAll();
+    }
+    // Clear IndexedDB if available
+    if (window.indexedDB && window.indexedDB.databases) {
+      const databases = await window.indexedDB.databases();
+      for (const db of databases) {
+        if (db.name && db.name.includes('TikTrack')) {
+          const deleteReq = window.indexedDB.deleteDatabase(db.name);
+          deleteReq.onsuccess = () => console.log(`Cleared IndexedDB: ${db.name}`);
+        }
+      }
+    }
+  } catch (error) {
+    console.warn('Error clearing cache during logout:', error);
+  }
+
+  // Update header display before redirect
+  if (window.headerSystem?.updateUserDisplay) {
+    window.headerSystem.updateUserDisplay();
+  }
+
+  // Dispatch logout event
+  window.dispatchEvent(new CustomEvent('logout:success'));
+  window.dispatchEvent(new CustomEvent('user:logged-out'));
+
   // הפעלת פונקציה גלובלית להתנתקות אם קיימת
   if (typeof onLogout === 'function') {
     onLogout();
   }
+
+  // Clear dashboard data state if exists
+  if (window.dashboardDataState) {
+    window.dashboardDataState.data = { trades: [], alerts: [], accounts: [], cashFlows: [] };
+    window.dashboardDataState.lastLoadedAt = null;
+  }
+
+  // Small delay to allow UI updates, then redirect
+  setTimeout(() => {
+    window.location.href = 'login.html';
+  }, 100);
 }
 
 function isAuthenticated() {

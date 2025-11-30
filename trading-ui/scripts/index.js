@@ -312,12 +312,49 @@ function updateSummaryStats(data, currencySymbol) {
 }
 
 /**
+ * Update unified recent items widget (trades and trade plans)
+ * @param {Array} [trades=[]] - Array of trades
+ * @param {Array} [tradePlans=[]] - Array of trade plans
+ * @param {string} currencySymbol - Currency symbol
+ * @returns {void}
+ */
+function updateRecentItemsWidget(trades = [], tradePlans = [], currencySymbol) {
+    if (window.RecentItemsWidget?.render) {
+        window.Logger?.info?.('📊 Updating RecentItemsWidget', { 
+            tradesCount: Array.isArray(trades) ? trades.length : 0,
+            tradePlansCount: Array.isArray(tradePlans) ? tradePlans.length : 0,
+            currencySymbol,
+            page: 'index'
+        });
+        window.RecentItemsWidget.render({
+            trades: Array.isArray(trades) ? trades : [],
+            tradePlans: Array.isArray(tradePlans) ? tradePlans : [],
+            currencySymbol: currencySymbol || '$'
+        });
+        return;
+    }
+    
+    window.Logger?.warn?.('⚠️ RecentItemsWidget not available, falling back to separate widgets', { page: 'index' });
+    // Fallback to separate widgets if unified widget not available
+    updateRecentTrades(trades, currencySymbol);
+    if (tradePlans && tradePlans.length > 0) {
+        updateRecentTradePlans(tradePlans, currencySymbol);
+    }
+}
+
+/**
  * Update recent trade plans section
  * @param {Array} [tradePlans=[]] - Array of trade plans
  * @param {string} currencySymbol - Currency symbol
  * @returns {void}
  */
 function updateRecentTradePlans(tradePlans = [], currencySymbol) {
+    // Unified widget is updated via updateRecentItemsWidget or loadRecentTradePlans
+    // This function is kept for backward compatibility
+    if (window.RecentItemsWidget?.render) {
+        return; // Will be handled by unified widget
+    }
+    
     if (window.RecentTradePlansWidget?.render) {
         window.RecentTradePlansWidget.render(tradePlans, currencySymbol);
         return;
@@ -414,6 +451,13 @@ function updateRecentTradePlans(tradePlans = [], currencySymbol) {
  * @returns {void}
  */
 function updateRecentTrades(trades = [], currencySymbol) {
+    // Try unified widget first - but we need trade plans too, so call updateRecentItemsWidget instead
+    // This function is kept for backward compatibility
+    if (window.RecentItemsWidget?.render) {
+        // Will be updated via updateRecentItemsWidget
+        return;
+    }
+    
     if (window.RecentTradesWidget?.render) {
         window.RecentTradesWidget.render(trades, currencySymbol);
         return;
@@ -721,6 +765,13 @@ function handleDashboardError(error) {
  * @returns {void}
  */
 function processDashboardData(data, source = 'network') {
+    // Check authentication before processing data
+    const isAuth = window.TikTrackAuth?.isAuthenticated?.() || false;
+    if (!isAuth) {
+        // User is not authenticated - clear all displayed data
+        data = { trades: [], alerts: [], accounts: [], cashFlows: [] };
+    }
+    
     if (!data) {
         return;
     }
@@ -762,13 +813,15 @@ function processDashboardData(data, source = 'network') {
     const currencySymbol = determineCurrencySymbol(accounts, trades);
 
     updateSummaryStats({ trades, alerts, accounts, cashFlows }, currencySymbol);
-    updateRecentTrades(trades, currencySymbol);
     updateActiveAlerts(alerts);
     updateDashboardCount({ trades, alerts, accounts });
     updatePortfolioSummary({ accounts, trades, cashFlows }, currencySymbol);
     
-    // Load and update recent trade plans
-    loadRecentTradePlans(currencySymbol).catch((error) => {
+    // Update unified recent items widget with trades (trade plans will be loaded separately)
+    updateRecentItemsWidget(trades, [], currencySymbol);
+    
+    // Load and update recent trade plans (will update unified widget with both trades and plans)
+    loadRecentTradePlans(currencySymbol, trades).catch((error) => {
         window.Logger?.warn?.('⚠️ Failed to load recent trade plans', { error: error?.message }, { page: 'index' });
     });
 
@@ -781,33 +834,54 @@ function processDashboardData(data, source = 'network') {
 /**
  * Load and update recent trade plans
  * @param {string} currencySymbol - Currency symbol
+ * @param {Array} [currentTrades=[]] - Current trades array for unified widget
  * @returns {Promise<void>}
  */
-async function loadRecentTradePlans(currencySymbol) {
+async function loadRecentTradePlans(currencySymbol, currentTrades = []) {
     try {
+        let tradePlans = [];
+        
         // Try to use trade plans data service if available
         if (window.TradePlansDataService?.loadTradePlansData) {
-            const tradePlans = await window.TradePlansDataService.loadTradePlansData({ force: false });
-            if (Array.isArray(tradePlans)) {
-                updateRecentTradePlans(tradePlans, currencySymbol);
-                return;
+            tradePlans = await window.TradePlansDataService.loadTradePlansData({ force: false });
+            if (!Array.isArray(tradePlans)) {
+                tradePlans = [];
             }
+        } else {
+            // Fallback: fetch directly from API
+            const response = await fetch('/api/trade-plans/', { headers: { Accept: 'application/json' } });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const payload = await response.json();
+            tradePlans = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
         }
         
-        // Fallback: fetch directly from API
-        const response = await fetch('/api/trade-plans/', { headers: { Accept: 'application/json' } });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        // Update unified widget if available
+        if (window.RecentItemsWidget?.render) {
+            // Update only trade plans (widget will preserve existing trades)
+            window.RecentItemsWidget.render({
+                tradePlans: tradePlans,
+                currencySymbol: currencySymbol
+            });
+            window.Logger?.info?.('📊 Updated RecentItemsWidget with trade plans', {
+                tradePlansCount: tradePlans.length,
+                page: 'index'
+            });
+        } else {
+            // Fallback to separate widget
+            updateRecentTradePlans(tradePlans, currencySymbol);
         }
-        const payload = await response.json();
-        const tradePlans = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
-        updateRecentTradePlans(tradePlans, currencySymbol);
     } catch (error) {
         window.Logger?.warn?.('⚠️ Failed to load trade plans for recent widget', { error: error?.message }, { page: 'index' });
-        // Set empty state
-        const container = document.getElementById('recentTradePlans');
-        if (container) {
-            container.innerHTML = '<div class="text-muted small">אין תוכניות זמינות</div>';
+        // Update unified widget with empty trade plans if available
+        if (window.RecentItemsWidget?.render) {
+            updateRecentItemsWidget(currentTrades, [], currencySymbol);
+        } else {
+            const container = document.getElementById('recentTradePlans');
+            if (container) {
+                container.innerHTML = '<div class="text-muted small">אין תוכניות זמינות</div>';
+            }
         }
     }
 }
@@ -910,6 +984,19 @@ async function loadDashboardDataFromService(options = {}) {
 
 window.loadDashboardData = async function(options = {}) {
     const { force = false, ttl = DASHBOARD_DATA_TTL } = options;
+
+    // Check authentication before loading data
+    const isAuth = window.TikTrackAuth?.isAuthenticated?.() || false;
+    if (!isAuth) {
+        // User is not authenticated - clear dashboard data and return empty
+        if (window.dashboardDataState) {
+            window.dashboardDataState.data = { trades: [], alerts: [], accounts: [], cashFlows: [] };
+            window.dashboardDataState.lastLoadedAt = null;
+        }
+        // Clear displayed data
+        processDashboardData({ trades: [], alerts: [], accounts: [], cashFlows: [] }, 'network');
+        return { trades: [], alerts: [], accounts: [], cashFlows: [] };
+    }
 
     if (!force && dashboardDataPromise) {
         return dashboardDataPromise;

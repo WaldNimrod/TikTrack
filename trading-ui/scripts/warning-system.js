@@ -233,19 +233,63 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
   // הצגת המודל דרך ModalManagerV2 או Bootstrap fallback
   try {
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-      window.ModalManagerV2.showModal(modalId, 'view').catch(error => {
+      // ניקוי backdrops לפני פתיחה
+      if (window.ModalManagerV2._cleanupBootstrapBackdrops) {
+        window.ModalManagerV2._cleanupBootstrapBackdrops();
+      }
+      
+      window.ModalManagerV2.showModal(modalId, 'view').then(() => {
+        // עדכון z-index דרך ModalZIndexManager
+        if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+          requestAnimationFrame(() => {
+            window.ModalZIndexManager.forceUpdate(modal);
+          });
+        }
+      }).catch(error => {
         window.Logger?.error('Error showing confirmation modal via ModalManagerV2', { error, modalId, page: 'warning-system' });
         // Fallback to Bootstrap
         if (bootstrap?.Modal) {
-          const bootstrapModal = new bootstrap.Modal(modal);
+          // ניקוי backdrops לפני פתיחה
+          if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+            window.ModalManagerV2._cleanupBootstrapBackdrops();
+          }
+          const bootstrapModal = new bootstrap.Modal(modal, { backdrop: false });
           bootstrapModal.show();
+          // ניקוי backdrops אחרי פתיחה
+          if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+            setTimeout(() => {
+              window.ModalManagerV2._cleanupBootstrapBackdrops();
+            }, 50);
+          }
+          // עדכון z-index
+          if (window.ModalZIndexManager?.forceUpdate) {
+            setTimeout(() => {
+              window.ModalZIndexManager.forceUpdate(modal);
+            }, 50);
+          }
         } else {
           throw error;
         }
       });
     } else if (bootstrap?.Modal) {
-      const bootstrapModal = new bootstrap.Modal(modal);
+      // ניקוי backdrops לפני פתיחה
+      if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+        window.ModalManagerV2._cleanupBootstrapBackdrops();
+      }
+      const bootstrapModal = new bootstrap.Modal(modal, { backdrop: false });
       bootstrapModal.show();
+      // ניקוי backdrops אחרי פתיחה
+      if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+        setTimeout(() => {
+          window.ModalManagerV2._cleanupBootstrapBackdrops();
+        }, 50);
+      }
+      // עדכון z-index
+      if (window.ModalZIndexManager?.forceUpdate) {
+        setTimeout(() => {
+          window.ModalZIndexManager.forceUpdate(modal);
+        }, 50);
+      }
     } else {
       throw new Error('Bootstrap Modal not available');
     }

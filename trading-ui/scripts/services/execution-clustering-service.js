@@ -122,15 +122,25 @@
    * @returns {Array|null} - Cached clusters or null
    */
   async function getCachedClusters() {
+    // Always return a promise for consistency
     if (cachedClusters) {
+      window.Logger?.debug?.('📦 Returning clusters from memory cache', { 
+        ...PAGE_LOG_CONTEXT, 
+        count: cachedClusters.length 
+      });
       return cachedClusters;
     }
 
     if (typeof window.UnifiedCacheManager?.get === 'function') {
       try {
+        window.Logger?.debug?.('📦 Loading clusters from UnifiedCacheManager', PAGE_LOG_CONTEXT);
         const cached = await window.UnifiedCacheManager.get(CLUSTERS_CACHE_KEY);
         if (cached && Array.isArray(cached)) {
           cachedClusters = cached;
+          window.Logger?.debug?.('📦 Clusters loaded from UnifiedCacheManager', { 
+            ...PAGE_LOG_CONTEXT, 
+            count: cached.length 
+          });
           return cached;
         }
       } catch (error) {
@@ -138,7 +148,8 @@
       }
     }
 
-    return null;
+    window.Logger?.debug?.('📦 No cached clusters found', PAGE_LOG_CONTEXT);
+    return [];
   }
 
   /**

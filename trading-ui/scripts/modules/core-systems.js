@@ -3014,7 +3014,9 @@ function showFinalSuccessModal(successInfo) {
     : [];
   closeButtons.forEach(button => {
     button.addEventListener('click', () => {
-      if (modalInstance) {
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal('finalSuccessModal');
+      } else if (modalInstance) {
         modalInstance.hide();
       }
     });
@@ -3180,7 +3182,9 @@ function showFinalSuccessModalWithReload(successInfo) {
     : [];
   closeButtons.forEach(button => {
     button.addEventListener('click', () => {
-      if (modalInstance) {
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal('finalSuccessModalWithReload');
+      } else if (modalInstance) {
         modalInstance.hide();
       }
     });
@@ -3193,9 +3197,13 @@ function showFinalSuccessModalWithReload(successInfo) {
       console.log('🔄 User requested reload after cache clearing');
 
       // Close modal first
-      const modalInstance = bootstrap.Modal.getInstance(modal);
-      if (modalInstance) {
-        modalInstance.hide();
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal('finalSuccessModalWithReload');
+      } else {
+        const modalInstance = bootstrap?.Modal?.getInstance(modalElement);
+        if (modalInstance) {
+          modalInstance.hide();
+        }
       }
 
       // Wait a moment for modal to close, then reload
@@ -3305,11 +3313,68 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
   // Get modal element
   const modal = document.getElementById(modalId);
 
-  // Show modal using simple system (no Bootstrap dependency)
-  modal.style.display = 'block';
-  modal.classList.add('show');
-
-  // Backdrop handled by Bootstrap
+  // Show modal using ModalManagerV2 (with proper z-index and backdrop management)
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    // ניקוי backdrops לפני פתיחה
+    if (window.ModalManagerV2._cleanupBootstrapBackdrops) {
+      window.ModalManagerV2._cleanupBootstrapBackdrops();
+    }
+    
+    window.ModalManagerV2.showModal(modalId, 'view').then(() => {
+      // עדכון z-index דרך ModalZIndexManager
+      if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+        requestAnimationFrame(() => {
+          window.ModalZIndexManager.forceUpdate(modal);
+        });
+      }
+    }).catch(error => {
+      window.Logger?.error('Error showing critical error modal via ModalManagerV2', { error, modalId, page: 'core-systems' });
+      // Fallback to Bootstrap
+      if (bootstrap?.Modal) {
+        // ניקוי backdrops לפני פתיחה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          window.ModalManagerV2._cleanupBootstrapBackdrops();
+        }
+        const bootstrapModal = new bootstrap.Modal(modal, { backdrop: false });
+        bootstrapModal.show();
+        // ניקוי backdrops אחרי פתיחה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          setTimeout(() => {
+            window.ModalManagerV2._cleanupBootstrapBackdrops();
+          }, 50);
+        }
+        // עדכון z-index
+        if (window.ModalZIndexManager?.forceUpdate) {
+          setTimeout(() => {
+            window.ModalZIndexManager.forceUpdate(modal);
+          }, 50);
+        }
+      }
+    });
+  } else if (bootstrap?.Modal) {
+    // ניקוי backdrops לפני פתיחה
+    if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+      window.ModalManagerV2._cleanupBootstrapBackdrops();
+    }
+    const bootstrapModal = new bootstrap.Modal(modal, { backdrop: false });
+    bootstrapModal.show();
+    // ניקוי backdrops אחרי פתיחה
+    if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+      setTimeout(() => {
+        window.ModalManagerV2._cleanupBootstrapBackdrops();
+      }, 50);
+    }
+    // עדכון z-index
+    if (window.ModalZIndexManager?.forceUpdate) {
+      setTimeout(() => {
+        window.ModalZIndexManager.forceUpdate(modal);
+      }, 50);
+    }
+  } else {
+    // Fallback: Show modal using simple system (no Bootstrap dependency)
+    modal.style.display = 'block';
+    modal.classList.add('show');
+  }
 
   // Copy button in header
   const copyButton = modal.querySelector(`#${modalId}-copy-btn`);
@@ -3485,21 +3550,95 @@ async function showDetailsModal(title, content, options = {}) {
     detailsContent.innerHTML = content;
   }
 
-  // Show modal using simple system (no Bootstrap dependency)
-  modal.style.display = 'block';
-  modal.classList.add('show');
-  document.body.classList.add('modal-open');
-
-  // Create backdrop
-  const backdrop = document.createElement('div');
-  backdrop.className = 'modal-backdrop fade show';
-  backdrop.id = `${modalId}-backdrop`;
-  document.body.appendChild(backdrop);
+  // Show modal using ModalManagerV2 (with proper z-index and backdrop management)
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    // ניקוי backdrops לפני פתיחה
+    if (window.ModalManagerV2._cleanupBootstrapBackdrops) {
+      window.ModalManagerV2._cleanupBootstrapBackdrops();
+    }
+    
+    window.ModalManagerV2.showModal(modalId, 'view').then(() => {
+      // עדכון z-index דרך ModalZIndexManager
+      if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+        requestAnimationFrame(() => {
+          window.ModalZIndexManager.forceUpdate(modal);
+        });
+      }
+    }).catch(error => {
+      window.Logger?.error('Error showing details modal via ModalManagerV2', { error, modalId, page: 'core-systems' });
+      // Fallback to Bootstrap
+      if (bootstrap?.Modal) {
+        // ניקוי backdrops לפני פתיחה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          window.ModalManagerV2._cleanupBootstrapBackdrops();
+        }
+        const bootstrapModal = new bootstrap.Modal(modal, { backdrop: false });
+        bootstrapModal.show();
+        // ניקוי backdrops אחרי פתיחה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          setTimeout(() => {
+            window.ModalManagerV2._cleanupBootstrapBackdrops();
+          }, 50);
+        }
+        // עדכון z-index
+        if (window.ModalZIndexManager?.forceUpdate) {
+          setTimeout(() => {
+            window.ModalZIndexManager.forceUpdate(modal);
+          }, 50);
+        }
+      } else {
+        // Fallback: Show modal using simple system (no Bootstrap dependency)
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        // Create backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        backdrop.id = `${modalId}-backdrop`;
+        document.body.appendChild(backdrop);
+      }
+    });
+  } else if (bootstrap?.Modal) {
+    // ניקוי backdrops לפני פתיחה
+    if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+      window.ModalManagerV2._cleanupBootstrapBackdrops();
+    }
+    const bootstrapModal = new bootstrap.Modal(modal, { backdrop: false });
+    bootstrapModal.show();
+    // ניקוי backdrops אחרי פתיחה
+    if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+      setTimeout(() => {
+        window.ModalManagerV2._cleanupBootstrapBackdrops();
+      }, 50);
+    }
+    // עדכון z-index
+    if (window.ModalZIndexManager?.forceUpdate) {
+      setTimeout(() => {
+        window.ModalZIndexManager.forceUpdate(modal);
+      }, 50);
+    }
+  } else {
+    // Fallback: Show modal using simple system (no Bootstrap dependency)
+    modal.style.display = 'block';
+    modal.classList.add('show');
+    document.body.classList.add('modal-open');
+    
+    // Create backdrop
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade show';
+    backdrop.id = `${modalId}-backdrop`;
+    document.body.appendChild(backdrop);
+  }
 
   // סגירה בלחיצה על הרקע
   modal.addEventListener('click', e => {
     if (e.target === modal) {
-      hideModal(modalId);
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+      } else {
+        hideModal(modalId);
+      }
     }
   });
 
@@ -3536,7 +3675,11 @@ async function showDetailsModal(title, content, options = {}) {
   const headerCloseButton = modal.querySelector(`#${modalId}-close-btn`);
   if (headerCloseButton) {
     headerCloseButton.addEventListener('click', () => {
-      hideModal(modalId);
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+      } else {
+        hideModal(modalId);
+      }
     });
   }
 
@@ -3544,7 +3687,11 @@ async function showDetailsModal(title, content, options = {}) {
   const footerCloseBtn = modal.querySelector(`#${modalId}-footer-close`);
   if (footerCloseBtn) {
     footerCloseBtn.addEventListener('click', () => {
-      hideModal(modalId);
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+      } else {
+        hideModal(modalId);
+      }
     });
   }
 
@@ -4241,94 +4388,8 @@ window.NotificationSystem = {
   },
 };
 
-// פונקציה להצגת הודעה מפורטת בחלון
-window.showDetailedNotification = async function (
-  title,
-  message,
-  type = 'info',
-  duration = 8000,
-  category = null
-) {
-  try {
-    // יצירת modal עם התוכן המפורט
-    const modalId = `detailed-notification-${Date.now()}`;
-    const modalHtml = `
-      <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header bg-${type === 'error' ? 'danger' : type === 'warning' ? 'warning' : type === 'success' ? 'success' : 'info'} text-white">
-              <h5 class="modal-title" id="${modalId}Label">${title}</h5>
-              ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
-            </div>
-            <div class="modal-body">
-              <div style="white-space: pre-line; font-family: monospace; font-size: 0.9em;">${message}</div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
-              <button type="button" class="btn btn-primary" data-copy-text="${message.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" id="${modalId}-copy-btn">העתק</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Use the unified helper function to create and show modal without ARIA warnings
-    const modal = window.createAndShowModal(modalHtml, modalId);
-    const modalElement = document.getElementById(modalId);
-
-    // הוספת event listener לכפתור העתקה (למניעת בעיות escape)
-    const copyBtn = document.getElementById(`${modalId}-copy-btn`);
-    if (copyBtn) {
-      copyBtn.addEventListener('click', () => {
-        const textToCopy = copyBtn.getAttribute('data-copy-text') || message;
-        if (typeof window.copyToClipboard === 'function') {
-          window.copyToClipboard(textToCopy, title);
-        } else if (typeof copyToClipboard === 'function') {
-          copyToClipboard(textToCopy, title);
-        } else {
-          // Fallback: use navigator.clipboard directly
-          navigator.clipboard.writeText(textToCopy).then(() => {
-            if (typeof window.showSuccessNotification === 'function') {
-              window.showSuccessNotification('התוכן הועתק ללוח', 'העתקה');
-            }
-          }).catch(err => {
-            console.error('Failed to copy:', err);
-          });
-        }
-      });
-    }
-
-    // הסרת ה-modal אחרי סגירה
-    modalElement.addEventListener('hidden.bs.modal', () => {
-      modalElement.remove();
-    });
-
-    // סגירה אוטומטית אחרי הזמן שצוין
-    if (duration > 0) {
-      setTimeout(() => {
-        if (modalElement && document.contains(modalElement)) {
-          modal.hide();
-        }
-      }, duration);
-    }
-
-    return true;
-  } catch (error) {
-    console.error('❌ Error showing detailed notification:', error);
-    // fallback להודעה רגילה
-    return await window.showNotification(message, type, title, duration, category);
-  }
-};
-
-// Export new helper functions to global scope
-window.closeAllDetailsModals = closeAllDetailsModals;
-window.extractTextFromHTML = extractTextFromHTML;
-window.copyToClipboard = copyToClipboard;
-
-// בדיקת פונקציות בסוף טעינת notification-system.js
-// notification-system.js נטען
-// WARNING FUNCTIONS moved to warning-system.js
-// showDeleteWarning, showConfirmationDialog, showValidationWarning now in warning-system.js
+// REMOVED: showDetailedNotification - use window.showDetailedNotification from notification-system.js
+// The function is now defined in notification-system.js and shows corner notifications (not modals!)
 
 // ===== DYNAMIC LOADING GLOBAL FUNCTIONS =====
 

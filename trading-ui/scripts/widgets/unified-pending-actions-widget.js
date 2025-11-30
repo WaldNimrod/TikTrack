@@ -93,13 +93,32 @@
   async function getDataForCombination(combination) {
     try {
       if (combination === 'createTrades') {
-        if (!window.ExecutionClusteringService) return [];
+        if (!window.ExecutionClusteringService) {
+          window.Logger?.warn?.('ExecutionClusteringService not available', { combination, page: 'index' });
+          return [];
+        }
+        window.Logger?.debug?.('Getting cached clusters for createTrades', { page: 'index' });
         const clusters = await window.ExecutionClusteringService.getCachedClusters();
-        if (!clusters || clusters.length === 0) return [];
+        window.Logger?.debug?.('Cached clusters result', { 
+          clustersLength: clusters?.length || 0,
+          clusters: clusters ? 'exists' : 'null',
+          page: 'index' 
+        });
+        if (!clusters || clusters.length === 0) {
+          window.Logger?.debug?.('No clusters found in cache, returning empty array', { page: 'index' });
+          return [];
+        }
         const dismissed = await window.PendingActionsCacheService.getDismissed('trade-creation-clusters');
-        return clusters
+        const filtered = clusters
           .filter(cluster => !dismissed.has(cluster.cluster_id))
           .slice(0, state.config.defaultItemsLimit);
+        window.Logger?.debug?.('Filtered clusters result', { 
+          originalLength: clusters.length,
+          dismissedCount: dismissed.size,
+          filteredLength: filtered.length,
+          page: 'index' 
+        });
+        return filtered;
       }
       
       if (combination === 'assignTrades') {
@@ -190,7 +209,14 @@
     try {
       if (combination === 'createTrades') {
         if (window.ExecutionClusteringService) {
-          await window.ExecutionClusteringService.fetchClusters({ force: true });
+          window.Logger?.info?.('Fetching clusters for createTrades', { page: 'index' });
+          const clusters = await window.ExecutionClusteringService.fetchClusters({ force: true });
+          window.Logger?.info?.('Clusters fetched', { 
+            clustersLength: clusters?.length || 0,
+            page: 'index' 
+          });
+        } else {
+          window.Logger?.warn?.('ExecutionClusteringService not available for createTrades', { page: 'index' });
         }
       } else if (combination === 'assignTrades') {
         if (window.ExecutionAssignmentService) {

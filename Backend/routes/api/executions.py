@@ -302,6 +302,8 @@ def get_pending_assignment_trade_creation_clusters():
     normalizer = None
     try:
         db: Session = g.db
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
         normalizer = _get_date_normalizer()
 
         items_limit = request.args.get('limit', default=None, type=int)
@@ -309,6 +311,7 @@ def get_pending_assignment_trade_creation_clusters():
 
         clusters = ExecutionClusteringService.get_execution_trade_creation_clusters(
             db,
+            user_id=user_id,
             max_items=items_limit,
             limit_executions=executions_limit
         )

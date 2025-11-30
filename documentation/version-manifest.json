@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.3.14.2",
+    "version": "1.3.14.3",
     "major": 1,
     "minor": 3,
     "patch": 14,
-    "build": 2,
-    "commit": "f5a67b43b18ceb797e97959702b509c5aeec2b4c",
-    "updated_at": "2025-11-30T11:40:36+00:00",
-    "notes": "Final updates: ai-analysis-manager, info-summary-system, sm-section-server"
+    "build": 3,
+    "commit": "32f799344a83e17d01be48d4cbb32eb643d91e7d",
+    "updated_at": "2025-11-30T11:41:34+00:00",
+    "notes": "Additional fixes: ai-analysis-manager, info-summary-system, pagination-system"
   },
   "development": {
     "version": "1.3.46.0",

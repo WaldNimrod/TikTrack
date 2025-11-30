@@ -1393,9 +1393,13 @@
             const cacheKey = `ai-analysis-response-${id}`;
             try {
               const cachedData = await window.UnifiedCacheManager.get(cacheKey);
+              const hasCache = !!(cachedData && cachedData.response_text);
+              if (hasCache) {
+                window.Logger?.debug('Found in cache', { page: 'ai-analysis', id, cacheKey });
+              }
               return {
                 id,
-                has_cache: !!(cachedData && cachedData.response_text),
+                has_cache: hasCache,
                 has_note: false,
                 note_id: null
               };

@@ -525,25 +525,19 @@ class PaginationInstance {
      * @private
      */
     async notifyAfterRender(pageData) {
-        console.log(`🔍 [PaginationInstance.notifyAfterRender] Starting for table ${this.config.tableId}`, {
-            tableId: this.config.tableId,
-            hasCallback: typeof this.config.onAfterRender === 'function',
-            callbackType: typeof this.config.onAfterRender,
-            currentPage: this.currentPage,
-            pageDataLength: pageData?.length || 0,
-            totalItems: this.totalItems,
-        });
-        
-        if (typeof this.config.onAfterRender === 'function') {
-            const callbackStr = this.config.onAfterRender.toString().substring(0, 200);
-            console.log(`🔄 [PaginationInstance.notifyAfterRender] Calling onAfterRender for table ${this.config.tableId}`, {
+        // Use Logger.debug instead of console.log to avoid cluttering console
+        if (window.Logger && window.Logger.debug) {
+            window.Logger.debug(`PaginationInstance.notifyAfterRender starting for table ${this.config.tableId}`, {
                 tableId: this.config.tableId,
+                hasCallback: typeof this.config.onAfterRender === 'function',
                 currentPage: this.currentPage,
                 pageDataLength: pageData?.length || 0,
                 totalItems: this.totalItems,
-                callbackName: this.config.onAfterRender.name || 'anonymous',
-                callbackPreview: callbackStr + (this.config.onAfterRender.toString().length > 200 ? '...' : ''),
+                page: 'pagination-system'
             });
+        }
+        
+        if (typeof this.config.onAfterRender === 'function') {
             try {
                 const callbackPayload = {
                     tableId: this.config.tableId,
@@ -558,38 +552,27 @@ class PaginationInstance {
                         filteredItems: this.filteredData.length,
                     },
                 };
-                console.log(`📦 [PaginationInstance.notifyAfterRender] Calling callback with payload:`, {
-                    pageDataLength: callbackPayload.pageData.length,
-                    currentPage: callbackPayload.pagination.currentPage,
-                    totalPages: callbackPayload.pagination.totalPages,
-                });
-                console.log(`🚀 [PaginationInstance.notifyAfterRender] About to call callback function`);
                 const callbackResult = this.config.onAfterRender(callbackPayload);
-                console.log(`📥 [PaginationInstance.notifyAfterRender] Callback returned:`, {
-                    isPromise: callbackResult && typeof callbackResult.then === 'function',
-                    type: typeof callbackResult,
-                });
                 // If the callback returns a Promise, wait for it
                 if (callbackResult && typeof callbackResult.then === 'function') {
-                    console.log(`⏳ [PaginationInstance.notifyAfterRender] Waiting for async callback to complete...`);
                     await callbackResult;
-                    console.log(`✅ [PaginationInstance.notifyAfterRender] onAfterRender completed (async) for table ${this.config.tableId}`);
-                } else {
-                    console.log(`✅ [PaginationInstance.notifyAfterRender] onAfterRender completed (sync) for table ${this.config.tableId}`);
                 }
             } catch (error) {
-                console.error('❌ [PaginationInstance.notifyAfterRender] Callback failed:', error);
-                console.error('PaginationInstance.onAfterRender error details:', {
-                    tableId: this.config.tableId,
-                    error: error.message,
-                    stack: error.stack,
-                });
+                if (window.Logger && window.Logger.error) {
+                    window.Logger.error('PaginationInstance.notifyAfterRender callback failed:', error, {
+                        tableId: this.config.tableId,
+                        page: 'pagination-system'
+                    });
+                }
             }
         } else {
-            console.warn(`⚠️ [PaginationInstance.notifyAfterRender] No onAfterRender callback defined for table ${this.config.tableId}`, {
-                configKeys: Object.keys(this.config),
-                configOnAfterRender: this.config.onAfterRender,
-            });
+            // Only warn if Logger is available and in debug mode
+            if (window.Logger && window.Logger.debug) {
+                window.Logger.debug(`No onAfterRender callback defined for table ${this.config.tableId}`, {
+                    tableId: this.config.tableId,
+                    page: 'pagination-system'
+                });
+            }
         }
     }
 }

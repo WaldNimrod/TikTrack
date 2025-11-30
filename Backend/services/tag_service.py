@@ -5,8 +5,12 @@ Tag Service - TikTrack
 Provides CRUD operations for tag categories and tags, assignment helpers for
 all supported entities, analytics utilities, and suggestion endpoints.
 
+Also provides automatic cleanup of tag links when entities are deleted through
+SQLAlchemy event listeners and periodic cleanup utilities.
+
 Author: TikTrack Development Team
 Created: November 2025
+Updated: January 2025 - Added automatic tag links cleanup system
 """
 
 from __future__ import annotations

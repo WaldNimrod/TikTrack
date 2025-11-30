@@ -185,9 +185,26 @@ class PreferencesAPIClient {
      * @returns {Promise<Object>} All preferences
      */
   async getAllPreferences(userId = null, profileId = null) {
-    if (!window.PreferencesData?.loadAllPreferencesRaw || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
-      window.Logger?.warn?.('[PreferencesAPIClient] loadAllPreferencesRaw API is not available', { page: 'preferences-core-new' });
-      return null;
+    // Wait for PreferencesData to be available (with retry mechanism)
+    let waitCount = 0;
+    const maxWaitAttempts = 20; // 2 seconds total (20 * 100ms)
+    while (!window.PreferencesData?.loadAllPreferencesRaw || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
+      if (waitCount >= maxWaitAttempts) {
+        window.Logger?.warn?.('[PreferencesAPIClient] loadAllPreferencesRaw API is not available after waiting', { 
+          page: 'preferences-core-new',
+          waitTime: `${maxWaitAttempts * 100}ms`,
+        });
+        return null;
+      }
+      await new Promise(resolve => setTimeout(resolve, 100));
+      waitCount++;
+    }
+    
+    if (waitCount > 0) {
+      window.Logger?.debug?.('[PreferencesAPIClient] PreferencesData became available after waiting', {
+        page: 'preferences-core-new',
+        waitTime: `${waitCount * 100}ms`,
+      });
     }
     
     window.Logger?.debug?.('🔍 PreferencesAPIClient.getAllPreferences calling loadAllPreferencesRaw', {
@@ -526,32 +543,52 @@ class PreferencesCore {
         // Load all preferences at once from API
         // Use force: false to leverage cache - only call API if cache is missing or expired
         // This prevents rate limiting after cache clear or hard refresh
-        const preferencesDataApi = window.PreferencesData;
-        if (preferencesDataApi?.loadAllPreferencesRaw) {
-          try {
-            const payload = await preferencesDataApi.loadAllPreferencesRaw({
-              userId: finalUserId,
-              profileId: finalProfileId,
-              force: false, // Use cache if available - only fetch from API if cache is missing/expired
+        
+        // Wait for PreferencesData to be available (with retry mechanism)
+        let waitCount = 0;
+        const maxWaitAttempts = 20; // 2 seconds total (20 * 100ms)
+        while (!window.PreferencesData?.loadAllPreferencesRaw || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
+          if (waitCount >= maxWaitAttempts) {
+            window.Logger?.warn?.('[PreferencesCore] loadAllPreferencesRaw API is not available after waiting - returning null', { 
+              page: 'preferences-core-new',
+              preferenceName,
+              waitTime: `${maxWaitAttempts * 100}ms`,
             });
-
-            const allPreferences = payload?.preferences || {};
-            const value = allPreferences[preferenceName];
-
-            if (window.UnifiedCacheManager) {
-              await window.UnifiedCacheManager.save(cacheKey, value, {
-                layer: 'localStorage',
-                ttl: 300000,
-              });
-            }
-
-            return value;
-          } catch (error) {
-            window.Logger.error('❌ Error loading preferences:', error, { page: 'preferences-core-new' });
             return null;
           }
-        } else {
-          window.Logger?.warn?.('[PreferencesCore] loadAllPreferencesRaw API is not available - returning null', { page: 'preferences-core-new' });
+          await new Promise(resolve => setTimeout(resolve, 100));
+          waitCount++;
+        }
+        
+        if (waitCount > 0) {
+          window.Logger?.debug?.('[PreferencesCore] PreferencesData became available after waiting', {
+            page: 'preferences-core-new',
+            preferenceName,
+            waitTime: `${waitCount * 100}ms`,
+          });
+        }
+        
+        const preferencesDataApi = window.PreferencesData;
+        try {
+          const payload = await preferencesDataApi.loadAllPreferencesRaw({
+            userId: finalUserId,
+            profileId: finalProfileId,
+            force: false, // Use cache if available - only fetch from API if cache is missing/expired
+          });
+
+          const allPreferences = payload?.preferences || {};
+          const value = allPreferences[preferenceName];
+
+          if (window.UnifiedCacheManager) {
+            await window.UnifiedCacheManager.save(cacheKey, value, {
+              layer: 'localStorage',
+              ttl: 300000,
+            });
+          }
+
+          return value;
+        } catch (error) {
+          window.Logger.error('❌ Error loading preferences:', error, { page: 'preferences-core-new' });
           return null;
         }
       }

@@ -36,7 +36,9 @@ class SystemManagementMain {
       'sm-dashboard': {
         autoRefresh: true,
         refreshInterval: 30000,
-        priority: 1
+        priority: 1,
+        // Dashboard is now part of top section, so use special container
+        containerId: 'sm-dashboard-content'
       },
       'sm-server': {
         autoRefresh: true,

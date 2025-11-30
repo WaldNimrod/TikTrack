@@ -679,14 +679,30 @@ class LazyLoader {
     // Load all low priority preferences at once to avoid multiple API calls
     // This prevents rate limiting after cache clear or hard refresh
     try {
-      // Check if PreferencesData is available
-      if (!window.PreferencesData || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
-        window.Logger?.warn?.('[PreferencesLazyLoader] PreferencesData.loadAllPreferencesRaw API is not available - skipping low priority preferences', {
+      // Wait for PreferencesData to be available (with retry mechanism)
+      let waitCount = 0;
+      const maxWaitAttempts = 20; // 2 seconds total (20 * 100ms)
+      while (!window.PreferencesData || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
+        if (waitCount >= maxWaitAttempts) {
+          window.Logger?.warn?.('[PreferencesLazyLoader] PreferencesData.loadAllPreferencesRaw API is not available after waiting - skipping low priority preferences', {
+            page: 'preferences-lazy-loader',
+            userId,
+            profileId,
+            waitTime: `${maxWaitAttempts * 100}ms`,
+          });
+          return;
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+        waitCount++;
+      }
+      
+      if (waitCount > 0) {
+        window.Logger?.debug?.('[PreferencesLazyLoader] PreferencesData became available after waiting (low priority)', {
           page: 'preferences-lazy-loader',
           userId,
           profileId,
+          waitTime: `${waitCount * 100}ms`,
         });
-        return;
       }
       
       // Use force: false to leverage cache - only call API if cache is missing or expired

@@ -1022,6 +1022,9 @@
             reloadFn: async () => {
               // Reload history after successful analysis creation
               this.history = await window.AIAnalysisData?.loadHistory({ force: true }) || [];
+              // Check availability AFTER cache is saved (give it a moment)
+              await new Promise(resolve => setTimeout(resolve, 100)); // Small delay to ensure cache is saved
+              await this.checkAvailabilityForAll();
               this.renderHistory();
               // Update summary stats
               if (window.updatePageSummaryStats) {
@@ -1047,11 +1050,24 @@
                   layer: 'indexedDB',
                   compress: true
                 });
-                window.Logger?.debug('Saved AI analysis response to cache', { 
+                window.Logger?.info('✅ Saved AI analysis response to cache', { 
                   page: 'ai-analysis', 
                   requestId: result.id,
-                  cacheKey 
+                  cacheKey,
+                  hasResponseText: !!result.response_text
                 });
+                
+                // Update availability for this specific item immediately
+                if (this.history) {
+                  const historyItem = this.history.find(h => h.id === result.id);
+                  if (historyItem) {
+                    historyItem._availability = {
+                      has_cache: true,
+                      has_note: false,
+                      note_id: null
+                    };
+                  }
+                }
               }
             }
           }
@@ -1080,11 +1096,24 @@
                   layer: 'indexedDB',
                   compress: true
                 });
-                window.Logger?.debug('Saved AI analysis response to cache', { 
+                window.Logger?.info('✅ Saved AI analysis response to cache', { 
                   page: 'ai-analysis', 
                   requestId: result.id,
-                  cacheKey 
+                  cacheKey,
+                  hasResponseText: !!result.response_text
                 });
+                
+                // Update availability for this specific item immediately
+                if (this.history) {
+                  const historyItem = this.history.find(h => h.id === result.id);
+                  if (historyItem) {
+                    historyItem._availability = {
+                      has_cache: true,
+                      has_note: false,
+                      note_id: null
+                    };
+                  }
+                }
               }
             }
             
@@ -1101,6 +1130,9 @@
             
             // Reload history
             this.history = await window.AIAnalysisData?.loadHistory({ force: true }) || [];
+            // Check availability AFTER cache is saved (give it a moment)
+            await new Promise(resolve => setTimeout(resolve, 100)); // Small delay to ensure cache is saved
+            await this.checkAvailabilityForAll();
             this.renderHistory();
             // Update summary stats
             if (window.updatePageSummaryStats) {
@@ -1354,18 +1386,38 @@
           return;
         }
 
-        // Check cache for all items
+        // Check cache for all items (async check)
         const cacheChecks = {};
         if (window.UnifiedCacheManager) {
-          for (const id of analysisIds) {
+          const cachePromises = analysisIds.map(async (id) => {
             const cacheKey = `ai-analysis-response-${id}`;
-            const cachedData = await window.UnifiedCacheManager.get(cacheKey);
-            cacheChecks[id] = {
-              has_cache: !!(cachedData && cachedData.response_text),
-              has_note: false,
-              note_id: null
+            try {
+              const cachedData = await window.UnifiedCacheManager.get(cacheKey);
+              return {
+                id,
+                has_cache: !!(cachedData && cachedData.response_text),
+                has_note: false,
+                note_id: null
+              };
+            } catch (error) {
+              window.Logger?.warn('Error checking cache', { page: 'ai-analysis', id, error });
+              return {
+                id,
+                has_cache: false,
+                has_note: false,
+                note_id: null
+              };
+            }
+          });
+          
+          const cacheResults = await Promise.all(cachePromises);
+          cacheResults.forEach(result => {
+            cacheChecks[result.id] = {
+              has_cache: result.has_cache,
+              has_note: result.has_note,
+              note_id: result.note_id
             };
-          }
+          });
         }
 
         // Check notes via API (batch)
@@ -1635,58 +1687,64 @@
       // Actions
       const actionsCell = document.createElement('td');
       
-      // Show buttons based on status and availability
+      // Always add "Re-run" button for all records
+      const rerunBtn = document.createElement('button');
+      rerunBtn.className = 'btn btn-sm btn-outline-secondary';
+      rerunBtn.setAttribute('data-button-type', 'SECONDARY');
+      rerunBtn.setAttribute('data-variant', 'small');
+      rerunBtn.setAttribute('data-text', 'הרצה חוזרת');
+      rerunBtn.setAttribute('data-onclick', `window.AIAnalysisManager.rerunAnalysis(${item.id})`);
+      rerunBtn.setAttribute('title', 'הרצה חוזרת של הניתוח לקבלת משוב עדכני מהמנוע');
+      actionsCell.appendChild(rerunBtn);
+      
+      // Show "View Results" button only if data is available (cache or note)
       if (item.status === 'completed') {
         const availability = item._availability || { has_cache: false, has_note: false, note_id: null };
         
-        // Show "View Results" button if available in cache or note
-        // Note: We'll always show the button for completed analyses, and check availability when clicked
-        const viewBtn = document.createElement('button');
-        viewBtn.className = 'btn btn-sm btn-primary';
-        viewBtn.setAttribute('data-button-type', 'PRIMARY');
-        viewBtn.setAttribute('data-variant', 'small');
-        viewBtn.setAttribute('data-text', 'צפה בתוצאות');
-        viewBtn.setAttribute('data-onclick', `window.AIAnalysisManager.viewHistoryItem(${item.id})`);
-        
-        // Build tooltip based on availability
-        let tooltip = '';
-        if (availability.has_note && availability.note_id) {
-          tooltip = `נשמר כהערה (מזהה: ${availability.note_id})`;
-        } else if (availability.has_cache) {
-          tooltip = 'התוצאות זמינות זמנית במטמון (2 שעות)';
+        // Only show "View Results" if we have data available
+        if (availability.has_cache || availability.has_note) {
+          const viewBtn = document.createElement('button');
+          viewBtn.className = 'btn btn-sm btn-primary ms-2';
+          viewBtn.setAttribute('data-button-type', 'PRIMARY');
+          viewBtn.setAttribute('data-variant', 'small');
+          viewBtn.setAttribute('data-text', 'צפה בתוצאות');
+          viewBtn.setAttribute('data-onclick', `window.AIAnalysisManager.viewHistoryItem(${item.id})`);
+          
+          // Build tooltip based on availability
+          let tooltip = '';
+          if (availability.has_note && availability.note_id) {
+            tooltip = `נשמר כהערה (מזהה: ${availability.note_id})`;
+          } else if (availability.has_cache) {
+            tooltip = 'התוצאות זמינות זמנית במטמון (2 שעות)';
+          }
+          viewBtn.title = tooltip;
+          
+          actionsCell.appendChild(viewBtn);
+          
+          // Show note indicator if saved as note
+          if (availability.has_note && availability.note_id) {
+            const noteBadge = document.createElement('span');
+            noteBadge.className = 'badge bg-success ms-2';
+            noteBadge.textContent = `📝 הערה #${availability.note_id}`;
+            noteBadge.setAttribute('title', 'הניתוח נשמר כהערה');
+            actionsCell.appendChild(noteBadge);
+          }
         } else {
-          tooltip = 'לחץ לצפייה בתוצאות (ייתכן שנשמר במטמון או כהערה)';
+          // No data available - show message
+          const msgSpan = document.createElement('span');
+          msgSpan.className = 'text-muted small ms-2';
+          msgSpan.textContent = 'תוצאות לא זמינות';
+          msgSpan.setAttribute('title', 'התוצאות לא זמינות במטמון או כהערה. לחץ על "הרצה חוזרת" ליצירת ניתוח חדש.');
+          actionsCell.appendChild(msgSpan);
         }
-        viewBtn.title = tooltip;
-        
-        actionsCell.appendChild(viewBtn);
-        
-        // Show note indicator if saved as note
-        if (availability.has_note && availability.note_id) {
-          const noteBadge = document.createElement('span');
-          noteBadge.className = 'badge bg-success ms-2';
-          noteBadge.textContent = `📝 הערה #${availability.note_id}`;
-          noteBadge.setAttribute('title', 'הניתוח נשמר כהערה');
-          actionsCell.appendChild(noteBadge);
-        }
-        
-        // Add "Re-run" button for completed analyses
-        const rerunBtn = document.createElement('button');
-        rerunBtn.className = 'btn btn-sm btn-outline-secondary ms-2';
-        rerunBtn.setAttribute('data-button-type', 'SECONDARY');
-        rerunBtn.setAttribute('data-variant', 'small');
-        rerunBtn.setAttribute('data-text', 'הרצה חוזרת');
-        rerunBtn.setAttribute('data-onclick', `window.AIAnalysisManager.rerunAnalysis(${item.id})`);
-        rerunBtn.setAttribute('title', 'הרצה חוזרת של הניתוח לקבלת משוב עדכני מהמנוע');
-        actionsCell.appendChild(rerunBtn);
       } else if (item.status === 'failed') {
         const msgSpan = document.createElement('span');
-        msgSpan.className = 'text-danger small';
+        msgSpan.className = 'text-danger small ms-2';
         msgSpan.textContent = 'נכשל';
         actionsCell.appendChild(msgSpan);
-      } else {
+      } else if (item.status === 'pending') {
         const msgSpan = document.createElement('span');
-        msgSpan.className = 'text-muted small';
+        msgSpan.className = 'text-muted small ms-2';
         msgSpan.textContent = 'ממתין...';
         actionsCell.appendChild(msgSpan);
       }

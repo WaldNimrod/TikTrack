@@ -15,7 +15,8 @@ class SMServerSection extends SMBaseSection {
     super(sectionId, config);
     this.apiEndpoints = {
       status: '/api/server/status',
-      overview: '/api/system/overview' // Use overview instead of resources endpoint
+      overview: '/api/system/overview',
+      systemInfo: '/api/system/info' // System information endpoint
     };
   }
 
@@ -29,15 +30,17 @@ class SMServerSection extends SMBaseSection {
       console.log(`🖥️ Loading server data from multiple endpoints`);
 
       // Load data from multiple endpoints in parallel
-      const [statusData, overviewData] = await Promise.allSettled([
+      const [statusData, overviewData, systemInfoData] = await Promise.allSettled([
         this.fetchServerStatus(),
-        this.fetchSystemOverview()
+        this.fetchSystemOverview(),
+        this.fetchSystemInfo()
       ]);
 
       // Combine data from all sources
       const combinedData = {
         status: statusData.status === 'fulfilled' ? statusData.value : null,
         overview: overviewData.status === 'fulfilled' ? overviewData.value : null,
+        systemInfo: systemInfoData.status === 'fulfilled' ? systemInfoData.value : null,
         timestamp: new Date().toISOString()
       };
 
@@ -79,15 +82,13 @@ class SMServerSection extends SMBaseSection {
     }
   }
 
-  // Removed fetchSystemResources - endpoint doesn't exist, using overview instead
-
   /**
    * Fetch system overview
    * קבלת סקירת מערכת
    */
   async fetchSystemOverview() {
     try {
-      const response = await fetch(this.apiEndpoints.overview, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.overview, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -103,6 +104,32 @@ class SMServerSection extends SMBaseSection {
       return result.status === 'success' ? result.data : null;
     } catch (error) {
       console.warn('⚠️ Failed to fetch system overview:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Fetch system information
+   * קבלת מידע מערכת
+   */
+  async fetchSystemInfo() {
+    try {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.systemInfo, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      return result.status === 'success' ? result.data : null;
+    } catch (error) {
+      console.warn('⚠️ Failed to fetch system info:', error);
       return null;
     }
   }

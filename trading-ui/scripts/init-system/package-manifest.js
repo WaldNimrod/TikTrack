@@ -432,6 +432,34 @@ const PACKAGE_MANIFEST = {
         description: 'Rich text editor service',
         required: true,
         loadOrder: 14
+      },
+      {
+        file: 'services/pending-actions-cache-service.js',
+        globalCheck: 'window.PendingActionsCacheService',
+        description: 'Pending actions cache service (dismissed items management)',
+        required: false,
+        loadOrder: 15
+      },
+      {
+        file: 'services/execution-clustering-service.js',
+        globalCheck: 'window.ExecutionClusteringService',
+        description: 'Execution clustering service (trade creation clusters)',
+        required: false,
+        loadOrder: 16
+      },
+      {
+        file: 'services/execution-assignment-service.js',
+        globalCheck: 'window.ExecutionAssignmentService',
+        description: 'Execution assignment service (highlights/suggestions)',
+        required: false,
+        loadOrder: 17
+      },
+      {
+        file: 'services/trade-plan-assignment-service.js',
+        globalCheck: 'window.TradePlanAssignmentService',
+        description: 'Trade plan assignment service (assignments and creations)',
+        required: false,
+        loadOrder: 18
       }
     ],
     estimatedSize: '~180KB',

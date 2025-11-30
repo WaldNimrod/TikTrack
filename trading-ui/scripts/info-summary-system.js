@@ -429,19 +429,15 @@ class InfoSummarySystem {
       }
     });
     
-    console.log('📝 Setting innerHTML to:', html.substring(0, 300));
     container.innerHTML = html;
-    console.log('✅ innerHTML set. Current innerHTML:', container.innerHTML.substring(0, 300));
     
-    // Use console.log instead of Logger to avoid potential circular dependencies
-    const DEBUG_MODE = window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1' ||
-                       window.location.search.includes('debug=true');
-    
-    if (DEBUG_MODE) {
-      console.debug(`Info summary rendered for container '${containerId}'`, { 
+    // Use Logger.debug instead of console.log to avoid cluttering console
+    // Only log in debug mode
+    if (window.Logger && window.Logger.debug) {
+      window.Logger.debug(`Info summary rendered for container '${containerId}'`, { 
         statsCount: config.stats.length,
-        containerId 
+        containerId,
+        page: 'info-summary-system'
       });
     }
   }

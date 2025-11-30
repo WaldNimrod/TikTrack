@@ -1455,9 +1455,19 @@
         }
 
         // Store availability info in history items
+        let availableCount = 0;
         for (const item of this.history) {
           if (item.status === 'completed' && cacheChecks[item.id]) {
             item._availability = cacheChecks[item.id];
+            if (cacheChecks[item.id].has_cache || cacheChecks[item.id].has_note) {
+              availableCount++;
+            }
+          } else if (item.status === 'completed') {
+            item._availability = {
+              has_cache: false,
+              has_note: false,
+              note_id: null
+            };
           } else {
             item._availability = {
               has_cache: false,
@@ -1467,9 +1477,12 @@
           }
         }
 
-        window.Logger?.debug('Checked availability for all history items', {
+        window.Logger?.info('✅ Checked availability for all history items', {
           page: 'ai-analysis',
-          count: analysisIds.length
+          totalCompleted: analysisIds.length,
+          availableCount: availableCount,
+          cacheCount: Object.values(cacheChecks).filter(c => c.has_cache).length,
+          noteCount: Object.values(cacheChecks).filter(c => c.has_note).length
         });
       } catch (error) {
         window.Logger?.error('Error checking availability for all items', error, { page: 'ai-analysis' });

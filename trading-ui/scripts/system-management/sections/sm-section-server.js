@@ -165,7 +165,7 @@ class SMServerSection extends SMBaseSection {
    * יצירת HTML של שרת
    */
   createServerHTML(data) {
-    const { status, resources, overview } = data;
+    const { status, resources, overview, systemInfo } = data;
 
     return `
       <div class="server-overview">
@@ -355,8 +355,8 @@ class SMServerSection extends SMBaseSection {
    * Create system information card
    * יצירת כרטיס מידע מערכת
    */
-  createSystemInfoCard(status, resources, overview) {
-    const systemInfo = this.extractSystemInfo(status, resources, overview);
+  createSystemInfoCard(status, resources, overview, systemInfoData) {
+    const systemInfo = this.extractSystemInfo(status, resources, overview, systemInfoData);
 
     return `
       <div class="card">

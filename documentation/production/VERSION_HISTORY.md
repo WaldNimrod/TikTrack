@@ -53,3 +53,4 @@ This log records every production version update, including manual major/minor a
 4. עדכון מטמון - ניקוי אוטומטי של cache ענן התגיות |
 | 2025-11-30T11:23:36+00:00 | 1.3.14.0 | 1.3.13.0 | eb2bcafddc1d05edfcbaa5bbd37c2cf65cecb6f3 | 69d6b0878fc858aa8ceb6eb2169b58b004f3ba42 | patch | Comprehensive code improvements and bug fixes for production release: Fix Python type checking errors, complete UI standardization, console cleanup, AI analysis enhancements, and system improvements |
 | 2025-11-30T11:38:06+00:00 | 1.3.14.1 | 1.3.14.0 | 30b3a3401a92acfca8bed8fd486c6b9ae11edfe1 | eb2bcafddc1d05edfcbaa5bbd37c2cf65cecb6f3 | build | Additional fixes: tag service, preferences loader, system management improvements |
+| 2025-11-30T11:40:36+00:00 | 1.3.14.2 | 1.3.14.1 | f5a67b43b18ceb797e97959702b509c5aeec2b4c | 30b3a3401a92acfca8bed8fd486c6b9ae11edfe1 | build | Final updates: ai-analysis-manager, info-summary-system, sm-section-server |

@@ -4082,9 +4082,34 @@ async function openImportUserDataModal() {
             }
         }
         
-        // Show modal using Bootstrap when available
+        // Show modal using ModalManagerV2 first, fallback to Bootstrap
         let modalShown = false;
-        if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+            try {
+                await window.ModalManagerV2.showModal('importUserDataModal', 'view');
+                modalShown = true;
+            } catch (error) {
+                window.Logger?.error('[Import Modal] Error showing modal via ModalManagerV2, trying Bootstrap fallback', { error: error?.message, page: 'import-user-data' });
+                // Fallback to Bootstrap
+                if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+                    try {
+                        importModalBootstrapInstance = bootstrap.Modal.getInstance(modal);
+                        if (!importModalBootstrapInstance) {
+                            importModalBootstrapInstance = new bootstrap.Modal(modal, {
+                                backdrop: true,
+                                keyboard: true,
+                                focus: true
+                            });
+                        }
+                        importModalBootstrapInstance.show();
+                        modalShown = true;
+                    } catch (bootstrapError) {
+                        window.Logger?.error('[Import Modal] Error showing Bootstrap modal, trying manual fallback', { error: bootstrapError?.message, page: 'import-user-data' });
+                    }
+                }
+            }
+        } else if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+            // Fallback to Bootstrap if ModalManagerV2 not available
             try {
                 importModalBootstrapInstance = bootstrap.Modal.getInstance(modal);
                 if (!importModalBootstrapInstance) {
@@ -4097,11 +4122,12 @@ async function openImportUserDataModal() {
                 importModalBootstrapInstance.show();
                 modalShown = true;
             } catch (error) {
-                window.Logger?.error('[Import Modal] Error showing Bootstrap modal, trying fallback', { error: error?.message, page: 'import-user-data' });
+                window.Logger?.error('[Import Modal] Error showing Bootstrap modal, trying manual fallback', { error: error?.message, page: 'import-user-data' });
             }
         }
         
         if (!modalShown) {
+            // Last resort: manual modal display
             try {
                 modal.style.display = 'block';
                 modal.classList.add('show');
@@ -4185,7 +4211,10 @@ function closeImportUserDataModal() {
     modal.dataset.importClosing = 'true';
     
     const legacyHide = () => {
-        if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+        // Try ModalManagerV2 first
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+            window.ModalManagerV2.hideModal('importUserDataModal');
+        } else if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
             const instance = bootstrap.Modal.getInstance(modal) || importModalBootstrapInstance;
             if (instance) {
                 instance.hide();

@@ -2163,6 +2163,46 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                 /ModalConfig$/    // e.g., tradePlansModalConfig
             ];
             
+            // Critical services that should NEVER be deleted (they are not cache, they are system services)
+            const protectedServices = [
+                'PreferencesData',      // Preferences data service (API layer)
+                'PreferencesCore',      // Preferences core system
+                'PreferencesManager',   // Preferences manager
+                'PreferencesCache',     // Preferences cache manager
+                'PreferencesEvents',    // Preferences event system
+                'PreferencesUI',       // Preferences UI system
+                'PreferencesUIV4',      // Preferences UI V4
+                'LazyLoader',           // Lazy loader system
+                'UnifiedCacheManager',  // Cache manager itself
+                'Logger',              // Logger service
+                'NotificationSystem',   // Notification system
+                'ModalManagerV2',      // Modal manager
+                'HeaderSystem',        // Header system
+                'ButtonSystem',        // Button system
+                'IconSystem',          // Icon system
+                'FieldRendererService', // Field renderer service
+                'InfoSummarySystem',   // Info summary system
+                'TableDataRegistry',   // Table data registry
+                'UnifiedTableSystem',  // Unified table system
+                'EntityDetailsAPI',    // Entity details API
+                'EntityDetailsRenderer', // Entity details renderer
+                'EntityDetailsModal',  // Entity details modal
+                'ColorSchemeSystem',   // Color scheme system
+                'ColorManager',        // Color manager
+                'ExternalDataService', // External data service
+                'YahooFinanceService', // Yahoo Finance service
+                'TickerService',       // Ticker service
+                'AccountService',      // Account service
+                'AlertService',        // Alert service
+                'TradePlanService',    // Trade plan service
+                'LinkedItemsService',  // Linked items service
+                'PaginationSystem',    // Pagination system
+                'EventHandlerManager', // Event handler manager
+                'PageStateManager',    // Page state manager
+                'CacheSyncManager',    // Cache sync manager
+                'CacheTTLGuard',      // Cache TTL guard
+            ];
+            
             let dynamicCleared = 0;
             for (const key in window) {
                 // Skip standard window properties and functions
@@ -2172,6 +2212,11 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                     key === 'indexedDB' || key === 'document' || key === 'navigator' ||
                     typeof window[key] === 'function' || key.startsWith('on') ||
                     key === 'location' || key === 'history' || key === 'screen') {
+                    continue;
+                }
+                
+                // NEVER delete critical system services
+                if (protectedServices.includes(key)) {
                     continue;
                 }
                 

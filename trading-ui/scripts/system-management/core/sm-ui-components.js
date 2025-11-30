@@ -295,6 +295,98 @@ class SMUIComponents {
   }
 
   /**
+   * Create a standardized stats card with rows
+   * יצירת כרטיס סטטיסטיקות סטנדרטי עם שורות
+   * @param {string} title - Card title
+   * @param {Array} rows - Array of {label, value, icon, badge, color} objects
+   * @param {Object} options - Additional options (icon, className, etc.)
+   */
+  static createStatsCard(title, rows, options = {}) {
+    const {
+      icon = null,
+      className = '',
+      headerActions = null
+    } = options;
+
+    return `
+      <div class="card sm-stats-card ${className}">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+              ${icon ? `<i class="fas ${icon} me-2"></i>` : ''}
+              ${title}
+            </h5>
+            ${headerActions ? `<div class="card-actions">${headerActions}</div>` : ''}
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="sm-stats-rows">
+            ${rows.map(row => `
+              <div class="sm-stat-row">
+                <div class="stat-label">
+                  ${row.icon ? `<i class="fas ${row.icon} me-2"></i>` : ''}
+                  <span>${row.label}</span>
+                </div>
+                <div class="stat-value">
+                  ${row.badge ? `<span class="badge bg-${row.badge.variant || 'secondary'}">${row.badge.text}</span>` : ''}
+                  <span class="${row.color ? `text-${row.color}` : ''}">${row.value}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Create a standardized actions card
+   * יצירת כרטיס פעולות סטנדרטי
+   * @param {string} title - Card title
+   * @param {Array} actionGroups - Array of action groups {title, actions: [{text, icon, onclick, variant, size}]}
+   * @param {Object} options - Additional options
+   */
+  static createActionsCard(title, actionGroups, options = {}) {
+    const {
+      icon = null,
+      className = '',
+      direction = 'horizontal' // 'horizontal' or 'vertical'
+    } = options;
+
+    return `
+      <div class="card sm-actions-card ${className}">
+        <div class="card-header">
+          <h5 class="mb-0">
+            ${icon ? `<i class="fas ${icon} me-2"></i>` : ''}
+            ${title}
+          </h5>
+        </div>
+        <div class="card-body">
+          ${actionGroups.map(group => `
+            <div class="sm-action-group">
+              ${group.title ? `<h6 class="action-group-title">${group.title}</h6>` : ''}
+              <div class="action-buttons ${direction === 'vertical' ? 'd-flex flex-column gap-2' : 'd-flex flex-wrap gap-2'}">
+                ${group.actions.map(action => `
+                  <button 
+                    type="button"
+                    class="btn btn-${action.variant || 'outline-primary'} btn-${action.size || 'sm'}"
+                    ${action.onclick ? `onclick="${action.onclick}"` : ''}
+                    ${action.dataAction ? `data-action="${action.dataAction}"` : ''}
+                    ${action.title ? `title="${action.title}"` : ''}
+                    ${action.disabled ? 'disabled' : ''}>
+                    ${action.icon ? `<i class="fas ${action.icon} me-1"></i>` : ''}
+                    ${action.text || ''}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  /**
    * Create a timeline
    * יצירת ציר זמן
    */

@@ -89,8 +89,19 @@ function showEditCurrencyModal(id) {
   }
 
   // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('editCurrencyModal'));
-  modal.show();
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    window.ModalManagerV2.showModal('editCurrencyModal', 'edit', currency).catch(error => {
+      window.Logger?.error('Error showing edit currency modal via ModalManagerV2', { error, modalId: 'editCurrencyModal', page: 'currencies' });
+      // Fallback to bootstrap if ModalManagerV2 fails
+      if (bootstrap?.Modal) {
+        const modal = new bootstrap.Modal(document.getElementById('editCurrencyModal'));
+        modal.show();
+      }
+    });
+  } else if (bootstrap?.Modal) {
+    const modal = new bootstrap.Modal(document.getElementById('editCurrencyModal'));
+    modal.show();
+  }
 }
 
 /**
@@ -120,8 +131,19 @@ function showDeleteCurrencyModal(id) {
   document.getElementById('deleteCurrencyName').textContent = `${currency.symbol} - ${currency.name}`;
 
   // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('deleteCurrencyModal'));
-  modal.show();
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    window.ModalManagerV2.showModal('deleteCurrencyModal', 'delete', currency).catch(error => {
+      window.Logger?.error('Error showing delete currency modal via ModalManagerV2', { error, modalId: 'deleteCurrencyModal', page: 'currencies' });
+      // Fallback to bootstrap if ModalManagerV2 fails
+      if (bootstrap?.Modal) {
+        const modal = new bootstrap.Modal(document.getElementById('deleteCurrencyModal'));
+        modal.show();
+      }
+    });
+  } else if (bootstrap?.Modal) {
+    const modal = new bootstrap.Modal(document.getElementById('deleteCurrencyModal'));
+    modal.show();
+  }
 }
 
 // ========================================
@@ -202,8 +224,14 @@ async function confirmDeleteCurrency() {
     if (result.status === 'success') {
 
       // סגירת המודל
-      const modal = bootstrap.Modal.getInstance(document.getElementById('deleteCurrencyModal'));
-      modal.hide();
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal('deleteCurrencyModal');
+      } else if (bootstrap?.Modal) {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('deleteCurrencyModal'));
+        if (modal) {
+          modal.hide();
+        }
+      }
 
       // טעינה מחדש של הנתונים
       await loadCurrencies();

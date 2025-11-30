@@ -233,7 +233,7 @@ window.loadTradingAccountsDataForTradingAccountsPage = async function(passedOpti
       } else if (typeof window.showNotification === 'function') {
         window.showNotification('שגיאה בטעינת נתוני חשבונות מסחר', 'error');
       } else {
-        alert('שגיאה בטעינת נתוני חשבונות מסחר: ' + error.message);
+        window.showErrorNotification('שגיאה בטעינת נתוני חשבונות מסחר: ' + error.message, "שגיאה");
       }
       throw error;
     } finally {
@@ -299,7 +299,7 @@ let tradingAccountsPaginationInstance = null;
  */
 async function loadCurrenciesFromServer() {
   try {
-    const token = await window.unifiedCacheManager?.get('authToken') || localStorage.getItem('authToken');
+    const token = await window.unifiedCacheManager?.get('authToken') || window.PageStateManager?.getItem('authToken');
     const headers = {
       'Content-Type': 'application/json',
     };
@@ -1302,7 +1302,7 @@ async function cancelTradingAccount(tradingAccountId, tradingAccountName) {
                   'חזור'
                 );
               }) : 
-              window.confirm(`האם אתה בטוח שברצונך לבטל את החשבון מסחר "${accountName}"?`);
+              window.window.showConfirmationDialog(`האם אתה בטוח שברצונך לבטל את החשבון מסחר "${accountName}"?`);
             if (!confirmed) {
               return;
             }
@@ -1941,7 +1941,7 @@ async function restoreTradingAccount(tradingAccountId, tradingAccountName) {
         );
       });
       if (!confirmed) return;
-    } else if (!window.confirm(`האם אתה בטוח שברצונך להחזיר את החשבון מסחר "${accountName}" לסטטוס סגור?`)) {
+    } else if (!window.window.showConfirmationDialog(`האם אתה בטוח שברצונך להחזיר את החשבון מסחר "${accountName}" לסטטוס סגור?`)) {
       return;
     }
   }
@@ -2566,7 +2566,7 @@ async function deleteTradingAccount(accountId) {
             );
         } else {
             // Fallback to simple confirm
-            if (!confirm('האם אתה בטוח שברצונך למחוק את חשבון מסחר המסחר?')) {
+            if (!window.showConfirmationDialog('האם אתה בטוח שברצונך למחוק את חשבון מסחר המסחר?')) {
                 return;
             }
             await performTradingAccountDeletion(accountId);

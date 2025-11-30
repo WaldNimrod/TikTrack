@@ -98,7 +98,7 @@ const utils = {
       window.showNotification(message, type);
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      console.log(`${type.toUpperCase()}: ${message}`);
+      window.Logger?.debug(`${type.toUpperCase()}: ${message}`);
     }
   },
 
@@ -203,7 +203,7 @@ const apiService = {
       // Add cache buster to all requests
       const separator = url.includes('?') ? '&' : '?';
       const urlWithCacheBuster = `${url}${separator}_t=${Date.now()}`;
-      console.log('📡 API Request URL:', urlWithCacheBuster);
+      window.Logger?.debug('📡 API Request URL:', urlWithCacheBuster);
 
       const response = await fetch(urlWithCacheBuster, {
         headers: {
@@ -221,7 +221,7 @@ const apiService = {
 
       return await response.json();
     } catch (error) {
-      console.error('❌ API request failed:', error);
+      window.Logger?.error('❌ API request failed:', error);
       utils.showNotification(`שגיאה בפנייה לשרת: ${error.message}`, 'error');
       throw error;
     }
@@ -376,10 +376,10 @@ const uiManager = {
   renderTasks(tasks) {
     const tbody = document.querySelector('#tasks-table tbody');
     if (!tbody) {
-      console.error('❌ tasks-table tbody not found');
+      window.Logger?.error('❌ tasks-table tbody not found');
       return;
     }
-    console.log('✅ Found tbody, rendering', tasks?.length || 0, 'tasks');
+    window.Logger?.debug('✅ Found tbody, rendering', tasks?.length || 0, 'tasks');
 
     if (!tasks || tasks.length === 0) {
       tbody.innerHTML = '<tr><td colspan="7" class="no-data">אין משימות זמינות</td></tr>';
@@ -613,14 +613,14 @@ const eventHandlers = {
      * Initialize event handlers
      */
   init() {
-    console.log('🔧 EventHandlers init - fixing button connections 20250903-2050');
+    window.Logger?.debug('🔧 EventHandlers init - fixing button connections 20250903-2050');
 
     // Check if buttons exist
     const startBtn = document.getElementById('start-scheduler');
     const stopBtn = document.getElementById('stop-scheduler');
     const refreshBtn = document.getElementById('refresh-status');
 
-    console.log('🔍 Button check:', {
+    window.Logger?.debug('🔍 Button check:', {
       startBtn: !!startBtn,
       stopBtn: !!stopBtn,
       refreshBtn: !!refreshBtn,
@@ -629,23 +629,23 @@ const eventHandlers = {
     // Scheduler controls
     if (startBtn) {
       startBtn.addEventListener('click', eventHandlers.startScheduler);
-      console.log('✅ Start scheduler button connected');
+      window.Logger?.debug('✅ Start scheduler button connected');
     } else {
-      console.error('❌ Start scheduler button not found!');
+      window.Logger?.error('❌ Start scheduler button not found!');
     }
 
     if (stopBtn) {
       stopBtn.addEventListener('click', eventHandlers.stopScheduler);
-      console.log('✅ Stop scheduler button connected');
+      window.Logger?.debug('✅ Stop scheduler button connected');
     } else {
-      console.error('❌ Stop scheduler button not found!');
+      window.Logger?.error('❌ Stop scheduler button not found!');
     }
 
     if (refreshBtn) {
       refreshBtn.addEventListener('click', eventHandlers.refreshStatus);
-      console.log('✅ Refresh status button connected');
+      window.Logger?.debug('✅ Refresh status button connected');
     } else {
-      console.error('❌ Refresh status button not found!');
+      window.Logger?.error('❌ Refresh status button not found!');
     }
 
     // Task management
@@ -695,7 +695,7 @@ const eventHandlers = {
       await new Promise(resolve => setTimeout(resolve, 1000));
       await eventHandlers.refreshStatus();
     } catch (error) {
-      console.error('❌ Error in startScheduler:', error);
+      window.Logger?.error('❌ Error in startScheduler:', error);
       utils.showNotification(`שגיאה בהפעלת Scheduler: ${error.message}`, 'error');
     } finally {
       await utils.showLoading('start-scheduler', false);
@@ -714,7 +714,7 @@ const eventHandlers = {
       await eventHandlers.refreshStatus();
       await eventHandlers.refreshTasks();
     } catch (error) {
-      console.error('❌ Error in stopScheduler:', error);
+      window.Logger?.error('❌ Error in stopScheduler:', error);
       utils.showNotification(`שגיאה בעצירת Scheduler: ${error.message}`, 'error');
     } finally {
       await utils.showLoading('stop-scheduler', false);
@@ -729,14 +729,14 @@ const eventHandlers = {
       // Clear cache before refreshing to ensure fresh data
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         await window.UnifiedCacheManager.clear('memory');
-        console.log('🧹 Cleared memory cache before refreshing status');
+        window.Logger?.debug('🧹 Cleared memory cache before refreshing status');
       }
       
       const response = await apiService.getStatus();
       const status = response.data || response;
       uiManager.updateStatus(status);
     } catch (error) {
-      console.error('❌ Failed to refresh status:', error);
+      window.Logger?.error('❌ Failed to refresh status:', error);
       utils.showNotification('שגיאה בטעינת סטטוס המערכת', 'error');
     }
   },
@@ -751,15 +751,15 @@ const eventHandlers = {
       // Clear cache before refreshing to ensure fresh data
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         await window.UnifiedCacheManager.clear('memory');
-        console.log('🧹 Cleared memory cache before refreshing tasks');
+        window.Logger?.debug('🧹 Cleared memory cache before refreshing tasks');
       }
       
       const response = await apiService.getTasks();
       const tasks = response.tasks || response.data?.tasks || [];
-      console.log('📋 refreshTasks: received', tasks?.length || 0, 'tasks');
+      window.Logger?.debug('📋 refreshTasks: received', tasks?.length || 0, 'tasks');
       uiManager.renderTasks(tasks);
     } catch (error) {
-      console.error('❌ Failed to refresh tasks:', error);
+      window.Logger?.error('❌ Failed to refresh tasks:', error);
       utils.showNotification('שגיאה בטעינת רשימת המשימות', 'error');
     } finally {
       await utils.showLoading('refresh-tasks', false);
@@ -781,7 +781,7 @@ const eventHandlers = {
       const tasks = await apiService.getTasks(params);
       uiManager.renderTasks(tasks.tasks || []);
     } catch {
-      // console.error('Failed to apply filters:', error);
+      // window.Logger?.error('Failed to apply filters:', error);
     }
   },
 
@@ -795,7 +795,7 @@ const eventHandlers = {
       // Clear cache before refreshing to ensure fresh data
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         await window.UnifiedCacheManager.clear('memory');
-        console.log('🧹 Cleared memory cache before refreshing history');
+        window.Logger?.debug('🧹 Cleared memory cache before refreshing history');
       }
       
       const hours = document.getElementById('history-hours')?.value || 24;
@@ -803,7 +803,7 @@ const eventHandlers = {
       const history = response.history || response.data?.history || [];
       uiManager.renderHistory(history);
     } catch (error) {
-      console.error('❌ Failed to refresh history:', error);
+      window.Logger?.error('❌ Failed to refresh history:', error);
       utils.showNotification('שגיאה בטעינת היסטוריית המשימות', 'error');
     } finally {
       await utils.showLoading('refresh-history', false);
@@ -826,7 +826,7 @@ const eventHandlers = {
       const history = await apiService.getHistory(params);
       uiManager.renderHistory(history.history || []);
     } catch {
-      // console.error('Failed to apply history filters:', error);
+      // window.Logger?.error('Failed to apply history filters:', error);
     }
   },
 
@@ -840,7 +840,7 @@ const eventHandlers = {
       // Clear cache before refreshing to ensure fresh data
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
         await window.UnifiedCacheManager.clear('memory');
-        console.log('🧹 Cleared memory cache before refreshing analytics');
+        window.Logger?.debug('🧹 Cleared memory cache before refreshing analytics');
       }
       
       const period = document.getElementById('analytics-period')?.value || '7d';
@@ -848,7 +848,7 @@ const eventHandlers = {
       const analytics = response.data || response;
       uiManager.renderAnalytics(analytics);
     } catch (error) {
-      console.error('❌ Failed to refresh analytics:', error);
+      window.Logger?.error('❌ Failed to refresh analytics:', error);
       utils.showNotification('שגיאה בטעינת אנליטיקס המשימות', 'error');
     } finally {
       await utils.showLoading('refresh-analytics', false);
@@ -865,7 +865,7 @@ const eventHandlers = {
       await window.executeTask(currentTaskName);
       modalManager.closeModal();
     } catch (error) {
-      console.error('Failed to execute modal task:', error);
+      window.Logger?.error('Failed to execute modal task:', error);
     }
   },
 
@@ -880,7 +880,7 @@ const eventHandlers = {
       modalManager.closeModal();
       await eventHandlers.refreshTasks();
     } catch (error) {
-      console.error('Failed to toggle modal task:', error);
+      window.Logger?.error('Failed to toggle modal task:', error);
     }
   },
 };
@@ -942,10 +942,10 @@ window.executeTask = async function(taskName) {
 };
 
 window.toggleTask = async function(taskName) {
-  console.log('🔄 toggleTask called with:', taskName);
+  window.Logger?.debug('🔄 toggleTask called with:', taskName);
   try {
     const result = await apiService.toggleTask(taskName);
-    console.log('✅ toggleTask result:', result);
+    window.Logger?.debug('✅ toggleTask result:', result);
     const newStatus = result.new_status ? 'הופעלה' : 'כובתה';
     utils.showNotification(`משימה ${taskName} ${newStatus} בהצלחה`, 'success');
 
@@ -957,20 +957,20 @@ window.toggleTask = async function(taskName) {
 
     return result;
   } catch (error) {
-    console.error('❌ toggleTask error:', error);
+    window.Logger?.error('❌ toggleTask error:', error);
     utils.showNotification(`שגיאה בשינוי סטטוס משימה ${taskName}: ${error.message}`, 'error');
     throw error;
   }
 };
 
 window.stopTask = async function(taskName) {
-  console.log('🛑 stopTask called with:', taskName);
+  window.Logger?.debug('🛑 stopTask called with:', taskName);
   try {
     utils.showNotification(`עוצר משימה: ${taskName}`, 'info');
     
     // First disable the task
     const result = await apiService.toggleTask(taskName);
-    console.log('✅ stopTask result:', result);
+    window.Logger?.debug('✅ stopTask result:', result);
     
     if (result.new_status === false) {
       utils.showNotification(`משימה ${taskName} נעצרה בהצלחה`, 'success');
@@ -986,7 +986,7 @@ window.stopTask = async function(taskName) {
 
     return result;
   } catch (error) {
-    console.error('❌ stopTask error:', error);
+    window.Logger?.error('❌ stopTask error:', error);
     utils.showNotification(`שגיאה בעצירת משימה ${taskName}: ${error.message}`, 'error');
     throw error;
   }
@@ -1070,11 +1070,11 @@ const autoRefresh = {
       try {
         await eventHandlers.refreshStatus();
       } catch (error) {
-        console.error('Auto-refresh failed:', error);
+        window.Logger?.error('Auto-refresh failed:', error);
       }
     }, 30000); // Refresh every 30 seconds
 
-    console.log('Auto-refresh started');
+    window.Logger?.debug('Auto-refresh started');
   },
 
   /**
@@ -1084,7 +1084,7 @@ const autoRefresh = {
     if (refreshInterval) {
       clearInterval(refreshInterval);
       refreshInterval = null;
-      console.log('Auto-refresh stopped');
+      window.Logger?.debug('Auto-refresh stopped');
     }
   },
 };
@@ -1203,19 +1203,19 @@ const detailedLogGenerator = {
       utils.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
 
       // Show log in console for easy access
-      console.log('=== לוג מפורט שהועתק ===');
-      console.log(log);
-      console.log('=== סוף הלוג ===');
+      window.Logger?.debug('=== לוג מפורט שהועתק ===');
+      window.Logger?.debug(log);
+      window.Logger?.debug('=== סוף הלוג ===');
 
     } catch (error) {
-      console.error('Failed to copy log:', error);
+      window.Logger?.error('Failed to copy log:', error);
       utils.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
 
       // Fallback: show in console
       const log = this.generateDetailedLog();
-      console.log('=== לוג מפורט (לא הועתק) ===');
-      console.log(log);
-      console.log('=== סוף הלוג ===');
+      window.Logger?.debug('=== לוג מפורט (לא הועתק) ===');
+      window.Logger?.debug(log);
+      window.Logger?.debug('=== סוף הלוג ===');
     }
   },
 };
@@ -1259,7 +1259,7 @@ async function initializeBackgroundTasks() {
     
 
   } catch (error) {
-    console.error('Failed to initialize Background Tasks Management:', error);
+    window.Logger?.error('Failed to initialize Background Tasks Management:', error);
     utils.showNotification('שגיאה באתחול מערכת ניהול המשימות', 'error');
   }
 }
@@ -1277,7 +1277,7 @@ function copyDetailedLogLocal() {
   if (typeof detailedLogGenerator !== 'undefined' && detailedLogGenerator.copyDetailedLog) {
     detailedLogGenerator.copyDetailedLog();
   } else {
-    console.error('❌ detailedLogGenerator לא זמין');
+    window.Logger?.error('❌ detailedLogGenerator לא זמין');
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה', 'מערכת לוג מפורט לא זמינה');
     }
@@ -1344,7 +1344,7 @@ window.clearLog = function() {
   const logElement = document.getElementById('console-output');
   if (logElement) {
     logElement.textContent = '';
-    console.log('Log cleared');
+    window.Logger?.debug('Log cleared');
   }
 };
 
@@ -1440,7 +1440,10 @@ function generateDetailedLog() {
  */
 window.registerBackgroundTasksTable = function() {
     if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {
-        window.Logger?.warn?.('⚠️ UnifiedTableSystem not available for background_tasks registration', { page: 'background-tasks' });
+        // UnifiedTableSystem is optional - silently skip if not available
+        if (window.Logger?.debug) {
+          window.Logger.debug('UnifiedTableSystem not available for background_tasks registration (optional)', { page: 'background-tasks' });
+        }
         return false;
     }
 
@@ -1499,7 +1502,7 @@ function initializeRealtimeLogListener() {
         if (window.io && window.io.socket) {
             window.io.socket.on('background_task_log', async (logData) => {
                 try {
-                    console.log('📥 Received background task log:', logData);
+                    window.Logger?.debug('📥 Received background task log:', logData);
                     
                     // Save to IndexedDB using unified cache system
                     if (window.saveBackgroundTaskLog) {
@@ -1514,16 +1517,16 @@ function initializeRealtimeLogListener() {
                         // Refresh the log display
                     }
                 } catch (error) {
-                    console.error('❌ Error processing background task log:', error);
+                    window.Logger?.error('❌ Error processing background task log:', error);
                 }
             });
             
-            console.log('✅ Real-time background task log listener initialized');
+            window.Logger?.debug('✅ Real-time background task log listener initialized');
         } else {
-            console.warn('⚠️ Socket.IO not available for real-time log listening');
+            window.Logger?.warn('⚠️ Socket.IO not available for real-time log listening');
         }
     } catch (error) {
-        console.error('❌ Failed to initialize real-time log listener:', error);
+        window.Logger?.error('❌ Failed to initialize real-time log listener:', error);
     }
 }
 

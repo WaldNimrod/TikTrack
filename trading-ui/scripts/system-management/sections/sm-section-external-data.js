@@ -36,7 +36,8 @@ class SMExternalDataSection extends SMBaseSection {
     }
     
     // If dashboard is not available, return null and handle gracefully
-    console.warn('⚠️ ExternalDataDashboard is not available - section will show limited data');
+    // Note: ExternalDataDashboard is optional for system-management page
+    // It's only loaded on the external-data-dashboard page itself
     return null;
   }
 

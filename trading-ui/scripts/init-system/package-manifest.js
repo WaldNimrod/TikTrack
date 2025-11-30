@@ -460,6 +460,13 @@ const PACKAGE_MANIFEST = {
         description: 'Trade plan assignment service (assignments and creations)',
         required: false,
         loadOrder: 18
+      },
+      {
+        file: 'services/execution-cluster-helpers.js',
+        globalCheck: 'window.ExecutionClusterHelpers',
+        description: 'Execution cluster helper functions (rendering, actions, calculations)',
+        required: false,
+        loadOrder: 19
       }
     ],
     estimatedSize: '~180KB',
@@ -532,6 +539,41 @@ const PACKAGE_MANIFEST = {
         description: 'Nested modal navigation system',
         required: true,
         loadOrder: 1
+      },
+      {
+        file: 'modal-z-index-manager.js',
+        globalCheck: 'window.ModalZIndexManager',
+        description: 'Dynamic z-index management for nested modals',
+        required: true,
+        loadOrder: 1.5
+      },
+      {
+        file: 'modal-z-index-monitor.js',
+        globalCheck: 'window.modalZIndexMonitor',
+        description: 'Z-index monitoring tool for nested modals',
+        required: false,
+        loadOrder: 1.6
+      },
+      {
+        file: 'modal-backdrop-monitor.js',
+        globalCheck: 'window.modalBackdropMonitor',
+        description: 'Backdrop monitoring tool for nested modals',
+        required: false,
+        loadOrder: 1.7
+      },
+      {
+        file: 'modal-stack-monitor.js',
+        globalCheck: 'window.modalStackMonitor',
+        description: 'Stack monitoring tool for nested modals',
+        required: false,
+        loadOrder: 1.8
+      },
+      {
+        file: 'modal-quantum-system-tests.js',
+        globalCheck: 'window.modalQuantumSystemTests',
+        description: 'Automated tests for modal quantum system',
+        required: false,
+        loadOrder: 1.9
       },
       {
         file: 'modal-manager-v2.js',
@@ -729,14 +771,14 @@ const PACKAGE_MANIFEST = {
     initTime: '~80ms'
   },
 
-  // 4.2. TAG MANAGEMENT PAGE PACKAGE - Tag management
+  // 5.2. TAG MANAGEMENT PAGE PACKAGE - Tag management
   'tag-management': {
     id: 'tag-management',
     name: 'Tag Management Page Package',
     description: 'Dedicated logic for tag management page',
     version: '1.0.0',
     critical: false,
-    loadOrder: 4.2,
+    loadOrder: 5.2,
     dependencies: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences'],
     scripts: [
       {
@@ -1430,6 +1472,12 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.SMSystemSettingsSection',
         description: 'System settings section',
         required: true
+      },
+      {
+        file: 'system-management/sm-detailed-log.js',
+        globalCheck: 'window.generateSystemManagementDetailedLog',
+        description: 'System management detailed log generator',
+        required: false
       }
     ],
     estimatedSize: '~400KB',
@@ -1859,27 +1907,12 @@ const PACKAGE_MANIFEST = {
         required: false,
         loadOrder: 1.5
       },
-      {
-        file: 'pending-executions-widget.js',
-        globalCheck: 'window.PendingExecutionsHighlights',
-        description: 'Assignment recommendations widget',
-        required: true,
-        loadOrder: 2
-      },
-      {
-        file: 'pending-execution-trade-creation.js',
-        globalCheck: 'window.PendingExecutionTradeCreation',
-        description: 'Trade creation interface from executions',
-        required: false,
-        loadOrder: 3
-      },
-      {
-        file: 'pending-trade-plan-widget.js',
-        globalCheck: 'window.PendingTradePlanWidget',
-        description: 'Trade plan assignment widget',
-        required: true,
-        loadOrder: 4
-      },
+      // Note: Old pending widgets removed - replaced by shared services:
+      // - ExecutionClusteringService (replaces pending-execution-trade-creation.js)
+      // - ExecutionAssignmentService (replaces pending-executions-widget.js)
+      // - TradePlanAssignmentService (replaces pending-trade-plan-widget.js)
+      // - ExecutionClusterHelpers (shared rendering helpers)
+      // - PendingActionsCacheService (shared cache management)
       {
         file: 'widgets/unified-pending-actions-widget.js',
         globalCheck: 'window.UnifiedPendingActionsWidget',
@@ -1927,7 +1960,7 @@ const PACKAGE_MANIFEST = {
     description: 'Dashboard-specific modules including trade creation support',
     version: '1.0.0',
     critical: false,
-    loadOrder: 3.6,
+    loadOrder: 6.1,
     dependencies: ['modules', 'validation'],
     scripts: [
       {

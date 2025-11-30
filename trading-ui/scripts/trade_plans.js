@@ -1127,18 +1127,50 @@ async function openCancelTradePlanModal(tradePlanId) {
       try {
         await window.ModalManagerV2.showModal('cancelTradePlanModal', 'view');
       } catch (error) {
-        // אם המודל לא קיים במערכת, נשתמש ב-Bootstrap
+        // אם המודל לא קיים במערכת, נשתמש ב-Bootstrap - עם backdrop: false וניקוי
         window.Logger?.warn('cancelTradePlanModal not in ModalManagerV2, using Bootstrap fallback', { page: 'trade_plans' });
         if (bootstrap?.Modal) {
-          const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+          // ניקוי backdrops לפני פתיחה
+          if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+            window.ModalManagerV2._cleanupBootstrapBackdrops();
+          }
+          const modal = bootstrap.Modal.getOrCreateInstance(modalElement, { backdrop: false });
           modal.show();
+          // ניקוי backdrops אחרי פתיחה
+          if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+            setTimeout(() => {
+              window.ModalManagerV2._cleanupBootstrapBackdrops();
+            }, 50);
+          }
+          // עדכון z-index
+          if (window.ModalZIndexManager?.forceUpdate) {
+            setTimeout(() => {
+              window.ModalZIndexManager.forceUpdate(modalElement);
+            }, 50);
+          }
         }
       }
     } else {
-      // Fallback ל-Bootstrap modal
+      // Fallback ל-Bootstrap modal - עם backdrop: false וניקוי
       if (bootstrap?.Modal) {
-        const modal = new bootstrap.Modal(modalElement);
+        // ניקוי backdrops לפני פתיחה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          window.ModalManagerV2._cleanupBootstrapBackdrops();
+        }
+        const modal = new bootstrap.Modal(modalElement, { backdrop: false });
         modal.show();
+        // ניקוי backdrops אחרי פתיחה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          setTimeout(() => {
+            window.ModalManagerV2._cleanupBootstrapBackdrops();
+          }, 50);
+        }
+        // עדכון z-index
+        if (window.ModalZIndexManager?.forceUpdate) {
+          setTimeout(() => {
+            window.ModalZIndexManager.forceUpdate(modalElement);
+          }, 50);
+        }
       }
     }
   }

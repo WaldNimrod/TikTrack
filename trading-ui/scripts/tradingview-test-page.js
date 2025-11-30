@@ -641,7 +641,7 @@
         };
         
         try {
-            console.log(`Running test: ${test.name}`);
+            window.Logger?.debug(`Running test: ${test.name}`);
             let result = test.run();
             
             // Wait only for async operations (if test returns Promise)
@@ -973,7 +973,7 @@
             if (window.NotificationSystem) {
                 window.NotificationSystem.showSuccess('לוג מפורט הועתק ללוח', 'בדיקת TradingView');
             } else {
-                alert('לוג מפורט הועתק ללוח');
+                window.showErrorNotification('לוג מפורט הועתק ללוח', "שגיאה");
             }
         } catch (error) {
             if (window.Logger) {
@@ -982,7 +982,7 @@
             if (window.NotificationSystem) {
                 window.NotificationSystem.showError('שגיאה בהעתקת הלוג: ' + error.message, 'בדיקת TradingView');
             } else {
-                alert('שגיאה בהעתקת הלוג: ' + error.message);
+                window.showErrorNotification('שגיאה בהעתקת הלוג: ' + error.message, "שגיאה");
             }
             
             const copyBtn = document.getElementById('copyLogBtn');

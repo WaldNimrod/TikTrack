@@ -56,6 +56,27 @@ class InfoSummarySystem {
         }
         return data.filter(item => item[params.field] === params.value).length;
       },
+      countByAvailability: (data, params) => {
+        // Count items with availability (cache or note)
+        // For AI analysis, check _availability property
+        // Only count completed items (availability is only set for completed items)
+        if (params.type === 'cache') {
+          return data.filter(item => {
+            // Only check completed items
+            if (item.status !== 'completed') return false;
+            const availability = item._availability || {};
+            return availability.has_cache === true;
+          }).length;
+        } else if (params.type === 'note') {
+          return data.filter(item => {
+            // Only check completed items
+            if (item.status !== 'completed') return false;
+            const availability = item._availability || {};
+            return availability.has_note === true && availability.note_id !== null;
+          }).length;
+        }
+        return 0;
+      },
       
       // Sum a numeric field
       sumField: (data, params) => {

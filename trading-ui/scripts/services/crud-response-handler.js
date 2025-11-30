@@ -131,9 +131,13 @@ class CRUDResponseHandler {
             // סגירת modal
             if (options.modalId) {
                 console.log('✅ handleSaveResponse - Closing modal:', options.modalId);
-                const modal = bootstrap.Modal.getInstance(document.getElementById(options.modalId));
-                if (modal) {
-                    modal.hide();
+                if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+                    window.ModalManagerV2.hideModal(options.modalId);
+                } else if (bootstrap?.Modal) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById(options.modalId));
+                    if (modal) {
+                        modal.hide();
+                    }
                 }
             }
 
@@ -227,9 +231,13 @@ class CRUDResponseHandler {
 
             // סגירת modal
             if (options.modalId) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById(options.modalId));
-                if (modal) {
-                    modal.hide();
+                if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+                    window.ModalManagerV2.hideModal(options.modalId);
+                } else if (bootstrap?.Modal) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById(options.modalId));
+                    if (modal) {
+                        modal.hide();
+                    }
                 }
             }
 

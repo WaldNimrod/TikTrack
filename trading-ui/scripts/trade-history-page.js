@@ -308,14 +308,14 @@
                     // Fallback to Bootstrap if ModalManagerV2 fails
                     window.Logger?.warn('tradeSelectorModal not available in ModalManagerV2, using Bootstrap fallback', { page: 'trade-history-page' });
                     if (bootstrap?.Modal) {
-                        const modal = new bootstrap.Modal(modalElement);
+                        const modal = window.ModalManagerV2?.openModal(modalElement);
                         modal.show();
                     }
                 }
             } else {
                 // Fallback to Bootstrap modal
                 if (bootstrap?.Modal) {
-                    const modal = new bootstrap.Modal(modalElement);
+                    const modal = window.ModalManagerV2?.openModal(modalElement);
                     modal.show();
                 }
             }
@@ -522,7 +522,7 @@
             } else {
                 // Fallback to Bootstrap modal
                 if (bootstrap?.Modal) {
-                    const modal = bootstrap.Modal.getInstance(modalElement);
+                    const modal = window.ModalManagerV2?.getInstance(modalElement);
                     if (modal) {
                         modal.hide();
                     }

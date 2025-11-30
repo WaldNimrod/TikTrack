@@ -199,17 +199,36 @@
             log('🚀 Opening parent modal (Linked Items)', 'info');
             markStart('parent-modal-open');
             
-            const modal = new bootstrap.Modal(document.getElementById('linkedItemsModal'));
-            
-            document.getElementById('linkedItemsModal').addEventListener('shown.bs.modal', () => {
-                markEnd('parent-modal-open');
-                log('✅ Parent modal shown', 'success');
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+                window.ModalManagerV2.showModal('linkedItemsModal', 'view').then(() => {
+                    markEnd('parent-modal-open');
+                    log('✅ Parent modal shown', 'success');
+                    
+                    const visibility = checkModalVisibility('linkedItemsModal');
+                    log(`📊 Parent modal visibility: ${JSON.stringify(visibility, null, 2)}`, 'info');
+                }).catch(error => {
+                    window.Logger?.error('Error showing linked items modal via ModalManagerV2', { error, modalId: 'linkedItemsModal', page: 'test-nested-modal-rich-text' });
+                    // Fallback to Bootstrap
+                    if (bootstrap?.Modal) {
+                        const modal = new bootstrap.Modal(document.getElementById('linkedItemsModal'));
+                        modal.show();
+                        markEnd('parent-modal-open');
+                        log('✅ Parent modal shown (Bootstrap fallback)', 'success');
+                    }
+                });
+            } else if (bootstrap?.Modal) {
+                const modal = new bootstrap.Modal(document.getElementById('linkedItemsModal'));
                 
-                const visibility = checkModalVisibility('linkedItemsModal');
-                log(`📊 Parent modal visibility: ${JSON.stringify(visibility, null, 2)}`, 'info');
-            }, { once: true });
-            
-            modal.show();
+                document.getElementById('linkedItemsModal').addEventListener('shown.bs.modal', () => {
+                    markEnd('parent-modal-open');
+                    log('✅ Parent modal shown', 'success');
+                    
+                    const visibility = checkModalVisibility('linkedItemsModal');
+                    log(`📊 Parent modal visibility: ${JSON.stringify(visibility, null, 2)}`, 'info');
+                }, { once: true });
+                
+                modal.show();
+            }
         }
         
         // Open nested modal
@@ -218,9 +237,29 @@
             markStart('nested-modal-open');
             
             const nestedModal = document.getElementById('notesModal');
-            const modal = new bootstrap.Modal(nestedModal, {
-                backdrop: false
-            });
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+                window.ModalManagerV2.showModal('notesModal', 'edit').then(() => {
+                    markEnd('nested-modal-open');
+                    log('✅ Nested modal shown', 'success');
+                }).catch(error => {
+                    window.Logger?.error('Error showing notes modal via ModalManagerV2', { error, modalId: 'notesModal', page: 'test-nested-modal-rich-text' });
+                    // Fallback to Bootstrap
+                    if (bootstrap?.Modal) {
+                        const modal = new bootstrap.Modal(nestedModal, {
+                            backdrop: false
+                        });
+                        modal.show();
+                        markEnd('nested-modal-open');
+                        log('✅ Nested modal shown (Bootstrap fallback)', 'success');
+                    }
+                });
+            } else if (bootstrap?.Modal) {
+                const modal = new bootstrap.Modal(nestedModal, {
+                    backdrop: false
+                });
+                modal.show();
+                markEnd('nested-modal-open');
+                log('✅ Nested modal shown (Bootstrap fallback)', 'success');
             
             // Track Bootstrap events
             nestedModal.addEventListener('show.bs.modal', () => {

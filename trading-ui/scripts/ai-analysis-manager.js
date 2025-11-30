@@ -77,6 +77,7 @@
     initialized: false,
     selectedTemplate: null,
     currentAnalysis: null,
+    pendingResult: null, // Store result to show after history reload
     templates: [],
     history: [],
     llmProviderSettings: null,
@@ -117,20 +118,16 @@
         // Load history
         try {
           this.history = await window.AIAnalysisData?.loadHistory() || [];
-          // Check availability for all items (cache + notes)
+          // Check availability for all items (cache + notes) before rendering
           await this.checkAvailabilityForAll();
           this.renderHistory();
-        } catch (error) {
-          window.Logger?.warn('Could not load history', { page: 'ai-analysis', error });
-        }
-
-        // Update summary stats after loading history
-        try {
+          
+          // Update summary stats after checking availability
           if (window.updatePageSummaryStats && this.history) {
             window.updatePageSummaryStats('ai-analysis', this.history);
           }
         } catch (error) {
-          window.Logger?.warn('Could not update summary stats', { page: 'ai-analysis', error });
+          window.Logger?.warn('Could not load history', { page: 'ai-analysis', error });
         }
 
         // Setup form handler
@@ -269,9 +266,13 @@
         }
 
         // Close template selection modal
-        const templateModal = bootstrap.Modal.getInstance(document.getElementById('aiTemplateSelectionModal'));
-        if (templateModal) {
-          templateModal.hide();
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+          window.ModalManagerV2.hideModal('aiTemplateSelectionModal');
+        } else if (bootstrap?.Modal) {
+          const templateModal = bootstrap.Modal.getInstance(document.getElementById('aiTemplateSelectionModal'));
+          if (templateModal) {
+            templateModal.hide();
+          }
         }
 
         // Open variables modal
@@ -986,6 +987,65 @@
         this.setLoadingState(true, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner');
       }
 
+      // Validate request before generating analysis using Business Logic Layer
+      if (window.AIAnalysisData?.validateAnalysisRequest) {
+        try {
+          window.Logger?.info?.('🔍 Validating analysis request...', { page: 'ai-analysis' });
+          
+          const validationResult = await window.AIAnalysisData.validateAnalysisRequest({
+            template_id: this.selectedTemplate.id,
+            variables: variables,
+            provider: provider
+          });
+
+          if (!validationResult.is_valid) {
+            // Reset loading state
+            if (isModal) {
+              this.setLoadingState(false, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal');
+            } else {
+              this.setLoadingState(false, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner');
+            }
+            
+            const errorMessage = validationResult.errors.join(', ');
+            
+            window.Logger?.warn?.('⚠️ Validation failed', {
+              page: 'ai-analysis',
+              errors: validationResult.errors,
+            });
+            
+            if (window.NotificationSystem) {
+              window.NotificationSystem.showError(
+                'שגיאת ולידציה: ' + errorMessage,
+                'system'
+              );
+            }
+            return;
+          }
+          
+          window.Logger?.info?.('✅ Validation passed', { page: 'ai-analysis' });
+        } catch (validationError) {
+          // Reset loading state on validation error
+          if (isModal) {
+            this.setLoadingState(false, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal');
+          } else {
+            this.setLoadingState(false, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner');
+          }
+          
+          window.Logger?.error?.('❌ Error during validation', {
+            page: 'ai-analysis',
+            error: validationError?.message || validationError,
+          });
+          
+          if (window.NotificationSystem) {
+            window.NotificationSystem.showError(
+              'שגיאה בוולידציה: ' + (validationError?.message || 'שגיאה לא ידועה'),
+              'system'
+            );
+          }
+          return;
+        }
+      }
+
       try {
         window.Logger?.info('Generating analysis...', {
           page: 'ai-analysis',
@@ -1022,13 +1082,21 @@
             reloadFn: async () => {
               // Reload history after successful analysis creation
               this.history = await window.AIAnalysisData?.loadHistory({ force: true }) || [];
-              // Check availability AFTER cache is saved (give it a moment)
-              await new Promise(resolve => setTimeout(resolve, 100)); // Small delay to ensure cache is saved
+              // Check availability AFTER cache is saved (give it a moment for cache to be fully written)
+              await new Promise(resolve => setTimeout(resolve, 200)); // Delay to ensure cache is saved
               await this.checkAvailabilityForAll();
               this.renderHistory();
-              // Update summary stats
+              // Update summary stats after availability check
               if (window.updatePageSummaryStats) {
                 window.updatePageSummaryStats('ai-analysis', this.history);
+              }
+              
+              // Show results after history is updated (if we have a pending result)
+              if (this.pendingResult && this.pendingResult.id) {
+                // Find the updated result from history to get latest availability info
+                const updatedResult = this.history.find(h => h.id === this.pendingResult.id) || this.pendingResult;
+                await this.openResultsModal(updatedResult);
+                this.pendingResult = null; // Clear pending result
               }
             },
             requiresHardReload: false,
@@ -1056,20 +1124,11 @@
                   cacheKey,
                   hasResponseText: !!result.response_text
                 });
-                
-                // Update availability for this specific item immediately
-                if (this.history) {
-                  const historyItem = this.history.find(h => h.id === result.id);
-                  if (historyItem) {
-                    historyItem._availability = {
-                      has_cache: true,
-                      has_note: false,
-                      note_id: null
-                    };
-                  }
-                }
               }
             }
+            
+            // Store result for display after reload
+            this.pendingResult = result;
           }
         } else {
           // Fallback to manual handling
@@ -1087,7 +1146,7 @@
             if (result.id && result.response_text) {
               const cacheKey = `ai-analysis-response-${result.id}`;
               if (window.UnifiedCacheManager) {
-                await window.UnifiedCacheManager.save(cacheKey, {
+                const saveResult = await window.UnifiedCacheManager.save(cacheKey, {
                   response_text: result.response_text,
                   response_json: result.response_json || null,
                   cached_at: new Date().toISOString()
@@ -1096,31 +1155,49 @@
                   layer: 'indexedDB',
                   compress: true
                 });
-                window.Logger?.info('✅ Saved AI analysis response to cache', { 
-                  page: 'ai-analysis', 
-                  requestId: result.id,
-                  cacheKey,
-                  hasResponseText: !!result.response_text
-                });
                 
-                // Update availability for this specific item immediately
-                if (this.history) {
-                  const historyItem = this.history.find(h => h.id === result.id);
-                  if (historyItem) {
-                    historyItem._availability = {
-                      has_cache: true,
-                      has_note: false,
-                      note_id: null
-                    };
+                if (saveResult) {
+                  window.Logger?.info('✅ Saved AI analysis response to cache', { 
+                    page: 'ai-analysis', 
+                    requestId: result.id,
+                    cacheKey,
+                    hasResponseText: !!result.response_text
+                  });
+                  
+                  // Update availability for this specific item immediately
+                  if (this.history) {
+                    const historyItem = this.history.find(h => h.id === result.id);
+                    if (historyItem) {
+                      historyItem._availability = {
+                        has_cache: true,
+                        has_note: false,
+                        note_id: null
+                      };
+                      window.Logger?.debug('Updated availability for history item', {
+                        page: 'ai-analysis',
+                        id: result.id,
+                        has_cache: true
+                      });
+                    }
                   }
+                } else {
+                  window.Logger?.warn('⚠️ Failed to save AI analysis response to cache', { 
+                    page: 'ai-analysis', 
+                    requestId: result.id,
+                    cacheKey
+                  });
                 }
               }
             }
             
             // Close variables modal
-            const variablesModal = bootstrap.Modal.getInstance(document.getElementById('aiVariablesModal'));
-            if (variablesModal) {
-              variablesModal.hide();
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+              window.ModalManagerV2.hideModal('aiVariablesModal');
+            } else if (bootstrap?.Modal) {
+              const variablesModal = bootstrap.Modal.getInstance(document.getElementById('aiVariablesModal'));
+              if (variablesModal) {
+                variablesModal.hide();
+              }
             }
             
             // Show success notification
@@ -1130,23 +1207,29 @@
             
             // Reload history
             this.history = await window.AIAnalysisData?.loadHistory({ force: true }) || [];
-            // Check availability AFTER cache is saved (give it a moment)
-            await new Promise(resolve => setTimeout(resolve, 100)); // Small delay to ensure cache is saved
+            // Check availability AFTER cache is saved (give it a moment for cache to be fully written)
+            await new Promise(resolve => setTimeout(resolve, 200)); // Delay to ensure cache is saved
             await this.checkAvailabilityForAll();
             this.renderHistory();
-            // Update summary stats
+            // Update summary stats after availability check
             if (window.updatePageSummaryStats) {
               window.updatePageSummaryStats('ai-analysis', this.history);
+            }
+            
+            // Show results modal after history is updated
+            if (result && result.id) {
+              // Ensure we have the latest result with cache info
+              const updatedResult = this.history.find(h => h.id === result.id) || result;
+              await this.openResultsModal(updatedResult);
             }
           } else {
             throw new Error(data.message || 'שגיאה ביצירת ניתוח');
           }
         }
 
-        if (result) {
+        // Show results if not already shown (fallback for non-CRUDResponseHandler flow)
+        if (result && !window.CRUDResponseHandler) {
           this.currentAnalysis = result;
-          
-          // Open results modal
           await this.openResultsModal(result);
         }
       } catch (error) {
@@ -1386,9 +1469,23 @@
           return;
         }
 
+        window.Logger?.debug('Starting availability check', {
+          page: 'ai-analysis',
+          totalItems: this.history.length,
+          completedItems: analysisIds.length
+        });
+
+        // Small delay to ensure cache writes are complete
+        await new Promise(resolve => setTimeout(resolve, 150));
+
         // Check cache for all items (async check)
         const cacheChecks = {};
         if (window.UnifiedCacheManager) {
+          window.Logger?.debug('Checking cache for items', {
+            page: 'ai-analysis',
+            itemCount: analysisIds.length
+          });
+          
           const cachePromises = analysisIds.map(async (id) => {
             const cacheKey = `ai-analysis-response-${id}`;
             try {
@@ -1396,6 +1493,8 @@
               const hasCache = !!(cachedData && cachedData.response_text);
               if (hasCache) {
                 window.Logger?.debug('Found in cache', { page: 'ai-analysis', id, cacheKey });
+              } else {
+                window.Logger?.debug('Not found in cache', { page: 'ai-analysis', id, cacheKey });
               }
               return {
                 id,
@@ -1404,7 +1503,7 @@
                 note_id: null
               };
             } catch (error) {
-              window.Logger?.warn('Error checking cache', { page: 'ai-analysis', id, error });
+              window.Logger?.warn('Error checking cache', { page: 'ai-analysis', id, cacheKey, error });
               return {
                 id,
                 has_cache: false,
@@ -1422,9 +1521,21 @@
               note_id: result.note_id
             };
           });
+          
+          const cacheCount = Object.values(cacheChecks).filter(c => c.has_cache).length;
+          window.Logger?.debug('Cache check completed', {
+            page: 'ai-analysis',
+            totalChecked: cacheResults.length,
+            foundInCache: cacheCount
+          });
         }
 
         // Check notes via API (batch)
+        window.Logger?.debug('Checking notes availability via API', {
+          page: 'ai-analysis',
+          analysisIds: analysisIds
+        });
+        
         try {
           const response = await fetch('/api/ai-analysis/history/availability/batch', {
             method: 'POST',
@@ -1452,7 +1563,20 @@
                   };
                 }
               }
+              const noteCount = Object.values(cacheChecks).filter(c => c.has_note).length;
+              window.Logger?.debug('Merged note availability from API', {
+                page: 'ai-analysis',
+                noteCount: noteCount,
+                totalChecked: analysisIds.length
+              });
             }
+          } else {
+            const errorText = await response.text().catch(() => 'Unknown error');
+            window.Logger?.warn('API error checking notes availability', {
+              page: 'ai-analysis',
+              status: response.status,
+              error: errorText
+            });
           }
         } catch (error) {
           window.Logger?.warn('Error checking notes availability', { page: 'ai-analysis', error });
@@ -1587,32 +1711,113 @@
         const result = await response.json();
         
         if (result.status === 'success' && result.data) {
-          // Save to cache
-          if (window.UnifiedCacheManager && result.data.id && result.data.response_text) {
-            const cacheKey = `ai-analysis-response-${result.data.id}`;
-            await window.UnifiedCacheManager.save(cacheKey, {
-              response_text: result.data.response_text,
-              response_json: result.data.response_json
-            }, { ttl: 7200000 }); // 2 hours
-          }
+          // Use CRUDResponseHandler if available (same flow as handleGenerateAnalysis)
+          if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function') {
+            const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {
+              modalId: null, // No modal to close for rerun
+              successMessage: 'ניתוח נוצר מחדש בהצלחה!',
+              entityName: 'ניתוח AI',
+              reloadFn: async () => {
+                // Reload history after successful analysis creation
+                this.history = await window.AIAnalysisData?.loadHistory({ force: true }) || [];
+                // Check availability AFTER cache is saved (give it a moment for cache to be fully written)
+                await new Promise(resolve => setTimeout(resolve, 200)); // Delay to ensure cache is saved
+                await this.checkAvailabilityForAll();
+                this.renderHistory();
+                // Update summary stats after availability check
+                if (window.updatePageSummaryStats) {
+                  window.updatePageSummaryStats('ai-analysis', this.history);
+                }
+                
+                // Show results after history is updated (if we have a pending result)
+                if (this.pendingResult && this.pendingResult.id) {
+                  // Find the updated result from history to get latest availability info
+                  const updatedResult = this.history.find(h => h.id === this.pendingResult.id) || this.pendingResult;
+                  await this.openResultsModal(updatedResult);
+                  this.pendingResult = null; // Clear pending result
+                }
+              },
+              requiresHardReload: false,
+            });
 
-          // Show success notification
-          if (window.NotificationSystem) {
-            window.NotificationSystem.showSuccess('הניתוח הושלם בהצלחה!', 'business');
-          }
+            if (crudResult && crudResult.status === 'success' && crudResult.data) {
+              const analysisResult = crudResult.data;
+              
+              // Save response_text to cache (not in DB) - same as handleGenerateAnalysis
+              if (analysisResult.id && analysisResult.response_text) {
+                const cacheKey = `ai-analysis-response-${analysisResult.id}`;
+                if (window.UnifiedCacheManager) {
+                  await window.UnifiedCacheManager.save(cacheKey, {
+                    response_text: analysisResult.response_text,
+                    response_json: analysisResult.response_json || null,
+                    cached_at: new Date().toISOString()
+                  }, {
+                    ttl: 7200000, // 2 hours
+                    layer: 'indexedDB',
+                    compress: true
+                  });
+                  window.Logger?.info('✅ Saved AI analysis response to cache (rerun)', { 
+                    page: 'ai-analysis', 
+                    requestId: analysisResult.id,
+                    cacheKey,
+                    hasResponseText: !!analysisResult.response_text
+                  });
+                }
+              }
+              
+              // Store result for display after reload
+              this.pendingResult = analysisResult;
+            }
+          } else {
+            // Fallback to manual handling (same as handleGenerateAnalysis)
+            window.Logger?.warn('CRUDResponseHandler not available for rerun, using manual handling', { page: 'ai-analysis' });
+            
+            // Save response_text to cache (not in DB) - same options as handleGenerateAnalysis
+            if (result.data.id && result.data.response_text) {
+              const cacheKey = `ai-analysis-response-${result.data.id}`;
+              if (window.UnifiedCacheManager) {
+                await window.UnifiedCacheManager.save(cacheKey, {
+                  response_text: result.data.response_text,
+                  response_json: result.data.response_json || null,
+                  cached_at: new Date().toISOString()
+                }, {
+                  ttl: 7200000, // 2 hours
+                  layer: 'indexedDB',
+                  compress: true
+                });
+                window.Logger?.info('✅ Saved AI analysis response to cache (rerun, manual)', { 
+                  page: 'ai-analysis', 
+                  requestId: result.data.id,
+                  cacheKey,
+                  hasResponseText: !!result.data.response_text
+                });
+              }
+            }
 
-          // Reload history to show new analysis
-          this.history = await window.AIAnalysisData?.loadHistory({ force: true }) || [];
-          await this.checkAvailabilityForAll();
-          this.renderHistory();
-          
-          // Update summary stats
-          if (window.updatePageSummaryStats) {
-            window.updatePageSummaryStats('ai-analysis', this.history);
+            // Show success notification
+            if (window.NotificationSystem) {
+              window.NotificationSystem.showSuccess('הניתוח הושלם בהצלחה!', 'business');
+            }
+
+            // Reload history to show new analysis
+            this.history = await window.AIAnalysisData?.loadHistory({ force: true }) || [];
+            // Check availability AFTER cache is saved (give it a moment for cache to be fully written)
+            await new Promise(resolve => setTimeout(resolve, 200)); // Delay to ensure cache is saved
+            await this.checkAvailabilityForAll();
+            this.renderHistory();
+            
+            // Update summary stats after availability check
+            if (window.updatePageSummaryStats) {
+              window.updatePageSummaryStats('ai-analysis', this.history);
+            }
+            
+            // Open results modal after history is updated
+            if (result.data && result.data.id) {
+              // Ensure we have the latest result with cache info
+              const updatedResult = this.history.find(h => h.id === result.data.id) || result.data;
+              await this.openResultsModal(updatedResult);
+            }
           }
-          
-          // Open results modal
-          await this.openResultsModal(result.data);
         } else {
           throw new Error(result.message || 'Failed to generate analysis');
         }

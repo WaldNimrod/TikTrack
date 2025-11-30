@@ -620,9 +620,16 @@ function initializeModalBackdrop() {
     // הוספת event listener לסגירה בלחיצה על הרקע
     modal.addEventListener('click', event => {
       if (event.target === modal) {
-        const modalInstance = bootstrap.Modal.getInstance(modal);
-        if (modalInstance) {
-          modalInstance.hide();
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+          const modalId = modal.id;
+          if (modalId) {
+            window.ModalManagerV2.hideModal(modalId);
+          }
+        } else if (bootstrap?.Modal) {
+          const modalInstance = bootstrap.Modal.getInstance(modal);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
         }
       }
     });
@@ -893,26 +900,34 @@ window.toggleSection = async function (sectionId) {
     async function updateChevronIcon(iconElement, isCollapsed) {
         if (!iconElement) return;
         
-        // Use IconSystem if available
+        // Use IconSystem if available - use 'toggle' which maps to 'chevron-down'
         if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized && iconElement.tagName === 'IMG') {
             try {
+                // Use 'toggle' which maps to 'chevron-down' in icon-mappings.js
                 const iconHTML = await window.IconSystem.renderIcon('button', 'toggle', {
                     size: iconElement.getAttribute('width') || '16',
-                    alt: iconElement.getAttribute('alt') || 'toggle',
+                    alt: iconElement.getAttribute('alt') || (isCollapsed ? 'הצג' : 'הסתר'),
                     class: iconElement.getAttribute('class') || 'icon'
                 });
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = iconHTML;
                 const newIcon = tempDiv.firstElementChild;
                 if (newIcon) {
+                    // Apply rotation transform for expanded state
+                    if (!isCollapsed && newIcon.tagName === 'svg') {
+                        newIcon.style.transform = 'rotate(180deg)';
+                    } else if (!isCollapsed && newIcon.tagName === 'IMG') {
+                        newIcon.style.transform = 'rotate(180deg)';
+                    }
                     iconElement.parentNode.replaceChild(newIcon, iconElement);
                 }
             } catch (error) {
-                // Fallback to direct path
+                // Fallback to direct path - use chevron-down
                 const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
                     ? window.BUTTON_ICONS.TOGGLE 
                     : '/trading-ui/images/icons/tabler/chevron-down.svg';
                 iconElement.src = toggleIconPath;
+                iconElement.style.transform = isCollapsed ? '' : 'rotate(180deg)';
             }
         } else if (iconElement.tagName === 'IMG') {
             const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
@@ -922,10 +937,16 @@ window.toggleSection = async function (sectionId) {
             iconElement.style.transform = isCollapsed ? '' : 'rotate(180deg)';
         } else if (iconElement.querySelector('img')) {
             const img = iconElement.querySelector('img');
+            const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
+                ? window.BUTTON_ICONS.TOGGLE 
+                : '/trading-ui/images/icons/tabler/chevron-down.svg';
             img.src = toggleIconPath;
             img.style.transform = isCollapsed ? '' : 'rotate(180deg)';
         } else {
             // Replace text content with img tag
+            const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
+                ? window.BUTTON_ICONS.TOGGLE 
+                : '/trading-ui/images/icons/tabler/chevron-down.svg';
             const transformStyle = isCollapsed ? '' : ' style="transform: rotate(180deg);"';
             iconElement.innerHTML = `<img src="${toggleIconPath}" width="16" height="16" alt="${isCollapsed ? 'הצג' : 'הסתר'}" class="icon"${transformStyle}>`;
         }

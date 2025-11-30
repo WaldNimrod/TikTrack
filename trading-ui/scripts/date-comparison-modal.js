@@ -686,7 +686,7 @@
     function updateComparisonTable(data) {
         const tbody = document.getElementById('comparison-table-body');
         if (!tbody) {
-            console.error('Comparison table body not found');
+            window.Logger?.error('Comparison table body not found');
             if (window.Logger && typeof window.Logger.warn === 'function') {
                 window.Logger.warn('Comparison table body not found', { page: 'date-comparison-modal' });
             }
@@ -694,7 +694,7 @@
         }
         
         if (!data || !data.datesData || !selectedDates || selectedDates.length < 2) {
-            console.error('Invalid comparison data', data);
+            window.Logger?.error('Invalid comparison data', data);
             if (window.Logger && typeof window.Logger.warn === 'function') {
                 window.Logger.warn('Invalid comparison data', { page: 'date-comparison-modal', data });
             }
@@ -703,7 +703,7 @@
             return;
         }
         
-        console.log('Updating comparison table with data:', data);
+        window.Logger?.debug('Updating comparison table with data:', data);
 
         const metrics = [
             { key: 'balance', label: 'יתרות', format: 'currency' },
@@ -743,7 +743,7 @@
                         formattedValue = value.toString();
                     }
                 } catch (error) {
-                    console.error(`Error formatting metric ${metric.key} for date ${date}:`, error);
+                    window.Logger?.error(`Error formatting metric ${metric.key} for date ${date}:`, error);
                     formattedValue = '-';
                 }
 
@@ -768,7 +768,7 @@
                             formattedChange = formatNumberChange(changeValue, changePercent);
                         }
                     } catch (error) {
-                        console.error(`Error formatting change for metric ${metric.key}:`, error);
+                        window.Logger?.error(`Error formatting change for metric ${metric.key}:`, error);
                         formattedChange = '-';
                     }
 
@@ -1040,7 +1040,7 @@
             // Generate bar chart data
             const barData = generateBarChartData(data);
             
-            console.log('Updating bar chart with data:', barData);
+            window.Logger?.debug('Updating bar chart with data:', barData);
 
             // Add series for date1
             const series1 = window.TradingViewChartAdapter.addBarSeries(barChart, {
@@ -1134,7 +1134,7 @@
             });
         });
 
-        console.log('Generated bar chart data:', { date1Data, date2Data });
+        window.Logger?.debug('Generated bar chart data:', { date1Data, date2Data });
 
         return {
             date1Data: date1Data,
@@ -1296,7 +1296,7 @@
             // Generate line chart data
             const lineData = generateLineChartData(data);
             
-            console.log('Updating line chart with data:', lineData);
+            window.Logger?.debug('Updating line chart with data:', lineData);
 
             // Add series for balance
             if (lineData.balanceData && lineData.balanceData.length > 0) {
@@ -1383,7 +1383,7 @@
             plData.push({ time: timeStr, value: pl });
         }
 
-        console.log('Generated line chart data:', { balanceData, portfolioData, plData });
+        window.Logger?.debug('Generated line chart data:', { balanceData, portfolioData, plData });
 
         return {
             balanceData: balanceData,

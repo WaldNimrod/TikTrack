@@ -794,9 +794,16 @@ function initializeModalBackdrop() {
     // הוספת event listener לסגירה בלחיצה על הרקע
     modal.addEventListener('click', event => {
       if (event.target === modal) {
-        const modalInstance = bootstrap.Modal.getInstance(modal);
-        if (modalInstance) {
-          modalInstance.hide();
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+          const modalId = modal.id;
+          if (modalId) {
+            window.ModalManagerV2.hideModal(modalId);
+          }
+        } else if (bootstrap?.Modal) {
+          const modalInstance = bootstrap.Modal.getInstance(modal);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
         }
       }
     });

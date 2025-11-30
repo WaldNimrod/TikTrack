@@ -1615,10 +1615,21 @@ window.showDetailedNotification = async function(title, message, type = 'info', 
     // הוספת ה-modal ל-DOM
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     
-    // הצגת ה-modal
+    // הצגת ה-modal דרך ModalManagerV2 או Bootstrap fallback
     const modalElement = document.getElementById(modalId);
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      window.ModalManagerV2.showModal(modalId, 'view').catch(error => {
+        window.Logger?.error('Error showing notification modal via ModalManagerV2', { error, modalId, page: 'notification-system' });
+        // Fallback to Bootstrap
+        if (bootstrap?.Modal && modalElement) {
+          const modal = new bootstrap.Modal(modalElement);
+          modal.show();
+        }
+      });
+    } else if (bootstrap?.Modal && modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    }
     
     // הוספת event listener לכפתור העתקה (למניעת בעיות escape)
     const copyBtn = document.getElementById(`${modalId}-copy-btn`);

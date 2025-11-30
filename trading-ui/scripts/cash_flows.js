@@ -412,7 +412,7 @@ function getCashFlowsPaginationInstance() {
   // Always return the instance created by syncCashFlowsPagination if it exists
   // This ensures we use the instance with the correct render callback
   if (cashFlowsPaginationInstance) {
-    console.log('✅ [getCashFlowsPaginationInstance] Returning cached instance', {
+    window.Logger?.debug('✅ [getCashFlowsPaginationInstance] Returning cached instance', {
       hasOnAfterRender: typeof cashFlowsPaginationInstance.config?.onAfterRender === 'function',
       tableId: cashFlowsPaginationInstance.config?.tableId
     });
@@ -422,7 +422,7 @@ function getCashFlowsPaginationInstance() {
   if (window.PaginationSystem?.get) {
     const instance = window.PaginationSystem.get(CASH_FLOWS_TABLE_ID);
     if (instance) {
-      console.log('⚠️ [getCashFlowsPaginationInstance] Using PaginationSystem instance (fallback)', {
+      window.Logger?.debug('⚠️ [getCashFlowsPaginationInstance] Using PaginationSystem instance (fallback)', {
         hasOnAfterRender: typeof instance.config?.onAfterRender === 'function',
         tableId: instance.config?.tableId
       });
@@ -433,7 +433,7 @@ function getCashFlowsPaginationInstance() {
   if (typeof window.getPagination === 'function') {
     const instance = window.getPagination(CASH_FLOWS_TABLE_ID);
     if (instance) {
-      console.log('⚠️ [getCashFlowsPaginationInstance] Using getPagination instance (fallback)', {
+      window.Logger?.debug('⚠️ [getCashFlowsPaginationInstance] Using getPagination instance (fallback)', {
         hasOnAfterRender: typeof instance.config?.onAfterRender === 'function',
         tableId: instance.config?.tableId
       });
@@ -441,7 +441,7 @@ function getCashFlowsPaginationInstance() {
       return instance;
     }
   }
-  console.warn('⚠️ [getCashFlowsPaginationInstance] No pagination instance found');
+  window.Logger?.warn('⚠️ [getCashFlowsPaginationInstance] No pagination instance found');
   return null;
 }
 
@@ -534,7 +534,7 @@ async function filterCashFlowsByType(flowType, options = {}) {
   // Export to window for global access (needed for data-onchange)
   window.filterCashFlowsByType = filterCashFlowsByType;
   
-  console.log('🔍 [filterCashFlowsByType] Called with:', { flowType, options });
+  window.Logger?.debug('🔍 [filterCashFlowsByType] Called with:', { flowType, options });
   window.Logger?.info('🔍 filterCashFlowsByType called', { 
     flowType, 
     options, 
@@ -595,7 +595,7 @@ async function filterCashFlowsByType(flowType, options = {}) {
 
   // If pagination exists, update it with filtered data
   if (paginationInstance && typeof paginationInstance.setData === 'function') {
-    console.log('📊 [filterCashFlowsByType] Using pagination setData', { 
+    window.Logger?.debug('📊 [filterCashFlowsByType] Using pagination setData', { 
       filteredCount: filteredData.length,
       originalCount: (Array.isArray(window.allCashFlowsData) ? window.allCashFlowsData : window.cashFlowsData || []).length,
       hasPagination: true,
@@ -608,18 +608,18 @@ async function filterCashFlowsByType(flowType, options = {}) {
     });
     // Force update window.filteredCashFlowsData immediately BEFORE setData
     window.filteredCashFlowsData = filteredData;
-    console.log('✅ [filterCashFlowsByType] window.filteredCashFlowsData updated to', filteredData.length, 'items');
+    window.Logger?.debug('✅ [filterCashFlowsByType] window.filteredCashFlowsData updated to', filteredData.length, 'items');
     // Update pagination with filtered data - it will call render callback
     paginationInstance.setData(filteredData);
-    console.log('✅ [filterCashFlowsByType] paginationInstance.setData called with', filteredData.length, 'items');
+    window.Logger?.debug('✅ [filterCashFlowsByType] paginationInstance.setData called with', filteredData.length, 'items');
     
     // Force render table immediately if render callback didn't fire
     // This is a safety net - the render callback should handle this, but if it doesn't, we'll do it here
     setTimeout(async () => {
       const currentPageData = paginationInstance.getCurrentPageData();
-      console.log('🔄 [filterCashFlowsByType] Force render check - currentPageData length:', currentPageData.length);
+      window.Logger?.debug('🔄 [filterCashFlowsByType] Force render check - currentPageData length:', currentPageData.length);
       if (currentPageData.length > 0 || filteredData.length === 0) {
-        console.log('🔄 [filterCashFlowsByType] Force calling updateCashFlowsTable');
+        window.Logger?.debug('🔄 [filterCashFlowsByType] Force calling updateCashFlowsTable');
         await updateCashFlowsTable(currentPageData, { skipDataUpdate: true, skipSummary: true });
       }
     }, 100);
@@ -654,14 +654,14 @@ async function filterCashFlowsByType(flowType, options = {}) {
   }
 
   // Fallback: update table directly
-  console.log('📊 [filterCashFlowsByType] Using direct table update (no pagination)', { 
+  window.Logger?.debug('📊 [filterCashFlowsByType] Using direct table update (no pagination)', { 
     filteredCount: filteredData.length,
     hasPagination: false,
     page: 'cash_flows' 
   });
   window.Logger?.info('Using direct table update (no pagination)', { page: 'cash_flows' });
   await updateCashFlowsTable(filteredData);
-  console.log('✅ [filterCashFlowsByType] updateCashFlowsTable completed');
+  window.Logger?.debug('✅ [filterCashFlowsByType] updateCashFlowsTable completed');
 }
 
 /**
@@ -1035,7 +1035,7 @@ async function deleteCashFlow(id) {
       );
     } else {
       // Fallback to simple confirm
-      if (!confirm('האם אתה בטוח שברצונך למחוק את תזרים המזומנים?')) {
+      if (!window.showConfirmationDialog('האם אתה בטוח שברצונך למחוק את תזרים המזומנים?')) {
         return;
       }
       await performCashFlowDeletion(id);
@@ -1100,9 +1100,9 @@ async function deleteImportedCashFlows() {
             'danger'
           );
         } catch (error) {
-          console.error('Error in showConfirmationDialog:', error);
+          window.Logger?.error('Error in showConfirmationDialog:', error);
           // Fallback to simple confirm
-          const confirmed = window.confirm(confirmationMessage || 'האם אתה בטוח שברצונך למחוק את כל רשומות תזרימי המזומנים מייבוא?');
+          const confirmed = window.window.showConfirmationDialog(confirmationMessage || 'האם אתה בטוח שברצונך למחוק את כל רשומות תזרימי המזומנים מייבוא?');
           resolve(confirmed);
         }
       });
@@ -1112,7 +1112,7 @@ async function deleteImportedCashFlows() {
       }
     } else {
       // Fallback to simple confirm
-      if (!confirm(confirmationMessage || 'האם אתה בטוח שברצונך למחוק את כל רשומות תזרימי המזומנים מייבוא?')) {
+      if (!window.showConfirmationDialog(confirmationMessage || 'האם אתה בטוח שברצונך למחוק את כל רשומות תזרימי המזומנים מייבוא?')) {
         return;
       }
     }
@@ -1141,7 +1141,7 @@ async function deleteImportedCashFlows() {
       if (window.showNotification) {
         window.showNotification(message, 'success', 5000);
       } else {
-        alert(message);
+        window.showErrorNotification(message, "שגיאה");
       }
 
       // Reload cash flows data
@@ -1156,7 +1156,7 @@ async function deleteImportedCashFlows() {
       if (window.showNotification) {
         window.showNotification(errorMessage, 'error', 6000);
       } else {
-        alert(`שגיאה: ${errorMessage}`);
+        window.showErrorNotification(`שגיאה: ${errorMessage}`, "שגיאה");
       }
       
       if (window.Logger) {
@@ -1172,7 +1172,7 @@ async function deleteImportedCashFlows() {
     if (window.showNotification) {
       window.showNotification(errorMessage, 'error', 6000);
     } else {
-      alert(`שגיאה: ${errorMessage}`);
+      window.showErrorNotification(`שגיאה: ${errorMessage}`, "שגיאה");
     }
     
     if (window.Logger) {
@@ -1339,7 +1339,7 @@ async function renderCashFlowsTable() {
     ? window.filteredCashFlowsData
     : (Array.isArray(cashFlowsData) ? cashFlowsData : []);
   
-  console.log('🎨 [renderCashFlowsTable] Rendering table', {
+  window.Logger?.debug('🎨 [renderCashFlowsTable] Rendering table', {
     filteredDataLength: window.filteredCashFlowsData?.length || 0,
     cashFlowsDataLength: cashFlowsData?.length || 0,
     dataToRenderLength: dataToRender.length
@@ -1804,7 +1804,7 @@ async function syncCashFlowsPagination(cashFlows) {
           const actualPageData = Array.isArray(pageData) ? pageData : (pageData?.pageData || []);
           const paginationInfo = context?.pageInfo || pageData?.pagination || {};
           
-          console.log('🔄 [syncCashFlowsPagination] Render callback called', {
+          window.Logger?.debug('🔄 [syncCashFlowsPagination] Render callback called', {
             pageDataLength: actualPageData?.length || 0,
             paginationInfo: paginationInfo,
             currentPage: paginationInfo.currentPage,
@@ -1814,9 +1814,9 @@ async function syncCashFlowsPagination(cashFlows) {
           // to prevent infinite loops - pagination already handles data
           // IMPORTANT: Update window.filteredCashFlowsData so renderCashFlowsTable uses the correct data
           window.filteredCashFlowsData = actualPageData;
-          console.log('🔄 [syncCashFlowsPagination] window.filteredCashFlowsData updated to', window.filteredCashFlowsData.length, 'items');
+          window.Logger?.debug('🔄 [syncCashFlowsPagination] window.filteredCashFlowsData updated to', window.filteredCashFlowsData.length, 'items');
           await updateCashFlowsTable(actualPageData, { skipDataUpdate: true, skipSummary: true });
-          console.log('✅ [syncCashFlowsPagination] updateCashFlowsTable completed');
+          window.Logger?.debug('✅ [syncCashFlowsPagination] updateCashFlowsTable completed');
           if (window.setPageTableData) {
             window.setPageTableData('cash_flows', actualPageData, {
               tableId: 'cashFlowsTable',
@@ -2657,7 +2657,7 @@ function applyUserPreferences(preferences) {
  * @returns {Promise<void>}
  */
 async function initializeCashFlowsPage() {
-  console.log('🚀 [initializeCashFlowsPage] Starting initialization...');
+  window.Logger?.debug('🚀 [initializeCashFlowsPage] Starting initialization...');
   window.Logger.info('Initializing cash flows page', { page: 'cash_flows' });
 
   try {
@@ -2698,10 +2698,10 @@ async function initializeCashFlowsPage() {
     setupSourceFieldListeners();
 
     // הגדרת event listener לדרופדאון סוג תזרים
-    console.log('🔧 [initializeCashFlowsPage] Setting up cash flow type filter dropdown...');
+    window.Logger?.debug('🔧 [initializeCashFlowsPage] Setting up cash flow type filter dropdown...');
     // Use setTimeout to ensure DOM is ready
     setTimeout(() => {
-      console.log('⏰ [initializeCashFlowsPage] setTimeout callback - calling setupCashFlowTypeFilterDropdown');
+      window.Logger?.debug('⏰ [initializeCashFlowsPage] setTimeout callback - calling setupCashFlowTypeFilterDropdown');
       setupCashFlowTypeFilterDropdown();
     }, 100);
 
@@ -2726,12 +2726,12 @@ async function initializeCashFlowsPage() {
 // הפעלת אתחול כשהדף נטען - סטנדרטי כמו כל העמודים
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', function () {
-    console.log('🚀 [cash_flows.js] DOMContentLoaded - calling initializeCashFlowsPage');
+    window.Logger?.debug('🚀 [cash_flows.js] DOMContentLoaded - calling initializeCashFlowsPage');
     initializeCashFlowsPage();
   });
 } else {
   // DOM already loaded
-  console.log('🚀 [cash_flows.js] DOM already loaded - calling initializeCashFlowsPage immediately');
+  window.Logger?.debug('🚀 [cash_flows.js] DOM already loaded - calling initializeCashFlowsPage immediately');
   initializeCashFlowsPage();
 }
 
@@ -3448,7 +3448,7 @@ async function deleteCurrencyExchange(exchangeId) {
             });
         } else {
             // Fallback למקרה שמערכת התראות לא זמינה
-            confirmed = confirm('האם אתה בטוח שברצונך למחוק את המרת המטבע? פעולה זו תמחק את כל הרשומות המקושרות.');
+            confirmed = window.showConfirmationDialog('האם אתה בטוח שברצונך למחוק את המרת המטבע? פעולה זו תמחק את כל הרשומות המקושרות.');
         }
         
         if (!confirmed) {
@@ -3806,33 +3806,33 @@ window.initializeCashFlowsPage = initializeCashFlowsPage;
 
 // Export test functions to window for debugging (always available)
 window.testCashFlowFilter = async function(type = 'deposit') {
-  console.log('🧪 [testCashFlowFilter] Testing filter with type:', type);
+  window.Logger?.debug('🧪 [testCashFlowFilter] Testing filter with type:', type);
   if (typeof window.filterCashFlowsByType === 'function') {
     try {
       await window.filterCashFlowsByType(type);
-      console.log('✅ [testCashFlowFilter] Filter test completed');
+      window.Logger?.debug('✅ [testCashFlowFilter] Filter test completed');
     } catch (err) {
-      console.error('❌ [testCashFlowFilter] Filter test failed:', err);
+      window.Logger?.error('❌ [testCashFlowFilter] Filter test failed:', err);
     }
   } else {
-    console.error('❌ [testCashFlowFilter] filterCashFlowsByType function not found');
+    window.Logger?.error('❌ [testCashFlowFilter] filterCashFlowsByType function not found');
   }
 };
 
 window.testDirectChange = function() {
   const select = document.getElementById('cashFlowTypeFilter');
   if (!select) {
-    console.error('❌ [testDirectChange] Select element not found');
+    window.Logger?.error('❌ [testDirectChange] Select element not found');
     return;
   }
-  console.log('🧪 [testDirectChange] Testing direct change event...');
+  window.Logger?.debug('🧪 [testDirectChange] Testing direct change event...');
   const oldValue = select.value;
   select.value = select.value === 'all' ? 'deposit' : 'all';
-  console.log('   Changed value from', oldValue, 'to', select.value);
+  window.Logger?.debug('   Changed value from', oldValue, 'to', select.value);
   
   const event = new Event('change', { bubbles: true, cancelable: true });
   select.dispatchEvent(event);
-  console.log('✅ [testDirectChange] Direct change event dispatched, new value:', select.value);
+  window.Logger?.debug('✅ [testDirectChange] Direct change event dispatched, new value:', select.value);
 };
 // REMOVED: window exports for removed modal wrapper functions
 // Use window.ModalManagerV2.showModal('cashFlowModal', 'add') directly

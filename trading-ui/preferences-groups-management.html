@@ -358,8 +358,19 @@
         
         // Add group
         document.getElementById('addGroupBtn')?.addEventListener('click', () => {
-            const modal = new bootstrap.Modal(document.getElementById('addGroupModal'));
-            modal.show();
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+                window.ModalManagerV2.showModal('addGroupModal', 'add').catch(error => {
+                    window.Logger?.error('Error showing add group modal via ModalManagerV2', { error, modalId: 'addGroupModal', page: 'preferences-groups-management' });
+                    // Fallback to Bootstrap
+                    if (bootstrap?.Modal) {
+                        const modal = new bootstrap.Modal(document.getElementById('addGroupModal'));
+                        modal.show();
+                    }
+                });
+            } else if (bootstrap?.Modal) {
+                const modal = new bootstrap.Modal(document.getElementById('addGroupModal'));
+                modal.show();
+            }
         });
         
         document.getElementById('confirmAddGroupBtn')?.addEventListener('click', async () => {
@@ -384,8 +395,14 @@
             updateSummary();
             
             // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addGroupModal'));
-            modal.hide();
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+                window.ModalManagerV2.hideModal('addGroupModal');
+            } else if (bootstrap?.Modal) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addGroupModal'));
+                if (modal) {
+                    modal.hide();
+                }
+            }
             
             // Reset form
             document.getElementById('addGroupForm').reset();

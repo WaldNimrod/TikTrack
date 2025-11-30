@@ -5,7 +5,7 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 9
+ * Total Functions: 11
  * 
  * DATA LOADING (3)
  * - loadTemplates() - Load AI analysis templates from API with cache support
@@ -13,12 +13,16 @@
  * - getLLMProviderSettings() - Get LLM provider settings (Gemini/Perplexity)
  * 
  * DATA MANIPULATION (5)
- * - generateAnalysis() - Generate AI analysis request via API
+ * - generateAnalysis() - Generate AI analysis request via API (with validation)
  * - updateLLMProviderSettings() - Update LLM provider settings (API key, validation)
  * - saveAsNote() - Save analysis result as note
  * - exportToPDF() - Export analysis result to PDF format
  * - exportToMarkdown() - Export analysis result to Markdown format
  * - exportToHTML() - Export analysis result to HTML format
+ * 
+ * VALIDATION (2)
+ * - validateAnalysisRequest() - Validate AI analysis request using Business Logic Layer
+ * - validateVariables() - Validate AI analysis variables using Business Logic Layer
  * 
  * UTILITIES (1)
  * - convertMarkdownToHTML() - Convert markdown text to HTML using marked.js or fallback
@@ -210,6 +214,152 @@
   }
 
   /**
+   * Validate AI analysis request using Business Logic Layer
+   * Uses CacheTTLGuard for caching validation results (TTL: 60 seconds)
+   */
+  async function validateAnalysisRequest(data) {
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-ai-analysis', data)
+      : `business:validate-ai-analysis:${JSON.stringify(data)}`;
+    
+    try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch(buildUrl('/api/business/ai-analysis/validate'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(data)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            return {
+              is_valid: false,
+              errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+            };
+          }
+
+          const result = await response.json();
+          return {
+            is_valid: result.status === 'success',
+            errors: []
+          };
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
+      const response = await fetch(buildUrl('/api/business/ai-analysis/validate'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return {
+          is_valid: false,
+          errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+        };
+      }
+
+      const result = await response.json();
+      return {
+        is_valid: result.status === 'success',
+        errors: []
+      };
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating analysis request', {
+        ...PAGE_LOG_CONTEXT,
+        error: error?.message || error,
+      });
+      return {
+        is_valid: false,
+        errors: [error.message || 'Validation error']
+      };
+    }
+  }
+
+  /**
+   * Validate AI analysis variables using Business Logic Layer
+   * Uses CacheTTLGuard for caching validation results (TTL: 60 seconds)
+   */
+  async function validateVariables(variables) {
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-ai-analysis-variables', variables)
+      : `business:validate-ai-analysis-variables:${JSON.stringify(variables)}`;
+    
+    try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch(buildUrl('/api/business/ai-analysis/validate-variables'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ variables })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            return {
+              is_valid: false,
+              errors: errorData.error?.errors || [errorData.error?.message || 'Variables validation failed']
+            };
+          }
+
+          const result = await response.json();
+          return {
+            is_valid: result.status === 'success',
+            errors: []
+          };
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
+      const response = await fetch(buildUrl('/api/business/ai-analysis/validate-variables'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ variables })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return {
+          is_valid: false,
+          errors: errorData.error?.errors || [errorData.error?.message || 'Variables validation failed']
+        };
+      }
+
+      const result = await response.json();
+      return {
+        is_valid: result.status === 'success',
+        errors: []
+      };
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating variables', {
+        ...PAGE_LOG_CONTEXT,
+        error: error?.message || error,
+      });
+      return {
+        is_valid: false,
+        errors: [error.message || 'Variables validation error']
+      };
+    }
+  }
+
+  /**
    * Generate analysis
    */
   async function generateAnalysis(templateId, variables, provider) {
@@ -219,6 +369,30 @@
         templateId,
         provider,
       });
+
+      // Validate request using Business Logic Layer before sending
+      const validationResult = await validateAnalysisRequest({
+        template_id: templateId,
+        variables: variables,
+        provider: provider
+      });
+
+      if (!validationResult.is_valid) {
+        const errorMessage = validationResult.errors.join(', ');
+        window.Logger?.warn?.('⚠️ Validation failed before generating analysis', {
+          ...PAGE_LOG_CONTEXT,
+          errors: validationResult.errors,
+        });
+        
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showError(
+            'שגיאת ולידציה: ' + errorMessage,
+            'system'
+          );
+        }
+        
+        throw new Error('Validation failed: ' + errorMessage);
+      }
 
       const response = await fetch(buildUrl('/api/ai-analysis/generate'), {
         method: 'POST',
@@ -611,6 +785,8 @@
     exportToPDF,
     exportToMarkdown,
     exportToHTML,
+    validateAnalysisRequest,
+    validateVariables,
   };
 
   window.Logger?.info?.('✅ AI Analysis Data Service loaded', PAGE_LOG_CONTEXT);

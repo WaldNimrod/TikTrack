@@ -738,21 +738,21 @@ async function copyDetailedLogLocal() {
             if (window.showSuccessNotification) {
                 window.showSuccessNotification('לוג מפורט הועתק ללוח');
             } else {
-                alert('לוג מפורט הועתק ללוח!');
+                window.showErrorNotification('לוג מפורט הועתק ללוח!', "שגיאה");
             }
         } else {
             if (window.showWarningNotification) {
                 window.showWarningNotification('אין לוג להעתקה');
             } else {
-                alert('אין לוג להעתקה');
+                window.showErrorNotification('אין לוג להעתקה', "שגיאה");
             }
         }
     } catch (err) {
-        console.error('שגיאה בהעתקה:', err);
+        window.Logger?.error('שגיאה בהעתקה:', err);
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בהעתקת הלוג');
         } else {
-            alert('שגיאה בהעתקת הלוג');
+            window.showErrorNotification('שגיאה בהעתקת הלוג', "שגיאה");
         }
     }
 }

@@ -644,7 +644,7 @@ async function loadTickerProviderSymbols(tickerId) {
       populateProviderSymbolFields(mappings);
     }
   } catch (error) {
-    console.error('Error loading provider symbols:', error);
+    window.Logger?.error('Error loading provider symbols:', error);
     // Don't show error to user - mappings are optional
   }
 }
@@ -658,7 +658,7 @@ async function loadTickerProviderSymbols(tickerId) {
 function initializeProviderSymbolFields() {
   // This function is deprecated - ModalManagerV2 now handles this
   // Kept for backward compatibility
-  console.warn('⚠️ initializeProviderSymbolFields is deprecated - ModalManagerV2 now handles this');
+  window.Logger?.warn('⚠️ initializeProviderSymbolFields is deprecated - ModalManagerV2 now handles this');
 }
 
 // ===== SAVE AND UPDATE FUNCTIONS =====
@@ -674,7 +674,7 @@ function initializeProviderSymbolFields() {
 async function loadProviderSymbolFields() {
   const fieldsContainer = document.getElementById('providerSymbolsFields');
   if (!fieldsContainer) {
-    console.warn('⚠️ Provider symbols fields container not found');
+    window.Logger?.warn('⚠️ Provider symbols fields container not found');
     return;
   }
 
@@ -736,7 +736,7 @@ async function loadProviderSymbolFields() {
       });
     }
   } catch (error) {
-    console.error('Error loading providers:', error);
+    window.Logger?.error('Error loading providers:', error);
     fieldsContainer.innerHTML = `
       <div class="alert alert-danger mb-0">
         <i class="fas fa-exclamation-triangle me-2"></i>
@@ -790,7 +790,7 @@ function populateProviderSymbolFields(mappings) {
     // Support both provider_name and provider_display_name
     const providerName = mapping.provider_name || mapping.provider_display_name;
     if (!providerName) {
-      console.warn('⚠️ Mapping missing provider name:', mapping);
+      window.Logger?.warn('⚠️ Mapping missing provider name:', mapping);
       return;
     }
     
@@ -810,7 +810,7 @@ function populateProviderSymbolFields(mappings) {
         });
       }
     } else {
-      console.warn(`⚠️ Provider symbol input field not found: providerSymbol_${providerName}`);
+      window.Logger?.warn(`⚠️ Provider symbol input field not found: providerSymbol_${providerName}`);
       if (window.Logger) {
         window.Logger.warn('Provider symbol input field not found', {
           providerName,
@@ -1818,7 +1818,7 @@ async function deleteTicker(tickerId) {
             );
         } else {
             // Fallback to simple confirm
-            if (!confirm('האם אתה בטוח שברצונך למחוק את הטיקר?')) {
+            if (!window.showConfirmationDialog('האם אתה בטוח שברצונך למחוק את הטיקר?')) {
                 return;
             }
             await performTickerDeletion(tickerId);

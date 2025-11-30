@@ -95,12 +95,16 @@
         }
 
         // Open via ModalManagerV2
-        if (window.ModalManagerV2?.showModal) {
-            window.ModalManagerV2.showModal('watchListModal', {
-                mode: currentMode,
-                data: data
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+            window.ModalManagerV2.showModal('watchListModal', currentMode, data).catch(error => {
+                window.Logger?.error('Error showing watch list modal via ModalManagerV2', { error, modalId: 'watchListModal', page: 'watch-list-modal' });
+                // Fallback to bootstrap if ModalManagerV2 fails
+                if (bootstrap?.Modal && modal) {
+                    const bsModal = new bootstrap.Modal(modal);
+                    bsModal.show();
+                }
             });
-        } else if (modal) {
+        } else if (bootstrap?.Modal && modal) {
             // Fallback to Bootstrap modal
             const bsModal = new bootstrap.Modal(modal);
             bsModal.show();
@@ -111,9 +115,9 @@
      * Close watch list modal
      */
     function closeWatchListModal() {
-        if (window.ModalManagerV2?.closeModal) {
-            window.ModalManagerV2.closeModal('watchListModal');
-        } else {
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+            window.ModalManagerV2.hideModal('watchListModal');
+        } else if (bootstrap?.Modal) {
             const modal = document.getElementById('watchListModal');
             if (modal) {
                 const bsModal = bootstrap.Modal.getInstance(modal);
@@ -283,6 +287,7 @@
     window.Logger?.info?.('✅ WatchListModal loaded successfully', PAGE_LOG_CONTEXT);
 
 })();
+
 
 
 

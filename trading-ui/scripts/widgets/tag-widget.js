@@ -476,6 +476,9 @@
         window.Logger?.warn?.('TagWidget: Failed to store tag data map', { error, page: 'tag-widget' });
       }
     }
+
+    // Dispatch event to trigger height equalization
+    window.dispatchEvent(new CustomEvent('widgetContentUpdated'));
   }
 
   /**
@@ -1554,6 +1557,10 @@
      * Destroy widget and cleanup
      */
     destroy() {
+      if (!state.initialized) {
+        return;
+      }
+      
       state.initialized = false;
       state.metadataCache.clear();
       
@@ -1562,7 +1569,56 @@
         window.AutocompleteService.destroy(elements.searchInput);
       }
       
-      // Clear event listeners if needed
+      // Remove event listeners
+      if (elements.searchFilter) {
+        // Clone and replace to remove all event listeners
+        const newFilter = elements.searchFilter.cloneNode(true);
+        elements.searchFilter.parentNode?.replaceChild(newFilter, elements.searchFilter);
+        elements.searchFilter = newFilter;
+      }
+      
+      if (elements.cloudTab) {
+        const newTab = elements.cloudTab.cloneNode(true);
+        elements.cloudTab.parentNode?.replaceChild(newTab, elements.cloudTab);
+        elements.cloudTab = newTab;
+      }
+      
+      if (elements.searchTab) {
+        const newTab = elements.searchTab.cloneNode(true);
+        elements.searchTab.parentNode?.replaceChild(newTab, elements.searchTab);
+        elements.searchTab = newTab;
+      }
+      
+      if (elements.searchForm) {
+        const newForm = elements.searchForm.cloneNode(true);
+        elements.searchForm.parentNode?.replaceChild(newForm, elements.searchForm);
+        elements.searchForm = newForm;
+      }
+      
+      if (elements.cloudContainer) {
+        const newContainer = elements.cloudContainer.cloneNode(true);
+        elements.cloudContainer.parentNode?.replaceChild(newContainer, elements.cloudContainer);
+        elements.cloudContainer = newContainer;
+      }
+      
+      if (elements.drawerLoadMoreBtn) {
+        const newBtn = elements.drawerLoadMoreBtn.cloneNode(true);
+        elements.drawerLoadMoreBtn.parentNode?.replaceChild(newBtn, elements.drawerLoadMoreBtn);
+        elements.drawerLoadMoreBtn = newBtn;
+      }
+      
+      // Clear state
+      state.tagCloudLoading = false;
+      state.searchLoading = false;
+      state.lastQuery = '';
+      state.lastEntityFilter = '';
+      state.lastResults = [];
+      state.lastResultCount = 0;
+      state.currentLimit = DEFAULT_LIMIT;
+      state.currentPage = 1;
+      state.lastLinkedItems = [];
+      
+      window.Logger?.info?.('TagWidget: Destroyed and cleaned up', { page: 'tag-widget' });
     },
 
     /**

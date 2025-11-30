@@ -1864,21 +1864,249 @@ window.initializeExecutionsPage = async function() {
   setupModalConfigurations();
 
   // Initialize trade creation section - lazy loading when section opens
+  // REFACTORED: Uses shared ExecutionClusteringService and ExecutionClusterHelpers
   // Uses MutationObserver to detect when section opens (no interference with global toggle system)
   const tradeCreationSection = document.getElementById('trade-creation') || document.querySelector('[data-section="trade-creation"]');
-  if (tradeCreationSection && window.PendingExecutionTradeCreation) {
+  if (tradeCreationSection) {
     let tradeCreationInitialized = false;
+    let clusterSelectionState = new Map(); // Map<clusterId, Set<executionId>>
+    let activeClusterContext = null; // Store context for trade creation
+    let clustersData = [];
     
-    const initializeTradeCreationSection = () => {
-      if (!tradeCreationInitialized && window.PendingExecutionTradeCreation?.initializeExecutionsSection) {
-        tradeCreationInitialized = true;
-        window.PendingExecutionTradeCreation.initializeExecutionsSection({
-          containerId: 'executionTradeCreationClustersContainer',
-          countElementId: 'executionTradeCreationClustersCount',
-          loadingElementId: 'executionTradeCreationClustersLoading',
-          emptyStateId: 'executionTradeCreationClustersEmpty',
-          errorElementId: 'executionTradeCreationClustersError'
+    const initializeTradeCreationClustersSection = async () => {
+      if (tradeCreationInitialized) {
+        return;
+      }
+      
+      tradeCreationInitialized = true;
+      
+      const container = document.getElementById('executionTradeCreationClustersContainer');
+      const countEl = document.getElementById('executionTradeCreationClustersCount');
+      const loadingEl = document.getElementById('executionTradeCreationClustersLoading');
+      const emptyEl = document.getElementById('executionTradeCreationClustersEmpty');
+      const errorEl = document.getElementById('executionTradeCreationClustersError');
+      
+      if (!container) {
+        window.Logger?.warn('⚠️ executionTradeCreationClustersContainer not found', { page: 'executions' });
+        return;
+      }
+      
+      // Initial load
+      await loadAndRenderClusters();
+      
+      // Setup event handlers (one time only)
+      container.addEventListener('change', handleClusterCheckboxChange);
+      container.addEventListener('click', handleClusterButtonClick);
+      
+      // Setup trade modal handler for trade creation from cluster
+      document.addEventListener('crud:trade:created', async (event) => {
+        const form = event.detail?.form;
+        if (form && form.dataset.tradeCreationSource === 'execution-cluster' && activeClusterContext) {
+          const { clusterId, executionIds } = activeClusterContext;
+          await window.ExecutionClusterHelpers?.handleTradeCreated?.(event.detail, clusterId, executionIds);
+          // Clear context
+          activeClusterContext = null;
+          // Reload clusters
+          await loadAndRenderClusters({ force: true });
+        }
+      });
+      
+      async function loadAndRenderClusters(options = {}) {
+        try {
+          if (loadingEl) loadingEl.classList.remove('d-none');
+          if (errorEl) errorEl.classList.add('d-none');
+          
+          // Fetch clusters using shared service
+          if (!window.ExecutionClusteringService) {
+            throw new Error('ExecutionClusteringService not available');
+          }
+          
+          clustersData = await window.ExecutionClusteringService.fetchClusters({ force: options.force || false });
+          
+          // Filter out dismissed clusters
+          const dismissedSet = window.ExecutionClusteringService.getDismissedClusters() || new Set();
+          const visibleClusters = clustersData.filter(cluster => !dismissedSet.has(cluster.cluster_id));
+          
+          // Initialize selection state for new clusters
+          visibleClusters.forEach(cluster => {
+            if (!clusterSelectionState.has(cluster.cluster_id)) {
+              // Initialize with all executions selected by default
+              const executionIds = cluster.executions?.map(exec => exec.id) || cluster.execution_ids || [];
+              clusterSelectionState.set(cluster.cluster_id, new Set(executionIds));
+            }
+          });
+          
+          renderClusters(visibleClusters);
+          
+        } catch (error) {
+          window.Logger?.error('❌ Failed to load clusters', { error: error?.message, page: 'executions' });
+          if (errorEl) {
+            errorEl.textContent = error.message || 'שגיאה בטעינת אשכולות ליצירת טרייד';
+            errorEl.classList.remove('d-none');
+          }
+          if (emptyEl) emptyEl.classList.add('d-none');
+        } finally {
+          if (loadingEl) loadingEl.classList.add('d-none');
+        }
+      }
+      
+      function renderClusters(clusters) {
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        if (errorEl) errorEl.classList.add('d-none');
+        
+        if (!clusters || clusters.length === 0) {
+          if (emptyEl) emptyEl.classList.remove('d-none');
+          if (countEl) countEl.textContent = '0';
+          return;
+        }
+        
+        if (emptyEl) emptyEl.classList.add('d-none');
+        
+        const fragment = document.createDocumentFragment();
+        
+        clusters.forEach(cluster => {
+          const selectedIds = clusterSelectionState.get(cluster.cluster_id) || new Set();
+          if (!window.ExecutionClusterHelpers?.renderClusterCard) {
+            window.Logger?.error('❌ ExecutionClusterHelpers.renderClusterCard not available', { page: 'executions' });
+            return;
+          }
+          
+          const context = {
+            clusterId: cluster.cluster_id,
+            executionIds: null,
+            summary: null
+          };
+          
+          const card = window.ExecutionClusterHelpers.renderClusterCard(cluster, selectedIds, {
+            context: context,
+            onRefresh: async (clusterId) => {
+              await loadAndRenderClusters({ force: true });
+            },
+            onDismiss: async (clusterId) => {
+              await loadAndRenderClusters({ force: true });
+            }
+          });
+          
+          fragment.appendChild(card);
         });
+        
+        container.appendChild(fragment);
+        
+        // Initialize buttons
+        if (window.ButtonSystem?.initializeButtons) {
+          window.ButtonSystem.initializeButtons(container);
+        }
+        
+        // Update count
+        if (countEl) countEl.textContent = String(clusters.length);
+      }
+      
+      function handleClusterCheckboxChange(event) {
+        const checkbox = event.target;
+        if (!checkbox.matches('input[data-role="execution-select"]')) {
+          return;
+        }
+        
+        const clusterId = checkbox.dataset.clusterId;
+        const executionId = Number(checkbox.dataset.executionId);
+        
+        let selectedSet = clusterSelectionState.get(clusterId);
+        if (!selectedSet) {
+          selectedSet = new Set();
+          clusterSelectionState.set(clusterId, selectedSet);
+        }
+        
+        if (checkbox.checked) {
+          selectedSet.add(executionId);
+        } else {
+          selectedSet.delete(executionId);
+        }
+        
+        // Update summary badges in the card
+        updateClusterSummary(clusterId);
+      }
+      
+      function updateClusterSummary(clusterId) {
+        const cluster = clustersData.find(c => c.cluster_id === clusterId);
+        if (!cluster || !window.ExecutionClusterHelpers) {
+          return;
+        }
+        
+        const selectedIds = clusterSelectionState.get(clusterId) || new Set();
+        const summary = window.ExecutionClusterHelpers.computeSelectionSummary(cluster, selectedIds);
+        
+        const card = container.querySelector(`[data-cluster-id="${clusterId}"]`);
+        if (!card) return;
+        
+        const summaryEl = card.querySelector('.trade-create-summary');
+        if (summaryEl) {
+          const dateRange = cluster.stats?.date_range || {};
+          const dateRangeText = dateRange.start ? window.ExecutionClusterHelpers.renderDateRange(dateRange) : '';
+          const totalValueDisplay = summary.totalValue ? `$${summary.totalValue.toFixed(2)}` : '-';
+          const averagePriceDisplay = summary.averagePrice ? `$${summary.averagePrice.toFixed(4)}` : '-';
+          
+          summaryEl.innerHTML = `
+            ${window.ExecutionClusterHelpers.renderSummaryBadge('כמות', summary.totalQuantity.toLocaleString('en-US'))}
+            ${window.ExecutionClusterHelpers.renderSummaryBadge('שווי', totalValueDisplay)}
+            ${window.ExecutionClusterHelpers.renderSummaryBadge('מחיר ממוצע', averagePriceDisplay)}
+            ${window.ExecutionClusterHelpers.renderSummaryBadge('עלות עמלה', `$${summary.totalFee.toFixed(2)}`)}
+            ${window.ExecutionClusterHelpers.renderSummaryBadge('נבחרו', `${summary.selectedCount}/${cluster.stats.execution_count}`)}
+            ${dateRangeText ? `<span class="badge bg-body-secondary text-body trade-create-summary-badge">טווח: ${dateRangeText}</span>` : ''}
+          `;
+        }
+      }
+      
+      async function handleClusterButtonClick(event) {
+        const createBtn = event.target.closest('[data-role="create-trade"]');
+        if (createBtn) {
+          event.preventDefault();
+          event.stopPropagation();
+          const clusterId = createBtn.dataset.clusterId;
+          const cluster = clustersData.find(c => c.cluster_id === clusterId);
+          if (!cluster || !window.ExecutionClusterHelpers) {
+            return;
+          }
+          
+          const selectedIds = clusterSelectionState.get(clusterId) || new Set();
+          
+          // Store context for trade creation handler
+          activeClusterContext = {
+            clusterId: clusterId,
+            executionIds: null,
+            summary: null
+          };
+          
+          await window.ExecutionClusterHelpers.openTradeModalFromCluster(
+            clusterId,
+            cluster,
+            selectedIds,
+            activeClusterContext
+          );
+          return;
+        }
+        
+        const refreshBtn = event.target.closest('[data-role="refresh-cluster"]');
+        if (refreshBtn) {
+          event.preventDefault();
+          event.stopPropagation();
+          await loadAndRenderClusters({ force: true });
+          return;
+        }
+        
+        const dismissBtn = event.target.closest('[data-role="dismiss-cluster"]');
+        if (dismissBtn) {
+          event.preventDefault();
+          event.stopPropagation();
+          const clusterId = dismissBtn.dataset.clusterId;
+          if (window.ExecutionClusteringService?.dismissCluster) {
+            await window.ExecutionClusteringService.dismissCluster(clusterId);
+            await loadAndRenderClusters({ force: true });
+          }
+          return;
+        }
       }
     };
     
@@ -1886,7 +2114,7 @@ window.initializeExecutionsPage = async function() {
     const checkAndInitialize = () => {
       const sectionBody = tradeCreationSection?.querySelector('.section-body');
       if (sectionBody && window.getComputedStyle(sectionBody).display !== 'none') {
-        initializeTradeCreationSection();
+        initializeTradeCreationClustersSection();
       }
     };
     
@@ -1902,7 +2130,7 @@ window.initializeExecutionsPage = async function() {
     if (sectionBody) {
       const observer = new MutationObserver(() => {
         if (!tradeCreationInitialized && window.getComputedStyle(sectionBody).display !== 'none') {
-          setTimeout(initializeTradeCreationSection, 100);
+          setTimeout(initializeTradeCreationClustersSection, 100);
         }
       });
       observer.observe(sectionBody, {
@@ -4245,22 +4473,26 @@ let tradeSuggestionsPaginationInstance = null;
 
 /**
  * Load trade suggestions for all pending executions
+ * REFACTORED: Uses ExecutionAssignmentService instead of direct API calls
  */
 async function loadTradeSuggestionsForAll() {
     try {
         window.Logger?.info('🔄 Loading trade suggestions for all pending executions...', { page: "executions" });
         
-        // Get pending executions
-        const pendingResponse = await fetch('/api/executions/pending-assignment');
-        if (!pendingResponse.ok) {
-            throw new Error(`HTTP ${pendingResponse.status}: ${pendingResponse.statusText}`);
+        // Use shared service instead of direct API calls
+        if (!window.ExecutionAssignmentService) {
+            throw new Error('ExecutionAssignmentService not available');
         }
         
-        const pendingResult = await pendingResponse.json();
-        const pendingExecutions = pendingResult.data || [];
+        // Fetch highlights using shared service
+        const highlights = await window.ExecutionAssignmentService.fetchHighlights({
+            force: false,
+            limit: 100, // Large limit for executions page
+            suggestions: 5
+        });
         
-        if (pendingExecutions.length === 0) {
-            // No pending executions - hide section or show message
+        if (!highlights || highlights.length === 0) {
+            // No highlights - hide section or show message
             tradeSuggestionsData = {};
             tradeSuggestionsFlatList = [];
             renderTradeSuggestionsSection({});
@@ -4268,36 +4500,15 @@ async function loadTradeSuggestionsForAll() {
             return;
         }
         
-        // Load suggestions for each execution
-        const suggestionsPromises = pendingExecutions.map(async (execution) => {
-            try {
-                const suggestResponse = await fetch(`/api/executions/${execution.id}/suggest-trades`);
-                if (!suggestResponse.ok) {
-                    window.Logger?.warn(`⚠️ Failed to load suggestions for execution ${execution.id}`, { page: "executions" });
-                    return { execution_id: execution.id, suggestions: [] };
-                }
-                
-                const suggestResult = await suggestResponse.json();
-                return {
-                    execution_id: execution.id,
-                    execution: execution,
-                    suggestions: suggestResult.data || []
-                };
-            } catch (error) {
-                window.Logger?.error(`❌ Error loading suggestions for execution ${execution.id}:`, error, { page: "executions" });
-                return { execution_id: execution.id, execution: execution, suggestions: [] };
-            }
-        });
-        
-        const suggestionsResults = await Promise.all(suggestionsPromises);
-        
-        // Build suggestions data structure
+        // Convert highlights to the expected data structure
+        // highlights format: [{ execution_id, execution, suggestions, ... }]
+        // expected format: { [execution_id]: { execution, suggestions } }
         const suggestionsData = {};
-        suggestionsResults.forEach(result => {
-            if (result.suggestions && result.suggestions.length > 0) {
-                suggestionsData[result.execution_id] = {
-                    execution: result.execution,
-                    suggestions: result.suggestions
+        highlights.forEach(highlight => {
+            if (highlight.execution_id && highlight.suggestions && highlight.suggestions.length > 0) {
+                suggestionsData[highlight.execution_id] = {
+                    execution: highlight.execution,
+                    suggestions: highlight.suggestions || []
                 };
             }
         });
@@ -4581,6 +4792,11 @@ async function acceptSuggestion(executionId, tradeId) {
             window.showSuccessNotification('השיוך בוצע בהצלחה', `ביצוע #${executionId} שויך לטרייד #${tradeId}`);
         }
         
+        // Invalidate cache if service is available
+        if (window.ExecutionAssignmentService?.invalidateCache) {
+            await window.ExecutionAssignmentService.invalidateCache();
+        }
+        
         // Reload suggestions
         await loadTradeSuggestionsForAll();
         
@@ -4599,34 +4815,45 @@ async function acceptSuggestion(executionId, tradeId) {
 
 /**
  * Reject a single suggestion
+ * REFACTORED: Uses ExecutionAssignmentService for dismissing
  */
-function rejectSuggestion(executionId, tradeId) {
-    window.Logger?.info(`❌ Rejecting suggestion: execution ${executionId} -> trade ${tradeId}`, { page: "executions" });
-    
-    // Remove the suggestion row from UI
-    const suggestionRow = document.querySelector(
-        `.suggestion-row[data-execution-id="${executionId}"][data-trade-id="${tradeId}"]`
-    );
-    
-    if (suggestionRow) {
-        suggestionRow.classList.add('rejected', 'd-none');
-    }
-    
-    // Remove from data
-    if (tradeSuggestionsData[executionId]) {
-        tradeSuggestionsData[executionId].suggestions = tradeSuggestionsData[executionId].suggestions.filter(
-            s => s.trade_id !== tradeId
+async function rejectSuggestion(executionId, tradeId) {
+    try {
+        window.Logger?.info(`❌ Rejecting suggestion: execution ${executionId} -> trade ${tradeId}`, { page: "executions" });
+        
+        // Use shared service to dismiss
+        if (window.ExecutionAssignmentService?.dismissItem) {
+            await window.ExecutionAssignmentService.dismissItem(executionId, tradeId);
+        }
+        
+        // Remove the suggestion row from UI
+        const suggestionRow = document.querySelector(
+            `.suggestion-row[data-execution-id="${executionId}"][data-trade-id="${tradeId}"]`
         );
         
-        // If no more suggestions for this execution, remove it
-        if (tradeSuggestionsData[executionId].suggestions.length === 0) {
-            delete tradeSuggestionsData[executionId];
+        if (suggestionRow) {
+            suggestionRow.classList.add('rejected', 'd-none');
         }
+        
+        // Remove from data
+        if (tradeSuggestionsData[executionId]) {
+            tradeSuggestionsData[executionId].suggestions = tradeSuggestionsData[executionId].suggestions.filter(
+                s => s.trade_id !== tradeId
+            );
+            
+            // If no more suggestions for this execution, remove it
+            if (tradeSuggestionsData[executionId].suggestions.length === 0) {
+                delete tradeSuggestionsData[executionId];
+            }
+        }
+        
+        // Re-render table
+        renderTradeSuggestionsSection(tradeSuggestionsData);
+        updateSuggestionsCount(Object.keys(tradeSuggestionsData).length);
+        
+    } catch (error) {
+        window.Logger?.error('❌ Error rejecting suggestion:', error, { page: "executions" });
     }
-    
-    // Re-render table
-    renderTradeSuggestionsSection(tradeSuggestionsData);
-    updateSuggestionsCount(Object.keys(tradeSuggestionsData).length);
 }
 
 /**

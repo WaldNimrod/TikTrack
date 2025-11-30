@@ -147,9 +147,13 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
 
   // פונקציה לסגירת המודל
   const closeModal = () => {
-    const bootstrapModal = bootstrap.Modal.getInstance(modal);
-    if (bootstrapModal) {
-      bootstrapModal.hide();
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+      window.ModalManagerV2.hideModal(modalId);
+    } else if (bootstrap?.Modal) {
+      const bootstrapModal = bootstrap.Modal.getInstance(modal);
+      if (bootstrapModal) {
+        bootstrapModal.hide();
+      }
     }
     // הסרת המודל מהדף אחרי סגירה
     setTimeout(() => {
@@ -226,12 +230,27 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
     }, 300);
   });
 
-  // הצגת המודל
+  // הצגת המודל דרך ModalManagerV2 או Bootstrap fallback
   try {
-    const bootstrapModal = new bootstrap.Modal(modal);
-    bootstrapModal.show();
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      window.ModalManagerV2.showModal(modalId, 'view').catch(error => {
+        window.Logger?.error('Error showing confirmation modal via ModalManagerV2', { error, modalId, page: 'warning-system' });
+        // Fallback to Bootstrap
+        if (bootstrap?.Modal) {
+          const bootstrapModal = new bootstrap.Modal(modal);
+          bootstrapModal.show();
+        } else {
+          throw error;
+        }
+      });
+    } else if (bootstrap?.Modal) {
+      const bootstrapModal = new bootstrap.Modal(modal);
+      bootstrapModal.show();
+    } else {
+      throw new Error('Bootstrap Modal not available');
+    }
   } catch (error) {
-    console.error('❌ showConfirmationDialog - Bootstrap Modal Error:', error);
+    console.error('❌ showConfirmationDialog - Modal Error:', error);
     // fallback ל-confirm רגיל
     const confirmed = window.confirm(message);
     if (confirmed && onConfirm) {

@@ -128,10 +128,19 @@
 
             this.modalElement.classList.add('modal-nested');
 
-            this.bootstrapModal = bootstrap.Modal.getOrCreateInstance(this.modalElement, {
-                backdrop: false,
-                keyboard: true
-            });
+            // Use ModalManagerV2 if available, fallback to Bootstrap
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+                // ModalManagerV2 will handle the modal, but we still need Bootstrap instance for events
+                this.bootstrapModal = bootstrap.Modal.getOrCreateInstance(this.modalElement, {
+                    backdrop: false,
+                    keyboard: true
+                });
+            } else if (bootstrap?.Modal) {
+                this.bootstrapModal = bootstrap.Modal.getOrCreateInstance(this.modalElement, {
+                    backdrop: false,
+                    keyboard: true
+                });
+            }
             this.modalElement.addEventListener('shown.bs.modal', () => this.onModalShown());
             this.modalElement.addEventListener('hidden.bs.modal', () => this.onModalHidden());
 

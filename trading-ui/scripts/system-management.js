@@ -36,7 +36,7 @@ class SystemManagement {
     SystemManagement.setupEventListeners();
 
     this.isInitialized = true;
-    console.log('✅ System Management - Initialized successfully');
+    window.Logger?.debug('✅ System Management - Initialized successfully');
   }
 
   /**
@@ -44,7 +44,7 @@ class SystemManagement {
    * רענון נתוני מערכת
    */
   static refreshSystemData() {
-    console.log('🔄 Refreshing system data...');
+    window.Logger?.debug('🔄 Refreshing system data...');
     const systemManagement = new SystemManagement();
     systemManagement.loadSystemData();
   }
@@ -54,7 +54,7 @@ class SystemManagement {
    * הרצת בדיקת מערכת
    */
   static async runSystemCheck() {
-    console.log('🔍 Running comprehensive system check...');
+    window.Logger?.debug('🔍 Running comprehensive system check...');
 
     try {
       // Show loading notification only for long process start
@@ -406,13 +406,13 @@ class SystemManagement {
       SystemManagement.showNotification(overallMessage, overallStatus);
 
       // Log detailed results
-      console.log('📊 System Check Results:', checkResults);
+      window.Logger?.debug('📊 System Check Results:', checkResults);
 
       // Update results display in the page
       SystemManagement.updateCheckResultsDisplay(resultsContainer, checkResults);
 
     } catch (error) {
-      console.error('❌ System check failed:', error);
+      window.Logger?.error('❌ System check failed:', error);
       SystemManagement.showNotification(`שגיאה בבדיקת מערכת: ${error.message}`, 'error');
     }
   }
@@ -422,7 +422,7 @@ class SystemManagement {
    * ניקוי מטמון
    */
   static clearCache() {
-    console.log('🗑️ Clearing cache...');
+    window.Logger?.debug('🗑️ Clearing cache...');
     // Use global cache clearing function
     if (typeof window.clearAllCache === 'function') {
       window.clearAllCache();
@@ -437,7 +437,7 @@ class SystemManagement {
    * הפעלת גיבוי מערכת
    */
   static async runBackup() {
-    console.log('💾 Starting system backup...');
+    window.Logger?.debug('💾 Starting system backup...');
 
     try {
     // Show loading notification
@@ -459,7 +459,7 @@ class SystemManagement {
           `גיבוי הושלם בהצלחה! קובץ: ${backupData.backup_filename} (${backupData.backup_size_mb} MB)`,
           'success',
         );
-        console.log('✅ System backup completed successfully:', backupData);
+        window.Logger?.debug('✅ System backup completed successfully:', backupData);
 
         // Refresh system data to show updated backup info
         if (window.systemManagement) {
@@ -470,7 +470,7 @@ class SystemManagement {
       }
 
     } catch (error) {
-      console.error('❌ Backup failed:', error);
+      window.Logger?.error('❌ Backup failed:', error);
       SystemManagement.showNotification(`שגיאה בגיבוי: ${error.message}`, 'error');
     }
   }
@@ -480,7 +480,7 @@ class SystemManagement {
    * שחזור מגיבוי
    */
   static async restoreFromBackup() {
-    console.log('🔄 Starting restore from backup...');
+    window.Logger?.debug('🔄 Starting restore from backup...');
 
     try {
       // Get list of available backups
@@ -525,7 +525,7 @@ class SystemManagement {
         });
       } else {
         // Fallback למקרה שמערכת התראות לא זמינה
-        confirmed = confirm(confirmMessage);
+        confirmed = window.showConfirmationDialog(confirmMessage);
       }
 
       if (confirmed) {
@@ -547,7 +547,7 @@ class SystemManagement {
 
         if (result.status === 'success') {
           SystemManagement.showNotification('שחזור הושלם בהצלחה! המערכת תפעיל מחדש...', 'success');
-          console.log('✅ System restore completed successfully:', result.data);
+          window.Logger?.debug('✅ System restore completed successfully:', result.data);
 
           // Refresh page after successful restore
           setTimeout(() => {
@@ -558,11 +558,11 @@ class SystemManagement {
         }
       } else {
         SystemManagement.showNotification('שחזור בוטל על ידי המשתמש', 'info');
-        console.log('❌ System restore cancelled by user');
+        window.Logger?.debug('❌ System restore cancelled by user');
       }
 
     } catch (error) {
-      console.error('❌ Restore failed:', error);
+      window.Logger?.error('❌ Restore failed:', error);
       SystemManagement.showNotification(`שגיאה בשחזור: ${error.message}`, 'error');
     }
   }
@@ -575,7 +575,7 @@ class SystemManagement {
     if (typeof window.showNotification === 'function') {
       window.showNotification(message, type);
     } else {
-      console.log(`📢 ${type.toUpperCase()}: ${message}`);
+      window.Logger?.debug(`📢 ${type.toUpperCase()}: ${message}`);
     }
   }
 
@@ -924,18 +924,50 @@ class SystemManagement {
         try {
             await window.ModalManagerV2.showModal(modalId, 'view');
         } catch (error) {
-            // Fallback to Bootstrap if ModalManagerV2 fails
+            // Fallback to Bootstrap if ModalManagerV2 fails - עם backdrop: false וניקוי
             window.Logger?.warn('checkResultsModal not available in ModalManagerV2, using Bootstrap fallback', { page: 'system-management' });
             if (bootstrap?.Modal) {
-                const bsModal = new bootstrap.Modal(modal);
+                // ניקוי backdrops לפני פתיחה
+                if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                    window.ModalManagerV2._cleanupBootstrapBackdrops();
+                }
+                const bsModal = new bootstrap.Modal(modal, { backdrop: false });
                 bsModal.show();
+                // ניקוי backdrops אחרי פתיחה
+                if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                    setTimeout(() => {
+                        window.ModalManagerV2._cleanupBootstrapBackdrops();
+                    }, 50);
+                }
+                // עדכון z-index
+                if (window.ModalZIndexManager?.forceUpdate) {
+                    setTimeout(() => {
+                        window.ModalZIndexManager.forceUpdate(modal);
+                    }, 50);
+                }
             }
         }
     } else {
-        // Fallback to Bootstrap modal
+        // Fallback to Bootstrap modal - עם backdrop: false וניקוי
         if (bootstrap?.Modal) {
-            const bsModal = new bootstrap.Modal(modal);
+            // ניקוי backdrops לפני פתיחה
+            if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                window.ModalManagerV2._cleanupBootstrapBackdrops();
+            }
+            const bsModal = new bootstrap.Modal(modal, { backdrop: false });
             bsModal.show();
+            // ניקוי backdrops אחרי פתיחה
+            if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                setTimeout(() => {
+                    window.ModalManagerV2._cleanupBootstrapBackdrops();
+                }, 50);
+            }
+            // עדכון z-index
+            if (window.ModalZIndexManager?.forceUpdate) {
+                setTimeout(() => {
+                    window.ModalZIndexManager.forceUpdate(modal);
+                }, 50);
+            }
         }
     }
     
@@ -987,7 +1019,7 @@ class SystemManagement {
     navigator.clipboard.writeText(report).then(() => {
       SystemManagement.showNotification('תוצאות בדיקה הועתקו ללוח בהצלחה', 'success');
     }).catch(error => {
-      console.error('Failed to copy to clipboard:', error);
+      window.Logger?.error('Failed to copy to clipboard:', error);
       SystemManagement.showNotification('שגיאה בהעתקת התוצאות ללוח', 'error');
     });
   }
@@ -1009,7 +1041,7 @@ class SystemManagement {
     this.showLoadingState();
 
     try {
-      console.log('📊 Loading system data...');
+      window.Logger?.debug('📊 Loading system data...');
 
       // Load primary data provider
       await SystemManagement.loadPrimaryDataProvider();
@@ -1021,13 +1053,13 @@ class SystemManagement {
       if (overviewData.status === 'success') {
         this.currentData = overviewData.data;
         this.updateDashboard(overviewData.data);
-        console.log('✅ System data loaded successfully');
+        window.Logger?.debug('✅ System data loaded successfully');
       } else {
         throw new Error(overviewData.message || 'Failed to load system data');
       }
 
     } catch (error) {
-      console.error('❌ Error loading system data:', error);
+      window.Logger?.error('❌ Error loading system data:', error);
       this.handleLoadError(error);
     } finally {
       this.isLoading = false;
@@ -1486,7 +1518,7 @@ class SystemManagement {
           }
         }
 
-        console.log('✅ Backup status updated successfully');
+        window.Logger?.debug('✅ Backup status updated successfully');
       } else {
         // No backups found
         const backupStatusElement = document.getElementById('backupStatus');
@@ -1499,10 +1531,10 @@ class SystemManagement {
           lastBackupDateElement.textContent = 'לא נמצא';
         }
 
-        console.log('⚠️ No backups found');
+        window.Logger?.debug('⚠️ No backups found');
       }
     } catch (error) {
-      console.error('❌ Error updating backup status:', error);
+      window.Logger?.error('❌ Error updating backup status:', error);
       const backupStatusElement = document.getElementById('backupStatus');
       if (backupStatusElement) {
         backupStatusElement.innerHTML = '<span class="text-danger">❌ שגיאה בבדיקה</span>';
@@ -1592,7 +1624,7 @@ class SystemManagement {
         }
       }
     } catch (error) {
-      console.error('Error updating external data:', error);
+      window.Logger?.error('Error updating external data:', error);
     }
   }
 
@@ -1646,7 +1678,7 @@ class SystemManagement {
         }
       }
     } catch (error) {
-      console.error('Error updating alerts:', error);
+      window.Logger?.error('Error updating alerts:', error);
       SystemManagement.showNotification(
         `❌ שגיאה בטעינת התראות: ${error?.message || 'השרת לא החזיר נתונים'}`,
         'error',
@@ -1754,12 +1786,12 @@ class SystemManagement {
    */
   static async savePrimaryDataProvider(provider) {
     try {
-      console.log(`💾 Saving primary data provider: ${provider}`);
+      window.Logger?.debug(`💾 Saving primary data provider: ${provider}`);
 
       if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
         const success = await window.PreferencesCore.savePreference('primaryDataProvider', provider);
         if (success) {
-          console.log('✅ Primary data provider saved successfully via PreferencesCore');
+          window.Logger?.debug('✅ Primary data provider saved successfully via PreferencesCore');
           if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('הצלחה', `ספק נתונים ראשי נשמר: ${provider}`);
           }
@@ -1770,7 +1802,7 @@ class SystemManagement {
         throw new Error('PreferencesCore.savePreference not available');
       }
     } catch (error) {
-      console.error('❌ Error saving primary data provider:', error);
+      window.Logger?.error('❌ Error saving primary data provider:', error);
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה', 'שגיאה בשמירת ספק נתונים ראשי: ' + error.message);
       }
@@ -1783,7 +1815,7 @@ class SystemManagement {
    */
   static async loadPrimaryDataProvider() {
     try {
-      console.log('📡 Loading primary data provider...');
+      window.Logger?.debug('📡 Loading primary data provider...');
 
       if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
         const provider = await window.PreferencesCore.getPreference('primaryDataProvider');
@@ -1795,11 +1827,11 @@ class SystemManagement {
           } else {
             select.value = provider;
           }
-          console.log(`✅ Primary data provider loaded: ${provider}`);
+          window.Logger?.debug(`✅ Primary data provider loaded: ${provider}`);
         }
       }
     } catch (error) {
-      console.error('❌ Error loading primary data provider:', error);
+      window.Logger?.error('❌ Error loading primary data provider:', error);
     }
   }
 
@@ -1816,7 +1848,7 @@ class SystemManagement {
    */
   static async copyDetailedLog() {
     try {
-      console.log('📋 Generating detailed log...');
+      window.Logger?.debug('📋 Generating detailed log...');
 
       // Show loading state
       const copyBtn = document.querySelector('.copy-log-btn');
@@ -1844,17 +1876,17 @@ class SystemManagement {
           if (typeof window.showNotification === 'function') {
             window.showNotification(logInfo, 'success');
           } else {
-            alert(logInfo);
+            window.showErrorNotification(logInfo, "שגיאה");
           }
         }
 
-        console.log('✅ Detailed log copied to clipboard');
+        window.Logger?.debug('✅ Detailed log copied to clipboard');
       } else {
         throw new Error(data.message || 'Failed to generate detailed log');
       }
 
     } catch (error) {
-      console.error('❌ Error copying detailed log:', error);
+      window.Logger?.error('❌ Error copying detailed log:', error);
 
       const errorMsg = `שגיאה בהעתקת לוג: ${error.message}\n\n🔧 פתרונות אפשריים:\n• בדוק את החיבור לשרת\n• נסה לרענן את הדף\n• פנה לתמיכה טכנית`;
 
@@ -1863,7 +1895,7 @@ class SystemManagement {
       } else if (typeof window.showNotification === 'function') {
         window.showNotification(errorMsg, 'error');
       } else {
-        alert(errorMsg);
+        window.showErrorNotification(errorMsg, "שגיאה");
       }
     } finally {
     // Reset button

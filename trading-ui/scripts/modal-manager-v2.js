@@ -147,6 +147,8 @@ class ModalManagerV2 {
         
         // מאזין לפתיחת מודלים
         document.addEventListener('shown.bs.modal', (event) => {
+            // ניקוי backdrops של Bootstrap לאחר פתיחת modal
+            this._cleanupBootstrapBackdrops();
             this.handleModalShown(event.target);
         });
         
@@ -1621,15 +1623,39 @@ class ModalManagerV2 {
                 }
             }
             
+            // ניטור לפני פתיחת המודול
+            const stackBeforeShow = window.ModalNavigationService?.getStack?.() || [];
+            const currentZIndexBefore = modalElement.style.zIndex || getComputedStyle(modalElement).zIndex || 'none';
+            const backdropsBeforeShow = Array.from(document.querySelectorAll('.modal-backdrop')).map(b => ({
+                id: b.id,
+                zIndex: b.style.zIndex || getComputedStyle(b).zIndex,
+                hasShowClass: b.classList.contains('show')
+            }));
+            
+            window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: Before showing modal', {
+                modalId,
+                mode,
+                isNested,
+                stackLengthBefore: stackBeforeShow.length,
+                stackBefore: stackBeforeShow.map((e, idx) => ({
+                    index: idx,
+                    modalId: e.modalId,
+                    hasElement: !!e.element
+                })),
+                currentZIndex: currentZIndexBefore,
+                backdropsBeforeShow,
+                hasModalZIndexManager: !!window.ModalZIndexManager,
+                page: 'modal-manager-v2'
+            });
+
             // הוספת modal-nested class אם נפתח כמודל מקונן (לפני modal.show())
             if (isNested && modalElement) {
                 modalElement.classList.add('modal-nested', 'modal-nested-level-2');
                 // הגדרת offset גבוה יותר למודל מקונן (40 במקום 20)
                 modalElement.style.setProperty('--modal-nested-offset', '40');
-                window.Logger?.debug(`Modal ${modalId} marked as nested before show()`, {
+                window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: Modal marked as nested', {
                     modalId,
                     stackLength: window.ModalNavigationService?.getStack?.()?.length || 0,
-                    domCheck: true,
                     page: 'modal-manager-v2'
                 });
             } else if (modalElement) {
@@ -1638,9 +1664,105 @@ class ModalManagerV2 {
                 modalElement.style.removeProperty('--modal-nested-offset');
             }
             
+            window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: Calling modal.show()', {
+                modalId,
+                hasBootstrapModal: !!modal,
+                page: 'modal-manager-v2'
+            });
+            
+            // ניקוי backdrops של Bootstrap לפני modal.show() כדי למנוע backdrop כפול
+            this._cleanupBootstrapBackdrops();
+            
             modal.show();
             this.bindDismissButtons(modalElement);
+            
+            // ניקוי נוסף אחרי modal.show() למקרה ש-Bootstrap יצר backdrop חדש
+            const cleanedBackdrops = this._cleanupBootstrapBackdrops();
+            
+            window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: After modal.show(), before backdrop management', {
+                modalId,
+                cleanedBackdrops,
+                page: 'modal-manager-v2'
+            });
+            
             this.ensureGlobalBackdrop();
+            
+            // ניטור אחרי ensureGlobalBackdrop
+            const backdropsAfterBackdrop = Array.from(document.querySelectorAll('.modal-backdrop')).map(b => ({
+                id: b.id,
+                zIndex: b.style.zIndex || getComputedStyle(b).zIndex,
+                hasShowClass: b.classList.contains('show')
+            }));
+            
+            window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: After ensureGlobalBackdrop', {
+                modalId,
+                backdropsAfterBackdrop,
+                page: 'modal-manager-v2'
+            });
+            
+            // עדכון z-index דרך ModalZIndexManager
+            // שימוש ב-requestAnimationFrame לעדכון מיידי יותר
+            if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+                window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: Scheduling z-index forceUpdate', {
+                    modalId,
+                    method: 'requestAnimationFrame + setTimeout',
+                    page: 'modal-manager-v2'
+                });
+                
+                // עדכון מיידי עם requestAnimationFrame, ואז retry עם setTimeout
+                const updateZIndex = () => {
+                    const stackAfterDelay = window.ModalNavigationService?.getStack?.() || [];
+                    window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: Calling forceUpdate', {
+                        modalId,
+                        stackLengthAfterDelay: stackAfterDelay.length,
+                        stackAfterDelay: stackAfterDelay.map((e, idx) => ({
+                            index: idx,
+                            modalId: e.modalId,
+                            hasElement: !!e.element
+                        })),
+                        page: 'modal-manager-v2'
+                    });
+                    
+                    window.ModalZIndexManager.forceUpdate(modalElement);
+                    
+                    // ניטור אחרי forceUpdate
+                    requestAnimationFrame(() => {
+                        const finalZIndex = modalElement.style.zIndex || getComputedStyle(modalElement).zIndex || 'none';
+                        const dialogZIndex = modalElement.querySelector('.modal-dialog') ? (getComputedStyle(modalElement.querySelector('.modal-dialog')).zIndex) : 'none';
+                        const contentZIndex = modalElement.querySelector('.modal-content') ? (getComputedStyle(modalElement.querySelector('.modal-content')).zIndex) : 'none';
+                        
+                        window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: After forceUpdate', {
+                            modalId,
+                            zIndexBefore: currentZIndexBefore,
+                            zIndexAfter: finalZIndex,
+                            dialogZIndex,
+                            contentZIndex,
+                            zIndexChanged: currentZIndexBefore !== finalZIndex,
+                            page: 'modal-manager-v2'
+                        });
+                        
+                        // Retry אם z-index לא השתנה (race condition)
+                        if (currentZIndexBefore === finalZIndex && stackAfterDelay.length > 0) {
+                            setTimeout(() => {
+                                window.ModalZIndexManager.forceUpdate(modalElement);
+                            }, 50);
+                        }
+                    });
+                };
+                
+                // עדכון מיידי עם requestAnimationFrame
+                requestAnimationFrame(() => {
+                    updateZIndex();
+                    // Retry עם setTimeout למקרה שה-stack עדיין לא התעדכן
+                    setTimeout(updateZIndex, 50);
+                });
+            } else {
+                window.Logger?.warn('🔍 [Z-INDEX] ModalManagerV2.showModal: ModalZIndexManager not available', {
+                    modalId,
+                    hasModalZIndexManager: !!window.ModalZIndexManager,
+                    page: 'modal-manager-v2'
+                });
+            }
             
             if (mode === 'edit' && entityData) {
                 const entityId = entityData.id != null ? String(entityData.id) : '';
@@ -7238,31 +7360,159 @@ class ModalManagerV2 {
         }
     }
 
+    /**
+     * Clean up Bootstrap backdrops - ניקוי backdrops של Bootstrap
+     * מונע backdrop כפול על ידי הסרת כל backdrops של Bootstrap חוץ מ-globalModalBackdrop
+     * 
+     * @private
+     */
+    _cleanupBootstrapBackdrops() {
+        try {
+            // מציאת כל ה-backdrops ב-DOM
+            const allBackdrops = document.querySelectorAll('.modal-backdrop');
+            const backdropsBefore = Array.from(allBackdrops).map(b => ({
+                id: b.id,
+                className: b.className,
+                zIndex: b.style.zIndex || getComputedStyle(b).zIndex,
+                hasShowClass: b.classList.contains('show')
+            }));
+            
+            let removedCount = 0;
+            const removedBackdrops = [];
+            
+            // ניקוי כל backdrops חוץ מ-globalModalBackdrop
+            allBackdrops.forEach(backdrop => {
+                // אם זה לא ה-globalBackdrop שלנו - מחק אותו
+                if (backdrop.id !== 'globalModalBackdrop') {
+                    removedBackdrops.push({
+                        id: backdrop.id || 'no-id',
+                        className: backdrop.className,
+                        zIndex: backdrop.style.zIndex || getComputedStyle(backdrop).zIndex
+                    });
+                    window.Logger?.info('🔍 [BACKDROP] Removing Bootstrap backdrop', {
+                        backdropId: backdrop.id || 'no-id',
+                        backdropClasses: backdrop.className,
+                        zIndex: backdrop.style.zIndex || getComputedStyle(backdrop).zIndex,
+                        page: 'modal-manager-v2'
+                    });
+                    backdrop.remove();
+                    removedCount++;
+                }
+            });
+            
+            const backdropsAfter = Array.from(document.querySelectorAll('.modal-backdrop')).map(b => ({
+                id: b.id,
+                className: b.className,
+                zIndex: b.style.zIndex || getComputedStyle(b).zIndex,
+                hasShowClass: b.classList.contains('show')
+            }));
+            
+            if (removedCount > 0 || allBackdrops.length > 0) {
+                window.Logger?.info('🔍 [BACKDROP] Cleaned up Bootstrap backdrops', {
+                    removedCount,
+                    backdropsBefore: backdropsBefore,
+                    removedBackdrops: removedBackdrops,
+                    backdropsAfter: backdropsAfter,
+                    page: 'modal-manager-v2'
+                });
+            }
+            
+            return removedCount;
+        } catch (error) {
+            window.Logger?.warn('🔍 [BACKDROP] Error cleaning up Bootstrap backdrops', {
+                error: error?.message,
+                page: 'modal-manager-v2'
+            });
+            return 0;
+        }
+    }
+
     ensureGlobalBackdrop() {
         const activeCount = this._getActiveModalCount();
+        
+        window.Logger?.info('🔍 [BACKDROP] ensureGlobalBackdrop called', {
+            activeCount,
+            hasGlobalBackdrop: !!this.globalBackdrop,
+            globalBackdropInDOM: this.globalBackdrop ? document.body.contains(this.globalBackdrop) : false,
+            existingBackdropInDOM: !!document.getElementById('globalModalBackdrop'),
+            allBackdropsInDOM: Array.from(document.querySelectorAll('.modal-backdrop')).map(b => ({
+                id: b.id,
+                className: b.className,
+                zIndex: b.style.zIndex || getComputedStyle(b).zIndex,
+                hasShowClass: b.classList.contains('show')
+            })),
+            page: 'modal-manager-v2'
+        });
+
         if (activeCount <= 0) {
+            window.Logger?.info('🔍 [BACKDROP] No active modals, updating visibility', {
+                activeCount,
+                page: 'modal-manager-v2'
+            });
             this.updateGlobalBackdropVisibility();
             return;
         }
 
+        // ניקוי backdrops של Bootstrap לפני יצירת globalBackdrop
+        const cleanedBackdrops = this._cleanupBootstrapBackdrops();
+        window.Logger?.info('🔍 [BACKDROP] Cleaned Bootstrap backdrops', {
+            cleanedCount: cleanedBackdrops,
+            page: 'modal-manager-v2'
+        });
+
+        const backdropExistedBefore = !!this.globalBackdrop && document.body.contains(this.globalBackdrop);
+        const existingBackdropInDOM = document.getElementById('globalModalBackdrop');
+
         if (!this.globalBackdrop || !document.body.contains(this.globalBackdrop)) {
-            const existingBackdrop = document.getElementById('globalModalBackdrop');
-            if (existingBackdrop) {
-                this.globalBackdrop = existingBackdrop;
+            if (existingBackdropInDOM) {
+                window.Logger?.info('🔍 [BACKDROP] Reusing existing backdrop from DOM', {
+                    backdropId: existingBackdropInDOM.id,
+                    zIndex: existingBackdropInDOM.style.zIndex || getComputedStyle(existingBackdropInDOM).zIndex,
+                    page: 'modal-manager-v2'
+                });
+                this.globalBackdrop = existingBackdropInDOM;
             } else {
+                window.Logger?.info('🔍 [BACKDROP] Creating new global backdrop', {
+                    page: 'modal-manager-v2'
+                });
                 const backdrop = document.createElement('div');
                 backdrop.id = 'globalModalBackdrop';
                 backdrop.className = 'modal-backdrop fade global-modal-backdrop';
                 backdrop.addEventListener('click', this.backdropClickHandler, { passive: true });
                 document.body.appendChild(backdrop);
                 this.globalBackdrop = backdrop;
+                
+                window.Logger?.info('🔍 [BACKDROP] New global backdrop created and appended', {
+                    backdropId: backdrop.id,
+                    parentElement: backdrop.parentElement?.tagName || 'none',
+                    zIndex: backdrop.style.zIndex || getComputedStyle(backdrop).zIndex,
+                    page: 'modal-manager-v2'
+                });
             }
         }
 
         if (this.globalBackdrop) {
+            const zIndexBefore = this.globalBackdrop.style.zIndex || getComputedStyle(this.globalBackdrop).zIndex || 'none';
+            const hasShowClassBefore = this.globalBackdrop.classList.contains('show');
+            
             requestAnimationFrame(() => {
                 if (this.globalBackdrop) {
                     this.globalBackdrop.classList.add('show');
+                    
+                    const zIndexAfter = this.globalBackdrop.style.zIndex || getComputedStyle(this.globalBackdrop).zIndex || 'none';
+                    const hasShowClassAfter = this.globalBackdrop.classList.contains('show');
+                    
+                    window.Logger?.info('🔍 [BACKDROP] Global backdrop show class added', {
+                        backdropId: this.globalBackdrop.id,
+                        zIndexBefore,
+                        zIndexAfter,
+                        hasShowClassBefore,
+                        hasShowClassAfter,
+                        isVisible: this.globalBackdrop.offsetParent !== null,
+                        display: getComputedStyle(this.globalBackdrop).display,
+                        opacity: getComputedStyle(this.globalBackdrop).opacity,
+                        page: 'modal-manager-v2'
+                    });
                 }
             });
         }
@@ -7271,25 +7521,97 @@ class ModalManagerV2 {
         if (!document.body.style.overflow) {
             document.body.style.overflow = 'hidden';
         }
+
+        window.Logger?.info('🔍 [BACKDROP] ensureGlobalBackdrop completed', {
+            activeCount,
+            hasGlobalBackdrop: !!this.globalBackdrop,
+            globalBackdropId: this.globalBackdrop?.id,
+            globalBackdropZIndex: this.globalBackdrop ? (this.globalBackdrop.style.zIndex || getComputedStyle(this.globalBackdrop).zIndex) : 'none',
+            globalBackdropHasShow: this.globalBackdrop ? this.globalBackdrop.classList.contains('show') : false,
+            bodyHasModalOpen: document.body.classList.contains('modal-open'),
+            page: 'modal-manager-v2'
+        });
     }
 
     updateGlobalBackdropVisibility() {
         const activeCount = this._getActiveModalCount();
-        if (activeCount > 0) {
+        
+        // בדיקה מדויקת של מספר המודולים הפתוחים
+        const openModals = document.querySelectorAll('.modal.show');
+        const actualActiveCount = Array.from(openModals).filter(modal => {
+            // בדיקה שהמודל באמת גלוי
+            return modal.offsetParent !== null && 
+                   getComputedStyle(modal).display !== 'none' &&
+                   getComputedStyle(modal).visibility !== 'hidden';
+        }).length;
+        
+        window.Logger?.info('🔍 [BACKDROP] updateGlobalBackdropVisibility called', {
+            activeCount,
+            actualActiveCount,
+            openModalsCount: openModals.length,
+            hasGlobalBackdrop: !!this.globalBackdrop,
+            globalBackdropInDOM: this.globalBackdrop ? document.body.contains(this.globalBackdrop) : false,
+            allBackdropsInDOM: Array.from(document.querySelectorAll('.modal-backdrop')).map(b => ({
+                id: b.id,
+                className: b.className,
+                zIndex: b.style.zIndex || getComputedStyle(b).zIndex,
+                hasShowClass: b.classList.contains('show')
+            })),
+            bodyHasModalOpen: document.body.classList.contains('modal-open'),
+            page: 'modal-manager-v2'
+        });
+
+        // שימוש במספר המודולים הגלויים בפועל
+        if (actualActiveCount > 0) {
+            window.Logger?.info('🔍 [BACKDROP] Active modals exist, ensuring backdrop', {
+                actualActiveCount,
+                page: 'modal-manager-v2'
+            });
             this.ensureGlobalBackdrop();
             return;
         }
 
+        // ניקוי כל ה-backdrops אם אין מודולים פתוחים
+        this._cleanupBootstrapBackdrops();
+        
         if (this.globalBackdrop) {
             const backdrop = this.globalBackdrop;
+            const backdropZIndexBefore = backdrop.style.zIndex || getComputedStyle(backdrop).zIndex;
+            const hasShowClassBefore = backdrop.classList.contains('show');
+            
+            window.Logger?.info('🔍 [BACKDROP] Hiding and removing global backdrop', {
+                backdropId: backdrop.id,
+                zIndexBefore: backdropZIndexBefore,
+                hasShowClassBefore,
+                actualActiveCount,
+                page: 'modal-manager-v2'
+            });
+
             const removeBackdrop = () => {
                 backdrop.removeEventListener('transitionend', removeBackdrop);
+                
+                window.Logger?.info('🔍 [BACKDROP] Removing global backdrop from DOM', {
+                    backdropId: backdrop.id,
+                    parentNode: backdrop.parentNode?.tagName || 'none',
+                    page: 'modal-manager-v2'
+                });
+                
                 if (backdrop.parentNode) {
                     backdrop.parentNode.removeChild(backdrop);
                 }
                 if (this.globalBackdrop === backdrop) {
                     this.globalBackdrop = null;
                 }
+                
+                // ניקוי נוסף של כל ה-backdrops שנותרו
+                this._cleanupBootstrapBackdrops();
+                
+                window.Logger?.info('🔍 [BACKDROP] Global backdrop removed', {
+                    backdropRemoved: !document.body.contains(backdrop),
+                    globalBackdropIsNull: !this.globalBackdrop,
+                    allBackdropsRemaining: Array.from(document.querySelectorAll('.modal-backdrop')).length,
+                    page: 'modal-manager-v2'
+                });
             };
 
             backdrop.classList.remove('show');
@@ -7299,6 +7621,18 @@ class ModalManagerV2 {
 
         document.body.classList.remove('modal-open');
         document.body.style.overflow = '';
+        
+        window.Logger?.info('🔍 [BACKDROP] updateGlobalBackdropVisibility completed', {
+            activeCount,
+            actualActiveCount,
+            bodyHasModalOpen: document.body.classList.contains('modal-open'),
+            bodyOverflow: document.body.style.overflow,
+            allBackdropsRemaining: Array.from(document.querySelectorAll('.modal-backdrop')).map(b => ({
+                id: b.id,
+                zIndex: b.style.zIndex || getComputedStyle(b).zIndex
+            })),
+            page: 'modal-manager-v2'
+        });
     }
 
     handleGlobalBackdropClick(event) {

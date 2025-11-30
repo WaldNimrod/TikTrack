@@ -38,7 +38,7 @@ class ConstraintsMonitor {
             this.renderCurrentLayer();
         } catch (error) {
             this.showMessage('שגיאה בטעינת נתוני האילוצים', 'error');
-            console.error('Error initializing constraints monitor:', error);
+            window.Logger?.error('Error initializing constraints monitor:', error);
         }
     }
 
@@ -69,7 +69,7 @@ class ConstraintsMonitor {
             this.updateStats();
             this.populateFilters();
         } catch (error) {
-            console.error('Error loading data:', error);
+            window.Logger?.error('Error loading data:', error);
             // Use mock data as fallback
             this.constraints = this.getMockConstraints();
             this.tables = this.getMockTables();
@@ -632,7 +632,7 @@ window.refreshConstraints = function() {
         constraintsMonitor.showMessage('נתונים רועננו בהצלחה', 'success');
     }).catch(error => {
         constraintsMonitor.showMessage('שגיאה ברענון הנתונים', 'error');
-        console.error('Error refreshing data:', error);
+        window.Logger?.error('Error refreshing data:', error);
     });
 };
 
@@ -709,18 +709,50 @@ window.viewConstraint = async function(constraintName) {
             try {
                 await window.ModalManagerV2.showModal('viewConstraintModal', 'view');
             } catch (error) {
-                // Fallback to Bootstrap if ModalManagerV2 fails
+                // Fallback to Bootstrap if ModalManagerV2 fails - עם backdrop: false וניקוי
                 window.Logger?.warn('viewConstraintModal not available in ModalManagerV2, using Bootstrap fallback', { page: 'constraints' });
                 if (bootstrap?.Modal) {
-                    const modal = new bootstrap.Modal(modalElement);
+                    // ניקוי backdrops לפני פתיחה
+                    if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                        window.ModalManagerV2._cleanupBootstrapBackdrops();
+                    }
+                    const modal = window.ModalManagerV2?.openModal(modalElement, { backdrop: false });
                     modal.show();
+                    // ניקוי backdrops אחרי פתיחה
+                    if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                        setTimeout(() => {
+                            window.ModalManagerV2._cleanupBootstrapBackdrops();
+                        }, 50);
+                    }
+                    // עדכון z-index
+                    if (window.ModalZIndexManager?.forceUpdate) {
+                        setTimeout(() => {
+                            window.ModalZIndexManager.forceUpdate(modalElement);
+                        }, 50);
+                    }
                 }
             }
         } else {
-            // Fallback to Bootstrap modal
+            // Fallback to Bootstrap modal - עם backdrop: false וניקוי
             if (bootstrap?.Modal) {
-                const modal = new bootstrap.Modal(modalElement);
+                // ניקוי backdrops לפני פתיחה
+                if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                    window.ModalManagerV2._cleanupBootstrapBackdrops();
+                }
+                const modal = window.ModalManagerV2?.openModal(modalElement, { backdrop: false });
                 modal.show();
+                // ניקוי backdrops אחרי פתיחה
+                if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                    setTimeout(() => {
+                        window.ModalManagerV2._cleanupBootstrapBackdrops();
+                    }, 50);
+                }
+                // עדכון z-index
+                if (window.ModalZIndexManager?.forceUpdate) {
+                    setTimeout(() => {
+                        window.ModalZIndexManager.forceUpdate(modalElement);
+                    }, 50);
+                }
             }
         }
     }
@@ -866,18 +898,50 @@ async function showValidationModal(constraint, isAll) {
             try {
                 await window.ModalManagerV2.showModal('validationModal', 'view');
             } catch (error) {
-                // Fallback to Bootstrap if ModalManagerV2 fails
+                // Fallback to Bootstrap if ModalManagerV2 fails - עם backdrop: false וניקוי
                 window.Logger?.warn('validationModal not available in ModalManagerV2, using Bootstrap fallback', { page: 'constraints' });
                 if (bootstrap?.Modal) {
-                    const modal = new bootstrap.Modal(modalElement);
+                    // ניקוי backdrops לפני פתיחה
+                    if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                        window.ModalManagerV2._cleanupBootstrapBackdrops();
+                    }
+                    const modal = window.ModalManagerV2?.openModal(modalElement, { backdrop: false });
                     modal.show();
+                    // ניקוי backdrops אחרי פתיחה
+                    if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                        setTimeout(() => {
+                            window.ModalManagerV2._cleanupBootstrapBackdrops();
+                        }, 50);
+                    }
+                    // עדכון z-index
+                    if (window.ModalZIndexManager?.forceUpdate) {
+                        setTimeout(() => {
+                            window.ModalZIndexManager.forceUpdate(modalElement);
+                        }, 50);
+                    }
                 }
             }
         } else {
-            // Fallback to Bootstrap modal
+            // Fallback to Bootstrap modal - עם backdrop: false וניקוי
             if (bootstrap?.Modal) {
-                const modal = new bootstrap.Modal(modalElement);
+                // ניקוי backdrops לפני פתיחה
+                if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                    window.ModalManagerV2._cleanupBootstrapBackdrops();
+                }
+                const modal = window.ModalManagerV2?.openModal(modalElement, { backdrop: false });
                 modal.show();
+                // ניקוי backdrops אחרי פתיחה
+                if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                    setTimeout(() => {
+                        window.ModalManagerV2._cleanupBootstrapBackdrops();
+                    }, 50);
+                }
+                // עדכון z-index
+                if (window.ModalZIndexManager?.forceUpdate) {
+                    setTimeout(() => {
+                        window.ModalZIndexManager.forceUpdate(modalElement);
+                    }, 50);
+                }
             }
         }
     }
@@ -920,7 +984,7 @@ function startValidation(constraints, isAll) {
                 const result = await validateSingleConstraint(constraint);
                 results.push(result);
             } catch (error) {
-                console.error('Error validating constraint:', constraint.constraint_name, error);
+                window.Logger?.error('Error validating constraint:', constraint.constraint_name, error);
                 results.push({
                     constraint: constraint,
                     database: { status: 'error', message: 'שגיאה בבדיקה', details: error.message },
@@ -1038,7 +1102,7 @@ async function checkDataViolations(constraint) {
             };
         }
     } catch (error) {
-        console.error('Error validating constraint data:', error);
+        window.Logger?.error('Error validating constraint data:', error);
         return {
             status: 'error',
             message: 'שגיאה בבדיקת נתונים',
@@ -1088,7 +1152,7 @@ async function validateConstraintData(constraint) {
         }
         
     } catch (error) {
-        console.error('Error in validateConstraintData:', error);
+        window.Logger?.error('Error in validateConstraintData:', error);
         // Since we already fixed all issues, assume no violations
     }
     
@@ -1347,7 +1411,7 @@ window.exportValidationReport = function() {
  * Initialize constraints page
  */
 window.initializeConstraints = function() {
-    console.log('מוניטור אילוצים נטען');
+    window.Logger?.debug('מוניטור אילוצים נטען');
     constraintsMonitor = new ConstraintsMonitor();
 };
 

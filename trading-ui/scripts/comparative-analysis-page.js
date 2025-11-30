@@ -65,7 +65,7 @@ async function saveSeriesVisibilityState() {
             await window.PreferencesCore.savePreference(PREF_SERIES_VISIBILITY, seriesVisibility);
         } else {
             // Fallback to localStorage
-            localStorage.setItem(PREF_SERIES_VISIBILITY, JSON.stringify(seriesVisibility));
+            window.PageStateManager?.setItem(PREF_SERIES_VISIBILITY, JSON.stringify(seriesVisibility));
         }
     } catch (error) {
         if (window.Logger) {
@@ -82,7 +82,7 @@ async function loadSeriesVisibilityState() {
             savedState = await window.PreferencesCore.getPreference(PREF_SERIES_VISIBILITY);
         } else {
             // Fallback to localStorage
-            const saved = localStorage.getItem(PREF_SERIES_VISIBILITY);
+            const saved = window.PageStateManager?.getItem(PREF_SERIES_VISIBILITY);
             if (saved) {
                 savedState = JSON.parse(saved);
             }
@@ -541,15 +541,15 @@ async function saveFilterState() {
                         const result = await window.PreferencesCore.savePreference(PREF_FILTERS, filters);
                         // Check if save was successful - if not, fallback to localStorage
                         if (!result || (result.success === false)) {
-                            localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+                            window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));
                         }
                     } catch (prefError) {
                         // Final fallback to localStorage
-                        localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+                        window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));
                     }
                 } else {
                     // Fallback to localStorage
-                    localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+                    window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));
                 }
             }
         } else if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
@@ -564,7 +564,7 @@ async function saveFilterState() {
                             preference: PREF_FILTERS
                         });
                     }
-                    localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+                    window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));
                 }
             } catch (prefError) {
                 // If preference doesn't exist in database, fallback to localStorage
@@ -575,11 +575,11 @@ async function saveFilterState() {
                         error: prefError 
                     });
                 }
-                localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+                window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));
             }
         } else {
             // Fallback to localStorage
-            localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+            window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));
         }
     } catch (error) {
         if (window.Logger) {
@@ -588,7 +588,7 @@ async function saveFilterState() {
         // Final fallback: always try localStorage
         try {
             const filters = getFilterValues();
-            localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+            window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));
         } catch (e) {
             // Log localStorage errors (non-critical - already attempted fallback)
             if (window.Logger) {
@@ -678,7 +678,7 @@ async function loadFilterState() {
             filters = await window.PreferencesCore.getPreference(PREF_FILTERS);
         } else {
             // Fallback to localStorage
-            const saved = localStorage.getItem(PREF_FILTERS);
+            const saved = window.PageStateManager?.getItem(PREF_FILTERS);
             if (saved) {
                 filters = JSON.parse(saved);
             }
@@ -3141,7 +3141,7 @@ async function saveRecordFilterState() {
             await window.PreferencesCore.savePreference(PREF_RECORD_FILTERS, filters);
         } else {
             // Fallback to localStorage
-            localStorage.setItem(PREF_RECORD_FILTERS, JSON.stringify(filters));
+            window.PageStateManager?.setItem(PREF_RECORD_FILTERS, JSON.stringify(filters));
         }
     } catch (error) {
         if (window.Logger) {
@@ -3157,7 +3157,7 @@ async function loadRecordFilterState() {
             filters = await window.PreferencesCore.getPreference(PREF_RECORD_FILTERS);
         } else {
             // Fallback to localStorage
-            const saved = localStorage.getItem(PREF_RECORD_FILTERS);
+            const saved = window.PageStateManager?.getItem(PREF_RECORD_FILTERS);
             if (saved) {
                 filters = JSON.parse(saved);
             }
@@ -3188,7 +3188,7 @@ async function saveComparisonParameterState() {
                             preference: PREF_COMPARISON_PARAMS
                         });
                     }
-                    localStorage.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
+                    window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
                 }
             } catch (prefError) {
                 // If preference doesn't exist in database, fallback to localStorage
@@ -3199,11 +3199,11 @@ async function saveComparisonParameterState() {
                         error: prefError 
                     });
                 }
-                localStorage.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
+                window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
             }
         } else {
             // Fallback to localStorage
-            localStorage.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
+            window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
         }
     } catch (error) {
         if (window.Logger) {
@@ -3212,7 +3212,7 @@ async function saveComparisonParameterState() {
         // Final fallback: always try localStorage
         try {
             const params = getComparisonParameterValues();
-            localStorage.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
+            window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
         } catch (e) {
             // Log localStorage errors (non-critical - already attempted fallback)
             if (window.Logger) {
@@ -3233,7 +3233,7 @@ async function loadComparisonParameterState() {
             params = await window.PreferencesCore.getPreference(PREF_COMPARISON_PARAMS);
         } else {
             // Fallback to localStorage
-            const saved = localStorage.getItem(PREF_COMPARISON_PARAMS);
+            const saved = window.PageStateManager?.getItem(PREF_COMPARISON_PARAMS);
             if (saved) {
                 params = JSON.parse(saved);
             }
@@ -3766,8 +3766,8 @@ async function initializeComparisonTags() {
             savedComparisonParams = await window.PreferencesCore.getPreference(PREF_COMPARISON_PARAMS);
         } else {
             // Fallback to localStorage
-            const savedRecordFiltersStr = localStorage.getItem(PREF_RECORD_FILTERS);
-            const savedComparisonParamsStr = localStorage.getItem(PREF_COMPARISON_PARAMS);
+            const savedRecordFiltersStr = window.PageStateManager?.getItem(PREF_RECORD_FILTERS);
+            const savedComparisonParamsStr = window.PageStateManager?.getItem(PREF_COMPARISON_PARAMS);
             if (savedRecordFiltersStr) {
                 savedRecordFilters = JSON.parse(savedRecordFiltersStr);
             }

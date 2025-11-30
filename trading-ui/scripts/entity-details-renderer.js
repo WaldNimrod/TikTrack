@@ -2627,7 +2627,16 @@ class EntityDetailsRenderer {
             }
 
             setTimeout(() => {
-                window.ButtonSystem.initializeButtons();
+                // Initialize buttons if ButtonSystem is available
+                if (window.initializeButtons && typeof window.initializeButtons === 'function') {
+                    window.initializeButtons();
+                } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+                    window.ButtonSystem.initializeButtons();
+                } else {
+                    if (window.Logger) {
+                        window.Logger.debug('Button system not available for button initialization', { tableId, page: 'entity-details-renderer' });
+                    }
+                }
             }, 100);
         
             console.log('🔍 [renderLinkedItems] Returning HTML', { 
@@ -5146,24 +5155,39 @@ class EntityDetailsRenderer {
             // Wait for DOM to be ready, then use button system to initialize tooltips
             requestAnimationFrame(() => {
                 setTimeout(() => {
-                    console.log(`🔍 [Tooltip Debug] Calling initializeTooltips on container`);
-                    // Use button system to initialize tooltips for buttons with data-tooltip
-                    // Filter buttons don't have data-button-type, so we only initialize tooltips
-                    window.advancedButtonSystem.initializeTooltips(filterContainer);
-                    
-                    // Verify tooltips were initialized
-                    setTimeout(() => {
-                        const initializedCount = Array.from(buttonsWithTooltip).filter(btn => 
-                            bootstrap?.Tooltip?.getInstance(btn)
-                        ).length;
-                        console.log(`🔍 [Tooltip Debug] Tooltips initialized: ${initializedCount}/${buttonsWithTooltip.length}`);
-                    }, 200);
+                    // Double-check ButtonSystem is still available (might load asynchronously)
+                    if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+                        window.advancedButtonSystem.initializeTooltips(filterContainer);
+                        
+                        // Verify tooltips were initialized
+                        setTimeout(() => {
+                            const initializedCount = Array.from(buttonsWithTooltip).filter(btn => 
+                                bootstrap?.Tooltip?.getInstance(btn)
+                            ).length;
+                            if (window.Logger && window.Logger.debug) {
+                                window.Logger.debug('Tooltips initialized', { 
+                                    initializedCount, 
+                                    totalButtons: buttonsWithTooltip.length,
+                                    tableId,
+                                    page: 'entity-details-renderer' 
+                                });
+                            }
+                        }, 200);
+                    } else {
+                        if (window.Logger) {
+                            window.Logger.debug('Button system not available for tooltip initialization (delayed check)', { 
+                                tableId, 
+                                page: 'entity-details-renderer' 
+                            });
+                        }
+                    }
                 }, 100);
             });
         } else {
-            console.warn(`🔍 [Tooltip Debug] Button system not available - tooltips will not be initialized`);
-            if (window.Logger) {
-                window.Logger.warn('Button system not available for tooltip initialization', { 
+            // ButtonSystem not available - this is expected if it hasn't loaded yet
+            // Tooltips will be initialized when ButtonSystem becomes available
+            if (window.Logger && window.Logger.debug) {
+                window.Logger.debug('Button system not available for tooltip initialization', { 
                     tableId, 
                     page: 'entity-details-renderer' 
                 });

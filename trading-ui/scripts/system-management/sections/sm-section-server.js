@@ -358,61 +358,52 @@ class SMServerSection extends SMBaseSection {
   createSystemInfoCard(status, resources, overview, systemInfoData) {
     const systemInfo = this.extractSystemInfo(status, resources, overview, systemInfoData);
 
-    return `
-      <div class="card">
-        <div class="card-header">
-          <h5><i class="fas fa-info-circle"></i> מידע מערכת</h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <table class="table table-sm">
-                <tbody>
-                  <tr>
-                    <td><strong>מערכת הפעלה:</strong></td>
-                    <td>${systemInfo.os}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>גרסת Python:</strong></td>
-                    <td>${systemInfo.pythonVersion}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>גרסת Flask:</strong></td>
-                    <td>${systemInfo.flaskVersion}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>ארכיטקטורה:</strong></td>
-                    <td>${systemInfo.architecture}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="col-md-6">
-              <table class="table table-sm">
-                <tbody>
-                  <tr>
-                    <td><strong>זיכרון זמין:</strong></td>
-                    <td>${systemInfo.totalMemory}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>שטח דיסק זמין:</strong></td>
-                    <td>${systemInfo.totalDisk}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>מעבדים:</strong></td>
-                    <td>${systemInfo.cpuCount}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>זמן הפעלה:</strong></td>
-                    <td>${systemInfo.uptime}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
+    return SMUIComponents.createStatsCard(
+      'מידע מערכת',
+      [
+        {
+          label: 'מערכת הפעלה',
+          value: systemInfo.os,
+          icon: 'fa-desktop'
+        },
+        {
+          label: 'גרסת Python',
+          value: systemInfo.pythonVersion,
+          icon: 'fa-code'
+        },
+        {
+          label: 'גרסת Flask',
+          value: systemInfo.flaskVersion,
+          icon: 'fa-flask'
+        },
+        {
+          label: 'ארכיטקטורה',
+          value: systemInfo.architecture,
+          icon: 'fa-microchip'
+        },
+        {
+          label: 'זיכרון זמין',
+          value: systemInfo.totalMemory,
+          icon: 'fa-memory'
+        },
+        {
+          label: 'שטח דיסק זמין',
+          value: systemInfo.totalDisk,
+          icon: 'fa-hdd'
+        },
+        {
+          label: 'מעבדים',
+          value: systemInfo.cpuCount,
+          icon: 'fa-microchip'
+        },
+        {
+          label: 'זמן הפעלה',
+          value: systemInfo.uptime,
+          icon: 'fa-clock'
+        }
+      ],
+      { icon: 'fa-info-circle' }
+    );
   }
 
   /**

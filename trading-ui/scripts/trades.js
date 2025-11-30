@@ -4476,9 +4476,15 @@ window.saveTrade = async function saveTrade() {
             });
 
             // רק אם הטרייד נוצר מאשקול ביצועים - קישור אוטומטי של ביצועים לטרייד
+            // Note: This is now handled by ExecutionClusterHelpers.handleTradeCreated
+            // which is called from the widget's openTradeModalFromCluster context
             const isFromExecutionCluster = form.dataset.tradeCreationSource === 'execution-cluster';
-            if (isFromExecutionCluster && crudResult && window.PendingExecutionTradeCreation?.handleTradeCreated) {
-                await window.PendingExecutionTradeCreation.handleTradeCreated(crudResult);
+            if (isFromExecutionCluster && crudResult && window.ExecutionClusterHelpers?.handleTradeCreated) {
+                const clusterId = form.dataset.clusterId;
+                const selectedExecutionIds = form.dataset.selectedExecutionIds?.split(',').map(id => Number(id)).filter(Number.isFinite) || [];
+                if (clusterId && selectedExecutionIds.length > 0) {
+                    await window.ExecutionClusterHelpers.handleTradeCreated(crudResult, clusterId, selectedExecutionIds);
+                }
             }
         }
 

@@ -338,8 +338,68 @@ class EntityDetailsModal {
                 this.navigationInstanceId = null;
             }
 
-                // הצגת המודל
-                await this.showModal();
+            // הצגת המודל (ממתין ל-shown.bs.modal event)
+            await this.showModal();
+            
+            // ניטור z-index לפני עדכון
+            const stackBefore = window.ModalNavigationService?.getStack?.() || [];
+            const currentZIndex = this.modal ? (this.modal.style.zIndex || getComputedStyle(this.modal).zIndex) : 'none';
+            const dialogZIndex = this.modal?.querySelector('.modal-dialog') ? (getComputedStyle(this.modal.querySelector('.modal-dialog')).zIndex) : 'none';
+            const contentZIndex = this.modal?.querySelector('.modal-content') ? (getComputedStyle(this.modal.querySelector('.modal-content')).zIndex) : 'none';
+            
+            window.Logger?.info('🔍 [Z-INDEX] EntityDetailsModal: Before z-index update', {
+                modalId: this.modalId,
+                entityType,
+                entityId,
+                stackLength: stackBefore.length,
+                currentZIndex,
+                dialogZIndex,
+                contentZIndex,
+                hasModalZIndexManager: !!window.ModalZIndexManager,
+                page: 'entity-details-modal'
+            });
+            
+            // עדכון z-index דרך ModalZIndexManager
+            // ModalNavigationService אמור לעדכן אוטומטית דרך subscription,
+            // אבל נוסיף עדכון כפוי אחרי שהמודול פתוח לחלוטין
+            // (העדכון הראשוני קורה כבר ב-showModal() דרך shown.bs.modal event)
+            if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+                // עדכון נוסף לאחר שהמודול פתוח לחלוטין
+                setTimeout(() => {
+                    // עדכון כל המודולים כדי לוודא שה-hierarchy נכון
+                    window.Logger?.info('🔍 [Z-INDEX] EntityDetailsModal: Calling forceUpdate()', {
+                        modalId: this.modalId,
+                        entityType,
+                        entityId,
+                        page: 'entity-details-modal'
+                    });
+                    
+                    window.ModalZIndexManager.forceUpdate();
+                    
+                    // ניטור z-index אחרי עדכון
+                    setTimeout(() => {
+                        const stackAfter = window.ModalNavigationService?.getStack?.() || [];
+                        const newZIndex = this.modal ? (this.modal.style.zIndex || getComputedStyle(this.modal).zIndex) : 'none';
+                        const newDialogZIndex = this.modal?.querySelector('.modal-dialog') ? (getComputedStyle(this.modal.querySelector('.modal-dialog')).zIndex) : 'none';
+                        const newContentZIndex = this.modal?.querySelector('.modal-content') ? (getComputedStyle(this.modal.querySelector('.modal-content')).zIndex) : 'none';
+                        
+                        window.Logger?.info('🔍 [Z-INDEX] EntityDetailsModal: After z-index update', {
+                            modalId: this.modalId,
+                            entityType,
+                            entityId,
+                            stackLength: stackAfter.length,
+                            previousZIndex: currentZIndex,
+                            newZIndex,
+                            previousDialogZIndex: dialogZIndex,
+                            newDialogZIndex,
+                            previousContentZIndex: contentZIndex,
+                            newContentZIndex,
+                            zIndexChanged: currentZIndex !== newZIndex,
+                            page: 'entity-details-modal'
+                        });
+                    }, 50);
+                }, 100);
+            }
 
                 // טעינת הנתונים
                 await this.loadEntityData(entityType, entityId, options);
@@ -366,10 +426,17 @@ class EntityDetailsModal {
                     // יש מודל מקונן - חזור למודל הקודם
                     window.ModalNavigationService.goBack().catch((error) => {
                         window.Logger?.warn('Failed to go back via navigation service, using fallback', { error: error?.message }, { page: "entity-details-modal" });
-                        // fallback - סגירה רגילה
-                        const bsModal = bootstrap.Modal.getInstance(this.modal);
-                        if (bsModal) {
-                            bsModal.hide();
+                        // fallback - סגירה רגילה דרך ModalManagerV2 או Bootstrap
+                        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+                            window.ModalManagerV2.hideModal(this.modal.id);
+                        } else if (bootstrap?.Modal) {
+                            const bsModal = bootstrap.Modal.getInstance(this.modal);
+                            if (bsModal) {
+                                bsModal.hide();
+                            } else {
+                                this.modal.style.display = 'none';
+                                this.modal.classList.remove('show');
+                            }
                         } else {
                             this.modal.style.display = 'none';
                             this.modal.classList.remove('show');
@@ -378,10 +445,18 @@ class EntityDetailsModal {
                     return;
                 }
                 
-                // אין מודל מקונן - סגירה רגילה
-                const bsModal = bootstrap.Modal.getInstance(this.modal);
-                if (bsModal) {
-                    bsModal.hide();
+                // אין מודל מקונן - סגירה רגילה דרך ModalManagerV2 או Bootstrap
+                if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+                    window.ModalManagerV2.hideModal(this.modal.id);
+                } else if (bootstrap?.Modal) {
+                    const bsModal = bootstrap.Modal.getInstance(this.modal);
+                    if (bsModal) {
+                        bsModal.hide();
+                    } else {
+                        // fallback
+                        this.modal.style.display = 'none';
+                        this.modal.classList.remove('show');
+                    }
                 } else {
                     // fallback
                     this.modal.style.display = 'none';
@@ -1277,31 +1352,90 @@ class EntityDetailsModal {
     async showModal() {
         if (!this.modal) return;
 
-        try {
-            // יצירת Bootstrap modal instance ללא backdrop (ננהל אותו באופן מרכזי)
-            const bsModal = new bootstrap.Modal(this.modal, {
-                backdrop: false, // ננהל backdrop מרכזית
-                keyboard: true
-            });
-            
-            console.log('🟡 [showModal] About to call bsModal.show()', {
-                modalId: this.modal?.id,
-                hasModalNavigationService: !!window.ModalNavigationService,
-                timestamp: new Date().toISOString()
-            });
-            
-            bsModal.show();
-            
-            console.log('🟡 [showModal] bsModal.show() called - waiting for shown.bs.modal event', {
-                modalId: this.modal?.id,
-                timestamp: new Date().toISOString()
-            });
-        } catch (error) {
-            window.Logger.error('Error showing modal with Bootstrap:', error, { page: "entity-details-modal" });
-            // fallback להצגה ישירה
-            this.modal.style.display = 'block';
-            this.modal.classList.add('show');
-        }
+        return new Promise((resolve, reject) => {
+            try {
+                // פתיחה דרך ModalManagerV2 או Bootstrap fallback
+                if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+                    window.ModalManagerV2.showModal(this.modal.id, 'view').then(() => {
+                        resolve();
+                    }).catch(error => {
+                        window.Logger?.error('Error showing entity details modal via ModalManagerV2', { error, modalId: this.modal.id, page: 'entity-details-modal' });
+                        // Fallback to Bootstrap
+                        if (bootstrap?.Modal) {
+                            const bsModal = new bootstrap.Modal(this.modal, {
+                                backdrop: false, // ננהל backdrop מרכזית
+                                keyboard: true
+                            });
+                            bsModal.show();
+                            resolve();
+                        } else {
+                            reject(error);
+                        }
+                    });
+                    return;
+                }
+                
+                // Fallback to Bootstrap
+                const bsModal = new bootstrap.Modal(this.modal, {
+                    backdrop: false, // ננהל backdrop מרכזית
+                    keyboard: true
+                });
+                
+                window.Logger?.debug('🟡 [showModal] About to call bsModal.show()', {
+                    modalId: this.modal?.id,
+                    hasModalNavigationService: !!window.ModalNavigationService,
+                    timestamp: new Date().toISOString(),
+                    page: 'entity-details-modal'
+                });
+                
+                // המתינה ל-`shown.bs.modal` event לפני resolve
+                this.modal.addEventListener('shown.bs.modal', () => {
+                    // ניטור z-index ב-shown event
+                    const stackAtShown = window.ModalNavigationService?.getStack?.() || [];
+                    const zIndexAtShown = this.modal ? (this.modal.style.zIndex || getComputedStyle(this.modal).zIndex) : 'none';
+                    const globalBackdropAtShown = document.getElementById('globalModalBackdrop');
+                    
+                    window.Logger?.info('🔍 [Z-INDEX] EntityDetailsModal: shown.bs.modal event fired', {
+                        modalId: this.modal?.id,
+                        timestamp: new Date().toISOString(),
+                        stackLength: stackAtShown.length,
+                        zIndex: zIndexAtShown,
+                        backdrop: {
+                            exists: !!globalBackdropAtShown,
+                            zIndex: globalBackdropAtShown ? (globalBackdropAtShown.style.zIndex || getComputedStyle(globalBackdropAtShown).zIndex) : 'none'
+                        },
+                        page: 'entity-details-modal'
+                    });
+                    
+                    // עדכון z-index אחרי שהמודול פתוח לחלוטין
+                    if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+                        setTimeout(() => {
+                            window.Logger?.info('🔍 [Z-INDEX] EntityDetailsModal: Updating z-index from shown.bs.modal', {
+                                modalId: this.modal?.id,
+                                page: 'entity-details-modal'
+                            });
+                            window.ModalZIndexManager.forceUpdate();
+                        }, 50);
+                    }
+                    
+                    resolve();
+                }, { once: true });
+                
+                bsModal.show();
+                
+                window.Logger?.debug('🟡 [showModal] bsModal.show() called - waiting for shown.bs.modal event', {
+                    modalId: this.modal?.id,
+                    timestamp: new Date().toISOString(),
+                    page: 'entity-details-modal'
+                });
+            } catch (error) {
+                window.Logger.error('Error showing modal with Bootstrap:', error, { page: "entity-details-modal" });
+                // fallback להצגה ישירה
+                this.modal.style.display = 'block';
+                this.modal.classList.add('show');
+                reject(error);
+            }
+        });
     }
 
     /**

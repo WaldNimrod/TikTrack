@@ -109,11 +109,19 @@
         resetForm();
 
         // Open via ModalManagerV2
-        if (window.ModalManagerV2?.showModal) {
-            window.ModalManagerV2.showModal('addTickerModal', {
-                listId: listId
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+            window.ModalManagerV2.showModal('addTickerModal', 'add', { listId: listId }).catch(error => {
+                window.Logger?.error('Error showing add ticker modal via ModalManagerV2', { error, modalId: 'addTickerModal', page: 'add-ticker-modal' });
+                // Fallback to bootstrap if ModalManagerV2 fails
+                if (bootstrap?.Modal) {
+                    const modal = document.getElementById('addTickerModal');
+                    if (modal) {
+                        const bsModal = new bootstrap.Modal(modal);
+                        bsModal.show();
+                    }
+                }
             });
-        } else {
+        } else if (bootstrap?.Modal) {
             const modal = document.getElementById('addTickerModal');
             if (modal) {
                 const bsModal = new bootstrap.Modal(modal);
@@ -126,9 +134,9 @@
      * Close add ticker modal
      */
     function closeAddTickerModal() {
-        if (window.ModalManagerV2?.closeModal) {
-            window.ModalManagerV2.closeModal('addTickerModal');
-        } else {
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+            window.ModalManagerV2.hideModal('addTickerModal');
+        } else if (bootstrap?.Modal) {
             const modal = document.getElementById('addTickerModal');
             if (modal) {
                 const bsModal = bootstrap.Modal.getInstance(modal);
@@ -361,6 +369,7 @@
     window.Logger?.info?.('✅ AddTickerModal loaded successfully', PAGE_LOG_CONTEXT);
 
 })();
+
 
 
 

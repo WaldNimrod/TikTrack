@@ -655,6 +655,18 @@ const INFO_SUMMARY_CONFIGS = {
         label: 'ניתוחים נכשלו',
         calculator: 'countByField',
         params: { field: 'status', value: 'failed' }
+      },
+      {
+        id: 'analysesWithCache',
+        label: 'עם מטמון',
+        calculator: 'countByAvailability',
+        params: { type: 'cache' }
+      },
+      {
+        id: 'analysesWithNote',
+        label: 'עם הערה',
+        calculator: 'countByAvailability',
+        params: { type: 'note' }
       }
     ]
   }

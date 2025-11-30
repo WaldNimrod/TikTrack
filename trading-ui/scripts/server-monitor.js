@@ -35,7 +35,7 @@ class ServerMonitor {
 
     if (timeSinceLastAction < this.actionCooldown) {
       const remainingTime = Math.ceil((this.actionCooldown - timeSinceLastAction) / 1000);
-      console.warn(`⏳ ${actionName} ב-cooldown. נסה שוב בעוד ${remainingTime} שניות`);
+      window.Logger?.warn(`⏳ ${actionName} ב-cooldown. נסה שוב בעוד ${remainingTime} שניות`);
       return false;
     }
 
@@ -45,7 +45,7 @@ class ServerMonitor {
 
   // אתחול המערכת
   init() {
-    console.log('🔧 ServerMonitor init - מתחיל אתחול');
+    window.Logger?.debug('🔧 ServerMonitor init - מתחיל אתחול');
     this.loadSettings();
     this.setupEventListeners();
     this.startMonitoring();
@@ -56,21 +56,21 @@ class ServerMonitor {
   // טעינת הגדרות
   loadSettings() {
     try {
-      const saved = localStorage.getItem('serverMonitorSettings');
+      const saved = window.PageStateManager?.getItem('serverMonitorSettings');
       if (saved) {
         this.settings = { ...this.settings, ...JSON.parse(saved) };
       }
     } catch (error) {
-      console.error('❌ שגיאה בטעינת הגדרות:', error);
+      window.Logger?.error('❌ שגיאה בטעינת הגדרות:', error);
     }
   }
 
   // שמירת הגדרות
   saveSettings() {
     try {
-      localStorage.setItem('serverMonitorSettings', JSON.stringify(this.settings));
+      window.PageStateManager?.setItem('serverMonitorSettings', JSON.stringify(this.settings));
     } catch (error) {
-      console.error('❌ שגיאה בשמירת הגדרות:', error);
+      window.Logger?.error('❌ שגיאה בשמירת הגדרות:', error);
     }
   }
 
@@ -108,7 +108,7 @@ class ServerMonitor {
   startMonitoring() {
     if (this.isMonitoring) return;
 
-    console.log('🔄 ServerMonitor - מתחיל ניטור');
+    window.Logger?.debug('🔄 ServerMonitor - מתחיל ניטור');
     this.isMonitoring = true;
     this.updateStatus('מתחיל ניטור...');
 
@@ -129,7 +129,7 @@ class ServerMonitor {
   stopMonitoring() {
     if (!this.isMonitoring) return;
     
-    console.log('⏹️ ServerMonitor - עוצר ניטור');
+    window.Logger?.debug('⏹️ ServerMonitor - עוצר ניטור');
     this.isMonitoring = false;
     this.updateStatus('ניטור מושהה');
     
@@ -142,7 +142,7 @@ class ServerMonitor {
   // בדיקת סטטוס שרת
   async checkServerStatus() {
     try {
-      console.log('🔍 ServerMonitor - בודק סטטוס שרת');
+      window.Logger?.debug('🔍 ServerMonitor - בודק סטטוס שרת');
       
       const response = await fetch('/api/health');
       const data = await response.json();
@@ -156,7 +156,7 @@ class ServerMonitor {
         this.addLog('error', 'שרת לא זמין', data.message || 'שגיאה לא ידועה');
       }
     } catch (error) {
-      console.error('❌ שגיאה בבדיקת סטטוס שרת:', error);
+      window.Logger?.error('❌ שגיאה בבדיקת סטטוס שרת:', error);
       this.updateServerStatus('offline', { error: error.message });
       this.addLog('error', 'שגיאת חיבור', error.message);
     }
@@ -249,7 +249,7 @@ class ServerMonitor {
     }
     
     this.displayLogs();
-    console.log(`📝 ServerMonitor - לוג נוסף: ${type} - ${title}`);
+    window.Logger?.debug(`📝 ServerMonitor - לוג נוסף: ${type} - ${title}`);
   }
 
   // הצגת לוגים
@@ -324,7 +324,7 @@ class ServerMonitor {
   // העתקת לוג מפורט
   copyDetailedLog() {
     try {
-      console.log('📋 ServerMonitor - מעתיק לוג מפורט');
+      window.Logger?.debug('📋 ServerMonitor - מעתיק לוג מפורט');
       
       // Use dateUtils for consistent date handling (if available)
       const now = window.dateUtils?.now ? window.dateUtils.now() : new Date();
@@ -360,19 +360,19 @@ class ServerMonitor {
       
       // העתקה ללוח
       navigator.clipboard.writeText(logText).then(() => {
-        console.log('✅ לוג הועתק בהצלחה');
+        window.Logger?.debug('✅ לוג הועתק בהצלחה');
         if (window.showSuccessNotification) {
           window.showSuccessNotification('ניטור שרת', 'לוג מפורט הועתק ללוח');
         }
       }).catch(error => {
-        console.error('❌ שגיאה בהעתקה:', error);
+        window.Logger?.error('❌ שגיאה בהעתקה:', error);
         if (window.showErrorNotification) {
           window.showErrorNotification('שגיאה', 'לא ניתן להעתיק ללוח');
         }
       });
       
     } catch (error) {
-      console.error('❌ שגיאה בהעתקת לוג:', error);
+      window.Logger?.error('❌ שגיאה בהעתקת לוג:', error);
       if (window.showErrorNotification) {
         window.showErrorNotification('שגיאה', 'שגיאה בהעתקת לוג');
       }
@@ -382,7 +382,7 @@ class ServerMonitor {
   // ניקוי לוגים
   async clearLogs() {
     try {
-      console.log('🧹 ServerMonitor - מנקה לוגים');
+      window.Logger?.debug('🧹 ServerMonitor - מנקה לוגים');
       
       // בדיקת אישור
       let confirmed = false;
@@ -396,22 +396,22 @@ class ServerMonitor {
           );
         });
       } else {
-        confirmed = window.confirm('האם אתה בטוח שברצונך לנקות את כל הלוגים?');
+        confirmed = window.window.showConfirmationDialog('האם אתה בטוח שברצונך לנקות את כל הלוגים?');
       }
       
       if (confirmed) {
         this.logs = [];
         this.displayLogs();
-        console.log('✅ לוגים נוקו');
+        window.Logger?.debug('✅ לוגים נוקו');
         if (window.showSuccessNotification) {
           window.showSuccessNotification('ניטור שרת', 'לוגים נוקו');
         }
       } else {
-        console.log('❌ ניקוי לוגים בוטל');
+        window.Logger?.debug('❌ ניקוי לוגים בוטל');
       }
       
     } catch (error) {
-      console.error('❌ שגיאה בניקוי לוגים:', error);
+      window.Logger?.error('❌ שגיאה בניקוי לוגים:', error);
       if (window.showErrorNotification) {
         window.showErrorNotification('שגיאה', 'שגיאה בניקוי לוגים');
       }
@@ -425,7 +425,7 @@ class ServerMonitor {
     }
 
     try {
-      console.log('🔧 ServerMonitor - מבצע אופטימיזציה של בסיס הנתונים');
+      window.Logger?.debug('🔧 ServerMonitor - מבצע אופטימיזציה של בסיס הנתונים');
 
       const response = await fetch('/api/database/optimize', {
         method: 'POST',
@@ -436,7 +436,7 @@ class ServerMonitor {
       
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ אופטימיזציה הושלמה:', result);
+        window.Logger?.debug('✅ אופטימיזציה הושלמה:', result);
         if (window.showSuccessNotification) {
           window.showSuccessNotification('ניטור שרת', 'אופטימיזציה הושלמה');
         }
@@ -445,7 +445,7 @@ class ServerMonitor {
       }
       
     } catch (error) {
-      console.error('❌ שגיאה באופטימיזציה:', error);
+      window.Logger?.error('❌ שגיאה באופטימיזציה:', error);
       if (window.showErrorNotification) {
         window.showErrorNotification('שגיאה', 'שגיאה באופטימיזציה');
       }
@@ -455,7 +455,7 @@ class ServerMonitor {
   // ייצוא לוגים
   async exportLogs() {
     try {
-      console.log('📤 ServerMonitor - מייצא לוגים');
+      window.Logger?.debug('📤 ServerMonitor - מייצא לוגים');
       
       const logData = {
         timestamp: new Date().toISOString(),
@@ -476,13 +476,13 @@ class ServerMonitor {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      console.log('✅ לוגים יוצאו');
+      window.Logger?.debug('✅ לוגים יוצאו');
       if (window.showSuccessNotification) {
         window.showSuccessNotification('ניטור שרת', 'לוגים יוצאו');
       }
       
     } catch (error) {
-      console.error('❌ שגיאה בייצוא לוגים:', error);
+      window.Logger?.error('❌ שגיאה בייצוא לוגים:', error);
       if (window.showErrorNotification) {
         window.showErrorNotification('שגיאה', 'שגיאה בייצוא לוגים');
       }
@@ -492,7 +492,7 @@ class ServerMonitor {
   // טעינת מידע מערכת
   async loadSystemInfo() {
     try {
-      console.log('🔧 ServerMonitor - טוען מידע מערכת');
+      window.Logger?.debug('🔧 ServerMonitor - טוען מידע מערכת');
 
       const response = await fetch('/api/system-info');
       if (response.ok) {
@@ -500,14 +500,14 @@ class ServerMonitor {
         this.updateSystemInfo(data);
       }
     } catch (error) {
-      console.error('❌ שגיאה בטעינת מידע מערכת:', error);
+      window.Logger?.error('❌ שגיאה בטעינת מידע מערכת:', error);
     }
   }
 
   // טעינת נתוני בריאות שרת
   async loadHealthData() {
     try {
-      console.log('🔍 ServerMonitor - טוען נתוני בריאות');
+      window.Logger?.debug('🔍 ServerMonitor - טוען נתוני בריאות');
 
       const response = await fetch('/api/health');
       if (response.ok) {
@@ -515,7 +515,7 @@ class ServerMonitor {
         this.updateHealthData(data);
       }
     } catch (error) {
-      console.error('❌ שגיאה בטעינת נתוני בריאות:', error);
+      window.Logger?.error('❌ שגיאה בטעינת נתוני בריאות:', error);
     }
   }
 
@@ -597,7 +597,7 @@ class ServerMonitor {
       memoryUsageEl.textContent = `${data.components.system.details.memory_percent}%`;
     }
 
-    console.log('✅ נתוני בריאות עודכנו בהצלחה');
+    window.Logger?.debug('✅ נתוני בריאות עודכנו בהצלחה');
   }
 
   // בדיקת בריאות שרת
@@ -607,12 +607,12 @@ class ServerMonitor {
     }
 
     try {
-      console.log('🔍 ServerMonitor - בודק בריאות שרת');
+      window.Logger?.debug('🔍 ServerMonitor - בודק בריאות שרת');
 
       const response = await fetch('/api/health');
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ בריאות שרת:', data);
+        window.Logger?.debug('✅ בריאות שרת:', data);
         this.addLog('success', 'בדיקת בריאות', `סטטוס: ${data.status}`);
         if (window.showSuccessNotification) {
           window.showSuccessNotification('ניטור שרת', 'בדיקת בריאות הושלמה בהצלחה');
@@ -621,7 +621,7 @@ class ServerMonitor {
         throw new Error('שגיאה בבדיקת בריאות');
       }
     } catch (error) {
-      console.error('❌ שגיאה בבדיקת בריאות שרת:', error);
+      window.Logger?.error('❌ שגיאה בבדיקת בריאות שרת:', error);
       this.addLog('error', 'שגיאת בריאות', error.message);
       if (window.showErrorNotification) {
         window.showErrorNotification('שגיאה', 'שגיאה בבדיקת בריאות שרת');
@@ -636,7 +636,7 @@ class ServerMonitor {
     }
 
     try {
-      console.log('🔄 ServerMonitor - מפעיל שרת מחדש');
+      window.Logger?.debug('🔄 ServerMonitor - מפעיל שרת מחדש');
 
       const response = await fetch('/api/server/restart', {
         method: 'POST',
@@ -647,7 +647,7 @@ class ServerMonitor {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ שרת הופעל מחדש:', result);
+        window.Logger?.debug('✅ שרת הופעל מחדש:', result);
         this.addLog('success', 'הפעלה מחדש', 'השרת הופעל מחדש בהצלחה');
         if (window.showSuccessNotification) {
           window.showSuccessNotification('ניטור שרת', 'השרת הופעל מחדש בהצלחה');
@@ -656,7 +656,7 @@ class ServerMonitor {
         throw new Error('שגיאה בהפעלה מחדש');
       }
     } catch (error) {
-      console.error('❌ שגיאה בהפעלה מחדש:', error);
+      window.Logger?.error('❌ שגיאה בהפעלה מחדש:', error);
       this.addLog('error', 'שגיאת הפעלה', error.message);
       if (window.showErrorNotification) {
         window.showErrorNotification('שגיאה', 'שגיאה בהפעלה מחדש של השרת');
@@ -671,7 +671,7 @@ class ServerMonitor {
     }
 
     try {
-      console.log('🧹 ServerMonitor - מנקה מטמון');
+      window.Logger?.debug('🧹 ServerMonitor - מנקה מטמון');
 
       const response = await fetch('/api/cache/clear', {
         method: 'POST',
@@ -682,7 +682,7 @@ class ServerMonitor {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ מטמון נוקה:', result);
+        window.Logger?.debug('✅ מטמון נוקה:', result);
         this.addLog('success', 'ניקוי מטמון', 'המטמון נוקה בהצלחה');
         if (window.showSuccessNotification) {
           window.showSuccessNotification('ניטור שרת', 'המטמון נוקה בהצלחה');
@@ -691,7 +691,7 @@ class ServerMonitor {
         throw new Error('שגיאה בניקוי מטמון');
       }
     } catch (error) {
-      console.error('❌ שגיאה בניקוי מטמון:', error);
+      window.Logger?.error('❌ שגיאה בניקוי מטמון:', error);
       this.addLog('error', 'שגיאת ניקוי', error.message);
       if (window.showErrorNotification) {
         window.showErrorNotification('שגיאה', 'שגיאה בניקוי מטמון');
@@ -706,7 +706,7 @@ class ServerMonitor {
     }
 
     try {
-      console.log('🛑 ServerMonitor - מבצע עצירת חירום');
+      window.Logger?.debug('🛑 ServerMonitor - מבצע עצירת חירום');
 
       let confirmed = false;
       if (typeof window.showConfirmationDialog === 'function') {
@@ -721,7 +721,7 @@ class ServerMonitor {
         });
       } else {
         // Fallback למקרה שמערכת התראות לא זמינה
-        confirmed = confirm('האם אתה בטוח שברצונך לבצע עצירת חירום? זה יעצור את השרת מיידית!');
+        confirmed = window.showConfirmationDialog('האם אתה בטוח שברצונך לבצע עצירת חירום? זה יעצור את השרת מיידית!');
       }
       
       if (!confirmed) {
@@ -737,7 +737,7 @@ class ServerMonitor {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ עצירת חירום הושלמה:', result);
+        window.Logger?.debug('✅ עצירת חירום הושלמה:', result);
         this.addLog('warning', 'עצירת חירום', 'השרת נעצר בהצלחה');
         if (window.showWarningNotification) {
           window.showWarningNotification('ניטור שרת', 'עצירת חירום הושלמה');
@@ -746,7 +746,7 @@ class ServerMonitor {
         throw new Error('שגיאה בעצירת חירום');
       }
     } catch (error) {
-      console.error('❌ שגיאה בעצירת חירום:', error);
+      window.Logger?.error('❌ שגיאה בעצירת חירום:', error);
       this.addLog('error', 'שגיאת עצירה', error.message);
       if (window.showErrorNotification) {
         window.showErrorNotification('שגיאה', 'שגיאה בעצירת חירום');
@@ -778,12 +778,12 @@ class ServerMonitor {
 
 // אתחול המערכת כשהדף נטען
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🎯 DOM loaded, initializing ServerMonitor...');
+  window.Logger?.debug('🎯 DOM loaded, initializing ServerMonitor...');
   
   // יצירת instance גלובלי
   window.serverMonitor = new ServerMonitor();
   
-  console.log('✅ ServerMonitor initialized successfully');
+  window.Logger?.debug('✅ ServerMonitor initialized successfully');
 });
 
 // יצירת instance גלובלי מיד
@@ -794,7 +794,7 @@ window.copyDetailedLog = () => {
   if (window.serverMonitor) {
     return window.serverMonitor.copyDetailedLog();
   } else {
-    console.error('❌ serverMonitor instance לא קיים');
+    window.Logger?.error('❌ serverMonitor instance לא קיים');
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה', 'serverMonitor לא אותחל');
     }
@@ -806,7 +806,7 @@ ServerMonitor.optimizeDatabase = () => {
   if (window.serverMonitor) {
     return window.serverMonitor.optimizeDatabase();
   } else {
-    console.error('❌ serverMonitor instance לא קיים');
+    window.Logger?.error('❌ serverMonitor instance לא קיים');
   }
 };
 
@@ -814,8 +814,8 @@ ServerMonitor.exportLogs = () => {
   if (window.serverMonitor) {
     return window.serverMonitor.exportLogs();
   } else {
-    console.error('❌ serverMonitor instance לא קיים');
+    window.Logger?.error('❌ serverMonitor instance לא קיים');
   }
 };
 
-console.log('✅ ServerMonitor instance נוצר:', window.serverMonitor);
+window.Logger?.debug('✅ ServerMonitor instance נוצר:', window.serverMonitor);

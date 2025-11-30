@@ -577,50 +577,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
     },
     
     // Legacy entry (kept for compatibility)
-    'user_profile': {
-      name: 'User Profile',
-      packages: [
-        'base',
-        'services',
-        'validation',
-        'modules',
-        'ui-advanced',
-        'preferences',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'window.Logger',
-        'window.TikTrackAuth',
-        'window.UserProfilePage',
-        'window.AIAnalysisManager',
-      ],
-      pageSpecificScripts: [
-        'scripts/user-profile.js',
-        'scripts/user-profile-ai-analysis.js'
-      ],
-      description: 'ניהול פרופיל משתמש - עדכון פרטים, שינוי סיסמה, הגדרות SMTP, הגדרות AI Analysis',
-      lastModified: '2025-01-29',
-      pageType: 'settings',
-      requiresFilters: false,
-      requiresValidation: true,
-      requiresTables: false,
-      customInitializers: [
-        async () => {
-          if (window.UserProfilePage && typeof window.UserProfilePage.init === 'function') {
-            await window.UserProfilePage.init();
-          }
-          // Initialize AI Analysis Manager
-          if (window.AIAnalysisManager && typeof window.AIAnalysisManager.init === 'function') {
-            if (!window.AIAnalysisManager.initialized) {
-              await window.AIAnalysisManager.init();
-            }
-          }
-        },
-      ],
-    },
-
     // Trading Pages
     trades: {
       name: 'Trades',
@@ -1415,6 +1371,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'entity-services',
         'entity-details',
         'info-summary',
+        'tradingview-charts', // Required for price chart
         'init-system',
       ],
 
@@ -1444,6 +1401,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         async pageConfig => {
           window.Logger.info('📊 Initializing Ticker Dashboard...', { page: 'page-initialization-configs' });
 
+          // Note: HeaderSystem is already initialized by core-systems.js in manualInitialization
+          // No need to initialize it again here to avoid duplicate initialization warnings
+
+          // Initialize Ticker Dashboard
           if (typeof window.tickerDashboard?.init === 'function') {
             await window.tickerDashboard.init();
           }
@@ -1902,27 +1863,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
 
-    'test-header-only': {
-      name: 'Header System Test',
-      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
-      requiredGlobals: ['NotificationSystem'],
-      description: 'עמוד בדיקות לרכיבי ההדר המאוחדים',
-      lastModified: '2025-11-14',
-      pageType: 'development',
-      preloadAssets: ['header-demo'],
-      cacheStrategy: 'standard',
-      requiresFilters: false,
-      requiresValidation: false,
-      requiresTables: true,
-      customInitializers: [
-        () => {
-          window.Logger.info('🧪 Initializing Header-only test page...', {
-            page: 'page-initialization-configs',
-          });
-        },
-      ],
-    },
-
     'init-system-management': {
       name: 'Init System Management',
       packages: ['base', 'dev-tools', 'init-system'],
@@ -2257,27 +2197,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
     // Test page for monitoring system
-    'test-monitoring': {
-      name: 'Test Monitoring Page',
-      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'DataCollectionService',
-        'UnifiedCacheManager',
-        'Logger',
-      ],
-      description: 'עמוד בדיקה למערכת הניטור וכלי יצירת קוד טעינה',
-      lastModified: '2025-01-31',
-      pageType: 'test',
-      preloadAssets: [],
-      cacheStrategy: 'none',
-      requiresFilters: false,
-      requiresValidation: false,
-      requiresTables: false,
-      customInitializers: [],
-    },
-
     // Missing pages from documentation
     db_extradata: {
       name: 'Database Extra Data',
@@ -2596,81 +2515,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
 
-    // Trade History Page (Mockup)
-    'trade-history-page': {
-      name: 'Trade History Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'crud',
-        'preferences',
-        'entity-services',
-        'tradingview-charts',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'TradingViewChartAdapter',
-        'TradingViewTheme',
-        'window.LightweightCharts',
-        'window.tradeHistoryPage',
-        'window.UnifiedCacheManager',
-        'window.UnifiedAppInitializer',
-      ],
-      pageSpecificScripts: ['scripts/trade-history-page.js'],
-      description: 'עמוד היסטוריית טרייד - מוקאפ עם גרפים TradingView',
-      lastModified: '2025-01-29',
-      pageType: 'mockup',
-      preloadAssets: ['trades-data', 'executions-data'],
-      cacheStrategy: 'standard',
-      requiresFilters: true,
-      requiresValidation: false,
-      requiresTables: true,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger.info('📊 Initializing Trade History Page via UnifiedAppInitializer...', {
-            page: 'page-initialization-configs',
-          });
-
-          // Wait for tradeHistoryPage to be available
-          if (!window.tradeHistoryPage || typeof window.tradeHistoryPage.initializePage !== 'function') {
-            window.Logger.warn('⚠️ tradeHistoryPage.initializePage not available yet, waiting...', {
-              page: 'page-initialization-configs',
-            });
-            
-            // Wait up to 5 seconds for the script to load
-            let retries = 0;
-            while (!window.tradeHistoryPage || typeof window.tradeHistoryPage.initializePage !== 'function') {
-              if (retries >= 50) {
-                window.Logger.error('❌ tradeHistoryPage.initializePage not available after wait', {
-                  page: 'page-initialization-configs',
-                });
-                return;
-              }
-              await new Promise(resolve => setTimeout(resolve, 100));
-              retries++;
-            }
-          }
-
-          // Call initializePage from trade-history-page.js
-          try {
-            await window.tradeHistoryPage.initializePage();
-            window.Logger.info('✅ Trade History Page initialized via UnifiedAppInitializer', {
-              page: 'page-initialization-configs',
-            });
-          } catch (error) {
-            window.Logger.error('❌ Error initializing Trade History Page', {
-              page: 'page-initialization-configs',
-              error,
-            });
-            throw error;
-          }
-        },
-      ],
-    },
-
     'tradingview-widgets-showcase': {
       name: 'TradingView Widgets Showcase',
       packages: ['base', 'preferences', 'tradingview-widgets', 'init-system'],
@@ -2697,463 +2541,227 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
 
-    // Price History Page (Mockup)
-    'price-history-page': {
-      name: 'Price History Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'crud',
-        'preferences',
-        'entity-services',
-        'tradingview-charts',
-        'tradingview-widgets',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'TradingViewChartAdapter',
-        'TradingViewTheme',
-        'window.LightweightCharts',
-        'TradingViewWidgetsManager',
-        'TradingViewWidgetsColors',
-        'window.priceHistoryPage',
-      ],
-      pageSpecificScripts: ['scripts/price-history-page.js'],
-      description: 'עמוד היסטוריית מחירים - מוקאפ עם גרפים TradingView Lightweight Charts ו-TradingView Widgets',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: ['trades-data', 'executions-data'],
-      cacheStrategy: 'standard',
-      requiresFilters: true,
-      requiresValidation: false,
-      requiresTables: true,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger.info('📊 Initializing Price History Page...', {
-            page: 'page-initialization-configs',
-          });
-
-          // Wait for TradingView to be available
-          if (typeof window.lightweightCharts === 'undefined') {
-            window.Logger.warn('⚠️ TradingView Lightweight Charts not loaded yet', {
-              page: 'page-initialization-configs',
-            });
-          }
-
-          // Wait for TradingView Widgets Manager
-          if (window.TradingViewWidgetsManager) {
-            await window.TradingViewWidgetsManager.init();
-          }
-        },
-      ],
+    // Authentication Pages
+    login: {
+      name: 'Login',
+      packages: ['base', 'services', 'ui-advanced', 'validation', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'כניסה למערכת',
+      pageType: 'auth',
+      requiresFilters: false,
+      requiresValidation: true,
+      requiresTables: false,
     },
 
-    // Portfolio State Page (Mockup)
-    'portfolio-state-page': {
-      name: 'Portfolio State Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'crud',
-        'preferences',
-        'entity-services',
-        'tradingview-charts',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'TradingViewChartAdapter',
-        'TradingViewTheme',
-        'window.LightweightCharts',
-        'window.portfolioStatePage',
-      ],
-      pageSpecificScripts: ['scripts/portfolio-state-page.js'],
-      description: 'עמוד מצב תיק - מוקאפ עם גרפים TradingView Lightweight Charts',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: ['portfolio-data'],
-      cacheStrategy: 'standard',
-      requiresFilters: true,
-      requiresValidation: false,
-      requiresTables: true,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Portfolio State Page...', {
-            page: 'page-initialization-configs',
-          });
-        },
-      ],
+    register: {
+      name: 'Register',
+      packages: ['base', 'services', 'ui-advanced', 'validation', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'הרשמה למערכת',
+      pageType: 'auth',
+      requiresFilters: false,
+      requiresValidation: true,
+      requiresTables: false,
     },
 
-    // Comparative Analysis Page (Mockup)
-    'comparative-analysis-page': {
-      name: 'Comparative Analysis Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'crud',
-        'preferences',
-        'entity-services',
-        'tradingview-charts',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'TradingViewChartAdapter',
-        'TradingViewTheme',
-        'window.LightweightCharts',
-        'window.comparativeAnalysisPage',
-      ],
-      pageSpecificScripts: ['scripts/comparative-analysis-page.js'],
-      description: 'עמוד ניתוח השוואתי - מוקאפ עם גרפים TradingView Lightweight Charts',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: ['trades-data'],
-      cacheStrategy: 'standard',
-      requiresFilters: true,
-      requiresValidation: false,
-      requiresTables: true,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Comparative Analysis Page...', {
-            page: 'page-initialization-configs',
-          });
-        },
-      ],
+    'forgot-password': {
+      name: 'Forgot Password',
+      packages: ['base', 'services', 'ui-advanced', 'validation', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'שחזור סיסמה',
+      pageType: 'auth',
+      requiresFilters: false,
+      requiresValidation: true,
+      requiresTables: false,
     },
 
-    // Trading Journal Page (Mockup)
-    'trading-journal-page': {
-      name: 'Trading Journal Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'crud',
-        'preferences',
-        'entity-services',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'window.tradingJournalPage',
-      ],
-      pageSpecificScripts: ['scripts/trading-journal-page.js'],
-      description: 'עמוד יומן מסחר - מוקאפ',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: ['journal-data'],
-      cacheStrategy: 'standard',
+    'reset-password': {
+      name: 'Reset Password',
+      packages: ['base', 'services', 'ui-advanced', 'validation', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'איפוס סיסמה',
+      pageType: 'auth',
+      requiresFilters: false,
+      requiresValidation: true,
+      requiresTables: false,
+    },
+
+    // Development Tools Pages
+    'button-color-mapping': {
+      name: 'Button Color Mapping',
+      packages: ['base', 'services', 'ui-advanced', 'preferences', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem', 'window.ColorManager'],
+      description: 'מיפוי צבעי כפתורים',
+      pageType: 'dev-tools',
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Trading Journal Page...', {
-            page: 'page-initialization-configs',
-          });
-        },
-      ],
     },
 
-    // Strategy Analysis Page (Mockup)
-    'strategy-analysis-page': {
-      name: 'Strategy Analysis Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'crud',
-        'preferences',
-        'entity-services',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'window.strategyAnalysisPage',
-      ],
-      pageSpecificScripts: ['scripts/strategy-analysis-page.js'],
-      description: 'עמוד ניתוח אסטרטגיות - מוקאפ',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: ['strategies-data'],
-      cacheStrategy: 'standard',
-      requiresFilters: true,
-      requiresValidation: false,
-      requiresTables: true,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Strategy Analysis Page...', {
-            page: 'page-initialization-configs',
-          });
-        },
-      ],
-    },
-
-    // Economic Calendar Page (Mockup)
-    'economic-calendar-page': {
-      name: 'Economic Calendar Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'crud',
-        'preferences',
-        'entity-services',
-        'tradingview-widgets',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'TradingViewWidgetsManager',
-        'TradingViewWidgetsColors',
-        'window.economicCalendarPage',
-      ],
-      pageSpecificScripts: ['scripts/economic-calendar-page.js'],
-      description: 'עמוד לוח אירועים כלכליים - מוקאפ עם TradingView Widgets',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: ['calendar-data'],
-      cacheStrategy: 'standard',
+    'button-color-mapping-simple': {
+      name: 'Button Color Mapping Simple',
+      packages: ['base', 'services', 'ui-advanced', 'preferences', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem', 'window.ColorManager'],
+      description: 'מיפוי צבעי כפתורים - פשוט',
+      pageType: 'dev-tools',
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Economic Calendar Page...', {
-            page: 'page-initialization-configs',
-          });
-          
-          // Wait for TradingViewWidgetsManager
-          if (window.TradingViewWidgetsManager) {
-            if (!window.TradingViewWidgetsManager._initialized) {
-              await window.TradingViewWidgetsManager.init();
-            }
-          }
-          
-          // Wait for cache system
-          if (window.cacheSystemReady !== undefined) {
-            let waitCount = 0;
-            while (!window.cacheSystemReady && waitCount < 50) {
-              await new Promise(resolve => setTimeout(resolve, 100));
-              waitCount++;
-            }
-          }
-          
-          // Wait for preferences
-          let prefWaitCount = 0;
-          while (!window.currentPreferences && !window.userPreferences && prefWaitCount < 50) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-            prefWaitCount++;
-          }
-          
-          // Initialize widget if economicCalendarPage is available
-          if (window.economicCalendarPage && typeof window.economicCalendarPage.initializeEconomicCalendarWidget === 'function') {
-            await window.economicCalendarPage.initializeEconomicCalendarWidget();
-          }
-        },
-      ],
     },
 
-    // History Widget (Mockup)
-    'history-widget': {
-      name: 'History Widget',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'preferences',
-        'tradingview-charts',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'window.historyWidget',
-        'window.TradingViewChartAdapter',
-        'window.TradingViewTheme',
-        'window.FieldRendererService',
-      ],
-      pageSpecificScripts: ['scripts/history-widget.js'],
-      description: 'ווידג\'ט היסטוריה - מוקאפ',
-      lastModified: '2025-01-27',
-      pageType: 'mockup',
-      preloadAssets: [],
-      cacheStrategy: 'standard',
+    'conditions-modals': {
+      name: 'Conditions Modals',
+      packages: ['base', 'services', 'ui-advanced', 'conditions', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem', 'window.AlertConditionRenderer'],
+      description: 'מודלים של תנאים',
+      pageType: 'dev-tools',
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing History Widget...', {
-            page: 'page-initialization-configs',
-          });
-          
-          // Initialize widgets after systems are ready
-          if (typeof window.historyWidget !== 'undefined' && typeof window.historyWidget.initializeWidgets === 'function') {
-            try {
-              await window.historyWidget.initializeWidgets();
-            } catch (error) {
-              window.Logger?.warn('Error initializing history widget widgets', {
-                page: 'page-initialization-configs',
-                error
-              });
-            }
-          }
-        },
-      ],
     },
 
-    // Emotional Tracking Widget (Mockup)
-    'emotional-tracking-widget': {
-      name: 'Emotional Tracking Widget',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'preferences',
-        'tradingview-charts',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'window.emotionalTrackingWidget',
-        'TradingViewChartAdapter',
-        'TradingViewTheme',
-        'window.LightweightCharts',
-        'FieldRendererService',
-      ],
-      pageSpecificScripts: ['scripts/emotional-tracking-widget.js'],
-      description: 'ווידג\'ט תיעוד רגשי - מוקאפ',
-      lastModified: '2025-01-29',
-      pageType: 'mockup',
-      preloadAssets: [],
-      cacheStrategy: 'standard',
+    'tooltip-editor': {
+      name: 'Tooltip Editor',
+      packages: ['base', 'services', 'ui-advanced', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'עורך טולטיפים',
+      pageType: 'dev-tools',
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Emotional Tracking Widget...', {
-            page: 'page-initialization-configs',
-          });
-
-          // Wait for TradingView to be available
-          if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
-            window.Logger?.warn('⚠️ TradingView Lightweight Charts not loaded yet', {
-              page: 'page-initialization-configs',
-            });
-          }
-
-          // Initialize widgets after a short delay to ensure all systems are loaded
-          if (window.emotionalTrackingWidget && typeof window.emotionalTrackingWidget.initializeWidgets === 'function') {
-            setTimeout(() => {
-              window.emotionalTrackingWidget.initializeWidgets();
-            }, 500);
-          }
-        },
-      ],
     },
 
-    // Date Comparison Modal (Mockup)
-    'date-comparison-modal': {
+    'preferences-groups-management': {
+      name: 'Preferences Groups Management',
+      packages: ['base', 'services', 'ui-advanced', 'preferences', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem', 'window.PreferencesCore'],
+      description: 'ניהול קבוצות העדפות',
+      pageType: 'dev-tools',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    // Daily Snapshots Mockup Pages
+    'daily-snapshots-comparative-analysis-page': {
+      name: 'Comparative Analysis',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-charts', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'ניתוח השוואתי - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-date-comparison-modal': {
       name: 'Date Comparison Modal',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'preferences',
-        'init-system',
-        'charts',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'window.dateComparisonModal',
-        'TradingViewChartAdapter',
-        'UnifiedCacheManager',
-        'FieldRendererService',
-        'InfoSummarySystem',
-        'PreferencesCore',
-      ],
-      pageSpecificScripts: ['scripts/date-comparison-modal.js'],
-      description: 'מודל השוואת תאריכים - מוקאפ',
-      lastModified: '2025-01-29',
+      packages: ['base', 'services', 'ui-advanced', 'preferences', 'init-system', 'charts'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'השוואת תאריכים - מוקאפ',
       pageType: 'mockup',
-      preloadAssets: [],
-      cacheStrategy: 'standard',
-      requiresFilters: false,
-      requiresValidation: false,
-      requiresTables: true,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Date Comparison Modal...', {
-            page: 'page-initialization-configs',
-          });
-          
-          // Wait for all required systems
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          // Initialize date comparison modal if available
-          if (window.dateComparisonModal && typeof window.dateComparisonModal.initializePage === 'function') {
-            await window.dateComparisonModal.initializePage();
-          }
-        },
-      ],
-    },
-
-    // TradingView Test Page (Mockup)
-    'tradingview-test-page': {
-      name: 'TradingView Test Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'preferences',
-        'tradingview-charts',
-        'tradingview-widgets',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'TradingViewChartAdapter',
-        'TradingViewTheme',
-        'window.LightweightCharts',
-        'TradingViewWidgetsManager',
-        'TradingViewWidgetsColors',
-        'window.tradingviewTestPage',
-      ],
-      pageSpecificScripts: ['scripts/tradingview-test-page.js'],
-      description: 'עמוד בדיקת TradingView - מוקאפ עם גרפים ו-ווידג\'טים',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: [],
-      cacheStrategy: 'standard',
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing TradingView Test Page...', {
-            page: 'page-initialization-configs',
-          });
-          if (window.TradingViewWidgetsManager) {
-            await window.TradingViewWidgetsManager.init();
-          }
-        },
-      ],
+    },
+
+    'daily-snapshots-economic-calendar-page': {
+      name: 'Economic Calendar',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-widgets', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'לוח שנה כלכלי - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-emotional-tracking-widget': {
+      name: 'Emotional Tracking Widget',
+      packages: ['base', 'services', 'ui-advanced', 'preferences', 'tradingview-charts', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'ווידג\'ט מעקב רגשי - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-heatmap-visual-example': {
+      name: 'Heatmap Visual Example',
+      packages: ['base', 'services', 'ui-advanced', 'preferences', 'tradingview-charts', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'דוגמת מפת חום - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-history-widget': {
+      name: 'History Widget',
+      packages: ['base', 'services', 'ui-advanced', 'preferences', 'tradingview-charts', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'ווידג\'ט היסטוריה - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-portfolio-state-page': {
+      name: 'Portfolio State Page',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-charts', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'מצב תיק השקעות - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-price-history-page': {
+      name: 'Price History Page',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-charts', 'tradingview-widgets', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'היסטוריית מחירים - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-strategy-analysis-page': {
+      name: 'Strategy Analysis Page',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'ניתוח אסטרטגיה - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-trade-history-page': {
+      name: 'Trade History Page',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-charts', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'היסטוריית טריידים - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-trading-journal-page': {
+      name: 'Trading Journal Page',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      description: 'יומן מסחר - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
     },
 
     // Watch Lists Pages

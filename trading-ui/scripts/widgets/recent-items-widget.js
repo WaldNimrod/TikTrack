@@ -1508,6 +1508,9 @@
         tradePlansRendered: tradePlansToRender.length,
         page: 'recent-items-widget'
       });
+
+      // Dispatch event to trigger height equalization
+      window.dispatchEvent(new CustomEvent('widgetContentUpdated'));
     },
 
     /**

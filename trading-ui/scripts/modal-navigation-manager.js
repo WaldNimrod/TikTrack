@@ -230,8 +230,31 @@ class ModalNavigationService {
 
     this.openModals.set(entry.modalId, element || null);
     const resolvedElement = element || resolveModalElement(entry.modalId);
+    
+    // ניטור: ה-stack כבר עודכן למעלה, אז זה ה-stack אחרי הוספת המודול החדש
+    const stackAfterAdd = [...this.stack];
+    const stackLengthAfter = stackAfterAdd.length;
+    
     await this._persistState();
     this._emitState();
+    
+    window.Logger?.info('🔍 [Z-INDEX] ModalNavigationService: registerModalOpen', {
+      modalId: entry.modalId,
+      instanceId: entry.instanceId,
+      stackLengthAfter,
+      stack: stackAfterAdd.map((e, idx) => ({
+        index: idx,
+        modalId: e.modalId,
+        instanceId: e.instanceId
+      })),
+      entry: this._summarizeEntry(entry),
+      replaceActive,
+      allowDuplicate,
+      hasElement: !!resolvedElement,
+      activeInstanceId: this.activeInstanceId,
+      page: 'modal-navigation-manager'
+    });
+    
     this._logDebug('registerModalOpen', {
       modalId: entry.modalId,
       entry: this._summarizeEntry(entry),
@@ -286,6 +309,12 @@ class ModalNavigationService {
     }
     const removedModalId = removedEntry.modalId || modalId;
     const removedInstanceId = removedEntry.instanceId;
+    
+    // ניטור לפני שינוי ה-stack
+    const stackBeforeClose = [...this.stack];
+    const stackLengthBefore = stackBeforeClose.length;
+    const previousActiveInstanceId = this.activeInstanceId;
+    
     if (instanceId && !internal) {
       this.closedInstances.add(instanceId);
     }
@@ -293,9 +322,31 @@ class ModalNavigationService {
       ...this.stack.slice(0, index),
       ...this.stack.slice(index + 1)
     ];
-    const previousActiveInstanceId = this.activeInstanceId;
+    
     this.activeInstanceId = this.stack.length ? this.stack[this.stack.length - 1].instanceId : null;
     const stillExists = this.stack.some(entry => entry.modalId === removedModalId);
+    
+    window.Logger?.info('🔍 [Z-INDEX] ModalNavigationService: registerModalClose', {
+      modalId: removedModalId,
+      instanceId: removedInstanceId,
+      removedIndex: index,
+      stackLengthBefore,
+      stackLengthAfter: this.stack.length,
+      stackBefore: stackBeforeClose.map((e, idx) => ({
+        index: idx,
+        modalId: e.modalId,
+        instanceId: e.instanceId
+      })),
+      stackAfter: this.stack.map((e, idx) => ({
+        index: idx,
+        modalId: e.modalId,
+        instanceId: e.instanceId
+      })),
+      previousActiveInstanceId,
+      newActiveInstanceId: this.activeInstanceId,
+      stillExists,
+      page: 'modal-navigation-manager'
+    });
     if (!stillExists) {
       this.openModals.delete(removedModalId);
     }
@@ -1034,46 +1085,97 @@ class ModalNavigationUI {
   _updateBackButton(modalElement) {
     const header = modalElement.querySelector('.modal-header');
     if (!header) {
-                return;
-            }
+      return;
+    }
+    
     const canGoBack = this.service.canGoBack();
+    const stack = this.service.getStack();
+    const isNested = stack.length > 1;
+    
+    // חיפוש כפתור חזור קיים
     let backButton = header.querySelector('[data-button-type="BACK"]') ||
                      header.querySelector('.modal-back-btn') ||
                      header.querySelector('#entityDetailsBackBtn');
 
-    if (!backButton) {
+    // יצירת כפתור חזור אם לא קיים - תמיד במודולים מקוננים
+    if (!backButton && isNested) {
       backButton = document.createElement('button');
-      backButton.id = 'entityDetailsBackBtn';
+      // יצירת ID ייחודי לכל מודול
+      const uniqueId = `modalBackBtn_${modalElement.id || 'modal'}_${Date.now()}`;
+      backButton.id = uniqueId;
       backButton.className = 'modal-back-btn';
       backButton.setAttribute('data-button-type', 'BACK');
       backButton.setAttribute('data-variant', 'full');
       backButton.setAttribute('data-text', 'חזור');
       backButton.type = 'button';
       backButton.setAttribute('data-onclick', 'window.goBackInModalNavigation && window.goBackInModalNavigation()');
-      const closeButton = header.querySelector('[data-button-type="CLOSE"]') || header.querySelector('.btn-close');
+      
+      // מיקום הכפתור - מימין לכפתור סגירה (RTL)
+      const closeButton = header.querySelector('[data-button-type="CLOSE"]') || 
+                          header.querySelector('.btn-close') ||
+                          header.querySelector('button[data-bs-dismiss="modal"]');
+      
       if (closeButton) {
         header.insertBefore(backButton, closeButton);
       } else {
-        header.appendChild(backButton);
+        // אם אין כפתור סגירה, הוספה בסוף
+        const headerActions = header.querySelector('.modal-header-actions');
+        if (headerActions) {
+          headerActions.insertBefore(backButton, headerActions.firstChild);
+        } else {
+          header.appendChild(backButton);
+        }
       }
+      
+      // עיבוד הכפתור דרך מערכת הכפתורים
       if (window.ButtonSystem?.processButton) {
         window.ButtonSystem.processButton(backButton);
+      } else if (window.advancedButtonSystem?.processButton) {
+        window.advancedButtonSystem.processButton(backButton);
       }
+      
+      window.Logger?.info('🔍 [BACK-BUTTON] Created back button for nested modal', {
+        modalId: modalElement.id,
+        buttonId: uniqueId,
+        stackLength: stack.length,
+        page: 'modal-navigation-manager'
+      });
     }
 
-    if (!canGoBack) {
-      backButton.style.display = 'none';
-      backButton.style.visibility = 'hidden';
-                return;
+    // עדכון visibility ו-state של הכפתור
+    if (backButton) {
+      if (!canGoBack || !isNested) {
+        // הסתרת כפתור אם אין לאן לחזור או אם זה לא מודול מקונן
+        backButton.style.display = 'none';
+        backButton.style.visibility = 'hidden';
+        backButton.disabled = true;
+        backButton.style.pointerEvents = 'none';
+        backButton.style.opacity = '0.5';
+      } else {
+        // הצגת כפתור אם יש לאן לחזור
+        backButton.disabled = false;
+        backButton.style.pointerEvents = 'auto';
+        backButton.style.opacity = '1';
+        backButton.style.display = 'flex';
+        backButton.style.visibility = 'visible';
+        
+        // וידוא שיש event handler
+        if (!backButton.getAttribute('data-onclick')) {
+          backButton.setAttribute('data-onclick', 'window.goBackInModalNavigation && window.goBackInModalNavigation()');
+        }
+        
+        // הוספת מאזין ישיר אם צריך
+        if (!backButton._backButtonHandler) {
+          backButton._backButtonHandler = async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.goBackInModalNavigation) {
+              await window.goBackInModalNavigation();
             }
-            
-    backButton.disabled = !canGoBack;
-    backButton.style.pointerEvents = canGoBack ? 'auto' : 'none';
-    backButton.style.opacity = canGoBack ? '1' : '0.5';
-    backButton.style.display = 'flex';
-    backButton.style.visibility = 'visible';
-    if (!backButton.getAttribute('data-onclick')) {
-      backButton.setAttribute('data-onclick', 'window.goBackInModalNavigation && window.goBackInModalNavigation()');
+          };
+          backButton.addEventListener('click', backButton._backButtonHandler);
+        }
+      }
     }
   }
 }

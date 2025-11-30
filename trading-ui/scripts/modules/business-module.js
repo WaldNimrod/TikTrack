@@ -1243,7 +1243,14 @@ async function _REMOVED_saveEditTradeData() {
     await loadTradesData();
 
     // סגירת המודל
-    bootstrap.Modal.getInstance(document.getElementById('editTradeModal')).hide();
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+      window.ModalManagerV2.hideModal('editTradeModal');
+    } else if (bootstrap?.Modal) {
+      const modal = bootstrap.Modal.getInstance(document.getElementById('editTradeModal'));
+      if (modal) {
+        modal.hide();
+      }
+    }
 
   } catch (error) {
     if (typeof handleSaveError === 'function') {
@@ -1475,8 +1482,14 @@ async function saveNewTradeRecord() {
       loadTradesData();
 
       // סגירת המודל
-      const modal = bootstrap.Modal.getInstance(document.getElementById('addTradeModal'));
-      modal.hide();
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal('addTradeModal');
+      } else if (bootstrap?.Modal) {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addTradeModal'));
+        if (modal) {
+          modal.hide();
+        }
+      }
 
     } else {
       const errorData = await response.json();

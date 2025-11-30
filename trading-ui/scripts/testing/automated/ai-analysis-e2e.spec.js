@@ -119,6 +119,20 @@ test.describe('AI Analysis System - E2E Tests', () => {
     }
   });
 
+  test('Validation functions are available', async ({ page }) => {
+    // Check that validation functions are available
+    const hasValidateRequest = await page.evaluate(() => {
+      return typeof window.AIAnalysisData?.validateAnalysisRequest === 'function';
+    });
+    
+    const hasValidateVariables = await page.evaluate(() => {
+      return typeof window.AIAnalysisData?.validateVariables === 'function';
+    });
+    
+    expect(hasValidateRequest).toBeTruthy();
+    expect(hasValidateVariables).toBeTruthy();
+  });
+
   test('Error handling works', async ({ page }) => {
     // Try to generate analysis without selecting template
     const generateBtn = page.locator('#generateAnalysisBtn');
@@ -214,4 +228,5 @@ test.describe('AI Analysis - User Profile Integration', () => {
     expect(managerAvailable).toBeTruthy();
   });
 });
+
 

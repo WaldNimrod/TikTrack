@@ -161,44 +161,9 @@ class IndexPageEnhancements {
      */
     async loadChart(chartId) {
         try {
-            // Check if chart already exists to prevent duplicate loading
-            if (window.ChartSystem && typeof window.ChartSystem.has === 'function') {
-                if (window.ChartSystem.has(chartId)) {
-                    window.Logger.info(`⏭️ Chart ${chartId} already exists, skipping lazy load`, { page: 'index-enhancements' });
-                    return;
-                }
-            } else if (window.homeCharts && window.homeCharts[chartId]) {
-                // Fallback check using homeCharts object
-                window.Logger.info(`⏭️ Chart ${chartId} already exists in homeCharts, skipping lazy load`, { page: 'index-enhancements' });
-                return;
-            }
-            
-            window.Logger.info(`📊 Loading chart: ${chartId}`, { page: 'index-enhancements' });
-            
-            // Add loading indicator
-            this.addChartLoadingIndicator(chartId);
-            
-            // Load chart based on ID
-            switch (chartId) {
-                case 'tradesStatusChart':
-                    await window.createTradesStatusChart();
-                    break;
-                case 'performanceChart':
-                    await window.createPerformanceChart();
-                    break;
-                case 'accountChart':
-                    await window.createAccountChart();
-                    break;
-                case 'mixedChart':
-                    await window.createMixedChart();
-                    break;
-            }
-            
-            // Remove loading indicator
-            this.removeChartLoadingIndicator(chartId);
-            
-            this.stats.chartCount++;
-            window.Logger.info(`✅ Chart ${chartId} loaded successfully`, { page: 'index-enhancements' });
+            // Charts removed - no longer used on index page
+            window.Logger.warn(`⚠️ Chart loading requested but charts are no longer used: ${chartId}`, { page: 'index-enhancements' });
+            return;
         } catch (error) {
             window.Logger.error(`❌ Error loading chart ${chartId}:`, error, { page: 'index-enhancements' });
             this.showChartError(chartId);

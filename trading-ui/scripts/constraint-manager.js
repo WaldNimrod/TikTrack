@@ -606,10 +606,14 @@ class ConstraintManager {
 
     // Close modal
     const modal = document.getElementById('add-constraint-modal');
-    if (modal && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-      const bootstrapModal = bootstrap.Modal.getInstance(modal);
-      if (bootstrapModal) {
-        bootstrapModal.hide();
+    if (modal) {
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal('add-constraint-modal');
+      } else if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        if (bootstrapModal) {
+          bootstrapModal.hide();
+        }
       }
     }
   }
@@ -721,7 +725,19 @@ function showAddConstraintModal() {
     document.body.appendChild(modal);
   }
 
-  if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+  // Show modal using ModalManagerV2 first, fallback to Bootstrap
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    window.ModalManagerV2.showModal('add-constraint-modal', 'add').catch(error => {
+      window.Logger?.error('Error showing add constraint modal via ModalManagerV2', { error, modalId: 'add-constraint-modal', page: 'constraint-manager' });
+      // Fallback to Bootstrap
+      if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+      } else {
+        modal.style.display = 'block';
+      }
+    });
+  } else if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
     const bootstrapModal = new bootstrap.Modal(modal);
     bootstrapModal.show();
   } else {

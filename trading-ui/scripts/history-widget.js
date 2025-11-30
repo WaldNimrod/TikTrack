@@ -723,7 +723,7 @@
         }
         
         // Fallback if createActionsMenu is not available
-        console.warn('⚠️ [createQuickLinksActionsMenu] window.createActionsMenu not available, using fallback');
+        window.Logger?.warn('⚠️ [createQuickLinksActionsMenu] window.createActionsMenu not available, using fallback');
         return '';
     }
     

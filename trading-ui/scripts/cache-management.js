@@ -111,7 +111,8 @@ class CacheManagementPage {
         
         const logContainer = document.getElementById('unifiedLogDisplay');
         if (!logContainer) {
-            console.warn('⚠️ Log container not found');
+            // Log container is optional - only exists on cache-management page
+            // Silently skip if not found (this is expected on other pages)
             return;
         }
         

@@ -636,7 +636,7 @@ window.resetToDefaults = async function() {
         if (typeof showNotification === 'function') {
             showNotification('שגיאה באיפוס ההעדפות: ' + error.message, 'error');
         } else {
-            alert('שגיאה באיפוס ההעדפות: ' + error.message);
+            window.showErrorNotification('שגיאה באיפוס ההעדפות: ' + error.message, "שגיאה");
         }
         
         return false;

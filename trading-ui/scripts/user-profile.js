@@ -293,13 +293,13 @@
     async handlePostProfileUpdate(updatedUser) {
       // Update TikTrackAuth current user
       if (window.TikTrackAuth) {
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        window.PageStateManager?.setItem('currentUser', JSON.stringify(updatedUser));
         const currentUser = window.TikTrackAuth.getCurrentUser();
         if (currentUser) {
           Object.assign(currentUser, updatedUser);
         }
       } else {
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        window.PageStateManager?.setItem('currentUser', JSON.stringify(updatedUser));
       }
 
       // Update UnifiedCacheManager cache

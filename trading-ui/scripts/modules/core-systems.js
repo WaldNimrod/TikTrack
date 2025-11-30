@@ -721,7 +721,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           available:
             typeof window.PreferencesCore !== 'undefined' && window.PreferencesCore !== null,
           initialized: window.PreferencesCore?.initialized === true || true, // PreferencesCore doesn't have explicit initialized flag
-          optional: false,
+          optional: true, // Optional - not all pages need preferences (e.g., system-management)
         },
         Logger: {
           available: typeof window.Logger !== 'undefined' && window.Logger !== null,
@@ -738,7 +738,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           available:
             typeof window.ActionsMenuSystem !== 'undefined' && window.ActionsMenuSystem !== null,
           initialized: true, // ActionsMenuSystem doesn't have explicit initialized flag
-          optional: false,
+          optional: true, // Optional - not all pages need actions menu (e.g., system-management)
         },
         HeaderSystem: {
           available: typeof window.HeaderSystem !== 'undefined' && window.HeaderSystem !== null,
@@ -953,7 +953,10 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           } else {
             // Only log warning if ActionsMenuSystem is critical
             if (window.Logger) {
-              window.Logger.warn('ActionsMenuSystem not available', { page: 'core-systems' });
+              // ActionsMenuSystem is optional - silently skip if not available
+              if (window.Logger?.debug) {
+                window.Logger.debug('ActionsMenuSystem not available (optional)', { page: 'core-systems' });
+              }
             }
           }
         })(),
@@ -2490,10 +2493,23 @@ window.createAndShowModal = async function (modalHtml, modalId, options = {}) {
   }
 
   // Try to use ModalManagerV2 first (supports dynamic modals)
-  // ModalManagerV2 כבר מטפל ב-Modal Navigation System
+  // ModalManagerV2 כבר מטפל ב-Modal Navigation System, z-index, backdrop, וכפתור חזור
   if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
     try {
+      // ניקוי backdrops לפני פתיחה
+      if (window.ModalManagerV2._cleanupBootstrapBackdrops) {
+        window.ModalManagerV2._cleanupBootstrapBackdrops();
+      }
+      
       await window.ModalManagerV2.showModal(modalId, 'view');
+      
+      // עדכון z-index דרך ModalZIndexManager
+      if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+        requestAnimationFrame(() => {
+          window.ModalZIndexManager.forceUpdate(modalElement);
+        });
+      }
+      
       // Return Bootstrap instance for backwards compatibility (if available)
       if (bootstrap?.Modal) {
         return bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement, { backdrop: false });
@@ -2501,11 +2517,14 @@ window.createAndShowModal = async function (modalHtml, modalId, options = {}) {
       return null;
     } catch (error) {
       // Fallback to Bootstrap if ModalManagerV2 fails
-      window.Logger?.warn(`createAndShowModal: ${modalId} not available in ModalManagerV2, using Bootstrap fallback`, { page: 'core-systems' });
+      window.Logger?.warn(`createAndShowModal: ${modalId} not available in ModalManagerV2, using Bootstrap fallback`, { 
+        error: error?.message || error,
+        page: 'core-systems' 
+      });
     }
   }
 
-  // Fallback to Bootstrap modal (original implementation)
+  // Fallback to Bootstrap modal (original implementation) - עם backdrop: false
   // Modal Navigation System - רק למודלים מקוננים (nested modals)
   // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
   const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;

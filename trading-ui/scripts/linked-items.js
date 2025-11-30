@@ -266,11 +266,27 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
     }
   }
   
-  // יצירת Bootstrap modal instance ללא backdrop (ננהל אותו באופן מרכזי)
-  const modal = new bootstrap.Modal(modalElement, {
-    backdrop: false, // ננהל backdrop מרכזית
-    keyboard: true
-  });
+  // יצירת modal instance דרך ModalManagerV2 או Bootstrap fallback
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    // ModalManagerV2 מטפל ב-backdrop, z-index, וניווט אוטומטית
+    window.ModalManagerV2.showModal(modalElement.id, 'view').catch(error => {
+      window.Logger?.error('Error showing linked items modal via ModalManagerV2', { error, modalId: modalElement.id, page: 'linked-items' });
+      // Fallback to Bootstrap
+      if (bootstrap?.Modal) {
+        const modal = new bootstrap.Modal(modalElement, {
+          backdrop: false, // ננהל backdrop מרכזית
+          keyboard: true
+        });
+        modal.show();
+      }
+    });
+  } else if (bootstrap?.Modal) {
+    const modal = new bootstrap.Modal(modalElement, {
+      backdrop: false, // ננהל backdrop מרכזית
+      keyboard: true
+    });
+    modal.show();
+  }
   
   modalElement.addEventListener('hidden.bs.modal', () => {
     // רישום סגירה במערכת הניווט (רק אם לא נסגר דרך goBack)
@@ -335,9 +351,90 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
         window.ButtonSystem.initializeButtons();
       }
     }, 200);
+    
+    // עדכון z-index דרך ModalZIndexManager
+    if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+      setTimeout(() => {
+        window.ModalZIndexManager.forceUpdate(modalElement);
+      }, 50);
+    }
   }, { once: true });
   
-  modal.show();
+    // ניטור לפני פתיחת המודול
+    const stackBeforeShow = window.ModalNavigationService?.getStack?.() || [];
+    const currentZIndexBefore = modalElement.style.zIndex || getComputedStyle(modalElement).zIndex || 'none';
+    const backdropsBeforeShow = Array.from(document.querySelectorAll('.modal-backdrop')).map(b => ({
+      id: b.id,
+      zIndex: b.style.zIndex || getComputedStyle(b).zIndex,
+      hasShowClass: b.classList.contains('show')
+    }));
+    
+    window.Logger?.info('🔍 [Z-INDEX] LinkedItemsModal: Before showing modal', {
+      modalId: modalElement.id,
+      itemType,
+      itemId,
+      stackLengthBefore: stackBeforeShow.length,
+      currentZIndex: currentZIndexBefore,
+      backdropsBeforeShow,
+      hasModalZIndexManager: !!window.ModalZIndexManager,
+      page: 'linked-items'
+    });
+    
+    modal.show();
+    
+    // ניקוי backdrops של Bootstrap (אם ModalManagerV2 זמין)
+    let cleanedBackdrops = 0;
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2._cleanupBootstrapBackdrops === 'function') {
+      cleanedBackdrops = window.ModalManagerV2._cleanupBootstrapBackdrops();
+      window.Logger?.info('🔍 [Z-INDEX] LinkedItemsModal: Cleaned Bootstrap backdrops', {
+        modalId: modalElement.id,
+        cleanedCount: cleanedBackdrops,
+        page: 'linked-items'
+      });
+    }
+    
+    // עדכון z-index - ניטור מפורט
+    if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+      window.Logger?.info('🔍 [Z-INDEX] LinkedItemsModal: Scheduling z-index forceUpdate', {
+        modalId: modalElement.id,
+        delay: '50ms',
+        page: 'linked-items'
+      });
+      
+      setTimeout(() => {
+        const stackAfterDelay = window.ModalNavigationService?.getStack?.() || [];
+        window.Logger?.info('🔍 [Z-INDEX] LinkedItemsModal: Calling forceUpdate', {
+          modalId: modalElement.id,
+          stackLengthAfterDelay: stackAfterDelay.length,
+          page: 'linked-items'
+        });
+        
+        window.ModalZIndexManager.forceUpdate(modalElement);
+        
+        // ניטור אחרי forceUpdate
+        setTimeout(() => {
+          const finalZIndex = modalElement.style.zIndex || getComputedStyle(modalElement).zIndex || 'none';
+          const dialogZIndex = modalElement.querySelector('.modal-dialog') ? (getComputedStyle(modalElement.querySelector('.modal-dialog')).zIndex) : 'none';
+          const contentZIndex = modalElement.querySelector('.modal-content') ? (getComputedStyle(modalElement.querySelector('.modal-content')).zIndex) : 'none';
+          
+          window.Logger?.info('🔍 [Z-INDEX] LinkedItemsModal: After forceUpdate', {
+            modalId: modalElement.id,
+            zIndexBefore: currentZIndexBefore,
+            zIndexAfter: finalZIndex,
+            dialogZIndex,
+            contentZIndex,
+            zIndexChanged: currentZIndexBefore !== finalZIndex,
+            page: 'linked-items'
+          });
+        }, 50);
+      }, 50);
+    } else {
+      window.Logger?.warn('🔍 [Z-INDEX] LinkedItemsModal: ModalZIndexManager not available', {
+        modalId: modalElement.id,
+        hasModalZIndexManager: !!window.ModalZIndexManager,
+        page: 'linked-items'
+      });
+    }
 }
 
 /**

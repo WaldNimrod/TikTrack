@@ -159,7 +159,7 @@
             
             // Fallback to localStorage
             if (!stored) {
-                const localStorageData = localStorage.getItem(FILTERS_STORAGE_KEY);
+                const localStorageData = window.PageStateManager?.getItem(FILTERS_STORAGE_KEY);
                 if (localStorageData) {
                     stored = JSON.parse(localStorageData);
                 }
@@ -198,7 +198,7 @@
                 });
             } else {
                 // Fallback to localStorage
-                localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(data));
+                window.PageStateManager?.setItem(FILTERS_STORAGE_KEY, JSON.stringify(data));
             }
         } catch (error) {
             if (window.Logger) {
@@ -212,7 +212,7 @@
                     eventTypes: state.filters.eventTypes,
                     lastUpdated: Date.now()
                 };
-                localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(data));
+                window.PageStateManager?.setItem(FILTERS_STORAGE_KEY, JSON.stringify(data));
             } catch (e) {
                 // Ignore localStorage errors
             }
@@ -495,7 +495,7 @@
 
         // Save to localStorage (mock - in real system would save to backend)
         try {
-            localStorage.setItem('economic-calendar-saved-events', JSON.stringify(state.savedEvents));
+            window.PageStateManager?.setItem('economic-calendar-saved-events', JSON.stringify(state.savedEvents));
         } catch (error) {
             if (window.Logger) {
                 window.Logger.warn('Failed to save events to localStorage', {
@@ -539,7 +539,7 @@
 
         // Save to localStorage
         try {
-            localStorage.setItem('economic-calendar-saved-events', JSON.stringify(state.savedEvents));
+            window.PageStateManager?.setItem('economic-calendar-saved-events', JSON.stringify(state.savedEvents));
         } catch (error) {
             if (window.Logger) {
                 window.Logger.warn('Failed to save events to localStorage', {

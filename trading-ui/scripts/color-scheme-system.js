@@ -820,6 +820,7 @@ const PAGE_TO_ENTITY_MAPPING = {
   // עמודי משתמש
   'index-page': 'trade', // Dashboard shows trades overview
   'tickers-page': 'ticker',
+  'ticker-dashboard-page': 'ticker', // Extended ticker dashboard page
   'trading-accounts-page': 'trading_account', // Trading accounts page - חשבונות מסחר
   'accounts-page': 'trading_account', // Alias - חשבונות מסחר
   'trades-page': 'trade',
@@ -1146,11 +1147,14 @@ async function loadColorPreferences() {
           }
         } else {
           if (window.Logger) {
-            window.Logger.warn('⚠️ Preferences event timeout for color scheme - continuing without waiting', {
-              page: 'color-scheme',
-              timeout: `${timeoutMs}ms`,
-              waitTime: `${waitTime.toFixed(2)}ms`,
-            });
+            // Preferences event timeout is expected in some cases - use debug instead of warn
+            if (window.Logger?.debug) {
+              window.Logger.debug('Preferences event timeout for color scheme - continuing without waiting', {
+                page: 'color-scheme',
+                timeout: `${timeoutMs}ms`,
+                waitTime: `${waitTime.toFixed(2)}ms`,
+              });
+            }
           }
         }
         resolve();
@@ -1180,7 +1184,10 @@ async function loadColorPreferences() {
     }
     
     // Last resort: return empty object - NO hardcoded colors!
-    if (window.Logger) { window.Logger.warn('⚠️ No preferences loaded - colors will use CSS fallbacks only', { page: "color-scheme" }); }
+    // No preferences loaded is expected in some cases - use debug instead of warn
+    if (window.Logger?.debug) {
+      window.Logger.debug('No preferences loaded - colors will use CSS fallbacks only', { page: "color-scheme" });
+    }
     return {};
   } catch (error) {
     if (window.Logger) { window.Logger.error('❌ Error loading color preferences:', error, { page: "color-scheme" }); }

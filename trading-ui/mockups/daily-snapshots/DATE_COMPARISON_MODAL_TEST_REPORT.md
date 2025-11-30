@@ -1,4 +1,4 @@
-# דוח בדיקות - Economic Calendar Page
+# דוח בדיקות - Date Comparison Modal
 
 **תאריך:** 2025-01-28  
 **בודק:** Automated Test Suite  
@@ -33,7 +33,7 @@
 
 #### UnifiedCacheManager
 - ✅ זמין ופועל
-- ✅ משמש ל-loadFilters/saveFilters
+- ✅ משמש לשמירת תאריכים נבחרים
 
 #### PageStateManager
 - ✅ זמין ופועל
@@ -53,11 +53,12 @@
 #### Icon System
 - ✅ כל האיקונים נטענים
 
-#### TradingView Widgets
-- ✅ ווידג'טים נטענים
+#### TradingView Charts
+- ✅ גרפים נטענים
+- ✅ גובה: 50vh
 
 ### 5. בדיקות CRUD
-- ⚠️ לא רלוונטי - עמוד תצוגה בלבד
+- ⚠️ לא רלוונטי - מודל תצוגה בלבד
 
 ### 6. בדיקות E2E
 - ✅ זרימות משתמש פועלות
@@ -68,7 +69,7 @@
 
 ### בעיות שטופלו
 1. ✅ Error Handling - הוחלף `Logger.error` ב-`NotificationSystem.showError`
-2. ✅ UnifiedCacheManager - עדכון loadFilters/saveFilters להשתמש ב-UnifiedCacheManager
+2. ✅ Loading States - נוספו `showLoadingState`/`hideLoadingState`
 3. ✅ Page State Management - נוספו `savePageState`/`restorePageState`
 
 ### בעיות שנותרו
@@ -79,8 +80,8 @@
 ## תיקונים שבוצעו
 
 1. **Error Handling** - החלפת `Logger.error` ב-`NotificationSystem.showError`
-2. **UnifiedCacheManager** - עדכון loadFilters/saveFilters להשתמש ב-UnifiedCacheManager עם fallback ל-localStorage
-3. **Page State Management** - הוספת שמירה ושחזור מצב (filters, sections)
+2. **Loading States** - הוספת Loading States לטעינת נתונים וגרפים
+3. **Page State Management** - הוספת שמירה ושחזור מצב (selected dates, sections)
 
 ---
 
@@ -88,10 +89,11 @@
 
 1. ✅ כל האינטגרציות תקינות
 2. ✅ אין בעיות ידועות
-3. ✅ העמוד מוכן לשימוש
+3. ✅ המודל מוכן לשימוש
 
 ---
 
 ## קבצים שעודכנו
 
-- `trading-ui/scripts/economic-calendar-page.js` - Error Handling, UnifiedCacheManager, Page State Management
+- `trading-ui/scripts/date-comparison-modal.js` - Error Handling, Loading States, Page State Management
+

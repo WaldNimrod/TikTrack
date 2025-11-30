@@ -1,4 +1,4 @@
-# דוח בדיקות - Economic Calendar Page
+# דוח בדיקות - Comparative Analysis Page
 
 **תאריך:** 2025-01-28  
 **בודק:** Automated Test Suite  
@@ -33,16 +33,15 @@
 
 #### UnifiedCacheManager
 - ✅ זמין ופועל
-- ✅ משמש ל-loadFilters/saveFilters
 
 #### PageStateManager
 - ✅ זמין ופועל
-- ✅ `savePageState()` פועל
 - ✅ `restorePageState()` פועל
 
 #### Loading States
 - ✅ `showLoadingState()` פועל
 - ✅ `hideLoadingState()` פועל
+- ✅ משמש לטעינת חשבונות וטיקרים
 
 #### Error Handling
 - ✅ משתמש ב-`NotificationSystem.showError()`
@@ -53,8 +52,9 @@
 #### Icon System
 - ✅ כל האיקונים נטענים
 
-#### TradingView Widgets
-- ✅ ווידג'טים נטענים
+#### TradingView Charts
+- ✅ גרפים נטענים
+- ✅ גובה: 50vh (containerHeight)
 
 ### 5. בדיקות CRUD
 - ⚠️ לא רלוונטי - עמוד תצוגה בלבד
@@ -68,8 +68,9 @@
 
 ### בעיות שטופלו
 1. ✅ Error Handling - הוחלף `Logger.error` ב-`NotificationSystem.showError`
-2. ✅ UnifiedCacheManager - עדכון loadFilters/saveFilters להשתמש ב-UnifiedCacheManager
-3. ✅ Page State Management - נוספו `savePageState`/`restorePageState`
+2. ✅ Loading States - נוספו `showLoadingState`/`hideLoadingState`
+3. ✅ Page State Management - נוסף `restorePageState`
+4. ✅ Chart Height - גרף משתמש ב-containerHeight
 
 ### בעיות שנותרו
 - אין
@@ -79,8 +80,9 @@
 ## תיקונים שבוצעו
 
 1. **Error Handling** - החלפת `Logger.error` ב-`NotificationSystem.showError`
-2. **UnifiedCacheManager** - עדכון loadFilters/saveFilters להשתמש ב-UnifiedCacheManager עם fallback ל-localStorage
-3. **Page State Management** - הוספת שמירה ושחזור מצב (filters, sections)
+2. **Loading States** - הוספת Loading States לטעינת חשבונות וטיקרים
+3. **Page State Management** - הוספת שחזור מצב
+4. **Chart Height** - עדכון גובה גרף ל-containerHeight
 
 ---
 
@@ -94,4 +96,5 @@
 
 ## קבצים שעודכנו
 
-- `trading-ui/scripts/economic-calendar-page.js` - Error Handling, UnifiedCacheManager, Page State Management
+- `trading-ui/scripts/comparative-analysis-page.js` - Error Handling, Loading States, Page State Management, Chart Height
+

@@ -231,11 +231,18 @@ class SelectPopulatorService {
                 console.log(`🔍 [SelectPopulatorService] Filtered ${beforeFilter} → ${tickers.length} tickers`);
             }
             
-            // מילוי ה-select
+            // מילוי ה-select - הצג טיקר + שם חברה
             console.log(`🔍 [SelectPopulatorService] Calling _populateSelect with ${tickers.length} tickers...`);
-            this._populateSelect(select, tickers, {
+            
+            // Format tickers to show symbol + company name
+            const formattedTickers = tickers.map(ticker => ({
+                ...ticker,
+                display_text: ticker.name ? `${ticker.symbol} - ${ticker.name}` : ticker.symbol
+            }));
+            
+            this._populateSelect(select, formattedTickers, {
                 valueField: 'id',
-                textField: 'symbol',
+                textField: 'display_text',
                 includeEmpty: options.includeEmpty !== false,
                 emptyText: options.emptyText || 'בחר טיקר...',
                 defaultValue: options.defaultValue

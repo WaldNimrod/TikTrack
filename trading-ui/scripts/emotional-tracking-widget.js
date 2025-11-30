@@ -194,7 +194,11 @@
                 window.Logger.info('✅ Emotional patterns chart initialized', { page: 'emotional-tracking-widget' });
             }
         } catch (error) {
-            if (window.Logger) {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת גרף דפוסים רגשיים', 
+                    `לא ניתן לטעון את הגרף. ${errorMsg}`);
+            } else if (window.Logger) {
                 window.Logger.error('Error initializing emotional patterns chart', { 
                     page: 'emotional-tracking-widget', 
                     error 
@@ -649,6 +653,12 @@
      * Initialize all widgets
      */
     async function initializeWidgets() {
+        // Show loading state
+        const widgetContainer = document.getElementById('emotional-tracking-widget-container') || document.querySelector('.emotional-tracking-widget-container');
+        if (widgetContainer && typeof window.showLoadingState === 'function') {
+            window.showLoadingState(widgetContainer.id || 'emotional-tracking-widget-container');
+        }
+        
         try {
             // Setup mockup notice icon
             await setupMockupNotice();
@@ -664,12 +674,26 @@
 
             // Setup form
             await setupQuickEntryForm();
+            
+            // Hide loading state
+            if (widgetContainer && typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState(widgetContainer.id || 'emotional-tracking-widget-container');
+            }
 
             if (window.Logger) {
                 window.Logger.info('✅ All widgets initialized', { page: 'emotional-tracking-widget' });
             }
         } catch (error) {
-            if (window.Logger) {
+            // Hide loading state on error
+            if (widgetContainer && typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState(widgetContainer.id || 'emotional-tracking-widget-container');
+            }
+            
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה באתחול ווידג\'ט', 
+                    `לא ניתן לאתחל את הווידג'ט. ${errorMsg}`);
+            } else if (window.Logger) {
                 window.Logger.error('Error initializing widgets', { 
                     page: 'emotional-tracking-widget', 
                     error 

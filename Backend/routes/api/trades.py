@@ -492,16 +492,8 @@ def delete_trade(trade_id: int):
     try:
         normalizer = _get_date_normalizer()
         db: Session = g.db
-        # Remove tag associations before deleting the entity
-        try:
-            TagService.remove_all_tags_for_entity(db, 'trade', trade_id)
-        except ValueError as tag_error:
-            logger.warning(
-                "Failed to remove tags for trade %s before deletion: %s",
-                trade_id,
-                tag_error,
-            )
-
+        # Tag cleanup is handled automatically by SQLAlchemy event listeners
+        
         success = TradeService.delete(db, trade_id)
         if success:
             return jsonify({

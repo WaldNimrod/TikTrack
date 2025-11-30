@@ -15,8 +15,7 @@ class SMServerSection extends SMBaseSection {
     super(sectionId, config);
     this.apiEndpoints = {
       status: '/api/server/status',
-      resources: '/api/system/resources',
-      overview: '/api/system/overview'
+      overview: '/api/system/overview' // Use overview instead of resources endpoint
     };
   }
 
@@ -30,16 +29,14 @@ class SMServerSection extends SMBaseSection {
       console.log(`🖥️ Loading server data from multiple endpoints`);
 
       // Load data from multiple endpoints in parallel
-      const [statusData, resourcesData, overviewData] = await Promise.allSettled([
+      const [statusData, overviewData] = await Promise.allSettled([
         this.fetchServerStatus(),
-        this.fetchSystemResources(),
         this.fetchSystemOverview()
       ]);
 
       // Combine data from all sources
       const combinedData = {
         status: statusData.status === 'fulfilled' ? statusData.value : null,
-        resources: resourcesData.status === 'fulfilled' ? resourcesData.value : null,
         overview: overviewData.status === 'fulfilled' ? overviewData.value : null,
         timestamp: new Date().toISOString()
       };
@@ -82,31 +79,7 @@ class SMServerSection extends SMBaseSection {
     }
   }
 
-  /**
-   * Fetch system resources
-   * קבלת משאבי מערכת
-   */
-  async fetchSystemResources() {
-    try {
-      const response = await fetch(this.apiEndpoints.resources, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      return result.status === 'success' ? result.data : null;
-    } catch (error) {
-      console.warn('⚠️ Failed to fetch system resources:', error);
-      return null;
-    }
-  }
+  // Removed fetchSystemResources - endpoint doesn't exist, using overview instead
 
   /**
    * Fetch system overview
@@ -169,6 +142,17 @@ class SMServerSection extends SMBaseSection {
 
     return `
       <div class="server-overview">
+        <!-- Quick Link -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <div class="d-flex justify-content-end">
+              <a href="/server-monitor" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-external-link-alt me-1"></i> ניטור שרת מלא
+              </a>
+            </div>
+          </div>
+        </div>
+
         <!-- Server Status Card -->
         <div class="row mb-4">
           <div class="col-12">

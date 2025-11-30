@@ -107,7 +107,12 @@
                 window.NotificationSystem.showError('שגיאה', 'שגיאה באתחול גרף TradingView');
             }
             if (window.Logger) {
-                window.Logger.error('Error initializing TradingView Widget', { 
+                const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+                if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                    window.NotificationSystem.showError('שגיאה בטעינת גרף מחירים', 
+                        `לא ניתן לטעון את גרף המחירים. ${errorMsg}`);
+                } else if (window.Logger) {
+                    window.Logger.error('Error initializing TradingView Widget', { 
                     page: 'price-history-page', 
                     error: e 
                 });
@@ -135,7 +140,12 @@
                     window.NotificationSystem.showError('שגיאה', 'שגיאה בעדכון סמל בגרף');
                 }
                 if (window.Logger) {
-                    window.Logger.error('Error updating TradingView Widget symbol', { 
+                    const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+                    if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                        window.NotificationSystem.showError('שגיאה בעדכון גרף מחירים', 
+                            `לא ניתן לעדכן את גרף המחירים. ${errorMsg}`);
+                    } else if (window.Logger) {
+                        window.Logger.error('Error updating TradingView Widget symbol', { 
                         page: 'price-history-page', 
                         error: e 
                     });
@@ -222,11 +232,76 @@
     }
 
     /**
+     * Save page state (filters, selected ticker)
+     */
+    async function savePageState() {
+        if (!window.PageStateManager) {
+            return;
+        }
+
+        try {
+            const tickerSelect = document.getElementById('widgetTickerSelect');
+            const selectedTicker = tickerSelect ? tickerSelect.value : 'NASDAQ:AAPL';
+
+            const state = {
+                filters: {
+                    selectedTicker: selectedTicker
+                }
+            };
+
+            await window.PageStateManager.savePageState('price-history', state);
+            if (window.Logger) {
+                window.Logger.debug('✅ Saved page state', { page: 'price-history-page' });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to save page state', { error, page: 'price-history-page' });
+            }
+        }
+    }
+
+    /**
+     * Restore page state (filters, selected ticker)
+     */
+    async function restorePageState() {
+        if (!window.PageStateManager) {
+            return;
+        }
+
+        try {
+            const state = await window.PageStateManager.loadPageState('price-history');
+            if (!state || !state.filters) {
+                return;
+            }
+
+            // Restore selected ticker
+            if (state.filters.selectedTicker) {
+                const tickerSelect = document.getElementById('widgetTickerSelect');
+                if (tickerSelect) {
+                    tickerSelect.value = state.filters.selectedTicker;
+                    updateTradingViewWidgetSymbol(state.filters.selectedTicker);
+                }
+            }
+
+            if (window.Logger) {
+                window.Logger.debug('✅ Restored page state', { page: 'price-history-page' });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to restore page state', { error, page: 'price-history-page' });
+            }
+        }
+    }
+
+    /**
      * Initialize page
      */
-    function initializePage() {
+    async function initializePage() {
         // Initialize Header System first
         initializeHeader();
+        
+        // Restore page state
+        await restorePageState();
         
         // Wait for Preferences to be loaded
         if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
@@ -235,7 +310,8 @@
                 
                 // Wait a bit for TradingView library to load, then initialize widget
                 setTimeout(() => {
-                    const defaultSymbol = 'NASDAQ:AAPL';
+                    const tickerSelect = document.getElementById('widgetTickerSelect');
+                    const defaultSymbol = tickerSelect && tickerSelect.value ? tickerSelect.value : 'NASDAQ:AAPL';
                     initTradingViewWidget(defaultSymbol);
                 }, 1000);
             }).catch((error) => {
@@ -248,7 +324,8 @@
                 // Initialize widget anyway
                 setupTradingViewWidgetTickerSelector();
                 setTimeout(() => {
-                    const defaultSymbol = 'NASDAQ:AAPL';
+                    const tickerSelect = document.getElementById('widgetTickerSelect');
+                    const defaultSymbol = tickerSelect && tickerSelect.value ? tickerSelect.value : 'NASDAQ:AAPL';
                     initTradingViewWidget(defaultSymbol);
                 }, 1000);
             });
@@ -256,7 +333,8 @@
             // Preferences not available, initialize widget anyway
             setupTradingViewWidgetTickerSelector();
             setTimeout(() => {
-                const defaultSymbol = 'NASDAQ:AAPL';
+                const tickerSelect = document.getElementById('widgetTickerSelect');
+                const defaultSymbol = tickerSelect && tickerSelect.value ? tickerSelect.value : 'NASDAQ:AAPL';
                 initTradingViewWidget(defaultSymbol);
             }, 1000);
         }
@@ -274,7 +352,9 @@
     window.priceHistoryPage = {
         initTradingViewWidget,
         updateTradingViewWidgetSymbol,
-        setupTradingViewWidgetTickerSelector
+        setupTradingViewWidgetTickerSelector,
+        savePageState,
+        restorePageState
     };
 
 })();

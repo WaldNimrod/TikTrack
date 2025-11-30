@@ -669,12 +669,18 @@
                 return tradeHistoryData;
             }
             
-            if (window.Logger) {
+            const errorMsg = 'אין נתוני דמה זמינים';
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);
+            } else if (window.Logger) {
                 window.Logger.error('No mock data available', { page: 'trade-history-page' });
             }
             return null;
         } catch (error) {
-            if (window.Logger) {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת נתונים מהמטמון', errorMsg);
+            } else if (window.Logger) {
                 window.Logger.error('Error loading data from cache', { page: 'trade-history-page', error });
             }
             // Fallback to mock data
@@ -722,8 +728,18 @@
                 window.Logger.info('📊 Initializing Trade History Page...', { page: 'trade-history-page' });
             }
 
+            // Show loading state
+            if (typeof window.showLoadingState === 'function') {
+                window.showLoadingState('tradesTableContainer');
+            }
+
             // 1. Load mock data (from cache or fresh) - don't wait for cache, use fallback
             const data = await loadDataFromCache();
+            
+            // Hide loading state
+            if (typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState('tradesTableContainer');
+            }
             
             // 2. Wait for HeaderSystem (non-blocking)
             initializeHeader().catch(() => {
@@ -735,7 +751,10 @@
                 // TradingView is optional for initial render
             });
             if (!data) {
-                if (window.Logger) {
+                if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                    window.NotificationSystem.showError('שגיאה בטעינת עמוד', 
+                        'לא ניתן לטעון את הנתונים. נא לרענן את העמוד.');
+                } else if (window.Logger) {
                     window.Logger.error('Failed to load data, cannot initialize page', { page: 'trade-history-page' });
                 }
                 return;
@@ -768,7 +787,11 @@
                 window.Logger.info('✅ Trade History Page initialized successfully', { page: 'trade-history-page' });
             }
         } catch (error) {
-            if (window.Logger) {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה באתחול עמוד היסטוריית טריידים', 
+                    `לא ניתן לאתחל את העמוד. ${errorMsg}`);
+            } else if (window.Logger) {
                 window.Logger.error('Error initializing Trade History Page', { page: 'trade-history-page', error });
             }
             throw error;
@@ -794,9 +817,20 @@
             // Initialize timeline chart with data (after a short delay to ensure DOM is ready)
             setTimeout(async () => {
                 try {
+                    // Show loading state for chart
+                    const chartContainer = document.getElementById('timelineChart');
+                    if (chartContainer && typeof window.showLoadingState === 'function') {
+                        window.showLoadingState('timelineChart');
+                    }
+                    
                     // Check if initTimelineChart exists (from HTML script)
                     if (typeof window.initTimelineChart === 'function') {
                         await window.initTimelineChart();
+                        
+                        // Hide loading state after chart is initialized
+                        if (chartContainer && typeof window.hideLoadingState === 'function') {
+                            window.hideLoadingState('timelineChart');
+                        }
                         // Restore chart zoom state after chart is initialized
                         setTimeout(() => {
                             if (window.tradeHistoryPage && typeof window.tradeHistoryPage.restoreChartZoomState === 'function') {
@@ -804,12 +838,26 @@
                             }
                         }, 500);
                     } else {
+                        // Hide loading state if chart function not found
+                        if (chartContainer && typeof window.hideLoadingState === 'function') {
+                            window.hideLoadingState('timelineChart');
+                        }
                         if (window.Logger) {
                             window.Logger.warn('initTimelineChart not found in HTML, chart may not initialize', { page: 'trade-history-page' });
                         }
                     }
                 } catch (error) {
-                    if (window.Logger) {
+                    // Hide loading state on error
+                    const chartContainer = document.getElementById('timelineChart');
+                    if (chartContainer && typeof window.hideLoadingState === 'function') {
+                        window.hideLoadingState('timelineChart');
+                    }
+                    
+                    const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+                    if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                        window.NotificationSystem.showError('שגיאה בטעינת גרף', 
+                            `לא ניתן לטעון את גרף הזמן. ${errorMsg}`);
+                    } else if (window.Logger) {
                         window.Logger.error('Error initializing timeline chart', { page: 'trade-history-page', error });
                     }
                 }
@@ -825,7 +873,11 @@
                 window.Logger.info('Page rendered successfully', { page: 'trade-history-page' });
             }
         } catch (error) {
-            if (window.Logger) {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בהצגת עמוד', 
+                    `לא ניתן להציג את העמוד. ${errorMsg}`);
+            } else if (window.Logger) {
                 window.Logger.error('Error rendering page', { page: 'trade-history-page', error });
             }
         }
@@ -1498,8 +1550,9 @@
 
             return saved;
         } catch (error) {
+            // Silent error - saving page state is not critical for user experience
             if (window.Logger) {
-                window.Logger.error('Error saving page state', { page: 'trade-history-page', error });
+                window.Logger.warn('Error saving page state', { page: 'trade-history-page', error });
             }
             return false;
         }
@@ -1603,8 +1656,9 @@
 
             return state;
         } catch (error) {
+            // Silent error - loading page state is not critical for user experience
             if (window.Logger) {
-                window.Logger.error('Error loading page state', { page: 'trade-history-page', error });
+                window.Logger.warn('Error loading page state', { page: 'trade-history-page', error });
             }
             return null;
         }

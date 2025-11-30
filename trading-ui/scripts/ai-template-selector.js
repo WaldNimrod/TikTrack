@@ -1,3 +1,24 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 4
+ * 
+ * UI UPDATES (2)
+ * - render() - Render templates as cards in page container
+ * - renderModal() - Render templates as cards in modal container
+ * 
+ * DATA LOADING (1)
+ * - getSelectedTemplate() - Get currently selected template from AIAnalysisManager
+ * 
+ * EVENT HANDLING (1)
+ * - selectTemplate() - Handle template selection (legacy - redirects to modal flow)
+ * 
+ * ==========================================
+ */
 /**
  * AI Template Selector
  * ======================================
@@ -36,25 +57,50 @@
         return;
       }
 
-      container.innerHTML = '';
+      // Clear container but preserve structure
+      const sectionBody = container.closest('.section-body');
+      if (sectionBody) {
+        // Only clear the container, not the entire section
+        container.innerHTML = '';
+      } else {
+        container.innerHTML = '';
+      }
 
-      this.templates.forEach((template) => {
+      // Use for...of loop instead of forEach to support async/await
+      for (const template of this.templates) {
         const col = document.createElement('div');
         col.className = 'col-md-6 col-lg-3 mb-3';
 
         const card = document.createElement('div');
-        card.className = 'card h-100';
-        card.style.cursor = 'pointer';
+        card.className = 'card h-100 template-card';
         // Use string template with quotes for template ID to ensure proper evaluation
         // Open template selection modal first, then variables modal
-        card.setAttribute('data-onclick', `window.AIAnalysisManager.openTemplateSelectionModal('${template.id}')`);
+        card.setAttribute('data-onclick', `window.AIAnalysisManager.handleTemplateSelectionFromModal('${template.id}')`);
 
         const cardBody = document.createElement('div');
         cardBody.className = 'card-body d-flex flex-column';
 
         const icon = document.createElement('div');
         icon.className = 'text-center mb-3';
-        icon.innerHTML = '<img src="images/icons/entities/research.svg" alt="תבנית" class="section-icon" style="width: 48px; height: 48px;">';
+        
+        // Use IconSystem to render icon
+        let iconHTML = '';
+        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+          try {
+            iconHTML = await window.IconSystem.renderIcon('entity', 'research', {
+              size: '48',
+              alt: 'תבנית',
+              class: 'section-icon template-icon'
+            });
+          } catch (error) {
+            window.Logger?.warn('Failed to render icon via IconSystem, using fallback', { error, page: 'ai-analysis' });
+            iconHTML = '<img src="images/icons/entities/research.svg" alt="תבנית" class="section-icon template-icon">';
+          }
+        } else {
+          // Fallback if IconSystem not available
+          iconHTML = '<img src="images/icons/entities/research.svg" alt="תבנית" class="section-icon template-icon">';
+        }
+        icon.innerHTML = iconHTML;
 
         const title = document.createElement('h5');
         title.className = 'card-title text-center';
@@ -75,7 +121,7 @@
         card.appendChild(cardBody);
         col.appendChild(card);
         container.appendChild(col);
-      });
+      }
 
       window.Logger?.info('Templates rendered', { page: 'ai-analysis', count: this.templates.length });
     },
@@ -99,22 +145,40 @@
 
       container.innerHTML = '';
 
-      this.templates.forEach((template) => {
+      // Use for...of loop instead of forEach to support async/await
+      for (const template of this.templates) {
         const col = document.createElement('div');
         col.className = 'col-md-6 col-lg-3 mb-3';
 
         const card = document.createElement('div');
-        card.className = 'card h-100';
-        card.style.cursor = 'pointer';
+        card.className = 'card h-100 template-card';
         // Open variables modal directly from template selection modal
-        card.setAttribute('data-onclick', `window.AIAnalysisManager.openTemplateSelectionModal('${template.id}')`);
+        card.setAttribute('data-onclick', `window.AIAnalysisManager.handleTemplateSelectionFromModal('${template.id}')`);
 
         const cardBody = document.createElement('div');
         cardBody.className = 'card-body d-flex flex-column';
 
         const icon = document.createElement('div');
         icon.className = 'text-center mb-3';
-        icon.innerHTML = '<img src="images/icons/entities/research.svg" alt="תבנית" class="section-icon" style="width: 48px; height: 48px;">';
+        
+        // Use IconSystem to render icon
+        let iconHTML = '';
+        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+          try {
+            iconHTML = await window.IconSystem.renderIcon('entity', 'research', {
+              size: '48',
+              alt: 'תבנית',
+              class: 'section-icon template-icon'
+            });
+          } catch (error) {
+            window.Logger?.warn('Failed to render icon via IconSystem, using fallback', { error, page: 'ai-analysis' });
+            iconHTML = '<img src="images/icons/entities/research.svg" alt="תבנית" class="section-icon template-icon">';
+          }
+        } else {
+          // Fallback if IconSystem not available
+          iconHTML = '<img src="images/icons/entities/research.svg" alt="תבנית" class="section-icon template-icon">';
+        }
+        icon.innerHTML = iconHTML;
 
         const title = document.createElement('h5');
         title.className = 'card-title text-center';
@@ -135,21 +199,22 @@
         card.appendChild(cardBody);
         col.appendChild(card);
         container.appendChild(col);
-      });
+      }
 
       window.Logger?.info('Templates rendered in modal', { page: 'ai-analysis', count: this.templates.length });
     },
 
     /**
-     * Select template
+     * Select template (legacy - redirects to new modal flow)
      */
-    selectTemplate(templateId) {
+    async selectTemplate(templateId) {
       window.Logger?.info('selectTemplate called', { page: 'ai-analysis', templateId, AIAnalysisManagerAvailable: !!window.AIAnalysisManager });
       
       if (window.AIAnalysisManager) {
-        // Convert templateId to number if it's a string
-        const id = typeof templateId === 'string' ? parseInt(templateId, 10) : templateId;
-        window.AIAnalysisManager.handleTemplateSelection(id);
+        // Convert templateId to string for handleTemplateSelectionFromModal
+        const id = typeof templateId === 'number' ? String(templateId) : templateId;
+        // Use the new modal flow - ensure we call it with proper context
+        await window.AIAnalysisManager.handleTemplateSelectionFromModal.call(window.AIAnalysisManager, id);
       } else {
         window.Logger?.error('AIAnalysisManager not available', { page: 'ai-analysis' });
         if (window.NotificationSystem) {

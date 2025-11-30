@@ -225,7 +225,8 @@ def get_plan_conditions(plan_id):
         db_session = next(get_db())
 
         try:
-            _ensure_conditions_tables(db_session)
+            # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
+            # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
 
             plan = db_session.query(TradePlan).filter(TradePlan.id == plan_id).first()
             if not plan:
@@ -295,8 +296,8 @@ def create_plan_condition(plan_id):
         db_session = next(get_db())
         
         try:
-            _ensure_conditions_tables(db_session)
-
+            # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
+            # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
             normalizer = _get_date_normalizer()
             # Check if trade plan exists
             plan = db_session.query(TradePlan).filter(TradePlan.id == plan_id).first()
@@ -388,8 +389,9 @@ def get_plan_condition(condition_id):
         db_session = next(get_db())
         
         try:
-            _ensure_conditions_tables(db_session)
-
+            # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
+            # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
+            
             condition = db_session.query(PlanCondition).filter(
                 PlanCondition.id == condition_id
             ).first()
@@ -442,8 +444,9 @@ def update_plan_condition(condition_id):
         db_session = next(get_db())
         
         try:
-            _ensure_conditions_tables(db_session)
-
+            # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
+            # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
+            
             condition = db_session.query(PlanCondition).filter(
                 PlanCondition.id == condition_id
             ).first()
@@ -532,8 +535,9 @@ def delete_plan_condition(condition_id):
         db_session = next(get_db())
         
         try:
-            _ensure_conditions_tables(db_session)
-
+            # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
+            # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
+            
             condition = db_session.query(PlanCondition).filter(
                 PlanCondition.id == condition_id
             ).first()

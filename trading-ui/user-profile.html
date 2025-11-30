@@ -132,7 +132,7 @@
                                                             <div class="col-12">
                                                                 <button type="submit" class="btn btn-primary" id="updateInfoBtn">
                                                                     <span id="updateInfoBtnText">עדכן פרטים</span>
-                                                                    <span id="updateInfoBtnSpinner" style="display: none;">⏳ מעדכן...</span>
+                                                                    <span id="updateInfoBtnSpinner" class="btn-spinner">⏳ מעדכן...</span>
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -165,7 +165,7 @@
                                                             <div class="col-12">
                                                                 <button type="submit" class="btn btn-warning" id="updatePasswordBtn">
                                                                     <span id="updatePasswordBtnText">עדכן סיסמה</span>
-                                                                    <span id="updatePasswordBtnSpinner" style="display: none;">⏳ מעדכן...</span>
+                                                                    <span id="updatePasswordBtnSpinner" class="btn-spinner">⏳ מעדכן...</span>
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -177,115 +177,8 @@
                                 </div>
                             </div>
 
-                            <!-- SMTP Settings Section -->
-                            <div class="content-section" id="user-profile-smtp" data-section="smtp">
-                                <div class="section-header">
-                                    <div class="table-title">
-                                        <img src="images/icons/entities/user.svg" alt="הגדרות SMTP" class="section-icon" onerror="this.style.display='none'">
-                                        <span>הגדרות SMTP</span>
-                                    </div>
-                                    <div class="section-actions">
-                                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('smtp')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
-                                    </div>
-                                </div>
-                                <div class="section-body">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="card">
-                                                <div class="card-header bg-light">
-                                                    <h6 class="mb-0 text-muted">הגדרות שרת SMTP</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <form id="smtpSettingsForm">
-                                                        <div class="row g-3">
-                                                            <!-- Server Settings -->
-                                                            <div class="col-md-6">
-                                                                <label class="form-label" for="smtpHost">שרת SMTP (Host)</label>
-                                                                <input type="text" id="smtpHost" class="form-control" placeholder="smtp.gmail.com" required>
-                                                            </div>
-                                                            <div class="col-md-3">
-                                                                <label class="form-label" for="smtpPort">פורט (Port)</label>
-                                                                <input type="number" id="smtpPort" class="form-control" placeholder="587" required>
-                                                            </div>
-                                                            <div class="col-md-3">
-                                                                <label class="form-label" for="smtpUseTls">שימוש ב-TLS</label>
-                                                                <div class="form-check form-switch mt-2">
-                                                                    <input class="form-check-input" type="checkbox" id="smtpUseTls" checked>
-                                                                    <label class="form-check-label" for="smtpUseTls">מופעל</label>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Authentication -->
-                                                            <div class="col-md-6">
-                                                                <label class="form-label" for="smtpUser">שם משתמש (User)</label>
-                                                                <input type="text" id="smtpUser" class="form-control" placeholder="admin@mezoo.co" required>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label class="form-label" for="smtpPassword">סיסמה (Password)</label>
-                                                                <div class="input-group">
-                                                                    <input type="password" id="smtpPassword" class="form-control" placeholder="הכנס סיסמה">
-                                                                    <button class="btn btn-outline-secondary" type="button" id="togglePasswordBtn" title="הצג/הסתר סיסמה">
-                                                                        <span id="togglePasswordIcon">👁️</span>
-                                                                    </button>
-                                                                </div>
-                                                                <small class="form-text text-muted">הסיסמה תישמר מוצפנת במסד הנתונים</small>
-                                                            </div>
-
-                                                            <!-- From Settings -->
-                                                            <div class="col-md-6">
-                                                                <label class="form-label" for="smtpFromEmail">כתובת אימייל שולח (From Email)</label>
-                                                                <input type="email" id="smtpFromEmail" class="form-control" placeholder="admin@mezoo.co" required>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label class="form-label" for="smtpFromName">שם שולח (From Name)</label>
-                                                                <input type="text" id="smtpFromName" class="form-control" placeholder="TikTrack" required>
-                                                            </div>
-
-                                                            <!-- General Settings -->
-                                                            <div class="col-md-6">
-                                                                <label class="form-label" for="smtpEnabled">הפעלת שירות SMTP</label>
-                                                                <div class="form-check form-switch mt-2">
-                                                                    <input class="form-check-input" type="checkbox" id="smtpEnabled" checked>
-                                                                    <label class="form-check-label" for="smtpEnabled">מופעל</label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label class="form-label" for="smtpTestEmail">כתובת אימייל לבדיקה</label>
-                                                                <input type="email" id="smtpTestEmail" class="form-control" placeholder="test@example.com">
-                                                            </div>
-
-                                                            <!-- Action Buttons -->
-                                                            <div class="col-12">
-                                                                <div class="d-flex gap-2 flex-wrap">
-                                                                    <button type="submit" class="btn btn-primary" id="updateSmtpBtn">
-                                                                        <span id="updateSmtpBtnText">עדכן הגדרות SMTP</span>
-                                                                        <span id="updateSmtpBtnSpinner" style="display: none;">⏳ מעדכן...</span>
-                                                                    </button>
-                                                                    <button type="button" class="btn btn-info" id="testConnectionBtn">
-                                                                        <span id="testConnectionBtnText">בדיקת חיבור</span>
-                                                                        <span id="testConnectionBtnSpinner" style="display: none;">⏳ בודק...</span>
-                                                                    </button>
-                                                                    <button type="button" class="btn btn-success" id="sendTestEmailBtn">
-                                                                        <span id="sendTestEmailBtnText">שלח מייל בדיקה</span>
-                                                                        <span id="sendTestEmailBtnSpinner" style="display: none;">⏳ שולח...</span>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Status Display -->
-                                                            <div class="col-12">
-                                                                <div id="smtpStatus" class="alert alert-info" style="display: none;">
-                                                                    <strong>סטטוס:</strong> <span id="smtpStatusText"></span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- SMTP Settings moved to System Management page -->
+                            <!-- הגדרות SMTP הועברו לעמוד מנהל מערכת -->
 
                             <!-- AI Analysis Settings Section -->
                             <div class="content-section" id="user-profile-ai-analysis" data-section="ai-analysis">
@@ -302,13 +195,10 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="card">
-                                                <div class="card-header bg-light">
-                                                    <h6 class="mb-0 text-muted">הגדרות מנועי AI</h6>
-                                                </div>
                                                 <div class="card-body">
                                                     <form id="aiAnalysisSettingsForm">
                                                         <div class="row g-3">
-                                                            <!-- Default Provider -->
+                                                            <!-- Row 1: Default Provider + Help Panel -->
                                                             <div class="col-md-6">
                                                                 <label class="form-label" for="aiDefaultProvider">מנוע AI ברירת מחדל</label>
                                                                 <select id="aiDefaultProvider" class="form-select" required>
@@ -317,15 +207,31 @@
                                                                 </select>
                                                                 <small class="form-text text-muted">בחר מנוע AI שישמש כברירת מחדל לניתוחים</small>
                                                             </div>
-
-                                                            <!-- Gemini API Key -->
                                                             <div class="col-md-6">
-                                                                <label class="form-label" for="geminiApiKey">
-                                                                    Gemini API Key
-                                                                    <button type="button" class="btn btn-sm btn-link p-0 ms-1" data-onclick="window.AIAnalysisManager?.showHelpModal('gemini')" title="עזרה">
-                                                                        <span>❓</span>
-                                                                    </button>
-                                                                </label>
+                                                                <label class="form-label">איפה להשיג מפתח API?</label>
+                                                                <div class="alert alert-info mb-0">
+                                                                    <div class="mb-2">
+                                                                        <strong>Gemini:</strong><br>
+                                                                        <small>
+                                                                            1. עבור ל-<a href="https://aistudio.google.com/" target="_blank" class="alert-link">Google AI Studio</a><br>
+                                                                            2. לחץ על "Get API Key"<br>
+                                                                            3. העתק את המפתח
+                                                                        </small>
+                                                                    </div>
+                                                                    <div>
+                                                                        <strong>Perplexity:</strong><br>
+                                                                        <small>
+                                                                            1. עבור ל-<a href="https://www.perplexity.ai/api" target="_blank" class="alert-link">Perplexity API</a><br>
+                                                                            2. לחץ על "Create API Key"<br>
+                                                                            3. העתק את המפתח
+                                                                        </small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Row 2: Gemini API Key -->
+                                                            <div class="col-md-6">
+                                                                <label class="form-label" for="geminiApiKey">Gemini API Key</label>
                                                                 <div class="input-group">
                                                                     <input type="password" id="geminiApiKey" class="form-control" placeholder="הכנס Gemini API Key">
                                                                     <button class="btn btn-outline-secondary" type="button" id="toggleGeminiKeyBtn" title="הצג/הסתר מפתח">
@@ -333,17 +239,20 @@
                                                                     </button>
                                                                 </div>
                                                                 <small class="form-text text-muted">המפתח יישמר מוצפן במסד הנתונים</small>
-                                                                <div id="geminiKeyStatus" class="mt-2" style="display: none;"></div>
+                                                                
+                                                                <!-- Status and Validate Button for Gemini -->
+                                                                <div class="d-flex align-items-center gap-2 mt-2">
+                                                                    <div id="geminiKeyStatus" class="status-display flex-grow-1"></div>
+                                                                    <button type="button" data-button-type="SECONDARY" data-variant="small" data-onclick="window.AIAnalysisManager?.validateGeminiKey()" data-text="בדוק" data-id="validateGeminiBtn" id="validateGeminiBtn">
+                                                                        <span id="validateGeminiBtnText">בדוק</span>
+                                                                        <span id="validateGeminiBtnSpinner" class="btn-spinner d-none">⏳</span>
+                                                                    </button>
+                                                                </div>
                                                             </div>
 
-                                                            <!-- Perplexity API Key -->
+                                                            <!-- Row 2: Perplexity API Key -->
                                                             <div class="col-md-6">
-                                                                <label class="form-label" for="perplexityApiKey">
-                                                                    Perplexity API Key
-                                                                    <button type="button" class="btn btn-sm btn-link p-0 ms-1" data-onclick="window.AIAnalysisManager?.showHelpModal('perplexity')" title="עזרה">
-                                                                        <span>❓</span>
-                                                                    </button>
-                                                                </label>
+                                                                <label class="form-label" for="perplexityApiKey">Perplexity API Key</label>
                                                                 <div class="input-group">
                                                                     <input type="password" id="perplexityApiKey" class="form-control" placeholder="הכנס Perplexity API Key">
                                                                     <button class="btn btn-outline-secondary" type="button" id="togglePerplexityKeyBtn" title="הצג/הסתר מפתח">
@@ -351,30 +260,23 @@
                                                                     </button>
                                                                 </div>
                                                                 <small class="form-text text-muted">המפתח יישמר מוצפן במסד הנתונים</small>
-                                                                <div id="perplexityKeyStatus" class="mt-2" style="display: none;"></div>
-                                                            </div>
-
-                                                            <!-- Status Display -->
-                                                            <div class="col-12">
-                                                                <div id="aiAnalysisStatus" class="alert alert-info" style="display: none;">
-                                                                    <strong>סטטוס:</strong> <span id="aiAnalysisStatusText"></span>
+                                                                
+                                                                <!-- Status and Validate Button for Perplexity -->
+                                                                <div class="d-flex align-items-center gap-2 mt-2">
+                                                                    <div id="perplexityKeyStatus" class="status-display flex-grow-1"></div>
+                                                                    <button type="button" data-button-type="SECONDARY" data-variant="small" data-onclick="window.AIAnalysisManager?.validatePerplexityKey()" data-text="בדוק" data-id="validatePerplexityBtn" id="validatePerplexityBtn">
+                                                                        <span id="validatePerplexityBtnText">בדוק</span>
+                                                                        <span id="validatePerplexityBtnSpinner" class="btn-spinner d-none">⏳</span>
+                                                                    </button>
                                                                 </div>
                                                             </div>
 
-                                                            <!-- Action Buttons -->
+                                                            <!-- Row 3: Save Button (aligned to left/end) -->
                                                             <div class="col-12">
-                                                                <div class="d-flex gap-2 flex-wrap">
-                                                                    <button type="button" data-button-type="PRIMARY" data-variant="full" data-onclick="window.AIAnalysisManager?.saveSettings()" id="saveAiAnalysisBtn">
+                                                                <div class="d-flex justify-content-start">
+                                                                    <button type="button" data-button-type="PRIMARY" data-variant="full" data-onclick="window.AIAnalysisManager?.saveSettings()" data-text="שמור הגדרות" data-id="saveAiAnalysisBtn" id="saveAiAnalysisBtn">
                                                                         <span id="saveAiAnalysisBtnText">שמור הגדרות</span>
-                                                                        <span id="saveAiAnalysisBtnSpinner" style="display: none;">⏳ שומר...</span>
-                                                                    </button>
-                                                                    <button type="button" data-button-type="SECONDARY" data-variant="full" data-onclick="window.AIAnalysisManager?.validateGeminiKey()" id="validateGeminiBtn">
-                                                                        <span id="validateGeminiBtnText">בדוק Gemini Key</span>
-                                                                        <span id="validateGeminiBtnSpinner" style="display: none;">⏳ בודק...</span>
-                                                                    </button>
-                                                                    <button type="button" data-button-type="SECONDARY" data-variant="full" data-onclick="window.AIAnalysisManager?.validatePerplexityKey()" id="validatePerplexityBtn">
-                                                                        <span id="validatePerplexityBtnText">בדוק Perplexity Key</span>
-                                                                        <span id="validatePerplexityBtnSpinner" style="display: none;">⏳ בודק...</span>
+                                                                        <span id="saveAiAnalysisBtnSpinner" class="btn-spinner d-none">⏳ שומר...</span>
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -629,10 +531,18 @@
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
+    <!-- [79] Load Order: 79 -->
+    <script src="scripts/auth.js?v=2.2"></script> <!-- Authentication system (required for user-profile) -->
+    <!-- [80] Load Order: 80 -->
+    <script src="scripts/user-profile.js?v=1.0.0"></script> <!-- User profile page manager -->
+    <!-- [81] Load Order: 81 -->
+    <script src="scripts/user-profile-ai-analysis.js?v=1.0.0"></script> <!-- AI Analysis settings manager for user profile -->
+
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 78 | Unique Scripts Loaded: 78 -->
+    <!-- 📊 Total Scripts Processed: 81 | Unique Scripts Loaded: 81 -->
+    <!-- ✅ Page-specific scripts: user-profile.js, user-profile-ai-analysis.js -->
     <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
 </body>
 </html>

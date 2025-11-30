@@ -79,6 +79,9 @@
 - `containerId` (string, optional) - מזהה קונטיינר (ברירת מחדל: `'tagWidgetContainer'`)
 - `config` (object, optional) - תצורת אתחול
   - `config.defaultTab` (string) - טאב פעיל ברירת מחדל (`'cloud'` או `'search'`)
+  - `config.minRows` (number, optional) - מספר שורות מינימלי להצגה (ברירת מחדל: `1`)
+  - `config.maxRows` (number, optional) - מספר שורות מקסימלי במצב סגור (ברירת מחדל: `3`)
+  - `config.rowHeight` (number, optional) - גובה כל שורה בפיקסלים (ברירת מחדל: `20`)
 
 **Example:**
 ```javascript
@@ -88,6 +91,13 @@ window.TagWidget.init();
 // אתחול עם טאב חיפוש פעיל
 window.TagWidget.init('tagWidgetContainer', {
   defaultTab: 'search'
+});
+
+// אתחול עם הגדרת גובה מותאמת (מינימום 2 שורות, מקסימום 5 שורות)
+window.TagWidget.init('tagWidgetContainer', {
+  minRows: 2,
+  maxRows: 5,
+  rowHeight: 20
 });
 ```
 
@@ -134,6 +144,42 @@ await window.TagWidget.refreshTagCloud({ force: true });
 ```javascript
 window.TagWidget.destroy();
 ```
+
+---
+
+## 🔍 Autocomplete Integration
+
+הווידג'ט משתמש ב-**AutocompleteService** לשיפור חוויית המשתמש בטאב החיפוש.
+
+### מה זה Autocomplete?
+
+כאשר המשתמש מקליד בטאב החיפוש, מופיע overlay עם הצעות תגיות לפי:
+- שימוש נפוץ (usage_count)
+- קטגוריה (אם יש)
+- סינון לפי ישות (entity filter)
+
+### התכונות
+
+- ✅ **Suggestions**: הצגת תגיות מוצעות גם ב-input ריק (minChars: 0)
+- ✅ **Keyboard Navigation**: Arrow keys, Enter, ESC
+- ✅ **Click Outside**: סגירה אוטומטית
+- ✅ **Entity Filter Integration**: ריענון אוטומטי של suggestions כשמשנים entity filter
+- ✅ **RTL Support**: תמיכה מלאה ב-RTL
+
+### איך זה עובד?
+
+האינטגרציה מתבצעת אוטומטית ב-`initAutocomplete()` שנקראת מ-`TagWidget.init()`:
+
+1. **אתחול**: `AutocompleteService.init()` על `#tagWidgetSearchInput`
+2. **Fetch**: קריאה ל-`TagService.getSuggestions()` עם entity filter
+3. **Display**: הצגת suggestions עם שם + usage count + קטגוריה
+4. **Selection**: בחירת suggestion ממלאת את ה-input ומבצעת חיפוש
+
+### Customization
+
+אם אתה רוצה לשנות את התנהגות ה-autocomplete, תוכל לערוך את `initAutocomplete()` ב-`tag-widget.js`.
+
+**תיעוד מלא:** ראה [AUTOCOMPLETE_SERVICE_GUIDE.md](AUTOCOMPLETE_SERVICE_GUIDE.md)
 
 ---
 
@@ -274,14 +320,30 @@ button[data-tier="4"] {
 
 ### גובה ענן תגיות
 
+הגובה של ענן התגיות נשלט דרך קונפיגורציית הווידג'ט (`minRows` ו-`maxRows`), ומתבצע דרך CSS variables:
+
 ```css
+/* הגובה מוגדר דרך CSS variables שמוגדרות בעת האתחול */
 #tagWidgetCloudContainer {
-  max-height: 60px; /* 3 שורות במצב סגור */
+  min-height: var(--tag-widget-min-height, 20px); /* ברירת מחדל: שורה אחת */
+  max-height: var(--tag-widget-max-height, 60px); /* ברירת מחדל: 3 שורות */
 }
 
-#tagWidgetCloudContainer:hover {
-  max-height: 1000px; /* הרחבה על hover */
+/* הרחבה על hover - כל התגיות */
+#tagWidgetContainer:hover #tagWidgetCloudContainer {
+  max-height: none; /* ללא הגבלה */
+  position: absolute; /* overlay מעל */
 }
+```
+
+**שימוש בקונפיגורציה:**
+```javascript
+// הגדרת גובה מותאמת לכל אינסטנס
+window.TagWidget.init('tagWidgetContainer', {
+  minRows: 1,    // מינימום שורה אחת
+  maxRows: 3,    // מקסימום 3 שורות במצב סגור
+  rowHeight: 20  // גובה כל שורה בפיקסלים
+});
 ```
 
 ---

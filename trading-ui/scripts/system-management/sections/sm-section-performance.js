@@ -62,13 +62,13 @@ class SMPerformanceSection extends SMBaseSection {
    */
   async fetchSystemOverview() {
     try {
-      const response = await fetch(this.apiEndpoints.overview, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.overview, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         }
-      });
+      }, 10000);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -88,13 +88,13 @@ class SMPerformanceSection extends SMBaseSection {
    */
   async fetchSystemMetrics() {
     try {
-      const response = await fetch(this.apiEndpoints.metrics, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.metrics, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         }
-      });
+      }, 10000);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -114,13 +114,13 @@ class SMPerformanceSection extends SMBaseSection {
    */
   async fetchSystemPerformance() {
     try {
-      const response = await fetch(this.apiEndpoints.performance, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.performance, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         }
-      });
+      }, 10000);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -139,13 +139,24 @@ class SMPerformanceSection extends SMBaseSection {
    * הצגת נתוני ביצועים
    */
   render(data) {
-    if (!data || (!data.overview && !data.metrics && !data.performance)) {
+    // Provide fallback data if no data available
+    const fallbackData = {
+      overview: null,
+      metrics: null,
+      performance: null,
+      timestamp: new Date().toISOString()
+    };
+
+    const renderData = data || fallbackData;
+
+    // If no data at all, show empty state
+    if (!renderData.overview && !renderData.metrics && !renderData.performance) {
       this.showEmptyState('אין נתוני ביצועים זמינים');
       return;
     }
 
     try {
-      const performanceHtml = this.createPerformanceHTML(data);
+      const performanceHtml = this.createPerformanceHTML(renderData);
       this.container.innerHTML = performanceHtml;
       
       console.log('✅ Performance section rendered successfully');
@@ -300,6 +311,9 @@ class SMPerformanceSection extends SMBaseSection {
   createResponseTimeCard(overview, metrics, performance) {
     const responseTime = this.getResponseTime(overview, metrics, performance);
     const responseTrend = this.getResponseTrend(overview, metrics, performance);
+    
+    // Ensure responseTime is a number
+    const responseTimeNum = typeof responseTime === 'number' ? responseTime : parseFloat(responseTime) || 0;
 
     return `
       <div class="card response-time-card">
@@ -307,8 +321,8 @@ class SMPerformanceSection extends SMBaseSection {
           <h5><i class="fas fa-tachometer-alt"></i> זמן תגובה</h5>
           
           <div class="response-metric">
-            <div class="metric-value text-${this.getResponseTimeColor(responseTime)}">
-              ${responseTime.toFixed(0)}ms
+            <div class="metric-value text-${this.getResponseTimeColor(responseTimeNum)}">
+              ${responseTimeNum.toFixed(0)}ms
             </div>
             <div class="metric-label">זמן תגובה ממוצע</div>
           </div>
@@ -346,7 +360,7 @@ class SMPerformanceSection extends SMBaseSection {
           
           <div class="db-metric">
             <div class="metric-value text-${this.getDatabasePerformanceColor(dbPerformance)}">
-              ${dbPerformance.toFixed(0)}ms
+              ${(typeof dbPerformance === 'number' ? dbPerformance : parseFloat(dbPerformance) || 0).toFixed(0)}ms
             </div>
             <div class="metric-label">זמן שאילתה ממוצע</div>
           </div>
@@ -480,7 +494,7 @@ class SMPerformanceSection extends SMBaseSection {
                 <tbody>
                   <tr>
                     <td><strong>זמן תגובה ממוצע:</strong></td>
-                    <td>${this.getResponseTime(overview, metrics, performance).toFixed(0)}ms</td>
+                    <td>${(this.getResponseTime(overview, metrics, performance) || 0).toFixed(0)}ms</td>
                   </tr>
                   <tr>
                     <td><strong>בקשות/דקה:</strong></td>
@@ -650,19 +664,19 @@ class SMPerformanceSection extends SMBaseSection {
    * קבלת זמן תגובה
    */
   getResponseTime(overview, metrics, performance) {
+    let responseTime = 0;
+    
     if (performance && performance.response_time) {
-      return performance.response_time;
+      responseTime = performance.response_time;
+    } else if (metrics && metrics.avg_response_time) {
+      responseTime = metrics.avg_response_time;
+    } else if (overview && overview.response_time_ms) {
+      responseTime = overview.response_time_ms;
     }
     
-    if (metrics && metrics.avg_response_time) {
-      return metrics.avg_response_time;
-    }
-    
-    if (overview && overview.response_time_ms) {
-      return overview.response_time_ms;
-    }
-    
-    return 0;
+    // Ensure we return a number
+    const num = typeof responseTime === 'number' ? responseTime : parseFloat(responseTime);
+    return isNaN(num) ? 0 : num;
   }
 
   /**

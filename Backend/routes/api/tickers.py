@@ -650,15 +650,8 @@ def delete_ticker(ticker_id: int):
                 "version": "1.0"
             }), 400
         
-        try:
-            TagService.remove_all_tags_for_entity(db, 'ticker', ticker_id)
-        except ValueError as tag_error:
-            logger.warning(
-                "Failed to remove tags for ticker %s before deletion: %s",
-                ticker_id,
-                tag_error,
-            )
-
+        # Tag cleanup is handled automatically by SQLAlchemy event listeners
+        
         # Delete ticker
         success = TickerService.delete(db, ticker_id)
         if success:

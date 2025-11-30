@@ -353,6 +353,19 @@ class EntityDetailsAPI {
                 
             } catch (error) {
                 lastError = error;
+                
+                // Check for 404 first - don't log or retry on entity not found
+                const isNotFound = error?.message?.includes('לא נמצא') || 
+                                   error?.message?.includes('not found') ||
+                                   error?.message?.includes('404');
+                
+                if (isNotFound) {
+                    // For 404 errors, only log at debug level to reduce noise
+                    window.Logger.debug(`Entity ${entityType} ${entityId} not found (404), skipping retries`, { page: "entity-details-api" });
+                    throw error; // Don't retry, throw immediately
+                }
+                
+                // For other errors, log warning and retry
                 window.Logger.warn(`Attempt ${attempt} failed for ${entityType} ${entityId}:`, error.message, { page: "entity-details-api" });
                 
                 // המתנה לפני ניסיון נוסף (אלא אם זה הניסיון האחרון)
@@ -440,12 +453,38 @@ class EntityDetailsAPI {
 
             return entityData;
         } catch (error) {
+            // Check if it's a 404 error before trying fallback
+            const isNotFound = error?.message?.includes('לא נמצא') || 
+                               error?.message?.includes('not found') ||
+                               error?.message?.includes('404');
+            
+            if (isNotFound && options.skipRetryOn404) {
+                // If skipRetryOn404 is set and it's a 404, don't try fallback endpoints
+                window.Logger.debug(`Entity ${entityType} ${entityId} not found (404), skipping fallback endpoints`, { page: "entity-details-api" });
+                throw error;
+            }
+            
             // אם נכשל, נסה את ה-endpoints הישנים כגיבוי
-            window.Logger.warn(`New endpoint failed for ${entityType} ${entityId}, trying old endpoint:`, error.message, { page: "entity-details-api" });
+            if (!isNotFound) {
+                window.Logger.warn(`New endpoint failed for ${entityType} ${entityId}, trying old endpoint:`, error.message, { page: "entity-details-api" });
+            } else {
+                window.Logger.debug(`New endpoint returned 404 for ${entityType} ${entityId}, trying old endpoint`, { page: "entity-details-api" });
+            }
+            
             try {
                 return await this.fetchFromExistingEndpoints(entityType, entityId);
             } catch (fallbackError) {
-                window.Logger.error(`Failed to fetch ${entityType} ${entityId} from both endpoints:`, fallbackError.message, { page: "entity-details-api" });
+                const fallbackIsNotFound = fallbackError?.message?.includes('לא נמצא') || 
+                                           fallbackError?.message?.includes('not found') ||
+                                           fallbackError?.message?.includes('404');
+                
+                if (fallbackIsNotFound) {
+                    // For 404 errors, only log at debug level
+                    window.Logger.debug(`Entity ${entityType} ${entityId} not found (404) in both endpoints`, { page: "entity-details-api" });
+                } else {
+                    // For other errors, log as error
+                    window.Logger.error(`Failed to fetch ${entityType} ${entityId} from both endpoints:`, fallbackError.message, { page: "entity-details-api" });
+                }
                 throw fallbackError;
             }
         }

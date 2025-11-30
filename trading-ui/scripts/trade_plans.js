@@ -1747,6 +1747,20 @@ async function loadTradePlansData() {
   }
 }
 
+// Expose page-specific loadTradePlansData function to window
+// This version updates the table, unlike trade-plan-service.js version
+window.loadTradePlansDataPage = loadTradePlansData;
+
+// Override window.loadTradePlansData to use page-specific version
+// This ensures the table gets updated when data is loaded
+if (typeof window.loadTradePlansDataPage === 'function') {
+  const serviceLoadFunction = window.loadTradePlansData;
+  window.loadTradePlansData = async function(options = {}) {
+    // Use page-specific version that updates the table
+    return await window.loadTradePlansDataPage();
+  };
+}
+
 // REMOVED: updateDesignsTable - alias not used
 /**
  * עדכון טבלת עיצובים (alias ל-updateTradePlansTable)

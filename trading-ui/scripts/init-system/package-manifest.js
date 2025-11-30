@@ -306,10 +306,17 @@ const PACKAGE_MANIFEST = {
         loadOrder: 3
       },
       {
+        file: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+        globalCheck: 'window.jspdf',
+        description: 'jsPDF library (for AI analysis PDF export)',
+        required: true, // Required for ai-analysis-data.js exportToPDF function
+        loadOrder: 3.5
+      },
+      {
         file: 'services/ai-analysis-data.js',
         globalCheck: 'window.AIAnalysisData',
         description: 'AI Analysis data service',
-        required: false,
+        required: true,
         loadOrder: 4
       },
       {
@@ -374,6 +381,13 @@ const PACKAGE_MANIFEST = {
         description: 'Central tag service (tag management and retrieval)',
         required: true,
         loadOrder: 8
+      },
+      {
+        file: 'services/autocomplete-service.js',
+        globalCheck: 'window.AutocompleteService',
+        description: 'General autocomplete service for reusable suggestions dropdown',
+        required: false,
+        loadOrder: 8.1
       },
       {
         file: 'services/table-sort-value-adapter.js',
@@ -1130,18 +1144,18 @@ const PACKAGE_MANIFEST = {
         loadOrder: 4
       },
       {
+        file: 'services/trade-plans-data.js',
+        globalCheck: 'window.TradePlansData',
+        description: 'Trade plans data service',
+        required: true,  // Required for trade-plan-service.js
+        loadOrder: 4.5  // Load BEFORE trade-plan-service.js
+      },
+      {
         file: 'trade-plan-service.js',
         globalCheck: 'window.getTradePlans',
         description: 'Trade plan service',
         required: true,
-        loadOrder: 5
-      },
-      {
-        file: 'services/trade-plans-data.js',
-        globalCheck: 'window.TradePlansData',
-        description: 'Trade plans data service',
-        required: false,
-        loadOrder: 6
+        loadOrder: 5  // Load AFTER trade-plans-data.js
       },
       {
         file: 'services/notes-data.js',
@@ -1318,6 +1332,12 @@ const PACKAGE_MANIFEST = {
         required: true
       },
       {
+        file: 'system-management/core/sm-data-validators.js',
+        globalCheck: 'window.SMDataValidators',
+        description: 'System management data validators',
+        required: true
+      },
+      {
         file: 'system-management/core/sm-ui-components.js',
         globalCheck: 'window.SMUIComponents',
         description: 'System management UI components',
@@ -1375,6 +1395,12 @@ const PACKAGE_MANIFEST = {
         file: 'system-management/sections/sm-section-server.js',
         globalCheck: 'window.SMSectionServer',
         description: 'Server section',
+        required: true
+      },
+      {
+        file: 'system-management/sections/sm-section-system-settings.js',
+        globalCheck: 'window.SMSystemSettingsSection',
+        description: 'System settings section',
         required: true
       }
     ],
@@ -1656,6 +1682,13 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base', 'services', 'ui-advanced', 'modules', 'preferences', 'entity-services'],
     scripts: [
       {
+        file: 'https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js',
+        globalCheck: 'marked',
+        description: 'Markdown parser library (for AI result rendering)',
+        required: true,
+        loadOrder: 0.5
+      },
+      {
         file: 'ai-analysis-manager.js',
         globalCheck: 'window.AIAnalysisManager',
         description: 'AI Analysis UI manager',
@@ -1775,7 +1808,7 @@ const PACKAGE_MANIFEST = {
     version: '1.0.0',
     critical: false,
     loadOrder: 19.5,
-    dependencies: ['base', 'services', 'ui-advanced', 'entity-services'],
+    dependencies: ['base', 'services', 'ui-advanced', 'entity-services', 'modules', 'entity-details'],
     scripts: [
       {
         file: 'services/dashboard-data.js',
@@ -1785,11 +1818,18 @@ const PACKAGE_MANIFEST = {
         loadOrder: 0
       },
       {
-        file: 'widgets/recent-trades-widget.js',
-        globalCheck: 'window.RecentTradesWidget',
-        description: 'Recent trades widget',
+        file: 'widgets/recent-items-widget.js',
+        globalCheck: 'window.RecentItemsWidget',
+        description: 'Unified recent trades and trade plans widget',
         required: true,
         loadOrder: 1
+      },
+      {
+        file: 'widgets/recent-trades-widget.js',
+        globalCheck: 'window.RecentTradesWidget',
+        description: 'Recent trades widget (deprecated - use RecentItemsWidget)',
+        required: false,
+        loadOrder: 1.5
       },
       {
         file: 'pending-executions-widget.js',
@@ -1811,6 +1851,13 @@ const PACKAGE_MANIFEST = {
         description: 'Trade plan assignment widget',
         required: true,
         loadOrder: 4
+      },
+      {
+        file: 'widgets/unified-pending-actions-widget.js',
+        globalCheck: 'window.UnifiedPendingActionsWidget',
+        description: 'Unified widget for pending assignments and creations',
+        required: true,
+        loadOrder: 4.5
       },
       {
         file: 'widgets/tag-widget.js',

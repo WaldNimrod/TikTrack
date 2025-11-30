@@ -537,8 +537,19 @@
                 monthDisplay.textContent = window.CalendarDateUtils.formatMonthDisplay(currentYear, currentMonth);
             }
             
+            // Show loading state
+            const calendarContainer = document.getElementById('calendar-container') || document.querySelector('.calendar-container');
+            if (calendarContainer && typeof window.showLoadingState === 'function') {
+                window.showLoadingState(calendarContainer.id || 'calendar-container');
+            }
+            
             // Load and render initial calendar with data
             await loadAndRenderCalendar();
+            
+            // Hide loading state
+            if (calendarContainer && typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState(calendarContainer.id || 'calendar-container');
+            }
             
             // Apply dynamic colors
             applyDynamicColors();
@@ -567,15 +578,43 @@
      * Uses CalendarDataLoader and CalendarRenderer
      */
     async function loadAndRenderCalendar() {
-        // Load data using CalendarDataLoader
-        const dayData = await window.CalendarDataLoader.loadMonthDataWithCache(
-            currentYear, 
-            currentMonth, 
-            { entityFilter: window.currentEntityFilter || 'all' }
-        );
+        // Show loading state
+        const calendarContainer = document.getElementById('calendar-container') || document.querySelector('.calendar-container') || document.querySelector('.calendar-grid');
+        const containerId = calendarContainer ? (calendarContainer.id || 'calendar-container') : 'calendar-container';
+        if (calendarContainer && typeof window.showLoadingState === 'function') {
+            window.showLoadingState(containerId);
+        }
+        
+        try {
+            // Load data using CalendarDataLoader
+            const dayData = await window.CalendarDataLoader.loadMonthDataWithCache(
+                currentYear, 
+                currentMonth, 
+                { entityFilter: window.currentEntityFilter || 'all' }
+            );
 
-        // Render using CalendarRenderer
-        await window.CalendarRenderer.render(currentYear, currentMonth, dayData);
+            // Render using CalendarRenderer
+            await window.CalendarRenderer.render(currentYear, currentMonth, dayData);
+            
+            // Hide loading state
+            if (calendarContainer && typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState(containerId);
+            }
+        } catch (error) {
+            // Hide loading state on error
+            if (calendarContainer && typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState(containerId);
+            }
+            
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת יומן מסחר', 
+                    `לא ניתן לטעון את היומן. ${errorMsg}`);
+            } else if (window.Logger) {
+                window.Logger.error('Error loading calendar', { page: PAGE_NAME, error });
+            }
+            throw error;
+        }
     }
 
     /**

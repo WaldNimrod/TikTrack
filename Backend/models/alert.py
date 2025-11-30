@@ -1,8 +1,11 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, event
 from sqlalchemy.orm import relationship
 from .base import BaseModel
 from typing import Dict, Any, Optional
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Alert(BaseModel):
     __tablename__ = "alerts"
@@ -160,3 +163,27 @@ class Alert(BaseModel):
             return formatted.rstrip('0').rstrip('.')
         except (ValueError, TypeError):
             return str(value)
+
+
+# ========================================
+# SQLAlchemy Event Listeners for Tag Links Cleanup
+# ========================================
+
+@event.listens_for(Alert, 'after_delete')
+def alert_deleted(mapper, connection, target):
+    """
+    Event listener for when an alert is deleted.
+    Automatically removes all associated tag links.
+    """
+    try:
+        from services.tag_service import TagService
+        from sqlalchemy.orm import Session
+        
+        session = Session(bind=connection)
+        TagService.remove_all_tags_for_entity(
+            session, 'alert', target.id
+        )
+        session.close()
+    except Exception as e:
+        logger.error(f"Error cleaning up tags for alert {target.id}: {e}")
+        # Don't raise - allow deletion to proceed even if tag cleanup fails

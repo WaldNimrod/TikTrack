@@ -15,8 +15,7 @@ class SMDatabaseSection extends SMBaseSection {
     super(sectionId, config);
     this.apiEndpoints = {
       overview: '/api/system/overview',
-      status: '/api/database/status',
-      info: '/api/database/info'
+      database: '/api/system/database' // Use system database endpoint
     };
   }
 
@@ -30,17 +29,15 @@ class SMDatabaseSection extends SMBaseSection {
       console.log(`🗄️ Loading database data from multiple endpoints`);
 
       // Load data from multiple endpoints in parallel
-      const [overviewData, statusData, infoData] = await Promise.allSettled([
+      const [overviewData, databaseData] = await Promise.allSettled([
         this.fetchSystemOverview(),
-        this.fetchDatabaseStatus(),
         this.fetchDatabaseInfo()
       ]);
 
       // Combine data from all sources
       const combinedData = {
         overview: overviewData.status === 'fulfilled' ? overviewData.value : null,
-        status: statusData.status === 'fulfilled' ? statusData.value : null,
-        info: infoData.status === 'fulfilled' ? infoData.value : null,
+        database: databaseData.status === 'fulfilled' ? databaseData.value : null,
         timestamp: new Date().toISOString()
       };
 
@@ -82,31 +79,7 @@ class SMDatabaseSection extends SMBaseSection {
     }
   }
 
-  /**
-   * Fetch database status
-   * קבלת סטטוס בסיס נתונים
-   */
-  async fetchDatabaseStatus() {
-    try {
-      const response = await fetch(this.apiEndpoints.status, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      return result.status === 'success' ? result.data : null;
-    } catch (error) {
-      console.warn('⚠️ Failed to fetch database status:', error);
-      return null;
-    }
-  }
+  // Removed fetchDatabaseStatus - endpoint doesn't exist, using database endpoint instead
 
   /**
    * Fetch database info
@@ -114,7 +87,7 @@ class SMDatabaseSection extends SMBaseSection {
    */
   async fetchDatabaseInfo() {
     try {
-      const response = await fetch(this.apiEndpoints.info, {
+      const response = await fetch(this.apiEndpoints.database, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +112,7 @@ class SMDatabaseSection extends SMBaseSection {
    * הצגת נתוני בסיס נתונים
    */
   render(data) {
-    if (!data || (!data.overview && !data.status && !data.info)) {
+    if (!data || (!data.overview && !data.database)) {
       this.showEmptyState('אין נתוני בסיס נתונים זמינים');
       return;
     }

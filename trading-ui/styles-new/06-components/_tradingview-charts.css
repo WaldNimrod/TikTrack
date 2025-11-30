@@ -189,6 +189,9 @@
 .tradingview-chart-container {
     display: block;
     width: 100%;
+    height: 50vh; /* ברירת מחדל: חצי גובה מסך */
+    min-height: 300px; /* מינימום למניעת גרפים קטנים מדי */
+    max-height: 80vh; /* מקסימום למניעת גרפים גדולים מדי */
     box-sizing: border-box;
     position: relative;
     min-width: 0;
@@ -285,7 +288,9 @@
 /* Price Chart Wrapper */
 #price-chart-wrapper {
     position: relative;
-    height: 450px;
+    height: 50vh; /* ברירת מחדל: חצי גובה מסך */
+    min-height: 300px; /* מינימום למניעת גרפים קטנים מדי */
+    max-height: 80vh; /* מקסימום למניעת גרפים גדולים מדי */
     width: 100%;
     min-width: 0;
     background: var(--chart-background-color, var(--apple-bg-primary));
@@ -299,7 +304,9 @@
 /* Volume Chart Wrapper */
 #volume-chart-wrapper {
     position: relative;
-    height: 150px;
+    height: 20vh; /* גרף נפח: 20% גובה מסך */
+    min-height: 150px; /* מינימום למניעת גרפים קטנים מדי */
+    max-height: 30vh; /* מקסימום למניעת גרפים גדולים מדי */
     width: 100%;
     min-width: 0;
     background: var(--chart-background-color, var(--apple-bg-primary));
@@ -330,6 +337,9 @@
 
 .chart-container-wrapper {
     width: 100%;
+    height: 50vh; /* ברירת מחדל: חצי גובה מסך */
+    min-height: 300px; /* מינימום למניעת גרפים קטנים מדי */
+    max-height: 80vh; /* מקסימום למניעת גרפים גדולים מדי */
     min-width: 0;
     box-sizing: border-box;
     display: block;
@@ -470,7 +480,9 @@
 .chart-container-base {
     display: block;
     width: 100%;
-    height: 400px;
+    height: 50vh; /* ברירת מחדל: חצי גובה מסך */
+    min-height: 300px; /* מינימום למניעת גרפים קטנים מדי */
+    max-height: 80vh; /* מקסימום למניעת גרפים גדולים מדי */
     min-width: 0;
     box-sizing: border-box;
     position: relative;
@@ -481,7 +493,9 @@
 .chart-container-large {
     display: block;
     width: 100%;
-    height: 780px;
+    height: 60vh; /* גרפים גדולים: 60% גובה מסך */
+    min-height: 400px; /* מינימום גדול יותר לגרפים גדולים */
+    max-height: 80vh; /* מקסימום למניעת גרפים גדולים מדי */
     min-width: 0;
     box-sizing: border-box;
     position: relative;
@@ -494,7 +508,9 @@
 .chart-container-third {
     display: block;
     width: 100%;
-    height: 33.33%;
+    height: 50vh; /* ברירת מחדל: חצי גובה מסך (עבור portfolio-state) */
+    min-height: 200px; /* מינימום קטן יותר לגרפים קטנים */
+    max-height: 80vh; /* מקסימום למניעת גרפים גדולים מדי */
     min-width: 0;
     box-sizing: border-box;
     position: relative;
@@ -505,7 +521,9 @@
 .chart-container-third-border {
     display: block;
     width: 100%;
-    height: 33.33%;
+    height: 50vh; /* ברירת מחדל: חצי גובה מסך (עבור portfolio-state) */
+    min-height: 200px; /* מינימום קטן יותר לגרפים קטנים */
+    max-height: 80vh; /* מקסימום למניעת גרפים גדולים מדי */
     min-width: 0;
     box-sizing: border-box;
     position: relative;
@@ -517,16 +535,29 @@
 /* ===== Responsive Behavior ===== */
 
 @media (max-width: 768px) {
-    #price-chart-wrapper {
-        height: 300px;
-    }
-    
-    #volume-chart-wrapper {
-        height: 100px;
+    /* במסכים קטנים: 40vh במקום 50vh */
+    .tradingview-chart-container,
+    .chart-container-wrapper,
+    .chart-container-base,
+    .chart-container-third,
+    .chart-container-third-border {
+        height: 40vh;
+        min-height: 250px; /* מינימום קטן יותר במסכים קטנים */
     }
     
     .chart-container-large {
-        height: 500px;
+        height: 50vh; /* גרפים גדולים: 50vh במסכים קטנים */
+        min-height: 300px;
+    }
+    
+    #price-chart-wrapper {
+        height: 40vh;
+        min-height: 250px;
+    }
+    
+    #volume-chart-wrapper {
+        height: 15vh; /* גרף נפח: 15vh במסכים קטנים */
+        min-height: 120px;
     }
 }
 

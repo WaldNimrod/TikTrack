@@ -23,8 +23,9 @@
 
 | שם ווידג'ט | קובץ(ים) עיקריים | דוקומנטציה | סטטוס | הערות |
 |------------|-------------------|-------------|-------|-------|
-| **Recent Trades Widget** | `trading-ui/scripts/widgets/recent-trades-widget.js` | - | ✅ פעיל | מציג את 5 הטריידים האחרונים |
-| **Recent Trade Plans Widget** | `trading-ui/scripts/widgets/recent-trade-plans-widget.js` | - | ✅ פעיל | מציג את 5 התוכניות האחרונות |
+| **Recent Items Widget (מאוחד)** | `trading-ui/scripts/widgets/recent-items-widget.js`<br>`trading-ui/styles-new/06-components/_recent-items-widget.css` | - | ✅ פעיל | ווידג'ט מאוחד: טריידים אחרונים + תוכניות אחרונות עם Bootstrap Tabs |
+| **Recent Trades Widget** | `trading-ui/scripts/widgets/recent-trades-widget.js` | - | ⚠️ Deprecated | הוחלף ב-Recent Items Widget |
+| **Recent Trade Plans Widget** | `trading-ui/scripts/widgets/recent-trade-plans-widget.js` | - | ⚠️ Deprecated | הוחלף ב-Recent Items Widget |
 | **Pending Executions Highlights Widget** | `trading-ui/scripts/pending-executions-widget.js` | - | ✅ פעיל | המלצות שיוך בולטות לביצועים |
 | **Pending Execution Trade Creation Widget** | `trading-ui/scripts/pending-execution-trade-creation.js` | - | ✅ פעיל | ממשק יצירת טרייד מביצועים |
 | **Pending Trade Plan Widget** | `trading-ui/scripts/pending-trade-plan-widget.js` | [PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md) | ✅ פעיל | ווידג'ט שיוך/יצירת תוכניות מתוך טריידים |

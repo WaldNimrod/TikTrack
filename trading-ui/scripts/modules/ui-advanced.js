@@ -519,10 +519,15 @@ function getStatusBorderColor(status) {
  * @param {string} entityType - סוג הישות
  * @returns {string} קוד הצבע
  */
+// Save reference to centralized function before defining local function
+const _originalGetEntityBackgroundColor = typeof window.getEntityBackgroundColor === 'function' 
+  ? window.getEntityBackgroundColor 
+  : null;
+
 function getEntityBackgroundColor(entityType) {
-  // Use centralized Color Scheme System if available
-  if (typeof window.getEntityBackgroundColor === 'function') {
-    return window.getEntityBackgroundColor(entityType);
+  // Use centralized Color Scheme System if available (use saved reference to avoid recursion)
+  if (_originalGetEntityBackgroundColor) {
+    return _originalGetEntityBackgroundColor(entityType);
   }
   // Fallback to local implementation (should not happen in production)
   if (!entityType) {
@@ -539,10 +544,15 @@ function getEntityBackgroundColor(entityType) {
  * @param {string} entityType - סוג הישות
  * @returns {string} קוד הצבע
  */
+// Save reference to centralized function before defining local function
+const _originalGetEntityTextColor = typeof window.getEntityTextColor === 'function' 
+  ? window.getEntityTextColor 
+  : null;
+
 function getEntityTextColor(entityType) {
-  // Use centralized Color Scheme System if available
-  if (typeof window.getEntityTextColor === 'function') {
-    return window.getEntityTextColor(entityType);
+  // Use centralized Color Scheme System if available (use saved reference to avoid recursion)
+  if (_originalGetEntityTextColor) {
+    return _originalGetEntityTextColor(entityType);
   }
   // Fallback to local implementation (should not happen in production)
   if (!entityType) {

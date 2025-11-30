@@ -14,6 +14,8 @@ class SMDashboardSection extends SMBaseSection {
   constructor(sectionId, config) {
     super(sectionId, config);
     this.apiEndpoint = '/api/system/overview';
+    // Dashboard is now part of top section, so we use a different container
+    this.dashboardContainerId = 'sm-dashboard-content';
   }
 
   /**
@@ -25,26 +27,77 @@ class SMDashboardSection extends SMBaseSection {
       this.isLoading = true;
       console.log(`📊 Loading dashboard data from ${this.apiEndpoint}`);
 
-      const response = await fetch(this.apiEndpoint, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+      // Load both overview and environment data in parallel
+      const [overviewResponse, envResponse] = await Promise.allSettled([
+        fetch(this.apiEndpoint, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }),
+        fetch('/api/system/environment', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        })
+      ]);
+
+      // Process overview data
+      let overviewData = null;
+      if (overviewResponse.status === 'fulfilled' && overviewResponse.value.ok) {
+        const result = await overviewResponse.value.json();
+        if (result.status === 'success') {
+          overviewData = result.data;
         }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result = await response.json();
-      
-      if (result.status !== 'success') {
-        throw new Error(result.message || 'Failed to load system overview');
+      // Process environment data
+      let envData = null;
+      if (envResponse.status === 'fulfilled' && envResponse.value.ok) {
+        const result = await envResponse.value.json();
+        if (result.status === 'success') {
+          envData = result.data;
+        }
       }
 
-      this.lastData = result.data;
-      this.render(result.data);
+      // Validate and normalize data
+      let validatedOverview = null;
+      if (overviewData) {
+        const validation = window.SMDataValidators?.validateSystemOverview(overviewData);
+        if (validation && validation.valid) {
+          validatedOverview = validation.data;
+        } else {
+          console.warn('⚠️ System overview validation failed:', validation?.error);
+          validatedOverview = overviewData; // Use original data if validation fails
+        }
+      }
+
+      let validatedEnv = null;
+      if (envData) {
+        const validation = window.SMDataValidators?.validateEnvironmentData(envData);
+        if (validation && validation.valid) {
+          validatedEnv = validation.data;
+        } else {
+          console.warn('⚠️ Environment data validation failed:', validation?.error);
+          validatedEnv = envData; // Use original data if validation fails
+        }
+      }
+
+      // Merge data
+      const mergedData = {
+        ...validatedOverview,
+        environment: validatedEnv
+      };
+
+      if (!mergedData || (!validatedOverview && !validatedEnv)) {
+        throw new Error('Failed to load system data');
+      }
+
+      this.lastData = mergedData;
+      this.render(mergedData);
       this.retryCount = 0; // Reset retry count on success
 
     } catch (error) {
@@ -132,6 +185,63 @@ class SMDashboardSection extends SMBaseSection {
           </div>
         </div>
 
+        <!-- Environment Info -->
+        ${data.environment ? `
+        <div class="row mb-4">
+          <div class="col-md-4">
+            ${SMUIComponents.createMetricCard(
+              'סביבה',
+              data.environment.environment === 'production' ? 'ייצור' : 'פיתוח',
+              '',
+              data.environment.environment === 'production' ? 'danger' : 'info',
+              'fa-code-branch'
+            )}
+          </div>
+          <div class="col-md-4">
+            ${SMUIComponents.createMetricCard(
+              'פורט שרת',
+              data.environment.port || 'N/A',
+              '',
+              null,
+              'fa-network-wired'
+            )}
+          </div>
+          <div class="col-md-4">
+            ${SMUIComponents.createMetricCard(
+              'בסיס נתונים',
+              data.environment.database?.name || 'N/A',
+              '',
+              null,
+              'fa-database'
+            )}
+          </div>
+        </div>
+        ` : ''}
+
+        <!-- Quick Links -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h6 class="mb-0">קישורים מהירים</h6>
+              </div>
+              <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                  <a href="/cache-management" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-layer-group me-1"></i> ניהול מטמון מלא
+                  </a>
+                  <a href="/server-monitor" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-server me-1"></i> ניטור שרת מלא
+                  </a>
+                  <a href="/external-data-dashboard" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-globe me-1"></i> דשבורד נתונים חיצוניים
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Key Metrics Grid -->
         <div class="row mb-4">
           <div class="col-md-3">
@@ -196,7 +306,7 @@ class SMDashboardSection extends SMBaseSection {
                       this.getComponentStatus(health.database),
                       this.getComponentStatusColor(health.database),
                       'fa-database',
-                      'SQLite Database'
+                      data.environment?.database?.type || 'PostgreSQL'
                     )}
                   </div>
                   <div class="col-md-3">

@@ -411,6 +411,9 @@
 
             // Save selected dates
             await saveSelectedDates();
+            
+            // Save page state
+            await savePageState();
 
             // Generate cache key from all dates
             const cacheKey = `date-comparison-results-${selectedDates.join('-')}`;
@@ -467,7 +470,11 @@
             }
 
             } catch (error) {
-            if (window.Logger && typeof window.Logger.error === 'function') {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בהשוואת תאריכים', 
+                    `לא ניתן להשוות את התאריכים. ${errorMsg}`);
+            } else if (window.Logger && typeof window.Logger.error === 'function') {
                 window.Logger.error('Error comparing dates', { 
                         page: 'date-comparison-modal', 
                         error 
@@ -850,7 +857,11 @@
         }
         
         if (typeof window.TradingViewChartAdapter === 'undefined') {
-            if (window.Logger && typeof window.Logger.error === 'function') {
+            const errorMsg = 'TradingViewChartAdapter not loaded';
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת גרפים', 
+                    'ספריית TradingView לא נטענה. נא לרענן את העמוד.');
+            } else if (window.Logger && typeof window.Logger.error === 'function') {
                 window.Logger.error('TradingViewChartAdapter not available', { 
                     page: 'date-comparison-modal', 
                     timeout: maxRetries * 50 
@@ -860,7 +871,11 @@
         }
         
         if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
-            if (window.Logger && typeof window.Logger.error === 'function') {
+            const errorMsg = 'LightweightCharts not loaded';
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת גרפים', 
+                    'ספריית LightweightCharts לא נטענה. נא לרענן את העמוד.');
+            } else if (window.Logger && typeof window.Logger.error === 'function') {
                 window.Logger.error('LightweightCharts not available', { 
                     page: 'date-comparison-modal', 
                     timeout: maxRetries * 50 
@@ -1711,6 +1726,90 @@
         }
     }
 
+    // ===== PAGE STATE MANAGEMENT =====
+
+    /**
+     * Save page state (selected dates, sections)
+     * @async
+     */
+    async function savePageState() {
+        if (!window.PageStateManager) {
+            return;
+        }
+
+        try {
+            // Get section states
+            const sections = {};
+            const sectionIds = ['date-selection-section', 'date_comparison_modal-טבלת-השוואות',
+                               'date_comparison_modal-גרף-bar-chart---השוואה-בין-ה',
+                               'date_comparison_modal-גרף-line-chart---מגמה-בין-הת'];
+            sectionIds.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const sectionBody = section.querySelector('.section-body');
+                    sections[sectionId] = sectionBody ? sectionBody.style.display === 'none' : false;
+                }
+            });
+
+            const state = {
+                selectedDates: selectedDates,
+                sections: sections
+            };
+
+            await window.PageStateManager.savePageState('date-comparison-modal', state);
+            if (window.Logger) {
+                window.Logger.debug('✅ Saved page state', { page: 'date-comparison-modal' });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to save page state', { page: 'date-comparison-modal', error });
+            }
+        }
+    }
+
+    /**
+     * Restore page state (selected dates, sections)
+     * @async
+     */
+    async function restorePageState() {
+        if (!window.PageStateManager) {
+            return;
+        }
+
+        try {
+            const savedState = await window.PageStateManager.loadPageState('date-comparison-modal');
+            if (!savedState) {
+                return;
+            }
+
+            // Restore selected dates if available
+            if (savedState.selectedDates && savedState.selectedDates.length > 0) {
+                selectedDates = savedState.selectedDates;
+            }
+
+            // Restore section states if available
+            if (savedState.sections) {
+                Object.keys(savedState.sections).forEach(sectionId => {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        const sectionBody = section.querySelector('.section-body');
+                        if (sectionBody) {
+                            sectionBody.style.display = savedState.sections[sectionId] ? 'none' : 'block';
+                        }
+                    }
+                });
+            }
+
+            if (window.Logger) {
+                window.Logger.debug('✅ Restored page state', { page: 'date-comparison-modal' });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to restore page state', { page: 'date-comparison-modal', error });
+            }
+        }
+    }
+
     // ===== INITIALIZATION =====
 
     /**
@@ -1722,6 +1821,9 @@
             // The system will auto-initialize, but we wait a bit for it to complete
             await new Promise(resolve => setTimeout(resolve, 1500));
 
+            // Restore page state
+            await restorePageState();
+            
             // Load last selected dates
             await loadLastSelectedDates();
             
@@ -1755,7 +1857,11 @@
             }
 
         } catch (error) {
-            if (window.Logger && typeof window.Logger.error === 'function') {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה באתחול מודל השוואת תאריכים', 
+                    `לא ניתן לאתחל את המודל. ${errorMsg}`);
+            } else if (window.Logger && typeof window.Logger.error === 'function') {
                 window.Logger.error('Error initializing date comparison modal', { 
                     page: 'date-comparison-modal', 
                     error 

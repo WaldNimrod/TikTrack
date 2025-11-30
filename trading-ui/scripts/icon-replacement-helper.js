@@ -45,6 +45,7 @@ async function replaceIconsInContext(context = document, options = {}) {
         'notes.svg': { type: 'entity', name: 'note' },
         'preferences.svg': { type: 'entity', name: 'preference' },
         'research.svg': { type: 'entity', name: 'research' },
+        'user.svg': { type: 'entity', name: 'user' },
         
         // Button icons (Tabler)
         'info-circle.svg': { type: 'button', name: 'info-circle' },
@@ -63,8 +64,8 @@ async function replaceIconsInContext(context = document, options = {}) {
         'trash.svg': { type: 'button', name: 'delete' }
     };
 
-    // Find all img tags with icon paths
-    const imgTags = context.querySelectorAll('img[src*="/trading-ui/images/icons/"]');
+    // Find all img tags with icon paths (both absolute and relative)
+    const imgTags = context.querySelectorAll('img[src*="/trading-ui/images/icons/"], img[src*="images/icons/"]');
     
     for (const img of imgTags) {
         // Skip if already processed

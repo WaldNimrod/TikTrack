@@ -77,13 +77,16 @@ function notifyTradePlanLoadError(message, error, context = {}) {
  */
 async function loadTradePlansData(options = {}) {
   const { force = false } = options;
-  const loader = window.TradePlansData?.loadTradePlansData;
-  if (typeof loader !== 'function') {
+  
+  // Check if TradePlansData service is available
+  if (!window.TradePlansData || typeof window.TradePlansData.loadTradePlansData !== 'function') {
     const error = new Error('TradePlansData loader unavailable');
     isDataLoaded = false;
     notifyTradePlanLoadError('שכבת הנתונים של תכניות המסחר לא זמינה', error, { stage: 'missing-loader' });
     throw error;
   }
+  
+  const loader = window.TradePlansData.loadTradePlansData;
 
   try {
     const payload = await loader({ force });

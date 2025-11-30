@@ -3,7 +3,7 @@ AI Analysis Service
 Main service for AI analysis system
 """
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import Dict, Any, List, Optional, cast
 import logging
 import json
@@ -391,7 +391,9 @@ class AIAnalysisService:
             query = query.filter(AIAnalysisRequest.status == status)
         
         total = query.count()
-        requests = query.order_by(
+        requests = query.options(
+            joinedload(AIAnalysisRequest.template)
+        ).order_by(
             AIAnalysisRequest.created_at.desc()
         ).offset(offset).limit(limit).all()
         
@@ -414,7 +416,9 @@ class AIAnalysisService:
         Returns:
             Request or None if not found or not authorized
         """
-        return db.query(AIAnalysisRequest).filter(
+        return db.query(AIAnalysisRequest).options(
+            joinedload(AIAnalysisRequest.template)
+        ).filter(
             AIAnalysisRequest.id == request_id,
             AIAnalysisRequest.user_id == user_id
         ).first()

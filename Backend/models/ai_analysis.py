@@ -62,17 +62,48 @@ class AIAnalysisRequest(BaseModel):
     user = relationship("User", foreign_keys=[user_id])
     template = relationship("AIPromptTemplate", back_populates="analysis_requests")
     
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary"""
+    def to_dict(self, include_response: bool = False) -> Dict[str, Any]:
+        """
+        Convert to dictionary
+        
+        Args:
+            include_response: If True, include response_text (for initial response only, not saved to DB)
+        """
         result = super().to_dict()
         try:
             result['variables_json'] = json.loads(self.variables_json) if self.variables_json else {}
         except (json.JSONDecodeError, TypeError):
             result['variables_json'] = {}
-        try:
-            result['response_json'] = json.loads(self.response_json) if self.response_json else None
-        except (json.JSONDecodeError, TypeError):
-            result['response_json'] = None
+        
+        # Add template name for display in history table
+        if self.template:
+            result['template_name'] = self.template.name_he or self.template.name
+        else:
+            result['template_name'] = 'ניתוח'
+        
+        # Include response_text only if explicitly requested (for initial API response)
+        # This allows frontend to save to cache, but response_text is NOT saved to DB
+        if include_response:
+            # Check for temporary response (from generate_analysis) or DB response
+            if hasattr(self, '_temp_response_text') and self._temp_response_text:
+                result['response_text'] = self._temp_response_text
+            elif self.response_text:
+                result['response_text'] = self.response_text
+            if hasattr(self, '_temp_response_json') and self._temp_response_json:
+                try:
+                    result['response_json'] = json.loads(self._temp_response_json)
+                except (json.JSONDecodeError, TypeError):
+                    result['response_json'] = None
+            elif self.response_json:
+                try:
+                    result['response_json'] = json.loads(self.response_json)
+                except (json.JSONDecodeError, TypeError):
+                    result['response_json'] = None
+        else:
+            # Do NOT include response_text or response_json in history/listing responses
+            # These are saved to frontend cache only, not in database
+            result.pop('response_text', None)
+            result.pop('response_json', None)
         return result
     
     def __repr__(self) -> str:
@@ -108,6 +139,13 @@ class UserLLMProvider(BaseModel):
         result.pop('perplexity_api_key', None)
         result['gemini_configured'] = bool(self.gemini_api_key)
         result['perplexity_configured'] = bool(self.perplexity_api_key)
+        # Add providers_configured list for frontend
+        providers = []
+        if result['gemini_configured']:
+            providers.append('gemini')
+        if result['perplexity_configured']:
+            providers.append('perplexity')
+        result['providers_configured'] = providers
         return result
     
     def __repr__(self) -> str:

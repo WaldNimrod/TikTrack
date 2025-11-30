@@ -209,14 +209,7 @@ def delete_execution(execution_id: int):
         db: Session = g.db
         execution = db.query(Execution).filter(Execution.id == execution_id).first()
         if execution:
-            try:
-                TagService.remove_all_tags_for_entity(db, 'execution', execution_id)
-            except ValueError as tag_error:
-                logger.warning(
-                    "Failed to remove tags for execution %s before deletion: %s",
-                    execution_id,
-                    tag_error,
-                )
+            # Tag cleanup is handled automatically by SQLAlchemy event listeners
             db.delete(execution)
             db.commit()
             normalizer = _get_date_normalizer()

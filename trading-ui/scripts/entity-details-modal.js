@@ -1106,9 +1106,27 @@ class EntityDetailsModal {
 
         let buttonsHtml = '';
         
-        // עבור ticker - לא מציגים כפתורי פעולות מהירות
+        // עבור ticker - מציגים כפתור "דשבורד מורחב"
         if (entityType === 'ticker') {
-            buttonsHtml = ''; // ריק - לא מציגים כפתורים
+            const tickerId = this.currentEntityId || entityData?.id;
+            if (tickerId) {
+                if (typeof window.createActionsMenu === 'function') {
+                    const dashboardButton = window.createActionsMenu([
+                        { type: 'DASHBOARD', onclick: `window.location.href='/ticker-dashboard.html?tickerId=${tickerId}'`, title: 'דשבורד מורחב' }
+                    ]);
+                    buttonsHtml = dashboardButton || '';
+                } else {
+                    // Fallback: כפתור פשוט
+                    buttonsHtml = `
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-primary" 
+                                onclick="window.location.href='/ticker-dashboard.html?tickerId=${tickerId}'"
+                                title="דשבורד מורחב">
+                            דשבורד מורחב
+                        </button>
+                    `;
+                }
+            }
         }
         
         buttonsContainer.innerHTML = buttonsHtml;

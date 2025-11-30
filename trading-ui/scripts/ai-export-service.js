@@ -1,3 +1,19 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 3
+ * 
+ * DATA MANIPULATION (3)
+ * - exportToPDF() - Export analysis result to PDF format
+ * - exportToMarkdown() - Export analysis result to Markdown format
+ * - exportToHTML() - Export analysis result to HTML format
+ * 
+ * ==========================================
+ */
 /**
  * AI Export Service
  * ======================================

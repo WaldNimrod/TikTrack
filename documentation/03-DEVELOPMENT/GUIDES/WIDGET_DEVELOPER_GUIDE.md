@@ -1,8 +1,36 @@
 # מדריך מפתח - יצירת ווידג'טים
 
 **תאריך יצירה:** 21 ינואר 2025  
-**גרסה:** 1.0.0  
+**תאריך עדכון אחרון:** 29 ינואר 2025  
+**גרסה:** 1.1.0  
 **מטרה:** מדריך מקיף ליצירת ווידג'טים חדשים במערכת TikTrack
+
+> **⚠️ חשוב:** זהו **הסטנדרט הרשמי** ליצירת ווידג'טים במערכת TikTrack. כל ווידג'ט חדש **חייב** לעמוד בסטנדרט זה.
+
+---
+
+## 🚀 Quick Start - למפתחים חדשים
+
+### שלבים ראשונים
+
+1. **קרא את המדריך** - הכר את הארכיטקטורה המומלצת (Module Pattern IIFE)
+2. **השתמש בתבנית** - העתק את התבנית הבסיסית מהמדריך
+3. **עקוב אחר ה-Workflow** - יש workflow מוגדר שלב אחר שלב
+4. **עיין בדוגמאות** - ראה דוגמאות מהמערכת (Tag Widget, Recent Trades Widget)
+
+### נקודות מפתח
+
+- **ארכיטקטורה:** Module Pattern (IIFE) - **חובה**
+- **טאבים:** Bootstrap Tabs - **מומלץ מאוד**
+- **קונפיגורציה:** תמיכה ב-config object עם minRows/maxRows (אם רלוונטי)
+- **תיעוד:** עדכן את [WIDGETS_LIST.md](../../frontend/WIDGETS_LIST.md) אחרי יצירת ווידג'ט
+
+### קבצים חשובים
+
+- **מדריך זה:** `documentation/03-DEVELOPMENT/GUIDES/WIDGET_DEVELOPER_GUIDE.md`
+- **רשימת ווידג'טים:** `documentation/frontend/WIDGETS_LIST.md`
+- **ארכיטקטורה:** `documentation/02-ARCHITECTURE/FRONTEND/WIDGET_SYSTEM_ARCHITECTURE.md`
+- **דוגמה:** `trading-ui/scripts/widgets/tag-widget.js`
 
 ---
 
@@ -11,10 +39,11 @@
 1. [סקירה כללית](#סקירה-כללית)
 2. [ארכיטקטורה מומלצת](#ארכיטקטורה-מומלצת)
 3. [תבנית בסיסית](#תבנית-בסיסית)
-4. [שילוב עם Bootstrap Tabs](#שילוב-עם-bootstrap-tabs)
-5. [שילוב בעמודים נוספים](#שילוב-בעמודים-נוספים)
-6. [Best Practices](#best-practices)
-7. [דוגמאות מהמערכת](#דוגמאות-מהמערכת)
+4. [קונפיגורציה - הגדרת גובה דינמי](#קונפיגורציה---הגדרת-גובה-דינמי)
+5. [שילוב עם Bootstrap Tabs](#שילוב-עם-bootstrap-tabs)
+6. [שילוב בעמודים נוספים](#שילוב-בעמודים-נוספים)
+7. [Best Practices](#best-practices)
+8. [דוגמאות מהמערכת](#דוגמאות-מהמערכת)
 
 ---
 
@@ -142,16 +171,30 @@
      * Initialize widget
      * @param {string} containerId - Optional container ID
      * @param {object} config - Optional configuration
+     * @param {number} config.minRows - Minimum number of rows (if applicable)
+     * @param {number} config.maxRows - Maximum number of rows (if applicable)
+     * @param {number} config.rowHeight - Height per row in pixels (if applicable)
      */
     init(containerId = CONTAINER_ID, config = {}) {
       if (state.initialized) {
         return;
       }
 
+      // Merge configuration with defaults
+      state.config = {
+        minRows: 1,
+        maxRows: 3,
+        rowHeight: 20,
+        ...config
+      };
+
       if (!cacheElements()) {
         window.Logger?.warn?.('MyWidget: Container not found', { containerId });
         return;
       }
+
+      // Apply configuration (e.g., height settings via CSS variables)
+      applyConfiguration();
 
       bindEvents();
       // Other initialization...
@@ -341,6 +384,76 @@ window.MyWidget.init('customContainerId', {
   ]
 }
 ```
+
+---
+
+## ⚙️ קונפיגורציה - הגדרת גובה דינמי
+
+אם הווידג'ט שלך מציג תוכן עם מספר שורות (כמו תגיות, פריטים וכו'), ניתן להגדיר גובה מינימלי ומקסימלי דרך קונפיגורציה.
+
+### דוגמה: Tag Widget
+
+```javascript
+// הגדרת גובה מותאמת
+window.TagWidget.init('tagWidgetContainer', {
+  minRows: 1,      // מינימום שורה אחת
+  maxRows: 3,      // מקסימום 3 שורות במצב סגור
+  rowHeight: 20    // גובה כל שורה בפיקסלים
+});
+```
+
+### יישום בקוד
+
+```javascript
+// 1. הגדר ברירות מחדל
+const DEFAULT_CONFIG = {
+  minRows: 1,
+  maxRows: 3,
+  rowHeight: 20
+};
+
+// 2. שמור קונפיגורציה ב-state
+const state = {
+  initialized: false,
+  config: { ...DEFAULT_CONFIG }
+};
+
+// 3. עדכן קונפיגורציה באתחול
+init(containerId = CONTAINER_ID, config = {}) {
+  state.config = {
+    ...DEFAULT_CONFIG,
+    ...config
+  };
+  
+  // 4. החלת הקונפיגורציה דרך CSS variables
+  applyHeightConfiguration();
+}
+
+// 5. פונקציה להחלת קונפיגורציה
+function applyHeightConfiguration() {
+  if (!elements.container) return;
+  
+  const { minRows, maxRows, rowHeight } = state.config;
+  const minHeight = minRows * rowHeight;
+  const maxHeight = maxRows * rowHeight;
+  
+  elements.container.style.setProperty('--widget-min-height', `${minHeight}px`);
+  elements.container.style.setProperty('--widget-max-height', `${maxHeight}px`);
+}
+```
+
+### שימוש ב-CSS
+
+```css
+/* שימוש ב-CSS variables */
+.widget-content {
+  min-height: var(--widget-min-height, 20px);
+  max-height: var(--widget-max-height, 60px);
+  overflow: hidden;
+}
+```
+
+**דוגמה מלאה:** ראה [Tag Widget Developer Guide](TAG_WIDGET_DEVELOPER_GUIDE.md)
 
 ---
 

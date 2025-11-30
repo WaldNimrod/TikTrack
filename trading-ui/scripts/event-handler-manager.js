@@ -384,14 +384,14 @@ class EventHandlerManager {
                     
                     // Try direct function call if we found it
                     if (targetFunction) {
-                            if (this.verboseLogging) {
-                                this._log('debug', `Function found, calling directly: ${functionName}`, {
-                                    component: 'handleDelegatedClick',
-                                    functionName,
-                                    functionArgs
-                                });
-                            }
-                            
+                        if (this.verboseLogging) {
+                            this._log('debug', `Function found, calling directly: ${functionName}`, {
+                                component: 'handleDelegatedClick',
+                                functionName,
+                                functionArgs
+                            });
+                        }
+                        
                         try {
                             if (functionArgs) {
                                 // Parse arguments (simple comma-separated, no complex parsing)
@@ -405,31 +405,74 @@ class EventHandlerManager {
                                     // Try to evaluate as JavaScript expression, fallback to string
                                     try {
                                         return eval(trimmed);
-                                    } catch {
+                                    } catch (e) {
                                         return trimmed;
                                     }
                                 });
-                                result = targetFunction(...args);
+                                
+                                // If targetFunction is a method on an object, bind it to preserve context
+                                if (targetFunction && typeof targetFunction === 'function') {
+                                    // Check if it's a method (e.g., window.AIAnalysisManager.handleTemplateSelectionFromModal)
+                                    const parts = functionName.split('.');
+                                    if (parts.length > 1) {
+                                        // It's a method call - get the object and method
+                                        let obj = window;
+                                        for (let i = 0; i < parts.length - 1; i++) {
+                                            obj = obj[parts[i]];
+                                            if (!obj) break;
+                                        }
+                                        const methodName = parts[parts.length - 1];
+                                        if (obj && typeof obj[methodName] === 'function') {
+                                            // Bind the method to its object
+                                            targetFunction = obj[methodName].bind(obj);
+                                        }
+                                    }
+                                }
+                                
+                                if (args.length > 0) {
+                                    result = targetFunction(...args);
+                                } else {
+                                    result = targetFunction();
+                                }
                             } else {
+                                // If targetFunction is a method on an object, bind it to preserve context
+                                if (targetFunction && typeof targetFunction === 'function') {
+                                    // Check if it's a method (e.g., window.AIAnalysisManager.handleTemplateSelectionFromModal)
+                                    const parts = functionName.split('.');
+                                    if (parts.length > 1) {
+                                        // It's a method call - get the object and method
+                                        let obj = window;
+                                        for (let i = 0; i < parts.length - 1; i++) {
+                                            obj = obj[parts[i]];
+                                            if (!obj) break;
+                                        }
+                                        const methodName = parts[parts.length - 1];
+                                        if (obj && typeof obj[methodName] === 'function') {
+                                            // Bind the method to its object
+                                            targetFunction = obj[methodName].bind(obj);
+                                        }
+                                    }
+                                }
+                                
                                 result = targetFunction();
                             }
-                                
-                                if (this.verboseLogging) {
-                                    this._log('debug', `Direct call succeeded`, {
-                                        component: 'handleDelegatedClick',
-                                        functionName,
-                                        resultType: typeof result,
-                                        isPromise: result && typeof result.then === 'function'
-                                    });
-                                }
-                        } catch (directError) {
-                                error = directError;
-                                this._log('error', `Direct call failed: ${directError.name}`, {
+                            
+                            if (this.verboseLogging) {
+                                this._log('debug', `Direct call succeeded`, {
                                     component: 'handleDelegatedClick',
                                     functionName,
-                                    error: directError.message,
-                                    stack: directError.stack
+                                    resultType: typeof result,
+                                    isPromise: result && typeof result.then === 'function'
                                 });
+                            }
+                        } catch (directError) {
+                            error = directError;
+                            this._log('error', `Direct call failed: ${directError.name}`, {
+                                component: 'handleDelegatedClick',
+                                functionName,
+                                error: directError.message,
+                                stack: directError.stack
+                            });
                             throw directError;
                         }
                     } else {

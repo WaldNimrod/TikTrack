@@ -40,7 +40,7 @@ Date: January 2025
 import sys
 import os
 import argparse
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 from datetime import datetime
 
 # Add Backend to path for imports
@@ -109,7 +109,7 @@ class UserDataCleanup:
             'verified': {}
         }
     
-    def cleanup_all(self) -> Dict[str, any]:
+    def cleanup_all(self) -> Dict[str, Any]:
         """מבצע את כל שלבי הניקוי"""
         if self.dry_run:
             print("🔍 DRY RUN - רק הדגמה, ללא שינויים")
@@ -185,17 +185,17 @@ class UserDataCleanup:
         if not self.dry_run:
             # Delete notes
             result = self.db.execute(text("DELETE FROM notes"))
-            deleted_notes = result.rowcount
+            deleted_notes = result.rowcount  # type: ignore[attr-defined]
             
             # Delete alerts
             result = self.db.execute(text("DELETE FROM alerts"))
-            deleted_alerts = result.rowcount
+            deleted_alerts = result.rowcount  # type: ignore[attr-defined]
             
             # Delete condition alerts mapping (if table exists)
             deleted_mapping = 0
             try:
                 result = self.db.execute(text("DELETE FROM condition_alerts_mapping"))
-                deleted_mapping = result.rowcount
+                deleted_mapping = result.rowcount  # type: ignore[attr-defined]
             except Exception:
                 pass  # Table might not exist
             
@@ -229,11 +229,11 @@ class UserDataCleanup:
         if not self.dry_run:
             # Delete cash flows
             result = self.db.execute(text("DELETE FROM cash_flows"))
-            deleted_cash_flows = result.rowcount
+            deleted_cash_flows = result.rowcount  # type: ignore[attr-defined]
             
             # Delete executions
             result = self.db.execute(text("DELETE FROM executions"))
-            deleted_executions = result.rowcount
+            deleted_executions = result.rowcount  # type: ignore[attr-defined]
             
             self.stats['deleted']['cash_flows'] = deleted_cash_flows
             self.stats['deleted']['executions'] = deleted_executions
@@ -274,7 +274,7 @@ class UserDataCleanup:
             deleted_plan_conditions = 0
             try:
                 result = self.db.execute(text("DELETE FROM plan_conditions"))
-                deleted_plan_conditions = result.rowcount
+                deleted_plan_conditions = result.rowcount  # type: ignore[attr-defined]
             except Exception:
                 pass
             
@@ -282,7 +282,7 @@ class UserDataCleanup:
             deleted_trade_conditions = 0
             try:
                 result = self.db.execute(text("DELETE FROM trade_conditions"))
-                deleted_trade_conditions = result.rowcount
+                deleted_trade_conditions = result.rowcount  # type: ignore[attr-defined]
             except Exception:
                 pass
             
@@ -329,11 +329,11 @@ class UserDataCleanup:
         if not self.dry_run:
             # IMPORTANT: Delete trades FIRST before trade plans (due to FK constraints)
             result = self.db.execute(text("DELETE FROM trades"))
-            deleted_trades = result.rowcount
+            deleted_trades = result.rowcount  # type: ignore[attr-defined]
             
             # Now delete trade plans (after trades are deleted)
             result = self.db.execute(text("DELETE FROM trade_plans"))
-            deleted_trade_plans = result.rowcount
+            deleted_trade_plans = result.rowcount  # type: ignore[attr-defined]
             
             self.stats['deleted']['trade_plans'] = deleted_trade_plans
             self.stats['deleted']['trades'] = deleted_trades
@@ -366,13 +366,13 @@ class UserDataCleanup:
         if not self.dry_run:
             # Delete import sessions
             result = self.db.execute(text("DELETE FROM import_sessions"))
-            deleted_sessions = result.rowcount
+            deleted_sessions = result.rowcount  # type: ignore[attr-defined]
             
             # Delete tag links
             deleted_tag_links = 0
             try:
                 result = self.db.execute(text("DELETE FROM tag_links"))
-                deleted_tag_links = result.rowcount
+                deleted_tag_links = result.rowcount  # type: ignore[attr-defined]
             except Exception:
                 pass
             
@@ -398,17 +398,17 @@ class UserDataCleanup:
                 result = self.db.execute(
                     text(f"DELETE FROM tags WHERE category_id NOT IN ({placeholders})")
                 )
-                deleted_tags = result.rowcount
+                deleted_tags = result.rowcount  # type: ignore[attr-defined]
             else:
                 result = self.db.execute(text("DELETE FROM tags"))
-                deleted_tags = result.rowcount
+                deleted_tags = result.rowcount  # type: ignore[attr-defined]
             
             # Delete tag categories except import data
             deleted_categories = 0
             result = self.db.execute(
                 text("DELETE FROM tag_categories WHERE name NOT LIKE '%ייבוא נתונים%'")
             )
-            deleted_categories = result.rowcount
+            deleted_categories = result.rowcount  # type: ignore[attr-defined]
             
             self.stats['deleted']['import_sessions'] = deleted_sessions
             self.stats['deleted']['tag_links'] = deleted_tag_links
@@ -442,7 +442,7 @@ class UserDataCleanup:
         if not self.dry_run:
             # Delete trading accounts
             result = self.db.execute(text("DELETE FROM trading_accounts"))
-            deleted_accounts = result.rowcount
+            deleted_accounts = result.rowcount  # type: ignore[attr-defined]
             
             self.stats['deleted']['trading_accounts'] = deleted_accounts
             
@@ -488,34 +488,34 @@ class UserDataCleanup:
             deleted_market_quotes = 0
             try:
                 result = self.db.execute(text("DELETE FROM market_data_quotes"))
-                deleted_market_quotes = result.rowcount
+                deleted_market_quotes = result.rowcount  # type: ignore[attr-defined]
             except Exception:
                 pass
             
             deleted_refresh_logs = 0
             try:
                 result = self.db.execute(text("DELETE FROM data_refresh_logs"))
-                deleted_refresh_logs = result.rowcount
+                deleted_refresh_logs = result.rowcount  # type: ignore[attr-defined]
             except Exception:
                 pass
             
             deleted_intraday_slots = 0
             try:
                 result = self.db.execute(text("DELETE FROM intraday_data_slots"))
-                deleted_intraday_slots = result.rowcount
+                deleted_intraday_slots = result.rowcount  # type: ignore[attr-defined]
             except Exception:
                 pass
             
             deleted_quotes_last = 0
             try:
                 result = self.db.execute(text("DELETE FROM quotes_last"))
-                deleted_quotes_last = result.rowcount
+                deleted_quotes_last = result.rowcount  # type: ignore[attr-defined]
             except Exception:
                 pass
             
             # Now delete all tickers except SPY (after market data is deleted)
             result = self.db.execute(text("DELETE FROM tickers WHERE symbol != 'SPY'"))
-            deleted_tickers = result.rowcount
+            deleted_tickers = result.rowcount  # type: ignore[attr-defined]
             
             # Clean up ticker_provider_symbols - keep only SPY
             deleted_provider_symbols = 0
@@ -523,28 +523,28 @@ class UserDataCleanup:
                 result = self.db.execute(
                     text("DELETE FROM ticker_provider_symbols WHERE ticker_id NOT IN (SELECT id FROM tickers WHERE symbol = 'SPY')")
                 )
-                deleted_provider_symbols = result.rowcount
+                deleted_provider_symbols = result.rowcount  # type: ignore[attr-defined]
             except Exception:
                 pass
             
             deleted_refresh_logs = 0
             try:
                 result = self.db.execute(text("DELETE FROM data_refresh_logs"))
-                deleted_refresh_logs = result.rowcount
+                deleted_refresh_logs = result.rowcount  # type: ignore[attr-defined]
             except Exception:
                 pass
             
             deleted_intraday_slots = 0
             try:
                 result = self.db.execute(text("DELETE FROM intraday_data_slots"))
-                deleted_intraday_slots = result.rowcount
+                deleted_intraday_slots = result.rowcount  # type: ignore[attr-defined]
             except Exception:
                 pass
             
             deleted_quotes_last = 0
             try:
                 result = self.db.execute(text("DELETE FROM quotes_last"))
-                deleted_quotes_last = result.rowcount
+                deleted_quotes_last = result.rowcount  # type: ignore[attr-defined]
             except Exception:
                 pass
             
@@ -565,8 +565,8 @@ class UserDataCleanup:
                 raise VerificationError('step8', "1 טיקר (SPY)", f"{final_tickers} טיקרים")
             
             spy_symbol = self.db.execute(text("SELECT symbol FROM tickers")).scalar()
-            if spy_symbol != 'SPY':
-                raise VerificationError('step8', "SPY", spy_symbol)
+            if not spy_symbol or spy_symbol != 'SPY':
+                raise VerificationError('step8', "SPY", str(spy_symbol) if spy_symbol else "None")
             
             print(f"   ✅ אימות: נשאר רק SPY")
         else:
@@ -605,13 +605,13 @@ class UserDataCleanup:
         if not self.dry_run:
             # Delete all user preferences (values only, profile stays)
             result = self.db.execute(text("DELETE FROM user_preferences"))
-            deleted_preferences = result.rowcount
+            deleted_preferences = result.rowcount  # type: ignore[attr-defined]
             
             # Delete all profiles except active one
             result = self.db.execute(
                 text(f"DELETE FROM preference_profiles WHERE is_active != TRUE OR user_id != {active_profile.user_id}")
             )
-            deleted_profiles = result.rowcount
+            deleted_profiles = result.rowcount  # type: ignore[attr-defined]
             
             self.stats['deleted']['user_preferences'] = deleted_preferences
             self.stats['deleted']['preference_profiles'] = deleted_profiles
@@ -648,10 +648,10 @@ class UserDataCleanup:
         tickers_count = self._count_table('tickers')
         if tickers_count == 1:
             spy_symbol = self.db.execute(text("SELECT symbol FROM tickers")).scalar()
-            if spy_symbol == 'SPY':
+            if spy_symbol and spy_symbol == 'SPY':
                 verifications.append(("טיקרים", "✅ רק SPY"))
             else:
-                verifications.append(("טיקרים", f"❌ נמצא {spy_symbol} במקום SPY"))
+                verifications.append(("טיקרים", f"❌ נמצא {spy_symbol or 'None'} במקום SPY"))
         else:
             verifications.append(("טיקרים", f"❌ {tickers_count} טיקרים במקום 1"))
         
@@ -678,7 +678,7 @@ class UserDataCleanup:
             text("SELECT COUNT(*) FROM tag_categories WHERE name LIKE '%ייבוא נתונים%'")
         ).scalar()
         
-        if import_categories_count > 0:
+        if import_categories_count and import_categories_count > 0:
             verifications.append(("תגיות ייבוא", f"✅ {import_categories_count} קטגוריות ייבוא נשמרו"))
         else:
             verifications.append(("תגיות ייבוא", "⚠️  לא נמצאו קטגוריות ייבוא"))
@@ -790,6 +790,8 @@ def main():
             sys.exit(0)
     
     # Create database connection
+    if not DATABASE_URL:
+        raise CleanupError('init', "DATABASE_URL is not set", "Please configure DATABASE_URL in config/settings.py")
     engine = create_engine(DATABASE_URL, **_build_engine_kwargs())
     Session = sessionmaker(bind=engine)
     db = Session()

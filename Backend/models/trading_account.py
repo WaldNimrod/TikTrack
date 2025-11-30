@@ -16,11 +16,14 @@ Last Updated: 2025-08-16
 - Always follow: Models → Services → Routes → App architecture
 """
 
-from sqlalchemy import Column, String, Float, Integer, DateTime, ForeignKey
+from sqlalchemy import Column, String, Float, Integer, DateTime, ForeignKey, event
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .base import BaseModel
 from typing import Dict, Any, Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 class TradingAccount(BaseModel):
     """
@@ -128,3 +131,27 @@ class TradingAccount(BaseModel):
     def is_protected(self, db_session) -> bool:
         """Check if this account is protected from deletion (last account)"""
         return self.is_last_account(db_session)
+
+
+# ========================================
+# SQLAlchemy Event Listeners for Tag Links Cleanup
+# ========================================
+
+@event.listens_for(TradingAccount, 'after_delete')
+def trading_account_deleted(mapper, connection, target):
+    """
+    Event listener for when a trading account is deleted.
+    Automatically removes all associated tag links.
+    """
+    try:
+        from services.tag_service import TagService
+        from sqlalchemy.orm import Session
+        
+        session = Session(bind=connection)
+        TagService.remove_all_tags_for_entity(
+            session, 'trading_account', target.id
+        )
+        session.close()
+    except Exception as e:
+        logger.error(f"Error cleaning up tags for trading_account {target.id}: {e}")
+        # Don't raise - allow deletion to proceed even if tag cleanup fails

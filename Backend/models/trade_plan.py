@@ -137,10 +137,11 @@ def trade_plan_updated(mapper, connection, target):
 def trade_plan_deleted(mapper, connection, target):
     """
     Event listener for when a trade plan is deleted
-    Updates the ticker status based on linked items
+    Updates the ticker status based on linked items and removes associated tag links
     """
     try:
         from .ticker import Ticker
+        from services.tag_service import TagService
         from sqlalchemy.orm import Session
         
         # Get session from connection
@@ -148,6 +149,15 @@ def trade_plan_deleted(mapper, connection, target):
         
         # Update ticker status
         Ticker.update_ticker_status_from_linked_items(session, target.ticker_id)
+        
+        # Clean up tag links
+        try:
+            TagService.remove_all_tags_for_entity(
+                session, 'trade_plan', target.id
+            )
+        except Exception as tag_error:
+            logger.error(f"Error cleaning up tags for trade_plan {target.id}: {tag_error}")
+            # Don't raise - allow deletion to proceed even if tag cleanup fails
         
         session.close()
     except Exception as e:

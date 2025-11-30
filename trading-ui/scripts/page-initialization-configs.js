@@ -197,6 +197,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'base',
         'services',
         'ui-advanced',
+        'modules', // Required for ModalManagerV2 (tag search drawer)
         'crud',
         'preferences',
         'entity-services',
@@ -215,9 +216,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.IconSystem',
         'window.DashboardData',
         'window.loadDashboardData',
-        'window.RecentTradesWidget',
-        'window.PendingExecutionsHighlights',
-        'window.PendingExecutionTradeCreation',
+        'window.RecentItemsWidget',
+        'window.UnifiedPendingActionsWidget',
         'window.TagWidget',
       ],
 
@@ -237,6 +237,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       customInitializers: [
         // Dashboard-specific initialization
         async pageConfig => {
+          window.Logger?.info?.('🔵🔵🔵 CUSTOM INITIALIZER STARTED for index page', { 
+            page: 'page-initialization-configs' 
+          });
           // window.Logger.info('📊 Initializing Dashboard...', { page: "page-initialization-configs" });
 
           // Load trading accounts data if needed for portfolio
@@ -259,8 +262,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
 
           // Use the new unified initialization function
+          window.Logger?.info?.('🔵 About to call initializeIndexPage...', { page: 'page-initialization-configs' });
           if (typeof window.initializeIndexPage === 'function') {
             await window.initializeIndexPage();
+            window.Logger?.info?.('🔵 initializeIndexPage completed', { page: 'page-initialization-configs' });
           } else {
             // Fallback to old method
             // Initialize charts if available
@@ -275,9 +280,11 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
 
           // Initialize positions & portfolio system
+          window.Logger?.info?.('🔵 About to initialize positions portfolio...', { page: 'page-initialization-configs' });
           if (typeof window.initPositionsPortfolio === 'function') {
             try {
               await window.initPositionsPortfolio(false); // Don't auto-select account on home page
+              window.Logger?.info?.('🔵 Positions portfolio initialized', { page: 'page-initialization-configs' });
             } catch (error) {
               window.Logger?.warn('⚠️ Error initializing positions portfolio:', error, {
                 page: 'page-initialization-configs',
@@ -286,6 +293,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
 
           // Initialize unified tag widget
+          window.Logger?.info?.('🔵 About to initialize TagWidget...', { page: 'page-initialization-configs' });
           if (typeof window.TagWidget !== 'undefined' && typeof window.TagWidget.init === 'function') {
             try {
               window.Logger?.info?.('🏷️ Initializing TagWidget...', { page: 'page-initialization-configs' });
@@ -308,6 +316,73 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
               page: 'page-initialization-configs',
             });
           }
+
+          // Initialize unified recent items widget
+          if (typeof window.RecentItemsWidget !== 'undefined' && typeof window.RecentItemsWidget.init === 'function') {
+            try {
+              window.Logger?.info?.('📊 Initializing RecentItemsWidget...', { page: 'page-initialization-configs' });
+              window.RecentItemsWidget.init('recentItemsWidgetContainer', {
+                defaultTab: 'trades',
+                maxItems: 5 // Maximum number of items to display per tab
+              });
+              window.Logger?.info?.('✅ RecentItemsWidget initialization called', { page: 'page-initialization-configs' });
+            } catch (error) {
+              window.Logger?.warn('⚠️ Error initializing RecentItemsWidget:', error, {
+                page: 'page-initialization-configs',
+              });
+            }
+          } else {
+            window.Logger?.warn('⚠️ RecentItemsWidget not available', {
+              RecentItemsWidgetExists: typeof window.RecentItemsWidget !== 'undefined',
+              hasInit: typeof window.RecentItemsWidget?.init === 'function',
+              page: 'page-initialization-configs',
+            });
+          }
+
+          // Initialize unified pending actions widget
+          window.Logger?.info?.('🔴🔴🔴 CHECKING UnifiedPendingActionsWidget - START', {
+            WidgetExists: typeof window.UnifiedPendingActionsWidget !== 'undefined',
+            hasInit: typeof window.UnifiedPendingActionsWidget?.init === 'function',
+            page: 'page-initialization-configs',
+          });
+          
+          try {
+            if (typeof window.UnifiedPendingActionsWidget !== 'undefined' && typeof window.UnifiedPendingActionsWidget.init === 'function') {
+              window.Logger?.info?.('🟢🟢🟢 Initializing UnifiedPendingActionsWidget...', { 
+                containerId: 'unifiedPendingActionsWidgetContainer',
+                config: { defaultItemsLimit: 4, defaultAction: 'assign', defaultEntity: 'plans' },
+                page: 'page-initialization-configs' 
+              });
+              
+              const result = await window.UnifiedPendingActionsWidget.init('unifiedPendingActionsWidgetContainer', {
+                defaultItemsLimit: 4,
+                defaultAction: 'assign',
+                defaultEntity: 'plans'
+              });
+              
+              window.Logger?.info?.('✅✅✅ UnifiedPendingActionsWidget initialization completed', { 
+                result,
+                page: 'page-initialization-configs' 
+              });
+            } else {
+              window.Logger?.error?.('🔴🔴🔴 UnifiedPendingActionsWidget not available!', {
+                WidgetExists: typeof window.UnifiedPendingActionsWidget !== 'undefined',
+                hasInit: typeof window.UnifiedPendingActionsWidget?.init === 'function',
+                UnifiedPendingActionsWidgetType: typeof window.UnifiedPendingActionsWidget,
+                page: 'page-initialization-configs',
+              });
+            }
+          } catch (error) {
+            window.Logger?.error?.('🔴🔴🔴 ERROR initializing UnifiedPendingActionsWidget:', {
+              error: error.message,
+              errorStack: error.stack,
+              page: 'page-initialization-configs',
+            });
+          }
+          
+          window.Logger?.info?.('🔴🔴🔴 CHECKING UnifiedPendingActionsWidget - END', {
+            page: 'page-initialization-configs',
+          });
         },
       ],
     },
@@ -459,6 +534,54 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: [
         'base',
         'services',
+        'modules',
+        'ui-advanced',
+        'preferences',
+        'init-system'
+      ],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.Logger',
+        'window.TikTrackAuth',
+        'window.UserProfilePage',
+        'window.AIAnalysisManager'
+      ],
+      pageSpecificScripts: [
+        'scripts/user-profile.js',
+        'scripts/user-profile-ai-analysis.js'
+      ],
+      description: 'ניהול פרופיל משתמש - הגדרות אישיות, SMTP, AI Analysis',
+      lastModified: '2025-01-30',
+      pageType: 'management',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('👤 Initializing User Profile Page...', { page: 'page-initialization-configs' });
+          
+          // Initialize User Profile Page
+          if (window.UserProfilePage && typeof window.UserProfilePage.init === 'function') {
+            await window.UserProfilePage.init();
+          }
+          
+          // Initialize AI Analysis Manager (from user-profile-ai-analysis.js)
+          if (window.AIAnalysisManager && typeof window.AIAnalysisManager.init === 'function') {
+            if (!window.AIAnalysisManager.initialized) {
+              await window.AIAnalysisManager.init();
+            }
+          }
+        },
+      ],
+    },
+    
+    // Legacy entry (kept for compatibility)
+    'user_profile': {
+      name: 'User Profile',
+      packages: [
+        'base',
+        'services',
         'validation',
         'modules',
         'ui-advanced',
@@ -471,9 +594,14 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.Logger',
         'window.TikTrackAuth',
         'window.UserProfilePage',
+        'window.AIAnalysisManager',
       ],
-      description: 'ניהול פרופיל משתמש - עדכון פרטים ושינוי סיסמה',
-      lastModified: '2025-01-28',
+      pageSpecificScripts: [
+        'scripts/user-profile.js',
+        'scripts/user-profile-ai-analysis.js'
+      ],
+      description: 'ניהול פרופיל משתמש - עדכון פרטים, שינוי סיסמה, הגדרות SMTP, הגדרות AI Analysis',
+      lastModified: '2025-01-29',
       pageType: 'settings',
       requiresFilters: false,
       requiresValidation: true,
@@ -482,6 +610,12 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         async () => {
           if (window.UserProfilePage && typeof window.UserProfilePage.init === 'function') {
             await window.UserProfilePage.init();
+          }
+          // Initialize AI Analysis Manager
+          if (window.AIAnalysisManager && typeof window.AIAnalysisManager.init === 'function') {
+            if (!window.AIAnalysisManager.initialized) {
+              await window.AIAnalysisManager.init();
+            }
           }
         },
       ],
@@ -625,7 +759,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',
-        'window.PendingExecutionTradeCreation',
       ],
 
       // ← NEW: מטאדאטה
@@ -795,6 +928,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'NotificationSystem',
         'window.IconSystem',
         'DataUtils',
+        'window.TradePlansData',  // Required for trade-plan-service.js
         'window.loadTradePlansData',
         'window.ModalManagerV2',
         'window.tradePlansModalConfig',
@@ -821,12 +955,29 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             page: 'page-initialization-configs',
           });
 
-          // Load trade plans data directly
-          if (typeof window.loadTradePlansData === 'function') {
+          // Wait for trade_plans.js to load and override window.loadTradePlansData
+          // Retry a few times if page script hasn't loaded yet
+          let retries = 5;
+          while (retries > 0 && typeof window.loadTradePlansDataPage !== 'function') {
+            await new Promise(resolve => setTimeout(resolve, 200));
+            retries--;
+          }
+
+          // Use page-specific loadTradePlansData if available (updates table)
+          // Otherwise fallback to service version
+          if (typeof window.loadTradePlansDataPage === 'function') {
+            // Page-specific version handles everything including table update
+            await window.loadTradePlansDataPage();
+          } else if (typeof window.loadTradePlansData === 'function') {
+            // Fallback to service version with cache guard
             if (window.CacheTTLGuard?.ensure) {
               await window.CacheTTLGuard.ensure('trade-plans-data', window.loadTradePlansData);
             } else {
               await window.loadTradePlansData();
+            }
+            // After loading, try to update table if trade_plans.js loaded
+            if (typeof window.updateTradePlansTable === 'function' && window.tradePlansData) {
+              window.updateTradePlansTable(window.tradePlansData);
             }
           } else {
             window.Logger.warn('⚠️ loadTradePlansData function not available', {
@@ -1244,6 +1395,57 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             } else {
               await window.loadTickersData();
             }
+          }
+        },
+      ],
+    },
+
+    'ticker-dashboard': {
+      name: 'Ticker Dashboard',
+
+      // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'preferences',
+        'external-data',
+        'entity-services',
+        'entity-details',
+        'info-summary',
+        'init-system',
+      ],
+
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'DataUtils',
+        'ExternalDataService',
+        'window.TickerDashboardData',
+        'window.tickerDashboard',
+        'window.TradingViewChartAdapter',
+        'window.FieldRendererService',
+        'window.LinkedItemsService',
+      ],
+
+      description: 'דשבורד טיקר מורחב - גרפים, KPI, מדדים טכניים ופעילות משתמש',
+      lastModified: '2025-01-28',
+      pageType: 'dashboard',
+
+      preloadAssets: ['ticker-dashboard-data'],
+      cacheStrategy: 'aggressive',
+
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger.info('📊 Initializing Ticker Dashboard...', { page: 'page-initialization-configs' });
+
+          if (typeof window.tickerDashboard?.init === 'function') {
+            await window.tickerDashboard.init();
           }
         },
       ],
@@ -3104,6 +3306,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'modules',
         'preferences',
         'entity-services',
+        'info-summary',
         'ai-analysis',
         'init-system'
       ],
@@ -3120,9 +3323,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.SelectPopulatorService',
         'window.DataCollectionService',
         'window.FieldRendererService',
-        'window.NotesData',
         'window.ModalManagerV2',
         'window.CRUDResponseHandler'
+        // Note: window.NotesData is optional - ai-notes-integration.js has fallback
       ],
       description: 'ניתוח AI - יצירת ניתוחים באמצעות מנועי LLM',
       lastModified: '2025-01-28',
@@ -3189,7 +3392,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
   window.pageInitializationConfigs = PAGE_CONFIGS;
   // Also set PAGE_INITIALIZATION_CONFIGS for backward compatibility (used by check-pages-loading.js and package-manifest.js)
   window.PAGE_INITIALIZATION_CONFIGS = PAGE_CONFIGS;
-  console.log('✅ PAGE_CONFIGS loaded, trading_accounts exists:', !!PAGE_CONFIGS.trading_accounts);
 } else {
   // אם PAGE_CONFIGS כבר הוגדר, נמזג רק את הקונפיגים החדשים
   if (typeof PAGE_CONFIGS !== 'undefined') {

@@ -1,3 +1,20 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 2
+ * 
+ * UI UPDATES (1)
+ * - render() - Render analysis result in modal or page container
+ * 
+ * UTILITIES (1)
+ * - convertMarkdownBasic() - Basic markdown to HTML conversion (fallback)
+ * 
+ * ==========================================
+ */
 /**
  * AI Result Renderer
  * ======================================

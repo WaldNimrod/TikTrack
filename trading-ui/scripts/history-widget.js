@@ -345,7 +345,11 @@
                 window.Logger.info('✅ P/L chart initialized', { page: 'history-widget', dateRange: currentChartDateRange });
             }
         } catch (error) {
-            if (window.Logger) {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת גרף P/L', 
+                    `לא ניתן לטעון את גרף הרווח/הפסד. ${errorMsg}`);
+            } else if (window.Logger) {
                 window.Logger.error('Error initializing P/L chart', { 
                     page: 'history-widget', 
                     error 
@@ -861,6 +865,12 @@
      */
     async function refreshWidget() {
         try {
+            // Show loading state
+            const widgetContainer = document.getElementById('history-widget-container') || document.querySelector('.history-widget-container');
+            if (widgetContainer && typeof window.showLoadingState === 'function') {
+                window.showLoadingState(widgetContainer.id || 'history-widget-container');
+            }
+            
             if (window.NotificationSystem) {
                 window.NotificationSystem.showInfo('מרענן נתונים...', 'רענון ווידג\'ט היסטוריה');
             }
@@ -872,6 +882,11 @@
             updateDailyStats();
             updatePLStats();
             updateMarketValueStats();
+            
+            // Hide loading state
+            if (widgetContainer && typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState(widgetContainer.id || 'history-widget-container');
+            }
 
             // Show success notification
             if (window.NotificationSystem) {
@@ -898,6 +913,12 @@
      * Initialize all widgets
      */
     async function initializeWidgets() {
+        // Show loading state
+        const widgetContainer = document.getElementById('history-widget-container') || document.querySelector('.history-widget-container');
+        if (widgetContainer && typeof window.showLoadingState === 'function') {
+            window.showLoadingState(widgetContainer.id || 'history-widget-container');
+        }
+        
         try {
             // Wait for required systems to be available
             let retries = 0;
@@ -942,12 +963,21 @@
 
             // Setup links
             setupQuickLinks();
+            
+            // Hide loading state
+            if (widgetContainer && typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState(widgetContainer.id || 'history-widget-container');
+            }
 
             if (window.Logger) {
                 window.Logger.info('✅ All widgets initialized', { page: 'history-widget' });
             }
         } catch (error) {
-            if (window.Logger) {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה באתחול ווידג\'ט', 
+                    `לא ניתן לאתחל את הווידג'ט. ${errorMsg}`);
+            } else if (window.Logger) {
                 window.Logger.error('Error initializing widgets', { 
                     page: 'history-widget', 
                     error 

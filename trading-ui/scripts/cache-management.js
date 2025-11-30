@@ -876,7 +876,7 @@ class CacheManagementPage {
      */
     async logToUnifiedSystem(level, message, details = null) {
         try {
-            if (window.UnifiedLogManager) {
+            if (window.UnifiedLogManager && typeof window.UnifiedLogManager.log === 'function') {
                 await window.UnifiedLogManager.log(level, `Cache Management: ${message}`, {
                     source: 'cache-management-page',
                     details: details,
@@ -884,7 +884,7 @@ class CacheManagementPage {
                 });
             }
         } catch (error) {
-            console.warn('Failed to log to unified system:', error);
+            // Silently fail - logging is not critical
         }
     }
 

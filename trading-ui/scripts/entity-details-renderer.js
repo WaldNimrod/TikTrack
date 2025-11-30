@@ -2390,6 +2390,13 @@ class EntityDetailsRenderer {
     renderLinkedItems(linkedItems = [], entityColor = '#6c757d', parentEntityType = 'entity', parentEntityId = '0', sourceInfo = null, options = {}) {
         try {
             const items = Array.isArray(linkedItems) ? linkedItems.filter(Boolean) : [];
+            
+            // Pagination settings
+            // Pagination settings
+            const defaultPageSize = 25; // Default page size for linked items
+            const pageSize = options.pageSize || defaultPageSize;
+            const enablePagination = options.enablePagination !== false && items.length > pageSize;
+            
             window.Logger?.info('🔍 [renderLinkedItems] Starting render', { 
                 itemsCount: items.length, 
                 parentEntityType, 
@@ -2774,7 +2781,15 @@ class EntityDetailsRenderer {
                 return '<tr><td colspan="4" class="text-danger">שגיאה בטעינת שירות פריטים מקושרים</td></tr>';
             }
             const entityLabel = window.LinkedItemsService.getEntityLabel(item.type);
-            const cleanName = window.LinkedItemsService.formatLinkedItemName(item);
+            let cleanName = window.LinkedItemsService.formatLinkedItemName(item);
+            
+            // Get ticker symbol for entities that should display it
+            const tickerSymbol = this._getTickerSymbolForLinkedItem(item, entityType);
+            
+            // Add ticker to cleanName if available and not already included
+            if (tickerSymbol && !cleanName.includes(tickerSymbol)) {
+                cleanName = `${tickerSymbol} - ${cleanName}`;
+            }
             
             const itemId = item.id || item.entity_id || item.linked_id || '';
             const metrics = item.metrics || {};
@@ -2813,7 +2828,8 @@ class EntityDetailsRenderer {
                         renderMode: 'linked-items-table',
                         status: item.status,
                         side: item.side,
-                        investment_type: item.investment_type
+                        investment_type: item.investment_type,
+                        ticker: tickerSymbol // Pass ticker in meta for potential use
                     }
                 );
             }
@@ -5274,6 +5290,175 @@ class EntityDetailsRenderer {
             return `${item.type || parentEntityType || 'entity'}_${item.id || ''}`.toLowerCase();
         }
     }
+    
+    /**
+     * Get ticker symbol for linked item based on entity type
+     * @private
+     * @param {Object} item - Linked item object
+     * @param {string} entityType - Entity type (lowercase)
+     * @returns {string|null} - Ticker symbol or null
+     */
+    _getTickerSymbolForLinkedItem(item, entityType) {
+        if (!item || !entityType) {
+            return null;
+        }
+        
+        const normalizedId = this._normalizeLinkedItemId(item.id || item.entity_id || item.linked_id);
+        if (!normalizedId) {
+            return null;
+        }
+        
+        try {
+            // Try to get ticker symbol from item itself (from enrichment)
+            if (item.ticker_symbol) {
+                return item.ticker_symbol;
+            }
+            if (item.symbol && entityType === 'ticker') {
+                return item.symbol;
+            }
+            if (item.ticker?.symbol) {
+                return item.ticker.symbol;
+            }
+            
+            // Resolve ticker symbol based on entity type
+            switch (entityType) {
+                case 'trade': {
+                    // Get ticker from trade data
+                    const trade = this._resolveLinkedItemSource('trade', normalizedId, item);
+                    if (trade) {
+                        return trade.ticker_symbol || 
+                               trade.ticker?.symbol ||
+                               (trade.ticker_id && this._getTickerSymbolById(trade.ticker_id));
+                    }
+                    break;
+                }
+                case 'trade_plan': {
+                    // Get ticker from trade plan data
+                    const plan = this._resolveLinkedItemSource('trade_plan', normalizedId, item);
+                    if (plan) {
+                        return plan.ticker_symbol || 
+                               plan.ticker?.symbol ||
+                               (plan.ticker_id && this._getTickerSymbolById(plan.ticker_id));
+                    }
+                    break;
+                }
+                case 'alert': {
+                    // Get ticker from related object (alert -> trade/trade_plan/ticker)
+                    const alert = this._resolveLinkedItemSource('alert', normalizedId, item);
+                    if (alert) {
+                        const relatedType = alert.related_type_id || alert.related_type;
+                        const relatedId = alert.related_id || alert.related_object_id;
+                        
+                        if (relatedType === 4 || relatedType === 'ticker') {
+                            // Related to ticker
+                            return this._getTickerSymbolById(relatedId);
+                        } else if (relatedType === 2 || relatedType === 'trade') {
+                            // Related to trade
+                            const trade = this._resolveLinkedItemSource('trade', this._normalizeLinkedItemId(relatedId));
+                            if (trade) {
+                                return trade.ticker_symbol || 
+                                       trade.ticker?.symbol ||
+                                       (trade.ticker_id && this._getTickerSymbolById(trade.ticker_id));
+                            }
+                        } else if (relatedType === 3 || relatedType === 'trade_plan') {
+                            // Related to trade plan
+                            const plan = this._resolveLinkedItemSource('trade_plan', this._normalizeLinkedItemId(relatedId));
+                            if (plan) {
+                                return plan.ticker_symbol || 
+                                       plan.ticker?.symbol ||
+                                       (plan.ticker_id && this._getTickerSymbolById(plan.ticker_id));
+                            }
+                        }
+                    }
+                    break;
+                }
+                case 'execution': {
+                    // Get ticker from execution's trade
+                    const execution = this._resolveLinkedItemSource('execution', normalizedId, item);
+                    if (execution) {
+                        const tradeId = execution.trade_id;
+                        if (tradeId) {
+                            const trade = this._resolveLinkedItemSource('trade', this._normalizeLinkedItemId(tradeId));
+                            if (trade) {
+                                return trade.ticker_symbol || 
+                                       trade.ticker?.symbol ||
+                                       (trade.ticker_id && this._getTickerSymbolById(trade.ticker_id));
+                            }
+                        }
+                        // Fallback: check if execution has ticker_symbol directly
+                        return execution.ticker_symbol || execution.trade_ticker_symbol;
+                    }
+                    break;
+                }
+                case 'cash_flow': {
+                    // Get ticker from cash flow's trade (if linked)
+                    const cashFlow = this._resolveLinkedItemSource('cash_flow', normalizedId, item);
+                    if (cashFlow) {
+                        const tradeId = cashFlow.trade_id;
+                        if (tradeId) {
+                            const trade = this._resolveLinkedItemSource('trade', this._normalizeLinkedItemId(tradeId));
+                            if (trade) {
+                                return trade.ticker_symbol || 
+                                       trade.ticker?.symbol ||
+                                       (trade.ticker_id && this._getTickerSymbolById(trade.ticker_id));
+                            }
+                        }
+                        // Fallback: check if cash flow has ticker_symbol directly
+                        return cashFlow.ticker_symbol || cashFlow.trade_ticker_symbol;
+                    }
+                    break;
+                }
+                case 'ticker': {
+                    // Direct ticker entity
+                    const ticker = this._resolveLinkedItemSource('ticker', normalizedId, item);
+                    if (ticker) {
+                        return ticker.symbol || ticker.ticker_symbol;
+                    }
+                    break;
+                }
+            }
+        } catch (error) {
+            window.Logger?.warn('Error getting ticker symbol for linked item:', { error, item, entityType }, { page: 'entity-details-renderer' });
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Get ticker symbol by ticker ID
+     * @private
+     * @param {number|string} tickerId - Ticker ID
+     * @returns {string|null} - Ticker symbol or null
+     */
+    _getTickerSymbolById(tickerId) {
+        if (!tickerId) {
+            return null;
+        }
+        
+        const normalizedId = this._normalizeLinkedItemId(tickerId);
+        if (!normalizedId) {
+            return null;
+        }
+        
+        // Try to find ticker in global data
+        if (Array.isArray(window.tickersData)) {
+            const ticker = window.tickersData.find(t => this._normalizeLinkedItemId(t?.id) === normalizedId);
+            if (ticker) {
+                return ticker.symbol || ticker.ticker_symbol;
+            }
+        }
+        
+        // Try to use global getTickerSymbol function if available
+        if (typeof window.getTickerSymbol === 'function') {
+            try {
+                return window.getTickerSymbol(normalizedId);
+            } catch (error) {
+                // Ignore errors
+            }
+        }
+        
+        return null;
+    }
 
     _needsLinkedItemHydration(item) {
         if (!item) {
@@ -5334,8 +5519,11 @@ class EntityDetailsRenderer {
         const updatedItems = [...items];
 
         for (const { item, index } of itemsWithIndex) {
+            // Define variables outside try block so they're available in catch
+            let normalizedType;
+            let entityId;
+            
             try {
-                let normalizedType;
                 try {
                     normalizedType = this.normalizeEntityType(item.type);
                 } catch (typeError) {
@@ -5346,7 +5534,7 @@ class EntityDetailsRenderer {
                     }
                 }
 
-                const entityId = this._normalizeLinkedItemId(item.id);
+                entityId = this._normalizeLinkedItemId(item.id);
                 if (entityId === null || entityId === undefined) {
                     console.warn('⚠️ [_hydrateLinkedItemsAsync] Invalid entity ID for item:', item);
                     continue;
@@ -5360,7 +5548,8 @@ class EntityDetailsRenderer {
 
                 const details = await window.entityDetailsAPI.getEntityDetails(normalizedType, entityId, {
                     includeLinkedItems: false,
-                    forceRefresh: false
+                    forceRefresh: false,
+                    skipRetryOn404: true // Skip retry on 404 to avoid unnecessary requests and error logs
                 });
 
                 if (details) {
@@ -5377,8 +5566,25 @@ class EntityDetailsRenderer {
                     });
                 }
             } catch (error) {
-                console.error('❌ [_hydrateLinkedItemsAsync] Error hydrating item:', error, item);
-                window.Logger?.debug('Linked item hydration skipped', { error, item }, { page: 'entity-details-renderer' });
+                // Check if entity not found (404) - skip silently to avoid retry loops
+                const isNotFound = error?.message?.includes('לא נמצא') || 
+                                   error?.message?.includes('not found') ||
+                                   error?.message?.includes('404') ||
+                                   (error?.name === 'Error' && error?.message?.toLowerCase().includes('לא נמצא'));
+                
+                if (isNotFound) {
+                    // For 404 errors, only log at debug level to reduce noise
+                    window.Logger?.debug('Entity not found, skipping hydration:', {
+                        type: normalizedType || item.type || 'unknown',
+                        id: entityId || item.id || 'unknown',
+                        error: error.message
+                    }, { page: 'entity-details-renderer' });
+                    // Mark item as not found to avoid retries
+                    updatedItems[index]._entityNotFound = true;
+                } else {
+                    console.error('❌ [_hydrateLinkedItemsAsync] Error hydrating item:', error, item);
+                }
+                window.Logger?.debug('Linked item hydration skipped', { error, item, isNotFound }, { page: 'entity-details-renderer' });
             }
         }
 

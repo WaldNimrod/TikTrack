@@ -145,6 +145,14 @@ const TABLE_COLUMN_MAPPINGS = {
     { key: 'completed_at', sortType: 'dateEnvelope' }      // 9 - עודכן לאחרונה
   ],
 
+  // טבלת היסטוריית ניתוחי AI (AI Analysis History)
+  'ai_analysis_history': [
+    { key: 'template_name', sortType: 'string' },          // 0 - תבנית
+    { key: 'provider', sortType: 'string' },               // 1 - מנוע
+    { key: 'status', sortType: 'string' },                  // 2 - סטטוס
+    { key: 'created_at', sortType: 'dateEnvelope' }        // 3 - נוצר ב
+  ],
+
   // טבלת התראות (Alerts) - Alerts Page Structure (מוצג בפועל)
   'alerts': [
     'related_object',        // 0 - קשור ל (מחושב)
@@ -345,6 +353,12 @@ const TABLE_COLUMN_SORT_TYPES = {
     skipped_records: 'numeric',
     created_at: 'dateEnvelope',
     completed_at: 'dateEnvelope'
+  },
+  ai_analysis_history: {
+    template_name: 'string',
+    provider: 'string',
+    status: 'string',
+    created_at: 'dateEnvelope'
   },
   tickers: {
     symbol: 'string',

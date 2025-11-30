@@ -1,3 +1,25 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 5
+ * 
+ * DATA MANIPULATION (1)
+ * - saveAsNote() - Save analysis result as note with related type and object
+ * 
+ * MODAL MANAGEMENT (2)
+ * - showRelatedTypeSelector() - Show modal for selecting related type (ticker/trade/plan/account)
+ * - showRelatedObjectSelector() - Show modal for selecting related object based on type
+ * 
+ * UTILITIES (2)
+ * - convertMarkdownToHTML() - Convert markdown text to HTML
+ * - openNoteModal() - Open notes modal with pre-filled content
+ * 
+ * ==========================================
+ */
 /**
  * AI Notes Integration
  * ======================================
@@ -93,18 +115,19 @@
 
     /**
      * Show related type selector using modal
+     * Uses ModalManagerV2 via window.createAndShowModal helper for proper modal management
      */
     async showRelatedTypeSelector() {
-      return new Promise((resolve) => {
+      return new Promise(async (resolve) => {
         // Create a simple modal for type selection
         const modalId = 'aiNoteRelatedTypeModal';
         const modalHTML = `
-          <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+          <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header modal-header-colored">
                   <h5 class="modal-title" id="${modalId}Label">בחר סוג אובייקט מקושר</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  <button type="button" data-button-type="CLOSE" data-bs-dismiss="modal" data-text="" title="סגור"></button>
                 </div>
                 <div class="modal-body">
                   <label for="aiNoteRelatedTypeSelect" class="form-label">סוג אובייקט:</label>
@@ -117,50 +140,64 @@
                   </select>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                  <button type="button" class="btn btn-primary" id="aiNoteRelatedTypeConfirm">אישור</button>
+                  <button type="button" data-button-type="SECONDARY" data-variant="full" data-bs-dismiss="modal" data-text="ביטול"></button>
+                  <button type="button" data-button-type="PRIMARY" data-variant="full" id="aiNoteRelatedTypeConfirm" data-text="אישור"></button>
                 </div>
               </div>
             </div>
           </div>
         `;
 
-        // Remove existing modal if any
-        const existingModal = document.getElementById(modalId);
-        if (existingModal) {
-          existingModal.remove();
-        }
+        try {
+          // Use window.createAndShowModal helper which integrates with ModalManagerV2
+          await window.createAndShowModal(modalHTML, modalId, { backdrop: false, keyboard: true });
 
-        // Add modal to DOM
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
+          const modalElement = document.getElementById(modalId);
+          if (!modalElement) {
+            resolve(null);
+            return;
+          }
 
-        const modalElement = document.getElementById(modalId);
-        if (!modalElement) {
+          const confirmBtn = document.getElementById('aiNoteRelatedTypeConfirm');
+          const select = document.getElementById('aiNoteRelatedTypeSelect');
+
+          // Helper function to hide and cleanup modal
+          const hideAndCleanup = async () => {
+            // Hide modal using ModalManagerV2 or Bootstrap
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+              await window.ModalManagerV2.hideModal(modalId);
+            } else if (bootstrap?.Modal) {
+              const bsModal = bootstrap.Modal.getInstance(modalElement);
+              if (bsModal) {
+                bsModal.hide();
+              }
+            }
+            
+            // Remove modal from DOM after animation
+            setTimeout(() => {
+              if (modalElement.parentNode) {
+                modalElement.remove();
+              }
+            }, 300); // Bootstrap fade animation duration
+          };
+
+          const handleConfirm = async () => {
+            const selectedValue = select.value;
+            await hideAndCleanup();
+            resolve(selectedValue || null);
+          };
+
+          const handleCancel = async () => {
+            await hideAndCleanup();
+            resolve(null);
+          };
+
+          confirmBtn.addEventListener('click', handleConfirm);
+          modalElement.addEventListener('hidden.bs.modal', handleCancel);
+        } catch (error) {
+          window.Logger?.error('Error showing related type selector modal', error, { page: 'ai-analysis' });
           resolve(null);
-          return;
         }
-
-        const modal = new bootstrap.Modal(modalElement);
-        const confirmBtn = document.getElementById('aiNoteRelatedTypeConfirm');
-        const select = document.getElementById('aiNoteRelatedTypeSelect');
-
-        const handleConfirm = () => {
-          const selectedValue = select.value;
-          modal.hide();
-          modalElement.remove();
-          resolve(selectedValue || null);
-        };
-
-        const handleCancel = () => {
-          modal.hide();
-          modalElement.remove();
-          resolve(null);
-        };
-
-        confirmBtn.addEventListener('click', handleConfirm);
-        modalElement.addEventListener('hidden.bs.modal', handleCancel);
-
-        modal.show();
       });
     },
 
@@ -185,12 +222,12 @@
         // Create a simple modal for object selection
         const modalId = 'aiNoteRelatedObjectModal';
         const modalHTML = `
-          <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+          <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header modal-header-colored">
                   <h5 class="modal-title" id="${modalId}Label">בחר ${typeInfo.label}</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  <button type="button" data-button-type="CLOSE" data-bs-dismiss="modal" data-text="" title="סגור"></button>
                 </div>
                 <div class="modal-body">
                   <label for="aiNoteRelatedObjectSelect" class="form-label">${typeInfo.label}:</label>
@@ -199,103 +236,118 @@
                   </select>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                  <button type="button" class="btn btn-primary" id="aiNoteRelatedObjectConfirm">אישור</button>
+                  <button type="button" data-button-type="SECONDARY" data-variant="full" data-bs-dismiss="modal" data-text="ביטול"></button>
+                  <button type="button" data-button-type="PRIMARY" data-variant="full" id="aiNoteRelatedObjectConfirm" data-text="אישור"></button>
                 </div>
               </div>
             </div>
           </div>
         `;
 
-        // Remove existing modal if any
-        const existingModal = document.getElementById(modalId);
-        if (existingModal) {
-          existingModal.remove();
-        }
-
-        // Add modal to DOM
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-        const modalElement = document.getElementById(modalId);
-        if (!modalElement) {
-          resolve(null);
-          return;
-        }
-
-        const modal = new bootstrap.Modal(modalElement);
-        const confirmBtn = document.getElementById('aiNoteRelatedObjectConfirm');
-        const select = document.getElementById('aiNoteRelatedObjectSelect');
-
-        // Populate select using SelectPopulatorService
         try {
-          if (relatedType === '1' && window.SelectPopulatorService?.populateAccountsSelect) {
-            await window.SelectPopulatorService.populateAccountsSelect(select, {
-              includeEmpty: true,
-              emptyText: `בחר ${typeInfo.label}...`
-            });
-          } else if (relatedType === '2' && window.SelectPopulatorService?.populateTradesSelect) {
-            await window.SelectPopulatorService.populateTradesSelect(select, {
-              includeEmpty: true,
-              emptyText: `בחר ${typeInfo.label}...`
-            });
-          } else if (relatedType === '3' && window.SelectPopulatorService?.populateTradePlansSelect) {
-            await window.SelectPopulatorService.populateTradePlansSelect(select, {
-              includeEmpty: true,
-              emptyText: `בחר ${typeInfo.label}...`
-            });
-          } else if (relatedType === '4' && window.SelectPopulatorService?.populateTickersSelect) {
-            await window.SelectPopulatorService.populateTickersSelect(select, {
-              includeEmpty: true,
-              emptyText: `בחר ${typeInfo.label}...`
-            });
-          } else {
-            // Fallback: direct API call
-            const response = await fetch(`/api/${typeInfo.endpoint}/`);
-            if (response.ok) {
-              const data = await response.json();
-              const items = Array.isArray(data?.data) ? data.data : [];
-              select.innerHTML = `<option value="">בחר ${typeInfo.label}...</option>`;
-              items.forEach((item) => {
-                const option = document.createElement('option');
-                if (relatedType === '4') {
-                  option.value = item.id;
-                  option.textContent = item.symbol || `Ticker #${item.id}`;
-                } else {
-                  option.value = item.id;
-                  option.textContent = item.name || item.symbol || `${typeInfo.label} #${item.id}`;
-                }
-                select.appendChild(option);
-              });
-            }
-          }
-        } catch (error) {
-          window.Logger?.warn('Error populating related object select', error, { page: 'ai-analysis' });
-          select.innerHTML = `<option value="">שגיאה בטעינת ${typeInfo.label}</option>`;
-        }
+          // Use window.createAndShowModal helper which integrates with ModalManagerV2
+          await window.createAndShowModal(modalHTML, modalId, { backdrop: false, keyboard: true });
 
-        const handleConfirm = () => {
-          const selectedValue = select.value;
-          if (!selectedValue) {
-            if (window.NotificationSystem) {
-              window.NotificationSystem.showError('נא לבחור אובייקט', 'system');
-            }
+          const modalElement = document.getElementById(modalId);
+          if (!modalElement) {
+            resolve(null);
             return;
           }
-          modal.hide();
-          modalElement.remove();
-          resolve(parseInt(selectedValue, 10));
-        };
 
-        const handleCancel = () => {
-          modal.hide();
-          modalElement.remove();
+          const confirmBtn = document.getElementById('aiNoteRelatedObjectConfirm');
+          const select = document.getElementById('aiNoteRelatedObjectSelect');
+
+          // Populate select using SelectPopulatorService
+          try {
+            if (relatedType === '1' && window.SelectPopulatorService?.populateAccountsSelect) {
+              await window.SelectPopulatorService.populateAccountsSelect(select, {
+                includeEmpty: true,
+                emptyText: `בחר ${typeInfo.label}...`
+              });
+            } else if (relatedType === '2' && window.SelectPopulatorService?.populateTradesSelect) {
+              await window.SelectPopulatorService.populateTradesSelect(select, {
+                includeEmpty: true,
+                emptyText: `בחר ${typeInfo.label}...`
+              });
+            } else if (relatedType === '3' && window.SelectPopulatorService?.populateTradePlansSelect) {
+              await window.SelectPopulatorService.populateTradePlansSelect(select, {
+                includeEmpty: true,
+                emptyText: `בחר ${typeInfo.label}...`
+              });
+            } else if (relatedType === '4' && window.SelectPopulatorService?.populateTickersSelect) {
+              await window.SelectPopulatorService.populateTickersSelect(select, {
+                includeEmpty: true,
+                emptyText: `בחר ${typeInfo.label}...`
+              });
+            } else {
+              // Fallback: direct API call
+              const response = await fetch(`/api/${typeInfo.endpoint}/`);
+              if (response.ok) {
+                const data = await response.json();
+                const items = Array.isArray(data?.data) ? data.data : [];
+                select.innerHTML = `<option value="">בחר ${typeInfo.label}...</option>`;
+                items.forEach((item) => {
+                  const option = document.createElement('option');
+                  if (relatedType === '4') {
+                    option.value = item.id;
+                    option.textContent = item.symbol || `Ticker #${item.id}`;
+                  } else {
+                    option.value = item.id;
+                    option.textContent = item.name || item.symbol || `${typeInfo.label} #${item.id}`;
+                  }
+                  select.appendChild(option);
+                });
+              }
+            }
+          } catch (error) {
+            window.Logger?.warn('Error populating related object select', error, { page: 'ai-analysis' });
+            select.innerHTML = `<option value="">שגיאה בטעינת ${typeInfo.label}</option>`;
+          }
+
+          // Helper function to hide and cleanup modal
+          const hideAndCleanup = async () => {
+            // Hide modal using ModalManagerV2 or Bootstrap
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+              await window.ModalManagerV2.hideModal(modalId);
+            } else if (bootstrap?.Modal) {
+              const bsModal = bootstrap.Modal.getInstance(modalElement);
+              if (bsModal) {
+                bsModal.hide();
+              }
+            }
+            
+            // Remove modal from DOM after animation
+            setTimeout(() => {
+              if (modalElement.parentNode) {
+                modalElement.remove();
+              }
+            }, 300); // Bootstrap fade animation duration
+          };
+
+          const handleConfirm = async () => {
+            const selectedValue = select.value;
+            if (!selectedValue) {
+              if (window.NotificationSystem) {
+                window.NotificationSystem.showError('נא לבחור אובייקט', 'system');
+              }
+              return;
+            }
+            
+            await hideAndCleanup();
+            resolve(parseInt(selectedValue, 10));
+          };
+
+          const handleCancel = async () => {
+            await hideAndCleanup();
+            resolve(null);
+          };
+
+          confirmBtn.addEventListener('click', handleConfirm);
+          modalElement.addEventListener('hidden.bs.modal', handleCancel);
+        } catch (error) {
+          window.Logger?.error('Error showing related object selector modal', error, { page: 'ai-analysis' });
           resolve(null);
-        };
-
-        confirmBtn.addEventListener('click', handleConfirm);
-        modalElement.addEventListener('hidden.bs.modal', handleCancel);
-
-        modal.show();
+        }
       });
     },
 

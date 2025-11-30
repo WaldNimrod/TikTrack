@@ -326,11 +326,28 @@ function updateRecentItemsWidget(trades = [], tradePlans = [], currencySymbol) {
             currencySymbol,
             page: 'index'
         });
-        window.RecentItemsWidget.render({
-            trades: Array.isArray(trades) ? trades : [],
-            tradePlans: Array.isArray(tradePlans) ? tradePlans : [],
+        // Build render data - only include trades/tradePlans if they have data
+        // This matches the test page behavior where we only pass what we have
+        const renderData = {
             currencySymbol: currencySymbol || '$'
+        };
+        // Only add trades if we have valid data (don't pass empty array - it clears existing)
+        if (Array.isArray(trades) && trades.length > 0) {
+            renderData.trades = trades;
+        }
+        // Only add tradePlans if we have valid data
+        if (Array.isArray(tradePlans) && tradePlans.length > 0) {
+            renderData.tradePlans = tradePlans;
+        }
+        
+        window.Logger?.info?.('📊 Calling RecentItemsWidget.render', {
+            renderDataKeys: Object.keys(renderData),
+            tradesIncluded: renderData.hasOwnProperty('trades'),
+            tradePlansIncluded: renderData.hasOwnProperty('tradePlans'),
+            page: 'index'
         });
+        
+        window.RecentItemsWidget.render(renderData);
         return;
     }
     
@@ -784,7 +801,7 @@ function processDashboardData(data, source = 'network') {
         const tradesSummary = window.TableDataRegistry.getSummary('trades');
         if (tradesSummary) {
             const registryTrades = window.TableDataRegistry.getFilteredData('trades', { asReference: false });
-            if (Array.isArray(registryTrades)) {
+            if (Array.isArray(registryTrades) && registryTrades.length > 0) {
                 trades = registryTrades;
             }
         }
@@ -817,13 +834,63 @@ function processDashboardData(data, source = 'network') {
     updateDashboardCount({ trades, alerts, accounts });
     updatePortfolioSummary({ accounts, trades, cashFlows }, currencySymbol);
     
+    window.Logger?.info?.('🔍 [index.js] processDashboardData - About to update widget', {
+        tradesCount: trades.length,
+        alertsCount: alerts.length,
+        accountsCount: accounts.length,
+        currencySymbol,
+        page: 'index'
+    });
+    
     // Update unified recent items widget with trades (trade plans will be loaded separately)
-    updateRecentItemsWidget(trades, [], currencySymbol);
+    // IMPORTANT: Only pass trades if we have data - don't pass empty array (it clears existing)
+    // This matches the test page behavior
+    if (trades && trades.length > 0) {
+        window.Logger?.info?.('🔍 [index.js] processDashboardData - Updating widget with trades', {
+            tradesCount: trades.length,
+            page: 'index'
+        });
+        updateRecentItemsWidget(trades, [], currencySymbol);
+    } else {
+        window.Logger?.info?.('🔍 [index.js] processDashboardData - No trades, skipping widget update (will update when trades loaded)', {
+            page: 'index'
+        });
+    }
     
     // Load and update recent trade plans (will update unified widget with both trades and plans)
+    // Pass trades to loadRecentTradePlans so it can preserve them when updating
     loadRecentTradePlans(currencySymbol, trades).catch((error) => {
         window.Logger?.warn?.('⚠️ Failed to load recent trade plans', { error: error?.message }, { page: 'index' });
     });
+    
+    // If no trades were loaded, try to fetch them directly from API for the widget
+    if (!trades || trades.length === 0) {
+      window.Logger?.info?.('📊 No trades in dashboard data, attempting to load trades for widget...', { page: 'index' });
+      // Try to load trades from API directly (fallback if DashboardData returns empty)
+      fetch('/api/trades/', { headers: { Accept: 'application/json' } })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((payload) => {
+          const tradesData = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+          if (Array.isArray(tradesData) && tradesData.length > 0) {
+            window.Logger?.info?.('📊 Loaded trades for widget directly from API', { count: tradesData.length, page: 'index' });
+            // IMPORTANT: Update widget with trades, but preserve existing trade plans
+            // Don't pass empty array for tradePlans - let widget preserve existing
+            updateRecentItemsWidget(tradesData, [], currencySymbol);
+            // Also reload trade plans with the newly loaded trades to ensure both are displayed
+            loadRecentTradePlans(currencySymbol, tradesData).catch(() => {});
+          } else {
+            window.Logger?.debug?.('📊 No trades found in API response', { page: 'index' });
+          }
+        })
+        .catch((error) => {
+          window.Logger?.warn?.('⚠️ Failed to load trades for widget from API', { error: error?.message }, { page: 'index' });
+        });
+    }
 
     dashboardDataState.lastLoadedAt = Date.now();
     dashboardDataState.source = source;
@@ -838,44 +905,107 @@ function processDashboardData(data, source = 'network') {
  * @returns {Promise<void>}
  */
 async function loadRecentTradePlans(currencySymbol, currentTrades = []) {
+    window.Logger?.info?.('🔍 [index.js] loadRecentTradePlans START', {
+        currencySymbol,
+        currentTradesCount: Array.isArray(currentTrades) ? currentTrades.length : 0,
+        TradePlansDataServiceExists: !!window.TradePlansDataService,
+        TradePlansDataServiceLoadExists: !!window.TradePlansDataService?.loadTradePlansData,
+        RecentItemsWidgetExists: !!window.RecentItemsWidget,
+        RecentItemsWidgetRenderExists: !!window.RecentItemsWidget?.render,
+        page: 'index'
+    });
+    
     try {
         let tradePlans = [];
         
         // Try to use trade plans data service if available
         if (window.TradePlansDataService?.loadTradePlansData) {
+            window.Logger?.info?.('🔍 [index.js] Using TradePlansDataService to load trade plans', { page: 'index' });
             tradePlans = await window.TradePlansDataService.loadTradePlansData({ force: false });
+            window.Logger?.info?.('🔍 [index.js] TradePlansDataService returned', {
+                isArray: Array.isArray(tradePlans),
+                count: Array.isArray(tradePlans) ? tradePlans.length : 0,
+                firstPlan: tradePlans?.[0],
+                page: 'index'
+            });
             if (!Array.isArray(tradePlans)) {
                 tradePlans = [];
+                window.Logger?.warn?.('⚠️ [index.js] TradePlansDataService returned non-array, setting to empty', { 
+                    type: typeof tradePlans,
+                    tradePlans,
+                    page: 'index' 
+                });
             }
         } else {
+            window.Logger?.info?.('🔍 [index.js] TradePlansDataService not available, fetching directly from API', { page: 'index' });
             // Fallback: fetch directly from API
             const response = await fetch('/api/trade-plans/', { headers: { Accept: 'application/json' } });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const payload = await response.json();
+            window.Logger?.info?.('🔍 [index.js] API response received', {
+                hasData: !!payload?.data,
+                isArrayData: Array.isArray(payload?.data),
+                isArrayRoot: Array.isArray(payload),
+                dataCount: Array.isArray(payload?.data) ? payload.data.length : (Array.isArray(payload) ? payload.length : 0),
+                page: 'index'
+            });
             tradePlans = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
         }
         
+        window.Logger?.info?.('🔍 [index.js] About to update RecentItemsWidget', {
+            tradePlansCount: tradePlans.length,
+            currentTradesCount: Array.isArray(currentTrades) ? currentTrades.length : 0,
+            willPassTrades: Array.isArray(currentTrades) && currentTrades.length > 0,
+            currencySymbol,
+            page: 'index'
+        });
+        
         // Update unified widget if available
         if (window.RecentItemsWidget?.render) {
-            // Update only trade plans (widget will preserve existing trades)
-            window.RecentItemsWidget.render({
+            // Update with both trades and trade plans
+            // IMPORTANT: Don't pass trades at all if currentTrades is empty - let widget preserve existing trades from state
+            // This matches the test page behavior where both are passed together
+            const renderData = {
                 tradePlans: tradePlans,
                 currencySymbol: currencySymbol
+            };
+            // Only add trades if we have valid data (don't pass empty array or undefined - it clears existing)
+            if (Array.isArray(currentTrades) && currentTrades.length > 0) {
+                renderData.trades = currentTrades;
+            }
+            // If currentTrades is empty, don't pass it at all - widget will preserve existing trades from state
+            
+            window.Logger?.info?.('🔍 [index.js] Calling RecentItemsWidget.render', {
+                willPassTrades: renderData.hasOwnProperty('trades'),
+                tradesCount: renderData.trades?.length || 0,
+                tradePlansCount: renderData.tradePlans?.length || 0,
+                renderDataKeys: Object.keys(renderData),
+                page: 'index'
             });
-            window.Logger?.info?.('📊 Updated RecentItemsWidget with trade plans', {
+            
+            window.RecentItemsWidget.render(renderData);
+            window.Logger?.info?.('📊 [index.js] Updated RecentItemsWidget with trade plans', {
+                tradesCount: Array.isArray(currentTrades) ? currentTrades.length : 0,
                 tradePlansCount: tradePlans.length,
+                firstTradePlan: tradePlans[0],
                 page: 'index'
             });
         } else {
+            window.Logger?.warn?.('⚠️ [index.js] RecentItemsWidget not available, falling back to separate widget', { page: 'index' });
             // Fallback to separate widget
             updateRecentTradePlans(tradePlans, currencySymbol);
         }
     } catch (error) {
-        window.Logger?.warn?.('⚠️ Failed to load trade plans for recent widget', { error: error?.message }, { page: 'index' });
+        window.Logger?.error?.('❌ [index.js] Failed to load trade plans for recent widget', { 
+            error: error?.message,
+            stack: error?.stack,
+            page: 'index' 
+        });
         // Update unified widget with empty trade plans if available
         if (window.RecentItemsWidget?.render) {
+            window.Logger?.info?.('🔍 [index.js] Updating widget with empty trade plans due to error', { page: 'index' });
             updateRecentItemsWidget(currentTrades, [], currencySymbol);
         } else {
             const container = document.getElementById('recentTradePlans');
@@ -1611,32 +1741,8 @@ window.initializeIndexPage = async function() {
     // Note: positions & portfolio system initialization is handled by page-initialization-configs.js
     // which calls initPositionsPortfolio() after initializeIndexPage()
     
-    // Initialize pending execution trade creation widget
-    if (window.PendingExecutionTradeCreation?.initializeDashboardWidget) {
-        setTimeout(() => {
-            window.PendingExecutionTradeCreation.initializeDashboardWidget({
-                cardSelector: '#pendingExecutionsTradeCreationCard',
-                listSelector: '#pendingTradeCreationWidgetList',
-                countSelector: '#pendingExecutionsTradeCreationCount',
-                loadingSelector: '#pendingExecutionsTradeCreationLoading',
-                emptySelector: '#pendingExecutionsTradeCreationEmpty',
-                errorSelector: '#pendingExecutionsTradeCreationError'
-            });
-        }, 1400);
-    }
-
-    // Initialize pending executions widget
-    if (typeof window.initializePendingExecutionsWidget === 'function') {
-        setTimeout(() => {
-            window.initializePendingExecutionsWidget();
-        }, 1500);
-    }
-
-    if (typeof window.initializePendingTradePlanWidget === 'function') {
-        setTimeout(() => {
-            window.initializePendingTradePlanWidget();
-        }, 1600);
-    }
+    // Note: Old pending widgets (PendingExecutionTradeCreation, PendingExecutionsHighlights, PendingTradePlanWidget)
+    // have been removed and replaced by UnifiedPendingActionsWidget which is initialized in page-initialization-configs.js
 };
 
 // Note: initializeIndexPage() is now called via PAGE_CONFIGS.index.customInitializers

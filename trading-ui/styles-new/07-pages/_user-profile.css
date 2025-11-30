@@ -75,3 +75,59 @@
   text-align: left;
 }
 
+/* Button Spinner States - Hidden by default, shown when loading */
+.user-profile-page .btn-spinner {
+  display: none;
+}
+
+.user-profile-page .btn-spinner.show {
+  display: inline;
+}
+
+/* Status Display - Hidden by default, shown when needed */
+.user-profile-page .status-display {
+  display: none;
+}
+
+.user-profile-page .status-display.show {
+  display: block;
+}
+
+/* Specific spinner IDs */
+.user-profile-page #updateInfoBtnSpinner,
+.user-profile-page #updatePasswordBtnSpinner,
+.user-profile-page #updateSmtpBtnSpinner,
+.user-profile-page #testConnectionBtnSpinner,
+.user-profile-page #sendTestEmailBtnSpinner,
+.user-profile-page #saveAiAnalysisBtnSpinner,
+.user-profile-page #validateGeminiBtnSpinner,
+.user-profile-page #validatePerplexityBtnSpinner {
+  display: none;
+}
+
+.user-profile-page #updateInfoBtnSpinner.show,
+.user-profile-page #updatePasswordBtnSpinner.show,
+.user-profile-page #updateSmtpBtnSpinner.show,
+.user-profile-page #testConnectionBtnSpinner.show,
+.user-profile-page #sendTestEmailBtnSpinner.show,
+.user-profile-page #saveAiAnalysisBtnSpinner.show,
+.user-profile-page #validateGeminiBtnSpinner.show,
+.user-profile-page #validatePerplexityBtnSpinner.show {
+  display: inline;
+}
+
+/* Specific status display IDs */
+.user-profile-page #smtpStatus,
+.user-profile-page #geminiKeyStatus,
+.user-profile-page #perplexityKeyStatus,
+.user-profile-page #aiAnalysisStatus {
+  display: none;
+}
+
+.user-profile-page #smtpStatus.show,
+.user-profile-page #geminiKeyStatus.show,
+.user-profile-page #perplexityKeyStatus.show,
+.user-profile-page #aiAnalysisStatus.show {
+  display: block;
+}
+

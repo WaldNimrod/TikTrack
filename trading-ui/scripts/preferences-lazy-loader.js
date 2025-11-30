@@ -338,14 +338,30 @@ class LazyLoader {
 
       // If not from cache, load from API
       if (!fromCache) {
-        // Check if PreferencesData is available
-        if (!window.PreferencesData || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
-          window.Logger?.warn?.('[PreferencesLazyLoader] PreferencesData.loadAllPreferencesRaw API is not available - returning empty preferences', {
+        // Wait for PreferencesData to be available (with retry mechanism)
+        let waitCount = 0;
+        const maxWaitAttempts = 20; // 2 seconds total (20 * 100ms)
+        while (!window.PreferencesData || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
+          if (waitCount >= maxWaitAttempts) {
+            window.Logger?.warn?.('[PreferencesLazyLoader] PreferencesData.loadAllPreferencesRaw API is not available after waiting - returning empty preferences', {
+              page: 'preferences-lazy-loader',
+              userId,
+              profileId,
+              waitTime: `${maxWaitAttempts * 100}ms`,
+            });
+            return { preferences: {}, userId, profileId, fromCache: false };
+          }
+          await new Promise(resolve => setTimeout(resolve, 100));
+          waitCount++;
+        }
+        
+        if (waitCount > 0) {
+          window.Logger?.debug?.('[PreferencesLazyLoader] PreferencesData became available after waiting', {
             page: 'preferences-lazy-loader',
             userId,
             profileId,
+            waitTime: `${waitCount * 100}ms`,
           });
-          return { preferences: {}, userId, profileId, fromCache: false };
         }
         
         // Use force: false to leverage cache - only call API if cache is missing or expired

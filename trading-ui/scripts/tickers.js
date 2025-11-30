@@ -2228,6 +2228,7 @@ function renderTickersTableRows(tickers) {
                           if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
                           const result = window.createActionsMenu([
                             { type: 'VIEW', onclick: `window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })`, title: 'צפה בפרטי טיקר' },
+                            { type: 'DASHBOARD', onclick: `window.location.href='/ticker-dashboard.html?tickerId=${ticker.id}'`, title: 'דשבורד מורחב' },
                             { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})`, title: 'ערוך' },
                             { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `${ticker.status === 'cancelled' ? 'reactivateTicker' : 'performTickerCancellation'}(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' },
                             { type: 'DELETE', onclick: `deleteTicker(${ticker.id})`, title: 'מחק' }

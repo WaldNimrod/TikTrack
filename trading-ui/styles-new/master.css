@@ -84,6 +84,9 @@
 @import '06-components/_unified-log-display.css?v=1.0.0';
 @import '06-components/_watch-lists.css?v=1.0.0';
 @import '06-components/_tag-widget.css?v=1.0.0';
+@import '06-components/_autocomplete.css?v=1.0.0';
+@import '06-components/_recent-items-widget.css?v=1.0.0';
+@import '06-components/_unified-pending-actions-widget.css?v=1.0.0';
 
 /* 07-trumps - Specific overrides (not page-specific) */
 @import '07-trumps/chart-management.css?v=1.0.0';

@@ -185,11 +185,25 @@ def trade_updated(mapper, connection, target):
 def trade_deleted(mapper, connection, target):
     """
     Event listener for when a trade is deleted
-    Updates the active_trades field of the related ticker
+    Updates the active_trades field of the related ticker and removes associated tag links
     """
     try:
         # Update ticker active_trades field using connection directly
         update_ticker_active_trades(connection, target.ticker_id)
+        
+        # Clean up tag links
+        try:
+            from services.tag_service import TagService
+            from sqlalchemy.orm import Session
+            
+            session = Session(bind=connection)
+            TagService.remove_all_tags_for_entity(
+                session, 'trade', target.id
+            )
+            session.close()
+        except Exception as tag_error:
+            logger.error(f"Error cleaning up tags for trade {target.id}: {tag_error}")
+            # Don't raise - allow deletion to proceed even if tag cleanup fails
         
     except Exception as e:
         logger.error(f"Error in trade_deleted event: {e}")

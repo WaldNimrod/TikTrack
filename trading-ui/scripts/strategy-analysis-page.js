@@ -149,17 +149,25 @@ async function waitForTradingViewAdapter() {
     }
     
     if (typeof window.TradingViewChartAdapter === 'undefined') {
-        if (window.Logger) {
+        const errorMsg = 'TradingViewChartAdapter not loaded';
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בטעינת גרפים', 
+                'ספריית TradingView לא נטענה. נא לרענן את העמוד.');
+        } else if (window.Logger) {
             window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'strategy-analysis-page', timeout: maxRetries * 50 });
         }
-        throw new Error('TradingViewChartAdapter not loaded');
+        throw new Error(errorMsg);
     }
     
     if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
-        if (window.Logger) {
+        const errorMsg = 'LightweightCharts not loaded';
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בטעינת גרפים', 
+                'ספריית LightweightCharts לא נטענה. נא לרענן את העמוד.');
+        } else if (window.Logger) {
             window.Logger.error('❌ LightweightCharts not available', { page: 'strategy-analysis-page', timeout: maxRetries * 50 });
         }
-        throw new Error('LightweightCharts not loaded');
+        throw new Error(errorMsg);
     }
     
     if (window.Logger) {
@@ -1835,15 +1843,25 @@ async function initStrategyPerformanceChart() {
         
         const container = document.getElementById('strategy-performance-chart-container');
         if (!container) {
+            // Silent error - container might not exist in some views
             if (window.Logger) {
-                window.Logger.error('Strategy performance chart container not found', { page: 'strategy-analysis-page' });
+                window.Logger.warn('Strategy performance chart container not found', { page: 'strategy-analysis-page' });
             }
             return;
         }
         
         // Get wrapper for width calculation (if exists)
         const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
-        const containerWidth = wrapper ? wrapper.clientWidth : container.clientWidth;
+        const containerWidth = wrapper ? wrapper.clientWidth : (container.clientWidth || container.offsetWidth || 800);
+        const containerHeight = container.clientHeight || container.offsetHeight || window.innerHeight * 0.5;
+        
+        if (containerWidth === 0 || containerHeight === 0) {
+            if (window.Logger) {
+                window.Logger.warn('Strategy performance chart container has zero dimensions, waiting...', { page: 'strategy-analysis-page' });
+            }
+            setTimeout(() => initStrategyPerformanceChart(), 100);
+            return;
+        }
         
         // Remove loading indicator
         const loading = container.querySelector('.chart-loading');
@@ -1877,7 +1895,7 @@ async function initStrategyPerformanceChart() {
                 horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
             },
             width: containerWidth,
-            height: 300,
+            height: containerHeight,
             timeScale: {
                 visible: true,
                 timeVisible: true,
@@ -2031,7 +2049,11 @@ async function initStrategyPerformanceChart() {
         }
         
     } catch (error) {
-        if (window.Logger) {
+        const errorMsg = error?.message || (typeof error === 'string' ? error : String(error));
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בטעינת גרף ביצועי אסטרטגיות', 
+                `לא ניתן לטעון את הגרף. ${errorMsg}`);
+        } else if (window.Logger) {
             window.Logger.error('Error initializing strategy performance chart', { page: 'strategy-analysis-page', error });
         }
         const container = document.getElementById('strategy-performance-chart-container');
@@ -2217,7 +2239,11 @@ async function updateStrategyPerformanceChart(filters) {
         strategyPerformanceChart.timeScale().fitContent();
         
     } catch (error) {
-        if (window.Logger) {
+        const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בעדכון גרף ביצועי אסטרטגיות', 
+                `לא ניתן לעדכן את הגרף. ${errorMsg}`);
+        } else if (window.Logger) {
             window.Logger.error('Error updating strategy performance chart', { page: 'strategy-analysis-page', error });
         }
     }
@@ -2345,6 +2371,101 @@ async function saveRecordFilterState() {
         if (window.Logger) {
             window.Logger.warn('Failed to save record filter state', { page: 'strategy-analysis-page', error });
         }
+    }
+}
+
+// Save page state (filters, sections, charts)
+async function savePageState() {
+    if (!window.PageStateManager) {
+        // Fallback to existing save functions
+        await saveRecordFilterState();
+        await saveComparisonParameterState();
+        await saveSeriesVisibilityState();
+        return;
+    }
+
+    try {
+        const recordFilters = getRecordFilterValues();
+        const comparisonParams = getComparisonParameterValues();
+
+        // Get section states
+        const sections = {};
+        const sectionIds = ['strategy-performance-section', 'strategy-insights-section'];
+        sectionIds.forEach(sectionId => {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const sectionBody = section.querySelector('.section-body');
+                sections[sectionId] = sectionBody ? sectionBody.style.display === 'none' : false;
+            }
+        });
+
+        const state = {
+            filters: {
+                recordFilters: recordFilters,
+                comparisonParams: comparisonParams
+            },
+            sections: sections
+        };
+
+        await window.PageStateManager.savePageState('strategy-analysis', state);
+        if (window.Logger) {
+            window.Logger.debug('✅ Saved page state', { page: 'strategy-analysis-page' });
+        }
+    } catch (error) {
+        if (window.Logger) {
+            window.Logger.warn('Failed to save page state', { error, page: 'strategy-analysis-page' });
+        }
+        // Fallback to existing save functions
+        await saveRecordFilterState();
+        await saveComparisonParameterState();
+        await saveSeriesVisibilityState();
+    }
+}
+
+// Restore page state (filters, sections, charts)
+async function restorePageState() {
+    if (!window.PageStateManager) {
+        // Fallback to existing load functions
+        await loadRecordFilterState();
+        await loadComparisonParameterState();
+        await loadSeriesVisibilityState();
+        return;
+    }
+
+    try {
+        const state = await window.PageStateManager.loadPageState('strategy-analysis');
+        if (!state || !state.filters) {
+            // Fallback to existing load functions
+            await loadRecordFilterState();
+            await loadComparisonParameterState();
+            await loadSeriesVisibilityState();
+            return;
+        }
+
+        // Restore section states if available
+        if (state.sections) {
+            Object.keys(state.sections).forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const sectionBody = section.querySelector('.section-body');
+                    if (sectionBody) {
+                        sectionBody.style.display = state.sections[sectionId] ? 'none' : 'block';
+                    }
+                }
+            });
+        }
+
+        if (window.Logger) {
+            window.Logger.debug('✅ Restored page state', { page: 'strategy-analysis-page' });
+        }
+    } catch (error) {
+        if (window.Logger) {
+            window.Logger.warn('Failed to restore page state, using fallback', { error, page: 'strategy-analysis-page' });
+        }
+        // Fallback to existing load functions
+        await loadRecordFilterState();
+        await loadComparisonParameterState();
+        await loadSeriesVisibilityState();
     }
 }
 
@@ -2774,7 +2895,10 @@ async function initializePage() {
         await initializeRecordFilterTags();
         await initializeComparisonTags();
         
-        // Load saved state or set defaults
+        // Restore page state (filters, sections, etc.)
+        await restorePageState();
+        
+        // Load saved state or set defaults (fallback if PageStateManager not available)
         await loadRecordFilterState();
         await loadComparisonParameterState();
         await loadSeriesVisibilityState();
@@ -2802,11 +2926,15 @@ async function initializePage() {
             window.Logger.info('✅ Strategy analysis page initialized', { page: 'strategy-analysis-page' });
         }
         
-    } catch (error) {
-        if (window.Logger) {
-            window.Logger.error('Error initializing strategy analysis page', { page: 'strategy-analysis-page', error });
+        } catch (error) {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה באתחול עמוד ניתוח אסטרטגיות', 
+                    `לא ניתן לאתחל את העמוד. ${errorMsg}`);
+            } else if (window.Logger) {
+                window.Logger.error('Error initializing strategy analysis page', { page: 'strategy-analysis-page', error });
+            }
         }
-    }
 }
 
 // Set up event listeners

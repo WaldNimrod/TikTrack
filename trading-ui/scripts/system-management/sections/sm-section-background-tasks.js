@@ -16,7 +16,7 @@ class SMBackgroundTasksSection extends SMBaseSection {
     this.apiEndpoints = {
       tasks: '/api/background-tasks/',
       history: '/api/background-tasks/history',
-      status: '/api/background-tasks/status'
+      status: '/api/background-tasks/' // Use main endpoint for status
     };
   }
 

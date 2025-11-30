@@ -39,7 +39,9 @@
     lastResultCount: 0,
     currentLimit: DEFAULT_LIMIT,
     metadataCache: new Map(),
-    config: { ...DEFAULT_CONFIG } // Store widget configuration
+    config: { ...DEFAULT_CONFIG }, // Store widget configuration
+    currentPage: 1, // Current page for pagination
+    lastLinkedItems: [] // Store full linked items for pagination
   };
 
   // DOM Elements cache
@@ -147,6 +149,103 @@
   }
 
   /**
+   * Initialize autocomplete for search input
+   */
+  function initAutocomplete() {
+    if (!elements.searchInput || !window.AutocompleteService) {
+      window.Logger?.warn?.('TagWidget: AutocompleteService not available or search input not found', { page: 'tag-widget' });
+      return;
+    }
+
+    window.Logger?.info?.('TagWidget: Initializing autocomplete...', { page: 'tag-widget' });
+
+    // Configure autocomplete
+    const autocompleteConfig = {
+      fetchFunction: async (query) => {
+        const entityType = elements.searchFilter?.value || null;
+        
+        try {
+          const result = await window.TagService.getSuggestions({ 
+            entityType, 
+            limit: 10,
+            force: false 
+          });
+          
+          // requestJSON already extracts data, but handle both formats
+          const suggestions = Array.isArray(result) ? result : (result?.data || []);
+          return suggestions;
+        } catch (error) {
+          window.Logger?.error?.('TagWidget: Error fetching suggestions for autocomplete', { error, page: 'tag-widget' });
+          return [];
+        }
+      },
+      minChars: 0, // Show suggestions even when input is empty
+      maxSuggestions: 10,
+      itemRenderer: (tag) => {
+        // Render with name + usage_count + category
+        // Escape HTML to prevent XSS
+        const escapeHtml = (text) => {
+          if (!text) return '';
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+        };
+        
+        const name = escapeHtml(tag.name || '');
+        const usageText = tag.usage_count ? ` • ${escapeHtml(String(tag.usage_count))} שיוכים` : '';
+        const categoryText = tag.category_name ? ` • ${escapeHtml(tag.category_name)}` : '';
+        return `${name}${usageText}${categoryText}`;
+      },
+      onSelect: (tag) => {
+        // Fill input + perform search
+        if (elements.searchInput) {
+          elements.searchInput.value = tag.name || '';
+        }
+        performSearch({
+          query: tag.name || '',
+          entityType: elements.searchFilter?.value || '',
+          limit: DEFAULT_LIMIT,
+          origin: 'autocomplete'
+        }).catch(() => {});
+      },
+      filterFunction: (suggestions, query) => {
+        // Filter by query (case-insensitive)
+        if (!query || !query.trim()) {
+          return suggestions;
+        }
+        const queryLower = query.trim().toLowerCase();
+        return suggestions.filter(tag => 
+          tag.name && tag.name.toLowerCase().includes(queryLower)
+        );
+      },
+      zIndex: 10000
+    };
+
+    // Initialize autocomplete
+    window.AutocompleteService.init(elements.searchInput, autocompleteConfig);
+
+    // Handle entity filter change - refresh suggestions
+    if (elements.searchFilter) {
+      elements.searchFilter.addEventListener('change', () => {
+        // Hide current autocomplete
+        window.AutocompleteService.hide(elements.searchInput);
+        
+        // Show suggestions again with new entity filter
+        if (elements.searchInput === document.activeElement) {
+          const query = elements.searchInput.value || '';
+          if (autocompleteConfig.minChars === 0 || query.length >= autocompleteConfig.minChars) {
+            autocompleteConfig.fetchFunction(query).then((suggestions) => {
+              if (suggestions && suggestions.length > 0) {
+                window.AutocompleteService.show(elements.searchInput, suggestions);
+              }
+            });
+          }
+        }
+      });
+    }
+  }
+
+  /**
    * Bind events
    */
   function bindEvents() {
@@ -167,6 +266,47 @@
       elements.searchForm.addEventListener('submit', (event) => {
         event.preventDefault();
         handleQuickSearchSubmit();
+      });
+    }
+    
+    // Event delegation for tag cloud buttons (survives ButtonSystem processing)
+    if (elements.cloudContainer) {
+      elements.cloudContainer.addEventListener('click', (event) => {
+        // Find clicked button
+        const button = event.target.closest('button[data-tag-id]');
+        if (!button) {
+          return;
+        }
+        
+        // Get tag ID
+        const tagId = button.getAttribute('data-tag-id');
+        const tagName = button.getAttribute('data-tag-name') || button.textContent?.trim();
+        
+        if (tagId && tagName) {
+          event.preventDefault();
+          event.stopPropagation();
+          
+          // Try to get full tag data from stored map
+          let tagData = null;
+          try {
+            const tagDataMapStr = elements.cloudContainer.dataset.tagDataMap;
+            if (tagDataMapStr) {
+              const tagDataMap = new Map(JSON.parse(tagDataMapStr));
+              tagData = tagDataMap.get(parseInt(tagId));
+            }
+          } catch (error) {
+            window.Logger?.warn?.('TagWidget: Failed to parse tag data map', { error, page: 'tag-widget' });
+          }
+          
+          // Create tag object from available data
+          const tag = tagData || {
+            tag_id: parseInt(tagId),
+            name: tagName
+          };
+          
+          window.Logger?.info?.('TagWidget: Tag clicked', { tagId, tagName, page: 'tag-widget' });
+          applyTagFromCloud(tag);
+        }
       });
     }
   }
@@ -271,22 +411,29 @@
     if (!elements.cloudContainer) {
       return;
     }
+    
+    // Store tag data before clearing container (needed for event delegation)
+    const usageValues = tags.map((tag) => tag.usage_count || 0);
+    const maxUsage = Math.max(...usageValues, 1);
+
+    // Clear container first
     elements.cloudContainer.innerHTML = '';
+    
     if (!Array.isArray(tags) || tags.length === 0) {
       if (elements.cloudEmpty) {
         elements.cloudEmpty.classList.remove('d-none');
       }
+      delete elements.cloudContainer.dataset.tagDataMap;
       return;
     }
     if (elements.cloudEmpty) {
       elements.cloudEmpty.classList.add('d-none');
     }
 
-    const usageValues = tags.map((tag) => tag.usage_count || 0);
-    const maxUsage = Math.max(...usageValues, 1);
-
     // Store tag tier info for restoration after button processing
+    // Also store full tag data for event delegation
     const tagTierMap = new Map();
+    const tagDataMap = new Map(); // Store full tag data by tag_id
     
     tags.forEach((tag) => {
       const button = document.createElement('button');
@@ -300,6 +447,9 @@
         usageCount: tag.usage_count || 0
       });
       
+      // Store full tag data for click handler
+      tagDataMap.set(tag.tag_id, tag);
+      
       button.type = 'button';
       button.dataset.buttonType = 'FILTER';
       button.dataset.variant = 'full';
@@ -311,11 +461,21 @@
       button.dataset.tooltipPlacement = 'top';
       button.dataset.tooltipTrigger = 'hover';
       button.dataset.tagId = tag.tag_id;
-      button.addEventListener('click', () => applyTagFromCloud(tag));
+      // Store tag name for event delegation fallback
+      button.dataset.tagName = tag.name || '';
       elements.cloudContainer.appendChild(button);
     });
 
     processButtons(elements.cloudContainer, tagTierMap);
+    
+    // Store tag data map in dataset for event delegation (survives ButtonSystem processing)
+    if (tagDataMap.size > 0) {
+      try {
+        elements.cloudContainer.dataset.tagDataMap = JSON.stringify(Array.from(tagDataMap.entries()));
+      } catch (error) {
+        window.Logger?.warn?.('TagWidget: Failed to store tag data map', { error, page: 'tag-widget' });
+      }
+    }
   }
 
   /**
@@ -354,21 +514,7 @@
    * Apply tag from cloud to search
    */
   function applyTagFromCloud(tag) {
-    if (elements.searchInput) {
-      // Use DataCollectionService to set value if available
-      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
-        window.DataCollectionService.setValue(elements.searchInput.id, tag.name || '', 'text');
-      } else {
-        elements.searchInput.value = tag.name || '';
-      }
-      elements.searchInput.focus();
-      
-      // Switch to search tab
-      if (elements.searchTab && window.bootstrap?.Tab) {
-        const searchTabInstance = new window.bootstrap.Tab(elements.searchTab);
-        searchTabInstance.show();
-      }
-    }
+    // Don't switch to search tab - stay on cloud tab and just open the drawer
     performSearch({
       query: tag.name || '',
       entityType: elements.searchFilter?.value || '',
@@ -406,6 +552,7 @@
     state.lastQuery = query;
     state.lastEntityFilter = entityType;
     state.currentLimit = limit;
+    state.currentPage = 1; // Reset to first page on new search
 
     if (origin === 'form' && elements.searchStatus) {
       updateStatus('מבצע חיפוש...', 'info');
@@ -475,17 +622,134 @@
   }
 
   /**
+   * Wait for ModalManagerV2 to be available
+   * @param {number} maxWait - Maximum wait time in milliseconds (default: 2000)
+   * @returns {Promise<boolean>} - True if ModalManagerV2 is available, false otherwise
+   */
+  async function waitForModalManager(maxWait = 2000) {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      return true;
+    }
+
+    const startTime = Date.now();
+    const checkInterval = 100;
+
+    return new Promise((resolve) => {
+      const checkModalManager = () => {
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+          window.Logger?.info?.('ModalManagerV2 available after wait', { 
+            waitTime: Date.now() - startTime,
+            page: 'tag-widget' 
+          });
+          resolve(true);
+          return;
+        }
+
+        if (Date.now() - startTime >= maxWait) {
+          window.Logger?.warn?.('ModalManagerV2 not available after waiting', { 
+            waitTime: maxWait,
+            page: 'tag-widget' 
+          });
+          resolve(false);
+          return;
+        }
+
+        setTimeout(checkModalManager, checkInterval);
+      };
+
+      checkModalManager();
+    });
+  }
+
+  /**
+   * Wait for drawer to be created in DOM
+   * @param {number} maxWait - Maximum wait time in milliseconds (default: 2000)
+   * @returns {Promise<boolean>} - True if drawer exists, false otherwise
+   */
+  async function waitForDrawer(maxWait = 2000) {
+    if (document.getElementById('tagSearchDrawer')) {
+      return true;
+    }
+
+    const startTime = Date.now();
+    const checkInterval = 100;
+
+    return new Promise((resolve) => {
+      const checkDrawer = () => {
+        if (document.getElementById('tagSearchDrawer')) {
+          window.Logger?.info?.('Tag search drawer found after wait', { 
+            waitTime: Date.now() - startTime,
+            page: 'tag-widget' 
+          });
+          resolve(true);
+          return;
+        }
+
+        if (Date.now() - startTime >= maxWait) {
+          window.Logger?.warn?.('Tag search drawer not found after waiting', { 
+            waitTime: maxWait,
+            page: 'tag-widget' 
+          });
+          resolve(false);
+          return;
+        }
+
+        setTimeout(checkDrawer, checkInterval);
+      };
+
+      checkDrawer();
+    });
+  }
+
+  /**
    * Open search results drawer
    */
   async function openDrawer({ query, entityType, results, total }) {
-    if (!window.ModalManagerV2) {
-      window.Logger?.warn?.('ModalManagerV2 missing, cannot open tag search drawer', { page: 'index' });
+    // Wait for ModalManagerV2 to be available (with retry)
+    const modalManagerReady = await waitForModalManager(3000);
+    
+    if (!modalManagerReady) {
+      window.Logger?.error?.('ModalManagerV2 not available, cannot open tag search drawer', { 
+        page: 'tag-widget',
+        ModalManagerV2Exists: typeof window.ModalManagerV2 !== 'undefined',
+        hasShowModal: typeof window.ModalManagerV2?.showModal === 'function'
+      });
+      window.NotificationSystem?.showError?.('מערכת החלונות לא זמינה. אנא רענן את הדף.');
       return;
     }
-    await window.ModalManagerV2.showModal('tagSearchDrawer', 'view');
-    // Re-cache drawer elements in case DOM was recreated
-    ensureDrawerChrome();
-    hydrateDrawer({ query, entityType, results, total });
+
+    // Wait for drawer to be created (ModalManagerV2.createCRUDModal needs to run first)
+    const drawerReady = await waitForDrawer(2000);
+    
+    if (!drawerReady) {
+      window.Logger?.warn?.('Tag search drawer not found, attempting to initialize...', { 
+        page: 'tag-widget' 
+      });
+      
+      // Try to initialize the drawer if tagSearchDrawerConfig exists
+      if (window.tagSearchDrawerConfig && window.ModalManagerV2?.createCRUDModal) {
+        try {
+          window.ModalManagerV2.createCRUDModal(window.tagSearchDrawerConfig);
+          // Wait a bit more for drawer to be created
+          await new Promise(resolve => setTimeout(resolve, 200));
+        } catch (error) {
+          window.Logger?.error?.('Failed to initialize tag search drawer', { error, page: 'tag-widget' });
+        }
+      }
+    }
+
+    try {
+      await window.ModalManagerV2.showModal('tagSearchDrawer', 'view');
+      // Re-cache drawer elements in case DOM was recreated
+      ensureDrawerChrome();
+      hydrateDrawer({ query, entityType, results, total });
+    } catch (error) {
+      window.Logger?.error?.('Failed to open tag search drawer', { 
+        error, 
+        page: 'tag-widget' 
+      });
+      window.NotificationSystem?.showError?.('שגיאה בפתיחת חלון החיפוש. אנא נסה שוב.');
+    }
   }
 
   /**
@@ -538,43 +802,414 @@
   }
 
   /**
-   * Render drawer rows
+   * Add pagination controls to linked items table
+   * @param {string} tableId - Table ID
+   * @param {number} totalItems - Total number of items
+   * @param {number} pageSize - Items per page
+   * @param {number} currentPage - Current page number
+   * @param {number} totalPages - Total number of pages
    */
-  function renderDrawerRows(results) {
-    if (!elements.drawerResultsBody) {
+  function addPaginationControls(tableId, totalItems, pageSize, currentPage, totalPages) {
+    if (totalPages <= 1) {
+      // No pagination needed
       return;
     }
-    elements.drawerResultsBody.innerHTML = '';
+    
+    const table = document.getElementById(tableId);
+    if (!table) {
+      return;
+    }
+    
+    // Find table wrapper
+    const tableWrapper = table.closest('.table-responsive');
+    if (!tableWrapper) {
+      return;
+    }
+    
+    // Remove existing pagination if any
+    const existingPagination = tableWrapper.parentElement.querySelector('.linked-items-pagination');
+    if (existingPagination) {
+      existingPagination.remove();
+    }
+    
+    // Create pagination container
+    const paginationContainer = document.createElement('div');
+    paginationContainer.className = 'linked-items-pagination d-flex justify-content-between align-items-center mt-3';
+    
+    // Page info
+    const startItem = (currentPage - 1) * pageSize + 1;
+    const endItem = Math.min(currentPage * pageSize, totalItems);
+    const pageInfo = document.createElement('div');
+    pageInfo.className = 'text-muted small';
+    pageInfo.textContent = `מציג ${startItem}-${endItem} מתוך ${totalItems} רשומות`;
+    paginationContainer.appendChild(pageInfo);
+    
+    // Pagination controls
+    const paginationControls = document.createElement('div');
+    paginationControls.className = 'd-flex gap-2 align-items-center';
+    
+    // Previous button
+    const prevButton = document.createElement('button');
+    prevButton.type = 'button';
+    prevButton.className = 'btn btn-sm btn-outline-secondary';
+    prevButton.textContent = '← קודם';
+    prevButton.disabled = currentPage === 1;
+    prevButton.onclick = () => {
+      if (currentPage > 1) {
+        goToPage(currentPage - 1);
+      }
+    };
+    paginationControls.appendChild(prevButton);
+    
+    // Page numbers
+    const pageNumbers = document.createElement('div');
+    pageNumbers.className = 'd-flex gap-1 align-items-center';
+    
+    // Show page numbers (max 5 pages)
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    if (startPage > 1) {
+      const firstButton = document.createElement('button');
+      firstButton.type = 'button';
+      firstButton.className = 'btn btn-sm btn-outline-secondary';
+      firstButton.textContent = '1';
+      firstButton.onclick = () => {
+        goToPage(1);
+      };
+      pageNumbers.appendChild(firstButton);
+      
+      if (startPage > 2) {
+        const ellipsis = document.createElement('span');
+        ellipsis.className = 'text-muted';
+        ellipsis.textContent = '...';
+        pageNumbers.appendChild(ellipsis);
+      }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      const pageButton = document.createElement('button');
+      pageButton.type = 'button';
+      pageButton.className = `btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-outline-secondary'}`;
+      pageButton.textContent = String(i);
+      pageButton.onclick = () => {
+        goToPage(i);
+      };
+      pageNumbers.appendChild(pageButton);
+    }
+    
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        const ellipsis = document.createElement('span');
+        ellipsis.className = 'text-muted';
+        ellipsis.textContent = '...';
+        pageNumbers.appendChild(ellipsis);
+      }
+      
+      const lastButton = document.createElement('button');
+      lastButton.type = 'button';
+      lastButton.className = 'btn btn-sm btn-outline-secondary';
+      lastButton.textContent = String(totalPages);
+      lastButton.onclick = () => {
+        goToPage(totalPages);
+      };
+      pageNumbers.appendChild(lastButton);
+    }
+    
+    paginationControls.appendChild(pageNumbers);
+    
+    // Next button
+    const nextButton = document.createElement('button');
+    nextButton.type = 'button';
+    nextButton.className = 'btn btn-sm btn-outline-secondary';
+    nextButton.textContent = 'הבא →';
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.onclick = () => {
+      if (currentPage < totalPages) {
+        goToPage(currentPage + 1);
+      }
+    };
+    paginationControls.appendChild(nextButton);
+    
+    paginationContainer.appendChild(paginationControls);
+    
+    // Insert pagination after table wrapper
+    tableWrapper.parentElement.insertBefore(paginationContainer, tableWrapper.nextSibling);
+  }
+
+  /**
+   * Go to specific page in pagination
+   * @param {number} page - Page number to navigate to
+   */
+  function goToPage(page) {
+    if (!state.lastLinkedItems || !Array.isArray(state.lastLinkedItems)) {
+      window.Logger?.warn?.('TagWidget: Cannot go to page, no linked items available', { page: 'tag-widget' });
+      return;
+    }
+    
+    const totalItems = state.lastLinkedItems.length || 0;
+    const pageSize = 25; // Default page size
+    const totalPages = Math.ceil(totalItems / pageSize);
+    
+    if (page < 1 || page > totalPages) {
+      window.Logger?.warn?.('TagWidget: Invalid page number', { page, totalPages, page: 'tag-widget' });
+      return;
+    }
+    
+    state.currentPage = page;
+    
+    // Update table body with paginated items
+    const tableId = 'linkedItemsTable_tag_search';
+    const table = document.getElementById(tableId);
+    if (!table) {
+      window.Logger?.warn?.('TagWidget: Table not found for pagination', { tableId, page: 'tag-widget' });
+      return;
+    }
+    
+    // Get paginated items
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedItems = state.lastLinkedItems.slice(startIndex, endIndex);
+    
+    // Update table body using EntityDetailsRenderer
+    if (window.entityDetailsRenderer && typeof window.entityDetailsRenderer.updateLinkedItemsTableBody === 'function') {
+      window.entityDetailsRenderer.updateLinkedItemsTableBody(tableId, paginatedItems);
+      
+      // Update pagination controls
+      const tableWrapper = table.closest('.table-responsive');
+      if (tableWrapper) {
+        const existingPagination = tableWrapper.parentElement.querySelector('.linked-items-pagination');
+        if (existingPagination) {
+          existingPagination.remove();
+        }
+        addPaginationControls(tableId, totalItems, pageSize, page, totalPages);
+      }
+      
+      // Re-process buttons after update
+      if (window.ButtonSystem && typeof window.ButtonSystem.processButtons === 'function') {
+        window.ButtonSystem.processButtons(elements.drawerBody);
+      }
+      if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+        window.ButtonSystem.initializeButtons();
+      }
+    } else {
+      // Fallback: re-render if updateLinkedItemsTableBody not available
+      window.Logger?.warn?.('TagWidget: updateLinkedItemsTableBody not available, re-rendering', { page: 'tag-widget' });
+      renderDrawerRows(state.lastResults);
+    }
+  }
+
+  /**
+   * Render drawer rows using EntityDetailsRenderer.renderLinkedItems
+   * Uses existing linked items system instead of custom rendering
+   */
+  function renderDrawerRows(results) {
+    if (!elements.drawerBody) {
+      return;
+    }
+    
     if (!Array.isArray(results) || results.length === 0) {
       if (elements.drawerEmpty) {
         elements.drawerEmpty.classList.remove('d-none');
       }
+      // Hide table if exists
+      const tableWrapper = elements.drawerBody.querySelector('.table-responsive');
+      if (tableWrapper) {
+        tableWrapper.classList.add('d-none');
+      }
       return;
     }
 
-    const flattened = [];
+    // Convert search results to linked items format
+    const linkedItems = [];
     results.forEach((entry) => {
       const tag = entry.tag;
       (entry.assignments || []).forEach((assignment) => {
-        flattened.push({
-          entity_type: assignment.entity_type,
-          entity_id: assignment.entity_id,
-          linked_at: assignment.linked_at,
-          tag
+        linkedItems.push({
+          type: assignment.entity_type,
+          id: assignment.entity_id,
+          created_at: assignment.created_at || assignment.linked_at,
+          updated_at: assignment.updated_at || assignment.linked_at,
+          // Store tag info for reference (renderLinkedItems will handle display)
+          _tag: tag
         });
       });
     });
 
-    if (flattened.length === 0 && elements.drawerEmpty) {
-      elements.drawerEmpty.classList.remove('d-none');
+    if (linkedItems.length === 0) {
+      if (elements.drawerEmpty) {
+        elements.drawerEmpty.classList.remove('d-none');
+      }
+      // Hide table if exists
+      const tableWrapper = elements.drawerBody.querySelector('.table-responsive');
+      if (tableWrapper) {
+        tableWrapper.classList.add('d-none');
+      }
       return;
     }
 
-    flattened.forEach((item) => {
-      const row = buildDrawerRow(item);
-      elements.drawerResultsBody.appendChild(row);
-      hydrateRowMetadata(row, item);
-    });
+    // Hide empty message
+    if (elements.drawerEmpty) {
+      elements.drawerEmpty.classList.add('d-none');
+    }
+
+    // Use EntityDetailsRenderer.renderLinkedItems to generate the table
+    if (!window.entityDetailsRenderer || typeof window.entityDetailsRenderer.renderLinkedItems !== 'function') {
+      window.Logger?.error?.('EntityDetailsRenderer.renderLinkedItems not available', { page: 'tag-widget' });
+      if (elements.drawerError) {
+        elements.drawerError.textContent = 'מערכת הצגת פריטים מקושרים אינה זמינה';
+        elements.drawerError.classList.remove('d-none');
+      }
+      return;
+    }
+
+    // Get entity color for the table
+    const entityColor = (window.getEntityColor && typeof window.getEntityColor === 'function')
+      ? window.getEntityColor('tag')
+      : '#6c757d';
+
+    // Create sourceInfo for the drawer
+    const sourceInfo = {
+      sourceModal: 'tag-search-drawer',
+      sourceType: 'tag',
+      sourceId: 'search'
+    };
+
+    // Store full linked items for pagination (before enrichment)
+    // We'll store enriched items after renderLinkedItems completes
+    const allLinkedItems = linkedItems;
+    
+    // Pagination settings
+    const pageSize = 25; // Default page size
+    const currentPage = state.currentPage || 1;
+    const totalPages = Math.ceil(allLinkedItems.length / pageSize);
+    
+    // Render linked items table with ALL items first for enrichment
+    // renderLinkedItems will enrich all items, but we'll handle pagination manually
+    // Disable pagination in renderLinkedItems - we'll do it ourselves
+    const linkedItemsHtml = window.entityDetailsRenderer.renderLinkedItems(
+      allLinkedItems, // Pass ALL items for enrichment
+      entityColor,
+      'tag',
+      'search',
+      sourceInfo,
+      { enablePagination: false } // Disable built-in pagination - we handle it manually
+    );
+
+    // Replace the table wrapper with the linked items section
+    // renderLinkedItems returns a full section - we'll insert it and hide its header
+    const tableWrapper = elements.drawerBody.querySelector('.table-responsive');
+    
+    // Remove any existing linked items section from previous search
+    const existingSection = elements.drawerBody.querySelector('section.content-section[data-section^="linked-items-"]');
+    if (existingSection) {
+      existingSection.remove();
+    }
+    
+    if (linkedItemsHtml) {
+      // Parse the HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = linkedItemsHtml.trim();
+      
+      // Find the section in the generated HTML
+      const linkedItemsSection = tempDiv.querySelector('section.content-section');
+      if (linkedItemsSection) {
+        // Hide the section header (we already have title/subtitle in drawer header)
+        const sectionHeader = linkedItemsSection.querySelector('.section-header-with-extra-info');
+        if (sectionHeader) {
+          sectionHeader.style.display = 'none';
+        }
+        
+        // Remove existing linked items section if exists
+        const existingLinkedSection = elements.drawerBody.querySelector('section.content-section[data-section^="linked-items-"]');
+        if (existingLinkedSection) {
+          existingLinkedSection.remove();
+        }
+        
+        // Remove existing table wrapper if exists
+        if (tableWrapper) {
+          tableWrapper.remove();
+        }
+        
+        // Insert section before footer controls or at the end
+        const footerControls = elements.drawerBody.querySelector('#tagSearchModalFooterControls');
+        const clonedSection = linkedItemsSection.cloneNode(true);
+        
+        if (footerControls) {
+          elements.drawerBody.insertBefore(clonedSection, footerControls);
+        } else {
+          elements.drawerBody.appendChild(clonedSection);
+        }
+        
+        // Wait for DOM to update and table to be available before initializing
+        setTimeout(() => {
+          // Verify table exists in DOM
+          const tableId = 'linkedItemsTable_tag_search';
+          const table = document.getElementById(tableId);
+          
+          if (table) {
+            // Initialize tooltips and other dynamic features after DOM update
+            if (window.ButtonSystem && typeof window.ButtonSystem.processButtons === 'function') {
+              window.ButtonSystem.processButtons(elements.drawerBody);
+            }
+            // Also trigger button initialization from renderLinkedItems
+            if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+              window.ButtonSystem.initializeButtons();
+            }
+            
+            // Store enriched items from TableDataRegistry for pagination
+            // These are the items that were enriched by renderLinkedItems
+            if (window.TableDataRegistry) {
+              const tableType = window.TableDataRegistry.resolveTableType?.(tableId) || 'linked_items__tag_search';
+              const enrichedItems = window.TableDataRegistry.getFullData?.(tableType, { asReference: true });
+              if (Array.isArray(enrichedItems) && enrichedItems.length > 0) {
+                // Store enriched items - these will be used for pagination
+                state.lastLinkedItems = enrichedItems;
+                window.Logger?.debug?.('TagWidget: Stored enriched items for pagination', {
+                  count: enrichedItems.length,
+                  totalOriginal: allLinkedItems.length,
+                  page: 'tag-widget'
+                });
+                
+                // Now paginate: show only items for current page
+                const startIndex = (currentPage - 1) * pageSize;
+                const endIndex = startIndex + pageSize;
+                const paginatedItems = enrichedItems.slice(startIndex, endIndex);
+                
+                // Update table to show only paginated items
+                if (window.entityDetailsRenderer && typeof window.entityDetailsRenderer.updateLinkedItemsTableBody === 'function') {
+                  window.entityDetailsRenderer.updateLinkedItemsTableBody(tableId, paginatedItems);
+                  window.Logger?.debug?.('TagWidget: Updated table with paginated items', {
+                    page: currentPage,
+                    itemsShown: paginatedItems.length,
+                    totalItems: enrichedItems.length,
+                    page: 'tag-widget'
+                  });
+                }
+              } else {
+                // Fallback: use original items if enrichment not available
+                state.lastLinkedItems = allLinkedItems;
+              }
+            } else {
+              // Fallback: use original items if TableDataRegistry not available
+              state.lastLinkedItems = allLinkedItems;
+            }
+            
+            // Add pagination if needed
+            addPaginationControls(tableId, allLinkedItems.length, pageSize, currentPage, totalPages);
+          } else {
+            window.Logger?.warn?.('TagWidget: Table not found in DOM after insertion', {
+              tableId,
+              page: 'tag-widget'
+            });
+          }
+        }, 200); // Increased timeout to ensure DOM is ready
+      }
+    }
   }
 
   /**
@@ -868,6 +1503,7 @@
             applyHeightConfiguration();
             bindEvents();
             ensureDrawerChrome();
+            initAutocomplete();
             refreshTagCloud().catch((error) => {
               window.Logger?.error?.('TagWidget: Error during initial refresh (retry)', { error, page: 'tag-widget' });
             });
@@ -884,6 +1520,9 @@
       
       bindEvents();
       ensureDrawerChrome();
+      
+      // Initialize autocomplete for search input
+      initAutocomplete();
       
       // Set active tab from config
       if (config.defaultTab === 'search' && elements.searchTab && window.bootstrap?.Tab) {
@@ -917,6 +1556,12 @@
     destroy() {
       state.initialized = false;
       state.metadataCache.clear();
+      
+      // Destroy autocomplete if exists
+      if (elements.searchInput && window.AutocompleteService) {
+        window.AutocompleteService.destroy(elements.searchInput);
+      }
+      
       // Clear event listeners if needed
     },
 
@@ -926,6 +1571,14 @@
      */
     refreshTagCloud(options = {}) {
       return refreshTagCloud(options);
+    },
+
+    /**
+     * Go to specific page in pagination
+     * @param {number} page - Page number to navigate to
+     */
+    goToPage(page) {
+      return goToPage(page);
     },
 
     version: '1.0.0'

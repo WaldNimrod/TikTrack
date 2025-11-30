@@ -626,6 +626,37 @@ const INFO_SUMMARY_CONFIGS = {
         formatter: 'integer'
       }
     ]
+  },
+
+  // AI Analysis page configuration
+  'ai-analysis': {
+    containerId: 'summaryStats',
+    tableType: 'ai_analysis',
+    stats: [
+      {
+        id: 'totalAnalyses',
+        label: 'סה"כ ניתוחים',
+        calculator: 'count'
+      },
+      {
+        id: 'completedAnalyses',
+        label: 'ניתוחים הושלמו',
+        calculator: 'countByField',
+        params: { field: 'status', value: 'completed' }
+      },
+      {
+        id: 'pendingAnalyses',
+        label: 'ניתוחים ממתינים',
+        calculator: 'countByField',
+        params: { field: 'status', value: 'pending' }
+      },
+      {
+        id: 'failedAnalyses',
+        label: 'ניתוחים נכשלו',
+        calculator: 'countByField',
+        params: { field: 'status', value: 'failed' }
+      }
+    ]
   }
 };
 

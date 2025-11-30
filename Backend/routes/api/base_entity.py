@@ -324,6 +324,36 @@ class BaseEntityAPI:
             if not existing_record:
                 return self._error_response(f"{self.entity_name.title()} with ID {entity_id} not found", normalizer), 404
             
+            # Remove tag associations before deleting the entity
+            # Note: Event listeners will also handle this automatically, but this ensures cleanup
+            # even if event listeners fail or are not triggered
+            try:
+                from services.tag_service import TagService
+                
+                # Map entity_name to entity_type
+                entity_type_map = {
+                    'cash_flows': 'cash_flow',
+                    'trades': 'trade',
+                    'trade_plans': 'trade_plan',
+                    'executions': 'execution',
+                    'trading_accounts': 'trading_account',
+                    'tickers': 'ticker',
+                    'alerts': 'alert',
+                    'notes': 'note',
+                }
+                
+                entity_type = entity_type_map.get(self.entity_name)
+                if entity_type:
+                    TagService.remove_all_tags_for_entity(
+                        db, entity_type, entity_id
+                    )
+            except Exception as tag_error:
+                self.logger.warning(
+                    "Failed to remove tags for %s %s before deletion: %s",
+                    self.entity_name, entity_id, tag_error
+                )
+                # Continue with deletion even if tag cleanup fails
+            
             # Delete record via service
             if hasattr(self.service_class, 'delete'):
                 import inspect

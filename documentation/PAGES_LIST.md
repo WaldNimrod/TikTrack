@@ -95,6 +95,7 @@
 | **trade_plans.html** | תכניות מסחר | `http://localhost:5000/trade_plans.html` | `/api/trade-plans/*` | ✅ TradePlanBusinessService | ✅ מוכן |
 | **alerts.html** | מערכת התראות | `http://localhost:5000/alerts.html` | `/api/alerts/*` | ✅ AlertBusinessService | ✅ מוכן |
 | **tickers.html** | ניהול טיקרים | `http://localhost:5000/tickers.html` | `/api/tickers/*` | ✅ TickerBusinessService | ✅ מוכן |
+| **ticker-dashboard.html** | דשבורד טיקר מורחב | `http://localhost:5000/ticker-dashboard.html` | `/api/tickers/{id}/*` | ✅ TickerBusinessService | ✅ מוכן |
 | **trading_accounts.html** | חשבונות מסחר | `http://localhost:5000/trading_accounts.html` | `/api/trading-accounts/*` | ✅ TradingAccountBusinessService | ✅ מוכן |
 | **executions.html** | ביצועי עסקאות | `http://localhost:5000/executions.html` | `/api/executions/*` | ✅ ExecutionBusinessService | ✅ מוכן |
 | **data_import.html** | ייבוא נתונים | `http://localhost:5000/data_import.html` | `/api/user-data-import/*` | ❌ חסר | ⏳ צריך Business Service |

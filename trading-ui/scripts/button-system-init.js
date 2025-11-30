@@ -818,7 +818,13 @@ class AdvancedButtonSystem {
             let content = '';
             if (variant === 'small') {
                 // For small variant, prefer icon, but fallback to text if icon is empty
-                content = icon || buttonText;
+                // CRITICAL: For TOGGLE buttons, always ensure there's content (icon or fallback emoji)
+                if (typeUpper === 'TOGGLE') {
+                    // For TOGGLE buttons, use icon if available, otherwise use chevron emoji as fallback
+                    content = icon || '▼';
+                } else {
+                    content = icon || buttonText;
+                }
             } else if (variant === 'normal') {
                 content = buttonText;
             } else if (variant === 'full') {
@@ -831,7 +837,14 @@ class AdvancedButtonSystem {
             return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${tooltipAttrs}${allAttributes}>${content}</button>`;
         } else {
             this.logger.warn('Button system dependencies not found, using fallback');
-            return this.createFallbackButton(type, onClick, classes, attributes, text, id);
+            // CRITICAL: For TOGGLE buttons, ensure fallback has content
+            const fallbackButton = this.createFallbackButton(type, onClick, classes, attributes, text, id);
+            // If it's a TOGGLE button with small variant and no content, add chevron emoji
+            if (type && type.toUpperCase() === 'TOGGLE' && variant === 'small' && !fallbackButton.includes('>') || fallbackButton.match(/>\s*</)) {
+                // Replace empty content with chevron emoji
+                return fallbackButton.replace(/>\s*</, '>▼<');
+            }
+            return fallbackButton;
         }
     }
 

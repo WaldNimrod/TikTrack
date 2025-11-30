@@ -78,26 +78,54 @@ Build the report this way:
             {
                 "key": "stock_ticker",
                 "label": "Stock Ticker / Company Name",
-                "type": "text",
+                "type": "select",
                 "required": False,
-                "placeholder": "Add name if you want specific analysis",
-                "default_value": None
+                "placeholder": "בחר טיקר...",
+                "default_value": None,
+                "options": [],
+                "integration": "tickers"
             },
             {
                 "key": "investment_thesis",
                 "label": "Investment Thesis",
-                "type": "textarea",
+                "type": "select",
                 "required": False,
-                "placeholder": "Add input here",
-                "default_value": None
+                "placeholder": "בחר סיבה...",
+                "default_value": None,
+                "options": [],
+                "integration": "reasons"
             },
             {
                 "key": "goal",
                 "label": "Goal",
-                "type": "textarea",
+                "type": "select",
                 "required": False,
-                "placeholder": "Add the goal here",
-                "default_value": None
+                "placeholder": "בחר מטרה...",
+                "default_value": None,
+                "options": [
+                    {"value": "long_term_investment", "label": "השקעה ארוכת טווח - בניית פורטפוליו יציב"},
+                    {"value": "short_term_trading", "label": "מסחר קצר טווח - רווחים מהירים"},
+                    {"value": "sector_analysis", "label": "ניתוח סקטור - הבנת תעשייה ספציפית"},
+                    {"value": "valuation_check", "label": "בדיקת הערכה - האם המניה מוערכת נכון"},
+                    {"value": "risk_assessment", "label": "הערכת סיכונים - זיהוי סיכונים פוטנציאליים"},
+                    {"value": "entry_timing", "label": "תזמון כניסה - מתי הזמן הנכון לקנות"},
+                    {"value": "exit_strategy", "label": "אסטרטגיית יציאה - מתי למכור"},
+                    {"value": "portfolio_diversification", "label": "גיוון פורטפוליו - הוספת מניה לפורטפוליו"},
+                    {"value": "competitive_analysis", "label": "ניתוח תחרותי - השוואה למתחרים"},
+                    {"value": "fundamental_review", "label": "סקירה פונדמנטלית - בדיקת יסודות החברה"}
+                ]
+            },
+            {
+                "key": "response_language",
+                "label": "Response Language / שפת המשוב",
+                "type": "select",
+                "required": False,
+                "placeholder": "בחר שפה...",
+                "default_value": "hebrew",
+                "options": [
+                    {"value": "hebrew", "label": "עברית"},
+                    {"value": "english", "label": "English"}
+                ]
             }
         ]
     }, ensure_ascii=False),
@@ -200,6 +228,18 @@ Build the report this way:
                 "required": False,
                 "options": ["swing", "investment", "passive", "day_trading", "scalping"],
                 "default_value": None
+            },
+            {
+                "key": "response_language",
+                "label": "Response Language / שפת המשוב",
+                "type": "select",
+                "required": False,
+                "placeholder": "בחר שפה...",
+                "default_value": "hebrew",
+                "options": [
+                    {"value": "hebrew", "label": "עברית"},
+                    {"value": "english", "label": "English"}
+                ]
             }
         ]
     }, ensure_ascii=False),
@@ -305,6 +345,18 @@ Build the report this way:
                 "required": False,
                 "placeholder": "Optional - filter by trading account",
                 "default_value": None
+            },
+            {
+                "key": "response_language",
+                "label": "Response Language / שפת המשוב",
+                "type": "select",
+                "required": False,
+                "placeholder": "בחר שפה...",
+                "default_value": "hebrew",
+                "options": [
+                    {"value": "hebrew", "label": "עברית"},
+                    {"value": "english", "label": "English"}
+                ]
             }
         ]
     }, ensure_ascii=False),
@@ -397,6 +449,18 @@ Build the report this way:
                 "required": False,
                 "options": ["swing", "investment", "passive", "day_trading", "scalping"],
                 "default_value": None
+            },
+            {
+                "key": "response_language",
+                "label": "Response Language / שפת המשוב",
+                "type": "select",
+                "required": False,
+                "placeholder": "בחר שפה...",
+                "default_value": "hebrew",
+                "options": [
+                    {"value": "hebrew", "label": "עברית"},
+                    {"value": "english", "label": "English"}
+                ]
             }
         ]
     }, ensure_ascii=False),
@@ -412,8 +476,13 @@ TEMPLATES = [
 ]
 
 
-def seed_templates(db: Session):
-    """Seed AI prompt templates"""
+def seed_templates(db: Session, update_existing: bool = True):
+    """Seed AI prompt templates
+    
+    Args:
+        db: Database session
+        update_existing: If True, update existing templates instead of skipping
+    """
     logger.info("🚀 Starting AI prompt templates seeding...")
     
     for template in TEMPLATES:
@@ -424,19 +493,36 @@ def seed_templates(db: Session):
         ).fetchone()
         
         if result:
-            logger.info(f"⏭️  Template '{template['name']}' already exists, skipping...")
-            continue
-        
-        # Insert template
-        db.execute(
-            text("""
-                INSERT INTO ai_prompt_templates 
-                (name, name_he, description, prompt_text, variables_json, is_active, sort_order)
-                VALUES (:name, :name_he, :description, :prompt_text, :variables_json, :is_active, :sort_order)
-            """),
-            template
-        )
-        logger.info(f"✅ Created template: {template['name']}")
+            if update_existing:
+                # Update existing template
+                db.execute(
+                    text("""
+                        UPDATE ai_prompt_templates 
+                        SET name_he = :name_he,
+                            description = :description,
+                            prompt_text = :prompt_text,
+                            variables_json = :variables_json,
+                            is_active = :is_active,
+                            sort_order = :sort_order
+                        WHERE name = :name
+                    """),
+                    template
+                )
+                logger.info(f"🔄 Updated template: {template['name']}")
+            else:
+                logger.info(f"⏭️  Template '{template['name']}' already exists, skipping...")
+                continue
+        else:
+            # Insert new template
+            db.execute(
+                text("""
+                    INSERT INTO ai_prompt_templates 
+                    (name, name_he, description, prompt_text, variables_json, is_active, sort_order)
+                    VALUES (:name, :name_he, :description, :prompt_text, :variables_json, :is_active, :sort_order)
+                """),
+                template
+            )
+            logger.info(f"✅ Created template: {template['name']}")
     
     db.commit()
     logger.info("🎉 AI prompt templates seeding completed successfully!")

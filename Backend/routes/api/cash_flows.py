@@ -671,14 +671,7 @@ def delete_cash_flow(cash_flow_id: int):
         cash_flow = db.query(CashFlow).filter(CashFlow.id == cash_flow_id).first()
         
         if cash_flow:
-            try:
-                TagService.remove_all_tags_for_entity(db, 'cash_flow', cash_flow_id)
-            except ValueError as tag_error:
-                logger.warning(
-                    "Failed to remove tags for cash_flow %s before deletion: %s",
-                    cash_flow_id,
-                    tag_error,
-                )
+            # Tag cleanup is handled automatically by SQLAlchemy event listeners
             db.delete(cash_flow)
             # CRITICAL: Must commit here to make deletion visible to subsequent queries
             db.commit()

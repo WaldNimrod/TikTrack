@@ -44,6 +44,9 @@
         // Setup form handlers
         this.setupFormHandlers();
 
+        // Restore button children after ButtonSystem processing
+        this.restoreButtonChildren();
+
         this.initialized = true;
         window.Logger?.info('✅ AI Analysis Settings Manager initialized successfully', { page: 'user-profile' });
       } catch (error) {
@@ -483,6 +486,57 @@
     },
 
     /**
+     * Restore button children after ButtonSystem processing
+     * שחזור ילדי כפתורים אחרי עיבוד ButtonSystem
+     */
+    restoreButtonChildren() {
+      // Wait for ButtonSystem to finish processing
+      setTimeout(() => {
+        // Save Settings Button
+        const saveBtn = document.getElementById('saveAiAnalysisBtn');
+        if (saveBtn) {
+          // If button is empty or missing text, restore it
+          const currentText = saveBtn.textContent?.trim() || '';
+          const dataText = saveBtn.getAttribute('data-text') || 'שמור הגדרות';
+          
+          if (!currentText || currentText.length === 0) {
+            // Button is empty - restore text and spans
+            saveBtn.innerHTML = `<span id="saveAiAnalysisBtnText">${dataText}</span><span id="saveAiAnalysisBtnSpinner" class="btn-spinner d-none">⏳ שומר...</span>`;
+          } else if (!saveBtn.querySelector('#saveAiAnalysisBtnText')) {
+            // Button has text but no spans - wrap existing text
+            saveBtn.innerHTML = `<span id="saveAiAnalysisBtnText">${currentText}</span><span id="saveAiAnalysisBtnSpinner" class="btn-spinner d-none">⏳ שומר...</span>`;
+          }
+        }
+
+        // Validate Gemini Button
+        const geminiBtn = document.getElementById('validateGeminiBtn');
+        if (geminiBtn) {
+          const currentText = geminiBtn.textContent?.trim() || '';
+          const dataText = geminiBtn.getAttribute('data-text') || 'בדוק Gemini Key';
+          
+          if (!currentText || currentText.length === 0) {
+            geminiBtn.innerHTML = `<span id="validateGeminiBtnText">${dataText}</span><span id="validateGeminiBtnSpinner" class="btn-spinner d-none">⏳ בודק...</span>`;
+          } else if (!geminiBtn.querySelector('#validateGeminiBtnText')) {
+            geminiBtn.innerHTML = `<span id="validateGeminiBtnText">${currentText}</span><span id="validateGeminiBtnSpinner" class="btn-spinner d-none">⏳ בודק...</span>`;
+          }
+        }
+
+        // Validate Perplexity Button
+        const perplexityBtn = document.getElementById('validatePerplexityBtn');
+        if (perplexityBtn) {
+          const currentText = perplexityBtn.textContent?.trim() || '';
+          const dataText = perplexityBtn.getAttribute('data-text') || 'בדוק Perplexity Key';
+          
+          if (!currentText || currentText.length === 0) {
+            perplexityBtn.innerHTML = `<span id="validatePerplexityBtnText">${dataText}</span><span id="validatePerplexityBtnSpinner" class="btn-spinner d-none">⏳ בודק...</span>`;
+          } else if (!perplexityBtn.querySelector('#validatePerplexityBtnText')) {
+            perplexityBtn.innerHTML = `<span id="validatePerplexityBtnText">${currentText}</span><span id="validatePerplexityBtnSpinner" class="btn-spinner d-none">⏳ בודק...</span>`;
+          }
+        }
+      }, 500);
+    },
+
+    /**
      * Set loading state for button
      * הגדרת מצב טעינה לכפתור
      */
@@ -493,6 +547,25 @@
 
       if (btn) {
         btn.disabled = loading;
+        
+        // If button was processed by ButtonSystem and children don't exist,
+        // work directly with button textContent
+        if (!text && !spinner) {
+          const originalText = btn.getAttribute('data-text') || btn.textContent?.trim() || '';
+          if (loading) {
+            // Store original text if not already stored
+            if (!btn.hasAttribute('data-original-text')) {
+              btn.setAttribute('data-original-text', originalText);
+            }
+            btn.textContent = '⏳ ' + (originalText || 'טוען...');
+          } else {
+            // Restore original text
+            const storedText = btn.getAttribute('data-original-text') || originalText;
+            btn.textContent = storedText;
+            btn.removeAttribute('data-original-text');
+          }
+          return;
+        }
       }
 
       if (text) {

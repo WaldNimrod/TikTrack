@@ -1,3 +1,30 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: 9
+ * 
+ * DATA LOADING (3)
+ * - loadTemplates() - Load AI analysis templates from API with cache support
+ * - loadHistory() - Load analysis history from API with cache support
+ * - getLLMProviderSettings() - Get LLM provider settings (Gemini/Perplexity)
+ * 
+ * DATA MANIPULATION (5)
+ * - generateAnalysis() - Generate AI analysis request via API
+ * - updateLLMProviderSettings() - Update LLM provider settings (API key, validation)
+ * - saveAsNote() - Save analysis result as note
+ * - exportToPDF() - Export analysis result to PDF format
+ * - exportToMarkdown() - Export analysis result to Markdown format
+ * - exportToHTML() - Export analysis result to HTML format
+ * 
+ * UTILITIES (1)
+ * - convertMarkdownToHTML() - Convert markdown text to HTML using marked.js or fallback
+ * 
+ * ==========================================
+ */
 /**
  * AI Analysis Data Service
  * ======================================

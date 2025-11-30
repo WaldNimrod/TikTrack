@@ -20,114 +20,210 @@
     <!-- External Libraries -->
     <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
 </head><body class="index-page"><div id="unified-header"></div><div class="background-wrapper"><div class="page-body"><div class="top-section" data-section="top"><div class="section-header"><div class="table-title"><img src="/trading-ui/images/icons/entities/home.svg" alt="דף הבית" class="section-icon"> דף הבית - TikTrack </div><div class="table-actions"><button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button></div></div><div class="section-body"><active-alerts></active-alerts><div class="info-summary" id="summaryStats"><div>סה"כ טריידים: <strong id="totalTrades">0</strong></div><div>סה"כ התראות: <strong id="totalAlerts">0</strong></div><div>יתרה נוכחית: <strong id="currentBalance">$0</strong></div><div>רווח/הפסד: <strong id="totalPnL">$0</strong></div></div><div class="info-summary portfolio-summary-card d-flex align-items-center justify-content-between gap-3 flex-nowrap" id="portfolioSummaryContent"><div id="portfolioSummaryStats" class="flex-grow-1"><div>טוען סיכום...</div></div><button data-button-type="VIEW" data-variant="small" data-onclick="togglePortfolioSummarySize()" data-id="portfolioSummaryToggleSize" data-tooltip="הצג סיכום מלא" data-tooltip-placement="bottom" aria-label="הצג סיכום מלא" class="flex-shrink-0 ms-2"></button></div></div></div><div class="main-content"><div class="content-section" id="main"><div class="section-header"><div class="table-title"><img src="images/icons/entities/home.svg" alt="לוח בקרה" class="section-icon"> לוח בקרה </div><div class="table-count" id="dashboardCount">טוען...</div><div class="table-actions"><button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button></div></div><div class="section-body">
-        <!-- שורה ראשונה: טריידים אחרונים + תוכניות אחרונות -->
+        <!-- שורה ראשונה: טריידים אחרונים + תוכניות אחרונות (מאוחד) -->
         <div class="row g-3 mb-3">
             <div class="col-md-6">
-                <div class="card h-100" style="max-height: 400px; display: flex; flex-direction: column;">
-                    <div class="card-header"><h5>טריידים אחרונים</h5></div>
-                    <div class="card-body" style="overflow-y: auto; flex: 1;"><div id="recentTrades">טוען טריידים...</div></div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card h-100" style="max-height: 400px; display: flex; flex-direction: column;">
-                    <div class="card-header"><h5>תוכניות אחרונות</h5></div>
-                    <div class="card-body" style="overflow-y: auto; flex: 1;"><div id="recentTradePlans">טוען תוכניות...</div></div>
+                <div class="card h-100" id="recentItemsWidgetContainer" style="max-height: 400px; display: flex; flex-direction: column;">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs mb-0" id="recentItemsTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" 
+                                        id="recentItemsTradesTab" 
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#recentItemsWidgetTradesPane" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="recentItemsWidgetTradesPane" 
+                                        aria-selected="true">
+                                    טריידים אחרונים
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" 
+                                        id="recentItemsPlansTab" 
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#recentItemsWidgetPlansPane" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="recentItemsWidgetPlansPane" 
+                                        aria-selected="false">
+                                    תוכניות אחרונות
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; min-height: 0; padding: 0.5rem;">
+                        <!-- Tab Content -->
+                        <div class="tab-content" id="recentItemsWidgetTabContent" style="flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: visible;">
+                            <!-- Trades Tab Pane -->
+                            <div class="tab-pane fade show active" 
+                                 id="recentItemsWidgetTradesPane" 
+                                 role="tabpanel" 
+                                 aria-labelledby="recentItemsTradesTab">
+                                <div class="d-flex flex-column gap-0 position-relative recent-items-tab-content-wrapper">
+                                    <div id="recentItemsWidgetTradesLoading" class="recent-items-widget-loading d-none d-flex align-items-center justify-content-center text-muted small">
+                                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                        <span>טוען טריידים...</span>
+                                    </div>
+                                    <div id="recentItemsWidgetTradesError" class="recent-items-widget-error alert alert-danger d-none" role="alert"></div>
+                                    <div id="recentItemsWidgetTradesEmpty" class="recent-items-widget-empty d-none">
+                                        <div class="text-muted small">אין טריידים זמינים</div>
+                                    </div>
+                                    <ul id="recentItemsWidgetTradesList" class="list-group list-group-flush"></ul>
+                                </div>
+                            </div>
+                            
+                            <!-- Plans Tab Pane -->
+                            <div class="tab-pane fade" 
+                                 id="recentItemsWidgetPlansPane" 
+                                 role="tabpanel" 
+                                 aria-labelledby="recentItemsPlansTab">
+                                <div class="d-flex flex-column gap-0 position-relative recent-items-tab-content-wrapper">
+                                    <div id="recentItemsWidgetPlansLoading" class="recent-items-widget-loading d-none d-flex align-items-center justify-content-center text-muted small">
+                                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                        <span>טוען תוכניות...</span>
+                                    </div>
+                                    <div id="recentItemsWidgetPlansError" class="recent-items-widget-error alert alert-danger d-none" role="alert"></div>
+                                    <div id="recentItemsWidgetPlansEmpty" class="recent-items-widget-empty d-none">
+                                        <div class="text-muted small">אין תוכניות זמינות</div>
+                                    </div>
+                                    <ul id="recentItemsWidgetPlansList" class="list-group list-group-flush"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         
         <!-- שורה שנייה: 4 עמודות - שיוך לטרייד, יצירת טרייד, שיוך לתוכנית, יצירת תוכנית -->
+        <!-- שורה שלישית: ווידג'ט פעולות ממתינות מאוחד (שיוך ויצירה) -->
         <div class="row g-3 mb-3">
-        <div class="col-md-6 col-lg-3">
-            <div class="card h-100" id="pendingExecutionsHighlightsCard" style="max-height: 400px; display: flex; flex-direction: column;">
-                <div class="card-header d-flex align-items-center justify-content-between gap-2">
-                    <h5 class="mb-0">
-                        <a href="executions.html" class="d-inline-flex align-items-center gap-2 widget-title-link" data-onclick="navigateToPage('executions', { preserveState: true })">
-                            <img src="/trading-ui/images/icons/entities/executions.svg" alt="ביצועים" width="20" height="20">
-                            <span>המלצות שיוך בולטות</span>
-                        </a>
-                    </h5>
-                    <span class="badge entity-execution" id="pendingExecutionsHighlightsCount">0</span>
-                </div>
-                <div class="card-body d-flex flex-column gap-3" style="overflow-y: auto; flex: 1;">
-                    <div id="pendingExecutionsHighlightsLoading" class="d-flex align-items-center justify-content-center text-muted small">
-                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
-                        <span>טוען המלצות...</span>
+            <div class="col-12 col-lg-6">
+                <div class="card h-100" id="unifiedPendingActionsWidgetContainer" style="max-height: 500px; display: flex; flex-direction: column;">
+                    <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                        <h5 class="mb-0" id="unifiedPendingActionsWidgetTitle">
+                            <span class="d-inline-flex align-items-center gap-2">
+                                <img src="images/icons/entities/trades.svg" alt="פעולות ממתינות" width="20" height="20">
+                                <span>פעולות ממתינות</span>
+                            </span>
+                        </h5>
+                        <span class="badge entity-trade" id="unifiedPendingActionsWidgetBadge">0</span>
                     </div>
-                    <div id="pendingExecutionsHighlightsError" class="alert alert-danger d-none" role="alert"></div>
-                    <div id="pendingExecutionsHighlightsEmpty" class="alert alert-success d-none" role="status">
-                        אין כרגע ביצועים שממתינים לשיוך. המשך עבודה מצוינת!
+                    <div class="card-header">
+                        <!-- Action Tabs Row (Top) -->
+                        <ul class="nav nav-tabs" id="unifiedPendingActionsActionTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" 
+                                        id="actionTabAssign" 
+                                        type="button">
+                                    שיוך
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" 
+                                        id="actionTabCreate" 
+                                        type="button">
+                                    יצירת חדש
+                                </button>
+                            </li>
+                        </ul>
+                        
+                        <!-- Entity Tabs Row (Bottom) -->
+                        <ul class="nav nav-tabs" id="unifiedPendingActionsEntityTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" 
+                                        id="entityTabPlans" 
+                                        type="button">
+                                    תוכניות
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" 
+                                        id="entityTabTrades" 
+                                        type="button">
+                                    טריידים
+                                </button>
+                            </li>
+                        </ul>
                     </div>
-                    <ul class="list-group list-group-flush flex-grow-1" id="pendingExecutionsHighlightsList"></ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card h-100" id="pendingExecutionsTradeCreationCard" style="max-height: 400px; display: flex; flex-direction: column;">
-                <div class="card-header d-flex align-items-center justify-content-between gap-2">
-                    <h5 class="mb-0">
-                        <a href="executions.html" class="d-inline-flex align-items-center gap-2 widget-title-link" data-onclick="navigateToPage('executions', { preserveState: true })">
-                            <img src="/trading-ui/images/icons/entities/trades.svg" alt="טריידים" width="20" height="20">
-                            <span>יצירת טריידים מאשכול ביצועים</span>
-                        </a>
-                    </h5>
-                    <span class="badge entity-trade" id="pendingExecutionsTradeCreationCount">0</span>
-                </div>
-                <div class="card-body d-flex flex-column gap-3" style="overflow-y: auto; flex: 1;">
-                    <div id="pendingExecutionsTradeCreationLoading" class="d-flex align-items-center justify-content-center text-muted small">
-                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
-                        <span>טוען אשכולות ליצירת טרייד...</span>
-                    </div>
-                    <div id="pendingExecutionsTradeCreationError" class="alert alert-danger d-none" role="alert"></div>
-                    <div id="pendingExecutionsTradeCreationEmpty" class="alert alert-success d-none" role="status">
-                        אין כרגע אשכולות זמינים ליצירת טרייד חדש.
-                    </div>
-                    <ul class="list-group list-group-flush flex-grow-1" id="pendingTradeCreationWidgetList"></ul>
-                </div>
-            </div>
-        </div>
-        <!-- שיוך תוכנית + יצירת תוכנית - מאוחדים בווידג'ט אחד -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card h-100" id="pendingTradePlanWidgetCard" style="max-height: 400px; display: flex; flex-direction: column;">
-                <div class="card-header d-flex align-items-center justify-content-between gap-2">
-                    <h5 class="mb-0">
-                        <a href="trades.html" class="d-inline-flex align-items-center gap-2 widget-title-link" data-onclick="navigateToPage('trades', { preserveState: true })">
-                            <img src="/trading-ui/images/icons/entities/trade_plans.svg" alt="תוכניות מסחר" width="20" height="20">
-                            <span>שיוך תוכניות למסחר</span>
-                        </a>
-                    </h5>
-                    <span class="badge entity-trade" id="pendingTradePlanWidgetCount">0</span>
-                </div>
-                <div class="card-body d-flex flex-column gap-3">
-                    <div id="pendingTradePlanWidgetLoading" class="d-flex align-items-center justify-content-center text-muted small">
-                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
-                        <span>טוען הצעות לתוכניות...</span>
-                    </div>
-                    <div id="pendingTradePlanWidgetError" class="alert alert-danger d-none" role="alert"></div>
-                    <div id="pendingTradePlanWidgetEmpty" class="alert alert-success d-none" role="status">
-                        כל הטריידים מלווים בתוכנית מתאימה. עבודה מצוינת!
-                    </div>
-                    <div class="d-flex flex-column gap-2 widget-section" id="pendingTradePlanAssignmentsSection">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <h6 class="mb-0 text-muted">שיוך לתוכנית קיימת</h6>
-                            <span class="badge bg-body-secondary text-body" id="pendingTradePlanAssignmentsCount">0</span>
+                    <div class="card-body d-flex flex-column gap-3" style="overflow-y: auto; flex: 1;">
+                        <!-- Tab Content Panes -->
+                        <div class="tab-content" id="unifiedPendingActionsTabContent" style="flex: 1; display: flex; flex-direction: column;">
+                            <!-- Assign Plans Pane -->
+                            <div class="tab-pane fade show active" 
+                                 id="paneAssignPlans" 
+                                 role="tabpanel"
+                                 style="flex: 1; display: flex; flex-direction: column;">
+                                <div id="assignPlansLoading" class="d-flex align-items-center justify-content-center text-muted small unified-pending-loading">
+                                    <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                    <span>טוען הצעות שיוך תוכניות...</span>
+                                </div>
+                                <div id="assignPlansError" class="alert alert-danger d-none unified-pending-error" role="alert"></div>
+                                <div id="assignPlansEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
+                                    כל הטריידים מלווים בתוכנית מתאימה. עבודה מצוינת!
+                                </div>
+                                <span class="badge bg-body-secondary text-body mb-2" id="assignPlansCount" style="align-self: flex-start;">0</span>
+                                <ul class="unified-pending-list flex-grow-1" id="assignPlansList"></ul>
+                            </div>
+                            
+                            <!-- Assign Trades Pane -->
+                            <div class="tab-pane fade" 
+                                 id="paneAssignTrades" 
+                                 role="tabpanel"
+                                 style="flex: 1; display: flex; flex-direction: column;">
+                                <div id="assignTradesLoading" class="d-flex align-items-center justify-content-center text-muted small unified-pending-loading">
+                                    <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                    <span>טוען המלצות שיוך ביצועים...</span>
+                                </div>
+                                <div id="assignTradesError" class="alert alert-danger d-none unified-pending-error" role="alert"></div>
+                                <div id="assignTradesEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
+                                    אין כרגע ביצועים שממתינים לשיוך. המשך עבודה מצוינת!
+                                </div>
+                                <span class="badge bg-body-secondary text-body mb-2" id="assignTradesCount" style="align-self: flex-start;">0</span>
+                                <ul class="unified-pending-list flex-grow-1" id="assignTradesList"></ul>
+                            </div>
+                            
+                            <!-- Create Plans Pane -->
+                            <div class="tab-pane fade" 
+                                 id="paneCreatePlans" 
+                                 role="tabpanel"
+                                 style="flex: 1; display: flex; flex-direction: column;">
+                                <div id="createPlansLoading" class="d-flex align-items-center justify-content-center text-muted small unified-pending-loading">
+                                    <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                    <span>טוען הצעות יצירת תוכניות...</span>
+                                </div>
+                                <div id="createPlansError" class="alert alert-danger d-none unified-pending-error" role="alert"></div>
+                                <div id="createPlansEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
+                                    כל הטריידים מלווים בתוכנית מתאימה. עבודה מצוינת!
+                                </div>
+                                <span class="badge bg-body-secondary text-body mb-2" id="createPlansCount" style="align-self: flex-start;">0</span>
+                                <ul class="unified-pending-list flex-grow-1" id="createPlansList"></ul>
+                            </div>
+                            
+                            <!-- Create Trades Pane -->
+                            <div class="tab-pane fade" 
+                                 id="paneCreateTrades" 
+                                 role="tabpanel"
+                                 style="flex: 1; display: flex; flex-direction: column;">
+                                <div id="createTradesLoading" class="d-flex align-items-center justify-content-center text-muted small unified-pending-loading">
+                                    <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                    <span>טוען אשכולות ליצירת טרייד...</span>
+                                </div>
+                                <div id="createTradesError" class="alert alert-danger d-none unified-pending-error" role="alert"></div>
+                                <div id="createTradesEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
+                                    אין כרגע אשכולות זמינים ליצירת טרייד חדש.
+                                </div>
+                                <span class="badge bg-body-secondary text-body mb-2" id="createTradesCount" style="align-self: flex-start;">0</span>
+                                <ul class="unified-pending-list flex-grow-1" id="createTradesList"></ul>
+                            </div>
                         </div>
-                        <ul class="list-group list-group-flush" id="pendingTradePlanAssignmentsList"></ul>
-                    </div>
-                    <hr class="my-1 d-none" id="pendingTradePlanDivider">
-                    <div class="d-flex flex-column gap-2 widget-section" id="pendingTradePlanCreationsSection">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <h6 class="mb-0 text-muted">יצירת תוכנית חדשה</h6>
-                            <span class="badge bg-body-secondary text-body" id="pendingTradePlanCreationsCount">0</span>
-                        </div>
-                        <ul class="list-group list-group-flush" id="pendingTradePlanCreationsList"></ul>
                     </div>
                 </div>
             </div>
-        </div>
         </div>
         
-        <!-- שורה שלישית: ווידג'ט תגיות מאוחד (ענן + חיפוש) -->
+        <!-- שורה רביעית: ווידג'ט תגיות מאוחד (ענן + חיפוש) -->
         <div class="row g-3 mb-3">
             <div class="col-md-6">
                 <div class="card h-100" id="tagWidgetContainer">
@@ -173,7 +269,7 @@
                                  id="tagWidgetCloudPane" 
                                  role="tabpanel" 
                                  aria-labelledby="tagWidgetCloudTab">
-                                <div class="d-flex flex-column gap-3 mt-3 position-relative">
+                                <div class="d-flex flex-column gap-0 position-relative">
                                     <div id="tagWidgetCloudLoading" class="d-flex align-items-center justify-content-center text-muted small">
                                         <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
                                         <span>טוען נתוני תגיות...</span>
@@ -182,7 +278,7 @@
                                     <div id="tagWidgetCloudEmpty" class="alert alert-info d-none" role="status">
                                         אין עדיין נתונים להצגה. צרף תגיות לטרנזקציות כדי לראות תובנות כאן.
                                     </div>
-                                    <div id="tagWidgetCloudContainer" class="d-flex flex-wrap gap-2 align-items-center"></div>
+                                    <div id="tagWidgetCloudContainer" class="d-flex flex-wrap align-items-center"></div>
                                 </div>
                             </div>
 
@@ -435,6 +531,8 @@
     <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- Investment form amount ↔ quantity calculations -->
     <!-- [34] Load Order: 34 -->
     <script src="scripts/services/tag-service.js?v=1.0.0"></script> <!-- Central tag service (tag management and retrieval) -->
+    <!-- [34.1] Load Order: 34.1 -->
+    <script src="scripts/services/autocomplete-service.js?v=1.0.0"></script> <!-- General autocomplete service for reusable suggestions dropdown -->
     <!-- [35] Load Order: 35 -->
     <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
     <!-- [36] Load Order: 36 -->
@@ -447,21 +545,53 @@
     <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- Rich text editor service -->
 
     <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3.5/10: MODULES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3.5 | Description: General modules -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [39.5] Load Order: 39.5 -->
+    <script src="scripts/modal-navigation-manager.js?v=1.0.0"></script> <!-- Nested modal navigation system -->
+    <!-- [39.6] Load Order: 39.6 -->
+    <script src="scripts/modal-manager-v2.js?v=1.0.0"></script> <!-- Modal manager V2 -->
+    <!-- [39.7] Load Order: 39.7 -->
+    <script src="scripts/tag-ui-manager.js?v=1.0.0"></script> <!-- Tag selection management in modals -->
+    <!-- [39.8] Load Order: 39.8 -->
+    <script src="scripts/tag-events.js?v=1.0.0"></script> <!-- Global tag events system -->
+    <!-- [39.9] Load Order: 39.9 -->
+    <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- Basic data -->
+    <!-- [40] Load Order: 40 -->
+    <script src="scripts/modules/ui-basic.js?v=1.0.0"></script> <!-- Basic interface -->
+    <!-- [41] Load Order: 41 -->
+    <script src="scripts/modules/data-advanced.js?v=1.0.0"></script> <!-- Advanced data -->
+    <!-- [42] Load Order: 42 -->
+    <script src="scripts/modules/ui-advanced.js?v=1.0.0"></script> <!-- Advanced interface -->
+    <!-- [43] Load Order: 43 -->
+    <script src="scripts/modules/communication-module.js?v=1.0.0"></script> <!-- Communication module -->
+    <!-- [44] Load Order: 44 -->
+    <script src="scripts/modules/business-module.js?v=1.0.0"></script> <!-- Business module -->
+    <!-- [45] Load Order: 45 -->
+    <script src="scripts/modules/localstorage-sync.js?v=1.0.0"></script> <!-- localStorage synchronization -->
+    <!-- [46] Load Order: 46 -->
+    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script> <!-- Dynamic loader configuration -->
+
+    <!-- =============================================================== -->
     <!-- ===== PACKAGE 3/10: UI ADVANCED PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 3 | Description: Advanced user interface -->
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [40] Load Order: 40 -->
+    <!-- [47] Load Order: 47 -->
     <script src="scripts/table-mappings.js?v=1.0.0"></script> <!-- Table mappings -->
-    <!-- [41] Load Order: 41 -->
+    <!-- [48] Load Order: 48 -->
     <script src="scripts/tables.js?v=1.0.0"></script> <!-- Table system -->
-    <!-- [42] Load Order: 42 -->
+    <!-- [49] Load Order: 49 -->
     <script src="scripts/table-data-registry.js?v=1.0.0"></script> <!-- Table data registry -->
-    <!-- [43] Load Order: 43 -->
+    <!-- [50] Load Order: 50 -->
     <script src="scripts/pagination-system.js?v=1.0.0"></script> <!-- Pagination system -->
-    <!-- [44] Load Order: 44 -->
+    <!-- [51] Load Order: 51 -->
     <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- Actions menu system -->
 
     <!-- =============================================================== -->
@@ -471,11 +601,11 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [45] Load Order: 45 -->
+    <!-- [52] Load Order: 52 -->
     <script src="scripts/date-utils.js?v=1.0.0"></script> <!-- Date utilities -->
-    <!-- [46] Load Order: 46 -->
+    <!-- [53] Load Order: 53 -->
     <script src="scripts/data-utils.js?v=1.0.0"></script> <!-- General data utilities -->
-    <!-- [47] Load Order: 47 -->
+    <!-- [54] Load Order: 54 -->
     <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- Unified central table system -->
 
     <!-- =============================================================== -->
@@ -485,31 +615,31 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.1.0 -->
 
-    <!-- [48] Load Order: 48 -->
-    <script src="scripts/preferences-cache.js?v=1.0.0"></script> <!-- Preferences cache management layer -->
-    <!-- [49] Load Order: 49 -->
-    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
-    <!-- [50] Load Order: 50 -->
-    <script src="scripts/preferences-events.js?v=1.0.0"></script> <!-- Preferences event system -->
-    <!-- [51] Load Order: 51 -->
-    <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- Preferences core (without colors) -->
-    <!-- [52] Load Order: 52 -->
-    <script src="scripts/preferences-ui-layer.js?v=1.0.0"></script> <!-- Preferences UI layer -->
-    <!-- [53] Load Order: 53 -->
-    <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- Color system (60+ preferences) -->
-    <!-- [54] Load Order: 54 -->
-    <script src="scripts/preferences-manager.js?v=1.0.0"></script> <!-- Preferences manager (central) -->
     <!-- [55] Load Order: 55 -->
-    <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- Profile management -->
+    <script src="scripts/preferences-cache.js?v=1.0.0"></script> <!-- Preferences cache management layer -->
     <!-- [56] Load Order: 56 -->
-    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [57] Load Order: 57 -->
-    <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
+    <script src="scripts/preferences-events.js?v=1.0.0"></script> <!-- Preferences event system -->
     <!-- [58] Load Order: 58 -->
-    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- User interface V4 (Group-First) -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- Preferences core (without colors) -->
     <!-- [59] Load Order: 59 -->
-    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- User interface -->
+    <script src="scripts/preferences-ui-layer.js?v=1.0.0"></script> <!-- Preferences UI layer -->
     <!-- [60] Load Order: 60 -->
+    <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- Color system (60+ preferences) -->
+    <!-- [61] Load Order: 61 -->
+    <script src="scripts/preferences-manager.js?v=1.0.0"></script> <!-- Preferences manager (central) -->
+    <!-- [62] Load Order: 62 -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- Profile management -->
+    <!-- [63] Load Order: 63 -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
+    <!-- [64] Load Order: 64 -->
+    <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
+    <!-- [65] Load Order: 65 -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- User interface V4 (Group-First) -->
+    <!-- [66] Load Order: 66 -->
+    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- User interface -->
+    <!-- [67] Load Order: 67 -->
     <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- Preferences group manager -->
 
     <!-- =============================================================== -->
@@ -519,23 +649,25 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [61] Load Order: 61 -->
-    <script src="scripts/account-service.js?v=1.0.0"></script> <!-- Account service -->
-    <!-- [62] Load Order: 62 -->
-    <script src="scripts/alert-service.js?v=1.0.0"></script> <!-- Alert service -->
-    <!-- [63] Load Order: 63 -->
-    <script src="scripts/ticker-service.js?v=1.0.0"></script> <!-- Ticker service -->
-    <!-- [64] Load Order: 64 -->
-    <script src="scripts/trade-plan-service.js?v=1.0.0"></script> <!-- Trade plan service -->
-    <!-- [65] Load Order: 65 -->
-    <script src="scripts/condition-translator.js?v=1.0.0"></script> <!-- Condition translator -->
-    <!-- [66] Load Order: 66 -->
-    <script src="scripts/constraints.js?v=1.0.0"></script> <!-- Constraints system -->
-    <!-- [67] Load Order: 67 -->
-    <script src="scripts/services/linked-items-service.js?v=1.0.0"></script> <!-- Shared logic service for linked items -->
     <!-- [68] Load Order: 68 -->
-    <script src="scripts/linked-items.js?v=1.0.0"></script> <!-- Linked items -->
+    <script src="scripts/account-service.js?v=1.0.0"></script> <!-- Account service -->
     <!-- [69] Load Order: 69 -->
+    <script src="scripts/alert-service.js?v=1.0.0"></script> <!-- Alert service -->
+    <!-- [70] Load Order: 70 -->
+    <script src="scripts/ticker-service.js?v=1.0.0"></script> <!-- Ticker service -->
+    <!-- [70.5] Load Order: 70.5 -->
+    <script src="scripts/services/trade-plans-data.js?v=1.0.0"></script> <!-- Trade plans data service -->
+    <!-- [71] Load Order: 71 -->
+    <script src="scripts/trade-plan-service.js?v=1.0.0"></script> <!-- Trade plan service -->
+    <!-- [72] Load Order: 72 -->
+    <script src="scripts/condition-translator.js?v=1.0.0"></script> <!-- Condition translator -->
+    <!-- [73] Load Order: 73 -->
+    <script src="scripts/constraints.js?v=1.0.0"></script> <!-- Constraints system -->
+    <!-- [74] Load Order: 74 -->
+    <script src="scripts/services/linked-items-service.js?v=1.0.0"></script> <!-- Shared logic service for linked items -->
+    <!-- [75] Load Order: 75 -->
+    <script src="scripts/linked-items.js?v=1.0.0"></script> <!-- Linked items -->
+    <!-- [76] Load Order: 76 -->
     <script src="scripts/related-object-filters.js?v=1.0.0"></script> <!-- Related object filters -->
 
     <!-- =============================================================== -->
@@ -545,11 +677,11 @@
     <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [70] Load Order: 70 -->
+    <!-- [77] Load Order: 77 -->
     <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- Entity details API -->
-    <!-- [71] Load Order: 71 -->
+    <!-- [78] Load Order: 78 -->
     <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- Entity details renderer -->
-    <!-- [72] Load Order: 72 -->
+    <!-- [79] Load Order: 79 -->
     <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- Entity details modal -->
 
     <!-- =============================================================== -->
@@ -559,9 +691,9 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [73] Load Order: 73 -->
+    <!-- [80] Load Order: 80 -->
     <script src="scripts/info-summary-system.js?v=1.0.0"></script> <!-- Core data summary system -->
-    <!-- [74] Load Order: 74 -->
+    <!-- [81] Load Order: 81 -->
     <script src="scripts/info-summary-configs.js?v=1.0.0"></script> <!-- Page configurations for data summary -->
 
     <!-- =============================================================== -->
@@ -571,21 +703,25 @@
     <!-- Dependencies: base, services, ui-advanced, entity-services -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [75] Load Order: 75 -->
-    <script src="scripts/services/dashboard-data.js?v=1.0.0"></script> <!-- Unified dashboard data service -->
-    <!-- [76] Load Order: 76 -->
-    <script src="scripts/widgets/recent-trades-widget.js?v=1.0.0"></script> <!-- Recent trades widget -->
-    <!-- [77] Load Order: 77 -->
-    <script src="scripts/pending-executions-widget.js?v=1.0.0"></script> <!-- Assignment recommendations widget -->
-    <!-- [78] Load Order: 78 -->
-    <script src="scripts/pending-trade-plan-widget.js?v=1.0.0"></script> <!-- Trade plan assignment widget -->
-    <!-- [79] Load Order: 79 -->
-    <script src="scripts/widgets/tag-widget.js?v=1.0.0"></script> <!-- Unified tag widget (cloud + search) -->
-    <!-- [80] Load Order: 80 -->
-    <script src="scripts/active-alerts-component.js?v=1.0.0"></script> <!-- Active alerts component -->
-    <!-- [81] Load Order: 81 -->
-    <script src="scripts/modal-configs/tag-search-config.js?v=1.0.0"></script> <!-- Tag search drawer configuration (for TagWidget) -->
     <!-- [82] Load Order: 82 -->
+    <script src="scripts/services/dashboard-data.js?v=1.0.0"></script> <!-- Unified dashboard data service -->
+    <!-- [83] Load Order: 83 -->
+    <script src="scripts/widgets/recent-items-widget.js?v=1.0.0"></script> <!-- Unified recent trades and trade plans widget -->
+    <!-- [83.5] Load Order: 83.5 -->
+    <script src="scripts/widgets/recent-trades-widget.js?v=1.0.0"></script> <!-- Recent trades widget (deprecated - use RecentItemsWidget) -->
+    <!-- [84] Load Order: 84 -->
+    <script src="scripts/pending-executions-widget.js?v=1.0.0"></script> <!-- Assignment recommendations widget -->
+    <!-- [85] Load Order: 85 -->
+    <script src="scripts/pending-trade-plan-widget.js?v=1.0.0"></script> <!-- Trade plan assignment widget -->
+    <!-- [85.5] Load Order: 85.5 -->
+    <script src="scripts/widgets/unified-pending-actions-widget.js?v=1.0.0"></script> <!-- Unified widget for pending assignments and creations -->
+    <!-- [86] Load Order: 86 -->
+    <script src="scripts/widgets/tag-widget.js?v=1.0.0"></script> <!-- Unified tag widget (cloud + search) -->
+    <!-- [87] Load Order: 87 -->
+    <script src="scripts/active-alerts-component.js?v=1.0.0"></script> <!-- Active alerts component -->
+    <!-- [88] Load Order: 88 -->
+    <script src="scripts/modal-configs/tag-search-config.js?v=1.0.0"></script> <!-- Tag search drawer configuration (for TagWidget) -->
+    <!-- [88] Load Order: 88 -->
     <script src="scripts/index.js?v=1.0.0"></script> <!-- Dashboard page logic -->
 
     <!-- =============================================================== -->
@@ -595,13 +731,13 @@
     <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary, dashboard-widgets, tradingview-widgets, tradingview-charts, watch-lists, ai-analysis -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [83] Load Order: 83 -->
+    <!-- [89] Load Order: 89 -->
     <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- Package manifest -->
-    <!-- [84] Load Order: 84 -->
+    <!-- [90] Load Order: 90 -->
     <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- Page initialization configurations -->
-    <!-- [85] Load Order: 85 -->
+    <!-- [91] Load Order: 91 -->
     <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- Initialization system check -->
-    <!-- [86] Load Order: 86 -->
+    <!-- [92] Load Order: 92 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- Page monitoring functions -->
 
     <!-- =============================================================== -->
@@ -613,5 +749,49 @@
     <!-- =============================================================== -->
     <!-- 📊 Total Scripts Processed: 86 | Unique Scripts Loaded: 86 -->
     <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
+    
+    <!-- =============================================================== -->
+    <!-- ===== DIRECT WIDGET INITIALIZATION (FALLBACK) ===== -->
+    <!-- =============================================================== -->
+    <!-- Initialize UnifiedPendingActionsWidget directly as fallback if customInitializers don't run -->
+    <script>
+        // Wait for DOM and all systems to load
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Wait a bit more for all scripts to load
+            setTimeout(async () => {
+                window.Logger?.info?.('🔵🔵🔵 FALLBACK: Attempting direct widget initialization', { 
+                    widgetExists: typeof window.UnifiedPendingActionsWidget !== 'undefined',
+                    containerExists: !!document.getElementById('unifiedPendingActionsWidgetContainer'),
+                    page: 'index' 
+                });
+                
+                if (typeof window.UnifiedPendingActionsWidget !== 'undefined' && 
+                    typeof window.UnifiedPendingActionsWidget.init === 'function' &&
+                    document.getElementById('unifiedPendingActionsWidgetContainer')) {
+                    try {
+                        await window.UnifiedPendingActionsWidget.init('unifiedPendingActionsWidgetContainer', {
+                            defaultItemsLimit: 4,
+                            defaultAction: 'assign',
+                            defaultEntity: 'plans'
+                        });
+                        window.Logger?.info?.('✅✅✅ FALLBACK: Widget initialized successfully', { page: 'index' });
+                    } catch (error) {
+                        window.Logger?.error?.('🔴🔴🔴 FALLBACK: Error initializing widget', { 
+                            error: error.message,
+                            errorStack: error.stack,
+                            page: 'index' 
+                        });
+                    }
+                } else {
+                    window.Logger?.warn?.('⚠️⚠️⚠️ FALLBACK: Widget or container not available', { 
+                        widgetExists: typeof window.UnifiedPendingActionsWidget !== 'undefined',
+                        hasInit: typeof window.UnifiedPendingActionsWidget?.init === 'function',
+                        containerExists: !!document.getElementById('unifiedPendingActionsWidgetContainer'),
+                        page: 'index' 
+                    });
+                }
+            }, 2000); // Wait 2 seconds for all systems to load
+        });
+    </script>
 </body>
 </html>

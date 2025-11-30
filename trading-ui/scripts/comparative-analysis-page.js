@@ -142,17 +142,25 @@ async function waitForTradingViewAdapter() {
     }
     
     if (typeof window.TradingViewChartAdapter === 'undefined') {
-        if (window.Logger) {
+        const errorMsg = 'TradingViewChartAdapter not loaded';
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בטעינת גרפים', 
+                'ספריית TradingView לא נטענה. נא לרענן את העמוד.');
+        } else if (window.Logger) {
             window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'comparative-analysis-page', timeout: maxRetries * 50 });
         }
-        throw new Error('TradingViewChartAdapter not loaded');
+        throw new Error(errorMsg);
     }
     
     if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
-        if (window.Logger) {
+        const errorMsg = 'LightweightCharts not loaded';
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בטעינת גרפים', 
+                'ספריית LightweightCharts לא נטענה. נא לרענן את העמוד.');
+        } else if (window.Logger) {
             window.Logger.error('❌ LightweightCharts not available', { page: 'comparative-analysis-page', timeout: maxRetries * 50 });
         }
-        throw new Error('LightweightCharts not loaded');
+        throw new Error(errorMsg);
     }
     
     if (window.Logger) {
@@ -591,6 +599,74 @@ async function saveFilterState() {
                 });
             }
         }
+    }
+}
+
+// Restore page state (filters, sections, charts)
+async function restorePageState() {
+    if (!window.PageStateManager) {
+        // Fallback to existing load functions
+        await loadFilterState();
+        await loadRecordFilterState();
+        await loadComparisonParameterState();
+        return;
+    }
+
+    try {
+        const state = await window.PageStateManager.loadPageState('comparative-analysis-page');
+        if (!state || !state.filters) {
+            // Fallback to existing load functions
+            await loadFilterState();
+            await loadRecordFilterState();
+            await loadComparisonParameterState();
+            return;
+        }
+
+        // Restore filters if available
+        if (state.filters) {
+            // Restore record filters
+            if (state.filters.recordFilters) {
+                // Restore trading accounts
+                if (state.filters.recordFilters.tradingAccounts) {
+                    const select = document.getElementById('recordFilterTradingAccounts');
+                    if (select) {
+                        Array.from(select.options).forEach(opt => {
+                            opt.selected = state.filters.recordFilters.tradingAccounts.includes(parseInt(opt.value));
+                        });
+                    }
+                }
+            }
+
+            // Restore comparison parameters if available
+            if (state.filters.comparisonParams) {
+                // Comparison parameters will be restored by loadComparisonParameterState
+            }
+        }
+
+        // Restore section states if available
+        if (state.sections) {
+            Object.keys(state.sections).forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const sectionBody = section.querySelector('.section-body');
+                    if (sectionBody) {
+                        sectionBody.style.display = state.sections[sectionId] ? 'none' : 'block';
+                    }
+                }
+            });
+        }
+
+        if (window.Logger) {
+            window.Logger.debug('✅ Restored page state', { page: 'comparative-analysis-page' });
+        }
+    } catch (error) {
+        if (window.Logger) {
+            window.Logger.warn('Failed to restore page state, using fallback', { error, page: 'comparative-analysis-page' });
+        }
+        // Fallback to existing load functions
+        await loadFilterState();
+        await loadRecordFilterState();
+        await loadComparisonParameterState();
     }
 }
 
@@ -1853,15 +1929,25 @@ async function initComparisonChart() {
         
         const container = document.getElementById('comparison-chart-container');
         if (!container) {
+            // Silent error - container might not exist in some views
             if (window.Logger) {
-                window.Logger.error('Comparison chart container not found', { page: 'comparative-analysis-page' });
+                window.Logger.warn('Comparison chart container not found', { page: 'comparative-analysis-page' });
             }
             return;
         }
         
         // Get wrapper for width calculation (if exists)
         const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
-        const containerWidth = wrapper ? wrapper.clientWidth : container.clientWidth;
+        const containerWidth = wrapper ? wrapper.clientWidth : (container.clientWidth || container.offsetWidth || 800);
+        const containerHeight = container.clientHeight || container.offsetHeight || window.innerHeight * 0.5;
+        
+        if (containerWidth === 0 || containerHeight === 0) {
+            if (window.Logger) {
+                window.Logger.warn('Comparison chart container has zero dimensions, waiting...', { page: 'comparative-analysis-page' });
+            }
+            setTimeout(() => initComparisonChart(), 100);
+            return;
+        }
         
         // Remove loading indicator
         const loading = container.querySelector('.chart-loading');
@@ -1895,7 +1981,7 @@ async function initComparisonChart() {
                 horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
             },
             width: containerWidth,
-            height: 300,
+            height: containerHeight,
             timeScale: {
                 visible: true,
                 timeVisible: true,
@@ -2041,7 +2127,11 @@ async function initComparisonChart() {
         }
         
     } catch (error) {
-        if (window.Logger) {
+        const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בטעינת גרף השוואה', 
+                `לא ניתן לטעון את הגרף. ${errorMsg}`);
+        } else if (window.Logger) {
             window.Logger.error('Error initializing comparison chart', { page: 'comparative-analysis-page', error });
         }
         const container = document.getElementById('comparison-chart-container');
@@ -2226,7 +2316,11 @@ async function updateComparisonChart(filters) {
         
         comparisonChart.timeScale().fitContent();
     } catch (error) {
-        if (window.Logger) {
+        const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בעדכון גרף השוואה', 
+                `לא ניתן לעדכן את הגרף. ${errorMsg}`);
+        } else if (window.Logger) {
             window.Logger.error('Error updating comparison chart', { page: 'comparative-analysis-page', error });
         }
         // Fallback: reinitialize
@@ -2806,6 +2900,11 @@ function resetComparisonParametersToDefaults() {
 
 // ===== Data Loading Functions =====
 async function loadTradingAccounts() {
+    // Show loading state
+    const select = document.getElementById('recordFilterTradingAccounts');
+    if (select && typeof window.showLoadingState === 'function') {
+        window.showLoadingState('recordFilterTradingAccounts');
+    }
     try {
         const select = document.getElementById('recordFilterTradingAccounts');
         if (!select) return;
@@ -2854,15 +2953,25 @@ async function loadTradingAccounts() {
             }
         }
         
+        // Hide loading state
+        if (select && typeof window.hideLoadingState === 'function') {
+            window.hideLoadingState('recordFilterTradingAccounts');
+        }
+        
         if (window.Logger) {
             window.Logger.info('✅ Trading accounts loaded', { page: 'comparative-analysis-page' });
         }
     } catch (error) {
+        // Hide loading state on error
+        if (select && typeof window.hideLoadingState === 'function') {
+            window.hideLoadingState('recordFilterTradingAccounts');
+        }
         if (window.NotificationSystem) {
             window.NotificationSystem.showError('שגיאה בטעינת נתונים', 'שגיאה בטעינת חשבונות מסחר');
         }
+        // Error already handled by NotificationSystem above
         if (window.Logger) {
-            window.Logger.error('❌ Error loading trading accounts', { page: 'comparative-analysis-page', error });
+            window.Logger.warn('❌ Error loading trading accounts', { page: 'comparative-analysis-page', error });
         }
         // Mock data fallback
         const select = document.getElementById('recordFilterTradingAccounts');
@@ -2939,6 +3048,11 @@ async function loadTradingMethods() {
 }
 
 async function loadTickers() {
+    // Show loading state
+    const select = document.getElementById('comparisonTickers');
+    if (select && typeof window.showLoadingState === 'function') {
+        window.showLoadingState('comparisonTickers');
+    }
     try {
         const select = document.getElementById('comparisonTickers');
         if (!select) return;
@@ -2989,6 +3103,11 @@ async function loadTickers() {
             }
         }
         
+        // Hide loading state
+        if (select && typeof window.hideLoadingState === 'function') {
+            window.hideLoadingState('comparisonTickers');
+        }
+        
         if (window.Logger) {
             window.Logger.info('✅ Tickers loaded', { page: 'comparative-analysis-page' });
         }
@@ -2996,8 +3115,9 @@ async function loadTickers() {
         if (window.NotificationSystem) {
             window.NotificationSystem.showError('שגיאה בטעינת נתונים', 'שגיאה בטעינת טיקרים');
         }
+        // Error already handled by NotificationSystem above
         if (window.Logger) {
-            window.Logger.error('❌ Error loading tickers', { page: 'comparative-analysis-page', error });
+            window.Logger.warn('❌ Error loading tickers', { page: 'comparative-analysis-page', error });
         }
         // Mock data fallback
         const select = document.getElementById('comparisonTickers');
@@ -3768,6 +3888,9 @@ async function initializeComparisonTags() {
         // Initialize series controls UI
         initializeSeriesControls();
         
+        // Restore page state (filters, sections, etc.)
+        await restorePageState();
+        
         // Update all visualizations with initial filters
         // This will initialize the chart if needed and update all data
         updateAllVisualizationsInternal();
@@ -3783,7 +3906,11 @@ async function initializeComparisonTags() {
             }
             
         } catch (error) {
-            if (window.Logger) {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה באתחול עמוד ניתוח השוואתי', 
+                    `לא ניתן לאתחל את העמוד. ${errorMsg}`);
+            } else if (window.Logger) {
                 window.Logger.error('Error initializing page', { page: 'comparative-analysis-page', error });
             }
         }

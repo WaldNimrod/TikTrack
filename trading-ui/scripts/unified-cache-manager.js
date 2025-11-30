@@ -179,6 +179,7 @@ const TTL_POLICIES = {
     'user-preferences': 'long',      // 24 hours
     'preference-data': 'medium',
     'preference-single': 'medium',
+    'ai-analysis-response': 'short', // 2 hours - AI analysis responses
     'preference-group': 'medium',
     'preference-multiple': 'medium',
     'preference-groups': 'long',
@@ -256,6 +257,7 @@ class UnifiedCacheManager {
             'ui-state': { layer: 'localStorage', ttl: 3600000, compress: false },
             'filter-state': { layer: 'localStorage', ttl: 3600000, compress: false },
             'notifications-history': { layer: 'indexedDB', ttl: 86400000, compress: true },
+            'ai-analysis-response-*': { layer: 'indexedDB', ttl: 7200000, compress: true }, // 2 hours - AI responses (large data)
             'file-mappings': { layer: 'indexedDB', ttl: null, compress: true },
             'linter-results': { layer: 'indexedDB', ttl: 86400000, compress: true },
             'js-analysis': { layer: 'indexedDB', ttl: 86400000, compress: true },

@@ -105,13 +105,8 @@
             // Load mockup data
             await loadMockupData();
 
-            // Restore view mode from state
-            if (typeof window.PageStateManager?.get === 'function') {
-                const savedViewMode = window.PageStateManager.get('watch-lists-view-mode');
-                if (savedViewMode) {
-                    setViewMode(savedViewMode);
-                }
-            }
+            // Restore page state (view mode, active list, sections)
+            await restorePageState();
 
             // Initialize drag and drop (mockup)
             if (window.WatchListsUIService?.initializeDragAndDrop) {
@@ -128,9 +123,12 @@
 
             window.Logger?.info?.('✅ Watch Lists Page initialized successfully', PAGE_LOG_CONTEXT);
         } catch (error) {
-            window.Logger?.error?.('❌ Error initializing Watch Lists Page', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('שגיאה', 'error', 'שגיאה באתחול עמוד רשימות צפייה', 5000);
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה באתחול עמוד רשימות צפייה', 
+                    `לא ניתן לאתחל את העמוד. ${errorMsg}`);
+            } else if (window.Logger) {
+                window.Logger.error('❌ Error initializing Watch Lists Page', { ...PAGE_LOG_CONTEXT, error: errorMsg });
             }
         }
     }
@@ -188,20 +186,41 @@
      * @async
      */
     async function loadMockupData() {
+        // Show loading state
+        const container = document.getElementById('watchListsGrid') || document.querySelector('.watch-lists-container');
+        if (container && typeof window.showLoadingState === 'function') {
+            window.showLoadingState(container.id || 'watchListsGrid');
+        }
+        
         try {
             // Load watch lists
             await loadWatchLists();
 
             // Load summary stats
             calculateSummaryStats();
+            
+            // Hide loading state
+            if (container && typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState(container.id || 'watchListsGrid');
+            }
 
             window.Logger?.debug?.('✅ Mockup data loaded', PAGE_LOG_CONTEXT);
         } catch (error) {
-            // In mockup mode, data loading errors are expected - use warn instead of error
-            window.Logger?.warn?.('⚠️ Error loading mockup data (non-critical in mockup mode)', { 
-                ...PAGE_LOG_CONTEXT, 
-                error: error?.message || error 
-            });
+            // Hide loading state on error
+            if (container && typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState(container.id || 'watchListsGrid');
+            }
+            
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת נתונים', 
+                    `לא ניתן לטעון את הנתונים. ${errorMsg}`);
+            } else if (window.Logger) {
+                window.Logger.warn('⚠️ Error loading mockup data (non-critical in mockup mode)', { 
+                    ...PAGE_LOG_CONTEXT, 
+                    error: errorMsg 
+                });
+            }
             // Try fallback to mockup data directly
             try {
                 if (window.WatchListsDataService?.getMockupWatchLists) {
@@ -231,7 +250,13 @@
                 }
             }
         } catch (error) {
-            window.Logger?.error?.('❌ Error loading watch lists', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת רשימות צפייה', 
+                    `לא ניתן לטעון את הרשימות. ${errorMsg}`);
+            } else if (window.Logger) {
+                window.Logger.error('❌ Error loading watch lists', { ...PAGE_LOG_CONTEXT, error: errorMsg });
+            }
         }
     }
 
@@ -253,7 +278,13 @@
                 }
             }
         } catch (error) {
-            window.Logger?.error?.('❌ Error loading watch list items', { ...PAGE_LOG_CONTEXT, listId, error: error?.message || error });
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת פריטי רשימה', 
+                    `לא ניתן לטעון את הפריטים. ${errorMsg}`);
+            } else if (window.Logger) {
+                window.Logger.error('❌ Error loading watch list items', { ...PAGE_LOG_CONTEXT, listId, error: errorMsg });
+            }
         }
     }
 
@@ -350,6 +381,9 @@
 
             currentViewMode = mode;
         }
+        
+        // Save page state
+        savePageState();
     }
 
     // ===== FLAG MANAGEMENT =====
@@ -579,10 +613,19 @@
 
             // Load items
             await loadWatchListItems(listId);
+            
+            // Save page state
+            await savePageState();
 
             window.Logger?.info?.('✅ List selected', { ...PAGE_LOG_CONTEXT, listId });
         } catch (error) {
-            window.Logger?.error?.('❌ Error selecting list', { ...PAGE_LOG_CONTEXT, listId, error: error?.message || error });
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בבחירת רשימה', 
+                    `לא ניתן לבחור את הרשימה. ${errorMsg}`);
+            } else if (window.Logger) {
+                window.Logger.error('❌ Error selecting list', { ...PAGE_LOG_CONTEXT, listId, error: errorMsg });
+            }
         }
     }
 
@@ -765,6 +808,101 @@
         // Compact view rendering is handled by HTML (mockup)
         // This is a placeholder for future dynamic rendering
         window.Logger?.debug?.('📋 Compact view rendered', { ...PAGE_LOG_CONTEXT, count: items.length });
+    }
+
+    // ===== PAGE STATE MANAGEMENT =====
+
+    /**
+     * Save page state (view mode, active list, sections)
+     * @async
+     */
+    async function savePageState() {
+        if (!window.PageStateManager) {
+            return;
+        }
+
+        try {
+            // Get section states
+            const sections = {};
+            const sectionIds = ['watch-lists-grid-section', 'active-list-section', 'summary-stats-section'];
+            sectionIds.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const sectionBody = section.querySelector('.section-body');
+                    sections[sectionId] = sectionBody ? sectionBody.style.display === 'none' : false;
+                }
+            });
+
+            const state = {
+                viewMode: currentViewMode,
+                activeListId: activeListId,
+                sections: sections
+            };
+
+            await window.PageStateManager.savePageState(PAGE_NAME, state);
+            if (window.Logger) {
+                window.Logger.debug('✅ Saved page state', PAGE_LOG_CONTEXT);
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to save page state', { ...PAGE_LOG_CONTEXT, error });
+            }
+        }
+    }
+
+    /**
+     * Restore page state (view mode, active list, sections)
+     * @async
+     */
+    async function restorePageState() {
+        if (!window.PageStateManager) {
+            // Fallback to old method
+            if (typeof window.PageStateManager?.get === 'function') {
+                const savedViewMode = window.PageStateManager.get('watch-lists-view-mode');
+                if (savedViewMode) {
+                    setViewMode(savedViewMode);
+                }
+            }
+            return;
+        }
+
+        try {
+            const state = await window.PageStateManager.loadPageState(PAGE_NAME);
+            if (!state) {
+                return;
+            }
+
+            // Restore view mode
+            if (state.viewMode) {
+                setViewMode(state.viewMode);
+            }
+
+            // Restore active list
+            if (state.activeListId) {
+                selectList(state.activeListId);
+            }
+
+            // Restore section states
+            if (state.sections) {
+                Object.keys(state.sections).forEach(sectionId => {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        const sectionBody = section.querySelector('.section-body');
+                        if (sectionBody) {
+                            sectionBody.style.display = state.sections[sectionId] ? 'none' : 'block';
+                        }
+                    }
+                });
+            }
+
+            if (window.Logger) {
+                window.Logger.debug('✅ Restored page state', PAGE_LOG_CONTEXT);
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to restore page state', { ...PAGE_LOG_CONTEXT, error });
+            }
+        }
     }
 
     // ===== INITIALIZATION =====

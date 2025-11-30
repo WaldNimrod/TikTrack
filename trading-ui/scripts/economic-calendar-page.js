@@ -100,7 +100,12 @@
             window.NotificationSystem.showError('שגיאה', message || 'שגיאה לא ידועה');
         }
         if (window.Logger) {
-            window.Logger.error('Economic Calendar Widget Error', { 
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בלוח כלכלי', 
+                    `לא ניתן לטעון את הלוח הכלכלי. ${errorMsg}`);
+            } else if (window.Logger) {
+                window.Logger.error('Economic Calendar Widget Error', { 
                 page: 'economic-calendar-page', 
                 message 
             });
@@ -141,26 +146,41 @@
     // ===== FILTERS MANAGEMENT =====
 
     /**
-     * Load filters from localStorage
+     * Load filters from UnifiedCacheManager or localStorage fallback
      */
-    function loadFilters() {
+    async function loadFilters() {
         try {
-            const stored = localStorage.getItem(FILTERS_STORAGE_KEY);
+            let stored = null;
+            
+            // Try UnifiedCacheManager first
+            if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
+                stored = await window.UnifiedCacheManager.get(FILTERS_STORAGE_KEY);
+            }
+            
+            // Fallback to localStorage
+            if (!stored) {
+                const localStorageData = localStorage.getItem(FILTERS_STORAGE_KEY);
+                if (localStorageData) {
+                    stored = JSON.parse(localStorageData);
+                }
+            }
+            
             if (stored) {
-                const parsed = JSON.parse(stored);
-                if (parsed.countries) state.filters.countries = parsed.countries;
-                if (parsed.importance) state.filters.importance = parsed.importance;
-                if (parsed.eventTypes) state.filters.eventTypes = parsed.eventTypes;
+                if (stored.countries) state.filters.countries = stored.countries;
+                if (stored.importance) state.filters.importance = stored.importance;
+                if (stored.eventTypes) state.filters.eventTypes = stored.eventTypes;
             }
         } catch (error) {
-            // Ignore localStorage errors
+            if (window.Logger) {
+                window.Logger.warn('Failed to load filters', { page: 'economic-calendar-page', error });
+            }
         }
     }
 
     /**
-     * Save filters to localStorage
+     * Save filters to UnifiedCacheManager or localStorage fallback
      */
-    function saveFilters() {
+    async function saveFilters() {
         try {
             const data = {
                 countries: state.filters.countries,
@@ -168,9 +188,34 @@
                 eventTypes: state.filters.eventTypes,
                 lastUpdated: Date.now()
             };
-            localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(data));
+            
+            // Try UnifiedCacheManager first
+            if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
+                await window.UnifiedCacheManager.save(FILTERS_STORAGE_KEY, data, {
+                    layer: 'localStorage',
+                    ttl: null, // persistent
+                    syncToBackend: false
+                });
+            } else {
+                // Fallback to localStorage
+                localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(data));
+            }
         } catch (error) {
-            // Ignore localStorage errors
+            if (window.Logger) {
+                window.Logger.warn('Failed to save filters', { page: 'economic-calendar-page', error });
+            }
+            // Final fallback to localStorage
+            try {
+                const data = {
+                    countries: state.filters.countries,
+                    importance: state.filters.importance,
+                    eventTypes: state.filters.eventTypes,
+                    lastUpdated: Date.now()
+                };
+                localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(data));
+            } catch (e) {
+                // Ignore localStorage errors
+            }
         }
     }
 
@@ -237,7 +282,8 @@
         }
 
         // Save filters
-        saveFilters();
+        await saveFilters();
+        await savePageState();
 
         // Update widget
         updateWidgetConfig();
@@ -247,7 +293,7 @@
      * Initialize filters
      */
     function initializeFilters() {
-        loadFilters();
+        await loadFilters();
         applyFiltersToUI();
 
         // Add event listeners
@@ -967,7 +1013,10 @@
         initializeIcons();
 
         // Initialize filters
-        initializeFilters();
+        await initializeFilters();
+        
+        // Restore page state
+        await restorePageState();
 
         // Initialize preferences integration
         initializePreferencesIntegration();
@@ -1008,6 +1057,100 @@
             if (config && state.savedEvents && state.savedEvents.length > 0) {
                 window.InfoSummarySystem.calculateAndRender(state.savedEvents, config);
                 
+            }
+        }
+    }
+
+    /**
+     * Save page state (filters, sections)
+     * @async
+     */
+    async function savePageState() {
+        if (!window.PageStateManager) {
+            return;
+        }
+
+        try {
+            // Get section states
+            const sections = {};
+            const sectionIds = ['economic_calendar_page-פילטרים', 'economic_calendar_page-אירועים-כלכליים', 
+                               'economic_calendar_page-אירועים-שמורים', 'economic_calendar_page-סטטיסטיקות'];
+            sectionIds.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const sectionBody = section.querySelector('.section-body');
+                    sections[sectionId] = sectionBody ? sectionBody.style.display === 'none' : false;
+                }
+            });
+
+            const pageState = {
+                filters: {
+                    countries: state.filters.countries,
+                    importance: state.filters.importance,
+                    eventTypes: state.filters.eventTypes
+                },
+                sections: sections
+            };
+
+            await window.PageStateManager.savePageState('economic-calendar', pageState);
+            if (window.Logger) {
+                window.Logger.debug('✅ Saved page state', { page: 'economic-calendar-page' });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to save page state', { page: 'economic-calendar-page', error });
+            }
+        }
+    }
+
+    /**
+     * Restore page state (filters, sections)
+     * @async
+     */
+    async function restorePageState() {
+        if (!window.PageStateManager) {
+            return;
+        }
+
+        try {
+            const savedState = await window.PageStateManager.loadPageState('economic-calendar');
+            if (!savedState) {
+                return;
+            }
+
+            // Restore filters if available
+            if (savedState.filters) {
+                if (savedState.filters.countries) {
+                    state.filters.countries = savedState.filters.countries;
+                }
+                if (savedState.filters.importance) {
+                    state.filters.importance = savedState.filters.importance;
+                }
+                if (savedState.filters.eventTypes) {
+                    state.filters.eventTypes = savedState.filters.eventTypes;
+                }
+                applyFiltersToUI();
+            }
+
+            // Restore section states if available
+            if (savedState.sections) {
+                Object.keys(savedState.sections).forEach(sectionId => {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        const sectionBody = section.querySelector('.section-body');
+                        if (sectionBody) {
+                            sectionBody.style.display = savedState.sections[sectionId] ? 'none' : 'block';
+                        }
+                    }
+                });
+            }
+
+            if (window.Logger) {
+                window.Logger.debug('✅ Restored page state', { page: 'economic-calendar-page' });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to restore page state', { page: 'economic-calendar-page', error });
             }
         }
     }

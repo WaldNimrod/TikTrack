@@ -47,6 +47,7 @@
 | Info Summary System | `trading-ui/scripts/info-summary-system.js`<br>`trading-ui/scripts/services/statistics-calculator.js` | [INFO_SUMMARY_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/INFO_SUMMARY_SYSTEM.md) | חישובי KPI, תמיכה בסינונים, רינדור RTL |
 | Pagination System | `trading-ui/scripts/pagination-system.js` | [PAGINATION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/PAGINATION_SYSTEM.md) | פאג’ינציה אחידה לטבלאות, תמיכה במצבי חיפוש |
 | Entity Details Modal | `trading-ui/scripts/entity-details-modal.js`<br>`trading-ui/scripts/entity-details-renderer.js`<br>`trading-ui/scripts/entity-details-api.js` | [entity-details-system/README.md](../features/entity-details-system/README.md) | מודל פרטי ישות מאוחד עם תמיכה ב-linked items והעדפות תצוגה |
+| Autocomplete Service | `trading-ui/scripts/services/autocomplete-service.js`<br>`trading-ui/styles-new/06-components/_autocomplete.css` | [AUTOCOMPLETE_SERVICE_GUIDE.md](../03-DEVELOPMENT/GUIDES/AUTOCOMPLETE_SERVICE_GUIDE.md)<br>[AUTOCOMPLETE_SYSTEM_ARCHITECTURE.md](../02-ARCHITECTURE/FRONTEND/AUTOCOMPLETE_SYSTEM_ARCHITECTURE.md) | מערכת autocomplete כללית לשימוש חוזר - overlay עם suggestions, keyboard navigation, RTL support ✅ **חדש! ינואר 2025** |
 | Pending Trade Plan Widget | `trading-ui/scripts/pending-trade-plan-widget.js` | [PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md) | ווידג'ט דשבורד להצעות שיוך/יצירה, כולל Prefill מודלים ועדכון מטמון מאוחד |
 
 ### 🧩 מערכת ווידג'טים

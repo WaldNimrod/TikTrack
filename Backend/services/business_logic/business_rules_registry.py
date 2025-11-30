@@ -170,6 +170,33 @@ BUSINESS_RULES: Dict[str, Dict[str, Any]] = {
             'required': False,  # Some preferences can be empty
             'type': 'string'  # Stored as text in DB
         }
+    },
+    
+    'ai_analysis': {
+        'template_id': {
+            'min': 1,
+            'required': True,
+            'type': 'integer'
+        },
+        'user_id': {
+            'min': 1,
+            'required': True,
+            'type': 'integer'
+        },
+        'provider': {
+            'allowed_values': ['gemini', 'perplexity'],
+            'required': False,  # Optional - will use default_provider if not provided
+            'type': 'string'
+        },
+        'variables': {
+            'required': True,
+            'type': 'dict'
+        },
+        'status': {
+            'allowed_values': ['pending', 'completed', 'failed'],
+            'required': False,  # Optional - defaults to 'pending'
+            'type': 'string'
+        }
     }
 }
 

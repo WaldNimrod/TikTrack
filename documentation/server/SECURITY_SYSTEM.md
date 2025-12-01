@@ -1,8 +1,17 @@
 # מערכת אבטחה מתקדמת - TikTrack
 
+**תאריך עדכון אחרון:** 01.12.2025  
+**גרסה:** 2.0.0
+
 ## סקירה כללית
 
-מערכת האבטחה המתקדמת של TikTrack מספקת הגנה מקיפה מפני איומים שונים עם Rate Limiting, Response Headers ו-Error Handling מתקדם.
+מערכת האבטחה המתקדמת של TikTrack מספקת הגנה מקיפה מפני איומים שונים עם Rate Limiting, Response Headers, Error Handling מתקדם, בידוד נתוני משתמשים והגנת עמודים.
+
+## תיעוד נוסף
+
+- 🔐 **בידוד נתוני משתמשים**: [SECURITY_AUDIT_USER_DATA_ISOLATION.md](../production/SECURITY_AUDIT_USER_DATA_ISOLATION.md) - דוח אבטחה ותיקון בידוד נתוני משתמשים
+- 🛡️ **הגנת עמודים**: [SECURITY_AUDIT_PAGE_PROTECTION.md](../production/SECURITY_AUDIT_PAGE_PROTECTION.md) - דוח אבטחה ותיקון הגנת עמודים
+- 📖 **מדריך למפתחים**: [SECURITY_GUIDELINES.md](../03-DEVELOPMENT/GUIDES/SECURITY_GUIDELINES.md) - הנחיות למפתחים להוספת user_id filtering והגנת עמודים
 
 ## רכיבי המערכת
 

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Guard Browser Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h2 {
+            margin-top: 0;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 3px;
+        }
+        .pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .test-list {
+            list-style: none;
+            padding: 0;
+        }
+        .test-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Auth Guard Browser Test</h1>
+    <p>This page tests auth-guard functionality in the browser.</p>
+    
+    <div class="test-section">
+        <h2>Test 1: Auth Guard Loading</h2>
+        <div id="test1-results"></div>
+        <button onclick="testAuthGuardLoading()">Run Test</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Auth Functions</h2>
+        <div id="test2-results"></div>
+        <button onclick="testAuthFunctions()">Run Test</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Public Pages Detection</h2>
+        <div id="test3-results"></div>
+        <button onclick="testPublicPages()">Run Test</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 4: Protected Page Access</h2>
+        <div id="test4-results"></div>
+        <button onclick="testProtectedPageAccess()">Run Test</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 5: All Pages Check</h2>
+        <div id="test5-results"></div>
+        <button onclick="testAllPages()">Run Test</button>
+    </div>
+    
+    <script>
+        function addResult(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            container.appendChild(div);
+        }
+        
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+        
+        function testAuthGuardLoading() {
+            clearResults('test1-results');
+            
+            // Test 1.1: Check if AuthGuard is loaded
+            if (typeof window.AuthGuard !== 'undefined') {
+                addResult('test1-results', '✅ AuthGuard is loaded', 'pass');
+            } else {
+                addResult('test1-results', '❌ AuthGuard is not loaded', 'fail');
+            }
+            
+            // Test 1.2: Check if auth.js functions are available
+            if (typeof window.isAuthenticated === 'function') {
+                addResult('test1-results', '✅ isAuthenticated function is available', 'pass');
+            } else {
+                addResult('test1-results', '❌ isAuthenticated function is not available', 'fail');
+            }
+            
+            if (typeof window.checkAuthentication === 'function') {
+                addResult('test1-results', '✅ checkAuthentication function is available', 'pass');
+            } else {
+                addResult('test1-results', '❌ checkAuthentication function is not available', 'fail');
+            }
+        }
+        
+        function testAuthFunctions() {
+            clearResults('test2-results');
+            
+            // Test 2.1: Test isAuthenticated
+            try {
+                const isAuth = typeof window.isAuthenticated === 'function' ? window.isAuthenticated() : false;
+                addResult('test2-results', `isAuthenticated() returned: ${isAuth}`, isAuth ? 'pass' : 'warning');
+            } catch (e) {
+                addResult('test2-results', `❌ Error calling isAuthenticated: ${e.message}`, 'fail');
+            }
+            
+            // Test 2.2: Test checkAuthentication
+            if (typeof window.checkAuthentication === 'function') {
+                window.checkAuthentication(
+                    () => addResult('test2-results', '✅ checkAuthentication: User is authenticated', 'pass'),
+                    () => addResult('test2-results', '⚠️ checkAuthentication: User is not authenticated', 'warning')
+                );
+            } else {
+                addResult('test2-results', '❌ checkAuthentication function is not available', 'fail');
+            }
+        }
+        
+        function testPublicPages() {
+            clearResults('test3-results');
+            
+            if (typeof window.AuthGuard !== 'undefined' && typeof window.AuthGuard.isPublicPage === 'function') {
+                const publicPages = ['login.html', 'register.html', 'reset-password.html', 'forgot-password.html'];
+                publicPages.forEach(page => {
+                    // Simulate page name
+                    const originalPathname = window.location.pathname;
+                    Object.defineProperty(window, 'location', {
+                        value: { pathname: `/${page}` },
+                        writable: true
+                    });
+                    
+                    const isPublic = window.AuthGuard.isPublicPage();
+                    addResult('test3-results', `${page}: ${isPublic ? '✅ Public' : '❌ Not public'}`, isPublic ? 'pass' : 'fail');
+                    
+                    // Restore
+                    Object.defineProperty(window, 'location', {
+                        value: { pathname: originalPathname },
+                        writable: true
+                    });
+                });
+            } else {
+                addResult('test3-results', '❌ AuthGuard.isPublicPage is not available', 'fail');
+            }
+        }
+        
+        function testProtectedPageAccess() {
+            clearResults('test4-results');
+            
+            // Test 4.1: Check if current page would be protected
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const isPublic = ['login.html', 'register.html', 'reset-password.html', 'forgot-password.html'].includes(currentPage);
+            
+            if (isPublic) {
+                addResult('test4-results', `Current page (${currentPage}) is public - auth guard should skip`, 'pass');
+            } else {
+                addResult('test4-results', `Current page (${currentPage}) should be protected by auth guard`, 'warning');
+                
+                // Check if auth guard would protect it
+                if (typeof window.AuthGuard !== 'undefined') {
+                    addResult('test4-results', '✅ AuthGuard is available to protect this page', 'pass');
+                } else {
+                    addResult('test4-results', '❌ AuthGuard is not available - page is not protected', 'fail');
+                }
+            }
+        }
+        
+        async function testAllPages() {
+            clearResults('test5-results');
+            addResult('test5-results', 'Fetching page list...', 'warning');
+            
+            try {
+                // This would need to be implemented with a backend endpoint
+                // For now, we'll test a few known pages
+                const testPages = [
+                    'index.html',
+                    'trades.html',
+                    'notes.html',
+                    'alerts.html',
+                    'trading_accounts.html'
+                ];
+                
+                testPages.forEach(page => {
+                    // Check if page would load auth-guard
+                    // In real test, we'd fetch the HTML and check for auth-guard.js
+                    addResult('test5-results', `${page}: Should have auth-guard (manual check needed)`, 'warning');
+                });
+                
+                addResult('test5-results', '✅ Test complete - check HTML files manually for auth-guard.js', 'pass');
+            } catch (e) {
+                addResult('test5-results', `❌ Error: ${e.message}`, 'fail');
+            }
+        }
+        
+        // Auto-run basic tests on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                testAuthGuardLoading();
+                testAuthFunctions();
+            }, 1000);
+        });
+    </script>
+    
+    <!-- Load auth scripts for testing -->
+    <script src="../trading-ui/scripts/auth.js"></script>
+    <script src="../trading-ui/scripts/auth-guard.js"></script>
+</body>
+</html>
+

@@ -103,6 +103,9 @@ def get_portfolio():
     try:
         db: Session = g.db
         
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         # Parse query parameters
         account_id_filter = request.args.get('account_id')
         account_id_filter = int(account_id_filter) if account_id_filter and account_id_filter.isdigit() else None
@@ -112,6 +115,7 @@ def get_portfolio():
         
         portfolio_data = PositionPortfolioService.calculate_portfolio_summary(
             db=db,
+            user_id=user_id,
             account_id_filter=account_id_filter,
             include_closed=include_closed,
             unify_accounts=unify_accounts,

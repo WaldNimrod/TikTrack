@@ -131,16 +131,26 @@ def _get_notes_normalizer() -> DateNormalizationService:
     return DateNormalizationService(timezone_name)
 
 @notes_bp.route('/', methods=['GET'])
+@handle_database_session()
 def get_notes():
-    """Get all notes"""
+    """Get all notes (filtered by user_id if authenticated)"""
     try:
         logger.info("🔄 Starting get_notes function")
-        db = next(get_db())
+        db: Session = g.db
         logger.info("✅ Database connection established")
+        
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        logger.info(f"🔍 User ID from context: {user_id}")
         
         # Use SQLAlchemy ORM to ensure correct column mapping
         try:
-            notes = db.query(Note).order_by(Note.created_at.desc()).all()
+            query = db.query(Note).order_by(Note.created_at.desc())
+            # Filter by user_id if authenticated
+            if user_id is not None:
+                query = query.filter(Note.user_id == user_id)
+                logger.info(f"✅ Filtering notes by user_id: {user_id}")
+            notes = query.all()
             logger.info(f"✅ Successfully retrieved {len(notes)} notes using ORM")
             
             # Convert to dictionaries using to_dict() which handles column mapping correctly
@@ -189,16 +199,22 @@ def get_notes():
             "error": {"message": f"Failed to retrieve notes: {str(e)}"},
             "version": "1.0"
         }), 500
-    finally:
-        if 'db' in locals():
-            db.close()
+    # Don't close db here - handle_database_session decorator will do it
 
 @notes_bp.route('/<int:note_id>', methods=['GET'])
+@handle_database_session()
 def get_note(note_id: int):
-    """Get note by ID"""
+    """Get note by ID (filtered by user_id if authenticated)"""
     try:
-        db = next(get_db())
-        note = db.query(Note).filter(Note.id == note_id).first()
+        db: Session = g.db
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        query = db.query(Note).filter(Note.id == note_id)
+        # Filter by user_id if authenticated
+        if user_id is not None:
+            query = query.filter(Note.user_id == user_id)
+        note = query.first()
         if note:
             normalizer = _get_notes_normalizer()
             payload = normalizer.normalize_output(note.to_dict())
@@ -221,8 +237,7 @@ def get_note(note_id: int):
             "error": {"message": "Failed to retrieve note"},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
+    # Don't close db here - handle_database_session decorator will do it
 
 @notes_bp.route('/', methods=['POST'])
 @handle_database_session(auto_commit=True, auto_close=True)

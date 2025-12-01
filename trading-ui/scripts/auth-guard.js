@@ -16,7 +16,9 @@
 // Pages that don't require authentication
 const PUBLIC_PAGES = [
   'login.html',
-  'register.html'
+  'register.html',
+  'reset-password.html',
+  'forgot-password.html'
 ];
 
 /**

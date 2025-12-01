@@ -41,6 +41,7 @@ class TradePlanMatchingService:
     def get_assignment_suggestions(
         db: Session,
         *,
+        user_id: Optional[int] = None,
         max_items: Optional[int] = None,
         max_suggestions_per_trade: int = 3,
         status_filter: Optional[List[str]] = None,
@@ -50,6 +51,7 @@ class TradePlanMatchingService:
 
         Args:
             db: Database session.
+            user_id: Optional filter by user ID (None = all users, but should be set for security)
             max_items: Optional limit on returned trades.
             max_suggestions_per_trade: Limit for plan suggestions per trade.
             status_filter: Optional list of trade statuses to include.
@@ -58,13 +60,14 @@ class TradePlanMatchingService:
             db,
             status_filter=status_filter or ["open"],
             load_relationships=True,
+            user_id=user_id,
         )
 
         if not trades:
             return []
 
         ticker_ids = {trade.ticker_id for trade in trades if trade.ticker_id}
-        plans = TradePlanMatchingService._load_open_plans_for_tickers(db, ticker_ids)
+        plans = TradePlanMatchingService._load_open_plans_for_tickers(db, ticker_ids, user_id=user_id)
         plans_by_ticker: Dict[int, List[TradePlan]] = defaultdict(list)
         for plan in plans:
             plans_by_ticker[plan.ticker_id].append(plan)
@@ -165,6 +168,7 @@ class TradePlanMatchingService:
     def get_creation_suggestions(
         db: Session,
         *,
+        user_id: Optional[int] = None,
         max_items: Optional[int] = None,
         status_filter: Optional[List[str]] = None,
         assignment_index: Optional[Dict[int, int]] = None,
@@ -174,6 +178,7 @@ class TradePlanMatchingService:
 
         Args:
             db: Database session.
+            user_id: Optional filter by user ID (None = all users, but should be set for security)
             max_items: Optional limit on returned trades.
             status_filter: Optional list of trade statuses to include.
             assignment_index: Optional mapping of trade_id -> best assignment score
@@ -184,6 +189,7 @@ class TradePlanMatchingService:
             db,
             status_filter=status_filter or ["open"],
             load_relationships=True,
+            user_id=user_id,
         )
 
         if not trades:
@@ -328,19 +334,23 @@ class TradePlanMatchingService:
     # Utilities
     # ------------------------------------------------------------------ #
     @staticmethod
-    def _load_open_plans_for_tickers(db: Session, ticker_ids: set[int]) -> List[TradePlan]:
+    def _load_open_plans_for_tickers(db: Session, ticker_ids: set[int], user_id: Optional[int] = None) -> List[TradePlan]:
         if not ticker_ids:
             return []
 
-        return (
+        query = (
             db.query(TradePlan)
             .options(joinedload(TradePlan.account), joinedload(TradePlan.ticker))
             .filter(
                 TradePlan.ticker_id.in_(ticker_ids),  # type: ignore[arg-type]
                 TradePlan.status == "open",
             )
-            .all()
         )
+        # Filter by user_id if provided
+        if user_id is not None:
+            query = query.filter(TradePlan.user_id == user_id)
+        
+        return query.all()
 
     @staticmethod
     def _serialize_trade(trade: Optional[Trade]) -> Dict[str, Any]:

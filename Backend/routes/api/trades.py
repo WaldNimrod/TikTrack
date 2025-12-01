@@ -44,12 +44,15 @@ def get_trades_pending_plan_assignments():
     normalizer = None
     try:
         db: Session = g.db
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
         normalizer = _get_date_normalizer()
         limit = request.args.get('limit', type=int)
         suggestions_limit = request.args.get('suggestions', default=3, type=int)
 
         suggestions = TradePlanMatchingService.get_assignment_suggestions(
             db,
+            user_id=user_id,
             max_items=limit,
             max_suggestions_per_trade=max(suggestions_limit or 1, 1),
         )
@@ -81,11 +84,14 @@ def get_trades_pending_plan_creations():
     normalizer = None
     try:
         db: Session = g.db
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
         normalizer = _get_date_normalizer()
         limit = request.args.get('limit', type=int)
 
         assignment_preview = TradePlanMatchingService.get_assignment_suggestions(
             db,
+            user_id=user_id,
             max_items=None,
             max_suggestions_per_trade=3,
         )
@@ -96,6 +102,7 @@ def get_trades_pending_plan_creations():
 
         creations = TradePlanMatchingService.get_creation_suggestions(
             db,
+            user_id=user_id,
             max_items=limit,
             assignment_index=assignment_index,
         )

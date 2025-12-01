@@ -186,6 +186,20 @@ const PACKAGE_MANIFEST = {
         loadOrder: 9
       },
       {
+        file: 'auth.js',
+        globalCheck: 'window.isAuthenticated',
+        description: 'Authentication system',
+        required: true,
+        loadOrder: 9.5
+      },
+      {
+        file: 'auth-guard.js',
+        globalCheck: 'window.AuthGuard',
+        description: 'Page protection - authentication guard',
+        required: true,
+        loadOrder: 9.6
+      },
+      {
         file: 'logger-service.js',
         globalCheck: 'window.Logger',
         description: 'Advanced logging service',
@@ -389,6 +403,13 @@ const PACKAGE_MANIFEST = {
         description: 'General autocomplete service for reusable suggestions dropdown',
         required: false,
         loadOrder: 8.1
+      },
+      {
+        file: 'services/widget-overlay-service.js',
+        globalCheck: 'window.WidgetOverlayService',
+        description: 'Central widget overlay service for hover details',
+        required: false,
+        loadOrder: 8.2
       },
       {
         file: 'services/table-sort-value-adapter.js',

@@ -253,7 +253,11 @@ async function loadAccountsForPreferences() {
         accountsBeforeFilter: accounts.length,
       });
 
-      accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
+      accountSelect.textContent = '';
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'בחר חשבון מסחר...';
+      accountSelect.appendChild(defaultOption);
 
       const filteredAccounts = accounts.filter(account => 
         account && (account.status === 'open' || account.status === 'active' || account.is_active === true)

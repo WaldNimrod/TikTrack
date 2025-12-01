@@ -562,11 +562,25 @@ scripts: [
 - `documentation/frontend/JAVASCRIPT_ARCHITECTURE.md` - ארכיטקטורה כללית
 - `documentation/REFACTOR_INITIALIZATION_SYSTEM_COMPLETION_REPORT.md` - דוח השלמה
 - `documentation/05-REPORTS/BUSINESS_LOGIC_INITIALIZATION_INTEGRATION_ANALYSIS.md` - ניתוח אינטגרציה
+- `documentation/03-DEVELOPMENT/TOOLS/PACKAGE_LOAD_ORDER_AUDIT_TOOLS_GUIDE.md` - מדריך מקיף לכלי בדיקת סדר טעינה ותלויות ✅ **חדש! דצמבר 2025**
 
 ### כלי בדיקה:
 - `trading-ui/init-system-management.html` - ממשק ניטור
 - `trading-ui/scripts/init-system/all-pages-monitoring-test.js` - בדיקת כל העמודים
 - `trading-ui/scripts/init-system/comprehensive-initialization-test.js` - בדיקה מקיפה
+
+### כלי בדיקה אוטומטיים (scripts/audit/):
+- `validate-package-dependencies.js` - בדיקת תלויות וסדר טעינה של חבילות ✅ **חדש! דצמבר 2025**
+- `validate-all-pages-load-order.js` - בדיקת סדר טעינה בכל עמודי המערכת
+- `fix-all-pages-load-order-v2.js` - תיקון אוטומטי של סדר טעינה
+- `package-manifest-audit.js` - בדיקה מקיפה של המניפסט
+- `dependency-analyzer.js` - ניתוח מעמיק של תלויות
+- `browser-page-validator.js` - יצירת סקריפט לבדיקה בדפדפן
+- `browser-automated-validation.js` - בדיקה אוטומטית בדפדפן
+- `page-mapper.js` - מיפוי עמודים מול הגדרות
+- `load-order-validator.js` - ספרייה לבדיקת סדר טעינה
+
+**📖 מדריך מפורט:** `documentation/03-DEVELOPMENT/TOOLS/PACKAGE_LOAD_ORDER_AUDIT_TOOLS_GUIDE.md`
 
 ---
 
@@ -580,7 +594,33 @@ scripts: [
 
 ---
 
-**תאריך עדכון אחרון:** 24 בנובמבר 2025  
-**גרסה:** 2.0.0  
+**תאריך עדכון אחרון:** 1 בדצמבר 2025  
+**גרסה:** 1.5.0  
 **סטטוס:** ✅ פעיל ומתועד
+
+---
+
+## 🔧 כלי בדיקה ותיקון
+
+### סקירה כללית
+
+מערכת כלי הבדיקה ב-`scripts/audit/` מאפשרת לבדוק ולתקן את סדר טעינת הסקריפטים בכל עמודי המערכת.
+
+### כלי בדיקה עיקריים
+
+1. **validate-package-dependencies.js** - בדיקת תלויות וסדר טעינה של חבילות
+2. **validate-all-pages-load-order.js** - בדיקת סדר טעינה בכל עמודי המערכת
+3. **fix-all-pages-load-order-v2.js** - תיקון אוטומטי של סדר טעינה
+
+### מדריך מפורט
+
+**📖 מדריך מקיף למפתח העתידי:**
+`documentation/03-DEVELOPMENT/TOOLS/PACKAGE_LOAD_ORDER_AUDIT_TOOLS_GUIDE.md`
+
+המדריך כולל:
+- רשימת כל כלי הבדיקה
+- מדריך שימוש מפורט לכל כלי
+- תרחישי שימוש נפוצים
+- פתרון בעיות
+- טיפים למפתח העתידי
 

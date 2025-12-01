@@ -2086,17 +2086,29 @@ window.loadTableData = async function(tableType, updateFunction, options = {}) {
       const columns = options.columns || 5;
       
       if (tbody) {
-        tbody.innerHTML = `
-          <tr class="empty-state-row">
-            <td colspan="${columns}" class="text-center py-5">
-              <div class="empty-state-content">
-                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">אין ${entityName} להצגה</h5>
-                <p class="text-muted small mb-0">לא נמצאו רשומות במערכת</p>
-              </div>
-            </td>
-          </tr>
-        `;
+        // Build empty state using createElement
+        tbody.textContent = '';
+        const emptyRow = document.createElement('tr');
+        emptyRow.className = 'empty-state-row';
+        const emptyCell = document.createElement('td');
+        emptyCell.colSpan = columns;
+        emptyCell.className = 'text-center py-5';
+        const emptyContent = document.createElement('div');
+        emptyContent.className = 'empty-state-content';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-inbox fa-3x text-muted mb-3';
+        emptyContent.appendChild(icon);
+        const h5 = document.createElement('h5');
+        h5.className = 'text-muted';
+        h5.textContent = `אין ${entityName} להצגה`;
+        emptyContent.appendChild(h5);
+        const p = document.createElement('p');
+        p.className = 'text-muted small mb-0';
+        p.textContent = 'לא נמצאו רשומות במערכת';
+        emptyContent.appendChild(p);
+        emptyCell.appendChild(emptyContent);
+        emptyRow.appendChild(emptyCell);
+        tbody.appendChild(emptyRow);
         console.log(`ℹ️ Displayed empty state message for ${entityName} (0 records)`);
       }
     }

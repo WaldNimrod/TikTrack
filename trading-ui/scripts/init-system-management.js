@@ -74,17 +74,29 @@ async function loadSystemStatus() {
             const isInitialized = status && status.initialized;
             const statusText = isInitialized ? 'פעילה' : 'לא פעילה';
             const statusIcon = isInitialized ? 'fa-check-circle text-success' : 'fa-times-circle text-danger';
-            systemStatusCard.innerHTML = `<i class="fas ${statusIcon}"></i> ${statusText}`;
+            systemStatusCard.textContent = '';
+            const icon = document.createElement('i');
+            icon.className = `fas ${statusIcon}`;
+            systemStatusCard.appendChild(icon);
+            systemStatusCard.appendChild(document.createTextNode(` ${statusText}`));
         }
         
         if (pagesCountCard) {
             const pagesCount = Object.keys(window.PAGE_CONFIGS || {}).length;
-            pagesCountCard.innerHTML = `<i class="fas fa-file-alt"></i> ${pagesCount}`;
+            pagesCountCard.textContent = '';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-file-alt';
+            pagesCountCard.appendChild(icon);
+            pagesCountCard.appendChild(document.createTextNode(` ${pagesCount}`));
         }
         
         if (packagesCountCard) {
             const packagesCount = Object.keys(window.PACKAGE_MANIFEST || {}).length;
-            packagesCountCard.innerHTML = `<i class="fas fa-boxes"></i> ${packagesCount}`;
+            packagesCountCard.textContent = '';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-boxes';
+            packagesCountCard.appendChild(icon);
+            packagesCountCard.appendChild(document.createTextNode(` ${packagesCount}`));
         }
         
         

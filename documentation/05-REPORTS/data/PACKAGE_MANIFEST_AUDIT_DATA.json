@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalPages": 66,
+    "totalPages": 76,
     "pagesInDocs": 64,
-    "pagesInConfigs": 42,
+    "pagesInConfigs": 54,
     "pagesInHTML": 59,
     "totalPackages": 29,
     "totalScripts": 216,
     "issues": {
       "critical": 19,
       "high": 0,
-      "medium": 2,
+      "medium": 14,
       "low": 4
     }
   },
@@ -80,7 +80,17 @@
       "tradingview-widgets-showcase",
       "trades_formatted",
       "my-package",
-      "my-page"
+      "my-page",
+      "portfolio-state-page",
+      "trade-history-page",
+      "price-history-page",
+      "comparative-analysis-page",
+      "trading-journal-page",
+      "strategy-analysis-page",
+      "economic-calendar-page",
+      "history-widget",
+      "emotional-tracking-widget",
+      "date-comparison-modal"
     ],
     "documentedPages": [
       "index",
@@ -190,7 +200,19 @@
       "watch-list-modal",
       "add-ticker-modal",
       "flag-quick-action",
-      "ai-analysis"
+      "ai-analysis",
+      "cache-test",
+      "tradingview-test-page",
+      "portfolio-state-page",
+      "trade-history-page",
+      "price-history-page",
+      "comparative-analysis-page",
+      "trading-journal-page",
+      "strategy-analysis-page",
+      "economic-calendar-page",
+      "history-widget",
+      "emotional-tracking-widget",
+      "date-comparison-modal"
     ],
     "htmlPages": [
       "ai-analysis",
@@ -277,7 +299,19 @@
     ],
     "extraInConfigs": [
       "my-package",
-      "my-page"
+      "my-page",
+      "cache-test",
+      "tradingview-test-page",
+      "portfolio-state-page",
+      "trade-history-page",
+      "price-history-page",
+      "comparative-analysis-page",
+      "trading-journal-page",
+      "strategy-analysis-page",
+      "economic-calendar-page",
+      "history-widget",
+      "emotional-tracking-widget",
+      "date-comparison-modal"
     ],
     "duplicates": []
   },
@@ -300,12 +334,12 @@
       "ui-advanced": {
         "scriptsCount": 5,
         "loadOrder": 3,
-        "dependenciesCount": 2,
+        "dependenciesCount": 3,
         "hasCircular": false
       },
       "modules": {
         "scriptsCount": 28,
-        "loadOrder": 3.5,
+        "loadOrder": 2.5,
         "dependenciesCount": 2,
         "hasCircular": false
       },
@@ -838,7 +872,8 @@
       "ui-advanced": {
         "dependencies": [
           "base",
-          "services"
+          "services",
+          "modules"
         ],
         "loadOrder": 3,
         "scripts": [
@@ -884,7 +919,7 @@
           "base",
           "services"
         ],
-        "loadOrder": 3.5,
+        "loadOrder": 2.5,
         "scripts": [
           {
             "file": "modal-navigation-manager.js",

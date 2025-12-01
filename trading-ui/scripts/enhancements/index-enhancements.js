@@ -176,14 +176,22 @@ class IndexPageEnhancements {
     addChartLoadingIndicator(chartId) {
         const chartContainer = document.getElementById(chartId);
         if (chartContainer) {
-            chartContainer.innerHTML = `
-                <div class="chart-loading">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">טוען גרף...</span>
-                    </div>
-                    <p class="mt-2">טוען גרף...</p>
-                </div>
-            `;
+            chartContainer.textContent = '';
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'chart-loading';
+            const spinner = document.createElement('div');
+            spinner.className = 'spinner-border text-primary';
+            spinner.setAttribute('role', 'status');
+            const spinnerText = document.createElement('span');
+            spinnerText.className = 'visually-hidden';
+            spinnerText.textContent = 'טוען גרף...';
+            spinner.appendChild(spinnerText);
+            loadingDiv.appendChild(spinner);
+            const p = document.createElement('p');
+            p.className = 'mt-2';
+            p.textContent = 'טוען גרף...';
+            loadingDiv.appendChild(p);
+            chartContainer.appendChild(loadingDiv);
         }
     }
     

@@ -637,18 +637,32 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
   notification.style.borderLeft = `4px solid ${notificationColor}`;
-  notification.innerHTML = `
-    <div class="notification-icon" style="color: ${notificationColor}">
-      <i class="fas ${getNotificationIcon(type)}"></i>
-    </div>
-    <div class="notification-content">
-      <div class="notification-title">${title}</div>
-      <div class="notification-message">${message}</div>
-    </div>
-    <button class="notification-close" onclick="this.parentElement.remove()">
-      <i class="fas fa-times"></i>
-    </button>
-  `;
+  // Build notification structure
+  const iconDiv = document.createElement('div');
+  iconDiv.className = 'notification-icon';
+  iconDiv.style.color = notificationColor;
+  const icon = document.createElement('i');
+  icon.className = `fas ${getNotificationIcon(type)}`;
+  iconDiv.appendChild(icon);
+  notification.appendChild(iconDiv);
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'notification-content';
+  const titleDiv = document.createElement('div');
+  titleDiv.className = 'notification-title';
+  titleDiv.textContent = title;
+  contentDiv.appendChild(titleDiv);
+  const messageDiv = document.createElement('div');
+  messageDiv.className = 'notification-message';
+  messageDiv.textContent = message;
+  contentDiv.appendChild(messageDiv);
+  notification.appendChild(contentDiv);
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'notification-close';
+  closeBtn.onclick = function() { this.parentElement.remove(); };
+  const closeIcon = document.createElement('i');
+  closeIcon.className = 'fas fa-times';
+  closeBtn.appendChild(closeIcon);
+  notification.appendChild(closeBtn);
 
   // Debug: Log notification element details
   // window.Logger.info('🔍 DEBUG: Notification element created:', {

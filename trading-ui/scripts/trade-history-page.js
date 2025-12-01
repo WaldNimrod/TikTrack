@@ -160,12 +160,11 @@
     function populateTickerFilter() {
                 const tickerSelect = document.getElementById('filterTicker');
                 if (tickerSelect) {
-                    tickerSelect.innerHTML.textContent = '';
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = '\'<option value="">הכל</option>\'';
-        while (tempDiv.firstChild) {
-            tickerSelect.innerHTML.appendChild(tempDiv.firstChild);
-        }
+                    tickerSelect.textContent = '';
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = 'הכל';
+                    tickerSelect.appendChild(defaultOption);
                     allTickers.forEach(ticker => {
                         const option = document.createElement('option');
                         option.value = ticker.symbol;
@@ -181,12 +180,11 @@
     function loadInvestmentTypes() {
         const investmentSelect = document.getElementById('filterInvestmentType');
         if (investmentSelect) {
-            investmentSelect.innerHTML.textContent = '';
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = '\'<option value="">הכל</option>\'';
-        while (tempDiv.firstChild) {
-            investmentSelect.innerHTML.appendChild(tempDiv.firstChild);
-        }
+            investmentSelect.textContent = '';
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'הכל';
+            investmentSelect.appendChild(defaultOption);
             INVESTMENT_TYPES.forEach(type => {
                 const option = document.createElement('option');
                 option.value = type.value;

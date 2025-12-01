@@ -206,11 +206,16 @@
         if (!resultsContainer) return;
 
         if (results.length === 0) {
-            resultsContainer.innerHTML = '<div class="alert alert-info">לא נמצאו תוצאות</div>';
+            resultsContainer.textContent = '';
+            const noResultsDiv = document.createElement('div');
+            noResultsDiv.className = 'alert alert-info';
+            noResultsDiv.textContent = 'לא נמצאו תוצאות';
+            resultsContainer.appendChild(noResultsDiv);
             return;
         }
 
-        resultsContainer.innerHTML = results.map(ticker => `
+        // Build results HTML and insert using tempDiv
+        const resultsHTML = results.map(ticker => `
             <div class="search-result-item" data-ticker-id="${ticker.id}">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
@@ -226,6 +231,12 @@
                 </div>
             </div>
         `).join('');
+        resultsContainer.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = resultsHTML;
+        while (tempDiv.firstChild) {
+          resultsContainer.appendChild(tempDiv.firstChild);
+        }
 
         // Add click handlers
         resultsContainer.querySelectorAll('.search-result-item').forEach(item => {

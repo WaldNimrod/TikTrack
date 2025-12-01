@@ -185,7 +185,13 @@ function updateTableDisplay(data, tableType, containerId) {
   // Create table headers from first data row
   const thead = table.querySelector('thead');
   if (thead && data.length > 0) {
-    thead.innerHTML = createTableHeaders(data);
+    const headersHTML = createTableHeaders(data);
+    thead.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = headersHTML;
+    while (tempDiv.firstChild) {
+      thead.appendChild(tempDiv.firstChild);
+    }
   }
 
   // Create table body HTML

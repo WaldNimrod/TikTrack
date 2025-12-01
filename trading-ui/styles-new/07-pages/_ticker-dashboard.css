@@ -34,18 +34,24 @@
 }
 
 /* ===== CHART CONTAINER ===== */
-.ticker-dashboard-page #tickerPriceChartContainer {
+.ticker-dashboard-page #tradingview_widget {
     height: 50vh;
-    min-height: 300px;
+    min-height: 500px;
     max-height: 80vh;
     width: 100%;
     position: relative;
 }
 
+.ticker-dashboard-page .tradingview-widget-container {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
 @media (max-width: 768px) {
-    .ticker-dashboard-page #tickerPriceChartContainer {
+    .ticker-dashboard-page #tradingview_widget {
         height: 40vh;
-        min-height: 300px;
+        min-height: 400px;
     }
 }
 
@@ -111,9 +117,9 @@
         /* 2 cards per row - handled by col-md-6 */
     }
     
-    .ticker-dashboard-page #tickerPriceChartContainer {
+    .ticker-dashboard-page #tradingview_widget {
         height: 40vh;
-        min-height: 300px;
+        min-height: 400px;
     }
 }
 
@@ -129,9 +135,9 @@
         /* 1 card per row - handled by col-12 */
     }
     
-    .ticker-dashboard-page #tickerPriceChartContainer {
+    .ticker-dashboard-page #tradingview_widget {
         height: 30vh;
-        min-height: 250px;
+        min-height: 300px;
     }
 }
 

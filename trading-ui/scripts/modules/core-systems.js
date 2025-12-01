@@ -3547,7 +3547,12 @@ async function showDetailsModal(title, content, options = {}) {
   // Ensure content is properly rendered as HTML
   const detailsContent = modal.querySelector('.details-content');
   if (detailsContent) {
-    detailsContent.innerHTML = content;
+    detailsContent.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    while (tempDiv.firstChild) {
+      detailsContent.appendChild(tempDiv.firstChild);
+    }
   }
 
   // Show modal using ModalManagerV2 (with proper z-index and backdrop management)

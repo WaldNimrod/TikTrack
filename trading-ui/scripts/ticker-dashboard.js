@@ -12,7 +12,6 @@
 
     let tickerId = null;
     let tickerData = null;
-    let priceChart = null;
 
     /**
      * Resolve ticker symbol to ID
@@ -472,13 +471,15 @@
             
             // Create KPI cards using createElement
             // All technical indicators are now unified in KPI Cards
+            // Ensure atrHtml is a string, not a Promise
+            const atrHtmlString = (typeof atrHtml === 'string') ? atrHtml : (atrHtml || 'N/A');
             const kpiCards = [
-                { label: 'מחיר', value: priceHtml, dir: '' },
-                { label: 'שינוי', value: changeHtml, dir: '' },
-                { label: 'ATR', value: atrHtml || 'N/A', dir: '' },
-                { label: '52W Range', value: week52Html, dir: 'ltr' },
-                { label: 'נפח', value: formattedVolume, dir: 'ltr' },
-                { label: 'תנודתיות', value: volatilityHtml, dir: 'ltr' }
+                { label: 'מחיר', value: priceHtml, dir: '', helpKey: null },
+                { label: 'שינוי', value: changeHtml, dir: '', helpKey: null },
+                { label: 'ATR', value: atrHtmlString, dir: '', helpKey: 'atr' },
+                { label: '52W Range', value: week52Html, dir: 'ltr', helpKey: 'week52_range' },
+                { label: 'נפח', value: formattedVolume, dir: 'ltr', helpKey: 'volume' },
+                { label: 'תנודתיות', value: volatilityHtml, dir: 'ltr', helpKey: 'volatility' }
             ];
             
             kpiCards.forEach(kpi => {
@@ -492,9 +493,36 @@
                 labelDiv.className = 'kpi-label';
                 
                 // Add help icon for technical indicators
-                if (window.TechnicalIndicatorsHelp && (kpi.label === 'ATR' || kpi.label === '52W Range' || kpi.label === 'תנודתיות' || kpi.label === 'נפח')) {
-                    const helpIcon = window.TechnicalIndicatorsHelp.renderHelpIcon(kpi.label);
-                    labelDiv.innerHTML = helpIcon + kpi.label;
+                if (window.TechnicalIndicatorsHelp && window.IconSystem && (kpi.label === 'ATR' || kpi.label === '52W Range' || kpi.label === 'תנודתיות' || kpi.label === 'נפח')) {
+                    const helpKey = kpi.label === 'ATR' ? 'atr' : 
+                                   kpi.label === '52W Range' ? 'week52_range' : 
+                                   kpi.label === 'תנודתיות' ? 'volatility' : 
+                                   kpi.label === 'נפח' ? 'volume' : null;
+                    if (helpKey) {
+                        const helpText = window.TechnicalIndicatorsHelp.getHelpText(helpKey);
+                        // IconSystem.renderIcon returns a Promise, so we need to await it
+                        try {
+                            const helpIcon = await window.IconSystem.renderIcon('button', 'help', {
+                                size: 14,
+                                classes: 'ms-1 help-icon',
+                                onclick: `window.NotificationSystem.showInfo('${kpi.label}', '${helpText.replace(/'/g, "\\'")}')`
+                            });
+                            // Ensure helpIcon is a string, not a Promise
+                            const helpIconString = (typeof helpIcon === 'string') ? helpIcon : (helpIcon || '');
+                            labelDiv.innerHTML = `${kpi.label}${helpIconString}`;
+                        } catch (iconError) {
+                            if (window.Logger) {
+                                window.Logger.warn('Error rendering help icon', { 
+                                    error: iconError.message, 
+                                    helpKey, 
+                                    page: 'ticker-dashboard' 
+                                });
+                            }
+                            labelDiv.textContent = kpi.label;
+                        }
+                    } else {
+                        labelDiv.textContent = kpi.label;
+                    }
                 } else {
                     labelDiv.textContent = kpi.label;
                 }
@@ -543,18 +571,19 @@
      * Initialize price chart
      */
     async function initPriceChart() {
-        const container = document.getElementById('tickerPriceChartContainer');
+        const container = document.getElementById('tradingview_widget');
         if (window.Logger) {
-            window.Logger.info('📊 initPriceChart called', { 
+            window.Logger.info('📊 initPriceChart called - Using TradingView Widget', { 
                 hasContainer: !!container, 
                 hasTickerData: !!tickerData,
-                hasTradingViewAdapter: !!window.TradingViewChartAdapter,
+                tickerId,
+                tickerSymbol: tickerData?.symbol || tickerData?.ticker_symbol,
                 page: 'ticker-dashboard' 
             });
         }
         if (!container) {
             if (window.Logger) {
-                window.Logger.error('❌ Container not found: tickerPriceChartContainer', { page: 'ticker-dashboard' });
+                window.Logger.error('❌ Container not found: tradingview_widget', { page: 'ticker-dashboard' });
             }
             return;
         }
@@ -570,163 +599,144 @@
                 window.showLoadingState('ticker-dashboard-chart');
             }
             
-            // Destroy existing chart
-            if (priceChart && window.TradingViewChartAdapter) {
-                window.TradingViewChartAdapter.destroyChart(priceChart);
+            // Get ticker symbol and exchange
+            const tickerSymbol = tickerData.symbol || tickerData.ticker_symbol || '';
+            const exchange = tickerData.exchange || 'NASDAQ'; // Default to NASDAQ
+            
+            // Build TradingView symbol (e.g., "NASDAQ:QQQ")
+            let tvSymbol = tickerSymbol;
+            if (exchange && exchange.toUpperCase() !== 'NASDAQ' && exchange.toUpperCase() !== 'NYSE') {
+                // Map common exchanges to TradingView format
+                const exchangeMap = {
+                    'NYSE': 'NYSE',
+                    'NASDAQ': 'NASDAQ',
+                    'AMEX': 'AMEX',
+                    'OTC': 'OTC',
+                    'TSX': 'TSX',
+                    'LSE': 'LSE'
+                };
+                const tvExchange = exchangeMap[exchange.toUpperCase()] || 'NASDAQ';
+                tvSymbol = `${tvExchange}:${tickerSymbol}`;
+            } else if (exchange) {
+                tvSymbol = `${exchange.toUpperCase()}:${tickerSymbol}`;
             }
             
-            // Get container dimensions
-            const containerWidth = container.clientWidth || 800;
-            const containerHeight = window.innerHeight * 0.5; // 50vh
+            // Clear container
+            container.innerHTML = '';
             
-            // Create chart
-            if (window.TradingViewChartAdapter) {
-                priceChart = window.TradingViewChartAdapter.createChart(container, {
-                    layout: {
-                        background: { type: 'solid', color: 'transparent' },
-                        textColor: getCSSVariableValue('--text-color', '#333')
-                    },
-                    grid: {
-                        vertLines: { visible: false },
-                        horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
-                    },
-                    width: containerWidth,
-                    height: containerHeight,
-                    timeScale: {
-                        visible: true,
-                        timeVisible: true,
-                        secondsVisible: false
-                    },
-                    rightPriceScale: {
-                        borderVisible: true,
-                        borderColor: getCSSVariableValue('--border-color', '#e0e0e0')
+            // Load TradingView Widget script if not already loaded
+            if (!window.TradingView) {
+                const script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = 'https://s3.tradingview.com/tv.js';
+                script.async = true;
+                script.onload = () => {
+                    createTradingViewWidget(container, tvSymbol);
+                };
+                script.onerror = () => {
+                    if (window.Logger) {
+                        window.Logger.error('❌ Failed to load TradingView script', { page: 'ticker-dashboard' });
                     }
+                    if (typeof window.hideLoadingState === 'function') {
+                        window.hideLoadingState('ticker-dashboard-chart');
+                    }
+                    container.innerHTML = '<div class="alert alert-warning">שגיאה בטעינת גרף TradingView</div>';
+                };
+                document.head.appendChild(script);
+            } else {
+                createTradingViewWidget(container, tvSymbol);
+            }
+            
+        } catch (error) {
+            if (typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState('ticker-dashboard-chart');
+            }
+            if (window.Logger) {
+                window.Logger.error('❌ Error initializing price chart', { error: error.message, stack: error.stack, page: 'ticker-dashboard' });
+            }
+            const container = document.getElementById('tradingview_widget');
+            if (container) {
+                container.innerHTML = '<div class="alert alert-danger">שגיאה בטעינת גרף</div>';
+            }
+        }
+    }
+    
+    /**
+     * Create TradingView Widget
+     * @param {HTMLElement} container - Container element
+     * @param {string} symbol - TradingView symbol (e.g., "NASDAQ:QQQ")
+     */
+    function createTradingViewWidget(container, symbol) {
+        try {
+            if (!window.TradingView) {
+                if (window.Logger) {
+                    window.Logger.error('❌ TradingView not available', { page: 'ticker-dashboard' });
+                }
+                return;
+            }
+            
+            // Determine theme based on color scheme
+            let theme = 'light';
+            if (window.ColorSchemeSystem && typeof window.ColorSchemeSystem.getCurrentTheme === 'function') {
+                const currentTheme = window.ColorSchemeSystem.getCurrentTheme();
+                theme = currentTheme === 'dark' ? 'dark' : 'light';
+            } else if (document.body.classList.contains('dark-theme')) {
+                theme = 'dark';
+            }
+            
+            // Create TradingView Widget
+            new window.TradingView.widget({
+                "autosize": true,
+                "symbol": symbol,
+                "interval": "D",
+                "timezone": "Etc/UTC",
+                "theme": theme,
+                "style": "1", // Candlestick chart
+                "locale": "he",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "hide_top_toolbar": false,
+                "hide_legend": false,
+                "save_image": false,
+                "container_id": "tradingview_widget",
+                "height": "100%",
+                "width": "100%",
+                "studies": [
+                    "Volume@tv-basicstudies"
+                ],
+                "show_popup_button": true,
+                "popup_width": "1000",
+                "popup_height": "650",
+                "no_referral_id": true,
+                "referral_id": "",
+                "support_host": "https://www.tradingview.com"
+            });
+            
+            if (window.Logger) {
+                window.Logger.info('✅ TradingView Widget created', { 
+                    symbol, 
+                    theme,
+                    page: 'ticker-dashboard' 
                 });
-                
-                // Create candlestick series first
-                let candlestickSeries = null;
-                if (window.TradingViewChartAdapter && priceChart) {
-                    try {
-                        candlestickSeries = window.TradingViewChartAdapter.addCandlestickSeries(priceChart, {
-                            upColor: '#26baac',
-                            downColor: '#fc5a06',
-                            borderVisible: true
-                        });
-                    } catch (e) {
-                        if (window.Logger) {
-                            window.Logger.error('Error creating candlestick series', { 
-                                tickerId,
-                                error: e.message || e, 
-                                page: 'ticker-dashboard' 
-                            });
-                        }
-                    }
-                }
-                
-                // Try to load historical price data
-                if (tickerId && window.TickerDashboardData && typeof window.TickerDashboardData.loadHistoricalData === 'function') {
-                    try {
-                        const historicalData = await window.TickerDashboardData.loadHistoricalData(tickerId, { days: 30, interval: '1d' });
-                        
-                        if (historicalData && Array.isArray(historicalData) && historicalData.length > 0 && candlestickSeries) {
-                            // Convert historical data to TradingView format
-                            const formattedData = historicalData.map(item => {
-                                // Convert timestamp to TradingView format (YYYY-MM-DD)
-                                let timeValue;
-                                if (item.timestamp) {
-                                    // If Unix timestamp (seconds), convert to YYYY-MM-DD
-                                    const date = new Date(item.timestamp * 1000);
-                                    timeValue = date.toISOString().split('T')[0];
-                                } else if (item.date) {
-                                    timeValue = item.date;
-                                } else if (item.time) {
-                                    timeValue = item.time;
-                                } else {
-                                    return null;
-                                }
-                                
-                                return {
-                                    time: timeValue,
-                                    open: parseFloat(item.open || item.open_price || 0),
-                                    high: parseFloat(item.high || item.high_price || 0),
-                                    low: parseFloat(item.low || item.low_price || 0),
-                                    close: parseFloat(item.close || item.close_price || item.price || 0),
-                                    volume: parseFloat(item.volume || 0)
-                                };
-                            }).filter(item => item && item.close > 0); // Filter out invalid data
-                            
-                            if (formattedData.length > 0) {
-                                // Set data to series
-                                candlestickSeries.setData(formattedData);
-                                
-                                // Add volume series (optional)
-                                try {
-                                    const volumeSeries = window.TradingViewChartAdapter.addHistogramSeries(priceChart, {
-                                        color: '#26baac',
-                                        priceFormat: {
-                                            type: 'volume',
-                                            precision: 0,
-                                            minMove: 1
-                                        },
-                                        priceScaleId: 'right'
-                                    });
-                                    
-                                    const volumeData = formattedData.map(item => ({
-                                        time: item.time,
-                                        value: item.volume,
-                                        color: item.close >= item.open ? '#26baac' : '#fc5a06'
-                                    }));
-                                    volumeSeries.setData(volumeData);
-                                } catch (volumeError) {
-                                    if (window.Logger) {
-                                        window.Logger.warn('Error adding volume series', { 
-                                            tickerId,
-                                            error: volumeError.message || volumeError, 
-                                            page: 'ticker-dashboard' 
-                                        });
-                                    }
-                                }
-                                
-                                if (window.Logger) {
-                                    window.Logger.info('✅ Historical data added to chart', { 
-                                        tickerId, 
-                                        dataPoints: formattedData.length, 
-                                        page: 'ticker-dashboard' 
-                                    });
-                                }
-                            } else {
-                                showChartPlaceholder('נתונים היסטוריים לא זמינים כרגע. הפיצ\'ר בפיתוח.');
-                            }
-                        } else {
-                            // Historical data not available - show placeholder
-                            showChartPlaceholder('נתונים היסטוריים לא זמינים כרגע. הפיצ\'ר בפיתוח.');
-                        }
-                    } catch (e) {
-                        if (window.Logger) {
-                            window.Logger.warn('Error loading historical data', { 
-                                tickerId,
-                                error: e.message || e, 
-                                page: 'ticker-dashboard' 
-                            });
-                        }
-                        showChartPlaceholder('שגיאה בטעינת נתונים היסטוריים');
-                    }
-                } else {
-                    // Historical data service not available - show placeholder
-                    showChartPlaceholder('נתונים היסטוריים לא זמינים כרגע');
-                }
             }
             
             if (typeof window.hideLoadingState === 'function') {
                 window.hideLoadingState('ticker-dashboard-chart');
             }
         } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('❌ Error creating TradingView Widget', { 
+                    error: error.message, 
+                    stack: error.stack,
+                    symbol,
+                    page: 'ticker-dashboard' 
+                });
+            }
             if (typeof window.hideLoadingState === 'function') {
                 window.hideLoadingState('ticker-dashboard-chart');
             }
-            if (window.Logger) {
-                window.Logger.error('❌ Error initializing price chart', { error, page: 'ticker-dashboard' });
-            }
+            container.innerHTML = '<div class="alert alert-danger">שגיאה ביצירת גרף TradingView</div>';
         }
     }
 
@@ -978,7 +988,7 @@
      * @param {string} message - Message to display
      */
     function showChartPlaceholder(message) {
-        const chartContainer = document.getElementById('tickerPriceChartContainer');
+        const chartContainer = document.getElementById('tradingview_widget');
         if (!chartContainer) {
             if (window.Logger) {
                 window.Logger.warn('⚠️ Chart container not found for placeholder', { page: 'ticker-dashboard' });

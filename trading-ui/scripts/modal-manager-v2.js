@@ -2351,7 +2351,11 @@ class ModalManagerV2 {
                         } else {
                             // Disable and clear if no type selected
                             relatedObjectField.disabled = true;
-                            relatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                            relatedObjectField.textContent = '';
+                            const defaultOption = document.createElement('option');
+                            defaultOption.value = '';
+                            defaultOption.textContent = 'בחר אובייקט...';
+                            relatedObjectField.appendChild(defaultOption);
                             console.log('⚠️ noteRelatedObject disabled - no type selected');
                         }
                     };
@@ -2450,7 +2454,11 @@ class ModalManagerV2 {
                         } else {
                             alertRelatedObjectField.disabled = true;
                             alertRelatedObjectField.setAttribute('disabled', 'disabled');
-                            alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                            alertRelatedObjectField.textContent = '';
+                            const defaultOption = document.createElement('option');
+                            defaultOption.value = '';
+                            defaultOption.textContent = 'בחר אובייקט...';
+                            alertRelatedObjectField.appendChild(defaultOption);
                             await this.updateAlertTickerDisplay(form, null);
                             this.handleAlertLinkedEntityUpdate(null);
                         }

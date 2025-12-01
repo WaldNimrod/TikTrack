@@ -2029,7 +2029,14 @@ class EntityDetailsRenderer {
                 }
 
             if (!Array.isArray(data) || data.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">אין ביצועים להצגה</td></tr>';
+                    tableBody.textContent = '';
+                    const emptyRow = document.createElement('tr');
+                    const emptyCell = document.createElement('td');
+                    emptyCell.colSpan = 6;
+                    emptyCell.className = 'text-center text-muted py-3';
+                    emptyCell.textContent = 'אין ביצועים להצגה';
+                    emptyRow.appendChild(emptyCell);
+                    tableBody.appendChild(emptyRow);
                     return;
                 }
 
@@ -2070,7 +2077,13 @@ class EntityDetailsRenderer {
                     `;
                 }).join('');
 
-            tableBody.innerHTML = rows;
+            // Insert rows using tempDiv
+            tableBody.textContent = '';
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = rows;
+            while (tempDiv.firstChild) {
+              tableBody.appendChild(tempDiv.firstChild);
+            }
         };
 
         const executionRowsHtml = normalizedExecutions.length

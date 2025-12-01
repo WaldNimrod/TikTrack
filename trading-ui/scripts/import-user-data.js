@@ -1116,7 +1116,11 @@ async function loadAccountsForLinking(targetSelect) {
             accountOptionsCache = [];
         }
     }
-    targetSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
+    targetSelect.textContent = '';
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'בחר חשבון מסחר...';
+    targetSelect.appendChild(defaultOption);
     accountOptionsCache.forEach((account) => {
         const option = document.createElement('option');
         option.value = account.id;
@@ -1830,7 +1834,10 @@ function showProcessingOverlay(message = 'טוען ומעבד נתונים...') 
         const spinner = document.createElement('div');
         spinner.className = 'spinner-border text-light';
         spinner.setAttribute('role', 'status');
-        spinner.innerHTML = '<span class="visually-hidden">Loading...</span>';
+        const spinnerText = document.createElement('span');
+        spinnerText.className = 'visually-hidden';
+        spinnerText.textContent = 'Loading...';
+        spinner.appendChild(spinnerText);
 
         const messageEl = document.createElement('div');
         messageEl.className = 'processing-overlay-message';
@@ -1990,7 +1997,7 @@ function populateDataTypeSelect(select) {
     }
 
     const previousValue = select.value;
-    select.innerHTML = '';
+    select.textContent = '';
 
     IMPORT_DATA_TYPE_ORDER.forEach((key) => {
         const definition = IMPORT_DATA_TYPE_DEFINITIONS[key];

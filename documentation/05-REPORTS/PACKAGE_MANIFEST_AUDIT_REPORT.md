@@ -1,5 +1,5 @@
 # דוח בדיקה מקיף - מערכת הטעינה והחבילות
-**תאריך:** 30.11.2025
+**תאריך:** 1.12.2025
 **גרסה:** 1.0.0
 **סטטוס:** ✅ הושלם
 
@@ -13,7 +13,7 @@
 |-----|------|
 | **סה"כ עמודים בפועל** | 59 |
 | **עמודים מתועדים** | 64 |
-| **עמודים בהגדרות** | 42 |
+| **עמודים בהגדרות** | 54 |
 | **סה"כ חבילות** | 29 |
 | **סה"כ סקריפטים** | 216 |
 
@@ -23,9 +23,9 @@
 |--------|------|
 | 🔴 **קריטי** | 19 |
 | 🟠 **גבוה** | 0 |
-| 🟡 **בינוני** | 2 |
+| 🟡 **בינוני** | 14 |
 | 🟢 **נמוך** | 4 |
-| **סה"כ** | 25 |
+| **סה"כ** | 37 |
 
 ---
 
@@ -61,6 +61,18 @@
 
 - **my-package** - מוגדר אבל לא קיים בקוד
 - **my-page** - מוגדר אבל לא קיים בקוד
+- **cache-test** - מוגדר אבל לא קיים בקוד
+- **tradingview-test-page** - מוגדר אבל לא קיים בקוד
+- **portfolio-state-page** - מוגדר אבל לא קיים בקוד
+- **trade-history-page** - מוגדר אבל לא קיים בקוד
+- **price-history-page** - מוגדר אבל לא קיים בקוד
+- **comparative-analysis-page** - מוגדר אבל לא קיים בקוד
+- **trading-journal-page** - מוגדר אבל לא קיים בקוד
+- **strategy-analysis-page** - מוגדר אבל לא קיים בקוד
+- **economic-calendar-page** - מוגדר אבל לא קיים בקוד
+- **history-widget** - מוגדר אבל לא קיים בקוד
+- **emotional-tracking-widget** - מוגדר אבל לא קיים בקוד
+- **date-comparison-modal** - מוגדר אבל לא קיים בקוד
 
 ### כפילויות בהגדרות
 
@@ -146,6 +158,18 @@
 **הסר הגדרות מיותרות:**
 - הסר הגדרה ל-`my-package` מ-`page-initialization-configs.js`
 - הסר הגדרה ל-`my-page` מ-`page-initialization-configs.js`
+- הסר הגדרה ל-`cache-test` מ-`page-initialization-configs.js`
+- הסר הגדרה ל-`tradingview-test-page` מ-`page-initialization-configs.js`
+- הסר הגדרה ל-`portfolio-state-page` מ-`page-initialization-configs.js`
+- הסר הגדרה ל-`trade-history-page` מ-`page-initialization-configs.js`
+- הסר הגדרה ל-`price-history-page` מ-`page-initialization-configs.js`
+- הסר הגדרה ל-`comparative-analysis-page` מ-`page-initialization-configs.js`
+- הסר הגדרה ל-`trading-journal-page` מ-`page-initialization-configs.js`
+- הסר הגדרה ל-`strategy-analysis-page` מ-`page-initialization-configs.js`
+- הסר הגדרה ל-`economic-calendar-page` מ-`page-initialization-configs.js`
+- הסר הגדרה ל-`history-widget` מ-`page-initialization-configs.js`
+- הסר הגדרה ל-`emotional-tracking-widget` מ-`page-initialization-configs.js`
+- הסר הגדרה ל-`date-comparison-modal` מ-`page-initialization-configs.js`
 
 ---
 

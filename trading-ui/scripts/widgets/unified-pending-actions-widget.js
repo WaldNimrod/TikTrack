@@ -300,31 +300,47 @@
       }
       
       if (combination === 'assignTrades') {
-        // Render highlight item using ExecutionAssignmentService data
+        // Render highlight item like Recent Items - same structure and details
         const execution = item.execution || {};
         const executionId = execution.id;
         const suggestions = item.suggestions || [];
         const ticker = execution.ticker || {};
         const account = execution.trading_account || execution.account || {};
+        const date = execution.date || execution.execution_date || execution.created_at;
+        const action = execution.action || execution.type || '';
+        const value = execution.value || (execution.quantity && execution.price ? execution.quantity * execution.price : null);
         
         const FieldRenderer = window.FieldRendererService;
-        const tickerBadge = ticker.symbol 
-          ? `<span class="badge entity-ticker">${FieldRenderer?.escapeHtml?.(ticker.symbol) || ticker.symbol}</span>`
-          : '';
-        const accountBadge = account.name || account.display_name
-          ? `<span class="badge entity-account">${FieldRenderer?.escapeHtml?.(account.name || account.display_name) || account.name || account.display_name}</span>`
-          : '';
+        const symbol = ticker.symbol || (executionId ? `ביצוע #${executionId}` : 'לא זמין');
+        const dateLabel = date && FieldRenderer?.renderDateShort 
+          ? FieldRenderer.renderDateShort(date)
+          : (date ? (typeof date === 'object' && date.display ? date.display : String(date).substring(0, 10)) : '');
+        const actionDisplay = action && FieldRenderer?.renderAction 
+          ? FieldRenderer.renderAction(action)
+          : (action || '-');
+        const valueDisplay = value !== undefined && value !== null && FieldRenderer?.renderAmount
+          ? FieldRenderer.renderAmount(Number(value) || 0, '$', 2, true)
+          : (value !== undefined && value !== null ? `$${Number(value).toFixed(2)}` : 'לא זמין');
         
-        const suggestionsText = suggestions.length > 0 
-          ? `${suggestions.length} הצעות שיוך`
-          : 'אין הצעות שיוך';
+        const executionIconPath = window.IconSystem?.getEntityIcon ? window.IconSystem.getEntityIcon('execution') : 'images/icons/entities/executions.svg';
         
         return `
           <li class="list-group-item unified-pending-list-item" data-execution-id="${executionId}">
+            <!-- Header Section - Always Visible (like Recent Items) -->
             <div class="unified-pending-item-header">
               <div class="unified-pending-item-title">
-                <span class="text-muted small">ביצוע #${executionId}</span>
-                <span class="text-muted small">${suggestionsText}</span>
+                <div class="unified-pending-item-title-main-row">
+                  <img src="${executionIconPath}" alt="ביצוע" class="unified-pending-item-icon" width="16" height="16">
+                  <span class="unified-pending-item-title-main">${symbol}</span>
+                </div>
+                <div class="unified-pending-item-title-meta">
+                  ${actionDisplay ? `<span class="unified-pending-meta-item">${actionDisplay}</span>` : ''}
+                  ${dateLabel ? `<span class="unified-pending-meta-item">${dateLabel}</span>` : ''}
+                </div>
+              </div>
+              <div class="unified-pending-item-amount">
+                <div class="unified-pending-item-amount-value">${valueDisplay}</div>
+                ${suggestions.length > 0 ? `<div class="unified-pending-item-amount-quantity text-muted small">${suggestions.length} הצעות</div>` : ''}
               </div>
               <div class="unified-pending-item-actions">
                 <button
@@ -343,37 +359,58 @@
                 </button>
               </div>
             </div>
-            <div class="unified-pending-item-meta d-flex flex-wrap align-items-center gap-2 mt-2">
-              ${tickerBadge ? `
-                <span class="entity-icon-circle entity-icon-circle-sm d-flex align-items-center justify-content-center">
-                  <img src="images/icons/entities/tickers.svg" alt="טיקר" width="12" height="12" />
-                </span>
-                ${tickerBadge}
-              ` : ''}
-              ${accountBadge ? `
-                <span class="entity-icon-circle entity-icon-circle-sm d-flex align-items-center justify-content-center">
-                  <img src="images/icons/entities/trading_accounts.svg" alt="חשבון" width="12" height="12" />
-                </span>
-                ${accountBadge}
-              ` : ''}
-            </div>
+            <!-- Details Section - Hidden by default, shown on hover -->
             <div class="unified-pending-details" data-role="widget-detail" data-execution-id="${executionId}">
-              <div class="details-stats text-muted small mb-2">
+              <div class="unified-pending-details-content">
+                ${symbol ? `
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">סימבול:</span>
+                    <span class="unified-pending-details-value">${symbol}</span>
+                  </div>
+                ` : ''}
+                ${account.name || account.display_name ? `
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">חשבון:</span>
+                    <span class="unified-pending-details-value">${account.name || account.display_name}</span>
+                  </div>
+                ` : ''}
+                ${actionDisplay ? `
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">פעולה:</span>
+                    <span class="unified-pending-details-value">${actionDisplay}</span>
+                  </div>
+                ` : ''}
+                ${dateLabel ? `
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">תאריך:</span>
+                    <span class="unified-pending-details-value">${dateLabel}</span>
+                  </div>
+                ` : ''}
+                ${valueDisplay ? `
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">שווי:</span>
+                    <span class="unified-pending-details-value">${valueDisplay}</span>
+                  </div>
+                ` : ''}
                 ${suggestions.length > 0 ? `
-                  <div class="d-flex flex-column gap-1">
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">הצעות שיוך:</span>
+                    <span class="unified-pending-details-value">${suggestions.length}</span>
+                  </div>
+                  <div class="unified-pending-details-suggestions mt-2">
                     ${suggestions.slice(0, 3).map(suggestion => {
                       const trade = suggestion.trade || {};
                       const matchScore = suggestion.match_score || 0;
                       return `
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
                           <span>טרייד #${trade.id || suggestion.trade_id || '-'}</span>
                           <span class="badge bg-body-secondary">${matchScore}% התאמה</span>
                         </div>
                       `;
                     }).join('')}
-                    ${suggestions.length > 3 ? `<span class="text-muted">+${suggestions.length - 3} עוד</span>` : ''}
+                    ${suggestions.length > 3 ? `<span class="text-muted small">+${suggestions.length - 3} עוד</span>` : ''}
                   </div>
-                ` : '<span>אין הצעות שיוך זמינות</span>'}
+                ` : ''}
               </div>
             </div>
           </li>
@@ -381,21 +418,213 @@
       }
       
       if (combination === 'assignPlans') {
-        // Use TradePlanAssignmentService data structure
-        // For now, fallback to old widget rendering
-        const widget = window.PendingTradePlanWidget;
-        if (widget?.renderAssignmentItem) {
-          return widget.renderAssignmentItem(item);
-        }
+        // Render assignment item like Recent Items - same structure and details
+        const trade = item.trade || {};
+        const tradeId = trade.id || item.trade_id;
+        const suggestion = item.primary_suggestion || {};
+        const plan = suggestion.plan || {};
+        const planId = plan.id || suggestion.trade_plan_id;
+        const suggestions = item.suggestions || [];
+        
+        const FieldRenderer = window.FieldRendererService;
+        const ticker = trade.ticker || {};
+        const symbol = ticker.symbol || (tradeId ? `טרייד #${tradeId}` : 'לא זמין');
+        const status = trade.status || '';
+        const date = trade.created_at || trade.opened_at || trade.entry_date;
+        const amount = trade.position?.market_value ?? trade.position?.amount ?? trade.amount ?? trade.total_pl ?? trade.entry_price;
+        
+        const dateLabel = date && FieldRenderer?.renderDateShort 
+          ? FieldRenderer.renderDateShort(date)
+          : (date ? (typeof date === 'object' && date.display ? date.display : String(date).substring(0, 10)) : '');
+        const statusDisplay = status && FieldRenderer?.renderStatus
+          ? FieldRenderer.renderStatus(status, 'trade')
+          : '';
+        const amountDisplay = amount !== undefined && amount !== null && FieldRenderer?.renderAmount
+          ? FieldRenderer.renderAmount(Number(amount) || 0, '$', 2, true)
+          : (amount !== undefined && amount !== null ? `$${Number(amount).toFixed(2)}` : 'לא זמין');
+        
+        const tradeIconPath = window.IconSystem?.getEntityIcon ? window.IconSystem.getEntityIcon('trade') : 'images/icons/entities/trades.svg';
+        
+        return `
+          <li class="list-group-item unified-pending-list-item" data-trade-id="${tradeId}" data-plan-id="${planId}">
+            <!-- Header Section - Always Visible (like Recent Items) -->
+            <div class="unified-pending-item-header">
+              <div class="unified-pending-item-title">
+                <div class="unified-pending-item-title-main-row">
+                  <img src="${tradeIconPath}" alt="טרייד" class="unified-pending-item-icon" width="16" height="16">
+                  <span class="unified-pending-item-title-main">${symbol}</span>
+                </div>
+                <div class="unified-pending-item-title-meta">
+                  ${statusDisplay ? `<span class="unified-pending-meta-item">${statusDisplay}</span>` : ''}
+                  ${dateLabel ? `<span class="unified-pending-meta-item">${dateLabel}</span>` : ''}
+                </div>
+              </div>
+              <div class="unified-pending-item-amount">
+                <div class="unified-pending-item-amount-value">${amountDisplay}</div>
+                ${suggestions.length > 0 ? `<div class="unified-pending-item-amount-quantity text-muted small">${suggestions.length} הצעות</div>` : ''}
+              </div>
+              <div class="unified-pending-item-actions">
+                <button
+                  data-button-type="APPROVE"
+                  data-variant="small"
+                  data-trade-id="${tradeId}"
+                  data-plan-id="${planId}"
+                  data-text="אשר"
+                  title="פתח מודול שיוך">
+                </button>
+                <button
+                  data-button-type="REJECT"
+                  data-variant="small"
+                  data-trade-id="${tradeId}"
+                  data-plan-id="${planId}"
+                  data-text="התעלם"
+                  title="הסר מהרשימה">
+                </button>
+              </div>
+            </div>
+            <!-- Details Section - Hidden by default, shown on hover -->
+            <div class="unified-pending-details" data-role="widget-detail" data-trade-id="${tradeId}">
+              <div class="unified-pending-details-content">
+                ${symbol ? `
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">סימבול:</span>
+                    <span class="unified-pending-details-value">${symbol}</span>
+                  </div>
+                ` : ''}
+                ${statusDisplay ? `
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">סטטוס:</span>
+                    <span class="unified-pending-details-value">${statusDisplay}</span>
+                  </div>
+                ` : ''}
+                ${dateLabel ? `
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">תאריך:</span>
+                    <span class="unified-pending-details-value">${dateLabel}</span>
+                  </div>
+                ` : ''}
+                ${amountDisplay ? `
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">סכום:</span>
+                    <span class="unified-pending-details-value">${amountDisplay}</span>
+                  </div>
+                ` : ''}
+                ${suggestions.length > 0 ? `
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">הצעות שיוך:</span>
+                    <span class="unified-pending-details-value">${suggestions.length}</span>
+                  </div>
+                  <div class="unified-pending-details-suggestions mt-2">
+                    ${suggestions.slice(0, 3).map(s => {
+                      const p = s.plan || {};
+                      return `
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                          <span>${p.name || `תוכנית #${p.id || s.trade_plan_id || '-'}`}</span>
+                        </div>
+                      `;
+                    }).join('')}
+                    ${suggestions.length > 3 ? `<span class="text-muted small">+${suggestions.length - 3} עוד</span>` : ''}
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </li>
+        `;
       }
       
       if (combination === 'createPlans') {
-        // Use TradePlanAssignmentService data structure
-        // For now, fallback to old widget rendering
-        const widget = window.PendingTradePlanWidget;
-        if (widget?.renderCreationItem) {
-          return widget.renderCreationItem(item);
-        }
+        // Render creation item like Recent Items - same structure and details
+        const trade = item.trade || {};
+        const tradeId = trade.id || item.trade_id;
+        const ticker = trade.ticker || {};
+        const status = trade.status || '';
+        const date = trade.created_at || trade.opened_at || trade.entry_date;
+        const amount = trade.position?.market_value ?? trade.position?.amount ?? trade.amount ?? trade.total_pl ?? trade.entry_price;
+        
+        const FieldRenderer = window.FieldRendererService;
+        const symbol = ticker.symbol || (tradeId ? `טרייד #${tradeId}` : 'לא זמין');
+        const dateLabel = date && FieldRenderer?.renderDateShort 
+          ? FieldRenderer.renderDateShort(date)
+          : (date ? (typeof date === 'object' && date.display ? date.display : String(date).substring(0, 10)) : '');
+        const statusDisplay = status && FieldRenderer?.renderStatus
+          ? FieldRenderer.renderStatus(status, 'trade')
+          : '';
+        const amountDisplay = amount !== undefined && amount !== null && FieldRenderer?.renderAmount
+          ? FieldRenderer.renderAmount(Number(amount) || 0, '$', 2, true)
+          : (amount !== undefined && amount !== null ? `$${Number(amount).toFixed(2)}` : 'לא זמין');
+        
+        const tradeIconPath = window.IconSystem?.getEntityIcon ? window.IconSystem.getEntityIcon('trade') : 'images/icons/entities/trades.svg';
+        
+        return `
+          <li class="list-group-item unified-pending-list-item" data-trade-id="${tradeId}">
+            <!-- Header Section - Always Visible (like Recent Items) -->
+            <div class="unified-pending-item-header">
+              <div class="unified-pending-item-title">
+                <div class="unified-pending-item-title-main-row">
+                  <img src="${tradeIconPath}" alt="טרייד" class="unified-pending-item-icon" width="16" height="16">
+                  <span class="unified-pending-item-title-main">${symbol}</span>
+                </div>
+                <div class="unified-pending-item-title-meta">
+                  ${statusDisplay ? `<span class="unified-pending-meta-item">${statusDisplay}</span>` : ''}
+                  ${dateLabel ? `<span class="unified-pending-meta-item">${dateLabel}</span>` : ''}
+                </div>
+              </div>
+              <div class="unified-pending-item-amount">
+                <div class="unified-pending-item-amount-value">${amountDisplay}</div>
+                <div class="unified-pending-item-amount-quantity text-muted small">מוכן ליצירת תוכנית</div>
+              </div>
+              <div class="unified-pending-item-actions">
+                <button
+                  data-button-type="APPROVE"
+                  data-variant="small"
+                  data-trade-id="${tradeId}"
+                  data-text="אשר"
+                  title="פתח מודול יצירת תוכנית">
+                </button>
+                <button
+                  data-button-type="REJECT"
+                  data-variant="small"
+                  data-trade-id="${tradeId}"
+                  data-text="התעלם"
+                  title="הסר מהרשימה">
+                </button>
+              </div>
+            </div>
+            <!-- Details Section - Hidden by default, shown on hover -->
+            <div class="unified-pending-details" data-role="widget-detail" data-trade-id="${tradeId}">
+              <div class="unified-pending-details-content">
+                ${symbol ? `
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">סימבול:</span>
+                    <span class="unified-pending-details-value">${symbol}</span>
+                  </div>
+                ` : ''}
+                ${statusDisplay ? `
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">סטטוס:</span>
+                    <span class="unified-pending-details-value">${statusDisplay}</span>
+                  </div>
+                ` : ''}
+                ${dateLabel ? `
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">תאריך:</span>
+                    <span class="unified-pending-details-value">${dateLabel}</span>
+                  </div>
+                ` : ''}
+                ${amountDisplay ? `
+                  <div class="unified-pending-details-row">
+                    <span class="unified-pending-details-label">סכום:</span>
+                    <span class="unified-pending-details-value">${amountDisplay}</span>
+                  </div>
+                ` : ''}
+                <div class="unified-pending-details-row">
+                  <span class="unified-pending-details-label">סטטוס:</span>
+                  <span class="unified-pending-details-value">מוכן ליצירת תוכנית חדשה</span>
+                </div>
+              </div>
+            </div>
+          </li>
+        `;
       }
     } catch (error) {
       window.Logger?.error?.('Failed to render item', { error, combination, item, page: 'index' });
@@ -460,8 +689,13 @@
       return;
     }
     
-    // Set HTML content
-    list.innerHTML = html;
+    // Set HTML content using tempDiv
+    list.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    while (tempDiv.firstChild) {
+      list.appendChild(tempDiv.firstChild);
+    }
     window.Logger?.debug?.('List HTML set', { combination, htmlLength: html.length, page: 'index' });
     
     // Dispatch event to trigger height equalization after content update
@@ -569,18 +803,19 @@
       createTrades: elements.paneCreateTrades
     };
     
-    // Cache elements for each pane
-    const combinations = ['assignPlans', 'assignTrades', 'createPlans', 'createTrades'];
-    combinations.forEach(combination => {
-      const pane = elements.panes[combination];
-      if (pane) {
-        elements.loading[combination] = pane.querySelector(`#${combination}Loading`);
-        elements.error[combination] = pane.querySelector(`#${combination}Error`);
-        elements.empty[combination] = pane.querySelector(`#${combination}Empty`);
-        elements.list[combination] = pane.querySelector(`#${combination}List`);
-        elements.count[combination] = pane.querySelector(`#${combination}Count`);
-      }
-    });
+      // Cache elements for each pane
+      const combinations = ['assignPlans', 'assignTrades', 'createPlans', 'createTrades'];
+      combinations.forEach(combination => {
+        const pane = elements.panes[combination];
+        if (pane) {
+          elements.loading[combination] = pane.querySelector(`#${combination}Loading`);
+          elements.error[combination] = pane.querySelector(`#${combination}Error`);
+          elements.empty[combination] = pane.querySelector(`#${combination}Empty`);
+          elements.list[combination] = pane.querySelector(`#${combination}List`);
+          // Count elements are now in header, not in pane
+          elements.count[combination] = document.getElementById(`${combination}CountHeader`);
+        }
+      });
     
       // Cache general message element
       elements.generalMessage = elements.container.querySelector('#unifiedPendingActionsGeneralMessage');
@@ -740,7 +975,7 @@
   }
 
   /**
-   * Handle hover on widget items - simple relative positioning
+   * Handle hover on widget items - fixed positioning to escape container boundaries
    */
   function handleItemHover(event) {
     const item = event.target.closest('.unified-pending-list-item, .trade-create-widget-item');
@@ -748,12 +983,68 @@
       return;
     }
 
+    const details = item.querySelector('.unified-pending-details, .trade-create-widget-details, [data-role="widget-detail"]');
+    
     if (event.type === 'mouseenter') {
       item.classList.add('is-hovered');
-      // CSS handles positioning - no JavaScript needed for relative positioning
+      
+      // Position overlay as fixed to escape all container boundaries
+      if (details) {
+        const itemRect = item.getBoundingClientRect();
+        const isRTL = document.documentElement.dir === 'rtl' || document.documentElement.getAttribute('dir') === 'rtl';
+        
+        // Show overlay temporarily to get dimensions
+        details.style.display = 'block';
+        details.style.visibility = 'hidden';
+        const overlayWidth = Math.max(details.offsetWidth || 300, 280);
+        const overlayHeight = details.offsetHeight || 150;
+        details.style.visibility = '';
+        
+        // Position below item (or above if not enough space)
+        let top = itemRect.bottom + 8;
+        if (top + overlayHeight > window.innerHeight - 20) {
+          // Not enough space below - position above
+          top = itemRect.top - overlayHeight - 8;
+          if (top < 20) {
+            // Not enough space above either - position at top of viewport
+            top = 20;
+          }
+        }
+        
+        // Position horizontally
+        let left = itemRect.left;
+        let right = 'auto';
+        if (isRTL) {
+          right = window.innerWidth - itemRect.right;
+          left = 'auto';
+          // Check if overlay goes beyond viewport
+          if (right + overlayWidth > window.innerWidth - 20) {
+            right = 20;
+          }
+        } else {
+          if (left + overlayWidth > window.innerWidth - 20) {
+            left = window.innerWidth - overlayWidth - 20;
+          }
+          if (left < 20) {
+            left = 20;
+          }
+        }
+        
+        // Set fixed position
+        details.style.position = 'fixed';
+        details.style.top = `${top}px`;
+        if (isRTL) {
+          details.style.right = `${right}px`;
+          details.style.left = 'auto';
+        } else {
+          details.style.left = `${left}px`;
+          details.style.right = 'auto';
+        }
+        details.style.width = `${overlayWidth}px`;
+        details.style.zIndex = '1050';
+      }
     } else if (event.type === 'mouseleave') {
       // Check if mouse is moving to overlay
-      const details = item.querySelector('.unified-pending-details, .trade-create-widget-details, [data-role="widget-detail"]');
       const relatedTarget = event.relatedTarget;
       if (details && relatedTarget && details.contains(relatedTarget)) {
         // Mouse is moving to overlay, keep it visible
@@ -761,6 +1052,21 @@
       }
       
       item.classList.remove('is-hovered');
+      
+      // Hide overlay after transition
+      if (details) {
+        setTimeout(() => {
+          if (!item.classList.contains('is-hovered')) {
+            details.style.display = 'none';
+            details.style.position = '';
+            details.style.top = '';
+            details.style.left = '';
+            details.style.right = '';
+            details.style.width = '';
+            details.style.zIndex = '';
+          }
+        }, 200);
+      }
     }
   }
 
@@ -794,13 +1100,34 @@
       // Handle execution assignment to trade
       const executionId = item.dataset.executionId;
       if (executionId && window.ExecutionAssignmentService) {
-        // Get suggested trades and open assignment modal
+        // Get suggested trades
         const highlights = await window.ExecutionAssignmentService.getCachedHighlights() || [];
         const highlight = highlights.find(h => h.execution?.id === Number(executionId));
-        if (highlight && highlight.suggested_trades && highlight.suggested_trades.length > 0) {
-          // Open assignment modal with first suggestion or let user choose
-          // This should use ExecutionAssignmentService to open modal
-          window.Logger?.warn?.('Execution assignment modal not yet implemented', { executionId, page: 'index' });
+        if (highlight && highlight.suggestions && highlight.suggestions.length > 0) {
+          // Use first suggestion or let user choose
+          const firstSuggestion = highlight.suggestions[0];
+          const tradeId = firstSuggestion.trade?.id || firstSuggestion.trade_id;
+          if (tradeId && window.acceptSuggestion) {
+            await window.acceptSuggestion(Number(executionId), Number(tradeId));
+            await loadCombinationData(state.activeAction, state.activeEntity);
+          } else {
+            // Open executions modal for manual assignment
+            if (window.ModalManagerV2?.showModal) {
+              await window.ModalManagerV2.showModal('executionsModal', 'edit', { 
+                execution_id: Number(executionId),
+                trade_id: tradeId ? Number(tradeId) : null
+              });
+              await loadCombinationData(state.activeAction, state.activeEntity);
+            }
+          }
+        } else {
+          // No suggestions - open executions modal for manual assignment
+          if (window.ModalManagerV2?.showModal) {
+            await window.ModalManagerV2.showModal('executionsModal', 'edit', { 
+              execution_id: Number(executionId)
+            });
+            await loadCombinationData(state.activeAction, state.activeEntity);
+          }
         }
       }
     } else if (combination === 'createPlans' || combination === 'assignPlans') {
@@ -811,18 +1138,33 @@
           // Open plan creation modal with trade prefill
           if (window.ModalManagerV2?.showModal) {
             await window.ModalManagerV2.showModal('tradePlanModal', 'add', { 
-              trade_id: Number(tradeId),
-              // Add other prefill data from trade
+              trade_id: Number(tradeId)
             });
             await loadCombinationData(state.activeAction, state.activeEntity);
           }
         } else {
-          // Open plan assignment modal
+          // Open plan assignment - use first suggestion or open modal
           const assignments = await window.TradePlanAssignmentService.getCachedAssignments() || [];
-          const assignment = assignments.find(a => a.trade?.id === Number(tradeId));
-          if (assignment && assignment.suggested_plans && assignment.suggested_plans.length > 0) {
-            // Open assignment modal
-            window.Logger?.warn?.('Plan assignment modal not yet implemented', { tradeId, page: 'index' });
+          const assignment = assignments.find(a => (a.trade?.id || a.trade_id) === Number(tradeId));
+          if (assignment && assignment.suggestions && assignment.suggestions.length > 0) {
+            const firstSuggestion = assignment.suggestions[0];
+            const planId = firstSuggestion.plan?.id || firstSuggestion.trade_plan_id;
+            if (planId && window.ModalManagerV2?.showModal) {
+              // Open trade modal to assign plan
+              await window.ModalManagerV2.showModal('tradesModal', 'edit', { 
+                trade_id: Number(tradeId),
+                trade_plan_id: Number(planId)
+              });
+              await loadCombinationData(state.activeAction, state.activeEntity);
+            }
+          } else {
+            // No suggestions - open trade modal for manual assignment
+            if (window.ModalManagerV2?.showModal) {
+              await window.ModalManagerV2.showModal('tradesModal', 'edit', { 
+                trade_id: Number(tradeId)
+              });
+              await loadCombinationData(state.activeAction, state.activeEntity);
+            }
           }
         }
       }
@@ -922,7 +1264,7 @@
   }
   
   async function updateCount(combination, count) {
-    // Update the specific count element for this combination
+    // Update the specific count element in header for this combination
     const countEl = elements.count[combination];
     if (countEl) {
       countEl.textContent = String(count);
@@ -1173,7 +1515,7 @@
       // Clear all lists
       Object.values(elements.list).forEach(list => {
         if (list) {
-          list.innerHTML = '';
+          list.textContent = '';
         }
       });
       

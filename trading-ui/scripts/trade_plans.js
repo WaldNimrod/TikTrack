@@ -286,6 +286,12 @@ async function displayTradePlanTickerInfo(ticker) {
         </div>
       </div>
     `;
+    tickerInfoDiv.textContent = '';
+    const tempDiv2 = document.createElement('div');
+    tempDiv2.innerHTML = fallbackHTML;
+    while (tempDiv2.firstChild) {
+      tickerInfoDiv.appendChild(tempDiv2.firstChild);
+    }
   }
   
   // Set default entry price to current price if field exists
@@ -916,7 +922,14 @@ function addEditCondition() {
         window.showNotification?.('יש לשמור את התכנית לפני ניהול תנאים.', 'info');
         return;
       }
-      const entityName = modalElement.querySelector('[data-field="name"]')?.value || '';
+      // Get entity name using DataCollectionService if available
+      let entityName = '';
+      const nameField = modalElement.querySelector('[data-field="name"]');
+      if (nameField && nameField.id && window.DataCollectionService) {
+        entityName = window.DataCollectionService.getValue(nameField.id, 'text', '') || '';
+      } else if (nameField) {
+        entityName = nameField.value || '';
+      }
       window.conditionsModalController.open({
         entityType: 'plan',
         entityId: Number(entityId),

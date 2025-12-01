@@ -387,7 +387,11 @@ class CodeQualityDashboard {
         if (!resultsElement) return;
 
         if (!data || !data.data) {
-            resultsElement.innerHTML = '<div class="text-center text-muted">אין נתונים זמינים</div>';
+            resultsElement.textContent = '';
+            const noDataDiv = document.createElement('div');
+            noDataDiv.className = 'text-center text-muted';
+            noDataDiv.textContent = 'אין נתונים זמינים';
+            resultsElement.appendChild(noDataDiv);
             return;
         }
 
@@ -437,7 +441,13 @@ class CodeQualityDashboard {
             html += '</tbody></table></div></div>';
         }
 
-        resultsElement.innerHTML = html;
+        // Insert using tempDiv
+        resultsElement.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        while (tempDiv.firstChild) {
+          resultsElement.appendChild(tempDiv.firstChild);
+        }
 
         // Update stats
         const withCoverageElement = document.getElementById('errorHandlingWithCoverage');
@@ -457,7 +467,11 @@ class CodeQualityDashboard {
         if (!resultsElement) return;
 
         if (!data || !data.data) {
-            resultsElement.innerHTML = '<div class="text-center text-muted">אין נתונים זמינים</div>';
+            resultsElement.textContent = '';
+            const noDataDiv = document.createElement('div');
+            noDataDiv.className = 'text-center text-muted';
+            noDataDiv.textContent = 'אין נתונים זמינים';
+            resultsElement.appendChild(noDataDiv);
             return;
         }
 
@@ -507,7 +521,13 @@ class CodeQualityDashboard {
             html += '</tbody></table></div></div>';
         }
 
-        resultsElement.innerHTML = html;
+        // Insert using tempDiv
+        resultsElement.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        while (tempDiv.firstChild) {
+          resultsElement.appendChild(tempDiv.firstChild);
+        }
 
         // Update stats
         const withDocsElement = document.getElementById('jsdocWithDocs');
@@ -527,7 +547,11 @@ class CodeQualityDashboard {
         if (!resultsElement) return;
 
         if (!data || !data.data) {
-            resultsElement.innerHTML = '<div class="text-center text-muted">אין נתונים זמינים</div>';
+            resultsElement.textContent = '';
+            const noDataDiv = document.createElement('div');
+            noDataDiv.className = 'text-center text-muted';
+            noDataDiv.textContent = 'אין נתונים זמינים';
+            resultsElement.appendChild(noDataDiv);
             return;
         }
 
@@ -577,7 +601,13 @@ class CodeQualityDashboard {
             html += '</tbody></table></div></div>';
         }
 
-        resultsElement.innerHTML = html;
+        // Insert using tempDiv
+        resultsElement.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        while (tempDiv.firstChild) {
+          resultsElement.appendChild(tempDiv.firstChild);
+        }
 
         // Update stats
         const compliantElement = document.getElementById('namingCompliant');
@@ -597,7 +627,11 @@ class CodeQualityDashboard {
         if (!resultsElement) return;
 
         if (!data || !data.data) {
-            resultsElement.innerHTML = '<div class="text-center text-muted">אין נתונים זמינים</div>';
+            resultsElement.textContent = '';
+            const noDataDiv = document.createElement('div');
+            noDataDiv.className = 'text-center text-muted';
+            noDataDiv.textContent = 'אין נתונים זמינים';
+            resultsElement.appendChild(noDataDiv);
             return;
         }
 
@@ -646,7 +680,13 @@ class CodeQualityDashboard {
             html += '</tbody></table></div></div>';
         }
 
-        resultsElement.innerHTML = html;
+        // Insert using tempDiv
+        resultsElement.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        while (tempDiv.firstChild) {
+          resultsElement.appendChild(tempDiv.firstChild);
+        }
 
         // Update stats
         const withIndexElement = document.getElementById('filesWithIndex');
@@ -1140,7 +1180,11 @@ window.runDuplicateCheck = async function() {
         }).catch(() => {
             const resultsElement = document.getElementById('duplicateResults');
             if (resultsElement) {
-                resultsElement.innerHTML = '<div class="text-center text-danger">❌ שגיאה בהרצת בדיקת הכפילויות</div>';
+                resultsElement.textContent = '';
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'text-center text-danger';
+                errorDiv.textContent = '❌ שגיאה בהרצת בדיקת הכפילויות';
+                resultsElement.appendChild(errorDiv);
             }
             const detailsElement = document.getElementById('duplicateDetailsPanel');
             if (detailsElement) {

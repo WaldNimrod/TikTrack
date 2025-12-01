@@ -205,7 +205,7 @@ function addInvestmentTypeColorLegend() {
     });
 
     // החלף את התוכן הקיים
-    legendContainer.innerHTML = '';
+    legendContainer.textContent = '';
     legendContainer.appendChild(globalLegend);
   } else {
     // ברירת מחדל אם המערכת הכללית לא זמינה
@@ -324,7 +324,14 @@ async function loadTradesData() {
       // Fallback if ResponseHandler not available
       const tbody = document.querySelector('#tradesTable tbody');
       if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="11" class="text-center text-danger">שגיאה בטעינת נתונים: ' + error.message + '</td></tr>';
+        tbody.textContent = '';
+        const errorRow = document.createElement('tr');
+        const errorCell = document.createElement('td');
+        errorCell.colSpan = 11;
+        errorCell.className = 'text-center text-danger';
+        errorCell.textContent = 'שגיאה בטעינת נתונים: ' + error.message;
+        errorRow.appendChild(errorCell);
+        tbody.appendChild(errorRow);
       }
     }
   }

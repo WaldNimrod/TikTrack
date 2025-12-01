@@ -403,7 +403,14 @@ async function loadAccountPositions(accountId) {
     try {
         // Show loading state
         if (tableBody) {
-            tableBody.innerHTML = '<tr><td colspan="8" class="loading">טוען פוזיציות...</td></tr>';
+            tableBody.textContent = '';
+            const loadingRow = document.createElement('tr');
+            const loadingCell = document.createElement('td');
+            loadingCell.colSpan = 8;
+            loadingCell.className = 'loading';
+            loadingCell.textContent = 'טוען פוזיציות...';
+            loadingRow.appendChild(loadingCell);
+            tableBody.appendChild(loadingRow);
         }
         
         // Cache key
@@ -496,7 +503,14 @@ async function loadAccountPositions(accountId) {
     } catch (error) {
         window.Logger.error('❌ Error loading trading account positions:', error, { page: "trading_accounts" });
         if (tableBody) {
-            tableBody.innerHTML = '<tr><td colspan="8" class="error">שגיאה בטעינת פוזיציות</td></tr>';
+            tableBody.textContent = '';
+            const errorRow = document.createElement('tr');
+            const errorCell = document.createElement('td');
+            errorCell.colSpan = 8;
+            errorCell.className = 'error';
+            errorCell.textContent = 'שגיאה בטעינת פוזיציות';
+            errorRow.appendChild(errorCell);
+            tableBody.appendChild(errorRow);
         }
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה', 'שגיאה בטעינת פוזיציות. אנא נסה שוב.');

@@ -640,7 +640,12 @@ async function updateNotesTable(notes, options = {}) {
         </td>
       </tr>
     `;
-      tbody.innerHTML = emptyMessage;
+      tbody.textContent = '';
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = emptyMessage;
+      while (tempDiv.firstChild) {
+        tbody.appendChild(tempDiv.firstChild);
+      }
       
       // 🔘 עדכון כפתורים דינמיים
       if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {

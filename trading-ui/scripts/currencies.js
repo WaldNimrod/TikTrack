@@ -175,7 +175,14 @@ async function loadCurrencies() {
       // הצגת שגיאה למשתמש
       const tbody = document.querySelector('#currenciesTable tbody');
       if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת נתונים: ' + result.error + '</td></tr>';
+        tbody.textContent = '';
+        const errorRow = document.createElement('tr');
+        const errorCell = document.createElement('td');
+        errorCell.colSpan = 6;
+        errorCell.className = 'text-center text-danger';
+        errorCell.textContent = 'שגיאה בטעינת נתונים: ' + result.error;
+        errorRow.appendChild(errorCell);
+        tbody.appendChild(errorRow);
       }
     }
   } catch (error) {

@@ -1784,7 +1784,13 @@ function loadTableActionButtons(tableId, entityType, config = {}) {
       return;
     }
     
-    actionsCell.innerHTML = buttonsHtml;
+    // Insert buttons HTML using tempDiv
+    actionsCell.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = buttonsHtml;
+    while (tempDiv.firstChild) {
+      actionsCell.appendChild(tempDiv.firstChild);
+    }
   });
 
 }

@@ -154,7 +154,11 @@ class ConstraintManager {
    */
   populateTableFilter() {
     const select = document.getElementById('table-filter');
-    select.innerHTML = '<option value="">כל הטבלאות</option>';
+    select.textContent = '';
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'כל הטבלאות';
+    select.appendChild(defaultOption);
 
     this.tables.forEach(table => {
       const option = document.createElement('option');
@@ -173,7 +177,11 @@ class ConstraintManager {
     const container = document.getElementById('constraints-list-container');
 
     if (this.constraints.length === 0) {
-      container.innerHTML = '<div class="text-center text-muted">אין אילוצים להצגה</div>';
+      container.textContent = '';
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'text-center text-muted';
+      emptyDiv.textContent = 'אין אילוצים להצגה';
+      container.appendChild(emptyDiv);
       return;
     }
 

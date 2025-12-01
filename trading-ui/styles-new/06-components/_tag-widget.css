@@ -10,6 +10,24 @@
 /* ===== Widget Container ===== */
 #tagWidgetContainer {
   /* Inherits from card styles */
+  position: relative;
+  /* Ensure tag cloud doesn't get clipped by parent containers */
+  overflow: visible;
+  z-index: 1;
+}
+
+/* Ensure parent containers don't clip tag cloud */
+.content-section#main .section-body .row > [class*="col-"] > .card#tagWidgetContainer {
+  overflow: visible;
+}
+
+/* Position tag cloud container to prevent clipping */
+#tagWidgetCloudContainer {
+  position: relative;
+  /* If content is clipped, adjust positioning */
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: visible;
 }
 
 #tagWidgetContainer .card-header {

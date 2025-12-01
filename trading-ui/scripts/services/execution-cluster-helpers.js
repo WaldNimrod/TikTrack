@@ -341,7 +341,8 @@
       executionsTableHtml = '<div class="text-muted small">טבלת ביצועים זמינה בקרוב</div>';
     }
 
-    card.innerHTML = `
+    // Build card HTML and insert using tempDiv
+    const cardHTML = `
       <div class="card-body">
         <div class="d-flex flex-wrap align-items-start gap-3">
           <div class="flex-grow-1">
@@ -395,6 +396,12 @@
         </div>
       </div>
     `;
+    card.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = cardHTML;
+    while (tempDiv.firstChild) {
+      card.appendChild(tempDiv.firstChild);
+    }
 
     // Hover handlers are now managed by unified-pending-actions-widget.js
     // No need to add them here - the widget handles all hover events

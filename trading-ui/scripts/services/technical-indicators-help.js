@@ -27,6 +27,18 @@
     };
     
     /**
+     * Help text for technical indicators by key (lowercase, with underscores)
+     */
+    const HELP_TEXTS = {
+        atr: "Average True Range (ATR) הוא מדד תנודתיות המודד את טווח המחירים הממוצע של נכס פיננסי בתקופה נתונה. הוא אינו מראה את כיוון המחיר, אלא את מידת התנועה שלו. ערך ATR גבוה מצביע על תנודתיות גבוהה, וערך נמוך מצביע על תנודתיות נמוכה.",
+        week52_range: "טווח 52 שבועות מציג את מחיר השיא והשפל שהנכס הגיע אליהם במהלך 52 השבועות האחרונים. זהו מדד חשוב להערכת טווח המסחר ההיסטורי של הנכס.",
+        volume: "נפח המסחר מייצג את כמות המניות או החוזים שנסחרו בנכס פיננסי בתקופה נתונה. נפח גבוה מעיד על עניין רב בנכס, בעוד שנפח נמוך יכול להעיד על חוסר עניין או חוסר נזילות.",
+        volatility: "תנודתיות (Volatility) היא מדד סטטיסטי לפיזור התשואות של נכס פיננסי. היא משמשת למדידת הסיכון של הנכס – ככל שהתנודתיות גבוהה יותר, כך הסיכון נתפס כגבוה יותר. בדשבורד זה, התנודתיות מחושבת כאחוז סטיית התקן של התשואות היומיות.",
+        price: "מחיר הנכס הנוכחי.",
+        change: "שינוי המחיר באחוזים מהסגירה של יום המסחר הקודם."
+    };
+    
+    /**
      * Technical Indicators Help Service
      */
     window.TechnicalIndicatorsHelp = {
@@ -37,6 +49,15 @@
          */
         getHelp: function(indicatorName) {
             return INDICATOR_HELP[indicatorName] || 'מידע לא זמין';
+        },
+        
+        /**
+         * Get help text for a given technical indicator key.
+         * @param {string} key - The key of the technical indicator (e.g., 'atr', 'week52_range').
+         * @returns {string} The help text in Hebrew, or a default message if not found.
+         */
+        getHelpText: function(key) {
+            return HELP_TEXTS[key] || "אין הסבר זמין עבור מדד זה.";
         },
         
         /**

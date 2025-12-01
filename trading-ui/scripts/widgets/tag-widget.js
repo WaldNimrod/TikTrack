@@ -407,7 +407,7 @@
     const maxUsage = Math.max(...usageValues, 1);
 
     // Clear container first
-    elements.cloudContainer.innerHTML = '';
+    elements.cloudContainer.textContent = '';
     
     if (!Array.isArray(tags) || tags.length === 0) {
       if (elements.cloudEmpty) {

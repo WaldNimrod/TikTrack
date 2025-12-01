@@ -836,8 +836,13 @@ window.toggleSection = async function (sectionId) {
           existingImg.style.transform = isCollapsed ? '' : 'rotate(180deg)';
         }
       } else {
-        // Replace text content with img tag
-        icon.innerHTML = newIconHTML;
+        // Replace text content with img tag using tempDiv
+        icon.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = newIconHTML;
+        while (tempDiv.firstChild) {
+          icon.appendChild(tempDiv.firstChild);
+        }
       }
     }
     

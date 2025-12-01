@@ -597,14 +597,22 @@ class EntityDetailsModal {
         const contentElement = document.getElementById('entityDetailsContent');
         if (!contentElement) return;
 
-        contentElement.innerHTML = `
-            <div class="entity-details-loading d-flex flex-column align-items-center justify-content-center">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">טוען...</span>
-                </div>
-                <p class="mt-3 text-muted">טוען פרטי ישות...</p>
-            </div>
-        `;
+        contentElement.textContent = '';
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'entity-details-loading d-flex flex-column align-items-center justify-content-center';
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner-border text-primary';
+        spinner.setAttribute('role', 'status');
+        const spinnerText = document.createElement('span');
+        spinnerText.className = 'visually-hidden';
+        spinnerText.textContent = 'טוען...';
+        spinner.appendChild(spinnerText);
+        loadingDiv.appendChild(spinner);
+        const p = document.createElement('p');
+        p.className = 'mt-3 text-muted';
+        p.textContent = 'טוען פרטי ישות...';
+        loadingDiv.appendChild(p);
+        contentElement.appendChild(loadingDiv);
     }
 
     /**
@@ -1237,7 +1245,13 @@ class EntityDetailsModal {
             contentElementExists: !!contentElement
         });
 
-        contentElement.innerHTML = renderedContent;
+        // Insert rendered content using tempDiv
+        contentElement.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = renderedContent;
+        while (tempDiv.firstChild) {
+          contentElement.appendChild(tempDiv.firstChild);
+        }
         
         // Debug: Check if linked items table exists after insertion
         setTimeout(() => {
@@ -1329,18 +1343,29 @@ class EntityDetailsModal {
         const contentElement = document.getElementById('entityDetailsContent');
         if (!contentElement) return;
 
-        contentElement.innerHTML = `
-            <div class="entity-details-error d-flex flex-column align-items-center justify-content-center">
-                <div class="alert alert-danger text-center">
-                    <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
-                    <h6>שגיאה בטעינת פרטי הישות</h6>
-                    <p class="mb-0">${errorMessage}</p>
-                </div>
-                <button type="button" class="btn" data-onclick="window.entityDetailsModal.retry()">
-                    נסה שוב
-                </button>
-            </div>
-        `;
+        contentElement.textContent = '';
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'entity-details-error d-flex flex-column align-items-center justify-content-center';
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger text-center';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle fa-2x mb-3';
+        alertDiv.appendChild(icon);
+        const h6 = document.createElement('h6');
+        h6.textContent = 'שגיאה בטעינת פרטי הישות';
+        alertDiv.appendChild(h6);
+        const p = document.createElement('p');
+        p.className = 'mb-0';
+        p.textContent = errorMessage;
+        alertDiv.appendChild(p);
+        errorDiv.appendChild(alertDiv);
+        const retryBtn = document.createElement('button');
+        retryBtn.type = 'button';
+        retryBtn.className = 'btn';
+        retryBtn.setAttribute('data-onclick', 'window.entityDetailsModal.retry()');
+        retryBtn.textContent = 'נסה שוב';
+        errorDiv.appendChild(retryBtn);
+        contentElement.appendChild(errorDiv);
     }
 
     /**
@@ -1476,7 +1501,7 @@ class EntityDetailsModal {
 
         const contentElement = document.getElementById('entityDetailsContent');
         if (contentElement) {
-            contentElement.innerHTML = '';
+            contentElement.textContent = '';
             if (window.Logger) {
                 window.Logger.debug('✅ Cleared modal content after hide', {
                     modalId: this.modal?.id,

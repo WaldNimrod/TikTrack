@@ -649,7 +649,7 @@
   }
 
   /**
-   * Handle hover on widget items - simple relative positioning
+   * Handle hover on widget items - fixed positioning to escape container boundaries
    */
   function handleItemHover(event) {
     const item = event.target.closest('.recent-items-widget-item');
@@ -665,7 +665,62 @@
     
     if (event.type === 'mouseenter') {
       item.classList.add('is-hovered');
-      // CSS handles positioning - no JavaScript needed for relative positioning
+      
+      // Position overlay as fixed to escape all container boundaries
+      if (details) {
+        const itemRect = item.getBoundingClientRect();
+        const isRTL = document.documentElement.dir === 'rtl' || document.documentElement.getAttribute('dir') === 'rtl';
+        
+        // Show overlay temporarily to get dimensions
+        details.style.display = 'block';
+        details.style.visibility = 'hidden';
+        const overlayWidth = Math.max(details.offsetWidth || 300, 280);
+        const overlayHeight = details.offsetHeight || 150;
+        details.style.visibility = '';
+        
+        // Position below item (or above if not enough space)
+        let top = itemRect.bottom + 8;
+        if (top + overlayHeight > window.innerHeight - 20) {
+          // Not enough space below - position above
+          top = itemRect.top - overlayHeight - 8;
+          if (top < 20) {
+            // Not enough space above either - position at top of viewport
+            top = 20;
+          }
+        }
+        
+        // Position horizontally
+        let left = itemRect.left;
+        let right = 'auto';
+        if (isRTL) {
+          right = window.innerWidth - itemRect.right;
+          left = 'auto';
+          // Check if overlay goes beyond viewport
+          if (right + overlayWidth > window.innerWidth - 20) {
+            right = 20;
+          }
+        } else {
+          if (left + overlayWidth > window.innerWidth - 20) {
+            left = window.innerWidth - overlayWidth - 20;
+          }
+          if (left < 20) {
+            left = 20;
+          }
+        }
+        
+        // Set fixed position
+        details.style.position = 'fixed';
+        details.style.top = `${top}px`;
+        if (isRTL) {
+          details.style.right = `${right}px`;
+          details.style.left = 'auto';
+        } else {
+          details.style.left = `${left}px`;
+          details.style.right = 'auto';
+        }
+        details.style.width = `${overlayWidth}px`;
+        details.style.zIndex = '1050';
+      }
     } else if (event.type === 'mouseleave') {
       // Check if mouse is moving to overlay
       const relatedTarget = event.relatedTarget;
@@ -675,6 +730,21 @@
       }
       
       item.classList.remove('is-hovered');
+      
+      // Hide overlay after transition
+      if (details) {
+        setTimeout(() => {
+          if (!item.classList.contains('is-hovered')) {
+            details.style.display = 'none';
+            details.style.position = '';
+            details.style.top = '';
+            details.style.left = '';
+            details.style.right = '';
+            details.style.width = '';
+            details.style.zIndex = '';
+          }
+        }, 200);
+      }
     }
   }
 
@@ -976,7 +1046,7 @@
     }
     
     // Also clear innerHTML as backup
-    elements.tradesList.innerHTML = '';
+    elements.tradesList.textContent = '';
     
     window.Logger?.debug?.('🔍 [RecentItemsWidget] tradesList cleared', {
       remainingChildren: elements.tradesList.children.length,

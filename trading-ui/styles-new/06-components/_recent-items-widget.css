@@ -13,6 +13,17 @@
   position: relative;
   /* Allow hover overlay to extend beyond container */
   overflow: visible;
+  /* Ensure overlay can escape parent containers */
+  z-index: 1;
+}
+
+/* Ensure parent containers don't clip overlay */
+.content-section#main .section-body .row > [class*="col-"] > .card#recentItemsWidgetContainer {
+  overflow: visible;
+}
+
+.content-section#main .section-body .row > [class*="col-"] {
+  overflow: visible;
 }
 
 #recentItemsWidgetContainer .card-header {
@@ -199,11 +210,11 @@
   font-size: 0.95rem;
 }
 
-/* ===== Widget Details Container (Hidden by default, shown on hover as relative overlay) ===== */
+/* ===== Widget Details Container (Hidden by default, shown on hover as fixed overlay) ===== */
 .recent-items-widget-details-container {
   display: none; /* Hidden by default */
-  position: absolute; /* Relative to item - simple positioning */
-  z-index: 10; /* Above item content */
+  position: fixed; /* Fixed position to escape all container boundaries */
+  z-index: 1050; /* Above all content including modals */
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 0.375rem;
@@ -211,18 +222,15 @@
   padding: 0.75rem;
   min-width: 280px;
   max-width: 400px;
-  /* Position relative to item */
-  top: 100%;
-  left: 0;
-  margin-top: 0.5rem;
-  /* Allow overlay to extend beyond container */
+  /* Position will be set by JavaScript based on item position */
+  /* Allow overlay to extend beyond all containers */
   overflow: visible;
+  pointer-events: auto;
 }
 
 /* RTL support */
 [dir="rtl"] .recent-items-widget-details-container {
-  left: auto;
-  right: 0;
+  /* Position will be set by JavaScript */
 }
 
 /* Show details container on hover */

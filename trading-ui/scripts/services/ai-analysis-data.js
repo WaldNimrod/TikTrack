@@ -805,10 +805,31 @@
           deletedCount: result.deleted_count || 0
         });
         
-        // Clear cache for AI analysis history
-        await invalidateCache('ai-analysis-history');
+        // Clear all AI analysis cache entries
         if (window.UnifiedCacheManager) {
-          await window.UnifiedCacheManager.clearByPattern('ai-analysis-*');
+          try {
+            // Clear all response cache entries (ai-analysis-response-*)
+            if (typeof window.UnifiedCacheManager.clearByPattern === 'function') {
+              await window.UnifiedCacheManager.clearByPattern('ai-analysis-response-');
+              window.Logger?.info?.('🧹 Cleared AI analysis response cache', PAGE_LOG_CONTEXT);
+            } else if (typeof window.UnifiedCacheManager.invalidate === 'function') {
+              await window.UnifiedCacheManager.invalidate('ai-analysis-response-*');
+              window.Logger?.info?.('🧹 Invalidated AI analysis response cache', PAGE_LOG_CONTEXT);
+            }
+            
+            // Clear history cache
+            await invalidateCache('ai-analysis-history');
+            
+            // Also clear any other AI analysis related cache
+            if (typeof window.UnifiedCacheManager.clearByPattern === 'function') {
+              await window.UnifiedCacheManager.clearByPattern('ai-analysis-');
+            }
+          } catch (cacheError) {
+            window.Logger?.warn?.('⚠️ Error clearing cache', {
+              ...PAGE_LOG_CONTEXT,
+              error: cacheError?.message || cacheError
+            });
+          }
         }
         
         return result;

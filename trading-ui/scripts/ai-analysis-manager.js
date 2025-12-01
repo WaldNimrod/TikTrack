@@ -408,24 +408,85 @@
             const warningDiv = document.createElement('div');
             warningDiv.className = 'alert alert-warning alert-dismissible fade show';
             warningDiv.setAttribute('role', 'alert');
-            warningDiv.innerHTML = `
-              <strong>⚠️ אין מנוע AI מוגדר</strong>
-              <p>על מנת להשתמש במערכת ניתוח AI, יש להגדיר מפתח API למנוע AI בפרופיל המשתמש.</p>
-              <p><strong>איך להגדיר:</strong></p>
-              <ol>
-                <li>עבור לעמוד <a href="/user-profile#ai-analysis" target="_blank" class="alert-link"><strong>פרופיל משתמש → הגדרות AI Analysis</strong></a></li>
-                <li>גלול לסקשן "הגדרות AI Analysis" (או לחץ על הקישור למעלה)</li>
-                <li>הגדר מפתח API למנוע AI (Gemini או Perplexity)</li>
-                <li>לחץ על "בדוק מפתח" כדי לוודא שהמפתח תקין</li>
-                <li>לחץ על "שמור הגדרות"</li>
-              </ol>
-              <p><strong>איך להשיג מפתח API:</strong></p>
-              <ul>
-                <li><strong>Gemini:</strong> עבור ל-<a href="https://aistudio.google.com/" target="_blank" class="alert-link">Google AI Studio</a> ולחץ על "Get API Key"</li>
-                <li><strong>Perplexity:</strong> עבור ל-<a href="https://www.perplexity.ai/api" target="_blank" class="alert-link">Perplexity API</a> ולחץ על "Create API Key"</li>
-              </ul>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            `;
+            const strong = document.createElement('strong');
+            strong.textContent = '⚠️ אין מנוע AI מוגדר';
+            warningDiv.appendChild(strong);
+            const p1 = document.createElement('p');
+            p1.textContent = 'על מנת להשתמש במערכת ניתוח AI, יש להגדיר מפתח API למנוע AI בפרופיל המשתמש.';
+            warningDiv.appendChild(p1);
+            const p2 = document.createElement('p');
+            const strong2 = document.createElement('strong');
+            strong2.textContent = 'איך להגדיר:';
+            p2.appendChild(strong2);
+            warningDiv.appendChild(p2);
+            // Create ordered list
+            const ol = document.createElement('ol');
+            const li1 = document.createElement('li');
+            const a1 = document.createElement('a');
+            a1.href = '/user-profile#ai-analysis';
+            a1.target = '_blank';
+            a1.className = 'alert-link';
+            const strong3 = document.createElement('strong');
+            strong3.textContent = 'פרופיל משתמש → הגדרות AI Analysis';
+            a1.appendChild(strong3);
+            li1.appendChild(document.createTextNode('עבור לעמוד '));
+            li1.appendChild(a1);
+            ol.appendChild(li1);
+            const li2 = document.createElement('li');
+            li2.textContent = 'גלול לסקשן "הגדרות AI Analysis" (או לחץ על הקישור למעלה)';
+            ol.appendChild(li2);
+            const li3 = document.createElement('li');
+            li3.textContent = 'הגדר מפתח API למנוע AI (Gemini או Perplexity)';
+            ol.appendChild(li3);
+            const li4 = document.createElement('li');
+            li4.textContent = 'לחץ על "בדוק מפתח" כדי לוודא שהמפתח תקין';
+            ol.appendChild(li4);
+            const li5 = document.createElement('li');
+            li5.textContent = 'לחץ על "שמור הגדרות"';
+            ol.appendChild(li5);
+            warningDiv.appendChild(ol);
+            // Create "איך להשיג מפתח API" paragraph
+            const p3 = document.createElement('p');
+            const strong4 = document.createElement('strong');
+            strong4.textContent = 'איך להשיג מפתח API:';
+            p3.appendChild(strong4);
+            warningDiv.appendChild(p3);
+            // Create unordered list
+            const ul = document.createElement('ul');
+            const li6 = document.createElement('li');
+            const strong5 = document.createElement('strong');
+            strong5.textContent = 'Gemini:';
+            li6.appendChild(strong5);
+            li6.appendChild(document.createTextNode(' עבור ל-'));
+            const a2 = document.createElement('a');
+            a2.href = 'https://aistudio.google.com/';
+            a2.target = '_blank';
+            a2.className = 'alert-link';
+            a2.textContent = 'Google AI Studio';
+            li6.appendChild(a2);
+            li6.appendChild(document.createTextNode(' ולחץ על "Get API Key"'));
+            ul.appendChild(li6);
+            const li7 = document.createElement('li');
+            const strong6 = document.createElement('strong');
+            strong6.textContent = 'Perplexity:';
+            li7.appendChild(strong6);
+            li7.appendChild(document.createTextNode(' עבור ל-'));
+            const a3 = document.createElement('a');
+            a3.href = 'https://www.perplexity.ai/api';
+            a3.target = '_blank';
+            a3.className = 'alert-link';
+            a3.textContent = 'Perplexity API';
+            li7.appendChild(a3);
+            li7.appendChild(document.createTextNode(' ולחץ על "Create API Key"'));
+            ul.appendChild(li7);
+            warningDiv.appendChild(ul);
+            // Add close button
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'btn-close';
+            closeBtn.setAttribute('data-bs-dismiss', 'alert');
+            closeBtn.setAttribute('aria-label', 'Close');
+            warningDiv.appendChild(closeBtn);
             modalBody.insertBefore(warningDiv, modalBody.firstChild);
           }
         }
@@ -455,7 +516,15 @@
 
       // Clear existing content (but keep warning if exists)
       const warningDiv = container.querySelector('.alert-warning');
-      container.innerHTML = '';
+      // Remove all children except warningDiv
+      const children = Array.from(container.children);
+      children.forEach(child => {
+        if (child !== warningDiv) {
+          container.removeChild(child);
+        }
+      });
+      // Clear text content if any
+      container.textContent = '';
       if (warningDiv) {
         container.appendChild(warningDiv);
       }
@@ -1201,25 +1270,34 @@
           if (crudResult && crudResult.status === 'success' && crudResult.data) {
             result = crudResult.data;
             
-            // Save response_text to cache (not in DB)
+            // Save response_text to cache (not in DB) - only if not already cached
             if (result.id && result.response_text) {
               const cacheKey = `ai-analysis-response-${result.id}`;
               if (window.UnifiedCacheManager) {
-                await window.UnifiedCacheManager.save(cacheKey, {
-                  response_text: result.response_text,
-                  response_json: result.response_json || null,
-                  cached_at: new Date().toISOString()
-                }, {
-                  ttl: 7200000, // 2 hours
-                  layer: 'indexedDB',
-                  compress: true
-                });
-                window.Logger?.info('✅ Saved AI analysis response to cache', { 
-                  page: 'ai-analysis', 
-                  requestId: result.id,
-                  cacheKey,
-                  hasResponseText: !!result.response_text
-                });
+                // Check if already in cache before saving
+                const existingCache = await window.UnifiedCacheManager.get(cacheKey);
+                if (!existingCache || !existingCache.response_text) {
+                  await window.UnifiedCacheManager.save(cacheKey, {
+                    response_text: result.response_text,
+                    response_json: result.response_json || null,
+                    cached_at: new Date().toISOString()
+                  }, {
+                    ttl: 7200000, // 2 hours
+                    layer: 'indexedDB',
+                    compress: true
+                  });
+                  window.Logger?.info('✅ Saved AI analysis response to cache', { 
+                    page: 'ai-analysis', 
+                    requestId: result.id,
+                    cacheKey,
+                    hasResponseText: !!result.response_text
+                  });
+                } else {
+                  window.Logger?.debug('⏭️ Skipped cache save - already exists (handleGenerateAnalysis CRUD)', { 
+                    page: 'ai-analysis', 
+                    requestId: result.id
+                  });
+                }
               }
             }
             
@@ -1238,27 +1316,30 @@
           if (data.status === 'success' && data.data) {
             result = data.data;
             
-            // Save response_text to cache (not in DB)
+            // Save response_text to cache (not in DB) - only if not already cached
             if (result.id && result.response_text) {
               const cacheKey = `ai-analysis-response-${result.id}`;
               if (window.UnifiedCacheManager) {
-                const saveResult = await window.UnifiedCacheManager.save(cacheKey, {
-                  response_text: result.response_text,
-                  response_json: result.response_json || null,
-                  cached_at: new Date().toISOString()
-                }, {
-                  ttl: 7200000, // 2 hours
-                  layer: 'indexedDB',
-                  compress: true
-                });
-                
-                if (saveResult) {
-                  window.Logger?.info('✅ Saved AI analysis response to cache', { 
-                    page: 'ai-analysis', 
-                    requestId: result.id,
-                    cacheKey,
-                    hasResponseText: !!result.response_text
+                // Check if already in cache before saving
+                const existingCache = await window.UnifiedCacheManager.get(cacheKey);
+                if (!existingCache || !existingCache.response_text) {
+                  const saveResult = await window.UnifiedCacheManager.save(cacheKey, {
+                    response_text: result.response_text,
+                    response_json: result.response_json || null,
+                    cached_at: new Date().toISOString()
+                  }, {
+                    ttl: 7200000, // 2 hours
+                    layer: 'indexedDB',
+                    compress: true
                   });
+                  
+                  if (saveResult) {
+                    window.Logger?.info('✅ Saved AI analysis response to cache', { 
+                      page: 'ai-analysis', 
+                      requestId: result.id,
+                      cacheKey,
+                      hasResponseText: !!result.response_text
+                    });
                   
                   // Update availability for this specific item immediately
                   if (this.history) {
@@ -1283,8 +1364,14 @@
                     cacheKey
                   });
                 }
+              } else {
+                window.Logger?.debug('⏭️ Skipped cache save - already exists (handleGenerateAnalysis fallback)', { 
+                  page: 'ai-analysis', 
+                  requestId: result.id
+                });
               }
             }
+          }
             
             // Close variables modal
             if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
@@ -1445,8 +1532,23 @@
         }
       }
       
-      // If still no response_text, try to load from API
-      if (!responseText && analysisResult.id && analysisResult.status === 'completed') {
+      // If still no response_text, try pendingResult first (for just-created analyses)
+      if (!responseText && analysisResult.id && this.pendingResult && this.pendingResult.id === analysisResult.id) {
+        responseText = this.pendingResult.response_text;
+        if (responseText) {
+          window.Logger?.info('✅ Retrieved AI analysis response from pendingResult', { 
+            page: 'ai-analysis', 
+            requestId: analysisResult.id,
+            responseLength: responseText?.length || 0
+          });
+          // Don't save to cache here - it's already saved in handleGenerateAnalysis
+        }
+      }
+      
+      // If still no response_text, try to load from API (only if not just created)
+      // Skip API call if this is a just-created analysis (already saved in handleGenerateAnalysis)
+      const isJustCreated = this.pendingResult && this.pendingResult.id === analysisResult.id;
+      if (!responseText && !isJustCreated && analysisResult.id && analysisResult.status === 'completed') {
         window.Logger?.info('🔄 Loading analysis response from API...', { 
           page: 'ai-analysis', 
           requestId: analysisResult.id
@@ -1467,24 +1569,46 @@
                 responseLength: responseText?.length || 0
               });
               
-              // Save to cache for future use
+              // Save to cache for future use (only if not already cached)
               if (window.UnifiedCacheManager && analysisResult.id) {
                 const cacheKey = `ai-analysis-response-${analysisResult.id}`;
-                await window.UnifiedCacheManager.save(cacheKey, {
-                  response_text: responseText,
-                  response_json: data.data.response_json || null,
-                  cached_at: new Date().toISOString()
-                }, {
-                  ttl: 7200000, // 2 hours
-                  layer: 'indexedDB',
-                  compress: true
-                });
-                window.Logger?.info('💾 Saved analysis response to cache', { 
-                  page: 'ai-analysis', 
-                  requestId: analysisResult.id
-                });
+                // Check if already in cache before saving
+                const existingCache = await window.UnifiedCacheManager.get(cacheKey);
+                if (!existingCache || !existingCache.response_text) {
+                  await window.UnifiedCacheManager.save(cacheKey, {
+                    response_text: responseText,
+                    response_json: data.data.response_json || null,
+                    cached_at: new Date().toISOString()
+                  }, {
+                    ttl: 7200000, // 2 hours
+                    layer: 'indexedDB',
+                    compress: true
+                  });
+                  window.Logger?.info('💾 Saved analysis response to cache', { 
+                    page: 'ai-analysis', 
+                    requestId: analysisResult.id
+                  });
+                } else {
+                  window.Logger?.debug('⏭️ Skipped cache save - already exists', { 
+                    page: 'ai-analysis', 
+                    requestId: analysisResult.id
+                  });
+                }
               }
+            } else {
+              window.Logger?.warn('⚠️ API returned analysis but no response_text', { 
+                page: 'ai-analysis', 
+                requestId: analysisResult.id,
+                hasData: !!data.data,
+                status: data.status
+              });
             }
+          } else {
+            window.Logger?.warn('⚠️ API request failed', { 
+              page: 'ai-analysis', 
+              requestId: analysisResult.id,
+              status: response.status
+            });
           }
         } catch (apiError) {
           window.Logger?.error('❌ Error loading analysis from API', { 
@@ -1948,25 +2072,34 @@
             if (crudResult && crudResult.status === 'success' && crudResult.data) {
               const analysisResult = crudResult.data;
               
-              // Save response_text to cache (not in DB) - same as handleGenerateAnalysis
+              // Save response_text to cache (not in DB) - only if not already cached
               if (analysisResult.id && analysisResult.response_text) {
                 const cacheKey = `ai-analysis-response-${analysisResult.id}`;
                 if (window.UnifiedCacheManager) {
-                  await window.UnifiedCacheManager.save(cacheKey, {
-                    response_text: analysisResult.response_text,
-                    response_json: analysisResult.response_json || null,
-                    cached_at: new Date().toISOString()
-                  }, {
-                    ttl: 7200000, // 2 hours
-                    layer: 'indexedDB',
-                    compress: true
-                  });
-                  window.Logger?.info('✅ Saved AI analysis response to cache (rerun)', { 
-                    page: 'ai-analysis', 
-                    requestId: analysisResult.id,
-                    cacheKey,
-                    hasResponseText: !!analysisResult.response_text
-                  });
+                  // Check if already in cache before saving
+                  const existingCache = await window.UnifiedCacheManager.get(cacheKey);
+                  if (!existingCache || !existingCache.response_text) {
+                    await window.UnifiedCacheManager.save(cacheKey, {
+                      response_text: analysisResult.response_text,
+                      response_json: analysisResult.response_json || null,
+                      cached_at: new Date().toISOString()
+                    }, {
+                      ttl: 7200000, // 2 hours
+                      layer: 'indexedDB',
+                      compress: true
+                    });
+                    window.Logger?.info('✅ Saved AI analysis response to cache (rerun)', { 
+                      page: 'ai-analysis', 
+                      requestId: analysisResult.id,
+                      cacheKey,
+                      hasResponseText: !!analysisResult.response_text
+                    });
+                  } else {
+                    window.Logger?.debug('⏭️ Skipped cache save - already exists (rerun CRUD)', { 
+                      page: 'ai-analysis', 
+                      requestId: analysisResult.id
+                    });
+                  }
                 }
               }
               
@@ -1980,27 +2113,37 @@
           const result = await response.json();
           
           if (result.status === 'success' && result.data) {
-            // Save response_text to cache (not in DB) - same options as handleGenerateAnalysis
+            // Save response_text to cache (not in DB) - only if not already cached
             if (result.data.id && result.data.response_text) {
               const cacheKey = `ai-analysis-response-${result.data.id}`;
               if (window.UnifiedCacheManager) {
-                await window.UnifiedCacheManager.save(cacheKey, {
-                  response_text: result.data.response_text,
-                  response_json: result.data.response_json || null,
-                  cached_at: new Date().toISOString()
-                }, {
-                  ttl: 7200000, // 2 hours
-                  layer: 'indexedDB',
-                  compress: true
-                });
-                window.Logger?.info('✅ Saved AI analysis response to cache (rerun, manual)', { 
-                  page: 'ai-analysis', 
-                  requestId: result.data.id,
-                  cacheKey,
-                  hasResponseText: !!result.data.response_text
-                });
+                // Check if already in cache before saving
+                const existingCache = await window.UnifiedCacheManager.get(cacheKey);
+                if (!existingCache || !existingCache.response_text) {
+                  await window.UnifiedCacheManager.save(cacheKey, {
+                    response_text: result.data.response_text,
+                    response_json: result.data.response_json || null,
+                    cached_at: new Date().toISOString()
+                  }, {
+                    ttl: 7200000, // 2 hours
+                    layer: 'indexedDB',
+                    compress: true
+                  });
+                  window.Logger?.info('✅ Saved AI analysis response to cache (rerun, manual)', { 
+                    page: 'ai-analysis', 
+                    requestId: result.data.id,
+                    cacheKey,
+                    hasResponseText: !!result.data.response_text
+                  });
+                } else {
+                  window.Logger?.debug('⏭️ Skipped cache save - already exists (rerun manual)', { 
+                    page: 'ai-analysis', 
+                    requestId: result.data.id
+                  });
+                }
               }
             }
+          }
 
             // Show success notification
             if (window.NotificationSystem) {
@@ -2311,13 +2454,31 @@
           if (data.status === 'success' && data.data) {
             analysisResult = data.data;
             
-            // If API returned response_text, save to cache
+            // If API returned response_text, save to cache (only if not already cached)
             if (analysisResult.response_text && window.UnifiedCacheManager && item.id) {
               const cacheKey = `ai-analysis-response-${item.id}`;
-              await window.UnifiedCacheManager.save(cacheKey, {
-                response_text: analysisResult.response_text,
-                response_json: analysisResult.response_json
-              }, { ttl: 7200000 }); // 2 hours
+              // Check if already in cache before saving
+              const existingCache = await window.UnifiedCacheManager.get(cacheKey);
+              if (!existingCache || !existingCache.response_text) {
+                await window.UnifiedCacheManager.save(cacheKey, {
+                  response_text: analysisResult.response_text,
+                  response_json: analysisResult.response_json,
+                  cached_at: new Date().toISOString()
+                }, { 
+                  ttl: 7200000, // 2 hours
+                  layer: 'indexedDB',
+                  compress: true
+                });
+                window.Logger?.debug('💾 Saved analysis response to cache (viewHistoryItem)', { 
+                  page: 'ai-analysis', 
+                  requestId: item.id
+                });
+              } else {
+                window.Logger?.debug('⏭️ Skipped cache save - already exists (viewHistoryItem)', { 
+                  page: 'ai-analysis', 
+                  requestId: item.id
+                });
+              }
             }
           }
         }
@@ -2588,6 +2749,28 @@
         // Delete all analyses
         const result = await window.AIAnalysisData.deleteAllAnalyses();
 
+        // Clear all AI analysis cache entries
+        if (window.UnifiedCacheManager) {
+          try {
+            // Clear all response cache entries (ai-analysis-response-*)
+            if (typeof window.UnifiedCacheManager.clearByPattern === 'function') {
+              await window.UnifiedCacheManager.clearByPattern('ai-analysis-response-');
+              window.Logger?.info('🧹 Cleared AI analysis response cache', { page: 'ai-analysis' });
+            } else if (typeof window.UnifiedCacheManager.invalidate === 'function') {
+              await window.UnifiedCacheManager.invalidate('ai-analysis-response-*');
+              window.Logger?.info('🧹 Invalidated AI analysis response cache', { page: 'ai-analysis' });
+            }
+            
+            // Clear history cache
+            if (typeof window.UnifiedCacheManager.invalidate === 'function') {
+              await window.UnifiedCacheManager.invalidate('ai-analysis-history');
+              window.Logger?.info('🧹 Cleared AI analysis history cache', { page: 'ai-analysis' });
+            }
+          } catch (cacheError) {
+            window.Logger?.warn('⚠️ Error clearing cache', { page: 'ai-analysis', error: cacheError });
+          }
+        }
+
         // Clear history and re-render
         this.history = [];
         this.renderHistory();
@@ -2600,7 +2783,7 @@
         // Show success
         if (window.NotificationSystem) {
           window.NotificationSystem.showSuccess(
-            `נמחקו ${result.deleted_count || 0} רשומות בהצלחה`,
+            `נמחקו ${result.deleted_count || 0} רשומות והמטמון נוקה בהצלחה`,
             'business'
           );
         }

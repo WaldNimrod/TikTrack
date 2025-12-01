@@ -615,17 +615,35 @@ class CRUDResponseHandler {
             }
         };
 
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="${columnCount}" class="text-center text-danger" style="padding: 20px;">
-                    <i class="fas ${icon} fa-2x mb-2"></i><br>
-                    <strong style="font-size: 1.1em;">${title}</strong><br>
-                    <small>${message}</small><br>
-                    ${retryBtn}
-                    ${copyBtn}
-                </td>
-            </tr>
-        `;
+        // Build error row using createElement
+        tbody.textContent = '';
+        const errorRow = document.createElement('tr');
+        const errorCell = document.createElement('td');
+        errorCell.colSpan = columnCount;
+        errorCell.className = 'text-center text-danger';
+        errorCell.style.padding = '20px';
+        const errorIcon = document.createElement('i');
+        errorIcon.className = `fas ${icon} fa-2x mb-2`;
+        errorCell.appendChild(errorIcon);
+        errorCell.appendChild(document.createElement('br'));
+        const strong = document.createElement('strong');
+        strong.style.fontSize = '1.1em';
+        strong.textContent = title;
+        errorCell.appendChild(strong);
+        errorCell.appendChild(document.createElement('br'));
+        const small = document.createElement('small');
+        small.textContent = message;
+        errorCell.appendChild(small);
+        errorCell.appendChild(document.createElement('br'));
+        // Insert retry and copy buttons using tempDiv
+        const buttonsHTML = retryBtn + copyBtn;
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = buttonsHTML;
+        while (tempDiv.firstChild) {
+          errorCell.appendChild(tempDiv.firstChild);
+        }
+        errorRow.appendChild(errorCell);
+        tbody.appendChild(errorRow);
     }
 
     /**

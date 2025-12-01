@@ -343,10 +343,13 @@ class UIManager {
       originalDisabled: element.disabled,
     });
 
-    element.innerHTML = `
-            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-            ${message}
-        `;
+    element.textContent = '';
+    const spinner = document.createElement('span');
+    spinner.className = 'spinner-border spinner-border-sm me-2';
+    spinner.setAttribute('role', 'status');
+    spinner.setAttribute('aria-hidden', 'true');
+    element.appendChild(spinner);
+    element.appendChild(document.createTextNode(message));
     element.disabled = true;
 
     window.Logger.info(`⏳ Loading state: ${elementId}`, { page: 'preferences-ui' });
@@ -362,7 +365,13 @@ class UIManager {
 
     const state = this.loadingStates.get(elementId);
     if (state) {
-      element.innerHTML = state.originalContent;
+      // Restore original content using tempDiv
+      element.textContent = '';
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = state.originalContent;
+      while (tempDiv.firstChild) {
+        element.appendChild(tempDiv.firstChild);
+      }
       element.disabled = state.originalDisabled;
       this.loadingStates.delete(elementId);
     }

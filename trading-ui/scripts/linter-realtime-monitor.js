@@ -1111,7 +1111,13 @@ async function startFileScan() {
                 // Fallback already set
             }
         }
-        scanButton.innerHTML = loaderIcon + ' סורק... 0%';
+        scanButton.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = loaderIcon;
+        while (tempDiv.firstChild) {
+          scanButton.appendChild(tempDiv.firstChild);
+        }
+        scanButton.appendChild(document.createTextNode(' סורק... 0%'));
     }
     
     // Reset all counters to 0
@@ -1278,7 +1284,13 @@ async function performScan() {
                     // Fallback already set
                 }
             }
-            scanButton.innerHTML = searchIcon + ' סרוק קבצים';
+            scanButton.textContent = '';
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = searchIcon;
+            while (tempDiv.firstChild) {
+              scanButton.appendChild(tempDiv.firstChild);
+            }
+            scanButton.appendChild(document.createTextNode(' סרוק קבצים'));
         }
         
         return; // Stop the scanning process

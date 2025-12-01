@@ -124,7 +124,14 @@
                                 <span>פעולות ממתינות</span>
                             </span>
                         </h5>
-                        <span class="badge entity-trade" id="unifiedPendingActionsWidgetBadge">0</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <!-- Count display in header for each combination -->
+                            <span class="badge bg-body-secondary text-body" id="assignPlansCountHeader" style="display: none;">0</span>
+                            <span class="badge bg-body-secondary text-body" id="assignTradesCountHeader" style="display: none;">0</span>
+                            <span class="badge bg-body-secondary text-body" id="createPlansCountHeader" style="display: none;">0</span>
+                            <span class="badge bg-body-secondary text-body" id="createTradesCountHeader" style="display: none;">0</span>
+                            <span class="badge entity-trade" id="unifiedPendingActionsWidgetBadge">0</span>
+                        </div>
                     </div>
                     <div class="card-header">
                         <!-- All Tabs in Single Row: [טרייד][תוכנית] | [שיוך] [יצירת חדש] -->
@@ -178,7 +185,6 @@
                                 <div id="assignPlansEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
                                     כל הטריידים מלווים בתוכנית מתאימה. עבודה מצוינת!
                                 </div>
-                                <span class="badge bg-body-secondary text-body mb-2" id="assignPlansCount">0</span>
                                 <ul class="unified-pending-list flex-grow-1" id="assignPlansList"></ul>
                             </div>
                             
@@ -194,7 +200,6 @@
                                 <div id="assignTradesEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
                                     אין כרגע ביצועים שממתינים לשיוך. המשך עבודה מצוינת!
                                 </div>
-                                <span class="badge bg-body-secondary text-body mb-2" id="assignTradesCount">0</span>
                                 <ul class="unified-pending-list flex-grow-1" id="assignTradesList"></ul>
                             </div>
                             
@@ -210,7 +215,6 @@
                                 <div id="createPlansEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
                                     כל הטריידים מלווים בתוכנית מתאימה. עבודה מצוינת!
                                 </div>
-                                <span class="badge bg-body-secondary text-body mb-2" id="createPlansCount">0</span>
                                 <ul class="unified-pending-list flex-grow-1" id="createPlansList"></ul>
                             </div>
                             
@@ -759,47 +763,9 @@
     <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
     
     <!-- =============================================================== -->
-    <!-- ===== DIRECT WIDGET INITIALIZATION (FALLBACK) ===== -->
+    <!-- ===== WIDGET INITIALIZATION ===== -->
     <!-- =============================================================== -->
-    <!-- Initialize UnifiedPendingActionsWidget directly as fallback if customInitializers don't run -->
-    <script>
-        // Wait for DOM and all systems to load
-        window.addEventListener('DOMContentLoaded', async () => {
-            // Wait a bit more for all scripts to load
-            setTimeout(async () => {
-                window.Logger?.info?.('🔵🔵🔵 FALLBACK: Attempting direct widget initialization', { 
-                    widgetExists: typeof window.UnifiedPendingActionsWidget !== 'undefined',
-                    containerExists: !!document.getElementById('unifiedPendingActionsWidgetContainer'),
-                    page: 'index' 
-                });
-                
-                if (typeof window.UnifiedPendingActionsWidget !== 'undefined' && 
-                    typeof window.UnifiedPendingActionsWidget.init === 'function' &&
-                    document.getElementById('unifiedPendingActionsWidgetContainer')) {
-                    try {
-                        await window.UnifiedPendingActionsWidget.init('unifiedPendingActionsWidgetContainer', {
-                            defaultItemsLimit: 4,
-                            defaultAction: 'assign',
-                            defaultEntity: 'plans'
-                        });
-                        window.Logger?.info?.('✅✅✅ FALLBACK: Widget initialized successfully', { page: 'index' });
-                    } catch (error) {
-                        window.Logger?.error?.('🔴🔴🔴 FALLBACK: Error initializing widget', { 
-                            error: error.message,
-                            errorStack: error.stack,
-                            page: 'index' 
-                        });
-                    }
-                } else {
-                    window.Logger?.warn?.('⚠️⚠️⚠️ FALLBACK: Widget or container not available', { 
-                        widgetExists: typeof window.UnifiedPendingActionsWidget !== 'undefined',
-                        hasInit: typeof window.UnifiedPendingActionsWidget?.init === 'function',
-                        containerExists: !!document.getElementById('unifiedPendingActionsWidgetContainer'),
-                        page: 'index' 
-                    });
-                }
-            }, 2000); // Wait 2 seconds for all systems to load
-        });
-    </script>
+    <!-- UnifiedPendingActionsWidget is initialized via page-initialization-configs.js customInitializers -->
+    <!-- No fallback needed - widget initialization is handled by the unified initialization system -->
 </body>
 </html>

@@ -32,7 +32,12 @@ from config.settings import DATABASE_URL
 def create_sample_condition():
     """Create sample trade plan with conditions for QQQ"""
     
-    # Database setup
+    # Database setup - validate DATABASE_URL is not None
+    if not DATABASE_URL:
+        print("❌ DATABASE_URL is not configured")
+        print("   Please set DATABASE_URL environment variable or configure PostgreSQL")
+        return False
+    
     engine = create_engine(DATABASE_URL)
     Session = sessionmaker(bind=engine)
     session = Session()

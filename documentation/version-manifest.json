@@ -10,13 +10,13 @@
     "notes": "Final sm-section-server fix"
   },
   "development": {
-    "version": "1.3.70.0",
+    "version": "1.3.71.0",
     "major": 1,
     "minor": 3,
-    "patch": 70,
+    "patch": 71,
     "build": 0,
-    "commit": "cc305601826e3df568854ae28780d993136a2e93",
-    "updated_at": "2025-12-02T16:15:07+00:00",
-    "notes": "Remove 'מעל'/'מתחת' text from MA display, keep only sign and color"
+    "commit": "d0adc5ef4dca71a1fd6d1f2390b72836ad6e77c7",
+    "updated_at": "2025-12-02T16:18:08+00:00",
+    "notes": "Fix KPI cards responsiveness - prevent text wrapping inside cards, add responsive breakpoints"
   }
 }

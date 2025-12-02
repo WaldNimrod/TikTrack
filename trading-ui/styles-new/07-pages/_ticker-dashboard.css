@@ -14,6 +14,10 @@
     padding: 1rem;
     text-align: center;
     transition: all 0.2s ease;
+    /* Prevent text wrapping inside cards - force cards to wrap instead */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ticker-dashboard-page .kpi-card:hover {
@@ -25,12 +29,19 @@
     font-size: 0.875rem;
     color: var(--text-muted, #666);
     margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .ticker-dashboard-page .kpi-value {
     font-size: 1.5rem;
     font-weight: bold;
     color: var(--text-color, #333);
+    /* Allow line breaks only at <br> tags, not automatic wrapping */
+    white-space: pre-line;
+    word-break: keep-all;
+    overflow-wrap: normal;
 }
 
 /* ===== CHART CONTAINER ===== */
@@ -150,21 +161,42 @@
 }
 
 /* ===== RESPONSIVE ===== */
-/* Desktop (> 768px) - Default: 5 KPI Cards, 3 Technical Indicators */
-@media (min-width: 1025px) {
-    .ticker-dashboard-page .kpi-card {
-        /* 5 cards per row - handled by col-md-2 */
+/* Large Desktop (> 1400px) - 6 cards per row */
+@media (min-width: 1400px) {
+    .ticker-dashboard-page #tickerKPICards .col-md-2 {
+        flex: 0 0 16.666667%;
+        max-width: 16.666667%;
     }
-    
+}
+
+/* Desktop (1200px - 1399px) - 5 cards per row */
+@media (min-width: 1200px) and (max-width: 1399px) {
+    .ticker-dashboard-page #tickerKPICards .col-md-2 {
+        flex: 0 0 20%;
+        max-width: 20%;
+    }
+}
+
+/* Desktop (1025px - 1199px) - 4 cards per row */
+@media (min-width: 1025px) and (max-width: 1199px) {
+    .ticker-dashboard-page #tickerKPICards .col-md-2 {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+}
+
+/* Desktop (> 1025px) - Default: 4-6 KPI Cards, 3 Technical Indicators */
+@media (min-width: 1025px) {
     .ticker-dashboard-page .technical-indicator-card {
         /* 3 cards per row - handled by col-md-4 */
     }
 }
 
-/* Tablet (768px - 1024px) */
+/* Tablet (768px - 1024px) - 3 cards per row */
 @media (min-width: 768px) and (max-width: 1024px) {
-    .ticker-dashboard-page .kpi-card {
-        /* 3 cards per row - handled by col-sm-4 */
+    .ticker-dashboard-page #tickerKPICards .col-sm-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
     }
     
     .ticker-dashboard-page .technical-indicator-card {

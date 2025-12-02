@@ -724,6 +724,12 @@
             // Use for...of loop instead of forEach to support await
             for (const kpi of kpiCards) {
                 const colDiv = document.createElement('div');
+                // Responsive classes: 
+                // - Large screens (>1400px): 6 per row (col-md-2 = 16.67%)
+                // - Medium screens (1200-1399px): 5 per row (20%)
+                // - Small-medium (1025-1199px): 4 per row (25%)
+                // - Tablet (768-1024px): 3 per row (col-sm-4 = 33.33%)
+                // - Mobile (<768px): 2 per row (col-6 = 50%)
                 colDiv.className = 'col-md-2 col-sm-4 col-6';
                 
                 const cardDiv = document.createElement('div');

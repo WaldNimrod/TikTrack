@@ -544,6 +544,22 @@ class EntityDetailsService:
                         except Exception as week52_error:
                             logger.warning(f"Error calculating 52W range for ticker {entity.ticker.id}: {week52_error}")
                         
+                        # Calculate volatility
+                        try:
+                            from services.external_data.technical_indicators_calculator import TechnicalIndicatorsCalculator
+                            
+                            tech_calculator = TechnicalIndicatorsCalculator(db)
+                            volatility_result = tech_calculator.calculate_volatility(
+                                ticker_id=entity.ticker.id,
+                                period=30,  # 30 days default
+                                db_session=db
+                            )
+                            
+                            if volatility_result is not None:
+                                entity_dict['ticker']['volatility'] = volatility_result
+                        except Exception as volatility_error:
+                            logger.warning(f"Error calculating volatility for ticker {entity.ticker.id}: {volatility_error}")
+                        
                         logger.debug(f"Added market data to ticker {entity.ticker.id} for {entity_type} {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%, change_from_open={latest_quote.change_pct_from_open}%, ATR={entity_dict['ticker'].get('atr')}")
                     else:
                         logger.debug(f"No market data found for ticker {entity.ticker.id} in {entity_type} {entity_id}")
@@ -654,7 +670,71 @@ class EntityDetailsService:
                     entity_dict['yahoo_updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else None
                     entity_dict['updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else entity_dict.get('updated_at')
                     entity_dict['data_source'] = latest_quote.source
-                    logger.debug(f"Added market data to ticker {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%")
+                    
+                    # ATR data
+                    entity_dict['atr'] = latest_quote.atr
+                    entity_dict['atr_period'] = latest_quote.atr_period or 14
+                    
+                    # Calculate ATR if not available
+                    if latest_quote.atr is None:
+                        try:
+                            from services.external_data.atr_calculator import ATRCalculator
+                            from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
+                            
+                            user_id = EntityDetailsService._get_default_user_id()
+                            atr_calculator = ATRCalculator(db)
+                            adapter = YahooFinanceAdapter(db)
+                            
+                            atr_result = atr_calculator.get_atr_with_fallback(
+                                ticker_id=entity_id,
+                                adapter=adapter,
+                                user_id=user_id,
+                                db_session=db
+                            )
+                            
+                            if atr_result and atr_result.atr:
+                                entity_dict['atr'] = atr_result.atr
+                                entity_dict['atr_period'] = atr_result.period
+                                if atr_result.warnings:
+                                    entity_dict['atr_warnings'] = atr_result.warnings
+                        except Exception as atr_error:
+                            logger.warning(f"Error calculating ATR for ticker {entity_id}: {atr_error}")
+                    
+                    # Calculate 52W range
+                    try:
+                        from services.external_data.week52_calculator import Week52Calculator
+                        
+                        week52_calculator = Week52Calculator(db)
+                        week52_result = week52_calculator.calculate_52w_range(
+                            ticker_id=entity_id,
+                            db_session=db
+                        )
+                        
+                        if week52_result:
+                            entity_dict['week52_high'] = week52_result.high
+                            entity_dict['week52_low'] = week52_result.low
+                            if week52_result.warnings:
+                                entity_dict['week52_warnings'] = week52_result.warnings
+                    except Exception as week52_error:
+                        logger.warning(f"Error calculating 52W range for ticker {entity_id}: {week52_error}")
+                    
+                    # Calculate volatility
+                    try:
+                        from services.external_data.technical_indicators_calculator import TechnicalIndicatorsCalculator
+                        
+                        tech_calculator = TechnicalIndicatorsCalculator(db)
+                        volatility_result = tech_calculator.calculate_volatility(
+                            ticker_id=entity_id,
+                            period=30,  # 30 days default
+                            db_session=db
+                        )
+                        
+                        if volatility_result is not None:
+                            entity_dict['volatility'] = volatility_result
+                    except Exception as volatility_error:
+                        logger.warning(f"Error calculating volatility for ticker {entity_id}: {volatility_error}")
+                    
+                    logger.debug(f"Added market data to ticker {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%, ATR={entity_dict.get('atr')}, Week52High={entity_dict.get('week52_high')}, Volatility={entity_dict.get('volatility')}")
                 else:
                     logger.debug(f"No market data found for ticker {entity_id}")
                 

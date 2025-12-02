@@ -85,21 +85,23 @@
             
             // Use EntityDetailsAPI to get complete ticker data with market data and linked items
             if (window.entityDetailsAPI && typeof window.entityDetailsAPI.getEntityDetails === 'function') {
+                // EntityDetailsAPI.getEntityDetails returns the entity data directly (not wrapped in { ticker: {...} })
+                // It already includes market data merged into the entity object
                 const tickerData = await window.entityDetailsAPI.getEntityDetails('ticker', tickerId, {
                     includeLinkedItems: true,
                     includeMarketData: true,
                     forceRefresh: forceRefresh
                 });
                 
-                // Market data might be null if endpoint is not available - this is OK, continue with ticker data
-                if (tickerData && !tickerData.marketData) {
-                    if (window.Logger) {
-                        window.Logger.info('Market data not available - continuing with ticker data only', { 
-                            tickerId,
-                            hasTickerData: !!tickerData,
-                            page: 'ticker-dashboard-data' 
-                        });
-                    }
+                if (window.Logger) {
+                    window.Logger.info('✅ Loaded ticker data from EntityDetailsAPI', { 
+                        tickerId,
+                        hasTickerData: !!tickerData,
+                        hasAtr: !!tickerData?.atr,
+                        hasWeek52High: !!tickerData?.week52_high,
+                        hasVolatility: !!tickerData?.volatility,
+                        page: 'ticker-dashboard-data' 
+                    });
                 }
                 
                 // Save to cache
@@ -301,7 +303,9 @@
                                 ...condition,
                                 _source: 'trade_plan',
                                 _plan_id: plan.id,
-                                _plan_name: plan.name || `תוכנית ${plan.id}`
+                                plan_name: plan.name || `תוכנית ${plan.id}`, // Add plan_name for display
+                                method_name_he: condition.method_name_he || condition.method?.name_he || condition.method_name || 'תנאי', // Add method name in Hebrew
+                                method_name: condition.method_name || condition.method?.name_en || 'Condition' // Add method name in English
                             }));
                             allConditions.push(...conditionsWithContext);
                         }

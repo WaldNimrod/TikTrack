@@ -201,3 +201,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-30T20:57:24+00:00 | 1.3.48.0 | 1.3.47.0 | bb4966802ee54425a502854b5d1d2d915ff82cc6 | 722a398eed3438aae49d6df4bdc564bb328b272e | patch | Add package dependencies validator script |
 | 2025-12-01T09:58:06+00:00 | 1.3.49.0 | 1.3.48.0 | f6f0c84667990a96b4f5ecfddb599675c74edbf9 | bb4966802ee54425a502854b5d1d2d915ff82cc6 | patch | Complete package manifest audit process - all validation tests passing |
 | 2025-12-01T15:43:05+00:00 | 1.3.50.0 | 1.3.49.0 | f1e840d2bea7bf1540a7afa996c486b5488e8d77 | f6f0c84667990a96b4f5ecfddb599675c74edbf9 | patch | תיקון בידוד ואבטחת משתמשים - הושלם |
+| 2025-12-02T00:10:51+00:00 | 1.3.51.0 | 1.3.50.0 | 39d510460b78cd385d2fa86069ff0bd4b233abcd | f1e840d2bea7bf1540a7afa996c486b5488e8d77 | patch | Fix ticker dashboard: volume display in millions, conditions display, icon fixes |

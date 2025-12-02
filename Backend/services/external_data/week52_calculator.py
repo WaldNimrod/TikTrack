@@ -100,3 +100,5 @@ class Week52Calculator:
             logger.error(f"Error calculating 52W range for ticker {ticker_id}: {e}")
             return None
 
+
+

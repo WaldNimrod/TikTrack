@@ -13,8 +13,10 @@ Date: November 2025
 
 import logging
 from typing import Optional, Dict, List
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
+from sqlalchemy import and_, desc
+from models.external_data import MarketDataQuote
 
 logger = logging.getLogger(__name__)
 
@@ -27,53 +29,74 @@ class TechnicalIndicatorsCalculator:
     def __init__(self, db_session: Session):
         self.db_session = db_session
     
-    def calculate_volatility(self, historical_data: List[Dict], period: int = 20) -> Optional[float]:
+    def calculate_volatility(
+        self,
+        ticker_id: int,
+        period: int = 30,  # Default to 30 days for volatility
+        db_session: Optional[Session] = None
+    ) -> Optional[float]:
         """
-        Calculate volatility (standard deviation of returns) from historical data.
+        Calculate volatility (standard deviation of log returns) from historical data.
         
         Args:
-            historical_data: List of dicts with 'close' or 'close_price' keys, sorted by date (oldest first)
-            period: Number of periods to use for calculation (default 20)
+            ticker_id: Ticker ID
+            period: Number of days to consider for volatility calculation
+            db_session: Database session (optional)
             
         Returns:
             Volatility as percentage, or None if insufficient data
         """
+        session = db_session or self.db_session
+        
         try:
-            if len(historical_data) < period + 1:
-                logger.warning(f"Insufficient data for volatility: {len(historical_data)} points, need {period + 1}")
+            cutoff_date = datetime.utcnow() - timedelta(days=period + 5)  # Get a few extra days
+            
+            quotes = session.query(MarketDataQuote).filter(
+                and_(
+                    MarketDataQuote.ticker_id == ticker_id,
+                    MarketDataQuote.close_price.isnot(None),
+                    MarketDataQuote.asof_utc >= cutoff_date
+                )
+            ).order_by(MarketDataQuote.asof_utc).all()
+            
+            if len(quotes) < period + 1:  # Need at least period + 1 data points for returns
+                logger.info(f"Insufficient database data for Volatility for ticker {ticker_id}: {len(quotes)} quotes, need {period + 1}")
                 return None
             
-            # Extract closing prices
-            closes = []
-            for item in historical_data[-period-1:]:  # Get last period+1 points
-                close = item.get('close') or item.get('close_price') or item.get('price')
-                if close is not None:
-                    closes.append(float(close))
+            quotes_sorted = sorted(quotes, key=lambda q: q.asof_utc)
             
-            if len(closes) < period + 1:
+            # Calculate log returns
+            log_returns = []
+            for i in range(1, len(quotes_sorted)):
+                current_close = quotes_sorted[i].close_price
+                previous_close = quotes_sorted[i-1].close_price
+                
+                if current_close and previous_close and previous_close > 0:
+                    import math
+                    log_returns.append(math.log(current_close / previous_close))
+            
+            if len(log_returns) < period:
+                logger.warning(f"Insufficient log returns for Volatility: {len(log_returns)}, need {period}")
                 return None
             
-            # Calculate returns (percentage changes)
-            returns = []
-            for i in range(1, len(closes)):
-                if closes[i-1] > 0:
-                    ret = (closes[i] - closes[i-1]) / closes[i-1] * 100
-                    returns.append(ret)
+            # Calculate standard deviation of log returns
+            # Note: This is a simplified calculation. For annualized volatility,
+            # you'd multiply by sqrt(252) for daily data.
+            # For now, we'll return daily volatility.
+            sum_returns = sum(log_returns)
+            mean_return = sum_returns / len(log_returns)
             
-            if len(returns) < period:
-                return None
+            sum_squared_diff = sum((r - mean_return)**2 for r in log_returns)
+            variance = sum_squared_diff / len(log_returns)
+            import math
+            volatility = math.sqrt(variance) * 100  # Convert to percentage
             
-            # Calculate standard deviation of returns
-            mean_return = sum(returns) / len(returns)
-            variance = sum((r - mean_return) ** 2 for r in returns) / len(returns)
-            volatility = variance ** 0.5
+            logger.info(f"📊 Calculated Volatility from database for ticker {ticker_id}: {volatility:.2f}% (period: {period})")
             
-            logger.info(f"📊 Calculated volatility: {volatility:.4f}% (period: {period}, data points: {len(returns)})")
-            
-            return volatility
+            return float(volatility)
             
         except Exception as e:
-            logger.error(f"Error calculating volatility: {e}")
+            logger.error(f"Error calculating Volatility for ticker {ticker_id}: {e}")
             return None
     
     def calculate_rsi(self, historical_data: List[Dict], period: int = 14) -> Optional[float]:

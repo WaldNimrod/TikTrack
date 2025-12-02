@@ -213,6 +213,11 @@
                         hasData: !!tickerData, 
                         symbol: tickerData?.symbol,
                         price: tickerData?.current_price || tickerData?.price,
+                        atr: tickerData?.atr,
+                        week52_high: tickerData?.week52_high,
+                        week52_low: tickerData?.week52_low,
+                        volatility: tickerData?.volatility,
+                        allKeys: tickerData ? Object.keys(tickerData).filter(k => k.includes('atr') || k.includes('week') || k.includes('volatility') || k.includes('52')) : [],
                         page: 'ticker-dashboard' 
                     });
                 }
@@ -222,6 +227,15 @@
             
             if (!tickerData) {
                 throw new Error('Failed to load ticker data - tickerData is null or undefined');
+            }
+            
+            // Store tickerData in window.tickerDashboard for debugging
+            if (window.tickerDashboard) {
+                // Update the getter to return current tickerData
+                Object.defineProperty(window.tickerDashboard, 'tickerData', {
+                    get: () => tickerData,
+                    configurable: true
+                });
             }
             
             // Update page title
@@ -297,16 +311,40 @@
                 window.Logger.info('✅ initTickerDashboard COMPLETE', { page: 'ticker-dashboard' });
             }
             
-            // Restore page state (sections, filters, etc.)
-            await restorePageState('ticker-dashboard');
+            // Restore page state (sections, filters, etc.) - with timeout to prevent hanging
+            try {
+                await Promise.race([
+                    restorePageState('ticker-dashboard'),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('restorePageState timeout')), 5000))
+                ]);
+                if (window.Logger) {
+                    window.Logger.info('✅ restorePageState completed successfully', { page: 'ticker-dashboard' });
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ restorePageState timed out or failed, continuing...', { error: error.message, page: 'ticker-dashboard' });
+                }
+            }
             
-            // Restore section states using unified system
+            // Restore section states using unified system (with timeout to prevent hanging)
             if (typeof window.restoreAllSectionStates === 'function') {
-                await window.restoreAllSectionStates();
+                try {
+                    await Promise.race([
+                        window.restoreAllSectionStates(),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('restoreAllSectionStates timeout')), 5000))
+                    ]);
+                } catch (error) {
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ restoreAllSectionStates timeout or error, continuing anyway', { error: error.message, page: 'ticker-dashboard' });
+                    }
+                }
             }
             
             // Setup section toggle listeners to save state
             setupSectionStateSaving();
+            
+            // Initialize icons (replace icon placeholders)
+            await initializeIcons();
             
             if (typeof window.hideLoadingState === 'function') {
                 window.hideLoadingState('ticker-dashboard-top');
@@ -393,22 +431,80 @@
             const currencySymbol = tickerData.currency_symbol || (tickerData.currency && tickerData.currency.symbol) || '$';
             
             // Format ATR - use FieldRendererService.renderATR() only (no fallback)
-            let atrHtml = '';
-            if (atr !== null && price && price > 0) {
+            let atrHtml = 'N/A';
+            if (atr !== null && atr !== undefined && !isNaN(atr) && price && price > 0) {
                 const atrPercent = (parseFloat(atr) / parseFloat(price)) * 100;
                 if (window.FieldRendererService && typeof window.FieldRendererService.renderATR === 'function') {
-                    atrHtml = await window.FieldRendererService.renderATR(atr, atrPercent);
+                    try {
+                        // Add timeout to prevent hanging
+                        atrHtml = await Promise.race([
+                            window.FieldRendererService.renderATR(atr, atrPercent),
+                            new Promise((_, reject) => setTimeout(() => reject(new Error('ATR render timeout')), 2000))
+                        ]);
+                        // Ensure it's a string, not a Promise
+                        if (atrHtml && typeof atrHtml.then === 'function') {
+                            atrHtml = await Promise.race([
+                                atrHtml,
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('ATR render timeout')), 1000))
+                            ]);
+                        }
+                        if (!atrHtml || atrHtml === '' || typeof atrHtml !== 'string') {
+                            atrHtml = `<span class="atr-value" dir="ltr">${atrPercent.toFixed(2)}%</span>`;
+                        }
+                    } catch (atrError) {
+                        if (window.Logger) {
+                            window.Logger.warn('Error rendering ATR, using fallback', { 
+                                error: atrError.message, 
+                                atr, 
+                                price, 
+                                page: 'ticker-dashboard' 
+                            });
+                        }
+                        // Fallback: simple display
+                        const atrPercent = (parseFloat(atr) / parseFloat(price)) * 100;
+                        atrHtml = `<span class="atr-value" dir="ltr">${atrPercent.toFixed(2)}%</span>`;
+                    }
                 } else {
                     if (window.Logger) {
-                        window.Logger.warn('FieldRendererService.renderATR not available', { page: 'ticker-dashboard' });
+                        window.Logger.warn('FieldRendererService.renderATR not available, using fallback', { page: 'ticker-dashboard' });
                     }
-                    // If FieldRendererService not available, show N/A instead of fallback HTML
-                    atrHtml = 'N/A';
+                    // Fallback: simple display
+                    const atrPercent = (parseFloat(atr) / parseFloat(price)) * 100;
+                    atrHtml = `<span class="atr-value" dir="ltr">${atrPercent.toFixed(2)}%</span>`;
+                }
+            } else {
+                if (window.Logger) {
+                    window.Logger.debug('ATR not available', { 
+                        atr, 
+                        price, 
+                        hasAtr: atr !== null && atr !== undefined,
+                        hasPrice: price && price > 0,
+                        page: 'ticker-dashboard' 
+                    });
                 }
             }
             
-            // Format volume
-            const formattedVolume = volume > 0 ? volume.toLocaleString('he-IL') : 'N/A';
+            // Format volume in millions with 2 decimal places
+            let formattedVolume = 'N/A';
+            if (volume > 0) {
+                const volumeInMillions = volume / 1000000;
+                formattedVolume = `${volumeInMillions.toFixed(2)}M`;
+            }
+            
+            // Calculate monetary value (volume * price)
+            let volumeMonetaryValue = null;
+            if (volume > 0 && price > 0) {
+                volumeMonetaryValue = volume * price;
+            }
+            
+            // Format monetary value in millions with 2 decimal places
+            let formattedVolumeMonetary = '';
+            if (volumeMonetaryValue !== null && volumeMonetaryValue > 0) {
+                const volumeMonetaryInMillions = volumeMonetaryValue / 1000000;
+                formattedVolumeMonetary = `<span dir="ltr" class="text-muted"><small>${currencySymbol}${volumeMonetaryInMillions.toFixed(2)}M</small></span>`;
+            } else {
+                formattedVolumeMonetary = '<span class="text-muted"><small>N/A</small></span>';
+            }
             
             // Format change - use FieldRendererService.renderNumericValue for percentage display
             let changeHtml = '';
@@ -438,22 +534,68 @@
                 priceHtml = `<span dir="ltr">${currencySymbol}${parseFloat(price).toFixed(2)}</span>`;
             }
             
-            // Format 52W range - use week52_high and week52_low from backend
-            let week52Html = 'N/A';
-            if (week52High !== null && week52Low !== null) {
-                let highFormatted, lowFormatted;
+            // Format 52W High - separate card
+            // Maximum (high) = positive color (green)
+            // Display both value and percentage from current price
+            let week52HighHtml = 'N/A';
+            if (week52High !== null && price && price > 0) {
+                let highFormatted;
                 if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
                     highFormatted = window.FieldRendererService.renderAmount(week52High, currencySymbol, 2, false);
-                    lowFormatted = window.FieldRendererService.renderAmount(week52Low, currencySymbol, 2, false);
                 } else {
                     highFormatted = `${currencySymbol}${parseFloat(week52High).toFixed(2)}`;
+                }
+                
+                // Calculate percentage from current price
+                const highPercent = ((parseFloat(week52High) - parseFloat(price)) / parseFloat(price)) * 100;
+                const highPercentFormatted = highPercent >= 0 ? `+${highPercent.toFixed(2)}%` : `${highPercent.toFixed(2)}%`;
+                
+                // Maximum (high) = positive color (text-success)
+                // Display: value (percentage)
+                week52HighHtml = `<span class="text-success" dir="ltr">${highFormatted} (${highPercentFormatted})</span>`;
+            } else if (week52High !== null) {
+                // Fallback if price is not available - show only value
+                let highFormatted;
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
+                    highFormatted = window.FieldRendererService.renderAmount(week52High, currencySymbol, 2, false);
+                } else {
+                    highFormatted = `${currencySymbol}${parseFloat(week52High).toFixed(2)}`;
+                }
+                week52HighHtml = `<span class="text-success" dir="ltr">${highFormatted}</span>`;
+            }
+            
+            // Format 52W Low - separate card
+            // Minimum (low) = negative color (red)
+            // Display both value and percentage from current price
+            let week52LowHtml = 'N/A';
+            if (week52Low !== null && price && price > 0) {
+                let lowFormatted;
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
+                    lowFormatted = window.FieldRendererService.renderAmount(week52Low, currencySymbol, 2, false);
+                } else {
                     lowFormatted = `${currencySymbol}${parseFloat(week52Low).toFixed(2)}`;
                 }
-                week52Html = `${lowFormatted} - ${highFormatted}`;
+                
+                // Calculate percentage from current price
+                const lowPercent = ((parseFloat(week52Low) - parseFloat(price)) / parseFloat(price)) * 100;
+                const lowPercentFormatted = lowPercent >= 0 ? `+${lowPercent.toFixed(2)}%` : `${lowPercent.toFixed(2)}%`;
+                
+                // Minimum (low) = negative color (text-danger)
+                // Display: value (percentage)
+                week52LowHtml = `<span class="text-danger" dir="ltr">${lowFormatted} (${lowPercentFormatted})</span>`;
+            } else if (week52Low !== null) {
+                // Fallback if price is not available - show only value
+                let lowFormatted;
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
+                    lowFormatted = window.FieldRendererService.renderAmount(week52Low, currencySymbol, 2, false);
+                } else {
+                    lowFormatted = `${currencySymbol}${parseFloat(week52Low).toFixed(2)}`;
+                }
+                week52LowHtml = `<span class="text-danger" dir="ltr">${lowFormatted}</span>`;
             }
             
             // Clear container
-            container.innerHTML = '';
+            container.textContent = '';
             
             if (window.Logger) {
                 window.Logger.info('📊 Creating KPI cards', { 
@@ -466,23 +608,48 @@
             }
             
             // Get additional technical indicators
-            const volatility = tickerData.volatility || null;
-            const volatilityHtml = volatility ? `${volatility.toFixed(2)}%` : 'N/A';
+            const volatility = (tickerData.volatility !== null && tickerData.volatility !== undefined) ? tickerData.volatility : null;
+            const volatilityHtml = (volatility !== null && volatility !== undefined && !isNaN(volatility)) ? `${parseFloat(volatility).toFixed(2)}%` : 'N/A';
             
             // Create KPI cards using createElement
             // All technical indicators are now unified in KPI Cards
             // Ensure atrHtml is a string, not a Promise
-            const atrHtmlString = (typeof atrHtml === 'string') ? atrHtml : (atrHtml || 'N/A');
+            let atrHtmlString = 'N/A';
+            if (atrHtml && typeof atrHtml === 'string' && atrHtml.trim() !== '') {
+                atrHtmlString = atrHtml;
+            } else if (atrHtml && typeof atrHtml.then === 'function') {
+                // If it's still a Promise, wait for it
+                try {
+                    atrHtmlString = await atrHtml;
+                    if (!atrHtmlString || typeof atrHtmlString !== 'string') {
+                        atrHtmlString = 'N/A';
+                    }
+                } catch (e) {
+                    atrHtmlString = 'N/A';
+                }
+            }
+            
+            if (window.Logger) {
+                window.Logger.debug('ATR HTML for display', { 
+                    atrHtmlString,
+                    atrHtmlType: typeof atrHtml,
+                    atrHtmlLength: atrHtmlString ? atrHtmlString.length : 0,
+                    page: 'ticker-dashboard' 
+                });
+            }
+            
             const kpiCards = [
                 { label: 'מחיר', value: priceHtml, dir: '', helpKey: null },
                 { label: 'שינוי', value: changeHtml, dir: '', helpKey: null },
                 { label: 'ATR', value: atrHtmlString, dir: '', helpKey: 'atr' },
-                { label: '52W Range', value: week52Html, dir: 'ltr', helpKey: 'week52_range' },
-                { label: 'נפח', value: formattedVolume, dir: 'ltr', helpKey: 'volume' },
+                { label: '52W גבוהה', value: week52HighHtml, dir: 'ltr', helpKey: 'week52_range' },
+                { label: '52W נמוכה', value: week52LowHtml, dir: 'ltr', helpKey: 'week52_range' },
+                { label: 'נפח יומי', value: `${formattedVolume}<br><small class="text-muted">${formattedVolumeMonetary}</small>`, dir: 'ltr', helpKey: 'volume' },
                 { label: 'תנודתיות', value: volatilityHtml, dir: 'ltr', helpKey: 'volatility' }
             ];
             
-            kpiCards.forEach(kpi => {
+            // Use for...of loop instead of forEach to support await
+            for (const kpi of kpiCards) {
                 const colDiv = document.createElement('div');
                 colDiv.className = 'col-md-2 col-sm-4 col-6';
                 
@@ -493,32 +660,80 @@
                 labelDiv.className = 'kpi-label';
                 
                 // Add help icon for technical indicators
-                if (window.TechnicalIndicatorsHelp && window.IconSystem && (kpi.label === 'ATR' || kpi.label === '52W Range' || kpi.label === 'תנודתיות' || kpi.label === 'נפח')) {
+                if (window.TechnicalIndicatorsHelp && window.IconSystem && (kpi.label === 'ATR' || kpi.label === '52W גבוהה' || kpi.label === '52W נמוכה' || kpi.label === 'תנודתיות' || kpi.label === 'נפח יומי')) {
                     const helpKey = kpi.label === 'ATR' ? 'atr' : 
-                                   kpi.label === '52W Range' ? 'week52_range' : 
+                                   (kpi.label === '52W גבוהה' || kpi.label === '52W נמוכה') ? 'week52_range' : 
                                    kpi.label === 'תנודתיות' ? 'volatility' : 
-                                   kpi.label === 'נפח' ? 'volume' : null;
+                                   kpi.label === 'נפח יומי' ? 'volume' : null;
                     if (helpKey) {
                         const helpText = window.TechnicalIndicatorsHelp.getHelpText(helpKey);
-                        // IconSystem.renderIcon returns a Promise, so we need to await it
-                        try {
-                            const helpIcon = await window.IconSystem.renderIcon('button', 'help', {
-                                size: 14,
-                                classes: 'ms-1 help-icon',
-                                onclick: `window.NotificationSystem.showInfo('${kpi.label}', '${helpText.replace(/'/g, "\\'")}')`
-                            });
-                            // Ensure helpIcon is a string, not a Promise
-                            const helpIconString = (typeof helpIcon === 'string') ? helpIcon : (helpIcon || '');
-                            labelDiv.innerHTML = `${kpi.label}${helpIconString}`;
-                        } catch (iconError) {
-                            if (window.Logger) {
-                                window.Logger.warn('Error rendering help icon', { 
-                                    error: iconError.message, 
-                                    helpKey, 
-                                    page: 'ticker-dashboard' 
-                                });
+                        // Use fallback icon immediately to prevent blocking
+                        const escapedHelpText = helpText.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                        // Use tooltip for help icon - show on hover
+                        const helpIconId = `help-icon-${kpi.label.replace(/\s+/g, '-')}-${Date.now()}`;
+                        const fallbackIcon = `<span id="${helpIconId}" class="help-icon ms-1" style="cursor: help; display: inline-block; width: 14px; height: 14px; line-height: 14px; text-align: center; font-size: 12px;" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-html="true" title="${escapedHelpText}" onclick="if(window.NotificationSystem && window.NotificationSystem.showInfo) { window.NotificationSystem.showInfo('${kpi.label}', '${escapedHelpText}'); }">ℹ️</span>`;
+                        
+                        // Try to load icon with timeout, but don't block rendering
+                        labelDiv.innerHTML = `${kpi.label}${fallbackIcon}`;
+                        
+                        // Initialize Bootstrap tooltip for help icon
+                        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                            try {
+                                const helpIconElement = labelDiv.querySelector('.help-icon');
+                                if (helpIconElement) {
+                                    new bootstrap.Tooltip(helpIconElement, {
+                                        placement: 'top',
+                                        trigger: 'hover',
+                                        html: true
+                                    });
+                                }
+                            } catch (tooltipError) {
+                                if (window.Logger) {
+                                    window.Logger.warn('Failed to initialize tooltip for help icon', { error: tooltipError.message, page: 'ticker-dashboard' });
+                                }
                             }
-                            labelDiv.textContent = kpi.label;
+                        }
+                        
+                        // Try to replace with IconSystem icon in background (non-blocking)
+                        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+                            Promise.race([
+                                window.IconSystem.renderIcon('button', 'help', {
+                                    size: 14,
+                                    classes: 'ms-1 help-icon',
+                                    'data-bs-toggle': 'tooltip',
+                                    'data-bs-placement': 'top',
+                                    'data-bs-trigger': 'hover',
+                                    'data-bs-html': 'true',
+                                    title: escapedHelpText,
+                                    onclick: `if(window.NotificationSystem && window.NotificationSystem.showInfo) { window.NotificationSystem.showInfo('${kpi.label}', '${helpText.replace(/'/g, "\\'")}'); }`
+                                }),
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 1000))
+                            ]).then(helpIcon => {
+                                if (helpIcon && typeof helpIcon === 'string') {
+                                    const helpIconSpan = labelDiv.querySelector('.help-icon');
+                                    if (helpIconSpan) {
+                                        // Dispose old tooltip if exists
+                                        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                                            const oldTooltip = bootstrap.Tooltip.getInstance(helpIconSpan);
+                                            if (oldTooltip) {
+                                                oldTooltip.dispose();
+                                            }
+                                        }
+                                        helpIconSpan.outerHTML = helpIcon;
+                                        // Initialize new tooltip
+                                        const newHelpIcon = labelDiv.querySelector('.help-icon');
+                                        if (newHelpIcon && typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                                            new bootstrap.Tooltip(newHelpIcon, {
+                                                placement: 'top',
+                                                trigger: 'hover',
+                                                html: true
+                                            });
+                                        }
+                                    }
+                                }
+                            }).catch(() => {
+                                // Keep fallback icon - already rendered
+                            });
                         }
                     } else {
                         labelDiv.textContent = kpi.label;
@@ -542,7 +757,7 @@
                 cardDiv.appendChild(valueDiv);
                 colDiv.appendChild(cardDiv);
                 container.appendChild(colDiv);
-            });
+            }
             
             if (window.Logger) {
                 window.Logger.info('✅ KPI cards rendered successfully', { 
@@ -622,7 +837,7 @@
             }
             
             // Clear container
-            container.innerHTML = '';
+            container.textContent = '';
             
             // Load TradingView Widget script if not already loaded
             if (!window.TradingView) {
@@ -685,32 +900,76 @@
             }
             
             // Create TradingView Widget
+            // Note: autosize: true makes the widget fill its container
+            // The container must have a defined height (via CSS flex or fixed height)
+            // Default: Daily candles, zoom to 6 months (half year), Moving Averages 20 (blue) and 150 (burgundy)
+            // Candlestick colors based on intraday movement (not previous close)
             new window.TradingView.widget({
-                "autosize": true,
+                "autosize": true, // This makes the widget fill the container height
                 "symbol": symbol,
-                "interval": "D",
+                "interval": "D", // Daily candles by default
                 "timezone": "Etc/UTC",
                 "theme": theme,
                 "style": "1", // Candlestick chart
                 "locale": "he",
-                "toolbar_bg": "#f1f3f6",
+                "toolbar_bg": theme === 'dark' ? "#1e1e1e" : "#f1f3f6",
                 "enable_publishing": false,
                 "allow_symbol_change": true,
                 "hide_top_toolbar": false,
                 "hide_legend": false,
                 "save_image": false,
                 "container_id": "tradingview_widget",
-                "height": "100%",
-                "width": "100%",
+                "width": "100%", // Width is 100% of container
+                // Do NOT set height when using autosize: true - it will fill the container
                 "studies": [
-                    "Volume@tv-basicstudies"
+                    "Volume@tv-basicstudies",
+                    {
+                        id: "MASimple@tv-basicstudies",
+                        inputs: {
+                            length: 20
+                        },
+                        plots: [{
+                            id: "plot_0",
+                            type: "line",
+                            color: "#0000FF" // Blue for MA 20
+                        }]
+                    },
+                    {
+                        id: "MASimple@tv-basicstudies",
+                        inputs: {
+                            length: 150
+                        },
+                        plots: [{
+                            id: "plot_0",
+                            type: "line",
+                            color: "#800020" // Burgundy for MA 150
+                        }]
+                    }
                 ],
                 "show_popup_button": true,
                 "popup_width": "1000",
                 "popup_height": "650",
                 "no_referral_id": true,
                 "referral_id": "",
-                "support_host": "https://www.tradingview.com"
+                "support_host": "https://www.tradingview.com",
+                // Overrides for candlestick colors based on intraday movement (not previous close)
+                // This means: green if close > open (same day), red if close < open (same day)
+                // By default, TradingView colors candles based on intraday movement (close vs open of same candle)
+                // We just need to set the colors explicitly
+                "overrides": {
+                    "mainSeriesProperties.candleStyle.upColor": "#26baac", // Green for up candles (close > open)
+                    "mainSeriesProperties.candleStyle.downColor": "#fc5a06", // Red for down candles (close < open)
+                    "mainSeriesProperties.candleStyle.borderUpColor": "#26baac",
+                    "mainSeriesProperties.candleStyle.borderDownColor": "#fc5a06",
+                    "mainSeriesProperties.candleStyle.wickUpColor": "#26baac",
+                    "mainSeriesProperties.candleStyle.wickDownColor": "#fc5a06",
+                    "paneProperties.background": theme === 'dark' ? "#1e1e1e" : "#ffffff",
+                    "paneProperties.backgroundType": "solid"
+                },
+                // Range: 6 months (half year) - use disabled_features to prevent user from changing range
+                // Note: TradingView widget doesn't support direct range setting in config
+                // The widget will default to showing recent data, user can zoom to 6 months manually
+                // We can't programmatically set the zoom range, but we can suggest it in the UI
             });
             
             if (window.Logger) {
@@ -774,7 +1033,7 @@
             const volatility = tickerData.volatility || null;
             
             // Clear container
-            container.innerHTML = '';
+            container.textContent = '';
             
             // Create technical indicator cards using createElement
             // Note: ATR is now displayed in KPI Cards, not here
@@ -838,7 +1097,7 @@
      * Render user activity
      */
     async function renderUserActivity() {
-        const container = document.getElementById('tickerUserActivity');
+        const container = document.getElementById('tickerActivity');
         if (!container || !tickerId) return;
         
         try {
@@ -877,14 +1136,14 @@
                     // This is acceptable as it's from a centralized system
                     container.innerHTML = html;
                 } else {
-                    container.innerHTML = '';
+                    container.textContent = '';
                     const emptyDiv = document.createElement('div');
                     emptyDiv.className = 'text-muted';
                     emptyDiv.textContent = 'אין פעילות זמינה';
                     container.appendChild(emptyDiv);
                 }
             } else {
-                container.innerHTML = '';
+                container.textContent = '';
                 const emptyDiv = document.createElement('div');
                 emptyDiv.className = 'text-muted';
                 emptyDiv.textContent = 'אין פעילות זמינה';
@@ -935,26 +1194,110 @@
             }
             // Load conditions
             let conditions = [];
-            if (window.TickerDashboardData) {
-                conditions = await window.TickerDashboardData.loadTickerConditions(tickerId);
+            if (window.TickerDashboardData && typeof window.TickerDashboardData.loadTickerConditions === 'function') {
+                try {
+                    conditions = await window.TickerDashboardData.loadTickerConditions(tickerId);
+                    // Ensure conditions is an array
+                    if (!Array.isArray(conditions)) {
+                        conditions = [];
+                    }
+                } catch (loadError) {
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ Error loading conditions, continuing without them', { 
+                            tickerId, 
+                            error: loadError.message || loadError, 
+                            page: 'ticker-dashboard' 
+                        });
+                    }
+                    conditions = [];
+                }
+            } else {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ TickerDashboardData.loadTickerConditions not available', { page: 'ticker-dashboard' });
+                }
             }
             
             // Clear container
-            container.innerHTML = '';
+            container.textContent = '';
             
             if (conditions && conditions.length > 0) {
+                if (window.Logger) {
+                    window.Logger.info('📊 Rendering conditions', { 
+                        conditionsCount: conditions.length,
+                        conditions: conditions.map(c => ({ id: c.id, description: c.description, method: c.method })),
+                        page: 'ticker-dashboard' 
+                    });
+                }
                 conditions.forEach(condition => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'condition-item';
-                    
-                    const descDiv = document.createElement('div');
-                    descDiv.className = 'condition-description';
-                    descDiv.textContent = condition.description || 'תנאי';
-                    
-                    itemDiv.appendChild(descDiv);
-                    container.appendChild(itemDiv);
+                    try {
+                        if (!condition) return; // Skip null/undefined conditions
+                        
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'condition-item';
+                        
+                        // Build description from condition data
+                        let description = '';
+                        if (condition.description) {
+                            description = String(condition.description);
+                        } else if (condition.action_notes) {
+                            description = String(condition.action_notes);
+                        } else if (condition.method_name_he) {
+                            description = String(condition.method_name_he);
+                        } else if (condition.method_name) {
+                            description = String(condition.method_name);
+                        } else if (condition.method) {
+                            if (typeof condition.method === 'string') {
+                                description = condition.method;
+                            } else if (condition.method && typeof condition.method === 'object') {
+                                description = condition.method.name_he || condition.method.name_en || 'תנאי';
+                            } else {
+                                description = 'תנאי';
+                            }
+                        } else {
+                            description = 'תנאי';
+                        }
+                        
+                        // Add method name if available and different from description
+                        if (condition.method_name_he && condition.method_name_he !== description) {
+                            description = `${String(condition.method_name_he)}: ${description}`;
+                        }
+                        
+                        const descDiv = document.createElement('div');
+                        descDiv.className = 'condition-description';
+                        descDiv.textContent = description || 'תנאי';
+                        
+                        // Add plan context if available
+                        if (condition.trade_plan_id || condition.plan_name || condition._plan_name || condition._plan_id) {
+                            const planDiv = document.createElement('div');
+                            planDiv.className = 'condition-plan text-muted small';
+                            const planName = condition.plan_name || condition._plan_name || `תכנית #${condition.trade_plan_id || condition._plan_id || '?'}`;
+                            planDiv.textContent = String(planName);
+                            itemDiv.appendChild(planDiv);
+                        }
+                        
+                        itemDiv.appendChild(descDiv);
+                        container.appendChild(itemDiv);
+                    } catch (itemError) {
+                        if (window.Logger) {
+                            window.Logger.warn('⚠️ Error rendering condition item, skipping', { 
+                                error: itemError.message || itemError, 
+                                conditionId: condition ? (condition.id || 'unknown') : 'null',
+                                page: 'ticker-dashboard' 
+                            });
+                        }
+                        // Continue with next condition instead of crashing
+                    }
                 });
             } else {
+                if (window.Logger) {
+                    window.Logger.info('📊 No conditions to display', { 
+                        tickerId,
+                        conditionsWasNull: conditions === null,
+                        conditionsWasUndefined: conditions === undefined,
+                        conditionsLength: conditions ? conditions.length : 'N/A',
+                        page: 'ticker-dashboard' 
+                    });
+                }
                 const emptyDiv = document.createElement('div');
                 emptyDiv.className = 'text-muted';
                 emptyDiv.textContent = 'אין תנאים זמינים';
@@ -1196,8 +1539,106 @@
     window.tickerDashboard = {
         init: initTickerDashboard,
         refreshData,
-        goBack
+        goBack,
+        get tickerData() {
+            return tickerData;
+        },
+        get tickerId() {
+            return tickerId;
+        }
     };
+
+    /**
+     * Initialize icons by replacing placeholders with IconSystem output
+     * @returns {Promise<void>}
+     */
+    async function initializeIcons() {
+        // Wait for IconSystem to be available
+        if (typeof window.IconSystem === 'undefined') {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ IconSystem not available for icon initialization', { page: 'ticker-dashboard' });
+            }
+            return;
+        }
+
+        // Wait for IconSystem to be initialized
+        if (!window.IconSystem.initialized) {
+            try {
+                await window.IconSystem.initialize();
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Failed to initialize IconSystem', { error: error.message, page: 'ticker-dashboard' });
+                }
+                return;
+            }
+        }
+
+        // Find all icon placeholders
+        const placeholders = document.querySelectorAll('.icon-placeholder[data-icon]');
+        
+        if (placeholders.length === 0) {
+            return; // No icons to initialize
+        }
+
+        // Process each placeholder
+        for (const placeholder of placeholders) {
+            // Check if placeholder is still in DOM
+            if (!placeholder.parentNode || !document.contains(placeholder)) {
+                continue;
+            }
+
+            const iconName = placeholder.getAttribute('data-icon');
+            const size = placeholder.getAttribute('data-size') || '20';
+            const alt = placeholder.getAttribute('data-alt') || iconName;
+            const className = placeholder.className.replace('icon-placeholder', '').trim() || 'icon';
+
+            if (!iconName) {
+                continue;
+            }
+
+            try {
+                // Determine icon type based on icon name
+                // Map icon names to types and actual icon names from mappings
+                const iconNameMap = {
+                    'chart-line': { type: 'button', name: 'chart-line' },
+                    'chart': { type: 'button', name: 'chart-line' }, // chart maps to chart-line
+                    'activity': { type: 'button', name: 'activity' },
+                    'conditions': { type: 'button', name: 'clipboard-list' } // conditions maps to clipboard-list
+                };
+                
+                const iconMapping = iconNameMap[iconName] || { type: 'button', name: iconName };
+                const iconType = iconMapping.type;
+                const actualIconName = iconMapping.name;
+
+                // Render icon using IconSystem
+                const iconHTML = await window.IconSystem.renderIcon(iconType, actualIconName, {
+                    size: size,
+                    alt: alt,
+                    class: className
+                });
+
+                // Replace placeholder with rendered icon
+                if (placeholder.parentNode && document.contains(placeholder)) {
+                    placeholder.outerHTML = iconHTML;
+                }
+            } catch (error) {
+                // Fallback: try to use img tag with path
+                if (placeholder.parentNode && document.contains(placeholder)) {
+                    const fallbackPath = `/trading-ui/images/icons/tabler/${iconName}.svg`;
+                    placeholder.outerHTML = `<img src="${fallbackPath}" width="${size}" height="${size}" alt="${alt}" class="${className}" onerror="this.style.display='none'">`;
+                }
+
+                // Log error if Logger is available
+                if (window.Logger) {
+                    window.Logger.warn('Failed to render icon', {
+                        icon: iconName,
+                        error: error.message,
+                        page: 'ticker-dashboard'
+                    });
+                }
+            }
+        }
+    }
 
     // Note: Initialization is handled by unified-app-initializer via page-initialization-configs.js
     // The custom initializer will call window.tickerDashboard.init() after all systems are loaded

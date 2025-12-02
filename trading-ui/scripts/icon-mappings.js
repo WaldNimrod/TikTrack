@@ -86,6 +86,7 @@ const IconMappings = {
         'info-circle': 'info-circle',
         'bookmark': 'bookmark',
         'alert-circle': 'alert-circle',
+        help: 'info-circle', // Help icon - using info-circle from Tabler
         loader: 'loader', // Loading/spinner icon
         loading: 'loader', // Alias for loader
         spinner: 'loader', // Alias for loader
@@ -111,7 +112,10 @@ const IconMappings = {
         circle: 'circle', // Circle icon
         'file-text': 'file-text', // File text icon
         hourglass: 'hourglass', // Hourglass icon
-        tags: 'tags' // Tags icon (plural)
+        tags: 'tags', // Tags icon (plural)
+        'chart-line': 'chart-line', // Chart line icon
+        chart: 'chart-line', // Chart icon (alias for chart-line)
+        conditions: 'clipboard-list' // Conditions icon (using clipboard-list from Tabler)
     },
 
     /**

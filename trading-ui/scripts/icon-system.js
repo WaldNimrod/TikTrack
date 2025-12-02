@@ -177,11 +177,11 @@
                         type, 
                         name,
                         mappingsExists: !!this.mappings,
-                        buttonMappingsExists: !!this.mappings?.button,
-                        buttonMappingsKeys: this.mappings?.button ? Object.keys(this.mappings.button) : [],
-                        toggleMapping: this.mappings?.button?.toggle,
-                        windowIconMappingsButtons: window.IconMappings?.button ? Object.keys(window.IconMappings.button) : [],
-                        windowToggleMapping: window.IconMappings?.button?.toggle,
+                        buttonMappingsExists: !!this.mappings?.buttons,
+                        buttonMappingsKeys: this.mappings?.buttons ? Object.keys(this.mappings.buttons) : [],
+                        toggleMapping: this.mappings?.buttons?.toggle,
+                        windowIconMappingsButtons: window.IconMappings?.buttons ? Object.keys(window.IconMappings.buttons) : [],
+                        windowToggleMapping: window.IconMappings?.buttons?.toggle,
                         page: 'icon-system' 
                     });
                 }
@@ -189,11 +189,17 @@
                 // Try to get mapping from this.mappings first
                 let mapping = this.mappings?.[type]?.[name];
                 
-                // If mapping not found and this.mappings[type] is empty, try window.IconMappings directly
+                // If mapping not found, try window.IconMappings directly (fallback)
                 if (!mapping && typeof window.IconMappings !== 'undefined' && window.IconMappings && window.IconMappings[type] && window.IconMappings[type][name]) {
                     mapping = window.IconMappings[type][name];
                     // Reload this.mappings from window.IconMappings for future calls
-                    this.mappings = window.IconMappings;
+                    if (!this.mappings) {
+                        this.mappings = {};
+                    }
+                    if (!this.mappings[type]) {
+                        this.mappings[type] = {};
+                    }
+                    this.mappings[type][name] = mapping;
                     if (window.Logger && name === 'toggle') {
                         window.Logger.debug('✅ Icon mapping found via window.IconMappings fallback', { 
                             type, 
@@ -213,56 +219,20 @@
                         iconPath = `${this.tablerPath}${mapping}.svg`;
                     }
                 } else {
-                    // Try to reload mappings from window.IconMappings if available (fallback)
-                    // Use direct access to window.IconMappings to avoid reference issues
-                    if (typeof window.IconMappings !== 'undefined' && window.IconMappings && window.IconMappings[type] && window.IconMappings[type][name]) {
-                        const fallbackMapping = window.IconMappings[type][name];
-                        // Reload this.mappings from window.IconMappings for future calls
-                        this.mappings = window.IconMappings;
-                        if (fallbackMapping) {
-                            if (fallbackMapping.startsWith('/')) {
-                                iconPath = fallbackMapping;
-                            } else {
-                                iconPath = `${this.tablerPath}${fallbackMapping}.svg`;
-                            }
-                            if (window.Logger && name === 'toggle') {
-                                window.Logger.debug('✅ Icon mapping found via fallback mechanism', { 
-                                    type, 
-                                    name,
-                                    mapping: fallbackMapping,
-                                    page: 'icon-system' 
-                                });
-                            }
-                        } else {
-                            // Still no mapping found, try direct Tabler name
-                            if (window.Logger && name === 'toggle') {
-                                window.Logger.warn('⚠️ Icon mapping missing for toggle, trying direct name', { 
-                                    type, 
-                                    name, 
-                                    mappingsAvailable: !!this.mappings,
-                                    buttonMappings: this.mappings?.button ? Object.keys(this.mappings.button) : [],
-                                    iconMappingsGlobal: typeof window.IconMappings !== 'undefined',
-                                    iconMappingsButton: window.IconMappings?.button ? Object.keys(window.IconMappings.button) : [],
-                                    page: 'icon-system' 
-                                });
-                            }
-                            iconPath = `${this.tablerPath}${name}.svg`;
-                        }
-                    } else {
-                        // Try direct Tabler name - but log warning if mapping is missing
-                        if (window.Logger && name === 'toggle') {
-                            window.Logger.warn('⚠️ Icon mapping missing for toggle, trying direct name', { 
-                                type, 
-                                name, 
-                                mappingsAvailable: !!this.mappings,
-                                buttonMappings: this.mappings?.button ? Object.keys(this.mappings.button) : [],
-                                iconMappingsGlobal: typeof window.IconMappings !== 'undefined',
-                                iconMappingsButton: window.IconMappings?.button ? Object.keys(window.IconMappings.button) : [],
-                                page: 'icon-system' 
-                            });
-                        }
-                        iconPath = `${this.tablerPath}${name}.svg`;
+                    // No mapping found - try direct Tabler name
+                    // Only log warning for toggle to reduce noise
+                    if (window.Logger && name === 'toggle') {
+                        window.Logger.debug('ℹ️ Icon mapping not found for toggle, using direct name', { 
+                            type, 
+                            name, 
+                            mappingsAvailable: !!this.mappings,
+                            buttonMappings: this.mappings?.buttons ? Object.keys(this.mappings.buttons) : [],
+                            iconMappingsGlobal: typeof window.IconMappings !== 'undefined',
+                            iconMappingsButton: window.IconMappings?.buttons ? Object.keys(window.IconMappings.buttons) : [],
+                            page: 'icon-system' 
+                        });
                     }
+                    iconPath = `${this.tablerPath}${name}.svg`;
                 }
             }
 

@@ -27,13 +27,13 @@ from models.plan_condition import PlanCondition
 from models.trading_method import TradingMethod
 from models.trading_account import TradingAccount
 from models.ticker import Ticker
-from Backend.config.database import get_database_url
+from config.settings import DATABASE_URL
 
 def create_sample_condition():
     """Create sample trade plan with conditions for QQQ"""
     
     # Database setup
-    engine = create_engine(get_database_url())
+    engine = create_engine(DATABASE_URL)
     Session = sessionmaker(bind=engine)
     session = Session()
     
@@ -82,9 +82,21 @@ def create_sample_condition():
         ).first()
         
         if existing_plan:
-            print(f"⚠️  Trade plan already exists for QQQ: Plan ID {existing_plan.id}")
-            print("   Skipping creation to avoid duplicates")
-            return True
+            print(f"✅ Trade plan already exists for QQQ: Plan ID {existing_plan.id}")
+            print("   Checking if it has conditions...")
+            
+            # Check existing conditions
+            existing_conditions = session.query(PlanCondition).filter(
+                PlanCondition.trade_plan_id == existing_plan.id
+            ).all()
+            
+            if len(existing_conditions) > 0:
+                print(f"   Plan already has {len(existing_conditions)} condition(s)")
+                print("   Skipping creation to avoid duplicates")
+                return True
+            else:
+                print("   Plan has no conditions - will add conditions to existing plan")
+                trade_plan = existing_plan
         
         # Create trade plan
         trade_plan = TradePlan(

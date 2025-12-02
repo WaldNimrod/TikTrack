@@ -443,7 +443,7 @@ function renderAlertsTableRows(alerts) {
       if (window.FieldRendererService && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
         try {
           let displayName = '';
-          let metaForEntity = { renderMode: 'notes-table' };
+          let metaForEntity = { renderMode: 'notes-table' }; // כמו בגרסה הקודמת - מציג שדות לפי סוג ישות
           const relatedType = parseInt(alert.related_type_id, 10);
 
           switch (relatedType) {
@@ -468,7 +468,7 @@ function renderAlertsTableRows(alerts) {
               }
               return null;
             })();
-            const tickerSymbol = tradeTicker || `טרייד ${alert.related_id}`;
+            const tickerSymbol = tradeTicker || null; // רק סימבול, לא מזהה
             const tradeDateEnvelope = window.dateUtils?.ensureDateEnvelope
               ? window.dateUtils.ensureDateEnvelope(
                   trade?.created_at_envelope ||
@@ -486,10 +486,11 @@ function renderAlertsTableRows(alerts) {
                   trade?.date ||
                   null
                 );
-            displayName = tickerSymbol;
+            // displayName צריך להיות הסימבול, לא מזהה
+            displayName = tickerSymbol || `טרייד ${alert.related_id}`;
             metaForEntity = {
               renderMode: 'notes-table',
-              ticker: tickerSymbol,
+              ticker: tickerSymbol, // רק סימבול
               date: tradeDateEnvelope,
               date_envelope: tradeDateEnvelope,
               status: trade?.status || '',
@@ -507,7 +508,7 @@ function renderAlertsTableRows(alerts) {
               }
               return null;
             })();
-            const tickerSymbol = planTicker || `תוכנית ${alert.related_id}`;
+            const tickerSymbol = planTicker || null; // רק סימבול, לא מזהה
             const planDateEnvelope = window.dateUtils?.ensureDateEnvelope
               ? window.dateUtils.ensureDateEnvelope(
                   plan?.created_at_envelope ||
@@ -523,10 +524,11 @@ function renderAlertsTableRows(alerts) {
                   plan?.date ||
                   null
                 );
-            displayName = tickerSymbol;
+            // displayName צריך להיות הסימבול, לא מזהה
+            displayName = tickerSymbol || `תוכנית ${alert.related_id}`;
             metaForEntity = {
               renderMode: 'notes-table',
-              ticker: tickerSymbol,
+              ticker: tickerSymbol, // רק סימבול
               date: planDateEnvelope,
               date_envelope: planDateEnvelope,
               status: plan?.status || '',
@@ -538,11 +540,12 @@ function renderAlertsTableRows(alerts) {
           }
           case 4: { // Ticker
             const ticker = tickers.find(tk => tk && tk.id === alert.related_id);
-            const tickerSymbol = ticker?.symbol || `טיקר ${alert.related_id}`;
-            displayName = tickerSymbol;
+            const tickerSymbol = ticker?.symbol || null; // רק סימבול, לא מזהה
+            // displayName צריך להיות הסימבול, לא מזהה
+            displayName = tickerSymbol || `טיקר ${alert.related_id}`;
             metaForEntity = {
               renderMode: 'notes-table',
-              ticker: tickerSymbol,
+              ticker: tickerSymbol, // רק סימבול
               status: ticker?.status || ''
             };
             break;
@@ -837,158 +840,199 @@ function renderAlertsTableRows(alerts) {
             }
           })();
 
+      // בניית תוכן השורה - שומרים את כל הלוגיקה הקיימת
+      const updatedDateCell = (() => {
+        // Prefer FieldRendererService.renderDate for consistent date formatting
+        const rawDate = alert.updated_at || alert.triggered_at || alert.created_at || null;
+        
+        if (!rawDate) {
+          return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+        }
+
+        // Use FieldRendererService.renderDate for proper date formatting
+        let dateDisplay = '';
+        let epoch = null;
+
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+          // Use FieldRendererService to render date with time
+          dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+          
+          // Get epoch for sorting
+          if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+            const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+            epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+          } else if (rawDate instanceof Date) {
+            epoch = rawDate.getTime();
+          } else if (typeof rawDate === 'string') {
+            const parsed = Date.parse(rawDate);
+            epoch = Number.isNaN(parsed) ? null : parsed;
+          } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+            epoch = rawDate.epochMs;
+          }
+        } else {
+          // Fallback: work directly with date envelope objects or raw values
+          const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+            ? window.dateUtils.ensureDateEnvelope(rawDate)
+            : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+              ? rawDate
+              : null;
+
+          // Derive epoch milliseconds in a canonical way
+          epoch = (() => {
+            if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+              return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+            }
+            if (typeof window.getEpochMilliseconds === 'function') {
+              return window.getEpochMilliseconds(envelope || rawDate);
+            }
+            if (envelope && typeof envelope.epochMs === 'number') {
+              return envelope.epochMs;
+            }
+            if (rawDate instanceof Date) {
+              return rawDate.getTime();
+            }
+            if (typeof rawDate === 'string') {
+              const parsed = Date.parse(rawDate);
+              return Number.isNaN(parsed) ? null : parsed;
+            }
+            return null;
+          })();
+
+          if (epoch === null || Number.isNaN(epoch)) {
+            return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+          }
+
+          // Build date display using unified date utilities
+          dateDisplay = (() => {
+            if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+              return window.dateUtils.formatDateTime(envelope || rawDate);
+            }
+            if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+              return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+            }
+            try {
+              const dateObj = new Date(epoch);
+              return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              }));
+            } catch (err) {
+              window.Logger?.warn('⚠️ alerts updated-cell date formatting failed', { err, alertId: alert?.id }, { page: 'alerts' });
+              return 'לא מוגדר';
+            }
+          })();
+        }
+
+        if (!dateDisplay || dateDisplay === '-') {
+          return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+        }
+
+        return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
+      })();
+      
+      const actionsMenu = (() => {
+        if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+        const result = window.createActionsMenu([
+          { type: 'VIEW', onclick: `window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })`, title: 'צפה בפרטי התראה' },
+          { type: 'EDIT', onclick: `editAlert(${alert.id})`, title: 'ערוך התראה' },
+          { type: alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})`, title: alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },
+          { type: 'DELETE', onclick: `deleteAlert(${alert.id})`, title: 'מחק התראה' }
+        ]);
+        return result || '';
+      })();
+      
       return `
-        <tr data-status="${alert.status || ''}" data-date="${createdAtDataAttr || ''}">
-          <td class="related-cell">
-            ${relatedCellHtml}
-          </td>
-          <td class="ticker-cell">
-            <div class="ticker-cell-content">
-              <span class="ticker-symbol-link" 
-                    data-onclick="showEntityDetails('alert', ${alert.id}); return false;" 
-                    title="פרטי התראה">
-                ${symbolDisplay}
-              </span>
-            </div>
-          </td>
-          <td><span class="condition-text">${(() => {
-    if (alert.condition_attribute && alert.condition_operator &&
-        alert.condition_number && window.translateConditionFields) {
-      return window.translateConditionFields(
-        alert.condition_attribute,
-        alert.condition_operator,
-        alert.condition_number,
-      );
-    }
-    return alert.condition || '-';
-  })()}</span></td>
-          <td class="status-cell" data-status="${alert.status || ''}">
-            ${window.FieldRendererService.renderStatus(alert.status, 'alert')}
-          </td>
-          <td>
-            ${window.renderBoolean ? window.renderBoolean(alert.is_triggered) : 
-              `<span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span>`}
-          </td>
-          <td class="text-center">
-            ${getConditionSourceDisplay(alert)}
-          </td>
-          <td data-date="${createdAtDataAttr || ''}"><span class="date-text">${createdAtDisplay}</span></td>
-          <td data-date="${triggeredAtDataAttr || ''}"><span class="date-text">${triggeredAtDisplay}</span></td>
-          <td data-date="${expiryDataAttr || ''}"><span class="date-text">${expiryDisplay}</span></td>
-          ${(() => {
-            // Prefer FieldRendererService.renderDate for consistent date formatting
-            const rawDate = alert.updated_at || alert.triggered_at || alert.created_at || null;
-            
-            if (!rawDate) {
-              return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-            }
-
-            // Use FieldRendererService.renderDate for proper date formatting
-            let dateDisplay = '';
-            let epoch = null;
-
-            if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-              // Use FieldRendererService to render date with time
-              dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
-              
-              // Get epoch for sorting
-              if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-                const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
-                epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
-              } else if (rawDate instanceof Date) {
-                epoch = rawDate.getTime();
-              } else if (typeof rawDate === 'string') {
-                const parsed = Date.parse(rawDate);
-                epoch = Number.isNaN(parsed) ? null : parsed;
-              } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
-                epoch = rawDate.epochMs;
-              }
-            } else {
-              // Fallback: work directly with date envelope objects or raw values
-              const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
-                ? window.dateUtils.ensureDateEnvelope(rawDate)
-                : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
-                  ? rawDate
-                  : null;
-
-              // Derive epoch milliseconds in a canonical way
-              epoch = (() => {
-                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-                  return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
-                }
-                if (typeof window.getEpochMilliseconds === 'function') {
-                  return window.getEpochMilliseconds(envelope || rawDate);
-                }
-                if (envelope && typeof envelope.epochMs === 'number') {
-                  return envelope.epochMs;
-                }
-                if (rawDate instanceof Date) {
-                  return rawDate.getTime();
-                }
-                if (typeof rawDate === 'string') {
-                  const parsed = Date.parse(rawDate);
-                  return Number.isNaN(parsed) ? null : parsed;
-                }
-                return null;
-              })();
-
-              if (epoch === null || Number.isNaN(epoch)) {
-                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-              }
-
-              // Build date display using unified date utilities
-              dateDisplay = (() => {
-                if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
-                  return window.dateUtils.formatDateTime(envelope || rawDate);
-                }
-                if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
-                  return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
-                }
-                try {
-                  const dateObj = new Date(epoch);
-                  return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  }));
-                } catch (err) {
-                  window.Logger?.warn('⚠️ alerts updated-cell date formatting failed', { err, alertId: alert?.id }, { page: 'alerts' });
-                  return 'לא מוגדר';
-                }
-              })();
-            }
-
-            if (!dateDisplay || dateDisplay === '-') {
-              return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-            }
-
-            return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
-          })()}
-          <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
-            ${(() => {
-              if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
-              const result = window.createActionsMenu([
-                { type: 'VIEW', onclick: `window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })`, title: 'צפה בפרטי התראה' },
-                { type: 'EDIT', onclick: `editAlert(${alert.id})`, title: 'ערוך התראה' },
-                { type: alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})`, title: alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },
-                { type: 'DELETE', onclick: `deleteAlert(${alert.id})`, title: 'מחק התראה' }
-              ]);
-              return result || '';
-            })()}
-          </td>
-        </tr>
+        <td class="related-cell">
+          ${relatedCellHtml}
+        </td>
+        <td class="ticker-cell">
+          <div class="ticker-cell-content">
+            <span class="ticker-symbol-link" 
+                  data-onclick="showEntityDetails('alert', ${alert.id}); return false;" 
+                  title="פרטי התראה">
+              ${symbolDisplay}
+            </span>
+          </div>
+        </td>
+        <td><span class="condition-text">${(() => {
+          if (alert.condition_attribute && alert.condition_operator &&
+              alert.condition_number && window.translateConditionFields) {
+            return window.translateConditionFields(
+              alert.condition_attribute,
+              alert.condition_operator,
+              alert.condition_number,
+            );
+          }
+          return alert.condition || '-';
+        })()}</span></td>
+        <td class="status-cell" data-status="${alert.status || ''}">
+          ${window.FieldRendererService.renderStatus(alert.status, 'alert')}
+        </td>
+        <td>
+          ${window.renderBoolean ? window.renderBoolean(alert.is_triggered) : 
+            `<span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span>`}
+        </td>
+        <td class="text-center">
+          ${getConditionSourceDisplay(alert)}
+        </td>
+        <td data-date="${createdAtDataAttr || ''}"><span class="date-text">${createdAtDisplay}</span></td>
+        <td data-date="${triggeredAtDataAttr || ''}"><span class="date-text">${triggeredAtDisplay}</span></td>
+        <td data-date="${expiryDataAttr || ''}"><span class="date-text">${expiryDisplay}</span></td>
+        ${updatedDateCell}
+        <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
+          ${actionsMenu}
+        </td>
       `;
-    }).join('');
-
-    // Insert rows using tempDiv
+    });
+    
+    // בניית שורות הטבלה - כמו ב-notes.js: יוצרים row וממלאים עם innerHTML
     tbody.textContent = '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = tableHTML;
-    while (tempDiv.firstChild) {
-      tbody.appendChild(tempDiv.firstChild);
-    }
+    alerts.forEach((alert, index) => {
+      const row = document.createElement('tr');
+      row.setAttribute('data-status', alert.status || '');
+      // חישוב createdAtDataAttr - צריך לחשב מחדש כי זה בתוך הלולאה
+      const createdRawEnvelope =
+        alert.created_at_envelope ||
+        alert.createdAtEnvelope ||
+        alert.created_atEnvelope ||
+        alert.createdAt_envelope ||
+        null;
+      const createdSource =
+        createdRawEnvelope ||
+        alert.created_at ||
+        alert.createdAt ||
+        alert.created_at_utc ||
+        alert.createdAtUtc ||
+        alert.created_at_iso ||
+        alert.createdAtIso ||
+        alert.created_at_local ||
+        alert.createdAtLocal ||
+        null;
+      const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(createdSource)
+        : createdSource;
+      const createdDateObj = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(createdEnvelope || null)
+        : (createdEnvelope && typeof createdEnvelope === 'object' && typeof createdEnvelope.epochMs === 'number'
+          ? new Date(createdEnvelope.epochMs)
+          : (createdEnvelope ? new Date(createdEnvelope) : null));
+      const createdAtDataAttr = window.dateUtils?.getEpochMilliseconds
+        ? window.dateUtils.getEpochMilliseconds(createdEnvelope)
+        : (() => {
+            if (!createdDateObj || Number.isNaN(createdDateObj.getTime())) {return '';}
+            try {
+              return createdDateObj.getTime();
+            } catch {
+              return '';
+            }
+          })();
+      row.setAttribute('data-date', createdAtDataAttr || '');
+      row.innerHTML = tableHTML[index];
+      tbody.appendChild(row);
+    });
 
     // עדכון ספירת רשומות - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
     if (window.updateTableCount) {
@@ -1300,7 +1344,11 @@ function populateSelect(selectId, data, field, prefix = '') {
       return;
     }
 
-  select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+  select.textContent = '';
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = 'בחר אובייקט לשיוך...';
+  select.appendChild(defaultOption);
 
   if (!data || data.length === 0) {
     window.Logger?.debug('No data available for select', { selectId, page: "alerts" });
@@ -1596,7 +1644,11 @@ function populateRelatedObjects(relationTypeId) {
     if (!selectElement) {return;}
 
     // ניקוי הרשימה
-    selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+    selectElement.textContent = '';
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'בחר אובייקט לשיוך...';
+    selectElement.appendChild(defaultOption);
 
   // מילוי לפי סוג השיוך
   switch (parseInt(relationTypeId)) {
@@ -1824,7 +1876,14 @@ window.debugAlertForm = function() {
   
   // Test field collection exactly as saveAlert does
   console.group('🧪 Test Collection (as in saveAlert)');
-  const testCollection = {
+  // Use DataCollectionService if available for test collection
+  const testCollection = window.DataCollectionService ? {
+    relatedType: window.DataCollectionService.getValue('alertRelatedType', 'text', '') || '',
+    relatedId: window.DataCollectionService.getValue('alertRelatedObject', 'text', '') || '',
+    conditionAttribute: window.DataCollectionService.getValue('alertType', 'text', '') || '',
+    conditionOperator: window.DataCollectionService.getValue('alertCondition', 'text', '') || '',
+    conditionNumber: window.DataCollectionService.getValue('alertValue', 'text', '') || ''
+  } : {
     relatedType: form.querySelector('#alertRelatedType')?.value || '',
     relatedId: form.querySelector('#alertRelatedObject')?.value || '',
     conditionAttribute: form.querySelector('#alertType')?.value || '',
@@ -1919,9 +1978,11 @@ window.testAlertPayload = async function() {
     relatedType = window.DataCollectionService.getValue('alertRelatedType', 'text', '');
     relatedId = window.DataCollectionService.getValue('alertRelatedObject', 'text', '');
   } else {
-    // Fallback if DataCollectionService is not available
-    relatedType = form.querySelector('#alertRelatedType')?.value || '';
-    relatedId = form.querySelector('#alertRelatedObject')?.value || '';
+    // Fallback if DataCollectionService is not available - use direct querySelector
+    const relatedTypeEl = form.querySelector('#alertRelatedType');
+    const relatedIdEl = form.querySelector('#alertRelatedObject');
+    relatedType = relatedTypeEl?.value || '';
+    relatedId = relatedIdEl?.value || '';
   }
   
   const alertTypeField = form.querySelector('#alertType');
@@ -1953,7 +2014,8 @@ window.testAlertPayload = async function() {
   if (window.RichTextEditorService && typeof window.RichTextEditorService.getContent === 'function') {
     message = window.RichTextEditorService.getContent('alertName') || '';
   } else {
-    message = form.querySelector('#alertName')?.value || '';
+    const alertNameEl = form.querySelector('#alertName');
+    message = alertNameEl?.value || '';
   }
   
   // Get status - Use DataCollectionService if available
@@ -1964,11 +2026,15 @@ window.testAlertPayload = async function() {
     isTriggeredHidden = window.DataCollectionService.getValue('alertIsTriggered_hidden', 'text', 'false');
     expiryDate = window.DataCollectionService.getValue('alertExpiryDate', 'dateOnly', null);
   } else {
-    // Fallback if DataCollectionService is not available
-    statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
-    statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
-    isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
-    expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
+    // Fallback if DataCollectionService is not available - use direct querySelector
+    const statusCombinedEl = form.querySelector('#alertStatusCombined');
+    const statusHiddenEl = form.querySelector('#alertStatus_hidden');
+    const isTriggeredHiddenEl = form.querySelector('#alertIsTriggered_hidden');
+    const expiryDateEl = form.querySelector('#alertExpiryDate');
+    statusCombined = statusCombinedEl?.value || 'new';
+    statusHidden = statusHiddenEl?.value || 'open';
+    isTriggeredHidden = isTriggeredHiddenEl?.value || 'false';
+    expiryDate = expiryDateEl?.value || null;
   }
   
   const status = statusHidden;
@@ -2085,9 +2151,16 @@ async function saveAlert() {
   let tagIds = [];
 
   if (isNewForm) {
-    // New form structure (ModalManagerV2)
-    relatedType = form.querySelector('#alertRelatedType')?.value || '';
-    relatedId = form.querySelector('#alertRelatedObject')?.value || '';
+    // New form structure (ModalManagerV2) - use DataCollectionService if available
+    if (window.DataCollectionService) {
+      relatedType = window.DataCollectionService.getValue('alertRelatedType', 'text', '') || '';
+      relatedId = window.DataCollectionService.getValue('alertRelatedObject', 'text', '') || '';
+    } else {
+      const relatedTypeEl = form.querySelector('#alertRelatedType');
+      const relatedIdEl = form.querySelector('#alertRelatedObject');
+      relatedType = relatedTypeEl?.value || '';
+      relatedId = relatedIdEl?.value || '';
+    }
     
     // Get condition fields - ensure they are not null/undefined
     const alertTypeField = form.querySelector('#alertType');
@@ -2156,7 +2229,8 @@ async function saveAlert() {
     if (window.RichTextEditorService && typeof window.RichTextEditorService.getContent === 'function') {
       message = window.RichTextEditorService.getContent('alertName') || '';
     } else {
-      message = form.querySelector('#alertName')?.value || '';
+      const alertNameEl = form.querySelector('#alertName');
+      message = alertNameEl?.value || '';
     }
     
     // Get combined status and parse to status + is_triggered - Use DataCollectionService if available
@@ -2330,10 +2404,19 @@ async function saveAlert() {
     return;
   }
 
-  // Check if editing (form has alert ID)
-  const alertId = form.querySelector('input[name="id"]')?.value || 
-                  form.querySelector('[data-alert-id]')?.getAttribute('data-alert-id') ||
-                  form.closest('.modal')?.querySelector('[data-alert-id]')?.getAttribute('data-alert-id');
+  // Check if editing (form has alert ID) - try DataCollectionService first, then querySelector
+  let alertId = null;
+  const idInput = form.querySelector('input[name="id"]');
+  if (idInput && idInput.id && window.DataCollectionService) {
+    alertId = window.DataCollectionService.getValue(idInput.id, 'int', null);
+  } else if (idInput) {
+    alertId = idInput.value || null;
+  }
+  if (!alertId) {
+    const dataAlertId = form.querySelector('[data-alert-id]')?.getAttribute('data-alert-id') ||
+                        form.closest('.modal')?.querySelector('[data-alert-id]')?.getAttribute('data-alert-id');
+    alertId = dataAlertId || null;
+  }
   
   const isEdit = !!alertId;
   
@@ -3668,7 +3751,11 @@ function loadConditionsFromSource() {
     
     if (!sourceType) {
         sourceIdSelect.disabled = true;
-        sourceIdSelect.innerHTML = '<option value="">בחר קודם מקור</option>';
+        sourceIdSelect.textContent = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'בחר קודם מקור';
+        sourceIdSelect.appendChild(defaultOption);
         return;
     }
     
@@ -3708,7 +3795,11 @@ async function loadTradePlansForConditions() {
             const tradePlansData = await response.json();
             const tradePlans = Array.isArray(tradePlansData?.data) ? tradePlansData.data : (Array.isArray(tradePlansData) ? tradePlansData : []);
             
-            sourceIdSelect.innerHTML = '<option value="">בחר תכנית מסחר</option>';
+            sourceIdSelect.textContent = '';
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'בחר תכנית מסחר';
+            sourceIdSelect.appendChild(defaultOption);
             tradePlans.forEach(plan => {
                 const option = document.createElement('option');
                 option.value = plan.id;
@@ -3755,7 +3846,11 @@ async function loadTradesForConditions() {
             const tradesData = await response.json();
             const trades = Array.isArray(tradesData?.data) ? tradesData.data : (Array.isArray(tradesData) ? tradesData : []);
             
-            sourceIdSelect.innerHTML = '<option value="">בחר טרייד</option>';
+            sourceIdSelect.textContent = '';
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'בחר טרייד';
+            sourceIdSelect.appendChild(defaultOption);
             trades.forEach(trade => {
                 const option = document.createElement('option');
                 option.value = trade.id;
@@ -3795,8 +3890,14 @@ async function loadConditionsFromItem() {
     }
     
     if (!sourceType || !sourceId) {
-        document.getElementById('availableConditionsList').innerHTML = 
-            '<div class="text-muted text-center py-3">בחר מקור ופריט כדי לראות תנאים זמינים</div>';
+        const conditionsList = document.getElementById('availableConditionsList');
+        if (conditionsList) {
+          conditionsList.textContent = '';
+          const div = document.createElement('div');
+          div.className = 'text-muted text-center py-3';
+          div.textContent = 'בחר מקור ופריט כדי לראות תנאים זמינים';
+          conditionsList.appendChild(div);
+        }
         return;
     }
     
@@ -3827,7 +3928,11 @@ function displayAvailableConditions(conditions, sourceType) {
     const container = document.getElementById('availableConditionsList');
     
     if (!conditions || conditions.length === 0) {
-        container.innerHTML = '<div class="text-muted text-center py-3">אין תנאים זמינים לפריט זה</div>';
+        container.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted text-center py-3';
+        div.textContent = 'אין תנאים זמינים לפריט זה';
+        container.appendChild(div);
         return;
     }
     
@@ -3847,7 +3952,12 @@ function displayAvailableConditions(conditions, sourceType) {
     });
     html += '</div>';
     
-    container.innerHTML = html;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    container.textContent = '';
+    doc.body.childNodes.forEach(node => {
+      container.appendChild(node.cloneNode(true));
+    });
 }
 
 /**
@@ -4091,7 +4201,9 @@ function showEvaluationLoading() {
     const resultsDiv = document.getElementById('conditionEvaluationResults');
     if (resultsDiv) {
         resultsDiv.style.display = 'block';
-        resultsDiv.innerHTML = `
+        resultsDiv.textContent = '';
+        const parser = new DOMParser();
+        const loadingHTML = `
             <div class="alert alert-info">
                 <h5>📊 הערכת תנאים</h5>
                 <div class="d-flex align-items-center">
@@ -4102,6 +4214,10 @@ function showEvaluationLoading() {
                 </div>
             </div>
         `;
+        const doc = parser.parseFromString(loadingHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            resultsDiv.appendChild(node.cloneNode(true));
+        });
     }
 }
 
@@ -4119,7 +4235,7 @@ function displayEvaluationResults(data) {
         const evaluationTime = window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'));
         
         // Use createElement instead of innerHTML for better security
-        resultsDiv.innerHTML = ''; // Clear first
+        resultsDiv.textContent = ''; // Clear first
         
         const alertDiv = document.createElement('div');
         alertDiv.className = 'alert alert-info';
@@ -4269,14 +4385,14 @@ async function displayAlertTickerInfo(ticker) {
     }
     
     if (tickerInfoDiv) {
+      tickerInfoDiv.textContent = '';
+      let tickerInfoHtml = '';
       if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
-        const tickerInfoHtml = await window.FieldRendererService.renderTickerInfo(ticker);
-        tickerInfoDiv.innerHTML = tickerInfoHtml;
+        tickerInfoHtml = await window.FieldRendererService.renderTickerInfo(ticker);
       } else if (window.renderTickerInfo) {
-        const tickerInfoHtml = await window.renderTickerInfo(ticker, 'ticker-info-display');
-        tickerInfoDiv.innerHTML = tickerInfoHtml;
+        tickerInfoHtml = await window.renderTickerInfo(ticker, 'ticker-info-display');
       } else {
-        tickerInfoDiv.innerHTML = `
+        tickerInfoHtml = `
           <div class="ticker-info-display">
             <div class="d-flex flex-wrap align-items-center gap-2">
               <strong>${(ticker.currency_symbol || '$')}${(ticker.current_price || 0).toFixed(2)}</strong>
@@ -4289,6 +4405,13 @@ async function displayAlertTickerInfo(ticker) {
             </div>
           </div>
         `;
+      }
+      if (tickerInfoHtml) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(tickerInfoHtml, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          tickerInfoDiv.appendChild(node.cloneNode(true));
+        });
       }
     }
     window.Logger?.info?.('✅ [displayAlertTickerInfo] Ticker rendered (primary containers)', {
@@ -4324,14 +4447,21 @@ async function displayAlertTickerInfo(ticker) {
     }
   }
   
+  legacyTickerInfoDiv.textContent = '';
+  let tickerInfoHtml = '';
   if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
-    const tickerInfoHtml = await window.FieldRendererService.renderTickerInfo(ticker);
-    legacyTickerInfoDiv.innerHTML = tickerInfoHtml;
+    tickerInfoHtml = await window.FieldRendererService.renderTickerInfo(ticker);
   } else {
-    const tickerInfoHtml = window.renderTickerInfo
+    tickerInfoHtml = window.renderTickerInfo
       ? await window.renderTickerInfo(ticker, 'ticker-info-display')
       : `<strong>${ticker.symbol || 'N/A'}</strong>`;
-    legacyTickerInfoDiv.innerHTML = tickerInfoHtml;
+  }
+  if (tickerInfoHtml) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(tickerInfoHtml, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      legacyTickerInfoDiv.appendChild(node.cloneNode(true));
+    });
   }
   window.Logger?.info?.('✅ [displayAlertTickerInfo] Ticker rendered (legacy)', {}, { page: "alerts" });
 }
@@ -4356,7 +4486,7 @@ function clearAlertTickerInfo() {
   }
   
   if (tickerInfoDiv) {
-    tickerInfoDiv.innerHTML = '';
+    tickerInfoDiv.textContent = '';
   }
   
   if (legacyTickerInfoDiv) {

@@ -589,14 +589,340 @@ async function updateNotesTable(notes, options = {}) {
           tableType: 'notes',
           data: safeNotes,
           render: async (pageData, context) => {
-            // Render with additional data
-            const rows = renderNotesTableRows(pageData, additionalData);
+            // Render with additional data - כמו ב-cash_flows: יוצרים row וממלאים עם innerHTML
             tbody.textContent = '';
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = rows;
-            while (tempDiv.firstChild) {
-              tbody.appendChild(tempDiv.firstChild);
-            }
+            pageData.forEach(note => {
+              const row = document.createElement('tr');
+              row.className = 'table-cell-clickable';
+              
+              // קביעת האובייקט המקושר
+              // קביעת האובייקט המקושר - כמו במודול מקושרים: שימוש ב-FieldRendererService עם renderMode: 'linked-items-table'
+              let relatedCellHtml = '-';
+              if (note.related_type_id && note.related_id && window.FieldRendererService && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
+                try {
+                  let displayName = '';
+                  let metaForEntity = { renderMode: 'notes-table' }; // כמו בגרסה הקודמת - מציג שדות לפי סוג ישות
+                  const relatedType = parseInt(note.related_type_id, 10);
+                  
+                  switch (relatedType) {
+                    case 1: { // Trading Account
+                      const account = additionalData.accounts?.find(a => a && a.id === note.related_id);
+                      const accountName = account?.name || account?.account_name || `חשבון מסחר ${note.related_id}`;
+                      displayName = accountName;
+                      metaForEntity = {
+                        renderMode: 'notes-table',
+                        name: accountName,
+                        status: account?.status || '',
+                        currency: account?.currency_symbol || account?.currency || ''
+                      };
+                      break;
+                    }
+                    case 2: { // Trade
+                      const trade = additionalData.trades?.find(t => t && t.id === note.related_id);
+                      const tradeTicker = trade?.ticker_symbol || trade?.ticker?.symbol || (() => {
+                        if (trade?.ticker_id) {
+                          const ticker = additionalData.tickers?.find(tk => tk && tk.id === trade.ticker_id);
+                          return ticker?.symbol;
+                        }
+                        return null;
+                      })();
+                      const tickerSymbol = tradeTicker || null; // רק סימבול, לא מזהה
+                      const tradeDateEnvelope = window.dateUtils?.ensureDateEnvelope
+                        ? window.dateUtils.ensureDateEnvelope(
+                            trade?.created_at_envelope ||
+                            trade?.createdAtEnvelope ||
+                            trade?.created_at ||
+                            trade?.opened_at ||
+                            trade?.date ||
+                            null
+                          )
+                        : (
+                            trade?.created_at_envelope ||
+                            trade?.createdAtEnvelope ||
+                            trade?.created_at ||
+                            trade?.opened_at ||
+                            trade?.date ||
+                            null
+                          );
+                      // displayName צריך להיות הסימבול, לא מזהה
+                      displayName = tickerSymbol || `טרייד ${note.related_id}`;
+                      metaForEntity = {
+                        renderMode: 'notes-table',
+                        ticker: tickerSymbol, // רק סימבול
+                        date: tradeDateEnvelope,
+                        date_envelope: tradeDateEnvelope,
+                        status: trade?.status || '',
+                        side: trade?.side || '',
+                        investment_type: trade?.investment_type || ''
+                      };
+                      break;
+                    }
+                    case 3: { // Trade Plan
+                      const plan = additionalData.tradePlans?.find(p => p && p.id === note.related_id);
+                      const planTicker = plan?.ticker?.symbol || plan?.ticker_symbol || (() => {
+                        if (plan?.ticker_id) {
+                          const ticker = additionalData.tickers?.find(tk => tk && tk.id === plan.ticker_id);
+                          return ticker?.symbol;
+                        }
+                        return null;
+                      })();
+                      const tickerSymbol = planTicker || null; // רק סימבול, לא מזהה
+                      const planDateEnvelope = window.dateUtils?.ensureDateEnvelope
+                        ? window.dateUtils.ensureDateEnvelope(
+                            plan?.created_at_envelope ||
+                            plan?.createdAtEnvelope ||
+                            plan?.created_at ||
+                            plan?.date ||
+                            null
+                          )
+                        : (
+                            plan?.created_at_envelope ||
+                            plan?.createdAtEnvelope ||
+                            plan?.created_at ||
+                            plan?.date ||
+                            null
+                          );
+                      // displayName צריך להיות הסימבול, לא מזהה
+                      displayName = tickerSymbol || `תוכנית ${note.related_id}`;
+                      metaForEntity = {
+                        renderMode: 'notes-table',
+                        ticker: tickerSymbol, // רק סימבול
+                        date: planDateEnvelope,
+                        date_envelope: planDateEnvelope,
+                        status: plan?.status || '',
+                        side: plan?.side || '',
+                        investment_type: plan?.investment_type || '',
+                        planned_amount: plan?.planned_amount || plan?.plannedAmount || null
+                      };
+                      break;
+                    }
+                    case 4: { // Ticker
+                      const ticker = additionalData.tickers?.find(tk => tk && tk.id === note.related_id);
+                      const tickerSymbol = ticker?.symbol || null; // רק סימבול, לא מזהה
+                      // displayName צריך להיות הסימבול, לא מזהה
+                      displayName = tickerSymbol || `טיקר ${note.related_id}`;
+                      metaForEntity = {
+                        renderMode: 'notes-table',
+                        ticker: tickerSymbol, // רק סימבול
+                        status: ticker?.status || ''
+                      };
+                      break;
+                    }
+                    default: {
+                      displayName = `אובייקט ${note.related_id}`;
+                      metaForEntity = { renderMode: 'notes-table' };
+                    }
+                  }
+                  
+                  relatedCellHtml = window.FieldRendererService.renderLinkedEntity(
+                    note.related_type_id,
+                    note.related_id,
+                    displayName,
+                    metaForEntity
+                  );
+                } catch (error) {
+                  window.Logger?.warn('⚠️ renderLinkedEntity failed for note row, falling back to dash', { error, noteId: note?.id }, { page: "notes" });
+                  relatedCellHtml = '-';
+                }
+              }
+              
+              // תוכן
+              const noteContent = note.content || '';
+              const contentDisplay = (() => {
+                if (!noteContent || (typeof noteContent === 'string' && !noteContent.trim())) {
+                  return 'ללא תוכן';
+                }
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderTextPreview === 'function') {
+                  try {
+                    return window.FieldRendererService.renderTextPreview(noteContent, { maxLength: 20, emptyPlaceholder: 'ללא תוכן' });
+                  } catch (error) {
+                    window.Logger?.warn('⚠️ Error rendering text preview', { error, noteId: note?.id, page: 'notes' });
+                  }
+                }
+                const fallbackPlain = String(noteContent).replace(/<[^>]*>/g, '').trim();
+                if (!fallbackPlain) {
+                  return 'ללא תוכן';
+                }
+                const truncated = fallbackPlain.length > 20 ? `${fallbackPlain.substring(0, 20).trimEnd()}…` : fallbackPlain;
+                const escape = (text) => String(text)
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/'/g, '&#39;');
+                return `<span class="text-truncate-preview" title="${escape(fallbackPlain)}">${escape(truncated)}</span>`;
+              })();
+              
+              // קובץ מצורף
+              let attachmentDisplay = '-';
+              const noteAttachment = note.attachment || null;
+              if (noteAttachment && noteAttachment !== null && noteAttachment !== '' && typeof noteAttachment === 'string' && noteAttachment.trim() && noteAttachment !== 'null' && noteAttachment !== 'undefined') {
+                try {
+                  const fileExtension = noteAttachment.split('.').pop()?.toLowerCase();
+                  let fileIcon = '📄';
+                  if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+                    fileIcon = '🖼️';
+                  } else if (['pdf'].includes(fileExtension)) {
+                    fileIcon = '📕';
+                  } else if (['doc', 'docx'].includes(fileExtension)) {
+                    fileIcon = '📘';
+                  } else if (['txt'].includes(fileExtension)) {
+                    fileIcon = '📄';
+                  } else if (['xls', 'xlsx'].includes(fileExtension)) {
+                    fileIcon = '📊';
+                  }
+                  const shortName = noteAttachment.length > 10 ? noteAttachment.substring(0, 10) + '...' : noteAttachment;
+                  attachmentDisplay = `${fileIcon} ${shortName}`;
+                } catch (error) {
+                  attachmentDisplay = '-';
+                }
+              }
+              
+              // תאריך יצירה
+              const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+                ? window.dateUtils.ensureDateEnvelope(note.created_at)
+                : note.created_at;
+              const dateDisplay = window.FieldRendererService?.renderDate
+                ? window.FieldRendererService.renderDate(createdEnvelope || note.created_at)
+                : window.dateUtils?.formatDate
+                  ? window.dateUtils.formatDate(createdEnvelope || note.created_at, { includeTime: false })
+                  : (() => {
+                      try {
+                        const dateValue = createdEnvelope?.utc || createdEnvelope?.local || note.created_at;
+                        if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+                          const envelope = window.dateUtils.ensureDateEnvelope(dateValue);
+                          if (envelope && envelope.epochMs) {
+                            const parsed = new Date(envelope.epochMs);
+                            if (!Number.isNaN(parsed.getTime())) {
+                              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                                return window.FieldRendererService.renderDate(parsed, false);
+                              }
+                              if (window.dateUtils?.formatDate) {
+                                return window.dateUtils.formatDate(parsed, { includeTime: false });
+                              }
+                              return parsed.toLocaleDateString('he-IL');
+                            }
+                          }
+                        }
+                      } catch (error) {
+                        window.Logger?.warn('⚠️ notes table date fallback failed', { error, noteId: note?.id }, { page: 'notes' });
+                      }
+                      return 'לא מוגדר';
+                    })();
+              const dateSortValue = window.dateUtils?.getEpochMilliseconds
+                ? window.dateUtils.getEpochMilliseconds(createdEnvelope || note.created_at)
+                : (createdEnvelope?.epochMs || createdEnvelope?.utc || createdEnvelope?.local || note.created_at || '');
+              
+              // תאריך עדכון
+              const updatedDateCell = (() => {
+                const rawDate = note.updated_at || note.created_at || null;
+                if (!rawDate) {
+                  return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                }
+                let dateDisplay = '';
+                let epoch = null;
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                  dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+                  if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                    const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+                    epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                  } else if (rawDate instanceof Date) {
+                    epoch = rawDate.getTime();
+                  } else if (typeof rawDate === 'string') {
+                    const parsed = Date.parse(rawDate);
+                    epoch = Number.isNaN(parsed) ? null : parsed;
+                  } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+                    epoch = rawDate.epochMs;
+                  }
+                } else {
+                  const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+                    ? window.dateUtils.ensureDateEnvelope(rawDate)
+                    : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+                      ? rawDate
+                      : null;
+                  epoch = (() => {
+                    if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                      return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                    }
+                    if (typeof window.getEpochMilliseconds === 'function') {
+                      return window.getEpochMilliseconds(envelope || rawDate);
+                    }
+                    if (envelope && typeof envelope.epochMs === 'number') {
+                      return envelope.epochMs;
+                    }
+                    if (rawDate instanceof Date) {
+                      return rawDate.getTime();
+                    }
+                    if (typeof rawDate === 'string') {
+                      const parsed = Date.parse(rawDate);
+                      return Number.isNaN(parsed) ? null : parsed;
+                    }
+                    return null;
+                  })();
+                  if (epoch === null || Number.isNaN(epoch)) {
+                    return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                  }
+                  if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+                    dateDisplay = window.dateUtils.formatDateTime(envelope || rawDate);
+                  } else if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+                    dateDisplay = window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+                  } else {
+                    try {
+                      const dateObj = new Date(epoch);
+                      dateDisplay = window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      }));
+                    } catch (err) {
+                      window.Logger?.warn('⚠️ notes updated-cell date formatting failed', { err, noteId: note?.id }, { page: 'notes' });
+                      return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                    }
+                  }
+                }
+                if (!dateDisplay || dateDisplay === '-') {
+                  return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                }
+                return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
+              })();
+              
+              // Actions menu
+              const actionsMenu = (() => {
+                if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+                const noteId = note?.id ? parseInt(note.id) : null;
+                if (!noteId) {
+                  return '<!-- Invalid note ID -->';
+                }
+                const result = window.createActionsMenu([
+                  { type: 'VIEW', onclick: `window.showEntityDetails('note', ${noteId}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
+                  { type: 'EDIT', onclick: `editNote(${noteId})`, title: 'ערוך הערה' },
+                  { type: 'DELETE', onclick: `deleteNote(${noteId})`, title: 'מחק הערה' }
+                ]);
+                return result || '';
+              })();
+              
+              // בניית השורה - כמו ב-cash_flows: createElement
+              const rowHTML = `
+                <td class="col-linked-object related-cell">${relatedCellHtml}</td>
+                <td class="col-content">${contentDisplay}</td>
+                <td class="col-attachment">${attachmentDisplay}</td>
+                <td class="col-created" data-date='${dateSortValue}'>${dateDisplay}</td>
+                ${updatedDateCell}
+                <td class="col-actions actions-cell">${actionsMenu}</td>
+              `;
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(`<tr>${rowHTML}</tr>`, 'text/html');
+              const tempRow = doc.body.querySelector('tr');
+              if (tempRow) {
+                Array.from(tempRow.children).forEach(cell => {
+                  row.appendChild(cell.cloneNode(true));
+                });
+              }
+              
+              tbody.appendChild(row);
+            });
             
             // Update buttons
             if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
@@ -641,11 +967,11 @@ async function updateNotesTable(notes, options = {}) {
       </tr>
     `;
       tbody.textContent = '';
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = emptyMessage;
-      while (tempDiv.firstChild) {
-        tbody.appendChild(tempDiv.firstChild);
-      }
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(emptyMessage, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        tbody.appendChild(node.cloneNode(true));
+      });
       
       // 🔘 עדכון כפתורים דינמיים
       if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
@@ -658,9 +984,335 @@ async function updateNotesTable(notes, options = {}) {
       return;
     }
 
-    // בניית שורות הטבלה
-    const rows = renderNotesTableRows(safeNotes, additionalData);
-    tbody.innerHTML = rows;
+    // בניית שורות הטבלה - כמו ב-cash_flows: יוצרים row וממלאים עם innerHTML
+    safeNotes.forEach(note => {
+      const row = document.createElement('tr');
+      row.className = 'table-cell-clickable';
+      
+      // קביעת האובייקט המקושר - כמו במודול מקושרים: שימוש ב-FieldRendererService עם renderMode: 'linked-items-table'
+      let relatedCellHtml = '-';
+      if (note.related_type_id && note.related_id && window.FieldRendererService && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
+        try {
+          let displayName = '';
+          let metaForEntity = { renderMode: 'linked-items-table' };
+          const relatedType = parseInt(note.related_type_id, 10);
+          
+          switch (relatedType) {
+            case 1: { // Trading Account
+              const account = additionalData.accounts?.find(a => a && a.id === note.related_id);
+              const accountName = account?.name || account?.account_name || `חשבון מסחר ${note.related_id}`;
+              displayName = accountName;
+              metaForEntity = {
+                renderMode: 'linked-items-table',
+                name: accountName,
+                status: account?.status || '',
+                currency: account?.currency_symbol || account?.currency || ''
+              };
+              break;
+            }
+            case 2: { // Trade
+              const trade = additionalData.trades?.find(t => t && t.id === note.related_id);
+              const tradeTicker = trade?.ticker_symbol || trade?.ticker?.symbol || (() => {
+                if (trade?.ticker_id) {
+                  const ticker = additionalData.tickers?.find(tk => tk && tk.id === trade.ticker_id);
+                  return ticker?.symbol;
+                }
+                return null;
+              })();
+              const tickerSymbol = tradeTicker || `טרייד ${note.related_id}`;
+              const tradeDateEnvelope = window.dateUtils?.ensureDateEnvelope
+                ? window.dateUtils.ensureDateEnvelope(
+                    trade?.created_at_envelope ||
+                    trade?.createdAtEnvelope ||
+                    trade?.created_at ||
+                    trade?.opened_at ||
+                    trade?.date ||
+                    null
+                  )
+                : (
+                    trade?.created_at_envelope ||
+                    trade?.createdAtEnvelope ||
+                    trade?.created_at ||
+                    trade?.opened_at ||
+                    trade?.date ||
+                    null
+                  );
+              displayName = tickerSymbol;
+              metaForEntity = {
+                renderMode: 'linked-items-table',
+                ticker: tickerSymbol,
+                date: tradeDateEnvelope,
+                date_envelope: tradeDateEnvelope,
+                status: trade?.status || '',
+                side: trade?.side || '',
+                investment_type: trade?.investment_type || ''
+              };
+              break;
+            }
+            case 3: { // Trade Plan
+              const plan = additionalData.tradePlans?.find(p => p && p.id === note.related_id);
+              const planTicker = plan?.ticker?.symbol || plan?.ticker_symbol || (() => {
+                if (plan?.ticker_id) {
+                  const ticker = additionalData.tickers?.find(tk => tk && tk.id === plan.ticker_id);
+                  return ticker?.symbol;
+                }
+                return null;
+              })();
+              const tickerSymbol = planTicker || `תוכנית ${note.related_id}`;
+              const planDateEnvelope = window.dateUtils?.ensureDateEnvelope
+                ? window.dateUtils.ensureDateEnvelope(
+                    plan?.created_at_envelope ||
+                    plan?.createdAtEnvelope ||
+                    plan?.created_at ||
+                    plan?.date ||
+                    null
+                  )
+                : (
+                    plan?.created_at_envelope ||
+                    plan?.createdAtEnvelope ||
+                    plan?.created_at ||
+                    plan?.date ||
+                    null
+                  );
+              displayName = tickerSymbol;
+              metaForEntity = {
+                renderMode: 'linked-items-table',
+                ticker: tickerSymbol,
+                date: planDateEnvelope,
+                date_envelope: planDateEnvelope,
+                status: plan?.status || '',
+                side: plan?.side || '',
+                investment_type: plan?.investment_type || '',
+                planned_amount: plan?.planned_amount || plan?.plannedAmount || null
+              };
+              break;
+            }
+            case 4: { // Ticker
+              const ticker = additionalData.tickers?.find(tk => tk && tk.id === note.related_id);
+              const tickerSymbol = ticker?.symbol || `טיקר ${note.related_id}`;
+              displayName = tickerSymbol;
+              metaForEntity = {
+                renderMode: 'linked-items-table',
+                ticker: tickerSymbol,
+                status: ticker?.status || ''
+              };
+              break;
+            }
+            default: {
+              displayName = `אובייקט ${note.related_id}`;
+              metaForEntity = { renderMode: 'linked-items-table' };
+            }
+          }
+          
+          relatedCellHtml = window.FieldRendererService.renderLinkedEntity(
+            note.related_type_id,
+            note.related_id,
+            displayName,
+            metaForEntity
+          );
+        } catch (error) {
+          window.Logger?.warn('⚠️ renderLinkedEntity failed for note row, falling back to dash', { error, noteId: note?.id }, { page: "notes" });
+          relatedCellHtml = '-';
+        }
+      }
+      
+      // הצגת תוכן HTML עם הגבלה ל-20 תווים
+      const noteContent = note.content || '';
+      const contentDisplay = (() => {
+        if (!noteContent || (typeof noteContent === 'string' && !noteContent.trim())) {
+          return 'ללא תוכן';
+        }
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderTextPreview === 'function') {
+          try {
+            return window.FieldRendererService.renderTextPreview(noteContent, { maxLength: 20, emptyPlaceholder: 'ללא תוכן' });
+          } catch (error) {
+            window.Logger?.warn('⚠️ Error rendering text preview', { error, noteId: note?.id, page: 'notes' });
+          }
+        }
+        const fallbackPlain = String(noteContent).replace(/<[^>]*>/g, '').trim();
+        if (!fallbackPlain) {
+          return 'ללא תוכן';
+        }
+        const truncated = fallbackPlain.length > 20 ? `${fallbackPlain.substring(0, 20).trimEnd()}…` : fallbackPlain;
+        const escape = (text) => String(text)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+        return `<span class="text-truncate-preview" title="${escape(fallbackPlain)}">${escape(truncated)}</span>`;
+      })();
+      
+      // הצגת קובץ עם אייקון
+      let attachmentDisplay = '-';
+      const noteAttachment = note.attachment || null;
+      if (noteAttachment && noteAttachment !== null && noteAttachment !== '' && typeof noteAttachment === 'string' && noteAttachment.trim() && noteAttachment !== 'null' && noteAttachment !== 'undefined') {
+        try {
+          const fileExtension = noteAttachment.split('.').pop()?.toLowerCase();
+          let fileIcon = '📄';
+          if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+            fileIcon = '🖼️';
+          } else if (['pdf'].includes(fileExtension)) {
+            fileIcon = '📕';
+          } else if (['doc', 'docx'].includes(fileExtension)) {
+            fileIcon = '📘';
+          } else if (['txt'].includes(fileExtension)) {
+            fileIcon = '📄';
+          } else if (['xls', 'xlsx'].includes(fileExtension)) {
+            fileIcon = '📊';
+          }
+          const shortName = noteAttachment.length > 10 ? noteAttachment.substring(0, 10) + '...' : noteAttachment;
+          attachmentDisplay = `${fileIcon} ${shortName}`;
+        } catch (error) {
+          attachmentDisplay = '-';
+        }
+      }
+      
+      // תאריך יצירה
+      const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(note.created_at)
+        : note.created_at;
+      const dateDisplay = window.FieldRendererService?.renderDate
+        ? window.FieldRendererService.renderDate(createdEnvelope || note.created_at)
+        : window.dateUtils?.formatDate
+          ? window.dateUtils.formatDate(createdEnvelope || note.created_at, { includeTime: false })
+          : (() => {
+              try {
+                const dateValue = createdEnvelope?.utc || createdEnvelope?.local || note.created_at;
+                if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+                  const envelope = window.dateUtils.ensureDateEnvelope(dateValue);
+                  if (envelope && envelope.epochMs) {
+                    const parsed = new Date(envelope.epochMs);
+                    if (!Number.isNaN(parsed.getTime())) {
+                      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                        return window.FieldRendererService.renderDate(parsed, false);
+                      }
+                      if (window.dateUtils?.formatDate) {
+                        return window.dateUtils.formatDate(parsed, { includeTime: false });
+                      }
+                      return parsed.toLocaleDateString('he-IL');
+                    }
+                  }
+                }
+              } catch (error) {
+                window.Logger?.warn('⚠️ notes table date fallback failed', { error, noteId: note?.id }, { page: 'notes' });
+              }
+              return 'לא מוגדר';
+            })();
+      const dateSortValue = window.dateUtils?.getEpochMilliseconds
+        ? window.dateUtils.getEpochMilliseconds(createdEnvelope || note.created_at)
+        : (createdEnvelope?.epochMs || createdEnvelope?.utc || createdEnvelope?.local || note.created_at || '');
+      
+      // תאריך עדכון
+      const updatedDateCell = (() => {
+        const rawDate = note.updated_at || note.created_at || null;
+        if (!rawDate) {
+          return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+        }
+        let dateDisplay = '';
+        let epoch = null;
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+          dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+          if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+            const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+            epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+          } else if (rawDate instanceof Date) {
+            epoch = rawDate.getTime();
+          } else if (typeof rawDate === 'string') {
+            const parsed = Date.parse(rawDate);
+            epoch = Number.isNaN(parsed) ? null : parsed;
+          } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+            epoch = rawDate.epochMs;
+          }
+        } else {
+          const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+            ? window.dateUtils.ensureDateEnvelope(rawDate)
+            : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+              ? rawDate
+              : null;
+          epoch = (() => {
+            if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+              return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+            }
+            if (typeof window.getEpochMilliseconds === 'function') {
+              return window.getEpochMilliseconds(envelope || rawDate);
+            }
+            if (envelope && typeof envelope.epochMs === 'number') {
+              return envelope.epochMs;
+            }
+            if (rawDate instanceof Date) {
+              return rawDate.getTime();
+            }
+            if (typeof rawDate === 'string') {
+              const parsed = Date.parse(rawDate);
+              return Number.isNaN(parsed) ? null : parsed;
+            }
+            return null;
+          })();
+          if (epoch === null || Number.isNaN(epoch)) {
+            return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+          }
+          if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+            dateDisplay = window.dateUtils.formatDateTime(envelope || rawDate);
+          } else if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+            dateDisplay = window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+          } else {
+            try {
+              const dateObj = new Date(epoch);
+              dateDisplay = window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              }));
+            } catch (err) {
+              window.Logger?.warn('⚠️ notes updated-cell date formatting failed', { err, noteId: note?.id }, { page: 'notes' });
+              return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+            }
+          }
+        }
+        if (!dateDisplay || dateDisplay === '-') {
+          return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+        }
+        return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
+      })();
+      
+      // Actions menu
+      const actionsMenu = (() => {
+        if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+        const noteId = note?.id ? parseInt(note.id) : null;
+        if (!noteId) {
+          return '<!-- Invalid note ID -->';
+        }
+        const result = window.createActionsMenu([
+          { type: 'VIEW', onclick: `window.showEntityDetails('note', ${noteId}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
+          { type: 'EDIT', onclick: `editNote(${noteId})`, title: 'ערוך הערה' },
+          { type: 'DELETE', onclick: `deleteNote(${noteId})`, title: 'מחק הערה' }
+        ]);
+        return result || '';
+      })();
+      
+      // בניית השורה - כמו ב-cash_flows: row.innerHTML
+      const rowHTML = `
+        <td class="col-linked-object related-cell">${relatedCellHtml}</td>
+        <td class="col-content">${contentDisplay}</td>
+        <td class="col-attachment">${attachmentDisplay}</td>
+        <td class="col-created" data-date='${dateSortValue}'>${dateDisplay}</td>
+        ${updatedDateCell}
+        <td class="col-actions actions-cell">${actionsMenu}</td>
+      `;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(`<tr>${rowHTML}</tr>`, 'text/html');
+      const tempRow = doc.body.querySelector('tr');
+      if (tempRow) {
+        Array.from(tempRow.children).forEach(cell => {
+          row.appendChild(cell.cloneNode(true));
+        });
+      }
+      
+      tbody.appendChild(row);
+    });
     
     window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', safeNotes.length, 'הערות', { page: "notes", keepInfo: true });
     
@@ -823,130 +1475,70 @@ function renderNotesTableRows(notes, additionalData = {}) {
           }
         }
 
-      // קביעת האובייקט המקושר באמצעות המערכת הכללית
-      const dataSources = {
-        accounts: accounts,
-        trades: trades,
-        tradePlans: tradePlans,
-        tickers: tickers
-      };
-
-      let relatedCellHtml = '';
-      if (window.FieldRendererService && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
-        try {
-          let displayName = '';
-          let metaForEntity = {
-            renderMode: 'notes-table'
-          };
-
-          switch (note.related_type_id) {
-            case 1: { // Trading Account
-              const account = accounts.find(a => a && a.id === note.related_id);
-              const accountName = account?.name || account?.account_name || `חשבון מסחר ${note.related_id}`;
-              displayName = accountName;
-              metaForEntity = {
-                renderMode: 'notes-table',
-                name: accountName,
-                status: account?.status || '',
-                currency: account?.currency_symbol || account?.currency || ''
-              };
-              break;
-            }
-            case 2: { // Trade
-              const trade = trades.find(t => t && t.id === note.related_id);
-              const tradeTicker = trade?.ticker_symbol || trade?.ticker?.symbol || (() => {
-                if (trade?.ticker_id) {
-                  const ticker = tickers.find(tk => tk && tk.id === trade.ticker_id);
-                  return ticker?.symbol;
-                }
-                return null;
-              })();
-              const tickerSymbol = tradeTicker || `טרייד ${note.related_id}`;
-              const tradeDate = trade?.created_at || trade?.opened_at || trade?.date || '';
-              displayName = tickerSymbol;
-              metaForEntity = {
-                renderMode: 'notes-table',
-                ticker: tickerSymbol,
-                date: tradeDate,
-                status: trade?.status || '',
-                side: trade?.side || '',
-                investment_type: trade?.investment_type || ''
-              };
-              break;
-            }
-            case 3: { // Trade Plan
-              const plan = tradePlans.find(p => p && p.id === note.related_id);
-              const planTicker = plan?.ticker?.symbol || plan?.ticker_symbol || (() => {
-                if (plan?.ticker_id) {
-                  const ticker = tickers.find(tk => tk && tk.id === plan.ticker_id);
-                  return ticker?.symbol;
-                }
-                return null;
-              })();
-              const tickerSymbol = planTicker || `תוכנית ${note.related_id}`;
-              const planDate = plan?.created_at || plan?.date || '';
-              displayName = tickerSymbol;
-              metaForEntity = {
-                renderMode: 'notes-table',
-                ticker: tickerSymbol,
-                date: planDate,
-                status: plan?.status || '',
-                side: plan?.side || '',
-                investment_type: plan?.investment_type || ''
-              };
-              break;
-            }
-            case 4: { // Ticker
-              const ticker = tickers.find(tk => tk && tk.id === note.related_id);
-              const tickerSymbol = ticker?.symbol || `טיקר ${note.related_id}`;
-              displayName = tickerSymbol;
-              metaForEntity = {
-                renderMode: 'notes-table',
-                ticker: tickerSymbol,
-                status: ticker?.status || ''
-              };
-              break;
-            }
-            default: {
-              displayName = `אובייקט ${note.related_id}`;
-              metaForEntity = {
-                renderMode: 'notes-table'
-              };
-            }
+      // קביעת האובייקט המקושר - כמו ב-cash_flows.js: כפתור קטן + טקסט פשוט
+      let relatedCellHtml = '-';
+      
+      if (note.related_type_id && note.related_id) {
+        let entityType = '';
+        let displayName = '';
+        
+        switch (note.related_type_id) {
+          case 1: { // Trading Account
+            entityType = 'trading_account';
+            const account = accounts.find(a => a && a.id === note.related_id);
+            displayName = account?.name || account?.account_name || `חשבון מסחר ${note.related_id}`;
+            break;
           }
-
-          relatedCellHtml = window.FieldRendererService.renderLinkedEntity(
-            note.related_type_id,
-            note.related_id,
-            displayName,
-            metaForEntity
-          );
-        } catch (error) {
-          window.Logger?.warn('⚠️ renderLinkedEntity failed, falling back to basic renderer', { error, noteId: note.id }, { page: "notes" });
-          relatedCellHtml = '';
+          case 2: { // Trade
+            entityType = 'trade';
+            const trade = trades.find(t => t && t.id === note.related_id);
+            const tradeTicker = trade?.ticker_symbol || trade?.ticker?.symbol || (() => {
+              if (trade?.ticker_id) {
+                const ticker = tickers.find(tk => tk && tk.id === trade.ticker_id);
+                return ticker?.symbol;
+              }
+              return null;
+            })();
+            displayName = tradeTicker || `טרייד ${note.related_id}`;
+            break;
+          }
+          case 3: { // Trade Plan
+            entityType = 'trade_plan';
+            const plan = tradePlans.find(p => p && p.id === note.related_id);
+            const planTicker = plan?.ticker?.symbol || plan?.ticker_symbol || (() => {
+              if (plan?.ticker_id) {
+                const ticker = tickers.find(tk => tk && tk.id === plan.ticker_id);
+                return ticker?.symbol;
+              }
+              return null;
+            })();
+            displayName = planTicker || `תוכנית ${note.related_id}`;
+            break;
+          }
+          case 4: { // Ticker
+            entityType = 'ticker';
+            const ticker = tickers.find(tk => tk && tk.id === note.related_id);
+            displayName = ticker?.symbol || `טיקר ${note.related_id}`;
+            break;
+          }
+          default: {
+            entityType = 'unknown';
+            displayName = `אובייקט ${note.related_id}`;
+          }
         }
-      }
-
-      if (!relatedCellHtml) {
-        // שימוש בלוגיקה הישנה כ-Fallback
-        const relatedObjectInfo = window.getRelatedObjectDisplay ? 
-          window.getRelatedObjectDisplay(note, dataSources, { showLink: true, format: 'full' }) :
-          { display: 'כללי', icon: '🌐', class: 'related-general', color: '', bgColor: '', type: 'general', id: null };
-
-        window.Logger.info('🔍 Related object info result:', {
-          display: relatedObjectInfo.display,
-          class: relatedObjectInfo.class,
-          type: relatedObjectInfo.type,
-          id: relatedObjectInfo.id
-        }, { page: "notes" });
-
-        relatedCellHtml = `
-          <div class="related-object-cell ${relatedObjectInfo.class}" 
-           style="${relatedObjectInfo.color ? `color: ${relatedObjectInfo.color};` : ''} ${relatedObjectInfo.bgColor ? `background-color: ${relatedObjectInfo.bgColor};` : ''}"
-           title="${relatedObjectInfo.type || 'כללי'}">
-            ${relatedObjectInfo.display}
-          </div>
-        `;
+        
+        if (entityType && displayName) {
+          relatedCellHtml = `
+            <div class="table-cell-flex-small">
+              <button class="btn btn-sm btn-outline-primary table-btn-small" 
+                      data-onclick="if(window.showEntityDetails) { window.showEntityDetails('${entityType}', ${note.related_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('${entityType}', ${note.related_id}, 'view'); }" 
+                      title="פתח פרטי ${displayName}">
+                🔗
+              </button>
+              <span>${displayName}</span>
+            </div>
+          `;
+        }
       }
 
         // Debug: Log note data to verify content and attachment are correct
@@ -1112,11 +1704,12 @@ function updateNotesSummary(notes) {
       // Fallback - מערכת סיכום נתונים לא זמינה
       const summaryStatsElement = document.getElementById('summaryStats');
       if (summaryStatsElement) {
-        summaryStatsElement.innerHTML = `
-          <div style="color: #dc3545; font-weight: bold;">
-            ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
-          </div>
-        `;
+        summaryStatsElement.textContent = '';
+        const div = document.createElement('div');
+        div.style.color = '#dc3545';
+        div.style.fontWeight = 'bold';
+        div.textContent = '⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף';
+        summaryStatsElement.appendChild(div);
       }
     }
   } catch (error) {
@@ -1183,7 +1776,11 @@ function populateSelect(selectId, data, field, prefix = '') {
     // Data available for population
   }
 
-  select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+  select.textContent = '';
+  const option = document.createElement('option');
+  option.value = '';
+  option.textContent = 'בחר אובייקט לשיוך...';
+  select.appendChild(option);
 
   data.forEach(item => {
     const option = document.createElement('option');
@@ -1619,7 +2216,16 @@ async function saveNote() {
   }
 
   const isEditMode = form.dataset.mode === 'edit';
-  const formEntityId = form.dataset.entityId || form.dataset.noteId || form.querySelector('input[name="id"]')?.value || null;
+  // Get entity ID - try dataset first, then DataCollectionService, then querySelector
+  let formEntityId = form.dataset.entityId || form.dataset.noteId || null;
+  if (!formEntityId) {
+    const idInput = form.querySelector('input[name="id"]');
+    if (idInput && idInput.id && window.DataCollectionService) {
+      formEntityId = window.DataCollectionService.getValue(idInput.id, 'int', null);
+    } else if (idInput) {
+      formEntityId = idInput.value || null;
+    }
+  }
   const noteId = isEditMode && formEntityId ? parseInt(formEntityId, 10) : null;
   const method = noteId ? 'PUT' : 'POST';
   const url = noteId ? `/api/notes/${noteId}` : '/api/notes/';
@@ -2101,22 +2707,38 @@ function setupNoteValidationEvents() {
 
         const displayElement = document.getElementById('currentAttachmentDisplay');
         if (displayElement) {
-          displayElement.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span>${fileIcon}</span>
-              <span>${fileName} (חדש)</span>
-              <span style="color: ${window.getTableColors ? window.getTableColors().positive : '#28a745'}; font-weight: bold;">✓ נבחר</span>
-            </div>
-          `;
+          displayElement.textContent = '';
+          const container = document.createElement('div');
+          container.style.display = 'flex';
+          container.style.alignItems = 'center';
+          container.style.gap = '8px';
+          const iconSpan = document.createElement('span');
+          iconSpan.textContent = fileIcon;
+          container.appendChild(iconSpan);
+          const nameSpan = document.createElement('span');
+          nameSpan.textContent = `${fileName} (חדש)`;
+          container.appendChild(nameSpan);
+          const checkSpan = document.createElement('span');
+          checkSpan.style.color = window.getTableColors ? window.getTableColors().positive : '#28a745';
+          checkSpan.style.fontWeight = 'bold';
+          checkSpan.textContent = '✓ נבחר';
+          container.appendChild(checkSpan);
+          displayElement.appendChild(container);
         }
 
         // עדכון כפתורי הפעולה
         const actionsElement = document.getElementById('attachmentActions');
         if (actionsElement) {
-          actionsElement.innerHTML = `
+          actionsElement.textContent = '';
+          const actionsHTML = `
             <button data-button-type="SECONDARY" data-variant="full" data-text="✅ קובץ נבחר" data-classes="btn-sm" type="button" disabled></button>
             <button data-button-type="CANCEL" data-variant="full" data-icon="❌" data-text="בטל בחירה" data-classes="btn-sm" data-onclick="clearSelectedFile()" type="button"></button>
           `;
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(actionsHTML, 'text/html');
+          doc.body.childNodes.forEach(node => {
+            actionsElement.appendChild(node.cloneNode(true));
+          });
           actionsElement.style.display = 'block';
         }
       }
@@ -2408,7 +3030,14 @@ function setEditorContent(content, mode = 'add') {
       return;
     }
 
-    editor.innerHTML = content || '';
+    editor.textContent = '';
+    if (content) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(content, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        editor.appendChild(node.cloneNode(true));
+      });
+    }
   
   } catch (error) {
     window.Logger.error('שגיאה בהגדרת תוכן עורך:', error, { page: "notes" });
@@ -2654,7 +3283,16 @@ async function loadNoteForViewing(noteId) {
 
     // מילוי המודל
     document.getElementById('viewNoteRelated').textContent = getNoteRelatedDisplay(note);
-    document.getElementById('viewNoteContent').innerHTML = note.content || 'ללא תוכן';
+    const viewNoteContent = document.getElementById('viewNoteContent');
+    if (viewNoteContent) {
+      viewNoteContent.textContent = '';
+      const content = note.content || 'ללא תוכן';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(content, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        viewNoteContent.appendChild(node.cloneNode(true));
+      });
+    }
     const createdEnvelope = window.dateUtils?.ensureDateEnvelope
       ? window.dateUtils.ensureDateEnvelope(note.created_at)
       : note.created_at;
@@ -2700,16 +3338,26 @@ async function loadNoteForViewing(noteId) {
           fileIcon = '📊';
         }
 
-        attachmentElement.innerHTML = `
-          <a href="/api/notes/files/${fileName}" target="_blank" class="btn btn-sm">
-            ${fileIcon} ${fileName}
-          </a>
-        `;
+        attachmentElement.textContent = '';
+        const link = document.createElement('a');
+        link.href = `/api/notes/files/${fileName}`;
+        link.target = '_blank';
+        link.className = 'btn btn-sm';
+        link.textContent = `${fileIcon} ${fileName}`;
+        attachmentElement.appendChild(link);
       } else {
-        attachmentElement.innerHTML = '<span class="text-muted">אין קובץ מצורף</span>';
+        attachmentElement.textContent = '';
+        const span = document.createElement('span');
+        span.className = 'text-muted';
+        span.textContent = 'אין קובץ מצורף';
+        attachmentElement.appendChild(span);
       }
     } else {
-      attachmentElement.innerHTML = '<span class="text-muted">אין קובץ מצורף</span>';
+      attachmentElement.textContent = '';
+      const span = document.createElement('span');
+      span.className = 'text-muted';
+      span.textContent = 'אין קובץ מצורף';
+      attachmentElement.appendChild(span);
     }
 
   } catch {
@@ -2851,11 +3499,19 @@ function displayCurrentAttachment(attachment) {
         fileIcon = '📊';
       }
 
-      displayElement.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span>${fileIcon}</span>
-          <span>${fileName}</span>
-          <a href="/api/notes/files/${fileName}" 
+      displayElement.textContent = '';
+      const container = document.createElement('div');
+      container.style.display = 'flex';
+      container.style.alignItems = 'center';
+      container.style.gap = '8px';
+      const iconSpan = document.createElement('span');
+      iconSpan.textContent = fileIcon;
+      container.appendChild(iconSpan);
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = fileName;
+      container.appendChild(nameSpan);
+      const link = document.createElement('a');
+      link.href = `/api/notes/files/${fileName}` 
              target="_blank" 
              class="btn btn-sm" 
              style="margin-right: auto;">

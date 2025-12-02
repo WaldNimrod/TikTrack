@@ -864,11 +864,20 @@ class FieldRendererService {
         }
 
         if (renderMode === 'notes-table') {
+            // Rich table cell format - like the original version: icon, label, name, date, badges
             const entityColor = (typeof window !== 'undefined' && window.getEntityColor && typeof window.getEntityColor === 'function')
                 ? window.getEntityColor(type)
                 : '';
 
-            const escapedName = this._escapeHtml(text);
+            // Use ticker symbol from meta if available, otherwise use displayName
+            let nameToDisplay = text;
+            if (metaObj && metaObj.ticker && typeof metaObj.ticker === 'string') {
+                nameToDisplay = metaObj.ticker; // עדיפות לסימבול מה-meta
+            } else if (type === 'account' && metaObj && metaObj.name) {
+                nameToDisplay = metaObj.name; // לחשבון מסחר - שם החשבון
+            }
+            
+            const escapedName = this._escapeHtml(nameToDisplay);
             const titleStyle = entityColor ? ` style="color: ${entityColor};"` : '';
             const typeLabel = this._escapeHtml(label);
             const dateText = dateShort ? `<span class="linked-object-card-date">${this._escapeHtml(dateShort)}</span>` : '';

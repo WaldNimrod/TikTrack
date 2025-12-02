@@ -204,3 +204,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-02T00:10:51+00:00 | 1.3.51.0 | 1.3.50.0 | 39d510460b78cd385d2fa86069ff0bd4b233abcd | f1e840d2bea7bf1540a7afa996c486b5488e8d77 | patch | Fix ticker dashboard: volume display in millions, conditions display, icon fixes |
 | 2025-12-02T00:15:28+00:00 | 1.3.52.0 | 1.3.51.0 | 9f316bb7120dc4980fd0b265e33f4e67e84731f5 | 39d510460b78cd385d2fa86069ff0bd4b233abcd | patch | Fix type error in create_sample_condition_for_qqq.py |
 | 2025-12-02T00:19:29+00:00 | 1.3.53.0 | 1.3.52.0 | 7e0e3ae1838c32c23599663c245120de024d32f0 | 9f316bb7120dc4980fd0b265e33f4e67e84731f5 | patch | Enhance conditions display with plan details and link |
+| 2025-12-02T00:39:51+00:00 | 1.3.54.0 | 1.3.53.0 | 80dce4a7e7b0a47f6347a9473351ec7035bf834d | 7e0e3ae1838c32c23599663c245120de024d32f0 | patch | Add error handling to condition plan rendering |

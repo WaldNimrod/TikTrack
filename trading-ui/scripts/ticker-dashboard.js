@@ -1319,11 +1319,23 @@
                             // Status HTML
                             let statusHtml = '';
                             if (condition.plan_status) {
-                                if (window.FieldRendererService && window.FieldRendererService.renderStatus) {
-                                    // Use FieldRendererService for status badge
-                                    statusHtml = window.FieldRendererService.renderStatus(condition.plan_status, 'trade_plan');
-                                } else {
-                                    // Fallback: simple text
+                                try {
+                                    if (window.FieldRendererService && typeof window.FieldRendererService.renderStatus === 'function') {
+                                        // Use FieldRendererService for status badge
+                                        statusHtml = window.FieldRendererService.renderStatus(condition.plan_status, 'trade_plan');
+                                    } else {
+                                        // Fallback: simple text
+                                        const statusMap = {
+                                            'open': 'פתוח',
+                                            'closed': 'סגור',
+                                            'cancelled': 'מבוטל',
+                                            'canceled': 'מבוטל'
+                                        };
+                                        const statusDisplay = statusMap[condition.plan_status] || condition.plan_status;
+                                        statusHtml = `<span>${statusDisplay}</span>`;
+                                    }
+                                } catch (statusError) {
+                                    // Fallback on error
                                     const statusMap = {
                                         'open': 'פתוח',
                                         'closed': 'סגור',
@@ -1338,11 +1350,22 @@
                             // Investment type HTML
                             let typeHtml = '';
                             if (condition.plan_investment_type) {
-                                if (window.FieldRendererService && window.FieldRendererService.renderType) {
-                                    // Use FieldRendererService for type badge
-                                    typeHtml = window.FieldRendererService.renderType(condition.plan_investment_type);
-                                } else {
-                                    // Fallback: simple text
+                                try {
+                                    if (window.FieldRendererService && typeof window.FieldRendererService.renderType === 'function') {
+                                        // Use FieldRendererService for type badge
+                                        typeHtml = window.FieldRendererService.renderType(condition.plan_investment_type);
+                                    } else {
+                                        // Fallback: simple text
+                                        const typeMap = {
+                                            'swing': 'סווינג',
+                                            'investment': 'השקעה',
+                                            'passive': 'פאסיבי'
+                                        };
+                                        const typeDisplay = typeMap[condition.plan_investment_type] || condition.plan_investment_type;
+                                        typeHtml = `<span>${typeDisplay}</span>`;
+                                    }
+                                } catch (typeError) {
+                                    // Fallback on error
                                     const typeMap = {
                                         'swing': 'סווינג',
                                         'investment': 'השקעה',

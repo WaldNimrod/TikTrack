@@ -217,7 +217,9 @@
                         week52_high: tickerData?.week52_high,
                         week52_low: tickerData?.week52_low,
                         volatility: tickerData?.volatility,
-                        allKeys: tickerData ? Object.keys(tickerData).filter(k => k.includes('atr') || k.includes('week') || k.includes('volatility') || k.includes('52')) : [],
+                        ma_20: tickerData?.ma_20,
+                        ma_150: tickerData?.ma_150,
+                        allKeys: tickerData ? Object.keys(tickerData).filter(k => k.includes('atr') || k.includes('week') || k.includes('volatility') || k.includes('52') || k.includes('ma')) : [],
                         page: 'ticker-dashboard' 
                     });
                 }
@@ -435,6 +437,21 @@
             const week52Low = tickerData.week52_low || null;
             const ma20 = tickerData.ma_20 || null;
             const ma150 = tickerData.ma_150 || null;
+            
+            // Debug: Log MA values
+            if (window.Logger) {
+                window.Logger.debug('📊 MA values from tickerData', {
+                    ma20,
+                    ma150,
+                    ma20Type: typeof ma20,
+                    ma150Type: typeof ma150,
+                    ma20IsNull: ma20 === null,
+                    ma150IsNull: ma150 === null,
+                    ma20IsUndefined: ma20 === undefined,
+                    ma150IsUndefined: ma150 === undefined,
+                    page: 'ticker-dashboard'
+                });
+            }
             // Get currency symbol using central FieldRendererService
             const rawCurrencySymbol = tickerData.currency_symbol || (tickerData.currency && tickerData.currency.symbol) || '$';
             const currencySymbol = window.FieldRendererService && window.FieldRendererService._normalizeCurrencySymbol

@@ -216,3 +216,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-02T01:20:10+00:00 | 1.3.63.0 | 1.3.62.0 | e6f303521d62d6c4dbac95a83d8d1568c133d402 | a09e7739b4433762d53366971ccef331795471a8 | patch | Restore original ATR rendering with full HTML (traffic light, badge, colors) |
 | 2025-12-02T01:27:33+00:00 | 1.3.64.0 | 1.3.63.0 | 4eb03446f90f918c825bfad46a04406057245152 | e6f303521d62d6c4dbac95a83d8d1568c133d402 | patch | Add Moving Averages (MA 20/150) KPI card to ticker dashboard |
 | 2025-12-02T01:33:26+00:00 | 1.3.65.0 | 1.3.64.0 | 7220d7384860fa8dac1fa1631ae843be4f1420a2 | 4eb03446f90f918c825bfad46a04406057245152 | patch | Fix MA card labels styling and NA handling |
+| 2025-12-02T01:39:01+00:00 | 1.3.66.0 | 1.3.65.0 | d7fe9a74cb6f57a7ecc382d8b343b93064eb64e3 | 7220d7384860fa8dac1fa1631ae843be4f1420a2 | patch | Add debug logging for MA calculation |

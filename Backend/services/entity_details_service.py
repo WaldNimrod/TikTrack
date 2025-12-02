@@ -566,6 +566,8 @@ class EntityDetailsService:
                             
                             tech_calculator = TechnicalIndicatorsCalculator(db)
                             
+                            logger.debug(f"📊 Starting MA calculation for ticker {entity.ticker.id} (symbol: {entity.ticker.symbol})")
+                            
                             # Calculate SMA 20
                             sma_20 = tech_calculator.calculate_sma(
                                 ticker_id=entity.ticker.id,
@@ -574,6 +576,9 @@ class EntityDetailsService:
                             )
                             if sma_20 is not None:
                                 entity_dict['ticker']['ma_20'] = sma_20
+                                logger.info(f"✅ MA 20 calculated for ticker {entity.ticker.id}: {sma_20:.2f}")
+                            else:
+                                logger.warning(f"⚠️ MA 20 calculation returned None for ticker {entity.ticker.id}")
                             
                             # Calculate SMA 150
                             sma_150 = tech_calculator.calculate_sma(
@@ -583,10 +588,13 @@ class EntityDetailsService:
                             )
                             if sma_150 is not None:
                                 entity_dict['ticker']['ma_150'] = sma_150
+                                logger.info(f"✅ MA 150 calculated for ticker {entity.ticker.id}: {sma_150:.2f}")
+                            else:
+                                logger.warning(f"⚠️ MA 150 calculation returned None for ticker {entity.ticker.id}")
                         except Exception as ma_error:
-                            logger.warning(f"Error calculating moving averages for ticker {entity.ticker.id}: {ma_error}")
+                            logger.warning(f"Error calculating moving averages for ticker {entity.ticker.id}: {ma_error}", exc_info=True)
                         
-                        logger.debug(f"Added market data to ticker {entity.ticker.id} for {entity_type} {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%, change_from_open={latest_quote.change_pct_from_open}%, ATR={entity_dict['ticker'].get('atr')}")
+                        logger.debug(f"Added market data to ticker {entity.ticker.id} for {entity_type} {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%, change_from_open={latest_quote.change_pct_from_open}%, ATR={entity_dict['ticker'].get('atr')}, MA20={entity_dict['ticker'].get('ma_20')}, MA150={entity_dict['ticker'].get('ma_150')}")
                     else:
                         logger.debug(f"No market data found for ticker {entity.ticker.id} in {entity_type} {entity_id}")
                 elif hasattr(entity, 'ticker_id') and entity.ticker_id:

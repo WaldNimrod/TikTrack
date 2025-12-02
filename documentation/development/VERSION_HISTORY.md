@@ -222,3 +222,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-02T15:51:42+00:00 | 1.3.69.0 | 1.3.68.0 | a598a639de74af2243d30c0bd31acc5962710851 | 703cc92484709392e0672fb21602c1f1fed71ac1 | patch | Add MA calculation logging and fix cache issue |
 | 2025-12-02T16:15:07+00:00 | 1.3.70.0 | 1.3.69.0 | cc305601826e3df568854ae28780d993136a2e93 | a598a639de74af2243d30c0bd31acc5962710851 | patch | Remove 'מעל'/'מתחת' text from MA display, keep only sign and color |
 | 2025-12-02T16:18:08+00:00 | 1.3.71.0 | 1.3.70.0 | d0adc5ef4dca71a1fd6d1f2390b72836ad6e77c7 | cc305601826e3df568854ae28780d993136a2e93 | patch | Fix KPI cards responsiveness - prevent text wrapping inside cards, add responsive breakpoints |
+| 2025-12-02T16:18:39+00:00 | 1.3.72.0 | 1.3.71.0 | aa3e19845096ee92be39d6355a5316b834553a4d | d0adc5ef4dca71a1fd6d1f2390b72836ad6e77c7 | patch | Fix KPI card text wrapping - remove nowrap from card container |

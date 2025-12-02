@@ -14,10 +14,8 @@
     padding: 1rem;
     text-align: center;
     transition: all 0.2s ease;
-    /* Prevent text wrapping inside cards - force cards to wrap instead */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* Prevent automatic text wrapping - cards should wrap to new rows instead */
+    min-width: 0; /* Allow flexbox to shrink */
 }
 
 .ticker-dashboard-page .kpi-card:hover {
@@ -29,6 +27,7 @@
     font-size: 0.875rem;
     color: var(--text-muted, #666);
     margin-bottom: 0.5rem;
+    /* Prevent label from wrapping - should stay on one line */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -38,10 +37,12 @@
     font-size: 1.5rem;
     font-weight: bold;
     color: var(--text-color, #333);
-    /* Allow line breaks only at <br> tags, not automatic wrapping */
+    /* Allow line breaks only at <br> tags (pre-line), not automatic word wrapping */
     white-space: pre-line;
     word-break: keep-all;
     overflow-wrap: normal;
+    /* Prevent automatic wrapping of words */
+    hyphens: none;
 }
 
 /* ===== CHART CONTAINER ===== */

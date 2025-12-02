@@ -669,6 +669,7 @@ class EntityDetailsService:
             
             # Add external data if applicable (for tickers)
             if entity_type == 'ticker':
+                logger.info(f"🔍 Processing ticker entity {entity_id}")
                 entity_dict['external_data'] = EntityDetailsService._get_external_data_summary(entity)
                 
                 # Add provider symbol mappings if they exist
@@ -687,6 +688,8 @@ class EntityDetailsService:
                 latest_quote = db.query(MarketDataQuote).filter(
                     MarketDataQuote.ticker_id == entity_id
                 ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                
+                logger.info(f"🔍 Ticker {entity_id}: latest_quote={latest_quote is not None}, entity_type={entity_type}")
                 
                 if latest_quote:
                     # Add market data directly to ticker entity_dict
@@ -774,7 +777,7 @@ class EntityDetailsService:
                         
                         tech_calculator = TechnicalIndicatorsCalculator(db)
                         
-                        logger.debug(f"📊 Starting MA calculation for ticker {entity_id} (symbol: {entity.symbol})")
+                        logger.info(f"📊 Starting MA calculation for ticker {entity_id} (symbol: {entity.symbol})")
                         
                         # Calculate SMA 20
                         sma_20 = tech_calculator.calculate_sma(

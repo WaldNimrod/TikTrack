@@ -219,3 +219,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-02T01:39:01+00:00 | 1.3.66.0 | 1.3.65.0 | d7fe9a74cb6f57a7ecc382d8b343b93064eb64e3 | 7220d7384860fa8dac1fa1631ae843be4f1420a2 | patch | Add debug logging for MA calculation |
 | 2025-12-02T14:04:46+00:00 | 1.3.67.0 | 1.3.66.0 | ea73ff13a7984ca719b8db5c2ad34506c44a9e1e | d7fe9a74cb6f57a7ecc382d8b343b93064eb64e3 | patch | Fix MA calculation for ticker entity type |
 | 2025-12-02T14:05:10+00:00 | 1.3.68.0 | 1.3.67.0 | 703cc92484709392e0672fb21602c1f1fed71ac1 | ea73ff13a7984ca719b8db5c2ad34506c44a9e1e | patch | Update debug log to include MA values |
+| 2025-12-02T15:51:42+00:00 | 1.3.69.0 | 1.3.68.0 | a598a639de74af2243d30c0bd31acc5962710851 | 703cc92484709392e0672fb21602c1f1fed71ac1 | patch | Add MA calculation logging and fix cache issue |

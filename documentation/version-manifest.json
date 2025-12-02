@@ -10,13 +10,13 @@
     "notes": "Final sm-section-server fix"
   },
   "development": {
-    "version": "1.3.68.0",
+    "version": "1.3.69.0",
     "major": 1,
     "minor": 3,
-    "patch": 68,
+    "patch": 69,
     "build": 0,
-    "commit": "703cc92484709392e0672fb21602c1f1fed71ac1",
-    "updated_at": "2025-12-02T14:05:10+00:00",
-    "notes": "Update debug log to include MA values"
+    "commit": "a598a639de74af2243d30c0bd31acc5962710851",
+    "updated_at": "2025-12-02T15:51:42+00:00",
+    "notes": "Add MA calculation logging and fix cache issue"
   }
 }

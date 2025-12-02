@@ -433,19 +433,11 @@
             const atr = tickerData.atr || null;
             const week52High = tickerData.week52_high || null;
             const week52Low = tickerData.week52_low || null;
-            // Get currency symbol - convert code to symbol if needed
-            let currencySymbol = tickerData.currency_symbol || (tickerData.currency && tickerData.currency.symbol) || '$';
-            // Convert currency code to symbol (USD -> $, ILS -> ₪, etc.)
-            if (currencySymbol && currencySymbol.length > 1) {
-                switch (currencySymbol.toUpperCase()) {
-                    case 'USD': currencySymbol = '$'; break;
-                    case 'ILS': currencySymbol = '₪'; break;
-                    case 'EUR': currencySymbol = '€'; break;
-                    case 'GBP': currencySymbol = '£'; break;
-                    case 'JPY': currencySymbol = '¥'; break;
-                    default: break; // Already a symbol, keep as is
-                }
-            }
+            // Get currency symbol using central FieldRendererService
+            const rawCurrencySymbol = tickerData.currency_symbol || (tickerData.currency && tickerData.currency.symbol) || '$';
+            const currencySymbol = window.FieldRendererService && window.FieldRendererService._normalizeCurrencySymbol
+                ? window.FieldRendererService._normalizeCurrencySymbol(rawCurrencySymbol)
+                : rawCurrencySymbol;
             
             // Format ATR - use FieldRendererService.renderATR() only (no fallback)
             let atrHtml = 'N/A';

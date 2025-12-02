@@ -209,3 +209,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-02T00:48:04+00:00 | 1.3.56.0 | 1.3.55.0 | 7277878b9c5d18a33317b3e95e2e644d4f6aab26 | 0104d263941a16bb3f0677a8f372da3923ec1ad3 | patch | Update KPI cards: combine price+change, ATR+volatility, fix 52W low color |
 | 2025-12-02T00:48:32+00:00 | 1.3.57.0 | 1.3.56.0 | 5a41590b8c725a3ba7f931e3fc57909401ac720f | 7277878b9c5d18a33317b3e95e2e644d4f6aab26 | patch | Fix 52W low HTML structure |
 | 2025-12-02T00:53:13+00:00 | 1.3.58.0 | 1.3.57.0 | 6b5d5dcc54e1e43a2dde02e3a034320d3a84049f | 5a41590b8c725a3ba7f931e3fc57909401ac720f | patch | Fix KPI cards: 2 lines format, change calculation, ATR label, volatility subtitle |
+| 2025-12-02T00:56:19+00:00 | 1.3.59.0 | 1.3.58.0 | ec8c828919207a208064aa48ce04a9f0f67b3a2b | 6b5d5dcc54e1e43a2dde02e3a034320d3a84049f | patch | Convert currency code to symbol (USD->$) |

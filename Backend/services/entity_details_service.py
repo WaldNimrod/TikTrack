@@ -768,6 +768,40 @@ class EntityDetailsService:
                     except Exception as volatility_error:
                         logger.warning(f"Error calculating volatility for ticker {entity_id}: {volatility_error}")
                     
+                    # Calculate Moving Averages (MA 20 and MA 150)
+                    try:
+                        from services.external_data.technical_indicators_calculator import TechnicalIndicatorsCalculator
+                        
+                        tech_calculator = TechnicalIndicatorsCalculator(db)
+                        
+                        logger.debug(f"📊 Starting MA calculation for ticker {entity_id} (symbol: {entity.symbol})")
+                        
+                        # Calculate SMA 20
+                        sma_20 = tech_calculator.calculate_sma(
+                            ticker_id=entity_id,
+                            period=20,
+                            db_session=db
+                        )
+                        if sma_20 is not None:
+                            entity_dict['ma_20'] = sma_20
+                            logger.info(f"✅ MA 20 calculated for ticker {entity_id}: {sma_20:.2f}")
+                        else:
+                            logger.warning(f"⚠️ MA 20 calculation returned None for ticker {entity_id}")
+                        
+                        # Calculate SMA 150
+                        sma_150 = tech_calculator.calculate_sma(
+                            ticker_id=entity_id,
+                            period=150,
+                            db_session=db
+                        )
+                        if sma_150 is not None:
+                            entity_dict['ma_150'] = sma_150
+                            logger.info(f"✅ MA 150 calculated for ticker {entity_id}: {sma_150:.2f}")
+                        else:
+                            logger.warning(f"⚠️ MA 150 calculation returned None for ticker {entity_id}")
+                    except Exception as ma_error:
+                        logger.warning(f"Error calculating moving averages for ticker {entity_id}: {ma_error}", exc_info=True)
+                    
                     logger.debug(f"Added market data to ticker {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%, ATR={entity_dict.get('atr')}, Week52High={entity_dict.get('week52_high')}, Volatility={entity_dict.get('volatility')}")
                 else:
                     logger.debug(f"No market data found for ticker {entity_id}")

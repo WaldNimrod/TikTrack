@@ -1269,7 +1269,7 @@
                         
                         // Add plan context with full details if available
                         const planId = condition.trade_plan_id || condition._plan_id;
-                        if (planId) {
+                        if (planId && (typeof planId === 'number' || (typeof planId === 'string' && planId.trim() !== ''))) {
                             const planInfoDiv = document.createElement('div');
                             planInfoDiv.className = 'condition-plan-info mt-2';
                             

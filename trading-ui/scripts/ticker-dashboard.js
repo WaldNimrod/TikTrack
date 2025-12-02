@@ -668,32 +668,35 @@
                 const maParts = [];
                 
                 // MA 20
-                if (ma20 !== null && ma20 !== undefined && !isNaN(ma20)) {
+                if (ma20 !== null && ma20 !== undefined && !isNaN(ma20) && ma20 > 0) {
                     const isAbove20 = price > ma20;
                     const diffPercent20 = ((price - ma20) / ma20) * 100;
                     const ma20Status = isAbove20 ? 'מעל' : 'מתחת';
                     const ma20Color = isAbove20 ? 'text-success' : 'text-danger';
                     const ma20Sign = diffPercent20 >= 0 ? '+' : '';
-                    maParts.push(`MA 20: <span class="${ma20Color}">${ma20Status}</span> <span class="${ma20Color}" dir="ltr">${ma20Sign}${diffPercent20.toFixed(2)}%</span>`);
+                    maParts.push(`<small class="text-muted">MA 20:</small> <span class="${ma20Color}">${ma20Status}</span> <span class="${ma20Color}" dir="ltr">${ma20Sign}${diffPercent20.toFixed(2)}%</span>`);
                 } else {
-                    maParts.push('MA 20: N/A');
+                    maParts.push(`<small class="text-muted">MA 20:</small> N/A`);
                 }
                 
                 // MA 150
-                if (ma150 !== null && ma150 !== undefined && !isNaN(ma150)) {
+                if (ma150 !== null && ma150 !== undefined && !isNaN(ma150) && ma150 > 0) {
                     const isAbove150 = price > ma150;
                     const diffPercent150 = ((price - ma150) / ma150) * 100;
                     const ma150Status = isAbove150 ? 'מעל' : 'מתחת';
                     const ma150Color = isAbove150 ? 'text-success' : 'text-danger';
                     const ma150Sign = diffPercent150 >= 0 ? '+' : '';
-                    maParts.push(`MA 150: <span class="${ma150Color}">${ma150Status}</span> <span class="${ma150Color}" dir="ltr">${ma150Sign}${diffPercent150.toFixed(2)}%</span>`);
+                    maParts.push(`<small class="text-muted">MA 150:</small> <span class="${ma150Color}">${ma150Status}</span> <span class="${ma150Color}" dir="ltr">${ma150Sign}${diffPercent150.toFixed(2)}%</span>`);
                 } else {
-                    maParts.push('MA 150: N/A');
+                    maParts.push(`<small class="text-muted">MA 150:</small> N/A`);
                 }
                 
                 if (maParts.length > 0) {
                     maHtml = maParts.join('<br>');
                 }
+            } else {
+                // If no price, show N/A for both
+                maHtml = `<small class="text-muted">MA 20:</small> N/A<br><small class="text-muted">MA 150:</small> N/A`;
             }
             
             const kpiCards = [

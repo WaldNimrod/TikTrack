@@ -10,13 +10,13 @@
     "notes": "Final sm-section-server fix"
   },
   "development": {
-    "version": "1.3.64.0",
+    "version": "1.3.65.0",
     "major": 1,
     "minor": 3,
-    "patch": 64,
+    "patch": 65,
     "build": 0,
-    "commit": "4eb03446f90f918c825bfad46a04406057245152",
-    "updated_at": "2025-12-02T01:27:33+00:00",
-    "notes": "Add Moving Averages (MA 20/150) KPI card to ticker dashboard"
+    "commit": "7220d7384860fa8dac1fa1631ae843be4f1420a2",
+    "updated_at": "2025-12-02T01:33:26+00:00",
+    "notes": "Fix MA card labels styling and NA handling"
   }
 }

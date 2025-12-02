@@ -212,3 +212,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-02T00:56:19+00:00 | 1.3.59.0 | 1.3.58.0 | ec8c828919207a208064aa48ce04a9f0f67b3a2b | 6b5d5dcc54e1e43a2dde02e3a034320d3a84049f | patch | Convert currency code to symbol (USD->$) |
 | 2025-12-02T01:03:29+00:00 | 1.3.60.0 | 1.3.59.0 | 559eebdea47ba6460ae3cc2bf273615c4247a372 | ec8c828919207a208064aa48ce04a9f0f67b3a2b | patch | Use FieldRendererService for currency symbol normalization |
 | 2025-12-02T01:10:17+00:00 | 1.3.61.0 | 1.3.60.0 | 240b0210491f2a9dfdfa6a2472160bbcf7017397 | 559eebdea47ba6460ae3cc2bf273615c4247a372 | patch | Fix ATR volatility label styling and verify no websocket usage |
+| 2025-12-02T01:10:31+00:00 | 1.3.62.0 | 1.3.61.0 | a09e7739b4433762d53366971ccef331795471a8 | 240b0210491f2a9dfdfa6a2472160bbcf7017397 | patch | Fix misleading websocket text in notifications center |

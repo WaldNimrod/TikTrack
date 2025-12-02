@@ -802,7 +802,7 @@ class EntityDetailsService:
                     except Exception as ma_error:
                         logger.warning(f"Error calculating moving averages for ticker {entity_id}: {ma_error}", exc_info=True)
                     
-                    logger.debug(f"Added market data to ticker {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%, ATR={entity_dict.get('atr')}, Week52High={entity_dict.get('week52_high')}, Volatility={entity_dict.get('volatility')}")
+                    logger.debug(f"Added market data to ticker {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%, ATR={entity_dict.get('atr')}, Week52High={entity_dict.get('week52_high')}, Volatility={entity_dict.get('volatility')}, MA20={entity_dict.get('ma_20')}, MA150={entity_dict.get('ma_150')}")
                 else:
                     logger.debug(f"No market data found for ticker {entity_id}")
                 

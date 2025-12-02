@@ -10,13 +10,13 @@
     "notes": "Final sm-section-server fix"
   },
   "development": {
-    "version": "1.3.67.0",
+    "version": "1.3.68.0",
     "major": 1,
     "minor": 3,
-    "patch": 67,
+    "patch": 68,
     "build": 0,
-    "commit": "ea73ff13a7984ca719b8db5c2ad34506c44a9e1e",
-    "updated_at": "2025-12-02T14:04:46+00:00",
-    "notes": "Fix MA calculation for ticker entity type"
+    "commit": "703cc92484709392e0672fb21602c1f1fed71ac1",
+    "updated_at": "2025-12-02T14:05:10+00:00",
+    "notes": "Update debug log to include MA values"
   }
 }

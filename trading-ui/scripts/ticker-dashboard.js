@@ -640,17 +640,14 @@
             }
             
             // Combine ATR and Volatility into one card (2 lines)
-            // ATR on first line (no label), Volatility on second line with small label
+            // ATR on first line with full HTML rendering (traffic light, badge, colors)
+            // Volatility on second line with label
             let atrVolatilityHtml = 'N/A';
             if (atrHtmlString !== 'N/A' || volatilityHtml !== 'N/A') {
                 const parts = [];
-                // ATR on first line - no label, just value
+                // ATR on first line - keep full HTML rendering (with traffic light and badge)
                 if (atrHtmlString !== 'N/A') {
-                    // Extract text from ATR HTML (remove any HTML tags)
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = atrHtmlString;
-                    const atrText = tempDiv.textContent || tempDiv.innerText || atrHtmlString;
-                    parts.push(atrText);
+                    parts.push(atrHtmlString);
                 } else {
                     parts.push('N/A');
                 }

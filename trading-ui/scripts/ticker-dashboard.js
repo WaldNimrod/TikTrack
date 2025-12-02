@@ -1265,17 +1265,127 @@
                         const descDiv = document.createElement('div');
                         descDiv.className = 'condition-description';
                         descDiv.textContent = description || 'תנאי';
+                        itemDiv.appendChild(descDiv);
                         
-                        // Add plan context if available
-                        if (condition.trade_plan_id || condition.plan_name || condition._plan_name || condition._plan_id) {
+                        // Add plan context with full details if available
+                        const planId = condition.trade_plan_id || condition._plan_id;
+                        if (planId) {
+                            const planInfoDiv = document.createElement('div');
+                            planInfoDiv.className = 'condition-plan-info mt-2';
+                            
+                            // Build plan link with details
+                            const planLink = document.createElement('a');
+                            planLink.href = '#';
+                            planLink.className = 'condition-plan-link text-decoration-none';
+                            planLink.onclick = (e) => {
+                                e.preventDefault();
+                                if (window.showEntityDetails) {
+                                    window.showEntityDetails('trade_plan', planId, { mode: 'view' });
+                                }
+                                return false;
+                            };
+                            
+                            // Collect plan details (text elements)
+                            const planDetailsText = [];
+                            
+                            // Ticker symbol
+                            if (condition.plan_ticker && condition.plan_ticker.symbol) {
+                                planDetailsText.push(condition.plan_ticker.symbol);
+                            }
+                            
+                            // Date
+                            if (condition.plan_created_at) {
+                                try {
+                                    const date = new Date(condition.plan_created_at);
+                                    if (!isNaN(date.getTime())) {
+                                        const formattedDate = date.toLocaleDateString('he-IL', { 
+                                            day: '2-digit', 
+                                            month: '2-digit', 
+                                            year: 'numeric' 
+                                        });
+                                        planDetailsText.push(formattedDate);
+                                    }
+                                } catch (dateError) {
+                                    // Ignore date parsing errors
+                                }
+                            }
+                            
+                            // Side
+                            if (condition.plan_side) {
+                                const sideDisplay = condition.plan_side === 'Long' ? '↑ Long' : '↓ Short';
+                                planDetailsText.push(sideDisplay);
+                            }
+                            
+                            // Status HTML
+                            let statusHtml = '';
+                            if (condition.plan_status) {
+                                if (window.FieldRendererService && window.FieldRendererService.renderStatus) {
+                                    // Use FieldRendererService for status badge
+                                    statusHtml = window.FieldRendererService.renderStatus(condition.plan_status, 'trade_plan');
+                                } else {
+                                    // Fallback: simple text
+                                    const statusMap = {
+                                        'open': 'פתוח',
+                                        'closed': 'סגור',
+                                        'cancelled': 'מבוטל',
+                                        'canceled': 'מבוטל'
+                                    };
+                                    const statusDisplay = statusMap[condition.plan_status] || condition.plan_status;
+                                    statusHtml = `<span>${statusDisplay}</span>`;
+                                }
+                            }
+                            
+                            // Investment type HTML
+                            let typeHtml = '';
+                            if (condition.plan_investment_type) {
+                                if (window.FieldRendererService && window.FieldRendererService.renderType) {
+                                    // Use FieldRendererService for type badge
+                                    typeHtml = window.FieldRendererService.renderType(condition.plan_investment_type);
+                                } else {
+                                    // Fallback: simple text
+                                    const typeMap = {
+                                        'swing': 'סווינג',
+                                        'investment': 'השקעה',
+                                        'passive': 'פאסיבי'
+                                    };
+                                    const typeDisplay = typeMap[condition.plan_investment_type] || condition.plan_investment_type;
+                                    typeHtml = `<span>${typeDisplay}</span>`;
+                                }
+                            }
+                            
+                            // Build link content with text and HTML elements
+                            const planName = condition.plan_name || `תכנית #${planId}`;
+                            const detailsElements = [];
+                            
+                            // Add text elements (wrapped in spans)
+                            planDetailsText.forEach(text => {
+                                detailsElements.push(`<span>${text}</span>`);
+                            });
+                            
+                            // Add HTML elements (status and type badges)
+                            if (statusHtml) {
+                                detailsElements.push(statusHtml);
+                            }
+                            if (typeHtml) {
+                                detailsElements.push(typeHtml);
+                            }
+                            
+                            planLink.innerHTML = `
+                                <span class="condition-plan-name fw-bold">${planName}</span>
+                                ${detailsElements.length > 0 ? `<span class="condition-plan-details text-muted small ms-2">${detailsElements.join(' • ')}</span>` : ''}
+                            `;
+                            
+                            planInfoDiv.appendChild(planLink);
+                            itemDiv.appendChild(planInfoDiv);
+                        } else if (condition.plan_name || condition._plan_name) {
+                            // Fallback: just show plan name if no plan ID
                             const planDiv = document.createElement('div');
-                            planDiv.className = 'condition-plan text-muted small';
+                            planDiv.className = 'condition-plan text-muted small mt-2';
                             const planName = condition.plan_name || condition._plan_name || `תכנית #${condition.trade_plan_id || condition._plan_id || '?'}`;
                             planDiv.textContent = String(planName);
                             itemDiv.appendChild(planDiv);
                         }
                         
-                        itemDiv.appendChild(descDiv);
                         container.appendChild(itemDiv);
                     } catch (itemError) {
                         if (window.Logger) {

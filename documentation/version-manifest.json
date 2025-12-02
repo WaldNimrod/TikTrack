@@ -10,13 +10,13 @@
     "notes": "Final sm-section-server fix"
   },
   "development": {
-    "version": "1.3.52.0",
+    "version": "1.3.53.0",
     "major": 1,
     "minor": 3,
-    "patch": 52,
+    "patch": 53,
     "build": 0,
-    "commit": "9f316bb7120dc4980fd0b265e33f4e67e84731f5",
-    "updated_at": "2025-12-02T00:15:28+00:00",
-    "notes": "Fix type error in create_sample_condition_for_qqq.py"
+    "commit": "7e0e3ae1838c32c23599663c245120de024d32f0",
+    "updated_at": "2025-12-02T00:19:29+00:00",
+    "notes": "Enhance conditions display with plan details and link"
   }
 }

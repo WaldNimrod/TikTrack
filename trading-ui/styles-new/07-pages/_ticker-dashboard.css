@@ -108,6 +108,43 @@
     border-bottom: none;
 }
 
+.ticker-dashboard-page .condition-plan-info {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-color-light, #f0f0f0);
+}
+
+.ticker-dashboard-page .condition-plan-link {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    color: var(--link-color, #007bff);
+    transition: color 0.2s ease;
+}
+
+.ticker-dashboard-page .condition-plan-link:hover {
+    color: var(--link-hover-color, #0056b3);
+    text-decoration: underline;
+}
+
+.ticker-dashboard-page .condition-plan-name {
+    color: var(--text-color, #333);
+}
+
+.ticker-dashboard-page .condition-plan-details {
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.ticker-dashboard-page .condition-plan-details .badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
 .ticker-dashboard-page .condition-description {
     color: var(--text-color, #333);
 }

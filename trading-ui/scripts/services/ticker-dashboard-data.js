@@ -298,12 +298,22 @@
                     if (conditionsResponse.ok) {
                         const conditionsData = await conditionsResponse.json();
                         if (conditionsData.status === 'success' && Array.isArray(conditionsData.data)) {
-                            // Add plan context to each condition
+                            // Add plan context to each condition with full plan details
                             const conditionsWithContext = conditionsData.data.map(condition => ({
                                 ...condition,
                                 _source: 'trade_plan',
                                 _plan_id: plan.id,
                                 plan_name: plan.name || `תוכנית ${plan.id}`, // Add plan_name for display
+                                // Add full plan details for display
+                                plan_ticker: plan.ticker ? {
+                                    id: plan.ticker.id || plan.ticker_id,
+                                    symbol: plan.ticker.symbol || '',
+                                    name: plan.ticker.name || ''
+                                } : null,
+                                plan_created_at: plan.created_at || plan.date || null,
+                                plan_side: plan.side || null,
+                                plan_status: plan.status || null,
+                                plan_investment_type: plan.investment_type || null,
                                 method_name_he: condition.method_name_he || condition.method?.name_he || condition.method_name || 'תנאי', // Add method name in Hebrew
                                 method_name: condition.method_name || condition.method?.name_en || 'Condition' // Add method name in English
                             }));

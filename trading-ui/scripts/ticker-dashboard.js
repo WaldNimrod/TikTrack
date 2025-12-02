@@ -422,8 +422,13 @@
         
         try {
             const price = tickerData.current_price || tickerData.price || 0;
-            const change = tickerData.daily_change || tickerData.change_amount || 0;
+            // Calculate change from price and changePercent if change amount is 0 but percent exists
+            let change = tickerData.daily_change || tickerData.change_amount || 0;
             const changePercent = tickerData.daily_change_percent || tickerData.change_percent || 0;
+            // If change is 0 but we have changePercent, calculate the actual change amount
+            if (change === 0 && changePercent !== 0 && price > 0) {
+                change = (parseFloat(changePercent) / 100) * parseFloat(price);
+            }
             const volume = tickerData.volume || 0;
             const atr = tickerData.atr || null;
             const week52High = tickerData.week52_high || null;
@@ -506,84 +511,80 @@
                 formattedVolumeMonetary = '<span class="text-muted"><small>N/A</small></span>';
             }
             
-            // Format change - show both amount (with currency symbol) and percentage
-            let changeAmountHtml = '';
-            let changePercentHtml = '';
+            // Format change - show percentage and amount (in parentheses) on same line
             const changeColor = change >= 0 ? 'text-success' : 'text-danger';
             const changeSign = change >= 0 ? '+' : '';
             
-            // Format change amount with currency symbol
-            if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
-                changeAmountHtml = window.FieldRendererService.renderAmount(change, currencySymbol, 2, true);
-            } else {
-                changeAmountHtml = `<span class="${changeColor}" dir="ltr">${changeSign}${currencySymbol}${Math.abs(parseFloat(change)).toFixed(2)}</span>`;
-            }
-            
-            // Format change percentage
+            // Format change percentage (main value)
+            let changePercentText = '';
             if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'function') {
-                changePercentHtml = window.FieldRendererService.renderNumericValue(changePercent, '%', true);
+                // Extract text from HTML (remove tags) but keep color classes
+                const changePercentHtml = window.FieldRendererService.renderNumericValue(changePercent, '%', true);
+                // Try to preserve color class from FieldRendererService
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = changePercentHtml;
+                const percentSpan = tempDiv.querySelector('span');
+                if (percentSpan && percentSpan.className) {
+                    // Use the class from FieldRendererService
+                    changePercentText = `<span class="${percentSpan.className}" dir="ltr">${changeSign}${parseFloat(changePercent).toFixed(2)}%</span>`;
+                } else {
+                    changePercentText = `<span class="${changeColor}" dir="ltr">${changeSign}${parseFloat(changePercent).toFixed(2)}%</span>`;
+                }
             } else {
-                changePercentHtml = `<span class="${changeColor}" dir="ltr">${changeSign}${parseFloat(changePercent).toFixed(2)}%</span>`;
+                changePercentText = `<span class="${changeColor}" dir="ltr">${changeSign}${parseFloat(changePercent).toFixed(2)}%</span>`;
             }
             
-            // Combine change amount and percentage
-            const changeHtml = `${changeAmountHtml} <br><small>${changePercentHtml}</small>`;
+            // Format change amount with currency symbol (in parentheses) - only if change is not 0
+            let changeAmountText = '';
+            if (Math.abs(change) > 0.001) { // Use small threshold to avoid floating point issues
+                changeAmountText = ` <span class="${changeColor}" dir="ltr">(${changeSign}${currencySymbol}${Math.abs(parseFloat(change)).toFixed(2)})</span>`;
+            }
             
-            // Format price with change - combine price and change in one card
+            // Combine: percentage (amount) on same line
+            const changeHtml = `${changePercentText}${changeAmountText}`;
+            
+            // Format price with change - combine price and change in one card (2 lines)
             let priceHtml = '';
             if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
                 const priceFormatted = window.FieldRendererService.renderAmount(price, currencySymbol, 2, false);
-                priceHtml = `${priceFormatted} <br><small>${changeHtml}</small>`;
+                priceHtml = `${priceFormatted}<br>${changeHtml}`;
             } else {
                 const priceFormatted = `<span dir="ltr">${currencySymbol}${parseFloat(price).toFixed(2)}</span>`;
-                priceHtml = `${priceFormatted} <br><small>${changeHtml}</small>`;
+                priceHtml = `${priceFormatted}<br>${changeHtml}`;
             }
             
-            // Format 52W High - separate card
+            // Format 52W High - separate card (2 lines: value, percentage)
             // Maximum (high) = positive color (green)
-            // Display both value and percentage from current price
             let week52HighHtml = 'N/A';
             if (week52High !== null && price && price > 0) {
-                let highFormatted;
-                if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
-                    highFormatted = window.FieldRendererService.renderAmount(week52High, currencySymbol, 2, false);
-                } else {
-                    highFormatted = `${currencySymbol}${parseFloat(week52High).toFixed(2)}`;
-                }
+                const highValue = parseFloat(week52High).toFixed(2);
+                const highFormatted = `<span class="text-success" dir="ltr">${currencySymbol}${highValue}</span>`;
                 
                 // Calculate percentage from current price
                 const highPercent = ((parseFloat(week52High) - parseFloat(price)) / parseFloat(price)) * 100;
                 const highPercentFormatted = highPercent >= 0 ? `+${highPercent.toFixed(2)}%` : `${highPercent.toFixed(2)}%`;
                 
-                // Maximum (high) = positive color (text-success)
-                // Display: value (percentage)
-                week52HighHtml = `<span class="text-success" dir="ltr">${highFormatted} (${highPercentFormatted})</span>`;
+                // Display: value on first line, percentage on second line
+                week52HighHtml = `${highFormatted}<br><span class="text-success" dir="ltr">${highPercentFormatted}</span>`;
             } else if (week52High !== null) {
                 // Fallback if price is not available - show only value
-                let highFormatted;
-                if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
-                    highFormatted = window.FieldRendererService.renderAmount(week52High, currencySymbol, 2, false);
-                } else {
-                    highFormatted = `${currencySymbol}${parseFloat(week52High).toFixed(2)}`;
-                }
-                week52HighHtml = `<span class="text-success" dir="ltr">${highFormatted}</span>`;
+                const highValue = parseFloat(week52High).toFixed(2);
+                week52HighHtml = `<span class="text-success" dir="ltr">${currencySymbol}${highValue}</span>`;
             }
             
-            // Format 52W Low - separate card
+            // Format 52W Low - separate card (2 lines: value, percentage)
             // Minimum (low) = negative color (red) for both value and percentage
-            // Display both value and percentage from current price
             let week52LowHtml = 'N/A';
             if (week52Low !== null && price && price > 0) {
-                // Format value with negative color (text-danger) - simple format to ensure color
                 const lowValue = parseFloat(week52Low).toFixed(2);
+                const lowFormatted = `<span class="text-danger" dir="ltr">${currencySymbol}${lowValue}</span>`;
                 
                 // Calculate percentage from current price
                 const lowPercent = ((parseFloat(week52Low) - parseFloat(price)) / parseFloat(price)) * 100;
                 const lowPercentFormatted = lowPercent >= 0 ? `+${lowPercent.toFixed(2)}%` : `${lowPercent.toFixed(2)}%`;
                 
-                // Minimum (low) = negative color (text-danger) for both value and percentage
-                // Display: value (percentage) - both in red
-                week52LowHtml = `<span class="text-danger" dir="ltr">${currencySymbol}${lowValue} (${lowPercentFormatted})</span>`;
+                // Display: value on first line, percentage on second line (both in red)
+                week52LowHtml = `${lowFormatted}<br><span class="text-danger" dir="ltr">${lowPercentFormatted}</span>`;
             } else if (week52Low !== null) {
                 // Fallback if price is not available - show only value in red
                 const lowValue = parseFloat(week52Low).toFixed(2);
@@ -634,22 +635,33 @@
                 });
             }
             
-            // Combine ATR and Volatility into one card
+            // Combine ATR and Volatility into one card (2 lines)
+            // ATR on first line (no label), Volatility on second line with small label
             let atrVolatilityHtml = 'N/A';
             if (atrHtmlString !== 'N/A' || volatilityHtml !== 'N/A') {
                 const parts = [];
+                // ATR on first line - no label, just value
                 if (atrHtmlString !== 'N/A') {
-                    parts.push(`ATR: ${atrHtmlString}`);
+                    // Extract text from ATR HTML (remove any HTML tags)
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = atrHtmlString;
+                    const atrText = tempDiv.textContent || tempDiv.innerText || atrHtmlString;
+                    parts.push(atrText);
+                } else {
+                    parts.push('N/A');
                 }
+                // Volatility on second line with small label
                 if (volatilityHtml !== 'N/A') {
-                    parts.push(`תנודתיות: ${volatilityHtml}`);
+                    parts.push(`<small class="text-muted">תנודתיות:</small> ${volatilityHtml}`);
+                } else {
+                    parts.push(`<small class="text-muted">תנודתיות:</small> N/A`);
                 }
                 atrVolatilityHtml = parts.join('<br>');
             }
             
             const kpiCards = [
                 { label: 'מחיר', value: priceHtml, dir: '', helpKey: null },
-                { label: 'ATR / תנודתיות', value: atrVolatilityHtml, dir: '', helpKey: 'atr' },
+                { label: 'ATR', value: atrVolatilityHtml, dir: '', helpKey: 'atr' },
                 { label: '52W גבוהה', value: week52HighHtml, dir: 'ltr', helpKey: 'week52_range' },
                 { label: '52W נמוכה', value: week52LowHtml, dir: 'ltr', helpKey: 'week52_range' },
                 { label: 'נפח יומי', value: `${formattedVolume}<br><small class="text-muted">${formattedVolumeMonetary}</small>`, dir: 'ltr', helpKey: 'volume' }
@@ -667,8 +679,8 @@
                 labelDiv.className = 'kpi-label';
                 
                 // Add help icon for technical indicators
-                if (window.TechnicalIndicatorsHelp && window.IconSystem && (kpi.label === 'ATR / תנודתיות' || kpi.label === '52W גבוהה' || kpi.label === '52W נמוכה' || kpi.label === 'נפח יומי')) {
-                    const helpKey = kpi.label === 'ATR / תנודתיות' ? 'atr' : 
+                if (window.TechnicalIndicatorsHelp && window.IconSystem && (kpi.label === 'ATR' || kpi.label === '52W גבוהה' || kpi.label === '52W נמוכה' || kpi.label === 'נפח יומי')) {
+                    const helpKey = kpi.label === 'ATR' ? 'atr' : 
                                    (kpi.label === '52W גבוהה' || kpi.label === '52W נמוכה') ? 'week52_range' : 
                                    kpi.label === 'נפח יומי' ? 'volume' : null;
                     if (helpKey) {
@@ -680,7 +692,13 @@
                         const fallbackIcon = `<span id="${helpIconId}" class="help-icon ms-1" style="cursor: help; display: inline-block; width: 14px; height: 14px; line-height: 14px; text-align: center; font-size: 12px;" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover" data-bs-html="true" title="${escapedHelpText}" onclick="if(window.NotificationSystem && window.NotificationSystem.showInfo) { window.NotificationSystem.showInfo('${kpi.label}', '${escapedHelpText}'); }">ℹ️</span>`;
                         
                         // Try to load icon with timeout, but don't block rendering
-                        labelDiv.innerHTML = `${kpi.label}${fallbackIcon}`;
+                        labelDiv.textContent = '';
+                        labelDiv.textContent = kpi.label;
+                        const parser = new DOMParser();
+                        const iconDoc = parser.parseFromString(fallbackIcon, 'text/html');
+                        iconDoc.body.childNodes.forEach(node => {
+                            labelDiv.appendChild(node.cloneNode(true));
+                        });
                         
                         // Initialize Bootstrap tooltip for help icon
                         if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
@@ -754,7 +772,12 @@
                     valueDiv.setAttribute('dir', kpi.dir);
                 }
                 if (typeof kpi.value === 'string' && kpi.value.includes('<')) {
-                    valueDiv.innerHTML = kpi.value; // Allow HTML for FieldRendererService output
+                    valueDiv.textContent = '';
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(kpi.value, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        valueDiv.appendChild(node.cloneNode(true));
+                    });
                 } else {
                     valueDiv.textContent = kpi.value;
                 }
@@ -861,7 +884,11 @@
                     if (typeof window.hideLoadingState === 'function') {
                         window.hideLoadingState('ticker-dashboard-chart');
                     }
-                    container.innerHTML = '<div class="alert alert-warning">שגיאה בטעינת גרף TradingView</div>';
+                    container.textContent = '';
+                    const alert = document.createElement('div');
+                    alert.className = 'alert alert-warning';
+                    alert.textContent = 'שגיאה בטעינת גרף TradingView';
+                    container.appendChild(alert);
                 };
                 document.head.appendChild(script);
             } else {
@@ -877,7 +904,11 @@
             }
             const container = document.getElementById('tradingview_widget');
             if (container) {
-                container.innerHTML = '<div class="alert alert-danger">שגיאה בטעינת גרף</div>';
+                container.textContent = '';
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-danger';
+                alert.textContent = 'שגיאה בטעינת גרף';
+                container.appendChild(alert);
             }
         }
     }
@@ -1001,7 +1032,11 @@
             if (typeof window.hideLoadingState === 'function') {
                 window.hideLoadingState('ticker-dashboard-chart');
             }
-            container.innerHTML = '<div class="alert alert-danger">שגיאה ביצירת גרף TradingView</div>';
+            container.textContent = '';
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger';
+            alert.textContent = 'שגיאה ביצירת גרף TradingView';
+            container.appendChild(alert);
         }
     }
 
@@ -1065,7 +1100,12 @@
                     valueDiv.setAttribute('dir', indicator.dir);
                 }
                 if (typeof indicator.value === 'string' && indicator.value.includes('<')) {
-                    valueDiv.innerHTML = indicator.value; // Allow HTML for FieldRendererService output
+                    valueDiv.textContent = '';
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(indicator.value, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        valueDiv.appendChild(node.cloneNode(true));
+                    });
                 } else {
                     valueDiv.textContent = indicator.value;
                 }
@@ -1140,7 +1180,12 @@
                     );
                     // renderLinkedItems returns HTML string, so we use innerHTML here
                     // This is acceptable as it's from a centralized system
-                    container.innerHTML = html;
+                    container.textContent = '';
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        container.appendChild(node.cloneNode(true));
+                    });
                 } else {
                     container.textContent = '';
                     const emptyDiv = document.createElement('div');
@@ -1399,10 +1444,17 @@
                                 detailsElements.push(typeHtml);
                             }
                             
-                            planLink.innerHTML = `
-                                <span class="condition-plan-name fw-bold">${planName}</span>
-                                ${detailsElements.length > 0 ? `<span class="condition-plan-details text-muted small ms-2">${detailsElements.join(' • ')}</span>` : ''}
-                            `;
+                            planLink.textContent = '';
+                            const nameSpan = document.createElement('span');
+                            nameSpan.className = 'condition-plan-name fw-bold';
+                            nameSpan.textContent = planName;
+                            planLink.appendChild(nameSpan);
+                            if (detailsElements.length > 0) {
+                                const detailsSpan = document.createElement('span');
+                                detailsSpan.className = 'condition-plan-details text-muted small ms-2';
+                                detailsSpan.textContent = detailsElements.join(' • ');
+                                planLink.appendChild(detailsSpan);
+                            }
                             
                             planInfoDiv.appendChild(planLink);
                             itemDiv.appendChild(planInfoDiv);
@@ -1487,7 +1539,13 @@
         const placeholder = document.createElement('div');
         placeholder.className = 'chart-placeholder-message text-muted text-center p-4';
         placeholder.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background: rgba(255, 255, 255, 0.9); border-radius: 8px; padding: 2rem;';
-        placeholder.innerHTML = `<div>${message}</div><div class="small mt-2">הגרף מוכן לטעינת נתונים</div>`;
+        const div1 = document.createElement('div');
+        div1.textContent = message;
+        placeholder.appendChild(div1);
+        const div2 = document.createElement('div');
+        div2.className = 'small mt-2';
+        div2.textContent = 'הגרף מוכן לטעינת נתונים';
+        placeholder.appendChild(div2);
         chartContainer.appendChild(placeholder);
         
         if (window.Logger) {

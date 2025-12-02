@@ -506,32 +506,37 @@
                 formattedVolumeMonetary = '<span class="text-muted"><small>N/A</small></span>';
             }
             
-            // Format change - use FieldRendererService.renderNumericValue for percentage display
-            let changeHtml = '';
-            if (window.FieldRendererService) {
-                if (typeof window.FieldRendererService.renderNumericValue === 'function') {
-                    // Use renderNumericValue for percentage display (it handles positive/negative colors)
-                    changeHtml = window.FieldRendererService.renderNumericValue(changePercent, '%', true);
-                } else if (typeof window.FieldRendererService.renderAmount === 'function') {
-                    // Fallback to renderAmount
-                    changeHtml = window.FieldRendererService.renderAmount(changePercent, '%', 2, true);
-                } else {
-                    const changeColor = change >= 0 ? 'text-success' : 'text-danger';
-                    const changeSign = change >= 0 ? '+' : '';
-                    changeHtml = `<span class="${changeColor}" dir="ltr">${changeSign}${parseFloat(changePercent).toFixed(2)}%</span>`;
-                }
+            // Format change - show both amount (with currency symbol) and percentage
+            let changeAmountHtml = '';
+            let changePercentHtml = '';
+            const changeColor = change >= 0 ? 'text-success' : 'text-danger';
+            const changeSign = change >= 0 ? '+' : '';
+            
+            // Format change amount with currency symbol
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
+                changeAmountHtml = window.FieldRendererService.renderAmount(change, currencySymbol, 2, true);
             } else {
-                const changeColor = change >= 0 ? 'text-success' : 'text-danger';
-                const changeSign = change >= 0 ? '+' : '';
-                changeHtml = `<span class="${changeColor}" dir="ltr">${changeSign}${parseFloat(changePercent).toFixed(2)}%</span>`;
+                changeAmountHtml = `<span class="${changeColor}" dir="ltr">${changeSign}${currencySymbol}${Math.abs(parseFloat(change)).toFixed(2)}</span>`;
             }
             
-            // Format price - use FieldRendererService.renderAmount
+            // Format change percentage
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'function') {
+                changePercentHtml = window.FieldRendererService.renderNumericValue(changePercent, '%', true);
+            } else {
+                changePercentHtml = `<span class="${changeColor}" dir="ltr">${changeSign}${parseFloat(changePercent).toFixed(2)}%</span>`;
+            }
+            
+            // Combine change amount and percentage
+            const changeHtml = `${changeAmountHtml} <br><small>${changePercentHtml}</small>`;
+            
+            // Format price with change - combine price and change in one card
             let priceHtml = '';
             if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
-                priceHtml = window.FieldRendererService.renderAmount(price, currencySymbol, 2, false);
+                const priceFormatted = window.FieldRendererService.renderAmount(price, currencySymbol, 2, false);
+                priceHtml = `${priceFormatted} <br><small>${changeHtml}</small>`;
             } else {
-                priceHtml = `<span dir="ltr">${currencySymbol}${parseFloat(price).toFixed(2)}</span>`;
+                const priceFormatted = `<span dir="ltr">${currencySymbol}${parseFloat(price).toFixed(2)}</span>`;
+                priceHtml = `${priceFormatted} <br><small>${changeHtml}</small>`;
             }
             
             // Format 52W High - separate card
@@ -565,33 +570,25 @@
             }
             
             // Format 52W Low - separate card
-            // Minimum (low) = negative color (red)
+            // Minimum (low) = negative color (red) for both value and percentage
             // Display both value and percentage from current price
             let week52LowHtml = 'N/A';
             if (week52Low !== null && price && price > 0) {
-                let lowFormatted;
-                if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
-                    lowFormatted = window.FieldRendererService.renderAmount(week52Low, currencySymbol, 2, false);
-                } else {
-                    lowFormatted = `${currencySymbol}${parseFloat(week52Low).toFixed(2)}`;
-                }
+                // Format value with negative color (text-danger) - simple format to ensure color
+                const lowValue = parseFloat(week52Low).toFixed(2);
+                const lowFormatted = `<span class="text-danger" dir="ltr">${currencySymbol}${lowValue}</span>`;
                 
                 // Calculate percentage from current price
                 const lowPercent = ((parseFloat(week52Low) - parseFloat(price)) / parseFloat(price)) * 100;
                 const lowPercentFormatted = lowPercent >= 0 ? `+${lowPercent.toFixed(2)}%` : `${lowPercent.toFixed(2)}%`;
                 
-                // Minimum (low) = negative color (text-danger)
-                // Display: value (percentage)
+                // Minimum (low) = negative color (text-danger) for both value and percentage
+                // Display: value (percentage) - both in red
                 week52LowHtml = `<span class="text-danger" dir="ltr">${lowFormatted} (${lowPercentFormatted})</span>`;
             } else if (week52Low !== null) {
-                // Fallback if price is not available - show only value
-                let lowFormatted;
-                if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
-                    lowFormatted = window.FieldRendererService.renderAmount(week52Low, currencySymbol, 2, false);
-                } else {
-                    lowFormatted = `${currencySymbol}${parseFloat(week52Low).toFixed(2)}`;
-                }
-                week52LowHtml = `<span class="text-danger" dir="ltr">${lowFormatted}</span>`;
+                // Fallback if price is not available - show only value in red
+                const lowValue = parseFloat(week52Low).toFixed(2);
+                week52LowHtml = `<span class="text-danger" dir="ltr">${currencySymbol}${lowValue}</span>`;
             }
             
             // Clear container
@@ -638,14 +635,25 @@
                 });
             }
             
+            // Combine ATR and Volatility into one card
+            let atrVolatilityHtml = 'N/A';
+            if (atrHtmlString !== 'N/A' || volatilityHtml !== 'N/A') {
+                const parts = [];
+                if (atrHtmlString !== 'N/A') {
+                    parts.push(`ATR: ${atrHtmlString}`);
+                }
+                if (volatilityHtml !== 'N/A') {
+                    parts.push(`תנודתיות: ${volatilityHtml}`);
+                }
+                atrVolatilityHtml = parts.join('<br>');
+            }
+            
             const kpiCards = [
                 { label: 'מחיר', value: priceHtml, dir: '', helpKey: null },
-                { label: 'שינוי', value: changeHtml, dir: '', helpKey: null },
-                { label: 'ATR', value: atrHtmlString, dir: '', helpKey: 'atr' },
+                { label: 'ATR / תנודתיות', value: atrVolatilityHtml, dir: '', helpKey: 'atr' },
                 { label: '52W גבוהה', value: week52HighHtml, dir: 'ltr', helpKey: 'week52_range' },
                 { label: '52W נמוכה', value: week52LowHtml, dir: 'ltr', helpKey: 'week52_range' },
-                { label: 'נפח יומי', value: `${formattedVolume}<br><small class="text-muted">${formattedVolumeMonetary}</small>`, dir: 'ltr', helpKey: 'volume' },
-                { label: 'תנודתיות', value: volatilityHtml, dir: 'ltr', helpKey: 'volatility' }
+                { label: 'נפח יומי', value: `${formattedVolume}<br><small class="text-muted">${formattedVolumeMonetary}</small>`, dir: 'ltr', helpKey: 'volume' }
             ];
             
             // Use for...of loop instead of forEach to support await
@@ -660,10 +668,9 @@
                 labelDiv.className = 'kpi-label';
                 
                 // Add help icon for technical indicators
-                if (window.TechnicalIndicatorsHelp && window.IconSystem && (kpi.label === 'ATR' || kpi.label === '52W גבוהה' || kpi.label === '52W נמוכה' || kpi.label === 'תנודתיות' || kpi.label === 'נפח יומי')) {
-                    const helpKey = kpi.label === 'ATR' ? 'atr' : 
+                if (window.TechnicalIndicatorsHelp && window.IconSystem && (kpi.label === 'ATR / תנודתיות' || kpi.label === '52W גבוהה' || kpi.label === '52W נמוכה' || kpi.label === 'נפח יומי')) {
+                    const helpKey = kpi.label === 'ATR / תנודתיות' ? 'atr' : 
                                    (kpi.label === '52W גבוהה' || kpi.label === '52W נמוכה') ? 'week52_range' : 
-                                   kpi.label === 'תנודתיות' ? 'volatility' : 
                                    kpi.label === 'נפח יומי' ? 'volume' : null;
                     if (helpKey) {
                         const helpText = window.TechnicalIndicatorsHelp.getHelpText(helpKey);

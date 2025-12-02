@@ -1657,14 +1657,40 @@
             
             // Load user tickers
             let userTickers = [];
-            if (window.tickersData && typeof window.tickersData.getUserTickers === 'function') {
-                userTickers = await window.tickersData.getUserTickers({ force: false });
-            } else {
-                // Fallback: try to fetch from API
-                const response = await fetch('/api/tickers/my');
-                if (response.ok) {
-                    const data = await response.json();
-                    userTickers = data.data || data || [];
+            try {
+                // Try tickersData service first
+                if (window.tickersData && typeof window.tickersData.getUserTickers === 'function') {
+                    userTickers = await window.tickersData.getUserTickers({ force: false });
+                } 
+                // Fallback: try getAllTickers if getUserTickers not available
+                else if (window.tickersData && typeof window.tickersData.getAllTickers === 'function') {
+                    const allTickers = await window.tickersData.getAllTickers({ force: false });
+                    // Filter to active tickers only (open or closed status)
+                    userTickers = allTickers.filter(t => t.status === 'open' || t.status === 'closed');
+                }
+                // Fallback: try to fetch from API directly
+                else {
+                    const response = await fetch('/api/tickers/my');
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.status === 'success' && data.data) {
+                            userTickers = data.data;
+                        } else if (Array.isArray(data)) {
+                            userTickers = data;
+                        }
+                    } else if (response.status === 404) {
+                        // If /api/tickers/my doesn't exist, try /api/tickers/ and filter
+                        const allResponse = await fetch('/api/tickers/');
+                        if (allResponse.ok) {
+                            const allData = await allResponse.json();
+                            const allTickers = allData.data || allData || [];
+                            userTickers = allTickers.filter(t => t.status === 'open' || t.status === 'closed');
+                        }
+                    }
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Error loading user tickers, will show empty list', { error, page: 'ticker-dashboard' });
                 }
             }
             

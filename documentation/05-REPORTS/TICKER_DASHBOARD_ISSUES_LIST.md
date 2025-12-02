@@ -86,22 +86,24 @@
 
 ---
 
-### 5. **תנאים (Conditions) לא מוצגים**
+### 5. **תנאים (Conditions) לא מוצגים** ✅ **תוקן 13.01.2025**
 
 **תיאור:**
 - אין לוגים מ-`📊 Rendering conditions...`
 - ה-container `tickerConditions` נשאר עם spinner
 
-**מה צריך לבדוק:**
-- [ ] האם `renderConditions()` נקראת?
-- [ ] האם `loadTickerConditions()` מחזירה נתונים?
+**פתרון:**
+- תוקן ב-`ticker-dashboard-data.js` - טעינת תנאים מ-Trade Plans
+- תוקן ב-`ticker-dashboard.js` - הצגת שם תוכנית ושם שיטה בעברית
+- נוצר תנאי דוגמה לטיקר QQQ דרך `create_sample_condition_for_qqq.py`
 
 **קבצים רלוונטיים:**
 - `trading-ui/scripts/ticker-dashboard.js` - שורה 625
 - `trading-ui/scripts/services/ticker-dashboard-data.js` - שורה 215
 - `trading-ui/ticker-dashboard.html` - שורה 469
+- `Backend/scripts/create_sample_condition_for_qqq.py` - יצירת תנאי דוגמה
 
-**סטטוס:** 🔴 קריטי - מונע תצוגת תנאים
+**סטטוס:** ✅ **תוקן** - תנאים מוצגים נכון עם שם תוכנית ושיטה
 
 ---
 
@@ -149,24 +151,23 @@
 
 ## 🟠 בעיות UI/UX
 
-### 8. **אייקון `toggle.svg` חסר - 404**
+### 8. **אייקון `toggle.svg` חסר - 404** ✅ **תוקן 13.01.2025**
 
 **תיאור:**
 - `GET http://localhost:8080/trading-ui/images/icons/tabler/toggle.svg 404 (NOT FOUND)`
 - המיפוי `toggle: 'chevron-down'` לא עובד
 - הלוג מראה: `buttonMappings: Array(0)` - המיפוי לא נטען!
 
-**מה צריך לבדוק:**
-- [ ] למה `IconMappings.button` ריק?
-- [ ] האם `icon-mappings.js` נטען לפני `icon-system.js`?
-- [ ] האם המיפוי `toggle: 'chevron-down'` קיים ב-`icon-mappings.js`?
+**פתרון:**
+- תוקן ב-`icon-system.js` - שיפור טעינת מיפויים
+- תוקן ב-`ui-basic.js` - שימוש נכון ב-`IconSystem.renderIcon()`
 
 **קבצים רלוונטיים:**
 - `trading-ui/scripts/icon-mappings.js` - שורה 81
 - `trading-ui/scripts/icon-system.js` - שורה 124
 - `trading-ui/scripts/modules/ui-basic.js` - שורה 907
 
-**סטטוס:** 🟠 UI Issue - משפיע על תצוגת כפתורי toggle
+**סטטוס:** ✅ **תוקן** - כפתורי toggle עובדים נכון
 
 ---
 
@@ -262,7 +263,13 @@
 1. **Header System** - מוצג נכון ✅
 2. **Linked Items** - מוצגים נכון (2 executions) ✅
 3. **טעינת נתונים** - `loadTickerDashboardData()` עובד ✅
-4. **Section Toggle** - עובד (אבל עם בעיית אייקון) ✅
+4. **Section Toggle** - עובד ✅ (תוקן 13.01.2025)
+5. **KPI Cards** - מוצגים נכון עם כל הנתונים ✅ (תוקן 13.01.2025)
+6. **נפח יומי** - מוצג במיליונים עם ערך כספי ✅ (תוקן 13.01.2025)
+7. **תנאים** - מוצגים נכון עם שם תוכנית ושיטה ✅ (תוקן 13.01.2025)
+8. **52W Range** - מחושב ומוצג נכון ✅ (הושלם 13.01.2025)
+9. **תנודתיות** - מחושבת ומוצגת נכון ✅ (הושלם 13.01.2025)
+10. **גרף מחיר** - TradingView Widget עובד ✅ (הושלם 13.01.2025)
 
 ---
 
@@ -290,4 +297,6 @@
 - [ ] האם הרשימה נכונה?
 - [ ] מה צריך להיות מוצג בכל סעיף?
 - [ ] מה העדיפויות לתיקון?
+
+
 

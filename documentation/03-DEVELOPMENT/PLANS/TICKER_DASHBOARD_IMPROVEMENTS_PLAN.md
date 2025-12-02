@@ -257,3 +257,5 @@
 - `documentation/ATR_IMPLEMENTATION_PLAN.md` - תוכנית ATR
 - `documentation/02-ARCHITECTURE/FRONTEND/TRADINGVIEW_FEATURES_CHECKLIST.md` - תעוד TradingView
 
+
+

@@ -695,11 +695,11 @@ async function displayTradeTickerInfo(ticker) {
   if (window.renderTickerInfo) {
     const tickerInfoHtml = await window.renderTickerInfo(ticker, 'ticker-info-display');
     tickerInfoDiv.textContent = '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = tickerInfoHtml;
-    while (tempDiv.firstChild) {
-      tickerInfoDiv.appendChild(tempDiv.firstChild);
-    }
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(tickerInfoHtml, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      tickerInfoDiv.appendChild(node.cloneNode(true));
+    });
   } else {
     // Fallback if renderTickerInfo not available
     const currentPrice = typeof ticker.current_price === 'number' ? `$${ticker.current_price.toFixed(2)}` : 'לא זמין';
@@ -708,7 +708,8 @@ async function displayTradeTickerInfo(ticker) {
     const volume = typeof ticker.volume === 'number' ? ticker.volume.toLocaleString() : 'לא זמין';
     const isPositive = typeof ticker.daily_change === 'number' && ticker.daily_change >= 0;
 
-    tickerInfoDiv.innerHTML = `
+    tickerInfoDiv.textContent = '';
+    const fallbackHTML = `
       <div class="ticker-info-display">
         <div class="row">
           <div class="col-md-6">
@@ -730,6 +731,11 @@ async function displayTradeTickerInfo(ticker) {
         </div>
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(fallbackHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      tickerInfoDiv.appendChild(node.cloneNode(true));
+    });
   }
   
   // Set default entry price to current price if field exists
@@ -1173,7 +1179,26 @@ async function updateTradesTable(trades) {
   `;
   }).join('');
 
-  tbody.innerHTML = tableHTML;
+  tbody.textContent = '';
+  // Render rows directly using createElement + innerHTML (like notes.js and cash_flows.js)
+  if (tableHTML && tableHTML.trim()) {
+    // Split by </tr> to get individual rows
+    const rowMatches = tableHTML.match(/<tr[^>]*>[\s\S]*?<\/tr>/g);
+    if (rowMatches) {
+      rowMatches.forEach(rowHTML => {
+        const row = document.createElement('tr');
+        // Extract content between <tr> and </tr>
+        const match = rowHTML.match(/<tr[^>]*>(.*?)<\/tr>/s);
+        if (match && match[1]) {
+          row.innerHTML = match[1];
+        } else {
+          // Fallback: try to parse as full row
+          row.innerHTML = rowHTML.replace(/^<tr[^>]*>|<\/tr>$/g, '');
+        }
+        tbody.appendChild(row);
+      });
+    }
+  }
 
   // עדכון ספירת רשומות - רק בדף תכנון
   if (window.location.pathname === '/trade_plans' || window.location.pathname === '/trade_plans.html') {
@@ -2085,7 +2110,11 @@ function populateSelect(selectId, data, field, prefix = '') {
       return;
     }
 
-    select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+    select.textContent = '';
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'בחר אובייקט לשיוך...';
+    select.appendChild(option);
 
     if (!data || data.length === 0) {
       window.Logger?.debug('No data available for select', { selectId, page: "trades" });
@@ -2276,7 +2305,11 @@ function populateRelatedObjects(relationTypeId) {
       return;
     }
 
-    select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+    select.textContent = '';
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'בחר אובייקט לשיוך...';
+    select.appendChild(option);
 
     switch (parseInt(relationTypeId)) {
       case 1: // Account
@@ -3148,7 +3181,11 @@ async function loadTradeConditionsSummary(modalElement, { showLoading = true } =
   const entityId = modalElement.dataset.entityId;
   if (!entityId) {
     delete summaryContainer.dataset.entityId;
-    summaryContainer.innerHTML = '<div class="text-muted small mb-0">נדרש לשמור את הטרייד לפני שניתן להציג תנאים.</div>';
+    summaryContainer.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'text-muted small mb-0';
+    div.textContent = 'נדרש לשמור את הטרייד לפני שניתן להציג תנאים.';
+    summaryContainer.appendChild(div);
     window.ConditionsSummaryRenderer?.clearCache?.('trade', null);
     return;
   }
@@ -3156,17 +3193,27 @@ async function loadTradeConditionsSummary(modalElement, { showLoading = true } =
   summaryContainer.dataset.entityId = entityId;
   const crudManager = window.conditionsCRUDManager;
   if (!crudManager) {
-    summaryContainer.innerHTML = '<div class="text-muted small mb-0">מערכת התנאים אינה זמינה כעת.</div>';
+    summaryContainer.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'text-muted small mb-0';
+    div.textContent = 'מערכת התנאים אינה זמינה כעת.';
+    summaryContainer.appendChild(div);
     return;
   }
 
   if (showLoading) {
-    summaryContainer.innerHTML = `
+    summaryContainer.textContent = '';
+    const loadingHTML = `
       <div class="text-center text-muted py-2">
         <span class="spinner-border spinner-border-sm me-2" role="status"></span>
         טוען תנאים פעילים...
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(loadingHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      summaryContainer.appendChild(node.cloneNode(true));
+    });
   }
 
   try {
@@ -3176,16 +3223,26 @@ async function loadTradeConditionsSummary(modalElement, { showLoading = true } =
     window.ConditionsSummaryRenderer?.setConditions?.('trade', Number(entityId), activeConditions);
 
     if (!activeConditions.length) {
-      summaryContainer.innerHTML = '<div class="text-muted small mb-0">אין תנאים פעילים לטרייד זה.</div>';
+      summaryContainer.textContent = '';
+      const div = document.createElement('div');
+      div.className = 'text-muted small mb-0';
+      div.textContent = 'אין תנאים פעילים לטרייד זה.';
+      summaryContainer.appendChild(div);
       return;
     }
 
-    summaryContainer.innerHTML = window.ConditionsSummaryRenderer?.buildTable?.('trade', activeConditions, {
+    summaryContainer.textContent = '';
+    const tableHTML = window.ConditionsSummaryRenderer?.buildTable?.('trade', activeConditions, {
       edit: 'handleTradeConditionSummaryEdit',
       delete: 'handleTradeConditionSummaryDelete',
       evaluate: 'handleTradeConditionRowEvaluate',
       toggle: 'handleTradeConditionToggleAlerts'
     }) || '<div class="text-muted small mb-0">לא נמצא Renderer להצגת תנאים.</div>';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(tableHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      summaryContainer.appendChild(node.cloneNode(true));
+    });
     if (window.ButtonSystem?.processButtons) {
       window.ButtonSystem.processButtons(summaryContainer);
     } else if (window.ButtonSystem?.hydrateButtons) {
@@ -3193,7 +3250,11 @@ async function loadTradeConditionsSummary(modalElement, { showLoading = true } =
     }
   } catch (error) {
     window.Logger?.error('Failed to load trade conditions summary', { error: error?.message, entityId }, { page: 'trades' });
-    summaryContainer.innerHTML = '<div class="alert alert-warning py-2 px-2 mb-0 small">שגיאה בטעינת תנאים פעילים. נסה שוב.</div>';
+    summaryContainer.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'alert alert-warning py-2 px-2 mb-0 small';
+    div.textContent = 'שגיאה בטעינת תנאים פעילים. נסה שוב.';
+    summaryContainer.appendChild(div);
   }
 }
 
@@ -3239,7 +3300,11 @@ function setupTradeConditionsButton(modalElement) {
         loadTradeConditionsSummary(modalElement);
       } else {
         delete summaryContainer.dataset.entityId;
-        summaryContainer.innerHTML = '<div class="text-muted small mb-0">נדרש לשמור את הטרייד לפני שניתן להציג תנאים.</div>';
+        summaryContainer.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'text-muted small mb-0';
+    div.textContent = 'נדרש לשמור את הטרייד לפני שניתן להציג תנאים.';
+    summaryContainer.appendChild(div);
       }
     }
   };
@@ -3805,10 +3870,14 @@ async function updateEditTradePriceFromTicker(tickerId) {
           // Create element if it doesn't exist
           const changeFromOpenRow = document.createElement('div');
           changeFromOpenRow.className = 'mb-3';
-          changeFromOpenRow.innerHTML = `
-            <label class="form-label">שינוי מפתיחה</label>
-            <div id="editTradeChangeFromOpen" class="form-control-plaintext"></div>
-          `;
+          const label = document.createElement('label');
+          label.className = 'form-label';
+          label.textContent = 'שינוי מפתיחה';
+          changeFromOpenRow.appendChild(label);
+          const div = document.createElement('div');
+          div.id = 'editTradeChangeFromOpen';
+          div.className = 'form-control-plaintext';
+          changeFromOpenRow.appendChild(div);
           // Insert after daily change element
           if (dailyChangeElement && dailyChangeElement.parentElement) {
             dailyChangeElement.parentElement.parentElement.insertAdjacentElement('afterend', changeFromOpenRow);
@@ -4413,10 +4482,16 @@ window.saveTrade = async function saveTrade() {
             return; // Stop the save process
         }
         
+        // Collect form values using DataCollectionService
+        const tradePlanId = window.DataCollectionService?.getValue('tradePlan', 'int', null) || null;
+        const tradeAmount = window.DataCollectionService?.getValue('tradeAmount', 'number', null) || null;
+        const stopLossPercent = window.DataCollectionService?.getValue('tradeStopLossPercent', 'number', null) || null;
+        const takeProfitPercent = window.DataCollectionService?.getValue('tradeTakeProfitPercent', 'number', null) || null;
+        
         const businessValidationData = {
             trading_account_id: tradeData.trading_account_id,
             ticker_id: tradeData.ticker_id,
-            trade_plan_id: form.querySelector('#tradePlan')?.value ? parseInt(form.querySelector('#tradePlan').value) : null,
+            trade_plan_id: tradePlanId,
             side: tradeData.side,
             investment_type: investmentType, // Capitalized: 'Swing', 'Investment', 'Passive'
             status: tradeData.status,
@@ -4425,12 +4500,12 @@ window.saveTrade = async function saveTrade() {
             quantity: quantity,
             // Also include the original fields for completeness
             planned_quantity: quantity,
-            planned_amount: form.querySelector('#tradeAmount')?.value ? parseFloat(form.querySelector('#tradeAmount').value) : null,
+            planned_amount: tradeAmount,
             entry_price: entryPrice,
             stop_price: tradeData.stop_loss ? parseFloat(tradeData.stop_loss) : null,
             target_price: tradeData.take_profit ? parseFloat(tradeData.take_profit) : null,
-            stop_percentage: form.querySelector('#tradeStopLossPercent')?.value ? parseFloat(form.querySelector('#tradeStopLossPercent').value) : null,
-            target_percentage: form.querySelector('#tradeTakeProfitPercent')?.value ? parseFloat(form.querySelector('#tradeTakeProfitPercent').value) : null
+            stop_percentage: stopLossPercent,
+            target_percentage: takeProfitPercent
         };
         
         if (window.TradesData?.validateTrade) {

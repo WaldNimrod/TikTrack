@@ -1004,6 +1004,146 @@ class FieldRendererService {
     }
 
     /**
+     * Build meta object for related entity rendering
+     * פונקציה כללית לבניית meta object עבור רינדור ישות מקושרת
+     * מבוסס על הקוד המדויק מ-notes.js
+     * 
+     * @param {number|string} relatedTypeId - סוג הישות (1=account, 2=trade, 3=trade_plan, 4=ticker)
+     * @param {number|string} relatedId - מזהה הישות
+     * @param {Object} additionalData - נתונים נוספים: { accounts, trades, tradePlans, tickers }
+     * @param {Object} options - אפשרויות נוספות
+     * @returns {Object} - { displayName, metaForEntity } מוכן לשימוש ב-renderLinkedEntity
+     * 
+     * @example
+     * const { displayName, metaForEntity } = FieldRendererService.buildRelatedEntityMeta(
+     *   2, // trade
+     *   123,
+     *   { accounts: [], trades: [tradeObj], tradePlans: [], tickers: [tickerObj] }
+     * );
+     * const html = FieldRendererService.renderLinkedEntity(2, 123, displayName, metaForEntity);
+     */
+    static buildRelatedEntityMeta(relatedTypeId, relatedId, additionalData = {}, options = {}) {
+        const relatedType = parseInt(relatedTypeId, 10);
+        const safeId = parseInt(relatedId, 10);
+        const { accounts = [], trades = [], tradePlans = [], tickers = [] } = additionalData;
+        
+        let displayName = '';
+        let metaForEntity = { renderMode: 'notes-table' };
+        
+        switch (relatedType) {
+            case 1: { // Trading Account
+                const account = additionalData.accounts?.find(a => a && a.id === safeId);
+                const accountName = account?.name || account?.account_name || `חשבון מסחר ${safeId}`;
+                displayName = accountName;
+                metaForEntity = {
+                    renderMode: 'notes-table',
+                    name: accountName,
+                    status: account?.status || '',
+                    currency: account?.currency_symbol || account?.currency || ''
+                };
+                break;
+            }
+            case 2: { // Trade
+                const trade = additionalData.trades?.find(t => t && t.id === safeId);
+                const tradeTicker = trade?.ticker_symbol || trade?.ticker?.symbol || (() => {
+                    if (trade?.ticker_id) {
+                        const ticker = additionalData.tickers?.find(tk => tk && tk.id === trade.ticker_id);
+                        return ticker?.symbol;
+                    }
+                    return null;
+                })();
+                const tickerSymbol = tradeTicker || null; // רק סימבול, לא מזהה
+                const tradeDateEnvelope = window.dateUtils?.ensureDateEnvelope
+                    ? window.dateUtils.ensureDateEnvelope(
+                        trade?.created_at_envelope ||
+                        trade?.createdAtEnvelope ||
+                        trade?.created_at ||
+                        trade?.opened_at ||
+                        trade?.date ||
+                        null
+                    )
+                    : (
+                        trade?.created_at_envelope ||
+                        trade?.createdAtEnvelope ||
+                        trade?.created_at ||
+                        trade?.opened_at ||
+                        trade?.date ||
+                        null
+                    );
+                // displayName צריך להיות הסימבול, לא מזהה
+                displayName = tickerSymbol || null;
+                metaForEntity = {
+                    renderMode: 'notes-table',
+                    ticker: tickerSymbol, // רק סימבול
+                    date: tradeDateEnvelope,
+                    date_envelope: tradeDateEnvelope,
+                    status: trade?.status || '',
+                    side: trade?.side || '',
+                    investment_type: trade?.investment_type || ''
+                };
+                break;
+            }
+            case 3: { // Trade Plan
+                const plan = additionalData.tradePlans?.find(p => p && p.id === safeId);
+                const planTicker = plan?.ticker?.symbol || plan?.ticker_symbol || (() => {
+                    if (plan?.ticker_id) {
+                        const ticker = additionalData.tickers?.find(tk => tk && tk.id === plan.ticker_id);
+                        return ticker?.symbol;
+                    }
+                    return null;
+                })();
+                const tickerSymbol = planTicker || null; // רק סימבול, לא מזהה
+                const planDateEnvelope = window.dateUtils?.ensureDateEnvelope
+                    ? window.dateUtils.ensureDateEnvelope(
+                        plan?.created_at_envelope ||
+                        plan?.createdAtEnvelope ||
+                        plan?.created_at ||
+                        plan?.date ||
+                        null
+                    )
+                    : (
+                        plan?.created_at_envelope ||
+                        plan?.createdAtEnvelope ||
+                        plan?.created_at ||
+                        plan?.date ||
+                        null
+                    );
+                // displayName צריך להיות הסימבול, לא מזהה
+                displayName = tickerSymbol || null;
+                metaForEntity = {
+                    renderMode: 'notes-table',
+                    ticker: tickerSymbol, // רק סימבול
+                    date: planDateEnvelope,
+                    date_envelope: planDateEnvelope,
+                    status: plan?.status || '',
+                    side: plan?.side || '',
+                    investment_type: plan?.investment_type || '',
+                    planned_amount: plan?.planned_amount || plan?.plannedAmount || null
+                };
+                break;
+            }
+            case 4: { // Ticker
+                const ticker = additionalData.tickers?.find(tk => tk && tk.id === safeId);
+                const tickerSymbol = ticker?.symbol || null; // רק סימבול, לא מזהה
+                // displayName צריך להיות הסימבול, לא מזהה
+                displayName = tickerSymbol || null;
+                metaForEntity = {
+                    renderMode: 'notes-table',
+                    ticker: tickerSymbol, // רק סימבול
+                    status: ticker?.status || ''
+                };
+                break;
+            }
+            default: {
+                displayName = `אובייקט ${safeId}`;
+                metaForEntity = { renderMode: 'notes-table' };
+            }
+        }
+        
+        return { displayName, metaForEntity };
+    }
+
+    /**
      * Render attachment preview and download link
      * 
      * @param {Object|string} attachmentInput - attachment path or object with attachment data
@@ -2005,6 +2145,7 @@ window.renderShares = (shares, cssClass) => FieldRendererService.renderShares(sh
 window.renderPosition = (quantity, averagePrice, currencySymbol) => FieldRendererService.renderPosition(quantity, averagePrice, currencySymbol);
 window.renderBoolean = (value, size) => FieldRendererService.renderBoolean(value, size);
 window.renderTickerInfo = async (ticker, cssClass) => await FieldRendererService.renderTickerInfo(ticker, cssClass);
+window.buildRelatedEntityMeta = (relatedTypeId, relatedId, additionalData, options) => FieldRendererService.buildRelatedEntityMeta(relatedTypeId, relatedId, additionalData, options);
 window.renderVolume = (volume, showMillions) => FieldRendererService.renderVolume(volume, showMillions);
 window.renderExecutionDate = (date) => FieldRendererService.renderExecutionDate(date);
 window.renderUpdatedTimestamp = (value, options) => FieldRendererService.renderUpdatedTimestamp(value, options);

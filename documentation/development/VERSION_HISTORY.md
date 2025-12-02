@@ -225,3 +225,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-02T16:18:39+00:00 | 1.3.72.0 | 1.3.71.0 | aa3e19845096ee92be39d6355a5316b834553a4d | d0adc5ef4dca71a1fd6d1f2390b72836ad6e77c7 | patch | Fix KPI card text wrapping - remove nowrap from card container |
 | 2025-12-02T22:08:38+00:00 | 1.3.73.0 | 1.3.72.0 | 6ee117c6f7a3cab6d7d68a2ee2e4fe9915a7dfc7 | aa3e19845096ee92be39d6355a5316b834553a4d | patch | Add ticker selection dropdown to dashboard header |
 | 2025-12-02T22:09:45+00:00 | 1.3.74.0 | 1.3.73.0 | 18714a889bfee6f0e9f0cc2f0ff9c77b8a409630 | 6ee117c6f7a3cab6d7d68a2ee2e4fe9915a7dfc7 | patch | Improve ticker selector fallback logic |
+| 2025-12-02T23:14:34+00:00 | 1.3.75.0 | 1.3.74.0 | c9aae2f03f4199f36f26978fcf9e06c149b59541 | 18714a889bfee6f0e9f0cc2f0ff9c77b8a409630 | patch | Fix table rendering for trade plans and trades pages - standardize with createElement pattern |

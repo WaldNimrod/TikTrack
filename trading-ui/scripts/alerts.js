@@ -427,7 +427,7 @@ function renderAlertsTableRows(alerts) {
           ? window.getStatusBackgroundColor(alert.status) 
           : '';
       
-      // קביעת האובייקט המקושר באמצעות המערכת הכללית
+      // קביעת האובייקט המקושר - שימוש בפונקציה הכללית
       const dataSources = {
         accounts: accounts,
         trades: trades,
@@ -435,126 +435,15 @@ function renderAlertsTableRows(alerts) {
         tickers: tickers
       };
 
-      const relatedObjectInfo = window.getRelatedObjectDisplay ?
-        window.getRelatedObjectDisplay(alert, dataSources, { showLink: true, format: 'full' }) :
-        { display: 'כללי', icon: '🌐', class: 'related-general', color: '', bgColor: '', type: 'general', id: null };
-
       let relatedCellHtml = '';
-      if (window.FieldRendererService && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
+      if (alert.related_type_id && alert.related_id && window.FieldRendererService && typeof window.FieldRendererService.buildRelatedEntityMeta === 'function' && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
         try {
-          let displayName = '';
-          let metaForEntity = { renderMode: 'notes-table' }; // כמו בגרסה הקודמת - מציג שדות לפי סוג ישות
-          const relatedType = parseInt(alert.related_type_id, 10);
-
-          switch (relatedType) {
-          case 1: { // Trading account
-            const account = accounts.find(a => a && a.id === alert.related_id);
-            const accountName = account?.name || account?.account_name || `חשבון מסחר ${alert.related_id}`;
-            displayName = accountName;
-            metaForEntity = {
-              renderMode: 'notes-table',
-              name: accountName,
-              status: account?.status || '',
-              currency: account?.currency_symbol || account?.currency || ''
-            };
-            break;
-          }
-          case 2: { // Trade
-            const trade = trades.find(t => t && t.id === alert.related_id);
-            const tradeTicker = trade?.ticker_symbol || trade?.ticker?.symbol || (() => {
-              if (trade?.ticker_id) {
-                const ticker = tickers.find(tk => tk && tk.id === trade.ticker_id);
-                return ticker?.symbol;
-              }
-              return null;
-            })();
-            const tickerSymbol = tradeTicker || null; // רק סימבול, לא מזהה
-            const tradeDateEnvelope = window.dateUtils?.ensureDateEnvelope
-              ? window.dateUtils.ensureDateEnvelope(
-                  trade?.created_at_envelope ||
-                  trade?.createdAtEnvelope ||
-                  trade?.created_at ||
-                  trade?.opened_at ||
-                  trade?.date ||
-                  null
-                )
-              : (
-                  trade?.created_at_envelope ||
-                  trade?.createdAtEnvelope ||
-                  trade?.created_at ||
-                  trade?.opened_at ||
-                  trade?.date ||
-                  null
-                );
-            // displayName צריך להיות הסימבול, לא מזהה
-            displayName = tickerSymbol || `טרייד ${alert.related_id}`;
-            metaForEntity = {
-              renderMode: 'notes-table',
-              ticker: tickerSymbol, // רק סימבול
-              date: tradeDateEnvelope,
-              date_envelope: tradeDateEnvelope,
-              status: trade?.status || '',
-              side: trade?.side || '',
-              investment_type: trade?.investment_type || ''
-            };
-            break;
-          }
-          case 3: { // Trade plan
-            const plan = tradePlans.find(p => p && p.id === alert.related_id);
-            const planTicker = plan?.ticker?.symbol || plan?.ticker_symbol || (() => {
-              if (plan?.ticker_id) {
-                const ticker = tickers.find(tk => tk && tk.id === plan.ticker_id);
-                return ticker?.symbol;
-              }
-              return null;
-            })();
-            const tickerSymbol = planTicker || null; // רק סימבול, לא מזהה
-            const planDateEnvelope = window.dateUtils?.ensureDateEnvelope
-              ? window.dateUtils.ensureDateEnvelope(
-                  plan?.created_at_envelope ||
-                  plan?.createdAtEnvelope ||
-                  plan?.created_at ||
-                  plan?.date ||
-                  null
-                )
-              : (
-                  plan?.created_at_envelope ||
-                  plan?.createdAtEnvelope ||
-                  plan?.created_at ||
-                  plan?.date ||
-                  null
-                );
-            // displayName צריך להיות הסימבול, לא מזהה
-            displayName = tickerSymbol || `תוכנית ${alert.related_id}`;
-            metaForEntity = {
-              renderMode: 'notes-table',
-              ticker: tickerSymbol, // רק סימבול
-              date: planDateEnvelope,
-              date_envelope: planDateEnvelope,
-              status: plan?.status || '',
-              side: plan?.side || '',
-              investment_type: plan?.investment_type || '',
-              planned_amount: plan?.planned_amount || plan?.plannedAmount || null
-            };
-            break;
-          }
-          case 4: { // Ticker
-            const ticker = tickers.find(tk => tk && tk.id === alert.related_id);
-            const tickerSymbol = ticker?.symbol || null; // רק סימבול, לא מזהה
-            // displayName צריך להיות הסימבול, לא מזהה
-            displayName = tickerSymbol || `טיקר ${alert.related_id}`;
-            metaForEntity = {
-              renderMode: 'notes-table',
-              ticker: tickerSymbol, // רק סימבול
-              status: ticker?.status || ''
-            };
-            break;
-          }
-          default:
-            displayName = `אובייקט ${alert.related_id}`;
-            metaForEntity = { renderMode: 'notes-table' };
-          }
-
+          const { displayName, metaForEntity } = window.FieldRendererService.buildRelatedEntityMeta(
+            alert.related_type_id,
+            alert.related_id,
+            dataSources
+          );
+          
           relatedCellHtml = window.FieldRendererService.renderLinkedEntity(
             alert.related_type_id,
             alert.related_id,
@@ -562,24 +451,11 @@ function renderAlertsTableRows(alerts) {
             metaForEntity
           );
         } catch (error) {
-          window.Logger?.warn('⚠️ renderLinkedEntity failed for alert row, falling back to legacy renderer', { error, alertId: alert.id }, { page: "alerts" });
-          relatedCellHtml = '';
+          window.Logger?.warn('⚠️ renderLinkedEntity failed for alert row, falling back to dash', { error, alertId: alert.id }, { page: "alerts" });
+          relatedCellHtml = '-';
         }
-      }
-
-      if (!relatedCellHtml) {
-        const relatedDisplay = relatedObjectInfo.display;
-        const relatedClass = relatedObjectInfo.class;
-        const relatedColor = relatedObjectInfo.color;
-        const relatedBgColor = relatedObjectInfo.bgColor;
-
-        relatedCellHtml = `
-          <div class="related-object-cell ${relatedClass}"
-           style="${relatedColor ? `color: ${relatedColor};` : ''} ${relatedBgColor ? `background-color: ${relatedBgColor};` : ''}"
-           title="${relatedObjectInfo.type || 'כללי'}">
-            ${relatedDisplay}
-          </div>
-        `;
+      } else {
+        relatedCellHtml = '-';
       }
 
       // קביעת הסימבול לטור הראשון באמצעות המערכת הכללית
@@ -1030,7 +906,15 @@ function renderAlertsTableRows(alerts) {
             }
           })();
       row.setAttribute('data-date', createdAtDataAttr || '');
-      row.innerHTML = tableHTML[index];
+      row.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(`<table><tbody><tr>${tableHTML[index]}</tr></tbody></table>`, 'text/html');
+      const tempRow = doc.body.querySelector('tr');
+      if (tempRow) {
+        Array.from(tempRow.children).forEach(cell => {
+          row.appendChild(cell.cloneNode(true));
+        });
+      }
       tbody.appendChild(row);
     });
 

@@ -595,124 +595,15 @@ async function updateNotesTable(notes, options = {}) {
               const row = document.createElement('tr');
               row.className = 'table-cell-clickable';
               
-              // קביעת האובייקט המקושר
-              // קביעת האובייקט המקושר - כמו במודול מקושרים: שימוש ב-FieldRendererService עם renderMode: 'linked-items-table'
+              // קביעת האובייקט המקושר - שימוש בפונקציה הכללית
               let relatedCellHtml = '-';
-              if (note.related_type_id && note.related_id && window.FieldRendererService && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
+              if (note.related_type_id && note.related_id && window.FieldRendererService && typeof window.FieldRendererService.buildRelatedEntityMeta === 'function' && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
                 try {
-                  let displayName = '';
-                  let metaForEntity = { renderMode: 'notes-table' }; // כמו בגרסה הקודמת - מציג שדות לפי סוג ישות
-                  const relatedType = parseInt(note.related_type_id, 10);
-                  
-                  switch (relatedType) {
-                    case 1: { // Trading Account
-                      const account = additionalData.accounts?.find(a => a && a.id === note.related_id);
-                      const accountName = account?.name || account?.account_name || `חשבון מסחר ${note.related_id}`;
-                      displayName = accountName;
-                      metaForEntity = {
-                        renderMode: 'notes-table',
-                        name: accountName,
-                        status: account?.status || '',
-                        currency: account?.currency_symbol || account?.currency || ''
-                      };
-                      break;
-                    }
-                    case 2: { // Trade
-                      const trade = additionalData.trades?.find(t => t && t.id === note.related_id);
-                      const tradeTicker = trade?.ticker_symbol || trade?.ticker?.symbol || (() => {
-                        if (trade?.ticker_id) {
-                          const ticker = additionalData.tickers?.find(tk => tk && tk.id === trade.ticker_id);
-                          return ticker?.symbol;
-                        }
-                        return null;
-                      })();
-                      const tickerSymbol = tradeTicker || null; // רק סימבול, לא מזהה
-                      const tradeDateEnvelope = window.dateUtils?.ensureDateEnvelope
-                        ? window.dateUtils.ensureDateEnvelope(
-                            trade?.created_at_envelope ||
-                            trade?.createdAtEnvelope ||
-                            trade?.created_at ||
-                            trade?.opened_at ||
-                            trade?.date ||
-                            null
-                          )
-                        : (
-                            trade?.created_at_envelope ||
-                            trade?.createdAtEnvelope ||
-                            trade?.created_at ||
-                            trade?.opened_at ||
-                            trade?.date ||
-                            null
-                          );
-                      // displayName צריך להיות הסימבול, לא מזהה
-                      displayName = tickerSymbol || `טרייד ${note.related_id}`;
-                      metaForEntity = {
-                        renderMode: 'notes-table',
-                        ticker: tickerSymbol, // רק סימבול
-                        date: tradeDateEnvelope,
-                        date_envelope: tradeDateEnvelope,
-                        status: trade?.status || '',
-                        side: trade?.side || '',
-                        investment_type: trade?.investment_type || ''
-                      };
-                      break;
-                    }
-                    case 3: { // Trade Plan
-                      const plan = additionalData.tradePlans?.find(p => p && p.id === note.related_id);
-                      const planTicker = plan?.ticker?.symbol || plan?.ticker_symbol || (() => {
-                        if (plan?.ticker_id) {
-                          const ticker = additionalData.tickers?.find(tk => tk && tk.id === plan.ticker_id);
-                          return ticker?.symbol;
-                        }
-                        return null;
-                      })();
-                      const tickerSymbol = planTicker || null; // רק סימבול, לא מזהה
-                      const planDateEnvelope = window.dateUtils?.ensureDateEnvelope
-                        ? window.dateUtils.ensureDateEnvelope(
-                            plan?.created_at_envelope ||
-                            plan?.createdAtEnvelope ||
-                            plan?.created_at ||
-                            plan?.date ||
-                            null
-                          )
-                        : (
-                            plan?.created_at_envelope ||
-                            plan?.createdAtEnvelope ||
-                            plan?.created_at ||
-                            plan?.date ||
-                            null
-                          );
-                      // displayName צריך להיות הסימבול, לא מזהה
-                      displayName = tickerSymbol || `תוכנית ${note.related_id}`;
-                      metaForEntity = {
-                        renderMode: 'notes-table',
-                        ticker: tickerSymbol, // רק סימבול
-                        date: planDateEnvelope,
-                        date_envelope: planDateEnvelope,
-                        status: plan?.status || '',
-                        side: plan?.side || '',
-                        investment_type: plan?.investment_type || '',
-                        planned_amount: plan?.planned_amount || plan?.plannedAmount || null
-                      };
-                      break;
-                    }
-                    case 4: { // Ticker
-                      const ticker = additionalData.tickers?.find(tk => tk && tk.id === note.related_id);
-                      const tickerSymbol = ticker?.symbol || null; // רק סימבול, לא מזהה
-                      // displayName צריך להיות הסימבול, לא מזהה
-                      displayName = tickerSymbol || `טיקר ${note.related_id}`;
-                      metaForEntity = {
-                        renderMode: 'notes-table',
-                        ticker: tickerSymbol, // רק סימבול
-                        status: ticker?.status || ''
-                      };
-                      break;
-                    }
-                    default: {
-                      displayName = `אובייקט ${note.related_id}`;
-                      metaForEntity = { renderMode: 'notes-table' };
-                    }
-                  }
+                  const { displayName, metaForEntity } = window.FieldRendererService.buildRelatedEntityMeta(
+                    note.related_type_id,
+                    note.related_id,
+                    additionalData
+                  );
                   
                   relatedCellHtml = window.FieldRendererService.renderLinkedEntity(
                     note.related_type_id,
@@ -903,7 +794,7 @@ async function updateNotesTable(notes, options = {}) {
                 return result || '';
               })();
               
-              // בניית השורה - כמו ב-cash_flows: createElement
+              // בניית השורה - כמו ב-cash_flows: createElement + DOMParser
               const rowHTML = `
                 <td class="col-linked-object related-cell">${relatedCellHtml}</td>
                 <td class="col-content">${contentDisplay}</td>
@@ -912,8 +803,9 @@ async function updateNotesTable(notes, options = {}) {
                 ${updatedDateCell}
                 <td class="col-actions actions-cell">${actionsMenu}</td>
               `;
+              row.textContent = '';
               const parser = new DOMParser();
-              const doc = parser.parseFromString(`<tr>${rowHTML}</tr>`, 'text/html');
+              const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
               const tempRow = doc.body.querySelector('tr');
               if (tempRow) {
                 Array.from(tempRow.children).forEach(cell => {
@@ -955,23 +847,27 @@ async function updateNotesTable(notes, options = {}) {
     
     // בדיקה שהנתונים קיימים
     if (!safeNotes || safeNotes.length === 0) {
-      const emptyMessage = `
-        <tr>
-          <td colspan="6" class="text-center text-muted">
+      tbody.textContent = '';
+      const emptyRow = document.createElement('tr');
+      const emptyRowHTML = `
+        <td colspan="6" class="text-center text-muted">
           <div style="padding: 20px;">
             <h5>📝 אין הערות</h5>
             <p>לא נמצאו הערות במערכת</p>
             <button data-button-type="ADD" data-variant="full" data-icon="➕" data-text="הוסף הערה ראשונה" data-classes="btn-sm" data-onclick="openNoteDetails()" data-tooltip="הוסף הערה ראשונה למערכת" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
           </div>
         </td>
-      </tr>
-    `;
-      tbody.textContent = '';
+      `;
+      emptyRow.textContent = '';
       const parser = new DOMParser();
-      const doc = parser.parseFromString(emptyMessage, 'text/html');
-      doc.body.childNodes.forEach(node => {
-        tbody.appendChild(node.cloneNode(true));
-      });
+      const doc = parser.parseFromString(`<table><tbody><tr>${emptyRowHTML}</tr></tbody></table>`, 'text/html');
+      const tempRow = doc.body.querySelector('tr');
+      if (tempRow) {
+        Array.from(tempRow.children).forEach(cell => {
+          emptyRow.appendChild(cell.cloneNode(true));
+        });
+      }
+      tbody.appendChild(emptyRow);
       
       // 🔘 עדכון כפתורים דינמיים
       if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
@@ -989,120 +885,15 @@ async function updateNotesTable(notes, options = {}) {
       const row = document.createElement('tr');
       row.className = 'table-cell-clickable';
       
-      // קביעת האובייקט המקושר - כמו במודול מקושרים: שימוש ב-FieldRendererService עם renderMode: 'linked-items-table'
+      // קביעת האובייקט המקושר - שימוש בפונקציה הכללית
       let relatedCellHtml = '-';
-      if (note.related_type_id && note.related_id && window.FieldRendererService && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
+      if (note.related_type_id && note.related_id && window.FieldRendererService && typeof window.FieldRendererService.buildRelatedEntityMeta === 'function' && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
         try {
-          let displayName = '';
-          let metaForEntity = { renderMode: 'linked-items-table' };
-          const relatedType = parseInt(note.related_type_id, 10);
-          
-          switch (relatedType) {
-            case 1: { // Trading Account
-              const account = additionalData.accounts?.find(a => a && a.id === note.related_id);
-              const accountName = account?.name || account?.account_name || `חשבון מסחר ${note.related_id}`;
-              displayName = accountName;
-              metaForEntity = {
-                renderMode: 'linked-items-table',
-                name: accountName,
-                status: account?.status || '',
-                currency: account?.currency_symbol || account?.currency || ''
-              };
-              break;
-            }
-            case 2: { // Trade
-              const trade = additionalData.trades?.find(t => t && t.id === note.related_id);
-              const tradeTicker = trade?.ticker_symbol || trade?.ticker?.symbol || (() => {
-                if (trade?.ticker_id) {
-                  const ticker = additionalData.tickers?.find(tk => tk && tk.id === trade.ticker_id);
-                  return ticker?.symbol;
-                }
-                return null;
-              })();
-              const tickerSymbol = tradeTicker || `טרייד ${note.related_id}`;
-              const tradeDateEnvelope = window.dateUtils?.ensureDateEnvelope
-                ? window.dateUtils.ensureDateEnvelope(
-                    trade?.created_at_envelope ||
-                    trade?.createdAtEnvelope ||
-                    trade?.created_at ||
-                    trade?.opened_at ||
-                    trade?.date ||
-                    null
-                  )
-                : (
-                    trade?.created_at_envelope ||
-                    trade?.createdAtEnvelope ||
-                    trade?.created_at ||
-                    trade?.opened_at ||
-                    trade?.date ||
-                    null
-                  );
-              displayName = tickerSymbol;
-              metaForEntity = {
-                renderMode: 'linked-items-table',
-                ticker: tickerSymbol,
-                date: tradeDateEnvelope,
-                date_envelope: tradeDateEnvelope,
-                status: trade?.status || '',
-                side: trade?.side || '',
-                investment_type: trade?.investment_type || ''
-              };
-              break;
-            }
-            case 3: { // Trade Plan
-              const plan = additionalData.tradePlans?.find(p => p && p.id === note.related_id);
-              const planTicker = plan?.ticker?.symbol || plan?.ticker_symbol || (() => {
-                if (plan?.ticker_id) {
-                  const ticker = additionalData.tickers?.find(tk => tk && tk.id === plan.ticker_id);
-                  return ticker?.symbol;
-                }
-                return null;
-              })();
-              const tickerSymbol = planTicker || `תוכנית ${note.related_id}`;
-              const planDateEnvelope = window.dateUtils?.ensureDateEnvelope
-                ? window.dateUtils.ensureDateEnvelope(
-                    plan?.created_at_envelope ||
-                    plan?.createdAtEnvelope ||
-                    plan?.created_at ||
-                    plan?.date ||
-                    null
-                  )
-                : (
-                    plan?.created_at_envelope ||
-                    plan?.createdAtEnvelope ||
-                    plan?.created_at ||
-                    plan?.date ||
-                    null
-                  );
-              displayName = tickerSymbol;
-              metaForEntity = {
-                renderMode: 'linked-items-table',
-                ticker: tickerSymbol,
-                date: planDateEnvelope,
-                date_envelope: planDateEnvelope,
-                status: plan?.status || '',
-                side: plan?.side || '',
-                investment_type: plan?.investment_type || '',
-                planned_amount: plan?.planned_amount || plan?.plannedAmount || null
-              };
-              break;
-            }
-            case 4: { // Ticker
-              const ticker = additionalData.tickers?.find(tk => tk && tk.id === note.related_id);
-              const tickerSymbol = ticker?.symbol || `טיקר ${note.related_id}`;
-              displayName = tickerSymbol;
-              metaForEntity = {
-                renderMode: 'linked-items-table',
-                ticker: tickerSymbol,
-                status: ticker?.status || ''
-              };
-              break;
-            }
-            default: {
-              displayName = `אובייקט ${note.related_id}`;
-              metaForEntity = { renderMode: 'linked-items-table' };
-            }
-          }
+          const { displayName, metaForEntity } = window.FieldRendererService.buildRelatedEntityMeta(
+            note.related_type_id,
+            note.related_id,
+            additionalData
+          );
           
           relatedCellHtml = window.FieldRendererService.renderLinkedEntity(
             note.related_type_id,
@@ -1293,7 +1084,7 @@ async function updateNotesTable(notes, options = {}) {
         return result || '';
       })();
       
-      // בניית השורה - כמו ב-cash_flows: row.innerHTML
+      // בניית השורה - כמו ב-cash_flows: row.innerHTML → DOMParser
       const rowHTML = `
         <td class="col-linked-object related-cell">${relatedCellHtml}</td>
         <td class="col-content">${contentDisplay}</td>
@@ -1302,8 +1093,9 @@ async function updateNotesTable(notes, options = {}) {
         ${updatedDateCell}
         <td class="col-actions actions-cell">${actionsMenu}</td>
       `;
+      row.textContent = '';
       const parser = new DOMParser();
-      const doc = parser.parseFromString(`<tr>${rowHTML}</tr>`, 'text/html');
+      const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
       const tempRow = doc.body.querySelector('tr');
       if (tempRow) {
         Array.from(tempRow.children).forEach(cell => {
@@ -1336,346 +1128,8 @@ async function updateNotesTable(notes, options = {}) {
   }
 }
 
-/**
- * Render notes table rows
- * @param {Array} notes - Array of notes to render
- * @param {Object} additionalData - Object with accounts, trades, tradePlans, tickers arrays
- * @returns {string} HTML string of table rows
- */
-function renderNotesTableRows(notes, additionalData = {}) {
-    if (!notes || notes.length === 0) {
-        return '';
-    }
-    
-    const accounts = additionalData.accounts || [];
-    const trades = additionalData.trades || [];
-    const tradePlans = additionalData.tradePlans || [];
-    const tickers = additionalData.tickers || [];
-    
-    return notes.map(note => {
-        try {
-        const createdEnvelope = window.dateUtils?.ensureDateEnvelope
-          ? window.dateUtils.ensureDateEnvelope(note.created_at)
-          : note.created_at;
-        const dateDisplay = window.FieldRendererService?.renderDate
-          ? window.FieldRendererService.renderDate(createdEnvelope || note.created_at)
-          : window.dateUtils?.formatDate
-            ? window.dateUtils.formatDate(createdEnvelope || note.created_at, { includeTime: false })
-            : (() => {
-                try {
-                  // Use dateUtils for consistent date parsing
-                  let parsed;
-                  const dateValue = createdEnvelope?.utc || createdEnvelope?.local || note.created_at;
-                  if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
-                    const envelope = window.dateUtils.ensureDateEnvelope(dateValue);
-                    if (envelope && envelope.epochMs) {
-                      parsed = new Date(envelope.epochMs);
-                    } else {
-                      parsed = new Date(dateValue);
-                    }
-                  } else if (dateValue && typeof dateValue === 'object' && typeof dateValue.epochMs === 'number') {
-                    parsed = new Date(dateValue.epochMs);
-                  } else {
-                    parsed = new Date(dateValue);
-                  }
-                  
-                  if (!Number.isNaN(parsed.getTime())) {
-                    // Use FieldRendererService or dateUtils for formatting
-                    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-                      return window.FieldRendererService.renderDate(parsed, false);
-                    }
-                    if (window.dateUtils?.formatDate) {
-                      return window.dateUtils.formatDate(parsed, { includeTime: false });
-                    }
-                    // Last resort: use toLocaleDateString
-                    return parsed.toLocaleDateString('he-IL');
-                  }
-                } catch (error) {
-                  window.Logger?.warn('⚠️ notes table date fallback failed', { error, noteId: note?.id }, { page: 'notes' });
-                }
-                return 'לא מוגדר';
-              })();
-        const dateSortValue = window.dateUtils?.getEpochMilliseconds
-          ? window.dateUtils.getEpochMilliseconds(createdEnvelope || note.created_at)
-          : (createdEnvelope?.epochMs || createdEnvelope?.utc || createdEnvelope?.local || note.created_at || '');
-
-        // הצגת תוכן HTML עם הגבלה ל-20 תווים
-        // Debug: Check note content
-        const noteContent = note.content || '';
-        const noteAttachment = note.attachment || null;
-        
-        // Ensure content is processed correctly
-        const contentDisplay = (() => {
-          // Check if content exists and is not empty
-          if (!noteContent || (typeof noteContent === 'string' && !noteContent.trim())) {
-            window.Logger?.warn('⚠️ Note content is empty', { noteId: note?.id, content: noteContent, page: 'notes' });
-            return 'ללא תוכן';
-          }
-          
-          // Use FieldRendererService if available
-          if (window.FieldRendererService && typeof window.FieldRendererService.renderTextPreview === 'function') {
-            try {
-              return window.FieldRendererService.renderTextPreview(noteContent, { maxLength: 20, emptyPlaceholder: 'ללא תוכן' });
-            } catch (error) {
-              window.Logger?.warn('⚠️ Error rendering text preview', { error, noteId: note?.id, page: 'notes' });
-            }
-          }
-          
-          // Fallback: strip HTML and truncate
-          const fallbackPlain = String(noteContent).replace(/<[^>]*>/g, '').trim();
-          if (!fallbackPlain) {
-            return 'ללא תוכן';
-          }
-          const truncated = fallbackPlain.length > 20 ? `${fallbackPlain.substring(0, 20).trimEnd()}…` : fallbackPlain;
-          const escape = (text) => String(text)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-          return `<span class="text-truncate-preview" title="${escape(fallbackPlain)}">${escape(truncated)}</span>`;
-        })();
-
-        // הצגת קובץ עם אייקון ו-10 תווים ראשונים
-        let attachmentDisplay = '-';
-        // Only show attachment if it exists and is not empty/null
-        if (noteAttachment && noteAttachment !== null && noteAttachment !== '') {
-          // Ensure attachment is a string before processing
-          const fileName = typeof noteAttachment === 'string' ? noteAttachment : String(noteAttachment || '');
-          
-          // Only process if fileName is a valid non-empty string (not just whitespace)
-          if (fileName && fileName.trim() && fileName !== 'null' && fileName !== 'undefined') {
-            try {
-              const fileExtension = fileName.split('.').pop()?.toLowerCase();
-              let fileIcon = '📄'; // ברירת מחדל
-
-              // קביעת אייקון לפי סוג הקובץ
-              if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
-                fileIcon = '🖼️';
-              } else if (['pdf'].includes(fileExtension)) {
-                fileIcon = '📕';
-              } else if (['doc', 'docx'].includes(fileExtension)) {
-                fileIcon = '📘';
-              } else if (['txt'].includes(fileExtension)) {
-                fileIcon = '📄';
-              } else if (['xls', 'xlsx'].includes(fileExtension)) {
-                fileIcon = '📊';
-              }
-
-              // הצגת אייקון + 10 תווים ראשונים
-              const shortName = fileName.length > 10 ? fileName.substring(0, 10) + '...' : fileName;
-              attachmentDisplay = `${fileIcon} ${shortName}`;
-            } catch (error) {
-              window.Logger?.warn('⚠️ Error processing attachment', { error, noteId: note?.id, attachment: noteAttachment, page: 'notes' });
-              attachmentDisplay = '-';
-            }
-          } else {
-            // Invalid attachment value - show dash
-            attachmentDisplay = '-';
-          }
-        }
-
-      // קביעת האובייקט המקושר - כמו ב-cash_flows.js: כפתור קטן + טקסט פשוט
-      let relatedCellHtml = '-';
-      
-      if (note.related_type_id && note.related_id) {
-        let entityType = '';
-        let displayName = '';
-        
-        switch (note.related_type_id) {
-          case 1: { // Trading Account
-            entityType = 'trading_account';
-            const account = accounts.find(a => a && a.id === note.related_id);
-            displayName = account?.name || account?.account_name || `חשבון מסחר ${note.related_id}`;
-            break;
-          }
-          case 2: { // Trade
-            entityType = 'trade';
-            const trade = trades.find(t => t && t.id === note.related_id);
-            const tradeTicker = trade?.ticker_symbol || trade?.ticker?.symbol || (() => {
-              if (trade?.ticker_id) {
-                const ticker = tickers.find(tk => tk && tk.id === trade.ticker_id);
-                return ticker?.symbol;
-              }
-              return null;
-            })();
-            displayName = tradeTicker || `טרייד ${note.related_id}`;
-            break;
-          }
-          case 3: { // Trade Plan
-            entityType = 'trade_plan';
-            const plan = tradePlans.find(p => p && p.id === note.related_id);
-            const planTicker = plan?.ticker?.symbol || plan?.ticker_symbol || (() => {
-              if (plan?.ticker_id) {
-                const ticker = tickers.find(tk => tk && tk.id === plan.ticker_id);
-                return ticker?.symbol;
-              }
-              return null;
-            })();
-            displayName = planTicker || `תוכנית ${note.related_id}`;
-            break;
-          }
-          case 4: { // Ticker
-            entityType = 'ticker';
-            const ticker = tickers.find(tk => tk && tk.id === note.related_id);
-            displayName = ticker?.symbol || `טיקר ${note.related_id}`;
-            break;
-          }
-          default: {
-            entityType = 'unknown';
-            displayName = `אובייקט ${note.related_id}`;
-          }
-        }
-        
-        if (entityType && displayName) {
-          relatedCellHtml = `
-            <div class="table-cell-flex-small">
-              <button class="btn btn-sm btn-outline-primary table-btn-small" 
-                      data-onclick="if(window.showEntityDetails) { window.showEntityDetails('${entityType}', ${note.related_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('${entityType}', ${note.related_id}, 'view'); }" 
-                      title="פתח פרטי ${displayName}">
-                🔗
-              </button>
-              <span>${displayName}</span>
-            </div>
-          `;
-        }
-      }
-
-        // Debug: Log note data to verify content and attachment are correct
-        window.Logger?.debug('🔍 Building note table row', {
-          noteId: note?.id,
-          hasContent: !!noteContent,
-          contentLength: noteContent?.length || 0,
-          contentPreview: noteContent ? String(noteContent).substring(0, 50) : 'null',
-          hasAttachment: !!noteAttachment,
-          attachmentValue: noteAttachment,
-          contentDisplay: contentDisplay.substring(0, 50),
-          attachmentDisplay,
-          page: 'notes'
-        });
-
-        return `
-          <tr class="table-cell-clickable">
-            <td class="related-cell">${relatedCellHtml}</td>
-            <td class="col-content">${contentDisplay}</td>
-            <td class="col-attachment">${attachmentDisplay}</td>
-            <td class="col-created" data-date='${dateSortValue}'>${dateDisplay}</td>
-            ${(() => {
-              // Prefer FieldRendererService.renderDate for consistent date formatting
-              const rawDate = note.updated_at || note.created_at || null;
-              
-              if (!rawDate) {
-                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-              }
-
-              // Use FieldRendererService.renderDate for proper date formatting
-              let dateDisplay = '';
-              let epoch = null;
-
-              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-                // Use FieldRendererService to render date with time
-                dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
-                
-                // Get epoch for sorting
-                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-                  const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
-                  epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
-                } else if (rawDate instanceof Date) {
-                  epoch = rawDate.getTime();
-                } else if (typeof rawDate === 'string') {
-                  const parsed = Date.parse(rawDate);
-                  epoch = Number.isNaN(parsed) ? null : parsed;
-                } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
-                  epoch = rawDate.epochMs;
-                }
-              } else {
-                // Fallback: work directly with date envelope objects or raw values
-                const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
-                  ? window.dateUtils.ensureDateEnvelope(rawDate)
-                  : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
-                    ? rawDate
-                    : null;
-
-                // Derive epoch milliseconds in a canonical way
-                epoch = (() => {
-                  if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-                    return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
-                  }
-                  if (typeof window.getEpochMilliseconds === 'function') {
-                    return window.getEpochMilliseconds(envelope || rawDate);
-                  }
-                  if (envelope && typeof envelope.epochMs === 'number') {
-                    return envelope.epochMs;
-                  }
-                  if (rawDate instanceof Date) {
-                    return rawDate.getTime();
-                  }
-                  if (typeof rawDate === 'string') {
-                    const parsed = Date.parse(rawDate);
-                    return Number.isNaN(parsed) ? null : parsed;
-                  }
-                  return null;
-                })();
-
-                if (epoch === null || Number.isNaN(epoch)) {
-                  return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-                }
-
-                // Build date display using unified date utilities
-                dateDisplay = (() => {
-                  if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
-                    return window.dateUtils.formatDateTime(envelope || rawDate);
-                  }
-                  if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
-                    return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
-                  }
-                  try {
-                    const dateObj = new Date(epoch);
-                    return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    }));
-                  } catch (err) {
-                    window.Logger?.warn('⚠️ notes updated-cell date formatting failed', { err, noteId: note?.id }, { page: 'notes' });
-                    return 'לא מוגדר';
-                  }
-                })();
-              }
-
-              if (!dateDisplay || dateDisplay === '-') {
-                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-              }
-
-              return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
-            })()}
-            <td class='actions-cell'>
-              ${(() => {
-                if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
-                // Ensure note.id is properly escaped and is a number
-                const noteId = note?.id ? parseInt(note.id) : null;
-                if (!noteId) {
-                  window.Logger?.warn('⚠️ Note ID is missing or invalid', { note, page: 'notes' });
-                  return '<!-- Invalid note ID -->';
-                }
-                const result = window.createActionsMenu([
-                  { type: 'VIEW', onclick: `window.showEntityDetails('note', ${noteId}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
-                  { type: 'EDIT', onclick: `editNote(${noteId})`, title: 'ערוך הערה' },
-                  { type: 'DELETE', onclick: `deleteNote(${noteId})`, title: 'מחק הערה' }
-                ]);
-                return result || '';
-              })()}
-            </td>
-          </tr>
-        `;
-        } catch (error) {
-          window.Logger.error(`❌ Error processing note ${note?.id}:`, error, { page: "notes" });
-          return `<tr><td colspan="6" class="text-center text-danger">שגיאה בעיבוד הערה ${note?.id}</td></tr>`;
-        }
-    }).join('');
-}
+// REMOVED: renderNotesTableRows() - All rendering is now done directly in updateNotesTable()
+// using the general FieldRendererService.buildRelatedEntityMeta() function
 
 // פונקציה לעדכון סיכום הערות
 /**
@@ -2148,7 +1602,27 @@ async function saveNote() {
     tag_ids: { id: 'noteTags', type: 'tags', default: [] }
   });
 
-  const content = noteData.content || ''; // HTML content from rich text editor
+  // Try to get content from rich text editor if not collected
+  let content = noteData.content || '';
+  if (!content || content.trim() === '') {
+    // Fallback: try to get content directly from RichTextEditorService
+    if (window.RichTextEditorService && typeof window.RichTextEditorService.getContent === 'function') {
+      content = window.RichTextEditorService.getContent('noteContent') || '';
+      window.Logger?.debug('📝 Retrieved content from RichTextEditorService fallback', {
+        contentLength: content?.length || 0,
+        page: 'notes'
+      });
+    }
+  }
+
+  window.Logger?.info('📋 Note data collected', {
+    contentLength: content?.length || 0,
+    hasContent: !!content,
+    related_type_id: noteData.related_type_id,
+    related_id: noteData.related_id,
+    page: 'notes'
+  });
+
   const related_type_id = noteData.related_type_id;
   const related_id = noteData.related_id;
   const tagIds = Array.isArray(noteData.tag_ids) ? noteData.tag_ids : [];
@@ -2156,6 +1630,11 @@ async function saveNote() {
 
   const textContent = content.replace(/<[^>]*>/g, '').trim();
   if (!textContent || textContent.length === 0) {
+    window.Logger?.warn('⚠️ Empty note content detected', {
+      contentLength: content?.length || 0,
+      textContentLength: textContent?.length || 0,
+      page: 'notes'
+    });
     window.showErrorNotification?.('שגיאה', 'תוכן ההערה חובה');
     return;
   }
@@ -2244,10 +1723,19 @@ async function saveNote() {
       payload = formData;
     } else {
       const requestData = {
-        content,
+        content: content || '',
         related_type_id: parseInt(related_type_id),
         related_id: parseInt(related_id)
       };
+      
+      window.Logger?.info('📤 Sending note creation request', {
+        contentLength: requestData.content?.length || 0,
+        hasContent: !!requestData.content,
+        related_type_id: requestData.related_type_id,
+        related_id: requestData.related_id,
+        page: 'notes'
+      });
+      
       payload = requestData;
     }
 
@@ -3511,14 +2999,13 @@ function displayCurrentAttachment(attachment) {
       nameSpan.textContent = fileName;
       container.appendChild(nameSpan);
       const link = document.createElement('a');
-      link.href = `/api/notes/files/${fileName}` 
-             target="_blank" 
-             class="btn btn-sm" 
-             style="margin-right: auto;">
-            👁️ צפה
-          </a>
-        </div>
-      `;
+      link.href = `/api/notes/files/${fileName}`;
+      link.target = "_blank";
+      link.className = "btn btn-sm";
+      link.style.marginRight = "auto";
+      link.textContent = "👁️ צפה";
+      container.appendChild(link);
+      displayElement.appendChild(container);
       actionsElement.style.display = 'block';
     } else {
       displayElement.textContent = 'אין קובץ מצורף';

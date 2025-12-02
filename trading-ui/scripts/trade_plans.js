@@ -256,11 +256,11 @@ async function displayTradePlanTickerInfo(ticker) {
   if (window.renderTickerInfo) {
     const tickerInfoHtml = await window.renderTickerInfo(ticker, 'ticker-info-display');
     tickerInfoDiv.textContent = '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = tickerInfoHtml;
-    while (tempDiv.firstChild) {
-      tickerInfoDiv.appendChild(tempDiv.firstChild);
-    }
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(tickerInfoHtml, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      tickerInfoDiv.appendChild(node.cloneNode(true));
+    });
   } else {
     // Fallback if renderTickerInfo not available
     const fallbackHTML = `
@@ -287,11 +287,11 @@ async function displayTradePlanTickerInfo(ticker) {
       </div>
     `;
     tickerInfoDiv.textContent = '';
-    const tempDiv2 = document.createElement('div');
-    tempDiv2.innerHTML = fallbackHTML;
-    while (tempDiv2.firstChild) {
-      tickerInfoDiv.appendChild(tempDiv2.firstChild);
-    }
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(fallbackHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      tickerInfoDiv.appendChild(node.cloneNode(true));
+    });
   }
   
   // Set default entry price to current price if field exists
@@ -1131,12 +1131,21 @@ async function openCancelTradePlanModal(tradePlanId) {
     }
 
     // הצגת פרטי התכנון במודל הביטול
-    document.getElementById('cancelTradePlanDetails').innerHTML = `
+    const detailsElement = document.getElementById('cancelTradePlanDetails');
+    if (detailsElement) {
+      detailsElement.textContent = '';
+      const detailsHTML = `
           <strong>טיקר:</strong> ${tradePlan.ticker?.symbol || 'לא מוגדר'}<br>
           <strong>סוג:</strong> ${tradePlan.investment_type || 'לא מוגדר'}<br>
           <strong>צד:</strong> ${tradePlan.side || 'לא מוגדר'}<br>
           <strong>סכום מתוכנן:</strong> $${tradePlan.planned_amount || '0.00'}
       `;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(detailsHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        detailsElement.appendChild(node.cloneNode(true));
+      });
+    }
 
   document.getElementById('cancelTradePlanModal').setAttribute('data-trade-plan-id', tradePlanId);
 
@@ -2190,7 +2199,23 @@ async function updateTradePlansTable(trade_plans, options = {}) {
               handleElementNotFound('#trade_plansTable tbody', 'CRITICAL');
               return;
             }
-            tbody.innerHTML = renderTradePlansTableRows(pageData);
+            tbody.textContent = '';
+            // Render rows directly using createElement + innerHTML (like notes.js and cash_flows.js)
+            pageData.forEach(design => {
+              const row = document.createElement('tr');
+              const rowHTML = renderTradePlansTableRows([design]);
+              if (rowHTML && rowHTML.trim()) {
+                // Extract content between <tr> and </tr>
+                const match = rowHTML.match(/<tr[^>]*>(.*?)<\/tr>/s);
+                if (match && match[1]) {
+                  row.innerHTML = match[1];
+                } else {
+                  // Fallback: try to parse as full row
+                  row.innerHTML = rowHTML.replace(/^<tr[^>]*>|<\/tr>$/g, '');
+                }
+                tbody.appendChild(row);
+              }
+            });
             if (window.setPageTableData) {
               window.setPageTableData('trade_plans', pageData, {
                 tableId: 'trade_plansTable',
@@ -2268,17 +2293,41 @@ async function updateTradePlansTable(trade_plans, options = {}) {
     if (hasOriginalData && hasActiveFilters) {
       // There is data but the filter didn't find results
       // Showing "no results" message due to filters
-      tbody.innerHTML = `<tr><td colspan="13" class="text-center text-info">
-                <i class="fas fa-search"></i> לא נמצאו תוצאות
-                <br><small>נסה לשנות את הפילטרים או מונח החיפוש</small>
-            </td></tr>`;
+      tbody.textContent = '';
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 13;
+      cell.className = 'text-center text-info';
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-search';
+      cell.appendChild(icon);
+      cell.appendChild(document.createTextNode(' לא נמצאו תוצאות'));
+      const br = document.createElement('br');
+      cell.appendChild(br);
+      const small = document.createElement('small');
+      small.textContent = 'נסה לשנות את הפילטרים או מונח החיפוש';
+      cell.appendChild(small);
+      row.appendChild(cell);
+      tbody.appendChild(row);
     } else {
       // No data at all
       // Showing "no data" message
-      tbody.innerHTML = `<tr><td colspan="13" class="text-center text-muted">
-                <i class="fas fa-info-circle"></i> אין תכנונים להצגה
-                <br><small>לא נמצאו תכנונים במערכת</small>
-            </td></tr>`;
+      tbody.textContent = '';
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 13;
+      cell.className = 'text-center text-muted';
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-info-circle';
+      cell.appendChild(icon);
+      cell.appendChild(document.createTextNode(' אין תכנונים להצגה'));
+      const br = document.createElement('br');
+      cell.appendChild(br);
+      const small = document.createElement('small');
+      small.textContent = 'לא נמצאו תכנונים במערכת';
+      cell.appendChild(small);
+      row.appendChild(cell);
+      tbody.appendChild(row);
     }
 
     // Updating record count - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
@@ -2302,7 +2351,26 @@ async function updateTradePlansTable(trade_plans, options = {}) {
 
   window.Logger.info(`🔄 Table HTML built successfully, length: ${tableHTML.length}`, { page: "trade_plans" });
   window.Logger.info(`🔄 Setting tbody.innerHTML with ${safeTradePlans.length} rows`, { page: "trade_plans" });
-  tbody.innerHTML = tableHTML;
+  tbody.textContent = '';
+  // Render rows directly using createElement + innerHTML (like notes.js and cash_flows.js)
+  if (tableHTML && tableHTML.trim()) {
+    // Split by </tr> to get individual rows
+    const rowMatches = tableHTML.match(/<tr[^>]*>[\s\S]*?<\/tr>/g);
+    if (rowMatches) {
+      rowMatches.forEach(rowHTML => {
+        const row = document.createElement('tr');
+        // Extract content between <tr> and </tr>
+        const match = rowHTML.match(/<tr[^>]*>(.*?)<\/tr>/s);
+        if (match && match[1]) {
+          row.innerHTML = match[1];
+        } else {
+          // Fallback: try to parse as full row
+          row.innerHTML = rowHTML.replace(/^<tr[^>]*>|<\/tr>$/g, '');
+        }
+        tbody.appendChild(row);
+      });
+    }
+  }
   window.Logger.info(`✅ Table updated successfully`, { page: "trade_plans" });
 
       // Updating record count - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
@@ -3271,7 +3339,11 @@ async function loadTradePlanConditionsSummary(modalElement, { showLoading = true
   const entityId = modalElement.dataset.entityId;
   if (!entityId) {
     delete summaryContainer.dataset.entityId;
-    summaryContainer.innerHTML = '<div class="text-muted small mb-0">נדרש לשמור את התכנון לפני שניתן להציג תנאים.</div>';
+    summaryContainer.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'text-muted small mb-0';
+    div.textContent = 'נדרש לשמור את התכנון לפני שניתן להציג תנאים.';
+    summaryContainer.appendChild(div);
     clearCachedConditionsSummary(modalElement.dataset.entityId || null);
     return;
   }
@@ -3279,17 +3351,27 @@ async function loadTradePlanConditionsSummary(modalElement, { showLoading = true
   summaryContainer.dataset.entityId = entityId;
   const crudManager = window.conditionsCRUDManager;
   if (!crudManager) {
-    summaryContainer.innerHTML = '<div class="text-muted small mb-0">מערכת התנאים אינה זמינה כעת.</div>';
+    summaryContainer.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'text-muted small mb-0';
+    div.textContent = 'מערכת התנאים אינה זמינה כעת.';
+    summaryContainer.appendChild(div);
     return;
   }
 
   if (showLoading) {
-    summaryContainer.innerHTML = `
+    summaryContainer.textContent = '';
+    const loadingHTML = `
       <div class="text-center text-muted py-2">
         <span class="spinner-border spinner-border-sm me-2" role="status"></span>
         טוען תנאים פעילים...
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(loadingHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      summaryContainer.appendChild(node.cloneNode(true));
+    });
   }
 
   try {
@@ -3299,16 +3381,26 @@ async function loadTradePlanConditionsSummary(modalElement, { showLoading = true
     window.ConditionsSummaryRenderer?.setConditions?.('plan', Number(entityId), activeConditions);
 
     if (!activeConditions.length) {
-      summaryContainer.innerHTML = '<div class="text-muted small mb-0">אין תנאים פעילים לתכנון זה.</div>';
+      summaryContainer.textContent = '';
+      const div = document.createElement('div');
+      div.className = 'text-muted small mb-0';
+      div.textContent = 'אין תנאים פעילים לתכנון זה.';
+      summaryContainer.appendChild(div);
       return;
     }
 
-    summaryContainer.innerHTML = window.ConditionsSummaryRenderer?.buildTable?.('plan', activeConditions, {
+    summaryContainer.textContent = '';
+    const tableHTML = window.ConditionsSummaryRenderer?.buildTable?.('plan', activeConditions, {
       edit: 'handleTradePlanConditionSummaryEdit',
       delete: 'handleTradePlanConditionSummaryDelete',
       evaluate: 'handleTradePlanConditionRowEvaluate',
       toggle: 'handleTradePlanConditionToggleAlerts'
     }) || '<div class="text-muted small mb-0">לא נמצא Renderer להצגת תנאים.</div>';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(tableHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      summaryContainer.appendChild(node.cloneNode(true));
+    });
     if (window.ButtonSystem?.processButtons) {
       window.ButtonSystem.processButtons(summaryContainer);
     } else if (window.ButtonSystem?.hydrateButtons) {
@@ -3316,7 +3408,11 @@ async function loadTradePlanConditionsSummary(modalElement, { showLoading = true
     }
   } catch (error) {
     window.Logger?.error('Failed to load trade plan conditions summary', { error: error?.message, entityId }, { page: 'trade_plans' });
-    summaryContainer.innerHTML = '<div class="alert alert-warning py-2 px-2 mb-0 small">שגיאה בטעינת תנאים פעילים. נסה שוב.</div>';
+    summaryContainer.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'alert alert-warning py-2 px-2 mb-0 small';
+    div.textContent = 'שגיאה בטעינת תנאים פעילים. נסה שוב.';
+    summaryContainer.appendChild(div);
   }
 }
 
@@ -3372,7 +3468,11 @@ function setupTradePlanConditionsButton(modalElement) {
         loadTradePlanConditionsSummary(modalElement);
       } else {
         delete summaryContainer.dataset.entityId;
-        summaryContainer.innerHTML = '<div class="text-muted small mb-0">נדרש לשמור את התכנון לפני שניתן להציג תנאים.</div>';
+        summaryContainer.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'text-muted small mb-0';
+    div.textContent = 'נדרש לשמור את התכנון לפני שניתן להציג תנאים.';
+    summaryContainer.appendChild(div);
       }
     }
   };

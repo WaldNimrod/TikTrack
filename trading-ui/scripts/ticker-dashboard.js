@@ -576,7 +576,6 @@
             if (week52Low !== null && price && price > 0) {
                 // Format value with negative color (text-danger) - simple format to ensure color
                 const lowValue = parseFloat(week52Low).toFixed(2);
-                const lowFormatted = `<span class="text-danger" dir="ltr">${currencySymbol}${lowValue}</span>`;
                 
                 // Calculate percentage from current price
                 const lowPercent = ((parseFloat(week52Low) - parseFloat(price)) / parseFloat(price)) * 100;
@@ -584,7 +583,7 @@
                 
                 // Minimum (low) = negative color (text-danger) for both value and percentage
                 // Display: value (percentage) - both in red
-                week52LowHtml = `<span class="text-danger" dir="ltr">${lowFormatted} (${lowPercentFormatted})</span>`;
+                week52LowHtml = `<span class="text-danger" dir="ltr">${currencySymbol}${lowValue} (${lowPercentFormatted})</span>`;
             } else if (week52Low !== null) {
                 // Fallback if price is not available - show only value in red
                 const lowValue = parseFloat(week52Low).toFixed(2);

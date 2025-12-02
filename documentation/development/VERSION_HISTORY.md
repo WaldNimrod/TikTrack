@@ -207,3 +207,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-02T00:39:51+00:00 | 1.3.54.0 | 1.3.53.0 | 80dce4a7e7b0a47f6347a9473351ec7035bf834d | 7e0e3ae1838c32c23599663c245120de024d32f0 | patch | Add error handling to condition plan rendering |
 | 2025-12-02T00:40:24+00:00 | 1.3.55.0 | 1.3.54.0 | 0104d263941a16bb3f0677a8f372da3923ec1ad3 | 80dce4a7e7b0a47f6347a9473351ec7035bf834d | patch | Fix planId validation in condition rendering |
 | 2025-12-02T00:48:04+00:00 | 1.3.56.0 | 1.3.55.0 | 7277878b9c5d18a33317b3e95e2e644d4f6aab26 | 0104d263941a16bb3f0677a8f372da3923ec1ad3 | patch | Update KPI cards: combine price+change, ATR+volatility, fix 52W low color |
+| 2025-12-02T00:48:32+00:00 | 1.3.57.0 | 1.3.56.0 | 5a41590b8c725a3ba7f931e3fc57909401ac720f | 7277878b9c5d18a33317b3e95e2e644d4f6aab26 | patch | Fix 52W low HTML structure |

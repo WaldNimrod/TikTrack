@@ -560,6 +560,32 @@ class EntityDetailsService:
                         except Exception as volatility_error:
                             logger.warning(f"Error calculating volatility for ticker {entity.ticker.id}: {volatility_error}")
                         
+                        # Calculate Moving Averages (MA 20 and MA 150)
+                        try:
+                            from services.external_data.technical_indicators_calculator import TechnicalIndicatorsCalculator
+                            
+                            tech_calculator = TechnicalIndicatorsCalculator(db)
+                            
+                            # Calculate SMA 20
+                            sma_20 = tech_calculator.calculate_sma(
+                                ticker_id=entity.ticker.id,
+                                period=20,
+                                db_session=db
+                            )
+                            if sma_20 is not None:
+                                entity_dict['ticker']['ma_20'] = sma_20
+                            
+                            # Calculate SMA 150
+                            sma_150 = tech_calculator.calculate_sma(
+                                ticker_id=entity.ticker.id,
+                                period=150,
+                                db_session=db
+                            )
+                            if sma_150 is not None:
+                                entity_dict['ticker']['ma_150'] = sma_150
+                        except Exception as ma_error:
+                            logger.warning(f"Error calculating moving averages for ticker {entity.ticker.id}: {ma_error}")
+                        
                         logger.debug(f"Added market data to ticker {entity.ticker.id} for {entity_type} {entity_id}: price={latest_quote.price}, change={latest_quote.change_pct_day}%, change_from_open={latest_quote.change_pct_from_open}%, ATR={entity_dict['ticker'].get('atr')}")
                     else:
                         logger.debug(f"No market data found for ticker {entity.ticker.id} in {entity_type} {entity_id}")

@@ -10,13 +10,13 @@
     "notes": "Final sm-section-server fix"
   },
   "development": {
-    "version": "1.3.63.0",
+    "version": "1.3.64.0",
     "major": 1,
     "minor": 3,
-    "patch": 63,
+    "patch": 64,
     "build": 0,
-    "commit": "e6f303521d62d6c4dbac95a83d8d1568c133d402",
-    "updated_at": "2025-12-02T01:20:10+00:00",
-    "notes": "Restore original ATR rendering with full HTML (traffic light, badge, colors)"
+    "commit": "4eb03446f90f918c825bfad46a04406057245152",
+    "updated_at": "2025-12-02T01:27:33+00:00",
+    "notes": "Add Moving Averages (MA 20/150) KPI card to ticker dashboard"
   }
 }

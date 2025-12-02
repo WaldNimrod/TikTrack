@@ -245,4 +245,58 @@ class TechnicalIndicatorsCalculator:
         except Exception as e:
             logger.error(f"Error calculating MACD: {e}")
             return None
+    
+    def calculate_sma(
+        self,
+        ticker_id: int,
+        period: int,
+        db_session: Optional[Session] = None
+    ) -> Optional[float]:
+        """
+        Calculate Simple Moving Average (SMA) from historical closing prices.
+        
+        Args:
+            ticker_id: Ticker ID
+            period: Number of days for moving average (e.g., 20, 150)
+            db_session: Database session (optional)
+            
+        Returns:
+            SMA value, or None if insufficient data
+        """
+        session = db_session or self.db_session
+        
+        try:
+            cutoff_date = datetime.utcnow() - timedelta(days=period + 5)  # Get a few extra days
+            
+            quotes = session.query(MarketDataQuote).filter(
+                and_(
+                    MarketDataQuote.ticker_id == ticker_id,
+                    MarketDataQuote.close_price.isnot(None),
+                    MarketDataQuote.asof_utc >= cutoff_date
+                )
+            ).order_by(MarketDataQuote.asof_utc).all()
+            
+            if len(quotes) < period:
+                logger.info(f"Insufficient database data for SMA {period} for ticker {ticker_id}: {len(quotes)} quotes, need {period}")
+                return None
+            
+            quotes_sorted = sorted(quotes, key=lambda q: q.asof_utc)
+            
+            # Get the last 'period' closing prices
+            recent_closes = [q.close_price for q in quotes_sorted[-period:] if q.close_price is not None]
+            
+            if len(recent_closes) < period:
+                logger.warning(f"Insufficient closing prices for SMA {period}: {len(recent_closes)}, need {period}")
+                return None
+            
+            # Calculate SMA: average of last 'period' closing prices
+            sma = sum(recent_closes) / len(recent_closes)
+            
+            logger.info(f"📊 Calculated SMA {period} from database for ticker {ticker_id}: {sma:.2f}")
+            
+            return float(sma)
+            
+        except Exception as e:
+            logger.error(f"Error calculating SMA {period} for ticker {ticker_id}: {e}")
+            return None
 

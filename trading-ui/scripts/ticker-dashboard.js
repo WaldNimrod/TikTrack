@@ -433,6 +433,8 @@
             const atr = tickerData.atr || null;
             const week52High = tickerData.week52_high || null;
             const week52Low = tickerData.week52_low || null;
+            const ma20 = tickerData.ma_20 || null;
+            const ma150 = tickerData.ma_150 || null;
             // Get currency symbol using central FieldRendererService
             const rawCurrencySymbol = tickerData.currency_symbol || (tickerData.currency && tickerData.currency.symbol) || '$';
             const currencySymbol = window.FieldRendererService && window.FieldRendererService._normalizeCurrencySymbol
@@ -660,12 +662,47 @@
                 atrVolatilityHtml = parts.join('<br>');
             }
             
+            // Format Moving Averages card (MA 20 and MA 150)
+            let maHtml = 'N/A';
+            if (price && price > 0) {
+                const maParts = [];
+                
+                // MA 20
+                if (ma20 !== null && ma20 !== undefined && !isNaN(ma20)) {
+                    const isAbove20 = price > ma20;
+                    const diffPercent20 = ((price - ma20) / ma20) * 100;
+                    const ma20Status = isAbove20 ? 'מעל' : 'מתחת';
+                    const ma20Color = isAbove20 ? 'text-success' : 'text-danger';
+                    const ma20Sign = diffPercent20 >= 0 ? '+' : '';
+                    maParts.push(`MA 20: <span class="${ma20Color}">${ma20Status}</span> <span class="${ma20Color}" dir="ltr">${ma20Sign}${diffPercent20.toFixed(2)}%</span>`);
+                } else {
+                    maParts.push('MA 20: N/A');
+                }
+                
+                // MA 150
+                if (ma150 !== null && ma150 !== undefined && !isNaN(ma150)) {
+                    const isAbove150 = price > ma150;
+                    const diffPercent150 = ((price - ma150) / ma150) * 100;
+                    const ma150Status = isAbove150 ? 'מעל' : 'מתחת';
+                    const ma150Color = isAbove150 ? 'text-success' : 'text-danger';
+                    const ma150Sign = diffPercent150 >= 0 ? '+' : '';
+                    maParts.push(`MA 150: <span class="${ma150Color}">${ma150Status}</span> <span class="${ma150Color}" dir="ltr">${ma150Sign}${diffPercent150.toFixed(2)}%</span>`);
+                } else {
+                    maParts.push('MA 150: N/A');
+                }
+                
+                if (maParts.length > 0) {
+                    maHtml = maParts.join('<br>');
+                }
+            }
+            
             const kpiCards = [
                 { label: 'מחיר', value: priceHtml, dir: '', helpKey: null },
                 { label: 'ATR', value: atrVolatilityHtml, dir: '', helpKey: 'atr' },
                 { label: '52W גבוהה', value: week52HighHtml, dir: 'ltr', helpKey: 'week52_range' },
                 { label: '52W נמוכה', value: week52LowHtml, dir: 'ltr', helpKey: 'week52_range' },
-                { label: 'נפח יומי', value: `${formattedVolume}<br><small class="text-muted">${formattedVolumeMonetary}</small>`, dir: 'ltr', helpKey: 'volume' }
+                { label: 'נפח יומי', value: `${formattedVolume}<br><small class="text-muted">${formattedVolumeMonetary}</small>`, dir: 'ltr', helpKey: 'volume' },
+                { label: 'יחס לממוצע', value: maHtml, dir: '', helpKey: null }
             ];
             
             // Use for...of loop instead of forEach to support await

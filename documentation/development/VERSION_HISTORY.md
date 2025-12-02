@@ -214,3 +214,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-02T01:10:17+00:00 | 1.3.61.0 | 1.3.60.0 | 240b0210491f2a9dfdfa6a2472160bbcf7017397 | 559eebdea47ba6460ae3cc2bf273615c4247a372 | patch | Fix ATR volatility label styling and verify no websocket usage |
 | 2025-12-02T01:10:31+00:00 | 1.3.62.0 | 1.3.61.0 | a09e7739b4433762d53366971ccef331795471a8 | 240b0210491f2a9dfdfa6a2472160bbcf7017397 | patch | Fix misleading websocket text in notifications center |
 | 2025-12-02T01:20:10+00:00 | 1.3.63.0 | 1.3.62.0 | e6f303521d62d6c4dbac95a83d8d1568c133d402 | a09e7739b4433762d53366971ccef331795471a8 | patch | Restore original ATR rendering with full HTML (traffic light, badge, colors) |
+| 2025-12-02T01:27:33+00:00 | 1.3.64.0 | 1.3.63.0 | 4eb03446f90f918c825bfad46a04406057245152 | e6f303521d62d6c4dbac95a83d8d1568c133d402 | patch | Add Moving Averages (MA 20/150) KPI card to ticker dashboard |

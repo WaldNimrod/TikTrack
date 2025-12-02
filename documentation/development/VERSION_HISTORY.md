@@ -211,3 +211,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-02T00:53:13+00:00 | 1.3.58.0 | 1.3.57.0 | 6b5d5dcc54e1e43a2dde02e3a034320d3a84049f | 5a41590b8c725a3ba7f931e3fc57909401ac720f | patch | Fix KPI cards: 2 lines format, change calculation, ATR label, volatility subtitle |
 | 2025-12-02T00:56:19+00:00 | 1.3.59.0 | 1.3.58.0 | ec8c828919207a208064aa48ce04a9f0f67b3a2b | 6b5d5dcc54e1e43a2dde02e3a034320d3a84049f | patch | Convert currency code to symbol (USD->$) |
 | 2025-12-02T01:03:29+00:00 | 1.3.60.0 | 1.3.59.0 | 559eebdea47ba6460ae3cc2bf273615c4247a372 | ec8c828919207a208064aa48ce04a9f0f67b3a2b | patch | Use FieldRendererService for currency symbol normalization |
+| 2025-12-02T01:10:17+00:00 | 1.3.61.0 | 1.3.60.0 | 240b0210491f2a9dfdfa6a2472160bbcf7017397 | 559eebdea47ba6460ae3cc2bf273615c4247a372 | patch | Fix ATR volatility label styling and verify no websocket usage |

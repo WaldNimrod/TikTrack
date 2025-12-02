@@ -654,11 +654,11 @@
                 } else {
                     parts.push('N/A');
                 }
-                // Volatility on second line with small label
+                // Volatility on second line with prominent label
                 if (volatilityHtml !== 'N/A') {
-                    parts.push(`<small class="text-muted">תנודתיות:</small> ${volatilityHtml}`);
+                    parts.push(`<span class="fw-bold" style="font-size: 0.9rem;">תנודתיות:</span> ${volatilityHtml}`);
                 } else {
-                    parts.push(`<small class="text-muted">תנודתיות:</small> N/A`);
+                    parts.push(`<span class="fw-bold" style="font-size: 0.9rem;">תנודתיות:</span> N/A`);
                 }
                 atrVolatilityHtml = parts.join('<br>');
             }

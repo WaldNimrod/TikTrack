@@ -364,6 +364,104 @@
     <!-- =============================================================== -->
     <!-- 📊 Total Scripts Processed: 111 | Unique Scripts Loaded: 111 -->
     <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
+</head>
+
+<body class="ticker-dashboard-page">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <!-- Main content -->
+            <div class="main-content">
+                
+                <!-- =============================================================== -->
+                <!-- סקירה כללית (KPI Cards) -->
+                <!-- =============================================================== -->
+                <div class="top-section" id="ticker-dashboard-top" data-section="ticker-dashboard-top" role="region" aria-label="סקירה כללית">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <span class="icon-placeholder icon" data-icon="chart-line" data-size="20" data-alt="דשבורד טיקר" aria-label="דשבורד טיקר"></span>
+                            <span id="tickerDashboardTitle">דשבורד טיקר</span>
+                            <!-- Ticker Selection Dropdown -->
+                            <select id="tickerSelector" class="form-select form-select-sm ms-3" style="display: inline-block; width: auto; min-width: 200px;" aria-label="בחר טיקר">
+                                <option value="">טוען טיקרים...</option>
+                            </select>
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="REFRESH" data-variant="small" data-onclick="window.tickerDashboard?.refreshData()" data-text="רענן" title="רענן נתונים"></button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('ticker-dashboard-top')" data-tooltip="הצג או הסתר את אזור הסיכום" data-tooltip-static="true" aria-label="הצג/הסתר סקשן סקירה כללית" aria-expanded="true"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- KPI Cards Container -->
+                        <div id="tickerKPICards" class="row g-3 mt-2"></div>
+                    </div>
+                </div>
+                
+                <!-- =============================================================== -->
+                <!-- גרף מחיר מרכזי -->
+                <!-- =============================================================== -->
+                <div class="content-section" id="ticker-dashboard-chart" data-section="ticker-dashboard-chart" role="region" aria-label="גרף מחיר מרכזי">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <span class="icon-placeholder icon" data-icon="chart" data-size="20" data-alt="גרף מחיר מרכזי" aria-label="גרף מחיר מרכזי"></span>
+                            גרף מחיר מרכזי
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('ticker-dashboard-chart')" data-tooltip="הצג או הסתר את גרף המחיר" data-tooltip-static="true" aria-label="הצג/הסתר סקשן גרף מחיר" aria-expanded="true"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- TradingView Widget Container -->
+                        <div id="tradingview_widget" class="tradingview-widget-container" role="img" aria-label="גרף מחיר טיקר">
+                            <!-- TradingView Widget will be injected here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- =============================================================== -->
+                <!-- פעילות המשתמש בנכס -->
+                <!-- =============================================================== -->
+                <div class="content-section" id="ticker-dashboard-activity" data-section="ticker-dashboard-activity" role="region" aria-label="פעילות המשתמש בנכס">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <span class="icon-placeholder icon" data-icon="activity" data-size="20" data-alt="פעילות המשתמש בנכס" aria-label="פעילות המשתמש בנכס"></span>
+                            פעילות המשתמש בנכס
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('ticker-dashboard-activity')" data-tooltip="הצג או הסתר את פעילות המשתמש" data-tooltip-static="true" aria-label="הצג/הסתר סקשן פעילות משתמש" aria-expanded="true"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- User Activity Container -->
+                        <div id="tickerActivity"></div>
+                    </div>
+                </div>
+                
+                <!-- =============================================================== -->
+                <!-- תנאים המשויכים לנכס -->
+                <!-- =============================================================== -->
+                <div class="content-section" id="ticker-dashboard-conditions" data-section="ticker-dashboard-conditions" role="region" aria-label="תנאים המשויכים לנכס">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <span class="icon-placeholder icon" data-icon="conditions" data-size="20" data-alt="תנאים" aria-label="תנאים"></span>
+                            תנאים (Conditions) המשויכים לנכס
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('ticker-dashboard-conditions')" data-tooltip="הצג או הסתר את התנאים המשויכים" data-tooltip-static="true" aria-label="הצג/הסתר סקשן תנאים" aria-expanded="true"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- Conditions Container -->
+                        <div id="tickerConditions"></div>
+                    </div>
+                </div>
+                
+            </div> <!-- End main-content -->
+        </div> <!-- End page-body -->
+    </div> <!-- End background-wrapper -->
 </body>
 </html>
 

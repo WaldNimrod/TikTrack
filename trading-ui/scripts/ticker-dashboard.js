@@ -243,6 +243,9 @@
             // Update page title
             updatePageTitle();
             
+            // Load and populate ticker selector
+            await loadTickerSelector();
+            
             // Render KPI cards
             if (window.Logger) {
                 window.Logger.info('📊 Rendering KPI cards...', { page: 'ticker-dashboard' });
@@ -1636,6 +1639,170 @@
     }
 
     /**
+     * Load and populate ticker selector dropdown
+     */
+    async function loadTickerSelector() {
+        try {
+            const selector = document.getElementById('tickerSelector');
+            if (!selector) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Ticker selector not found in DOM', { page: 'ticker-dashboard' });
+                }
+                return;
+            }
+            
+            // Show loading state
+            selector.innerHTML = '<option value="">טוען טיקרים...</option>';
+            selector.disabled = true;
+            
+            // Load user tickers
+            let userTickers = [];
+            if (window.tickersData && typeof window.tickersData.getUserTickers === 'function') {
+                userTickers = await window.tickersData.getUserTickers({ force: false });
+            } else {
+                // Fallback: try to fetch from API
+                const response = await fetch('/api/tickers/my');
+                if (response.ok) {
+                    const data = await response.json();
+                    userTickers = data.data || data || [];
+                }
+            }
+            
+            // Populate selector
+            selector.innerHTML = '';
+            if (userTickers.length === 0) {
+                selector.innerHTML = '<option value="">אין טיקרים זמינים</option>';
+                selector.disabled = true;
+                return;
+            }
+            
+            // Add options
+            userTickers.forEach(ticker => {
+                const option = document.createElement('option');
+                option.value = ticker.id;
+                const displayText = ticker.name ? `${ticker.symbol} - ${ticker.name}` : ticker.symbol;
+                option.textContent = displayText;
+                if (ticker.id === tickerId) {
+                    option.selected = true;
+                }
+                selector.appendChild(option);
+            });
+            
+            selector.disabled = false;
+            
+            // Add change event listener (remove old one first to avoid duplicates)
+            selector.removeEventListener('change', handleTickerChange);
+            selector.addEventListener('change', handleTickerChange);
+            
+            if (window.Logger) {
+                window.Logger.info('✅ Ticker selector loaded', { 
+                    tickerCount: userTickers.length, 
+                    currentTickerId: tickerId,
+                    page: 'ticker-dashboard' 
+                });
+            }
+        } catch (error) {
+            const selector = document.getElementById('tickerSelector');
+            if (selector) {
+                selector.innerHTML = '<option value="">שגיאה בטעינת טיקרים</option>';
+                selector.disabled = true;
+            }
+            if (window.Logger) {
+                window.Logger.error('❌ Error loading ticker selector', { error, page: 'ticker-dashboard' });
+            }
+        }
+    }
+    
+    /**
+     * Handle ticker selection change
+     */
+    async function handleTickerChange(event) {
+        const newTickerId = parseInt(event.target.value, 10);
+        if (!newTickerId || newTickerId === tickerId) {
+            return; // No change or invalid selection
+        }
+        
+        try {
+            if (window.Logger) {
+                window.Logger.info('🔄 Changing ticker', { 
+                    oldTickerId: tickerId, 
+                    newTickerId,
+                    page: 'ticker-dashboard' 
+                });
+            }
+            
+            // Show loading state
+            if (typeof window.showLoadingState === 'function') {
+                window.showLoadingState('ticker-dashboard-top');
+            }
+            
+            // Update tickerId
+            tickerId = newTickerId;
+            
+            // Update URL without page reload
+            const url = new URL(window.location.href);
+            url.searchParams.set('tickerId', tickerId.toString());
+            window.history.replaceState({ tickerId }, '', url.toString());
+            
+            // Invalidate cache for old ticker
+            if (window.UnifiedCacheManager) {
+                await window.UnifiedCacheManager.invalidate(`ticker-dashboard-${tickerId}`, 'memory');
+                await window.UnifiedCacheManager.invalidate(`ticker-user-activity-${tickerId}`, 'memory');
+            }
+            
+            // Load new ticker data
+            if (window.TickerDashboardData) {
+                tickerData = await window.TickerDashboardData.loadTickerDashboardData(tickerId, { forceRefresh: true });
+            } else {
+                throw new Error('TickerDashboardData service not available');
+            }
+            
+            // Re-render all components
+            updatePageTitle();
+            await renderKPICards();
+            await initPriceChart();
+            await renderUserActivity();
+            await renderConditions();
+            
+            // Show success notification
+            if (window.NotificationSystem) {
+                const tickerSymbol = tickerData?.symbol || `טיקר #${tickerId}`;
+                window.NotificationSystem.showSuccess('טיקר עודכן', `הדשבורד עודכן לטיקר ${tickerSymbol}`);
+            }
+            
+            if (typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState('ticker-dashboard-top');
+            }
+            
+            if (window.Logger) {
+                window.Logger.info('✅ Ticker changed successfully', { 
+                    tickerId, 
+                    symbol: tickerData?.symbol,
+                    page: 'ticker-dashboard' 
+                });
+            }
+        } catch (error) {
+            // Reset selector to previous value
+            const selector = document.getElementById('tickerSelector');
+            if (selector) {
+                selector.value = tickerId ? tickerId.toString() : '';
+            }
+            
+            if (typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState('ticker-dashboard-top');
+            }
+            
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאה', `שגיאה בעדכון טיקר: ${error.message}`);
+            }
+            
+            if (window.Logger) {
+                window.Logger.error('❌ Error changing ticker', { error, page: 'ticker-dashboard' });
+            }
+        }
+    }
+    
+    /**
      * Refresh dashboard data
      */
     async function refreshData() {
@@ -1797,6 +1964,8 @@
         init: initTickerDashboard,
         refreshData,
         goBack,
+        changeTicker: handleTickerChange,
+        loadTickerSelector,
         get tickerData() {
             return tickerData;
         },

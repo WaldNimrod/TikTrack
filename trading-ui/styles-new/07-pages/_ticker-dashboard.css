@@ -33,6 +33,24 @@
     text-overflow: ellipsis;
 }
 
+/* Ticker Selector in Header */
+.ticker-dashboard-page #tickerSelector {
+    display: inline-block;
+    width: auto;
+    min-width: 200px;
+    max-width: 300px;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+@media (max-width: 768px) {
+    .ticker-dashboard-page #tickerSelector {
+        min-width: 150px;
+        max-width: 200px;
+        font-size: 0.875rem;
+    }
+}
+
 .ticker-dashboard-page .kpi-value {
     font-size: 1.5rem;
     font-weight: bold;

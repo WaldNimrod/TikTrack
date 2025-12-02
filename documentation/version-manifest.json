@@ -10,13 +10,13 @@
     "notes": "Final sm-section-server fix"
   },
   "development": {
-    "version": "1.3.72.0",
+    "version": "1.3.73.0",
     "major": 1,
     "minor": 3,
-    "patch": 72,
+    "patch": 73,
     "build": 0,
-    "commit": "aa3e19845096ee92be39d6355a5316b834553a4d",
-    "updated_at": "2025-12-02T16:18:39+00:00",
-    "notes": "Fix KPI card text wrapping - remove nowrap from card container"
+    "commit": "6ee117c6f7a3cab6d7d68a2ee2e4fe9915a7dfc7",
+    "updated_at": "2025-12-02T22:08:38+00:00",
+    "notes": "Add ticker selection dropdown to dashboard header"
   }
 }

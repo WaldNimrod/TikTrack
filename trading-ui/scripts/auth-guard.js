@@ -35,8 +35,40 @@ function isPublicPage() {
  * Checks authentication and redirects to login if needed
  */
 async function initAuthGuard() {
-  // Skip check for public pages
+  // For public pages (login, register, etc.), check if user is already authenticated
+  // If authenticated, redirect to dashboard
   if (isPublicPage()) {
+    // Check if user is already authenticated (both local and server)
+    const isAuth = typeof isAuthenticated === 'function' ? isAuthenticated() : false;
+    
+    if (isAuth) {
+      // Double-check with server to ensure authentication is valid
+      try {
+        const response = await fetch('/api/auth/me', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status === 'success' && data.data?.user) {
+            // User is authenticated - redirect to dashboard
+            const redirectPath = getRedirectAfterLogin();
+            if (redirectPath) {
+              window.location.href = redirectPath;
+            } else {
+              window.location.href = 'index.html';
+            }
+            return;
+          }
+        }
+      } catch (error) {
+        // If server check fails, stay on login page
+        console.debug('Auth guard: Server check failed, staying on login page', error);
+      }
+    }
+    
+    // Not authenticated - stay on public page
     return;
   }
   

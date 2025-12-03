@@ -163,6 +163,21 @@ function loadSavedCredentials(usernameId = 'username', passwordId = 'password', 
 }
 
 function showDashboard(loginSectionId = 'loginSection', dashboardSectionId = 'dashboardSection') {
+  // If called from login page, redirect to dashboard instead
+  if (window.location.pathname.includes('login.html') || 
+      window.location.pathname.includes('register.html')) {
+    // Check if we have a redirect destination from auth guard
+    const redirectPath = window.AuthGuard?.getRedirectAfterLogin?.();
+    if (redirectPath) {
+      window.location.href = redirectPath;
+    } else {
+      // Default to index.html (dashboard)
+      window.location.href = 'index.html';
+    }
+    return;
+  }
+
+  // Original behavior for pages with login/dashboard sections
   const loginSection = document.getElementById(loginSectionId);
   const dashboardSection = document.getElementById(dashboardSectionId);
 
@@ -337,6 +352,15 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
 
       showLoginSuccess('התחברות הצליחה! מעביר לדשבורד...');
 
+      // Dispatch login success event
+      window.dispatchEvent(new CustomEvent('login:success'));
+      window.dispatchEvent(new CustomEvent('user:logged-in'));
+
+      // Update header display if available
+      if (window.headerSystem?.updateUserDisplay) {
+        window.headerSystem.updateUserDisplay();
+      }
+
       // הפעלת callback אם קיים
       if (onSuccess && typeof onSuccess === 'function') {
         setTimeout(() => {
@@ -345,7 +369,14 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
       } else {
         // מעבר לדשבורד אחרי שנייה
         setTimeout(() => {
-          showDashboard();
+          // Check if we have a redirect destination from auth guard
+          const redirectPath = window.AuthGuard?.getRedirectAfterLogin?.();
+          if (redirectPath) {
+            window.location.href = redirectPath;
+          } else {
+            // Default to index.html (dashboard)
+            window.location.href = 'index.html';
+          }
         }, 1000);
       }
 
@@ -420,49 +451,53 @@ function createLoginInterface(containerId, onSuccess = null) {
   const container = document.getElementById(containerId);
   if (!container) {return;}
 
-  container.innerHTML = `
-    <div class="login-container">
-      <div class="login-header">
-        <div class="login-logo">
-          <img src="images/logo.svg" alt="TikTrack Logo" />
-        </div>
+  container.textContent = '';
+  const loginHTML = `
+    <div class="login-header">
+      <div class="login-logo">
+        <img src="images/logo.svg" alt="TikTrack Logo" />
+      </div>
+      <h1 class="login-title">התחברות</h1>
+      <p class="login-subtitle">ברוכים הבאים ל-TikTrack</p>
+    </div>
+    
+    <div class="login-error" id="loginError"></div>
+    <div class="login-success" id="loginSuccess"></div>
+    
+    <form id="loginForm">
+      <div class="form-group">
+        <label class="form-label" for="username">שם משתמש</label>
+        <input type="text" id="username" class="form-control" placeholder="הכנס שם משתמש" required>
       </div>
       
-      <div class="login-error" id="loginError"></div>
-      <div class="login-success" id="loginSuccess"></div>
-      
-      <form id="loginForm">
-        <div class="form-group">
-          <label class="form-label" for="username">שם משתמש</label>
-          <input type="text" id="username" class="form-control" placeholder="הכנס שם משתמש" required>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label" for="password">סיסמה</label>
-          <input type="password" id="password" class="form-control" placeholder="הכנס סיסמה" required>
-        </div>
-        
-        <div class="remember-me">
-          <input type="checkbox" id="rememberMe">
-          <label for="rememberMe">זכור אותי לתקופת הפיתוח</label>
-        </div>
-        
-        <button type="submit" class="btn-login" id="loginBtn">
-          <span id="loginBtnText">התחבר</span>
-          <span id="loginBtnSpinner" style="display: none;">⏳ מתחבר...</span>
-        </button>
-      </form>
-      
-      <div style="text-align: center; margin-top: 1rem;">
-        <a href="forgot-password.html" style="color: var(--apple-blue, #007AFF); text-decoration: none; font-size: 0.9rem;">שכחת סיסמה?</a>
+      <div class="form-group">
+        <label class="form-label" for="password">סיסמה</label>
+        <input type="password" id="password" class="form-control" placeholder="הכנס סיסמה" required>
       </div>
       
-      <div class="demo-credentials">
-        <p><strong>מנהל:</strong> username=admin, password=admin123</p>
-        <p><strong>משתמש:</strong> username=user, password=user123</p>
+      <div class="remember-me">
+        <input type="checkbox" id="rememberMe">
+        <label for="rememberMe">זכור אותי לתקופת הפיתוח</label>
       </div>
+      
+      <button type="submit" class="btn-login" id="loginBtn">
+        <span id="loginBtnText">התחבר</span>
+        <span id="loginBtnSpinner" style="display: none;">⏳ מתחבר...</span>
+      </button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 1rem;">
+      <a href="forgot-password.html" style="color: #26baac; text-decoration: none; font-size: 0.9rem;">שכחת סיסמה?</a>
+    </div>
+    
+    <div class="demo-credentials">
+      <h6>פרטי התחברות לדמו:</h6>
+      <p><strong>מנהל:</strong> username=admin, password=admin123</p>
+      <p><strong>משתמש:</strong> username=user, password=user123</p>
     </div>
   `;
+  // Use innerHTML instead of DOMParser for better compatibility
+  container.innerHTML = loginHTML;
 
   // הגדרת הטופס
   setupLoginForm('loginForm', onSuccess);
@@ -473,11 +508,12 @@ function createLogoutButton(containerId) {
   const container = document.getElementById(containerId);
   if (!container) {return;}
 
-  container.innerHTML = `
-    <button class="btn" onclick="logout()">
-      🚪 התנתק
-    </button>
-  `;
+  container.textContent = '';
+  const button = document.createElement('button');
+  button.className = 'btn';
+  button.onclick = logout;
+  button.textContent = '🚪 התנתק';
+  container.appendChild(button);
 }
 
 // פונקציה לבדיקת הרשאות

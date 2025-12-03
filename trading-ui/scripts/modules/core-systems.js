@@ -649,25 +649,42 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
       // Load page-specific configuration from page-initialization-configs.js
       let pageConfig = null;
-      // Debug info only in verbose mode
+      
+      // Debug: Check what's available
+      if (window.Logger?.debug) {
+        window.Logger.debug('Looking for page config', {
+          pageName: this.pageInfo.name,
+          hasPageInitializationConfigs: typeof window.pageInitializationConfigs !== 'undefined',
+          hasPAGE_CONFIGS: typeof window.PAGE_CONFIGS !== 'undefined',
+          pageInitializationConfigsKeys: typeof window.pageInitializationConfigs !== 'undefined' ? Object.keys(window.pageInitializationConfigs) : [],
+          PAGE_CONFIGSKeys: typeof window.PAGE_CONFIGS !== 'undefined' ? Object.keys(window.PAGE_CONFIGS) : [],
+        }, { page: 'core-systems' });
+      }
 
       if (
         typeof window.pageInitializationConfigs !== 'undefined' &&
         window.pageInitializationConfigs[this.pageInfo.name]
       ) {
         pageConfig = window.pageInitializationConfigs[this.pageInfo.name];
-        // Removed debug log - page config loading is tracked internally
+        if (window.Logger?.debug) {
+          window.Logger.debug(`Found page config in pageInitializationConfigs for ${this.pageInfo.name}`, { page: 'core-systems' });
+        }
       } else if (
         typeof window.PAGE_CONFIGS !== 'undefined' &&
         window.PAGE_CONFIGS[this.pageInfo.name]
       ) {
         // Fallback to PAGE_CONFIGS if pageInitializationConfigs not available
         pageConfig = window.PAGE_CONFIGS[this.pageInfo.name];
-        // Removed debug log - page config loading is tracked internally
+        if (window.Logger?.debug) {
+          window.Logger.debug(`Found page config in PAGE_CONFIGS for ${this.pageInfo.name}`, { page: 'core-systems' });
+        }
       } else {
         // Only log warning if page config is critical
         if (window.Logger) {
-          window.Logger.warn(`No page config found for ${this.pageInfo.name}`, { page: 'core-systems' });
+          window.Logger.warn(`No page config found for ${this.pageInfo.name}`, { 
+            page: 'core-systems',
+            availableKeys: typeof window.pageInitializationConfigs !== 'undefined' ? Object.keys(window.pageInitializationConfigs) : (typeof window.PAGE_CONFIGS !== 'undefined' ? Object.keys(window.PAGE_CONFIGS) : [])
+          });
         }
       }
 
@@ -920,12 +937,23 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       }
       await Promise.all([
         // Header System - has localStorage fallback, doesn't need cache
+        // Skip header for auth pages (login, register, etc.)
         (async () => {
-          if (typeof window.initializeHeaderSystem === 'function') {
+          const isAuthPage = config.pageType === 'auth' || 
+                            config.name === 'Login' || 
+                            config.name === 'Register' ||
+                            window.location.pathname.includes('login.html') ||
+                            window.location.pathname.includes('register.html');
+          
+          if (!isAuthPage && typeof window.initializeHeaderSystem === 'function') {
             if (window.Logger?.debug) {
               window.Logger.debug('Initializing Header System', {}, { page: 'core-systems' });
             }
             window.initializeHeaderSystem();
+          } else if (isAuthPage) {
+            if (window.Logger?.debug) {
+              window.Logger.debug('Skipping Header System for auth page', {}, { page: 'core-systems' });
+            }
           } else {
             console.warn('⚠️ initializeHeaderSystem not available');
           }
@@ -3548,11 +3576,11 @@ async function showDetailsModal(title, content, options = {}) {
   const detailsContent = modal.querySelector('.details-content');
   if (detailsContent) {
     detailsContent.textContent = '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = content;
-    while (tempDiv.firstChild) {
-      detailsContent.appendChild(tempDiv.firstChild);
-    }
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      detailsContent.appendChild(node.cloneNode(true));
+    });
   }
 
   // Show modal using ModalManagerV2 (with proper z-index and backdrop management)
@@ -3739,12 +3767,12 @@ function closeAllDetailsModals() {
 
 // Helper function to extract text content from HTML
 function extractTextFromHTML(htmlContent) {
-  // Create temporary div to parse HTML
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = htmlContent;
+  // Parse HTML using DOMParser
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlContent, 'text/html');
 
   // Extract text content
-  let textContent = tempDiv.textContent || tempDiv.innerText || '';
+  let textContent = doc.body.textContent || doc.body.innerText || '';
 
   // Clean up the text
   textContent = textContent

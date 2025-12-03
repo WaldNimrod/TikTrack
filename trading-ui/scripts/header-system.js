@@ -673,7 +673,10 @@ class FilterManager {
       const accountItem = document.createElement('div');
       accountItem.className = 'account-filter-item';
       accountItem.setAttribute('data-value', account.id.toString());
-      accountItem.innerHTML = `<span class="option-text">${account.name || account.id}</span>`;
+      const span = document.createElement('span');
+      span.className = 'option-text';
+      span.textContent = account.name || account.id;
+      accountItem.appendChild(span);
       accountMenu.appendChild(accountItem);
     });
 
@@ -1052,6 +1055,19 @@ class HeaderSystem {
   }
 
   static createHeader() {
+    // Skip header creation for auth pages (login, register, etc.)
+    const isAuthPage = window.location.pathname.includes('login.html') ||
+                      window.location.pathname.includes('register.html') ||
+                      window.location.pathname.includes('forgot-password.html') ||
+                      window.location.pathname.includes('reset-password.html') ||
+                      document.documentElement.classList.contains('login-page') ||
+                      document.documentElement.classList.contains('auth-page');
+    
+    if (isAuthPage) {
+      window.Logger?.debug('Skipping header creation for auth page', { page: 'header-system' });
+      return;
+    }
+
     const headerElement = document.getElementById('unified-header');
     if (!headerElement) {
       if (!document.body) {
@@ -1064,7 +1080,12 @@ class HeaderSystem {
 
     const existingHeader = document.getElementById('unified-header');
     const headerHTML = HeaderSystem.getHeaderHTML();
-    existingHeader.innerHTML = headerHTML;
+    existingHeader.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(headerHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        existingHeader.appendChild(node.cloneNode(true));
+    });
   }
 
   /**

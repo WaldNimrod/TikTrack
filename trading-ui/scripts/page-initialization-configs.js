@@ -222,6 +222,14 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.TagWidget',
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System
+        'window.unifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        'window.CRUDResponseHandler', // CRUD Response Handler
+        'window.LinkedItemsService', // Linked Items System
+        'window.loadLinkedItemsData', // Linked Items System
+        'window.UnifiedTableSystem', // Unified Table System
+        'window.PaginationSystem', // Pagination System
       ],
 
       // ← NEW: מטאדאטה
@@ -456,6 +464,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'base',
         'services',
         'ui-advanced',
+        'modules', // Required for ModalManagerV2
         'crud',
         'preferences',
         'validation',
@@ -483,6 +492,11 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PaginationSystem', // Pagination System
         'window.showEntityDetails', // Entity Details Modal
         'window.PendingTradePlanWidget', // Pending Trade Plan Widget
+        'window.unifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        'window.ModalManagerV2', // Modal Manager V2
+        'window.ConditionsSummaryRenderer', // Conditions Summary Renderer
       ],
 
       // ← NEW: מטאדאטה
@@ -622,6 +636,14 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ConditionsUIManager',
         'window.ConditionsModalController',
         'window.conditionsModalConfig',
+        'window.unifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        'window.CRUDResponseHandler', // CRUD Response Handler
+        'window.LinkedItemsService', // Linked Items System
+        'window.loadLinkedItemsData', // Linked Items System
+        'window.UnifiedTableSystem', // Unified Table System
+        'window.PaginationSystem', // Pagination System
       ],
 
       // ← NEW: מטאדאטה
@@ -702,7 +724,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'DataUtils',
         'window.Logger',
         'window.CacheSyncManager',
-        'window.loadExecutionsData',
+        'window.ExecutionsData',
         'window.executionsModalConfig',
         'window.SelectPopulatorService',
         'window.tickerService',
@@ -742,33 +764,27 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           // Preferences are already loaded by core-systems.js via initializePreferencesForPage
           // No need to call loadUserPreferences here - it causes duplicate API calls and 429 errors
 
-          window.Logger.info('🔍 Checking loadExecutionsData...', {
-            exists: typeof window.loadExecutionsData !== 'undefined',
-            type: typeof window.loadExecutionsData,
-            isFunction: typeof window.loadExecutionsData === 'function',
-            page: 'page-initialization-configs',
-          });
-          
+          // Use window.loadExecutionsData wrapper which updates allExecutions and renders table
           if (typeof window.loadExecutionsData === 'function') {
-            window.Logger.info('📥 Calling loadExecutionsData...', {
+            window.Logger.info('📥 Calling window.loadExecutionsData...', {
               page: 'page-initialization-configs',
             });
             try {
               await window.loadExecutionsData();
-              window.Logger.info('✅ loadExecutionsData completed', {
+              window.Logger.info('✅ window.loadExecutionsData completed', {
                 page: 'page-initialization-configs',
               });
             } catch (error) {
-              window.Logger.error('❌ loadExecutionsData failed', {
+              window.Logger.error('❌ window.loadExecutionsData failed', {
                 error: error?.message,
                 stack: error?.stack,
                 page: 'page-initialization-configs',
               });
             }
           } else {
-            window.Logger.warn('⚠️ window.loadExecutionsData is not a function', {
-              type: typeof window.loadExecutionsData,
-              value: window.loadExecutionsData,
+            window.Logger.warn('⚠️ window.loadExecutionsData is not available', {
+              loadExecutionsDataExists: typeof window.loadExecutionsData,
+              ExecutionsDataExists: !!window.ExecutionsData,
               page: 'page-initialization-configs',
             });
           }
@@ -1082,6 +1098,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.DOMPurify',
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System
+        'window.unifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
       ],
 
       // ← NEW: מטאדאטה
@@ -1090,8 +1109,20 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       pageType: 'crud',
 
       // ← NEW: אופטימיזציה
-      preloadAssets: ['accounts-data'],
+      // Use the correct cache key: 'trading-accounts-data' (primary) with fallback to 'accounts-data' (legacy)
+      preloadAssets: ['trading-accounts-data', 'accounts-data'],
       cacheStrategy: 'aggressive',
+
+      // ← NEW: Section default states
+      // Top section and main table load open, other sections load closed (lazy loading)
+      sectionsDefaultState: 'open', // Default for all sections
+      sectionDefaultStates: {
+        'top': 'open',                          // Always open
+        'main': 'open',                         // Always open
+        'account-activity-summary': 'closed',   // Closed, parallel loading
+        'account-activity-table': 'closed',     // Closed, parallel loading
+        'positions-portfolio': 'closed'         // Closed, parallel loading
+      },
 
       // קיים
       requiresFilters: true,
@@ -1268,6 +1299,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.TableSortValueAdapter', // Data Collection Service
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System
+        'window.unifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
       ],
       description: 'ניהול תזרימי מזומנים - הכנסות והוצאות',
       lastModified: '2025-11-13',
@@ -1334,6 +1368,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.tickersModalConfig',
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System
+        'window.unifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
       ],
 
       // ← NEW: מטאדאטה
@@ -1468,6 +1505,15 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',
+        'window.ConditionsSummaryRenderer', // Conditions Summary Renderer
+        'window.unifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        'window.CRUDResponseHandler', // CRUD Response Handler
+        'window.LinkedItemsService', // Linked Items System
+        'window.loadLinkedItemsData', // Linked Items System
+        'window.UnifiedTableSystem', // Unified Table System
+        'window.PaginationSystem', // Pagination System
       ],
 
       requiresFilters: true,
@@ -1477,75 +1523,20 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         async pageConfig => {
           console.log('📝 [page-initialization-configs] Notes customInitializer started');
 
-          // Use general system getPageDataFunctions() instead of local code
-          if (typeof window.getPageDataFunctions === 'function') {
-            console.log('✅ [page-initialization-configs] getPageDataFunctions found');
-            const { loadData } = window.getPageDataFunctions();
-            console.log('🔍 [page-initialization-configs] loadData type:', typeof loadData);
-
-            if (loadData && typeof loadData === 'function') {
-              console.log(
-                '📝 [page-initialization-configs] Initializing Notes via general system...'
-              );
-              try {
-                await loadData();
-                console.log('✅ [page-initialization-configs] Notes data loaded successfully');
-              } catch (error) {
-                console.error('❌ [page-initialization-configs] Error loading notes data:', error);
-              }
-            } else {
-              console.warn(
-                '⚠️ [page-initialization-configs] loadData is not a function, trying fallback...'
-              );
-              // Fallback to direct function call if general system doesn't have it
-              if (typeof window.loadNotesData === 'function') {
-                console.log(
-                  '📝 [page-initialization-configs] Initializing Notes (fallback to loadNotesData via TTL guard)...'
-                );
-                try {
-                  if (window.CacheTTLGuard?.ensure) {
-                    await window.CacheTTLGuard.ensure('notes-data', window.loadNotesData);
-                  } else {
-                    await window.loadNotesData();
-                  }
-                  console.log(
-                    '✅ [page-initialization-configs] Notes data loaded successfully (fallback)'
-                  );
-                } catch (error) {
-                  console.error('❌ [page-initialization-configs] Error in loadNotesData:', error);
-                }
-              } else {
-                console.error(
-                  '❌ [page-initialization-configs] loadNotesData function not available'
-                );
-              }
+          // Use direct function call for notes page
+          if (typeof window.loadNotesData === 'function') {
+            window.Logger.info('📝 [page-initialization-configs] Initializing Notes via loadNotesData...', { page: 'page-initialization-configs' });
+            try {
+              await window.loadNotesData();
+              window.Logger.info('✅ [page-initialization-configs] Notes data loaded successfully', { page: 'page-initialization-configs' });
+            } catch (error) {
+              window.Logger.error('❌ [page-initialization-configs] Error in loadNotesData', { error: error?.message, stack: error?.stack, page: 'page-initialization-configs' });
             }
           } else {
-            console.warn(
-              '⚠️ [page-initialization-configs] getPageDataFunctions not found, trying direct loadNotesData...'
-            );
-            // Fallback if getPageDataFunctions doesn't exist
-            if (typeof window.loadNotesData === 'function') {
-              console.log(
-                '📝 [page-initialization-configs] Initializing Notes (direct loadNotesData via TTL guard)...'
-              );
-              try {
-                if (window.CacheTTLGuard?.ensure) {
-                  await window.CacheTTLGuard.ensure('notes-data', window.loadNotesData);
-                } else {
-                  await window.loadNotesData();
-                }
-                console.log(
-                  '✅ [page-initialization-configs] Notes data loaded successfully (direct)'
-                );
-              } catch (error) {
-                console.error('❌ [page-initialization-configs] Error in loadNotesData:', error);
-              }
-            } else {
-              console.error(
-                '❌ [page-initialization-configs] loadNotesData function not available'
-              );
-            }
+            window.Logger.error('❌ [page-initialization-configs] loadNotesData function not available', { 
+              loadNotesDataType: typeof window.loadNotesData,
+              page: 'page-initialization-configs' 
+            });
           }
         },
       ],
@@ -2142,15 +2133,34 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'TradingView Lightweight Charts Test Page',
       packages: [
         'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'info-summary',
+        'conditions',
         'system-management',
         'preferences',
         'charts',
         'tradingview-charts',
         'init-system',
       ],
-      requiredGlobals: [        'window.IconSystem',
-
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
         'window.Logger',
+        'window.ModalManagerV2',
+        'window.FieldRendererService',
+        'window.CRUDResponseHandler',
+        'window.InfoSummarySystem',
+        'window.LinkedItemsService',
+        'window.loadLinkedItemsData',
+        'window.PageStateManager',
+        'window.DataCollectionService',
+        'window.SelectPopulatorService',
+        'window.ConditionsSummaryRenderer',
+        'window.UnifiedTableSystem',
+        'window.PaginationSystem',
         'window.TradingViewTheme',
         'window.TradingViewChartAdapter',
         'window.LightweightCharts',
@@ -2370,6 +2380,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'ui-advanced',
         'modules',
         'crud',
+        'preferences', // Required for ColorSchemeSystem
         'conditions',
         'dashboard-widgets',
         'info-summary',
@@ -2394,6 +2405,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PendingTradePlanWidget',
         'window.InfoSummarySystem',
         'window.PaginationSystem',
+        'window.ColorSchemeSystem', // Color Scheme System
       ],
       requiredGlobals: ['NotificationSystem',
         'window.IconSystem', 'window.loadConstraints', 'window.ConstraintManager', 'window.createActionsMenu'],
@@ -2799,19 +2811,62 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
     // Authentication Pages
     login: {
       name: 'Login',
-      packages: ['base', 'services', 'ui-advanced', 'validation', 'init-system'],
-      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'info-summary', 'conditions', 'preferences', 'validation', 'init-system'],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.ModalManagerV2',
+        'window.CRUDResponseHandler',
+        'window.ColorSchemeSystem',
+        'window.InfoSummarySystem',
+        'window.LinkedItemsService',
+        'window.loadLinkedItemsData',
+        'window.ConditionsSummaryRenderer',
+        'window.UnifiedTableSystem',
+        'window.PaginationSystem',
+      ],
       description: 'כניסה למערכת',
       pageType: 'auth',
       requiresFilters: false,
       requiresValidation: true,
       requiresTables: false,
+      customInitializers: [
+        async (pageConfig) => {
+          // Create login interface
+          if (typeof window.TikTrackAuth !== 'undefined' && typeof window.TikTrackAuth.createLoginInterface === 'function') {
+            window.TikTrackAuth.createLoginInterface('loginContainer');
+            // Load saved credentials if available
+            if (typeof window.TikTrackAuth.loadSavedCredentials === 'function') {
+              window.TikTrackAuth.loadSavedCredentials();
+            }
+          } else if (typeof window.createLoginInterface === 'function') {
+            window.createLoginInterface('loginContainer');
+            if (typeof window.loadSavedCredentials === 'function') {
+              window.loadSavedCredentials();
+            }
+          } else {
+            window.Logger?.warn('⚠️ createLoginInterface not available', { page: 'login' });
+          }
+        },
+      ],
     },
 
     register: {
       name: 'Register',
-      packages: ['base', 'services', 'ui-advanced', 'validation', 'init-system'],
-      requiredGlobals: ['NotificationSystem', 'window.IconSystem'],
+      packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'info-summary', 'conditions', 'preferences', 'validation', 'init-system'],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.ModalManagerV2',
+        'window.CRUDResponseHandler',
+        'window.ColorSchemeSystem',
+        'window.InfoSummarySystem',
+        'window.LinkedItemsService',
+        'window.loadLinkedItemsData',
+        'window.ConditionsSummaryRenderer',
+        'window.UnifiedTableSystem',
+        'window.PaginationSystem',
+      ],
       description: 'הרשמה למערכת',
       pageType: 'auth',
       requiresFilters: false,
@@ -3187,7 +3242,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.DataCollectionService',
         'window.FieldRendererService',
         'window.ModalManagerV2',
-        'window.CRUDResponseHandler'
+        'window.CRUDResponseHandler',
+        'window.notesModalConfig' // Required for Save as Note feature
         // Note: window.NotesData is optional - ai-notes-integration.js has fallback
       ],
       description: 'ניתוח AI - יצירת ניתוחים באמצעות מנועי LLM',

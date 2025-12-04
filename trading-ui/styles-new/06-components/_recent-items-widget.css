@@ -90,8 +90,7 @@
   display: none; /* Hidden by default - Bootstrap will show via .active/.show */
   animation: fadeIn 0.2s ease-in;
   position: relative;
-  top: 0;
-  left: 0;
+  /* Removed top: 0; left: 0; - can interfere with positioning (same as Unified Pending Actions Widget) */
   width: 100%;
   flex: 1;
   min-height: 0;
@@ -121,7 +120,7 @@
 
 /* ===== Widget Item ===== */
 .recent-items-widget-item {
-  position: relative;
+  position: relative; /* Relative positioning for overlay */
   cursor: pointer;
   transition: background-color 0.2s ease;
   /* Ensure items are visible */
@@ -130,18 +129,15 @@
   /* Ensure item takes full width and is sensitive to hover */
   width: 100%;
   min-height: 60px; /* Minimum height to ensure hover area */
-  padding: 0.5rem 1rem; /* Padding to make entire area sensitive */
+  padding: 0.9rem 1rem; /* Padding to make entire area sensitive (same as Unified Pending Actions) */
+  margin-bottom: 0.75rem; /* Margin between items (same as Unified Pending Actions) */
   opacity: 1;
-  min-height: auto;
   /* Contain item within list - prevent text overflow, but allow overlay to extend */
   max-width: 100%;
   box-sizing: border-box;
   overflow: visible; /* Allow overlay to extend beyond */
   word-wrap: break-word;
   word-break: break-word;
-  /* Ensure item fills entire list item area for hover detection */
-  width: 100%;
-  padding: 0.5rem 1rem;
   /* Ensure header fills entire item area */
 }
 
@@ -305,8 +301,8 @@
   /* Allow overlay to extend beyond wrapper - scrolling handled by card-body */
   overflow: visible;
   position: relative;
-  /* Ensure wrapper doesn't clip overlay */
-  contain: layout style;
+  /* Remove contain to allow proper positioning (same as Unified Pending Actions Widget) */
+  /* contain: layout style; - REMOVED: This was causing positioning issues */
 }
 
 /* ===== List Container ===== */

@@ -404,15 +404,18 @@ def create_ticker():
                 }), 400
             
             # Create association with custom fields
+            from datetime import datetime, timezone
             user_ticker = UserTicker(
                 user_id=user_id,
                 ticker_id=existing_ticker.id,
                 name_custom=name_custom,
                 type_custom=type_custom,
-                status='open'
+                status='open',
+                created_at=datetime.now(timezone.utc)  # Explicitly set created_at
             )
             db.add(user_ticker)
-            db.commit()
+            db.flush()  # Flush to get ID and check for errors, but don't commit yet
+            # Let the decorator handle the commit
             ticker = existing_ticker
         else:
             # Create new ticker
@@ -434,15 +437,36 @@ def create_ticker():
                     }), 400
             
             # Create association with custom fields
-            user_ticker = UserTicker(
-                user_id=user_id,
-                ticker_id=ticker.id,
-                name_custom=name_custom,
-                type_custom=type_custom,
-                status='open'
-            )
-            db.add(user_ticker)
-            db.commit()
+            try:
+                from datetime import datetime, timezone
+                user_ticker = UserTicker(
+                    user_id=user_id,
+                    ticker_id=ticker.id,
+                    name_custom=name_custom,
+                    type_custom=type_custom,
+                    status='open',
+                    created_at=datetime.now(timezone.utc)  # Explicitly set created_at
+                )
+                db.add(user_ticker)
+                db.flush()  # Flush to get ID and check for errors, but don't commit yet
+                # Let the decorator handle the commit
+            except Exception as e:
+                db.rollback()
+                error_msg = str(e)
+                logger.error(f"Error creating user_ticker association: {error_msg}")
+                import traceback
+                logger.error(f"Full traceback: {traceback.format_exc()}")
+                # Try to delete the ticker we just created if association fails
+                try:
+                    db.delete(ticker)
+                    db.flush()
+                except Exception as del_error:
+                    logger.error(f"Error deleting ticker after association failure: {del_error}")
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": f"שגיאה ביצירת קישור טיקר למשתמש: {error_msg}"},
+                    "version": "1.0"
+                }), 500
             
             # Update ticker status
             try:
@@ -625,7 +649,7 @@ def update_ticker(ticker_id: int):
                     user_ticker.name_custom = name_custom
                 if type_custom is not None:
                     user_ticker.type_custom = type_custom
-                db.commit()
+                db.flush()  # Use flush instead of commit - let the decorator handle the commit
         
         # Update ticker (only general fields - custom fields updated above)
         # Only admin can update general ticker fields

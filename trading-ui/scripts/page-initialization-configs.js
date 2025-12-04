@@ -207,7 +207,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'conditions', // Conditions System
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
@@ -234,7 +233,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.UnifiedTableSystem', // Unified Table System
         'window.PaginationSystem', // Pagination System
       ],
-
       // ← NEW: מטאדאטה
       description: 'דשבורד ראשי - כולל גרפים, סטטיסטיקות ונתונים כלליים',
       lastModified: '2025-10-19',
@@ -481,7 +479,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'conditions', // Conditions System
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -504,9 +501,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PACKAGE_MANIFEST', // Unified Init System
         'window.ModalManagerV2', // Modal Manager V2
         'window.ConditionsSummaryRenderer', // Conditions Summary Renderer
-      ],
-
       // ← NEW: מטאדאטה
+      ],
       description: 'עמוד העדפות משתמש - הגדרות מערכת וצבעים',
       lastModified: '2025-10-19',
       pageType: 'settings',
@@ -625,7 +621,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'info-summary',
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -655,9 +650,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.loadLinkedItemsData', // Linked Items System
         'window.UnifiedTableSystem', // Unified Table System
         'window.PaginationSystem', // Pagination System
-      ],
-
       // ← NEW: מטאדאטה
+      ],
       description: 'עמוד מעקב טריידים - כולל טבלאות, פילטרים, התראות ותנאים',
       lastModified: '2025-10-19',
       pageType: 'crud',
@@ -727,7 +721,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'info-summary',
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -743,9 +736,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',
-      ],
-
       // ← NEW: מטאדאטה
+      ],
       description: 'מעקב ביצועי עסקאות - היסטוריית ביצועים שבוצעו',
       lastModified: '2025-11-24',
       pageType: 'crud',
@@ -870,8 +862,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.initializeDataImportPage',
         'window.refreshDataImportHistory',
         'window.showImportUserDataNotification',
-      ,
-
+      ],
       description: 'דף מרכזי לניהול תהליכי ייבוא נתונים ושיגור המודול המאוחד',
       lastModified: '2025-11-18',
       pageType: 'crud',
@@ -885,7 +876,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'scripts/monitor-import-execution.js',
         'scripts/debug-active-session.js',
       ],
-
       requiresFilters: false,
       requiresValidation: true,
       requiresTables: true,
@@ -927,7 +917,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'info-summary',
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -950,7 +939,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ConditionsModalController',
         'window.conditionsModalConfig',
       ],
-
       requiresFilters: true,
       requiresValidation: true,
       requiresTables: true,
@@ -1027,7 +1015,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'info-summary',
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -1044,9 +1031,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ConditionsUIManager',
         'window.ConditionsModalController',
         'window.conditionsModalConfig',
-      ],
-
       // ← NEW: מטאדאטה
+      ],
       description: 'מערכת התראות עסקיות - ניהול תנאי שוק והתראות',
       lastModified: '2025-11-13',
       pageType: 'crud',
@@ -1121,7 +1107,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'conditions', // Conditions System
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -1139,9 +1124,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
-      ],
-
       // ← NEW: מטאדאטה
+      ],
       description: 'ניהול חשבונות מסחר - הוספה, עריכה ומעקב חשבונות',
       lastModified: '2025-10-19',
       pageType: 'crud',
@@ -1341,7 +1325,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
-      ,
+      ],
       description: 'ניהול תזרימי מזומנים - הכנסות והוצאות',
       lastModified: '2025-11-13',
       pageType: 'crud',
@@ -1395,7 +1379,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'conditions', // Conditions System
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -1410,9 +1393,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
-      ],
-
       // ← NEW: מטאדאטה
+      ],
       description: 'ניהול טיקרים - מעקב מחירים ונתונים פיננסיים',
       lastModified: '2025-11-13',
       pageType: 'crud',
@@ -1472,8 +1454,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.TradingViewChartAdapter',
         'window.FieldRendererService',
         'window.LinkedItemsService',
-      ,
-
+      ],
       description: 'דשבורד טיקר מורחב - גרפים, KPI, מדדים טכניים ופעילות משתמש',
       lastModified: '2025-01-28',
       pageType: 'dashboard',
@@ -1534,7 +1515,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'info-summary',
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -1557,7 +1537,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.UnifiedTableSystem', // Unified Table System
         'window.PaginationSystem', // Pagination System
       ],
-
       requiresFilters: true,
       requiresValidation: true,
       requiresTables: true,
@@ -1625,9 +1604,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PendingTradePlanWidget',
         'window.InfoSummarySystem',
         'window.PaginationSystem',
-      ,
-
       // ← NEW: מטאדאטה
+      ],
       description: 'כלי ניהול מערכת - מעקב ביצועים, לוגים וסטטיסטיקות',
       lastModified: '2025-11-13',
       pageType: 'admin',
@@ -1701,8 +1679,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PendingTradePlanWidget',
         'window.InfoSummarySystem',
         'window.PaginationSystem',
-      ,
-
+      ],
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
@@ -1767,9 +1744,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ConditionsUIManager',
         'window.PendingTradePlanWidget',
         'window.PaginationSystem',
-      ,
-
       // ← NEW: מטאדאטה
+      ],
       description: 'דשבורד נתונים חיצוניים - Yahoo Finance וספקי נתונים אחרים',
       lastModified: '2025-10-19',
       pageType: 'dashboard',
@@ -1849,9 +1825,12 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ConditionsUIManager',
         'window.PendingTradePlanWidget',
         'window.PaginationSystem',
-      ,
-      requiredGlobals: ['NotificationSystem',
-        'window.IconSystem', 'window.initializeNotificationsCenter'],
+      ],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.initializeNotificationsCenter'
+      ],
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
@@ -1880,8 +1859,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
-'NotificationSystem',
-        'window.IconSystem', 'window.initializeNotificationsCenter',
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.initializeNotificationsCenter'
+      ],
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
@@ -1911,7 +1892,13 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
-'NotificationSystem', 'window.IconSystem', 'window.UnifiedTableSystem', 'window.FieldRendererService', 'window.TradesData', 'window.ModalManagerV2',
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.UnifiedTableSystem',
+        'window.FieldRendererService',
+        'window.TradesData',
+        'window.ModalManagerV2'
+      ],
       description: 'טריידים בפורמט',
       pageType: 'main',
       requiresFilters: true,
@@ -1972,7 +1959,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.IconSystem', 'DataUtils', 'window.initializeResearchPage',
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System
-      ,
+      ],
       preloadAssets: ['research-data'],
       cacheStrategy: 'standard',
       requiresFilters: true,
@@ -2027,7 +2014,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.conditionsInitializer',
         'window.ConditionsUIManager',
         'window.PendingTradePlanWidget',
-      ,
+      ],
       description: 'ניהול משימות רקע',
       lastModified: '2025-10-19',
       pageType: 'system',
@@ -2062,7 +2049,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'RuntimeValidator',
         'ScriptAnalyzer',
         'PageTemplateGenerator',
-      ,
+      ],
       description: 'ניהול מערכת האתחול - חבילות, ולידציה, כלי פיתוח',
       lastModified: '2025-10-19',
       pageType: 'development',
@@ -2094,7 +2081,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.IconSystem',
         'window.cacheManagementPage',
         'window.refreshCacheStats',
-      ,
+      ],
       pageSpecificScripts: ['scripts/cache-management.js'],
       description: 'ניהול מטמון מערכת - ניקוי, אופטימיזציה וניטור',
       lastModified: '2025-10-19',
@@ -2129,7 +2116,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.IconSystem',
         'window.loadConditionsTest',
         'window.ConditionsTestManager',
-      ,
+      ],
       description: 'בדיקת תנאי מערכת - ולידציה ובדיקות',
       lastModified: '2025-10-19',
       pageType: 'testing',
@@ -2165,7 +2152,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.runCRUDTests',
         'window.runAPITests',
         'window.runUITests',
-      ,
+      ],
       pageSpecificScripts: ['scripts/crud-testing-enhanced.js', 'scripts/crud-automated-test-runner.js'],
       description: 'דשבורד בדיקות CRUD - בדיקות API ו-UI אוטומטיות',
       lastModified: '2025-10-26',
@@ -2257,7 +2244,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.LightweightCharts',
         'window.PreferencesData',
         'window.PreferencesCore',
-      ,
+      ],
       description: 'דף בדיקה עבור אינטגרציית TradingView Lightweight Charts',
       lastModified: '2025-11-22',
       pageType: 'test',
@@ -2403,7 +2390,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.IconSystem',
         'window.codeQualityDashboard',
         'window.LintStatusService',
-      ,
+      ],
       pageSpecificScripts: ['scripts/linter-realtime-monitor.js'],
       requiresFilters: false,
       requiresValidation: false,
@@ -2450,7 +2437,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.loadUserPreferences',
         'window.initSystemCheck',
         'window.PendingTradePlanWidget',
-      ,
+      ],
       description: 'תצוגת נתונים נוספים במסד הנתונים',
       lastModified: '2025-11-13',
       pageType: 'database',
@@ -2509,9 +2496,14 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.InfoSummarySystem',
         'window.PaginationSystem',
         'window.ColorSchemeSystem', // Color Scheme System
-      ,
-      requiredGlobals: ['NotificationSystem',
-        'window.IconSystem', 'window.loadConstraints', 'window.ConstraintManager', 'window.createActionsMenu'],
+      ],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.loadConstraints',
+        'window.ConstraintManager',
+        'window.createActionsMenu'
+      ],
       description: 'ניהול אילוצי מערכת',
       lastModified: '2025-10-19',
       pageType: 'system',
@@ -2566,7 +2558,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PendingTradePlanWidget',
         'window.InfoSummarySystem',
         'window.PaginationSystem',
-      ,
+      ],
       description: 'ניהול CSS במערכת',
       lastModified: '2025-10-19',
       pageType: 'development',
@@ -2620,7 +2612,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PaginationSystem',
         'window.loadColorDisplay',
         'window.ColorSchemeSystem',
-      ,
+      ],
       description: 'תצוגת צבעים דינמיים',
       lastModified: '2025-10-19',
       pageType: 'utility',
@@ -2674,7 +2666,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PendingTradePlanWidget',
         'window.InfoSummarySystem',
         'window.PaginationSystem',
-      ,
+      ],
       pageSpecificScripts: ['scripts/button-system-demo-core.js'],
       description: 'גלריית עיצובים',
       lastModified: '2025-10-19',
@@ -2729,7 +2721,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PendingTradePlanWidget',
         'window.InfoSummarySystem',
         'window.PaginationSystem',
-      ,
+      ],
       description: 'ניהול גרפים במערכת',
       lastModified: '2025-10-19',
       pageType: 'development',
@@ -2765,7 +2757,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'RuntimeValidator',
         'ScriptAnalyzer',
         'PageTemplateGenerator',
-      ,
+      ],
       description: 'ניהול מערכת האתחול - חבילות, ולידציה, כלי פיתוח',
       lastModified: '2025-10-19',
       pageType: 'development',
@@ -2797,7 +2789,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.IconSystem',
         'window.cacheManagementPage',
         'window.refreshCacheStats',
-      ,
+      ],
       pageSpecificScripts: ['scripts/cache-management.js'],
       description: 'ניהול מטמון מערכת - ניקוי, אופטימיזציה וניטור',
       lastModified: '2025-10-19',
@@ -2832,7 +2824,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.IconSystem',
         'window.loadConditionsTest',
         'window.ConditionsTestManager',
-      ,
+      ],
       description: 'בדיקת תנאי מערכת - ולידציה ובדיקות',
       lastModified: '2025-10-19',
       pageType: 'testing',
@@ -2868,7 +2860,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.runCRUDTests',
         'window.runAPITests',
         'window.runUITests',
-      ,
+      ],
       description: 'דשבורד בדיקות CRUD - בדיקות API ו-UI אוטומטיות',
       lastModified: '2025-10-26',
       pageType: 'development',
@@ -2929,7 +2921,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.IconSystem',
         'TradingViewWidgetsManager',
         'TradingViewWidgetsColors',
-      ,
+      ],
       description: 'תצוגת כל הווידג\'טים הרשמיים של TradingView (iFrame Widgets) עם תיאור הפרמטרים',
       lastModified: '2025-11-24',
       pageType: 'development',
@@ -2962,7 +2954,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.RecentItemsWidget',
         'window.UnifiedPendingActionsWidget',
         'window.TagWidget',
-      ,
+      ],
       description: 'עמוד בדיקה לוויג\'טים עם Floating UI ו-GSAP - overlay positioning ואנימציות',
       lastModified: '2025-12-03',
       pageType: 'test',
@@ -3000,7 +2992,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ConditionsSummaryRenderer',
         'window.UnifiedTableSystem',
         'window.PaginationSystem',
-      ,
+      ],
       description: 'כניסה למערכת',
       pageType: 'auth',
       requiresFilters: false,
@@ -3046,7 +3038,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ConditionsSummaryRenderer',
         'window.UnifiedTableSystem',
         'window.PaginationSystem',
-      ,
+      ],
       description: 'הרשמה למערכת',
       pageType: 'auth',
       requiresFilters: false,
@@ -3061,7 +3053,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
-'NotificationSystem', 'window.IconSystem',
+        'NotificationSystem',
+        'window.IconSystem'
+      ],
       description: 'שחזור סיסמה',
       pageType: 'auth',
       requiresFilters: false,
@@ -3076,7 +3070,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
-'NotificationSystem', 'window.IconSystem',
+        'NotificationSystem',
+        'window.IconSystem'
+      ],
       description: 'איפוס סיסמה',
       pageType: 'auth',
       requiresFilters: false,
@@ -3092,7 +3088,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
-'NotificationSystem', 'window.IconSystem', 'window.ColorManager',
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.ColorManager'
+      ],
       description: 'מיפוי צבעי כפתורים',
       pageType: 'dev-tools',
       requiresFilters: false,
@@ -3108,6 +3107,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem', 'window.ColorManager',
+      ],
       description: 'מיפוי צבעי כפתורים - פשוט',
       pageType: 'dev-tools',
       requiresFilters: false,
@@ -3123,6 +3123,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem', 'window.AlertConditionRenderer',
+      ],
       description: 'מודלים של תנאים',
       pageType: 'dev-tools',
       requiresFilters: false,
@@ -3138,6 +3139,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
+      ],
       description: 'עורך טולטיפים',
       pageType: 'dev-tools',
       requiresFilters: false,
@@ -3153,6 +3155,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem', 'window.PreferencesCore',
+      ],
       description: 'ניהול קבוצות העדפות',
       pageType: 'dev-tools',
       requiresFilters: false,
@@ -3169,6 +3172,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
+      ],
       description: 'ניתוח השוואתי - מוקאפ',
       pageType: 'mockup',
       requiresFilters: false,
@@ -3184,6 +3188,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
+      ],
       description: 'השוואת תאריכים - מוקאפ',
       pageType: 'mockup',
       requiresFilters: false,
@@ -3199,6 +3204,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
+      ],
       description: 'לוח שנה כלכלי - מוקאפ',
       pageType: 'mockup',
       requiresFilters: false,
@@ -3214,6 +3220,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
+      ],
       description: 'ווידג\'ט מעקב רגשי - מוקאפ',
       pageType: 'mockup',
       requiresFilters: false,
@@ -3229,6 +3236,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
+      ],
       description: 'דוגמת מפת חום - מוקאפ',
       pageType: 'mockup',
       requiresFilters: false,
@@ -3244,6 +3252,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
+      ],
       description: 'ווידג\'ט היסטוריה - מוקאפ',
       pageType: 'mockup',
       requiresFilters: false,
@@ -3259,6 +3268,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
+      ],
       description: 'מצב תיק השקעות - מוקאפ',
       pageType: 'mockup',
       requiresFilters: false,
@@ -3274,6 +3284,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
+      ],
       description: 'היסטוריית מחירים - מוקאפ',
       pageType: 'mockup',
       requiresFilters: false,
@@ -3289,6 +3300,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
+      ],
       description: 'ניתוח אסטרטגיה - מוקאפ',
       pageType: 'mockup',
       requiresFilters: false,
@@ -3304,6 +3316,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
+      ],
       description: 'היסטוריית טריידים - מוקאפ',
       pageType: 'mockup',
       requiresFilters: false,
@@ -3319,6 +3332,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
 'NotificationSystem', 'window.IconSystem',
+      ],
       description: 'יומן מסחר - מוקאפ',
       pageType: 'mockup',
       requiresFilters: false,
@@ -3501,7 +3515,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.CRUDResponseHandler',
         'window.notesModalConfig' // Required for Save as Note feature
         // Note: window.NotesData is optional - ai-notes-integration.js has fallback
-      ,
+      ],
       description: 'ניתוח AI - יצירת ניתוחים באמצעות מנועי LLM',
       lastModified: '2025-01-28',
       pageType: 'feature',
@@ -3584,7 +3598,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.InfoSummarySystem',
         'window.PaginationSystem',
         'window.showEntityDetails',
-      ,
+      ],
       preloadAssets: ['cache-test'],
       cacheStrategy: 'standard',
       requiresFilters: false,
@@ -3639,7 +3653,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.InfoSummarySystem',
         'window.PaginationSystem',
         'window.showEntityDetails',
-      ,
+      ],
       preloadAssets: ['tradingview-test'],
       cacheStrategy: 'standard',
       requiresFilters: false,
@@ -3688,6 +3702,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.PendingTradePlanWidget",
         "window.PaginationSystem"
 ,
+      ],
       preloadAssets: ['portfolio-state-page-data'],
       cacheStrategy: 'standard',
       requiresFilters: false,
@@ -3738,6 +3753,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.PaginationSystem",
         "window.InfoSummarySystem"
 ,
+      ],
       preloadAssets: ['trade-history-page-data'],
       cacheStrategy: 'standard',
       requiresFilters: false,
@@ -3788,6 +3804,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.PaginationSystem",
         "window.InfoSummarySystem"
 ,
+      ],
       preloadAssets: ['price-history-page-data'],
       cacheStrategy: 'standard',
       requiresFilters: false,
@@ -3838,6 +3855,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.PaginationSystem",
         "window.InfoSummarySystem"
 ,
+      ],
       preloadAssets: ['comparative-analysis-page-data'],
       cacheStrategy: 'standard',
       requiresFilters: false,
@@ -3888,6 +3906,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.PaginationSystem",
         "window.InfoSummarySystem"
 ,
+      ],
       preloadAssets: ['trading-journal-page-data'],
       cacheStrategy: 'standard',
       requiresFilters: false,
@@ -3938,6 +3957,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.PaginationSystem",
         "window.InfoSummarySystem"
 ,
+      ],
       preloadAssets: ['strategy-analysis-page-data'],
       cacheStrategy: 'standard',
       requiresFilters: false,
@@ -3988,6 +4008,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.PaginationSystem",
         "window.InfoSummarySystem"
 ,
+      ],
       preloadAssets: ['economic-calendar-page-data'],
       cacheStrategy: 'standard',
       requiresFilters: false,
@@ -4038,6 +4059,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.PaginationSystem",
         "window.InfoSummarySystem"
 ,
+      ],
       preloadAssets: ['history-widget-data'],
       cacheStrategy: 'standard',
       requiresFilters: false,
@@ -4086,6 +4108,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.PendingTradePlanWidget",
         "window.PaginationSystem"
 ,
+      ],
       preloadAssets: ['emotional-tracking-widget-data'],
       cacheStrategy: 'standard',
       requiresFilters: false,
@@ -4136,6 +4159,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.PaginationSystem",
         "window.InfoSummarySystem"
 ,
+      ],
       preloadAssets: ['date-comparison-modal-data'],
       cacheStrategy: 'standard',
       requiresFilters: false,

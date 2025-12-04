@@ -724,7 +724,11 @@ class CRUDEnhancedTester {
         let updateData;
         const baseTestData = entity.testData || (entity.getTestData ? await entity.getTestData().catch(() => ({})) : {});
         if (entityName === 'tickers') {
+          // For tickers, we need to include symbol (required field) from the test data
+          // Symbol is required for UPDATE, so we must include it from the original testData
+          const tickerSymbol = baseTestData?.symbol || testData?.symbol || 'TEST';
           updateData = {
+            symbol: tickerSymbol, // Required field - must be included
             name: 'CRUD Test Ticker - Updated',
             remarks: 'UPDATED by CRUD Test - Safe to delete',
           };

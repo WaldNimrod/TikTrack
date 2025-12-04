@@ -226,31 +226,60 @@ async function populateAccountSelector(autoSelectDefault = false) {
     const currentValue = selector.value;
     if (!currentValue || currentValue === '') {
       try {
-        // Get default account from preferences
+        // Get default account from preferences - use PreferencesCore first, then fallback
         let defaultAccountId = null;
 
-        if (typeof window.getPreference === 'function') {
-          const prefValue = await window.getPreference('default_trading_account');
-
-          if (prefValue) {
-            // Try to parse as integer ID first
-            const parsed = parseInt(prefValue);
-            if (!isNaN(parsed)) {
-              defaultAccountId = parsed;
-            } else {
-              // Try to find account by name
-              const account = window.trading_accountsData.find(acc => acc.name === prefValue);
-              if (account) {
-                defaultAccountId = account.id;
+        // Try PreferencesCore first (preferred method)
+        if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+          try {
+            const prefValue = await window.PreferencesCore.getPreference('default_trading_account');
+            if (prefValue) {
+              const parsed = parseInt(prefValue);
+              if (!isNaN(parsed)) {
+                defaultAccountId = parsed;
+                window.Logger.info(`✅ Got default account from PreferencesCore: ${defaultAccountId}`, { page: 'trading_accounts' });
               }
             }
+          } catch (e) {
+            window.Logger.warn('⚠️ Error getting default account from PreferencesCore:', e, { page: 'trading_accounts' });
           }
         }
 
-        // If no preference found or invalid, fallback to first account
-        if (!defaultAccountId || !selector.querySelector(`option[value="${defaultAccountId}"]`)) {
-          defaultAccountId = selector.options[1].value;
-          window.Logger.info(`ℹ️ No valid default account in preferences, using first account (ID: ${defaultAccountId})`, { page: 'trading_accounts' });
+        // Fallback to window.getPreference if PreferencesCore didn't work
+        if (!defaultAccountId && typeof window.getPreference === 'function') {
+          try {
+            const prefValue = await window.getPreference('default_trading_account');
+            if (prefValue) {
+              // Try to parse as integer ID first
+              const parsed = parseInt(prefValue);
+              if (!isNaN(parsed)) {
+                defaultAccountId = parsed;
+                window.Logger.info(`✅ Got default account from window.getPreference: ${defaultAccountId}`, { page: 'trading_accounts' });
+              } else {
+                // Try to find account by name
+                const account = window.trading_accountsData.find(acc => acc.name === prefValue);
+                if (account) {
+                  defaultAccountId = account.id;
+                  window.Logger.info(`✅ Found default account by name: ${defaultAccountId}`, { page: 'trading_accounts' });
+                }
+              }
+            }
+          } catch (e) {
+            window.Logger.warn('⚠️ Error getting default account from window.getPreference:', e, { page: 'trading_accounts' });
+          }
+        }
+
+        // Verify that the default account exists in the selector options
+        const defaultOption = selector.querySelector(`option[value="${defaultAccountId}"]`);
+        if (!defaultAccountId || !defaultOption) {
+          // Fallback to first available account (skip the empty "בחר חשבון..." option)
+          if (selector.options.length > 1) {
+            defaultAccountId = selector.options[1].value;
+            window.Logger.info(`ℹ️ No valid default account in preferences, using first account (ID: ${defaultAccountId})`, { page: 'trading_accounts' });
+          } else {
+            window.Logger.warn('⚠️ No accounts available to select', { page: 'trading_accounts' });
+            return; // No accounts to select
+          }
         } else {
           window.Logger.info(`🔄 Auto-selecting default account from preferences (ID: ${defaultAccountId})`, { page: 'trading_accounts' });
         }
@@ -908,8 +937,15 @@ window.syncAccountActivityPagination = syncAccountActivityPagination;
  */
 function updateActivitySummary(data) {
   // Always update date range in title first (works even if data is null)
+  // Note: summaryDateRange might be inside a closed section, so we try to find it
   const tableTitleDateRange = document.getElementById('accountActivityDateRange');
-  const summaryDateRange = document.getElementById('accountActivitySelectedRange');
+  let summaryDateRange = document.getElementById('accountActivitySelectedRange');
+  
+  // If summaryDateRange not found, it might be in a closed section - try querySelector
+  if (!summaryDateRange) {
+    summaryDateRange = document.querySelector('#accountActivitySelectedRange');
+  }
+  
   if (tableTitleDateRange || summaryDateRange) {
     // Use filterSystem.currentFilters.dateRange (standard way to get date range)
     const dateRange = (window.filterSystem && window.filterSystem.currentFilters && window.filterSystem.currentFilters.dateRange) 
@@ -929,8 +965,17 @@ function updateActivitySummary(data) {
     if (window.accountActivityState && window.accountActivityState.selectedAccountId && window.trading_accountsData) {
       const account = window.trading_accountsData.find(acc => acc.id === window.accountActivityState.selectedAccountId);
       if (account && account.created_at) {
-        const parsed = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(account.created_at) : new Date(account.created_at);
-        if (parsed && !Number.isNaN(parsed.getTime())) {
+        // Handle DateEnvelope objects (server always returns DateEnvelope, not string)
+        let parsed = null;
+        if (account.created_at && typeof account.created_at === 'object' && (account.created_at.epochMs || account.created_at.utc || account.created_at.local)) {
+          // It's already a DateEnvelope
+          parsed = account.created_at;
+        } else if (window.dateUtils?.toDateObject) {
+          parsed = window.dateUtils.toDateObject(account.created_at);
+        } else {
+          parsed = new Date(account.created_at);
+        }
+        if (parsed && (parsed instanceof Date ? !Number.isNaN(parsed.getTime()) : true)) {
           accountOpeningDate = parsed;
         }
       }
@@ -939,21 +984,50 @@ function updateActivitySummary(data) {
     if (dateRange !== 'כל זמן' && typeof window.translateDateRangeToDates === 'function') {
       const range = window.translateDateRangeToDates(dateRange);
       if (range) {
-        startDate = range.startDate ? new Date(range.startDate) : null;
-        endDate = range.endDate ? new Date(range.endDate) : new Date();
+        // Handle DateEnvelope objects from translateDateRangeToDates
+        if (range.startDate) {
+          if (range.startDate && typeof range.startDate === 'object' && (range.startDate.epochMs || range.startDate.utc || range.startDate.local)) {
+            startDate = range.startDate;
+          } else {
+            startDate = new Date(range.startDate);
+          }
+        }
+        if (range.endDate) {
+          if (range.endDate && typeof range.endDate === 'object' && (range.endDate.epochMs || range.endDate.utc || range.endDate.local)) {
+            endDate = range.endDate;
+          } else {
+            endDate = new Date(range.endDate);
+          }
+        } else {
+          endDate = window.dateUtils?.getToday ? window.dateUtils.getToday() : new Date();
+        }
       }
     } else if (dateRange === 'כל זמן' && accountOpeningDate) {
       startDate = accountOpeningDate;
     }
 
     // Format date range for title using FieldRendererService.renderDate (standard date rendering)
+    // FieldRendererService.renderDate handles DateEnvelope objects automatically
+    window.Logger.info('🔵 [updateActivitySummary] Formatting dates', { 
+      startDateType: startDate ? (typeof startDate) : 'null',
+      endDateType: endDate ? (typeof endDate) : 'null',
+      startDateIsEnvelope: startDate && typeof startDate === 'object' && (startDate.epochMs || startDate.utc || startDate.local),
+      endDateIsEnvelope: endDate && typeof endDate === 'object' && (endDate.epochMs || endDate.utc || endDate.local),
+      hasFieldRenderer: !!(window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function'),
+      page: 'trading_accounts' 
+    });
     let dateRangeDisplay = '';
     if (startDate && endDate) {
-      // Use FieldRendererService.renderDate for consistent date formatting
+      // Use FieldRendererService.renderDate for consistent date formatting (handles DateEnvelope automatically)
       let startDateFormatted, endDateFormatted;
       if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
         startDateFormatted = window.FieldRendererService.renderDate(startDate, false);
         endDateFormatted = window.FieldRendererService.renderDate(endDate, false);
+        window.Logger.info('🔵 [updateActivitySummary] Dates formatted via FieldRendererService', { 
+          startDateFormatted, 
+          endDateFormatted, 
+          page: 'trading_accounts' 
+        });
       } else {
         const formatDateFn = window.dateUtils?.formatDate || window.formatDate;
         startDateFormatted = typeof formatDateFn === 'function'
@@ -987,12 +1061,39 @@ function updateActivitySummary(data) {
       dateRangeDisplay = 'כל הזמנים';
     }
 
+    window.Logger.info('🔵 [updateActivitySummary] Setting date range display', { 
+      dateRangeDisplay, 
+      hasTableTitleDateRange: !!tableTitleDateRange,
+      hasSummaryDateRange: !!summaryDateRange,
+      page: 'trading_accounts' 
+    });
+
     if (tableTitleDateRange) {
       tableTitleDateRange.textContent = dateRangeDisplay;
+      window.Logger.info('🔵 [updateActivitySummary] Updated tableTitleDateRange', { 
+        elementId: tableTitleDateRange.id,
+        textContent: dateRangeDisplay,
+        page: 'trading_accounts' 
+      });
+    } else {
+      window.Logger.warn('⚠️ [updateActivitySummary] tableTitleDateRange element not found', { 
+        searchedId: 'accountActivityDateRange',
+        page: 'trading_accounts' 
+      });
     }
 
     if (summaryDateRange) {
       summaryDateRange.textContent = dateRangeDisplay;
+      window.Logger.info('🔵 [updateActivitySummary] Updated summaryDateRange', { 
+        elementId: summaryDateRange.id,
+        textContent: dateRangeDisplay,
+        page: 'trading_accounts' 
+      });
+    } else {
+      window.Logger.warn('⚠️ [updateActivitySummary] summaryDateRange element not found', { 
+        searchedId: 'accountActivitySelectedRange',
+        page: 'trading_accounts' 
+      });
     }
   }
 
@@ -1696,6 +1797,7 @@ function calculateActivityStatistics() {
  * Update activity statistics display
  */
 function updateActivityStatistics() {
+  window.Logger.info('🔵 [updateActivityStatistics] START', { page: 'trading_accounts' });
   const statsCard = document.getElementById('accountActivityStatisticsCard');
   if (!statsCard) {
     window.Logger.warn('⚠️ Statistics card not found', { page: 'trading_accounts' });
@@ -1703,6 +1805,12 @@ function updateActivityStatistics() {
   }
 
   const stats = calculateActivityStatistics();
+  window.Logger.info('🔵 [updateActivityStatistics] stats calculated', { 
+    cashFlowsCount: stats.cashFlows?.totalCount || 0,
+    executionsCount: stats.executions?.totalCount || 0,
+    cashFlowsBySubtype: stats.cashFlows?.bySubtype ? Object.keys(stats.cashFlows.bySubtype) : [],
+    page: 'trading_accounts' 
+  });
 
   // Always show card, even if no data (will show "אין נתונים להצגה")
   statsCard.style.display = 'block';
@@ -1777,14 +1885,27 @@ function updateActivityStatistics() {
 
   const cashFlowsBreakdown2 = document.getElementById('cashFlowsBreakdownContent2');
   if (cashFlowsBreakdown2) {
+    window.Logger.info('🔵 [updateActivityStatistics] Rendering cashFlowsBreakdownContent2', { page: 'trading_accounts' });
     const cashFlowsColumn2 = splitCashFlowsByColumn(stats.cashFlows, 2);
+    window.Logger.info('🔵 [updateActivityStatistics] cashFlowsColumn2', { 
+      totalCount: cashFlowsColumn2?.totalCount || 0,
+      bySubtype: cashFlowsColumn2?.bySubtype ? Object.keys(cashFlowsColumn2.bySubtype) : [],
+      page: 'trading_accounts' 
+    });
     const html6 = renderBreakdownBySubtype(cashFlowsColumn2, 'תזרימי מזומנים', 2);
+    window.Logger.info('🔵 [updateActivityStatistics] html6 length', { htmlLength: html6?.length || 0, page: 'trading_accounts' });
     const parser6 = new DOMParser();
     const doc6 = parser6.parseFromString(html6, 'text/html');
     cashFlowsBreakdown2.textContent = '';
     doc6.body.childNodes.forEach(node => {
       cashFlowsBreakdown2.appendChild(node.cloneNode(true));
     });
+    window.Logger.info('🔵 [updateActivityStatistics] cashFlowsBreakdownContent2 rendered', { 
+      childNodesCount: cashFlowsBreakdown2.childNodes.length,
+      page: 'trading_accounts' 
+    });
+  } else {
+    window.Logger.warn('⚠️ [updateActivityStatistics] cashFlowsBreakdownContent2 element not found', { page: 'trading_accounts' });
   }
 
   // Render executions: main summary - TWO cards, split content (same structure as cash flows)
@@ -1930,12 +2051,19 @@ function combineStatistics(cashFlowsStats, executionsStats) {
  * @returns {Object} Filtered statistics object for the column
  */
 function splitCashFlowsByColumn(stats, column) {
+  window.Logger.info('🔵 [splitCashFlowsByColumn] START', { column, hasStats: !!stats, hasBySubtype: !!(stats?.bySubtype), page: 'trading_accounts' });
   if (!stats || !stats.bySubtype) {
+    window.Logger.warn('⚠️ [splitCashFlowsByColumn] No stats or bySubtype', { page: 'trading_accounts' });
     return stats;
   }
 
   const column1Subtypes = ['deposits_withdrawals', 'fee', 'dividend'];
   const column2Subtypes = ['transfer', 'interest', 'syep_interest', 'other'];
+  window.Logger.info('🔵 [splitCashFlowsByColumn] Available subtypes', { 
+    allSubtypes: Object.keys(stats.bySubtype),
+    targetSubtypes: column === 1 ? column1Subtypes : column2Subtypes,
+    page: 'trading_accounts' 
+  });
 
   const targetSubtypes = column === 1 ? column1Subtypes : column2Subtypes;
 
@@ -1957,7 +2085,14 @@ function splitCashFlowsByColumn(stats, column) {
       negativeAmount += stats.bySubtype[subtype].negativeAmount || 0;
       positiveCount += stats.bySubtype[subtype].positiveCount || 0;
       negativeCount += stats.bySubtype[subtype].negativeCount || 0;
+      window.Logger.info('🔵 [splitCashFlowsByColumn] Added subtype', { subtype, count: stats.bySubtype[subtype].count || 0, page: 'trading_accounts' });
     }
+  });
+  window.Logger.info('🔵 [splitCashFlowsByColumn] RESULT', { 
+    column, 
+    totalCount, 
+    filteredSubtypes: Object.keys(filteredBySubtype),
+    page: 'trading_accounts' 
   });
 
   return {
@@ -2143,7 +2278,7 @@ function renderStatisticsColumn(stats, typeName) {
       window.Logger.info(`  - Fallback: Using period between records for annualization: ${daysForAnnual} days`, { page: 'trading_accounts' });
     }
     // For executions: estimate annual based on total amount in period (not change)
-    const annualAmountChange = stats.totalAmount / daysForAnnual * 365;
+    const annualAmountChange = totalAmount / daysForAnnual * 365;
     const annualAmountChangeHtml = window.FieldRendererService && window.FieldRendererService.renderAmount
       ? window.FieldRendererService.renderAmount(annualAmountChange, currencySymbol, 0, true)
       : `<span>${annualAmountChange >= 0 ? '+' : ''}${annualAmountChange.toFixed(0)}${currencySymbol}</span>`;
@@ -2228,7 +2363,7 @@ function renderStatisticsColumn(stats, typeName) {
       window.Logger.info(`  - Fallback: Using period between records for annualization: ${daysForAnnual} days`, { page: 'trading_accounts' });
     }
     // Use totalAmount (already normalized) instead of overallAmountChange
-    const annualAmountChange = stats.totalAmount / daysForAnnual * 365;
+    const annualAmountChange = totalAmount / daysForAnnual * 365;
 
     // Log calculation details
     window.Logger.info(`📈 חישוב שנתי משוער (${typeName}):`, { page: 'trading_accounts' });
@@ -2302,10 +2437,19 @@ function renderStatisticsColumn(stats, typeName) {
  * @returns {string} HTML string
  */
 function renderStatisticsSummaryColumn1(stats, typeName) {
-  // Check if stats is empty object or has no totalCount
-  if (!stats || typeof stats !== 'object' || Object.keys(stats).length === 0 || stats.totalCount === undefined || stats.totalCount === null || stats.totalCount === 0) {
-    return '<div class="statistics-empty">אין נתונים להצגה</div>';
+  // Always render the card structure, even if no data
+  // Check if stats is completely missing or invalid
+  if (!stats || typeof stats !== 'object' || Object.keys(stats).length === 0) {
+    return '<div class="statistics-summary"><div class="statistics-card-item"><div class="statistics-card-content statistics-card-two-columns"><div class="statistics-card-col">מספר רשומות: <strong>0</strong></div><div class="statistics-card-col statistics-card-col-end">סה"כ סכום: <strong>0</strong></div></div></div></div>';
   }
+
+  // If totalCount is 0 or undefined, still show the card with 0 values
+  const totalCount = stats.totalCount || 0;
+  const totalAmount = stats.totalAmount || 0;
+  const negativeCount = stats.negativeCount || 0;
+  const positiveCount = stats.positiveCount || 0;
+  const negativeAmount = stats.negativeAmount || 0;
+  const positiveAmount = stats.positiveAmount || 0;
 
   const currency = stats.currency || 'USD';
   let currencySymbol = currency;
@@ -2325,22 +2469,20 @@ function renderStatisticsSummaryColumn1(stats, typeName) {
   // Card: מספר רשומות + סה"כ סכום
   html += '<div class="statistics-card-item">';
   const totalAmountHtml = window.FieldRendererService && window.FieldRendererService.renderAmount
-    ? window.FieldRendererService.renderAmount(stats.totalAmount, currencySymbol, 0, true)
-    : `<span>${stats.totalAmount < 0 ? '-' : ''}${Math.abs(stats.totalAmount).toFixed(0)}${currencySymbol}</span>`;
+    ? window.FieldRendererService.renderAmount(totalAmount, currencySymbol, 0, true)
+    : `<span>${totalAmount < 0 ? '-' : ''}${Math.abs(totalAmount).toFixed(0)}${currencySymbol}</span>`;
 
   // Format records count with breakdown
-  let recordsCountHtml = `${stats.totalCount}`;
-  if (stats.negativeCount > 0 || stats.positiveCount > 0) {
-    const negativeCountClass = (stats.negativeCount || 0) === 0 ? '' : 'text-danger';
-    const positiveCountClass = (stats.positiveCount || 0) === 0 ? '' : 'text-success';
-    recordsCountHtml = `${stats.totalCount} (<span class="${negativeCountClass}">${stats.negativeCount || 0}</span>/<span class="${positiveCountClass}">${stats.positiveCount || 0}</span>)`;
+  let recordsCountHtml = `${totalCount}`;
+  if (negativeCount > 0 || positiveCount > 0) {
+    const negativeCountClass = negativeCount === 0 ? '' : 'text-danger';
+    const positiveCountClass = positiveCount === 0 ? '' : 'text-success';
+    recordsCountHtml = `${totalCount} (<span class="${negativeCountClass}">${negativeCount}</span>/<span class="${positiveCountClass}">${positiveCount}</span>)`;
   }
 
   // Format total amount with breakdown
   let totalAmountWithBreakdown = totalAmountHtml;
-  if (stats.negativeAmount !== 0 || stats.positiveAmount !== 0) {
-    const negativeAmount = stats.negativeAmount || 0;
-    const positiveAmount = stats.positiveAmount || 0;
+  if (negativeAmount !== 0 || positiveAmount !== 0) {
 
     let negativeAmountHtml;
     if (negativeAmount === 0) {
@@ -2380,10 +2522,19 @@ function renderStatisticsSummaryColumn1(stats, typeName) {
  * @returns {string} HTML string
  */
 function renderStatisticsSummaryColumn2(stats, typeName) {
-  // Check if stats is empty object or has no totalCount
-  if (!stats || typeof stats !== 'object' || Object.keys(stats).length === 0 || stats.totalCount === undefined || stats.totalCount === null || stats.totalCount === 0) {
-    return '<div class="statistics-empty">אין נתונים להצגה</div>';
+  // Always render the card structure, even if no data
+  // Check if stats is completely missing or invalid
+  if (!stats || typeof stats !== 'object' || Object.keys(stats).length === 0) {
+    return '<div class="statistics-summary"><div class="statistics-card-item"><div class="statistics-card-content statistics-card-two-columns"><div class="statistics-card-col">ממוצע לפעולה: <strong>0</strong></div><div class="statistics-card-col statistics-card-col-end">שנתי משוער: <strong>0%</strong></div></div></div></div>';
   }
+
+  // If totalCount is 0 or undefined, still show the card with 0 values
+  const totalCount = stats.totalCount || 0;
+  const totalAmount = stats.totalAmount || 0;
+  const negativeAmount = stats.negativeAmount || 0;
+  const positiveAmount = stats.positiveAmount || 0;
+  const negativeCount = stats.negativeCount || 0;
+  const positiveCount = stats.positiveCount || 0;
 
   const currency = stats.currency || 'USD';
   let currencySymbol = currency;
@@ -2405,7 +2556,7 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
   // Card: ממוצע לפעולה + שנתי משוער
   html += '<div class="statistics-card-item">';
 
-  if (isExecution && stats.totalCount > 0) {
+  if (isExecution) {
     // Executions: Calculate average using absolute values
     let absoluteTotal = 0;
     if (stats.bySubtype && Object.keys(stats.bySubtype).length > 0) {
@@ -2419,23 +2570,19 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
     }
 
     if (absoluteTotal === 0) {
-      absoluteTotal = Math.abs(stats.positiveAmount || 0) + Math.abs(stats.negativeAmount || 0);
+      absoluteTotal = Math.abs(positiveAmount || 0) + Math.abs(negativeAmount || 0);
     }
 
-    const averagePerAction = stats.totalCount > 0 ? absoluteTotal / stats.totalCount : 0;
+    const averagePerAction = totalCount > 0 ? absoluteTotal / totalCount : 0;
     const formatted = Math.abs(averagePerAction).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     let averageHtml = `<span>${formatted}${currencySymbol}</span>`;
 
     // Check if we need to show breakdown by sides (both positive and negative exist)
-    const negativeAmount = stats.negativeAmount || 0;
-    const positiveAmount = stats.positiveAmount || 0;
     const hasBothSides = negativeAmount !== 0 && positiveAmount !== 0;
 
     // If both sides exist, calculate and show breakdown for average per action
     // Breakdown should be on a new line after the total
     if (hasBothSides) {
-      const positiveCount = stats.positiveCount || 0;
-      const negativeCount = stats.negativeCount || 0;
 
       const positiveAverage = positiveCount > 0 ? Math.abs(positiveAmount) / positiveCount : 0;
       const negativeAverage = negativeCount > 0 ? Math.abs(negativeAmount) / negativeCount : 0;
@@ -2464,7 +2611,7 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
       daysForAnnual = Math.max(1, Math.ceil((new Date(stats.lastRecord.date) - new Date(stats.firstRecord.date)) / (1000 * 60 * 60 * 24)));
     }
 
-    const annualAmountChange = stats.totalAmount / daysForAnnual * 365;
+    const annualAmountChange = totalAmount / daysForAnnual * 365;
     let annualAmountChangeHtml = window.FieldRendererService && window.FieldRendererService.renderAmount
       ? window.FieldRendererService.renderAmount(annualAmountChange, currencySymbol, 0, true)
       : `<span>${annualAmountChange >= 0 ? '+' : ''}${annualAmountChange.toFixed(0)}${currencySymbol}</span>`;
@@ -2498,7 +2645,7 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
     let annualPctClass = '';
 
     if (accountBalance > 0) {
-      const percentageChange = stats.totalAmount / Math.abs(accountBalance) * 100;
+      const percentageChange = totalAmount / Math.abs(accountBalance) * 100;
       const annualPercentageChange = annualAmountChange / Math.abs(accountBalance) * 100;
 
       const pctNumber = Math.abs(percentageChange).toFixed(2);
@@ -2521,24 +2668,20 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
     html += `<div class="statistics-card-col statistics-card-col-end">שנתי משוער: <strong>${annualAmountChangeHtml}</strong> | <strong class="${annualPctClass}">${annualPercentageDisplay}</strong></div>`;
     html += '</div>';
     html += '</div>';
-  } else if (!isExecution && stats.totalCount > 0) {
+  } else if (!isExecution) {
     // Cash flows: Calculate average using absolute values
-    const absoluteTotal = Math.abs(stats.positiveAmount || 0) + Math.abs(stats.negativeAmount || 0);
-    const averagePerAction = stats.totalCount > 0 ? absoluteTotal / stats.totalCount : 0;
+    const absoluteTotal = Math.abs(positiveAmount || 0) + Math.abs(negativeAmount || 0);
+    const averagePerAction = totalCount > 0 ? absoluteTotal / totalCount : 0;
 
     const formatted = Math.abs(averagePerAction).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     let averageHtml = `<span>${formatted}${currencySymbol}</span>`;
 
     // Check if we need to show breakdown by sides (both positive and negative exist)
-    const negativeAmount = stats.negativeAmount || 0;
-    const positiveAmount = stats.positiveAmount || 0;
     const hasBothSides = negativeAmount !== 0 && positiveAmount !== 0;
 
     // If both sides exist, calculate and show breakdown for average per action
     // Breakdown should be on a new line after the total
     if (hasBothSides) {
-      const positiveCount = stats.positiveCount || 0;
-      const negativeCount = stats.negativeCount || 0;
 
       const positiveAverage = positiveCount > 0 ? Math.abs(positiveAmount) / positiveCount : 0;
       const negativeAverage = negativeCount > 0 ? Math.abs(negativeAmount) / negativeCount : 0;
@@ -2567,7 +2710,7 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
       daysForAnnual = Math.max(1, Math.ceil((new Date(stats.lastRecord.date) - new Date(stats.firstRecord.date)) / (1000 * 60 * 60 * 24)));
     }
 
-    const annualAmountChange = stats.totalAmount / daysForAnnual * 365;
+    const annualAmountChange = totalAmount / daysForAnnual * 365;
     let annualAmountChangeHtml = window.FieldRendererService && window.FieldRendererService.renderAmount
       ? window.FieldRendererService.renderAmount(annualAmountChange, currencySymbol, 0, true)
       : `<span>${annualAmountChange >= 0 ? '+' : ''}${annualAmountChange.toFixed(0)}${currencySymbol}</span>`;
@@ -2639,9 +2782,29 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
  * @returns {string} HTML string
  */
 function renderBreakdownBySubtype(stats, typeName, column) {
+  window.Logger.info('🔵 [renderBreakdownBySubtype] START', { 
+    typeName, 
+    column, 
+    hasStats: !!stats, 
+    hasBySubtype: !!(stats?.bySubtype),
+    bySubtypeKeys: stats?.bySubtype ? Object.keys(stats.bySubtype) : [],
+    page: 'trading_accounts' 
+  });
   // Always render breakdown section, even if empty (will show empty state)
-  if (!stats || !stats.bySubtype || Object.keys(stats.bySubtype).length === 0) {
-    return '<div class="statistics-empty">אין נתונים להצגה</div>';
+  // BUT: If stats exists but has no bySubtype or empty bySubtype, still show structure with empty message
+  if (!stats) {
+    window.Logger.warn('⚠️ [renderBreakdownBySubtype] No stats at all, returning empty', { page: 'trading_accounts' });
+    return '<div class="statistics-breakdown"><div class="statistics-empty">אין נתונים להצגה</div></div>';
+  }
+  
+  // If stats exists but no bySubtype or empty, still render structure
+  if (!stats.bySubtype || Object.keys(stats.bySubtype).length === 0) {
+    window.Logger.info('🔵 [renderBreakdownBySubtype] Stats exists but no bySubtype, rendering empty structure', { 
+      totalCount: stats.totalCount || 0,
+      page: 'trading_accounts' 
+    });
+    // Return empty structure instead of just "אין נתונים להצגה"
+    return '<div class="statistics-breakdown"><div class="statistics-empty">אין נתונים להצגה</div></div>';
   }
 
   const currency = stats.currency || 'USD';

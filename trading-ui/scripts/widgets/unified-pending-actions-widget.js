@@ -102,24 +102,22 @@
     // Destroy existing handlers first to prevent duplicates
     window.WidgetOverlayService.destroy(listElement);
     
-    // Use requestAnimationFrame to ensure DOM is ready
-    requestAnimationFrame(() => {
-      window.WidgetOverlayService.setupOverlayHover(
-        listElement,
-        '.unified-pending-list-item, .trade-create-widget-item',
-        '[data-overlay="true"]',
-        {
-          hoverClass: 'is-hovered',
-          gap: 8,
-          minWidth: 280,
-          maxWidth: 400,
-          zIndex: 1050,
-          useAnimations: true, // Enable GSAP animations
-          transitionDuration: 200
-        }
-      );
-      state.overlaySetup[combination] = true;
-    });
+    // Setup immediately - no requestAnimationFrame (removed for faster response)
+    window.WidgetOverlayService.setupOverlayHover(
+      listElement,
+      '.unified-pending-list-item, .trade-create-widget-item',
+      '[data-overlay="true"]',
+      {
+        hoverClass: 'is-hovered',
+        gap: 8,
+        minWidth: 280,
+        maxWidth: 400,
+        zIndex: 1050,
+        useAnimations: true, // Enable GSAP animations
+        transitionDuration: 100 // Faster animation (reduced from 200)
+      }
+    );
+    state.overlaySetup[combination] = true;
   }
 
   /**

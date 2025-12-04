@@ -345,9 +345,9 @@
                 }
             }
 
-            // Step 3: Wait a bit for backend to process, then reload data
+            // Step 3: Wait for backend to process and verify all data is available
             if (window.Logger) {
-                window.Logger.info('📊 Step 3/4: Waiting for data processing...', { tickerId, page: 'ticker-dashboard' });
+                window.Logger.info('📊 Step 3/4: Waiting for data processing and verification...', { tickerId, page: 'ticker-dashboard' });
             }
             if (progressNotification && window.NotificationSystem && window.NotificationSystem.updateNotification) {
                 window.NotificationSystem.updateNotification(progressNotification, {
@@ -355,75 +355,147 @@
                 });
             }
 
-            // Wait 3 seconds for backend to process and save data
-            await new Promise(resolve => setTimeout(resolve, 3000));
-
-            // Step 4: Reload ticker data with force refresh
-            if (window.Logger) {
-                window.Logger.info('📊 Step 4/4: Reloading ticker data...', { tickerId, page: 'ticker-dashboard' });
-            }
-            if (progressNotification && window.NotificationSystem && window.NotificationSystem.updateNotification) {
-                window.NotificationSystem.updateNotification(progressNotification, {
-                    message: `מעדכן נתונים עבור ${tickerSymbol}...`
-                });
-            }
-
-            // Invalidate cache - both frontend and backend
-            if (window.UnifiedCacheManager) {
-                // Invalidate frontend cache
-                await window.UnifiedCacheManager.invalidate(`ticker-dashboard-${tickerId}`, 'memory');
-                await window.UnifiedCacheManager.invalidate(`entity-details-ticker-${tickerId}`, 'memory');
-                await window.UnifiedCacheManager.invalidate(`ticker-user-activity-${tickerId}`, 'memory');
-                await window.UnifiedCacheManager.invalidate(`ticker-conditions-${tickerId}`, 'memory');
+            // Wait for backend to process - longer wait for historical data (150 days)
+            // Check data availability with retries
+            let updatedData = null;
+            let retryCount = 0;
+            const maxRetries = 10; // Try up to 10 times (50 seconds total)
+            const retryDelay = 5000; // 5 seconds between retries
+            
+            while (retryCount < maxRetries) {
+                // Wait before checking
+                await new Promise(resolve => setTimeout(resolve, retryDelay));
                 
-                // Backend cache is invalidated by the refresh endpoint itself
-                // No need for separate cache invalidation call
-            }
-
-            // Reload data
-            if (window.TickerDashboardData) {
-                const updatedData = await window.TickerDashboardData.loadTickerDashboardData(tickerId, { forceRefresh: true });
-                
-                // Close progress notification
-                if (progressNotification && window.NotificationSystem && window.NotificationSystem.closeNotification) {
-                    window.NotificationSystem.closeNotification(progressNotification);
-                } else if (progressNotification && window.NotificationSystem) {
-                    // Fallback: try to remove by ID if closeNotification not available
-                    try {
-                        if (progressNotification.remove) {
-                            progressNotification.remove();
-                        }
-                    } catch (e) {
-                        // Ignore
-                    }
-                }
-
-                if (window.Logger) {
-                    window.Logger.info('✅ Data fetch completed', { 
-                        tickerId, 
-                        hasData: !!updatedData,
-                        hasPrice: !!updatedData?.current_price || !!updatedData?.price,
-                        hasATR: !!updatedData?.atr,
-                        hasWeek52: !!updatedData?.week52_high,
-                        hasVolatility: !!updatedData?.volatility,
-                        hasMA20: !!updatedData?.ma_20,
-                        hasMA150: !!updatedData?.ma_150,
-                        page: 'ticker-dashboard' 
+                if (progressNotification && window.NotificationSystem && window.NotificationSystem.updateNotification) {
+                    window.NotificationSystem.updateNotification(progressNotification, {
+                        message: `בודק נתונים עבור ${tickerSymbol}... (${retryCount + 1}/${maxRetries})`
                     });
                 }
 
-                // Show success notification
-                if (window.NotificationSystem) {
-                    window.NotificationSystem.showSuccess(
-                        'טעינת נתונים הושלמה',
-                        `הנתונים עבור ${tickerSymbol} נטענו בהצלחה`
-                    );
+                // Invalidate cache before reloading
+                if (window.UnifiedCacheManager) {
+                    await window.UnifiedCacheManager.invalidate(`ticker-dashboard-${tickerId}`, 'memory');
+                    await window.UnifiedCacheManager.invalidate(`entity-details-ticker-${tickerId}`, 'memory');
+                    await window.UnifiedCacheManager.invalidate(`ticker-user-activity-${tickerId}`, 'memory');
+                    await window.UnifiedCacheManager.invalidate(`ticker-conditions-${tickerId}`, 'memory');
                 }
 
-                return updatedData;
-            } else {
-                throw new Error('TickerDashboardData service not available');
+                // Reload data with force refresh
+                if (window.TickerDashboardData) {
+                    updatedData = await window.TickerDashboardData.loadTickerDashboardData(tickerId, { forceRefresh: true });
+                    
+                    // Check if all required data is now available
+                    const missingData = checkMissingData(updatedData);
+                    
+                    if (window.Logger) {
+                        window.Logger.info(`📊 Data check attempt ${retryCount + 1}/${maxRetries}`, { 
+                            tickerId, 
+                            hasData: !!updatedData,
+                            hasPrice: !!updatedData?.current_price || !!updatedData?.price,
+                            hasATR: !!updatedData?.atr,
+                            hasWeek52: !!updatedData?.week52_high && !!updatedData?.week52_low,
+                            hasVolatility: !!updatedData?.volatility,
+                            hasMA20: !!updatedData?.ma_20,
+                            hasMA150: !!updatedData?.ma_150,
+                            missingCalculations: missingData.missingCalculations,
+                            hasAnyMissing: missingData.hasAnyMissing,
+                            page: 'ticker-dashboard' 
+                        });
+                    }
+                    
+                    // If all critical data is available, break
+                    if (!missingData.hasAnyMissing || missingData.missingCalculations.length === 0) {
+                        if (window.Logger) {
+                            window.Logger.info('✅ All required data is now available', { tickerId, page: 'ticker-dashboard' });
+                        }
+                        break;
+                    }
+                    
+                    // If we still have missing calculations, continue waiting
+                    retryCount++;
+                } else {
+                    throw new Error('TickerDashboardData service not available');
+                }
             }
+
+            // Step 4: Final verification and return
+            if (window.Logger) {
+                window.Logger.info('📊 Step 4/4: Final data verification...', { tickerId, page: 'ticker-dashboard' });
+            }
+            if (progressNotification && window.NotificationSystem && window.NotificationSystem.updateNotification) {
+                window.NotificationSystem.updateNotification(progressNotification, {
+                    message: `מסיים טעינת נתונים עבור ${tickerSymbol}...`
+                });
+            }
+
+            // Final check - if still missing data, log warning but continue
+            if (updatedData) {
+                const finalMissingData = checkMissingData(updatedData);
+                if (finalMissingData.hasAnyMissing && finalMissingData.missingCalculations.length > 0) {
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ Some calculations still missing after data fetch', { 
+                            tickerId, 
+                            tickerSymbol,
+                            missingCalculations: finalMissingData.missingCalculations,
+                            page: 'ticker-dashboard' 
+                        });
+                    }
+                }
+            }
+
+            // Close progress notification
+            if (progressNotification && window.NotificationSystem && window.NotificationSystem.closeNotification) {
+                window.NotificationSystem.closeNotification(progressNotification);
+            } else if (progressNotification && window.NotificationSystem) {
+                // Fallback: try to remove by ID if closeNotification not available
+                try {
+                    if (progressNotification.remove) {
+                        progressNotification.remove();
+                    }
+                } catch (e) {
+                    // Ignore
+                }
+            }
+
+            if (window.Logger) {
+                window.Logger.info('✅ Data fetch completed', { 
+                    tickerId, 
+                    hasData: !!updatedData,
+                    hasPrice: !!updatedData?.current_price || !!updatedData?.price,
+                    hasATR: !!updatedData?.atr,
+                    hasWeek52: !!updatedData?.week52_high && !!updatedData?.week52_low,
+                    hasVolatility: !!updatedData?.volatility,
+                    hasMA20: !!updatedData?.ma_20,
+                    hasMA150: !!updatedData?.ma_150,
+                    retriesUsed: retryCount + 1,
+                    page: 'ticker-dashboard' 
+                });
+            }
+
+            // Show success notification
+            if (window.NotificationSystem) {
+                if (updatedData) {
+                    const finalMissingData = checkMissingData(updatedData);
+                    if (finalMissingData.hasAnyMissing && finalMissingData.missingCalculations.length > 0) {
+                        window.NotificationSystem.showWarning(
+                            'טעינת נתונים הושלמה חלקית',
+                            `הנתונים עבור ${tickerSymbol} נטענו, אך חלק מהחישובים עדיין חסרים. המערכת תנסה להשלים אותם בהמשך.`
+                        );
+                    } else {
+                        window.NotificationSystem.showSuccess(
+                            'טעינת נתונים הושלמה',
+                            `כל הנתונים עבור ${tickerSymbol} נטענו בהצלחה`
+                        );
+                    }
+                } else {
+                    window.NotificationSystem.showError(
+                        'שגיאה בטעינת נתונים',
+                        `לא ניתן לטעון נתונים עבור ${tickerSymbol}`
+                    );
+                }
+            }
+
+            return updatedData;
 
         } catch (error) {
             if (window.Logger) {
@@ -2564,6 +2636,125 @@
 
     // Note: Initialization is handled by unified-app-initializer via page-initialization-configs.js
     // The custom initializer will call window.tickerDashboard.init() after all systems are loaded
+    
+    // Fallback: If UnifiedAppInitializer is not available, initialize directly
+    // This ensures the dashboard works even if the unified init system fails to load
+    const initializeDashboardFallback = async () => {
+        // Wait a bit for all scripts to load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', async () => {
+                // Wait for critical dependencies
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Check if already initialized by UnifiedAppInitializer
+                if (window.globalInitializationState?.unifiedAppInitialized) {
+                    if (window.Logger) {
+                        window.Logger.debug('Dashboard already initialized by UnifiedAppInitializer', { page: 'ticker-dashboard' });
+                    }
+                    return;
+                }
+                
+                // Check if UnifiedAppInitializer exists and is initializing
+                if (window.unifiedAppInit && window.unifiedAppInit.initializationInProgress) {
+                    if (window.Logger) {
+                        window.Logger.debug('Waiting for UnifiedAppInitializer to complete', { page: 'ticker-dashboard' });
+                    }
+                    // Wait up to 5 seconds for UnifiedAppInitializer
+                    let waitCount = 0;
+                    while (waitCount < 50 && window.unifiedAppInit.initializationInProgress) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        waitCount++;
+                    }
+                    
+                    // If UnifiedAppInitializer completed, don't initialize again
+                    if (window.globalInitializationState?.unifiedAppInitialized) {
+                        if (window.Logger) {
+                            window.Logger.debug('UnifiedAppInitializer completed, skipping fallback', { page: 'ticker-dashboard' });
+                        }
+                        return;
+                    }
+                }
+                
+                // Fallback: Initialize directly if UnifiedAppInitializer is not available or failed
+                if (!window.unifiedAppInit || !window.unifiedAppInit.initialized) {
+                    if (window.Logger) {
+                        window.Logger.info('⚠️ UnifiedAppInitializer not available, using fallback initialization', { page: 'ticker-dashboard' });
+                    }
+                    
+                    // Check if tickerDashboard.init is available
+                    if (window.tickerDashboard && typeof window.tickerDashboard.init === 'function') {
+                        try {
+                            await window.tickerDashboard.init();
+                            if (window.Logger) {
+                                window.Logger.info('✅ TickerDashboard initialized via fallback', { page: 'ticker-dashboard' });
+                            }
+                        } catch (error) {
+                            if (window.Logger) {
+                                window.Logger.error('❌ Error initializing TickerDashboard via fallback', { error: error?.message || error, page: 'ticker-dashboard' });
+                            }
+                        }
+                    } else {
+                        if (window.Logger) {
+                            window.Logger.warn('⚠️ window.tickerDashboard.init is not available', { page: 'ticker-dashboard' });
+                        }
+                    }
+                }
+            });
+        } else {
+            // DOM already loaded, initialize immediately
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Check if already initialized
+            if (window.globalInitializationState?.unifiedAppInitialized) {
+                if (window.Logger) {
+                    window.Logger.debug('Dashboard already initialized by UnifiedAppInitializer', { page: 'ticker-dashboard' });
+                }
+                return;
+            }
+            
+            // Check if UnifiedAppInitializer is initializing
+            if (window.unifiedAppInit && window.unifiedAppInit.initializationInProgress) {
+                if (window.Logger) {
+                    window.Logger.debug('Waiting for UnifiedAppInitializer to complete', { page: 'ticker-dashboard' });
+                }
+                let waitCount = 0;
+                while (waitCount < 50 && window.unifiedAppInit.initializationInProgress) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    waitCount++;
+                }
+                
+                if (window.globalInitializationState?.unifiedAppInitialized) {
+                    if (window.Logger) {
+                        window.Logger.debug('UnifiedAppInitializer completed, skipping fallback', { page: 'ticker-dashboard' });
+                    }
+                    return;
+                }
+            }
+            
+            // Fallback: Initialize directly
+            if (!window.unifiedAppInit || !window.unifiedAppInit.initialized) {
+                if (window.Logger) {
+                    window.Logger.info('⚠️ UnifiedAppInitializer not available, using fallback initialization', { page: 'ticker-dashboard' });
+                }
+                
+                if (window.tickerDashboard && typeof window.tickerDashboard.init === 'function') {
+                    try {
+                        await window.tickerDashboard.init();
+                        if (window.Logger) {
+                            window.Logger.info('✅ TickerDashboard initialized via fallback', { page: 'ticker-dashboard' });
+                        }
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.error('❌ Error initializing TickerDashboard via fallback', { error: error?.message || error, page: 'ticker-dashboard' });
+                        }
+                    }
+                }
+            }
+        }
+    };
+    
+    // Start fallback initialization
+    initializeDashboardFallback();
 
     if (window.Logger) {
         window.Logger.info('✅ TickerDashboard loaded', { page: 'ticker-dashboard' });

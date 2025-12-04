@@ -18,20 +18,19 @@
 
 ## 1️⃣ Unified Init System - ממצאים קריטיים
 
-### 🔴 בעיה מרכזית: UnifiedAppInitializer נמצא ב-`modules` package, לא ב-`init-system`!
+### ✅ תוקן (דצמבר 2025): UnifiedAppInitializer עבר ל-`init-system` package
 
-**ממצא חשוב:**
-- ב-`package-manifest.js` שורה 1935: `// unified-app-initializer.js removed - initialization now handled by core-systems.js`
-- `UnifiedAppInitializer` נמצא ב-`modules/core-systems.js` (package: `modules`)
-- **לא** נמצא ב-`init-system` package
-
-**זה אומר:**
-- העמודים שצריכים `unifiedAppInitializer` צריכים את `modules` package, לא `init-system`
-- `init-system` package כולל רק:
+**ממצא מעודכן:**
+- `UnifiedAppInitializer` נמצא ב-`modules/core-systems.js` אבל נטען דרך `init-system` package
+- `init-system` package כולל:
   - `package-manifest.js` → `window.PACKAGE_MANIFEST`
   - `page-initialization-configs.js` → `window.PAGE_INITIALIZATION_CONFIGS`
   - `monitoring-functions.js` → `window.runDetailedPageScan`
-  - קבצים נוספים לניטור
+  - `modules/core-systems.js` → `window.UnifiedAppInitializer` ✅ **נוסף בדצמבר 2025**
+
+**זה אומר:**
+- כל העמודים שצריכים `UnifiedAppInitializer` צריכים את `init-system` package
+- `init-system` נטען אחרון (loadOrder: 22) - אחרי כל המערכות
 
 ### 📋 מצב העמודים שחסר להם Unified Init System
 

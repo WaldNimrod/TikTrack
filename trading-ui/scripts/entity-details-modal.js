@@ -1199,26 +1199,23 @@ class EntityDetailsModal {
 
         let buttonsHtml = '';
         
-        // עבור ticker - מציגים כפתור "דשבורד מורחב"
+        // עבור ticker - מציגים כפתור ישיר "דשבורד מלא" (לא תפריט)
         if (entityType === 'ticker') {
             const tickerId = this.currentEntityId || entityData?.id;
             if (tickerId) {
-                if (typeof window.createActionsMenu === 'function') {
-                    const dashboardButton = window.createActionsMenu([
-                        { type: 'DASHBOARD', onclick: `window.location.href='/ticker-dashboard.html?tickerId=${tickerId}'`, title: 'דשבורד מורחב' }
-                    ]);
-                    buttonsHtml = dashboardButton || '';
-                } else {
-                    // Fallback: כפתור פשוט
-                    buttonsHtml = `
-                        <button type="button" 
-                                class="btn btn-sm btn-outline-primary" 
-                                onclick="window.location.href='/ticker-dashboard.html?tickerId=${tickerId}'"
-                                title="דשבורד מורחב">
-                            דשבורד מורחב
-                        </button>
-                    `;
-                }
+                // כפתור ישיר עם איקון - לא תפריט
+                const iconPath = window.BUTTON_ICONS?.DASHBOARD || '/trading-ui/images/icons/tabler/gauge.svg';
+                buttonsHtml = `
+                    <button type="button" 
+                            class="btn btn-sm btn-outline-primary" 
+                            onclick="window.location.href='/ticker-dashboard.html?tickerId=${tickerId}'"
+                            title="דשבורד מלא"
+                            data-button-type="DASHBOARD"
+                            data-variant="normal">
+                        <img src="${iconPath}" width="16" height="16" alt="דשבורד" class="icon me-1">
+                        דשבורד מלא
+                    </button>
+                `;
             }
         }
         

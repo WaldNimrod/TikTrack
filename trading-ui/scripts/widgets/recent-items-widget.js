@@ -197,25 +197,23 @@
     // Destroy existing handlers first to prevent duplicates
     window.WidgetOverlayService.destroy(listElement);
     
-    // Use requestAnimationFrame to ensure DOM is ready
-    requestAnimationFrame(() => {
-      window.WidgetOverlayService.setupOverlayHover(
-        listElement,
-        '.recent-items-widget-item',
-        '[data-overlay="true"]',
-        {
-          hoverClass: 'is-hovered',
-          gap: 8, // Standard gap
-          minWidth: 280,
-          maxWidth: 400,
-          zIndex: 1050,
-          useAnimations: true, // Enable GSAP animations
-          transitionDuration: 100, // Faster animation (reduced from 200)
-          placement: 'bottom-start' // Will auto-flip to top if needed
-        }
-      );
-      state.overlaySetup[listKey] = true;
-    });
+    // Setup immediately - no requestAnimationFrame (same as Unified Pending Actions Widget)
+    window.WidgetOverlayService.setupOverlayHover(
+      listElement,
+      '.recent-items-widget-item',
+      '[data-overlay="true"]',
+      {
+        hoverClass: 'is-hovered',
+        gap: 8, // Standard gap
+        minWidth: 280,
+        maxWidth: 400,
+        zIndex: 1050,
+        useAnimations: true, // Enable GSAP animations
+        transitionDuration: 100 // Faster animation (same as Unified Pending Actions Widget)
+        // No placement - let UnifiedUIPositioning handle it automatically
+      }
+    );
+    state.overlaySetup[listKey] = true;
   }
 
   /**

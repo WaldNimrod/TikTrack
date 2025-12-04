@@ -1,11 +1,96 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: ~50+
+ * 
+ * UNIFIED APP INITIALIZER CLASS (Core Class)
+ * - UnifiedAppInitializer - Main initialization class
+ *   - constructor() - Initialize UnifiedAppInitializer instance
+ *   - initialize() - Main initialization entry point (4 stages)
+ *   - detectAndAnalyze() - Stage 1: Detect page and analyze available systems
+ *   - prepareConfiguration() - Stage 2: Prepare optimal configuration
+ *   - executeInitialization(config) - Stage 3: Execute initialization
+ *   - finalizeInitialization(config) - Stage 4: Finalize initialization
+ *   - initializeModuleConfigs() - Initialize module configurations for dynamic loading
+ *   - loadRequiredModules(pageConfig) - Load required modules for page
+ *   - getRequiredModules(pageConfig) - Get required modules for page
+ *   - sortModulesByPriority(moduleNames) - Sort modules by priority
+ *   - getLoadingStatistics() - Get loading statistics
+ *   - validateDependencies() - Validate all dependencies are loaded
+ *   - initializePreferencesForPage(config) - Initialize preferences system for page
+ *   - manualInitialization(config) - Manual initialization (standard flow)
+ *   - detectPageInfo() - Detect current page information
+ *   - analyzeAvailableSystems() - Analyze which systems are available
+ * 
+ * BOOTSTRAP FALLBACKS
+ * - BootstrapModalFallback - Fallback for Bootstrap Modal
+ * - BootstrapTooltipFallback - Fallback for Bootstrap Tooltip
+ * 
+ * GLOBAL FUNCTIONS
+ * - initializeUnifiedApp() - Global initialization function
+ * - initializeUnifiedAppWhenReady() - Initialize when DOM is ready
+ * 
+ * UNIFIED INITIALIZATION SYSTEM
+ * - UnifiedInitializationSystem.addCoreSystem(name, initFunction) - Register core system
+ * - UnifiedInitializationSystem.initializeCoreSystems() - Initialize all registered core systems
+ * 
+ * NOTIFICATION SYSTEM
+ * - showSuccessNotification(title, message, category) - Show success notification
+ * - showErrorNotification(title, message, category) - Show error notification
+ * - showWarningNotification(title, message, category) - Show warning notification
+ * - showInfoNotification(title, message, category) - Show info notification
+ * - showNotification(type, title, message, category) - Generic notification function
+ * 
+ * ALERT SYSTEM
+ * - createAlert(alertData) - Create new alert
+ * - updateAlertHistory(action, data) - Update alert history
+ * - updateAlert(alertId, alertData) - Update existing alert
+ * - markAlertAsTriggered(alertId) - Mark alert as triggered
+ * - markAlertAsRead(alertId) - Mark alert as read
+ * - getNotificationIcon(type) - Get icon for notification type
+ * 
+ * MODAL MANAGEMENT
+ * - showFinalSuccessModal(successInfo) - Show final success modal
+ * - showFinalSuccessModalWithReload(successInfo) - Show success modal with reload
+ * - closeAllDetailsModals() - Close all detail modals
+ * 
+ * UTILITIES
+ * - copyToClipboard(content, resolvedTitle) - Copy content to clipboard
+ * - copyBlockingModalContent(modalElement, title, buttons) - Copy modal content
+ * 
+ * ==========================================
+ */
+
 /**
  * Core Systems Module - TikTrack
  * מערכות ליבה חיוניות
  *
  * @fileoverview מודול מערכות ליבה הכולל את המערכות הבסיסיות ביותר
- * @version 1.0.0
+ * 
+ * **מערכת איתחול מאוחדת:**
+ * - UnifiedAppInitializer - נקודת כניסה מרכזית לכל איתחול עמוד
+ * - 4 שלבי איתחול: Detect → Prepare → Execute → Finalize
+ * - תמיכה ב-Bootstrap fallbacks
+ * - מערכת התראות מאוחדת
+ * 
+ * **Package:** init-system (נטען אחרון, loadOrder: 22)
+ * **תלויות:** רק base package
+ * 
+ * **שינוי חשוב (דצמבר 2025):**
+ * - הועבר מ-base package ל-init-system package
+ * - נטען אחרון כדי שכל המערכות יהיו זמינות לפני איתחול
+ * - תלויות הופחתו מ-25 ל-1 (base בלבד)
+ * 
+ * @version 1.6.0
  * @author TikTrack Development Team
  * @created 2025-01-06
+ * @updated 2025-12-04 - Moved to init-system package, reduced dependencies
+ * 
+ * @see {@link documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md|Unified Initialization System Documentation}
  */
 
 // ============================================================================
@@ -266,6 +351,11 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
     /**
      * Initialize module configurations for dynamic loading
      * אתחול תצורות מודולים לטעינה דינמית
+     * 
+     * @method initializeModuleConfigs
+     * @description מאתחל את תצורות המודולים לטעינה דינמית (כרגע לא בשימוש - static loading only)
+     * @memberof UnifiedAppInitializer
+     * @since 1.0.0
      */
     initializeModuleConfigs() {
       this.moduleConfigs.set('core-systems', {
@@ -794,6 +884,23 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
     /**
      * Stage 3: Execute initialization
      */
+    /**
+     * Stage 3: Execute Initialization
+     * שלב 3: ביצוע איתחול
+     * 
+     * @method executeInitialization
+     * @description מבצע את האיתחול בפועל:
+     * - Cache System initialization
+     * - Preferences initialization (אם packages כולל 'preferences')
+     * - Application initialization (Header, Notifications, Actions Menu)
+     * - Custom initializers (אם מוגדרים)
+     * 
+     * @memberof UnifiedAppInitializer
+     * @async
+     * @param {Object} config - Configuration object מ-prepareConfiguration()
+     * @returns {Promise<void>}
+     * @since 1.0.0
+     */
     async executeInitialization(config) {
       if (window.Logger?.debug) {
         window.Logger.debug('Stage 3: Executing initialization', {}, { page: 'core-systems' });
@@ -881,15 +988,8 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         // This ensures single point of entry, proper cache usage, and no duplicate API calls
         await this.initializePreferencesForPage(config);
 
-        // Use the application initializer if available
-        if (typeof window.initializeApplication === 'function') {
-          // Removed debug log - using application initializer
-          await window.initializeApplication(config);
-        } else {
-          // Removed debug log - manual initialization fallback is normal
-          // Fallback to manual initialization
-          await this.manualInitialization(config);
-        }
+        // Manual initialization (no backward compatibility with initializeApplication)
+        await this.manualInitialization(config);
       } catch (error) {
         if (typeof window.Logger !== 'undefined' && window.Logger.error) {
           window.Logger.error('❌ Error in executeInitialization:', error, {
@@ -945,17 +1045,51 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
                             window.location.pathname.includes('login.html') ||
                             window.location.pathname.includes('register.html');
           
-          if (!isAuthPage && typeof window.initializeHeaderSystem === 'function') {
-            if (window.Logger?.debug) {
-              window.Logger.debug('Initializing Header System', {}, { page: 'core-systems' });
-            }
-            window.initializeHeaderSystem();
-          } else if (isAuthPage) {
+          if (isAuthPage) {
             if (window.Logger?.debug) {
               window.Logger.debug('Skipping Header System for auth page', {}, { page: 'core-systems' });
             }
+            return;
+          }
+
+          // Wait for HeaderSystem to be available (in case base package loads late)
+          let waitCount = 0;
+          while (typeof window.initializeHeaderSystem !== 'function' && waitCount < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            waitCount++;
+          }
+
+          if (typeof window.initializeHeaderSystem === 'function') {
+            if (window.Logger?.debug) {
+              window.Logger.debug('Initializing Header System', {
+                waitCount,
+                HeaderSystemExists: typeof window.HeaderSystem !== 'undefined',
+                initializeHeaderSystemExists: typeof window.initializeHeaderSystem !== 'undefined'
+              }, { page: 'core-systems' });
+            }
+            try {
+              window.initializeHeaderSystem();
+            } catch (error) {
+              if (window.Logger?.error) {
+                window.Logger.error('Error initializing Header System', {
+                  error: error.message,
+                  stack: error.stack
+                }, { page: 'core-systems' });
+              } else {
+                console.error('❌ Error initializing Header System:', error);
+              }
+            }
           } else {
-            console.warn('⚠️ initializeHeaderSystem not available');
+            const errorMsg = '⚠️ initializeHeaderSystem not available after waiting';
+            if (window.Logger?.warn) {
+              window.Logger.warn(errorMsg, {
+                HeaderSystemExists: typeof window.HeaderSystem !== 'undefined',
+                HeaderSystemClassExists: typeof window.HeaderSystemClass !== 'undefined',
+                waitCount
+              }, { page: 'core-systems' });
+            } else {
+              console.warn(errorMsg);
+            }
           }
         })(),
 
@@ -1393,6 +1527,28 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
     /**
      * Detect page information
      */
+    /**
+     * Detect current page information
+     * זיהוי מידע על העמוד הנוכחי
+     * 
+     * @method detectPageInfo
+     * @description מזהה את העמוד הנוכחי על בסיס URL:
+     * - שם העמוד (pageName)
+     * - נתיב (path)
+     * - שם קובץ (filename)
+     * - סוג עמוד (type)
+     * - דרישות (requirements: filters, validation, tables, charts)
+     * 
+     * @memberof UnifiedAppInitializer
+     * @returns {Object} Page info object עם:
+     * - name: string - שם העמוד
+     * - path: string - נתיב העמוד
+     * - filename: string - שם הקובץ
+     * - type: string - סוג העמוד (trading, development, preferences, dashboard, general)
+     * - requirements: Object - דרישות העמוד
+     * 
+     * @since 1.0.0
+     */
     detectPageInfo() {
       const path = window.location.pathname;
       const filename = path.split('/').pop() || 'index';
@@ -1423,6 +1579,19 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
     /**
      * Detect available systems
+     * זיהוי מערכות זמינות
+     * 
+     * @method detectAvailableSystems
+     * @description בודק אילו מערכות זמינות ב-window:
+     * - Core Systems: NotificationSystem, HeaderSystem, FilterSystem
+     * - Page Systems: pageFilters, validation, tables
+     * - Preferences & Storage: preferences, indexeddb
+     * - UI Systems: uiUtils, notifications, actionsMenu
+     * 
+     * @memberof UnifiedAppInitializer
+     * @returns {Set<string>} Set של שמות מערכות זמינות
+     * 
+     * @since 1.0.0
      */
     detectAvailableSystems() {
       const systems = new Set();
@@ -1450,6 +1619,13 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
     /**
      * Analyze page requirements
+     * ניתוח דרישות העמוד
+     * 
+     * @method analyzePageRequirements
+     * @description מנתח את דרישות העמוד (כרגע רק לוג, הדרישות נקבעות ב-detectPageInfo)
+     * 
+     * @memberof UnifiedAppInitializer
+     * @since 1.0.0
      */
     analyzePageRequirements() {
       // This is already done in detectPageInfo, but can be extended
@@ -1460,6 +1636,21 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
     /**
      * Determine page type
+     * קביעת סוג העמוד
+     * 
+     * @method determinePageType
+     * @description קובע את סוג העמוד על בסיס שם העמוד:
+     * - 'trading' - עמודי מסחר (trades, executions, alerts)
+     * - 'development' - עמודי פיתוח (system-management, crud-testing-dashboard, וכו')
+     * - 'preferences' - עמוד העדפות
+     * - 'dashboard' - דשבורד ראשי
+     * - 'general' - עמוד כללי (ברירת מחדל)
+     * 
+     * @memberof UnifiedAppInitializer
+     * @param {string} pageName - שם העמוד
+     * @returns {string} סוג העמוד
+     * 
+     * @since 1.0.0
      */
     determinePageType(pageName) {
       if (['trades', 'executions', 'alerts'].includes(pageName)) return 'trading';
@@ -1474,6 +1665,16 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
     /**
      * Check if page requires filters
+     * בדיקה אם העמוד דורש פילטרים
+     * 
+     * @method requiresFilters
+     * @description בודק אם העמוד דורש מערכת פילטרים
+     * 
+     * @memberof UnifiedAppInitializer
+     * @param {string} pageName - שם העמוד
+     * @returns {boolean} true אם העמוד דורש פילטרים
+     * 
+     * @since 1.0.0
      */
     requiresFilters(pageName) {
       const filterPages = [
@@ -1495,6 +1696,16 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
     /**
      * Check if page requires validation
+     * בדיקה אם העמוד דורש ולידציה
+     * 
+     * @method requiresValidation
+     * @description בודק אם העמוד דורש מערכת ולידציה
+     * 
+     * @memberof UnifiedAppInitializer
+     * @param {string} pageName - שם העמוד
+     * @returns {boolean} true אם העמוד דורש ולידציה
+     * 
+     * @since 1.0.0
      */
     requiresValidation(pageName) {
       const validationPages = [
@@ -1511,6 +1722,16 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
     /**
      * Check if page requires tables
+     * בדיקה אם העמוד דורש טבלאות
+     * 
+     * @method requiresTables
+     * @description בודק אם העמוד דורש מערכת טבלאות
+     * 
+     * @memberof UnifiedAppInitializer
+     * @param {string} pageName - שם העמוד
+     * @returns {boolean} true אם העמוד דורש טבלאות
+     * 
+     * @since 1.0.0
      */
     requiresTables(pageName) {
       const tablePages = [
@@ -1595,6 +1816,20 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
     /**
      * Handle errors
+     */
+    /**
+     * Handle initialization error
+     * טיפול בשגיאת איתחול
+     * 
+     * @method handleError
+     * @description מטפל בשגיאות איתחול:
+     * - לוגים את השגיאה
+     * - מריץ error handlers רשומים
+     * - מציג הודעת שגיאה למשתמש
+     * 
+     * @memberof UnifiedAppInitializer
+     * @param {Error} error - שגיאת איתחול
+     * @since 1.0.0
      */
     handleError(error) {
       if (typeof window.Logger !== 'undefined' && window.Logger.error) {
@@ -1818,10 +2053,20 @@ function requiresTables(pageName) {
   return tablePages.includes(pageName) || document.querySelectorAll('table').length > 0;
 }
 
-/**
- * Check if page requires charts (Legacy - moved outside class)
- */
-function requiresCharts(pageName) {
+    /**
+     * Check if page requires charts
+     * בדיקה אם העמוד דורש גרפים
+     * 
+     * @method requiresCharts
+     * @description בודק אם העמוד דורש מערכת גרפים
+     * 
+     * @memberof UnifiedAppInitializer
+     * @param {string} pageName - שם העמוד
+     * @returns {boolean} true אם העמוד דורש גרפים
+     * 
+     * @since 1.0.0
+     */
+    requiresCharts(pageName) {
   return pageName === 'index' || document.querySelectorAll('canvas, .chart-container').length > 0;
 }
 
@@ -1907,6 +2152,27 @@ window.unifiedAppInit = new UnifiedAppInitializer();
 
 // ===== GLOBAL EXPORT =====
 
+/**
+ * Initialize Unified App - Global entry point
+ * אתחול אפליקציה מאוחדת - נקודת כניסה גלובלית
+ * 
+ * @function initializeUnifiedApp
+ * @global
+ * @async
+ * @description נקודת הכניסה הגלובלית לאיתחול המערכת.
+ * מבצע את כל תהליך האיתחול ב-4 שלבים דרך UnifiedAppInitializer.
+ * 
+ * @returns {Promise<Object>} Status object עם פרטי האיתחול
+ * @throws {Error} אם האיתחול נכשל
+ * 
+ * @example
+ * // האיתחול מתבצע אוטומטית ב-DOMContentLoaded
+ * // או ניתן לקרוא ישירות:
+ * await window.initializeUnifiedApp();
+ * 
+ * @since 1.0.0
+ * @updated 1.6.0 - Moved to init-system package
+ */
 window.initializeUnifiedApp = async function () {
   return await window.unifiedAppInit.initialize();
 };
@@ -1953,13 +2219,30 @@ window.globalInitializationState = {
   customInitializers: new Map(),
 };
 
-// Single DOMContentLoaded listener - replaces all others
-document.addEventListener('DOMContentLoaded', async () => {
+/**
+ * Initialize Unified App when DOM is ready
+ * אתחול אפליקציה מאוחדת כשהדף מוכן
+ * 
+ * @function initializeUnifiedAppWhenReady
+ * @private
+ * @async
+ * @description בודק את מצב ה-DOM ומריץ איתחול:
+ * - אם DOM עדיין בטעינה - ממתין ל-DOMContentLoaded
+ * - אם DOM כבר נטען - מריץ איתחול ישירות
+ * 
+ * זה תיקון חשוב לבעיה שבה init-system נטען מאוחר (loadOrder: 22)
+ * ואז DOMContentLoaded כבר עבר.
+ * 
+ * @returns {Promise<void>}
+ * @since 1.6.0 (2025-12-04) - Added to handle late loading
+ */
+const initializeUnifiedAppWhenReady = async () => {
   // Use Logger for initialization logs
   if (window.Logger && Logger.DEBUG_MODE) {
-    window.Logger.debug('DOM Content Loaded - Starting Unified App Initialization', {
+    window.Logger.debug('Starting Unified App Initialization', {
       url: window.location.href,
       pathname: window.location.pathname,
+      readyState: document.readyState,
       page: 'core-systems'
     });
   }
@@ -2017,7 +2300,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       window.globalInitializationState.unifiedAppInitializing = false;
     }
   }
-});
+};
+
+// Check if DOM is already loaded (when init-system loads late)
+if (document.readyState === 'loading') {
+  // DOM is still loading, wait for DOMContentLoaded
+  document.addEventListener('DOMContentLoaded', initializeUnifiedAppWhenReady);
+} else {
+  // DOM is already loaded (interactive or complete), initialize immediately
+  initializeUnifiedAppWhenReady();
+}
 
 // ===== ERROR HANDLING =====
 
@@ -2069,6 +2361,23 @@ window.addEventListener('unhandledrejection', event => {
 window.UnifiedInitializationSystem = {
   coreSystems: new Map(),
 
+  /**
+   * Register core system for initialization
+   * רישום מערכת ליבה לאיתחול
+   * 
+   * @method addCoreSystem
+   * @description רושם מערכת ליבה לאיתחול אוטומטי
+   * 
+   * @memberof UnifiedInitializationSystem
+   * @param {string} name - שם המערכת
+   * @param {Function} initFunction - פונקציית איתחול
+   * @since 1.0.0
+   * 
+   * @example
+   * window.UnifiedInitializationSystem.addCoreSystem('MySystem', async () => {
+   *   await window.MySystem.initialize();
+   * });
+   */
   addCoreSystem(name, initFunction) {
     if (window.Logger?.debug) {
       window.Logger.debug(`Registering core system: ${name}`, {}, { page: 'core-systems' });
@@ -2076,6 +2385,21 @@ window.UnifiedInitializationSystem = {
     this.coreSystems.set(name, initFunction);
   },
 
+  /**
+   * Initialize all registered core systems
+   * אתחול כל המערכות הליבה הרשומות
+   * 
+   * @method initializeCoreSystems
+   * @description מאתחל את כל המערכות הליבה שנרשמו:
+   * - בודק אם המערכת כבר מאותחלת
+   * - מריץ את פונקציית האיתחול
+   * - מטפל בשגיאות
+   * 
+   * @memberof UnifiedInitializationSystem
+   * @async
+   * @returns {Promise<void>}
+   * @since 1.0.0
+   */
   async initializeCoreSystems() {
     if (window.Logger?.debug) {
       window.Logger.debug('Initializing registered core systems', {}, { page: 'core-systems' });

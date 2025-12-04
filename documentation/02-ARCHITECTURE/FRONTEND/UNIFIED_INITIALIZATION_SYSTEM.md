@@ -2,10 +2,10 @@
 ## Unified Initialization System
 
 **תאריך יצירה:** 24 בנובמבר 2025  
-**גרסה:** 1.5.0  
-**עודכן:** 30 בנובמבר 2025  
+**גרסה:** 1.6.0  
+**עודכן:** 4 בדצמבר 2025  
 **סטטוס:** ✅ פעיל ומתועד  
-**נקודת כניסה:** `trading-ui/scripts/modules/core-systems.js`
+**נקודת כניסה:** `trading-ui/scripts/modules/core-systems.js` (ב-`init-system` package)
 
 ---
 
@@ -52,18 +52,31 @@
 
 ```
 trading-ui/scripts/
-├── modules/
-│   └── core-systems.js              # נקודת כניסה מרכזית (UnifiedAppInitializer)
 ├── init-system/
-│   └── package-manifest.js          # מניפסט כל החבילות (26 חבילות)
-└── page-initialization-configs.js    # הגדרות עמודים (39 עמודים)
+│   ├── package-manifest.js          # מניפסט כל החבילות (25 חבילות)
+│   └── (קבצי ניטור נוספים)
+├── modules/
+│   └── core-systems.js              # נקודת כניסה מרכזית (UnifiedAppInitializer) - נטען ב-init-system package
+└── page-initialization-configs.js    # הגדרות עמודים (39+ עמודים)
 ```
+
+**שינוי חשוב (דצמבר 2025):**
+- `core-systems.js` הועבר מ-`base` package ל-`init-system` package
+- `init-system` נטען אחרון (loadOrder: 22) - אחרי כל המערכות
+- `init-system` תלוי רק ב-`base` package (1 תלות במקום 25)
 
 ### UnifiedAppInitializer Class
 
-**מיקום:** `trading-ui/scripts/modules/core-systems.js`
+**מיקום:** `trading-ui/scripts/modules/core-systems.js`  
+**Package:** `init-system` (נטען אחרון, loadOrder: 22)  
+**תלויות:** רק `base` package
 
 **תפקיד:** נקודת הכניסה המרכזית לכל איתחול עמוד
+
+**שינוי חשוב (דצמבר 2025):**
+- `UnifiedAppInitializer` עבר מ-`base` package ל-`init-system` package
+- נטען אחרון כדי שכל המערכות יהיו זמינות לפני איתחול
+- תלויות הופחתו מ-25 ל-1 (`base` בלבד)
 
 **מבנה:**
 ```javascript
@@ -594,9 +607,59 @@ scripts: [
 
 ---
 
-**תאריך עדכון אחרון:** 1 בדצמבר 2025  
-**גרסה:** 1.5.0  
+**תאריך עדכון אחרון:** 4 בדצמבר 2025  
+**גרסה:** 1.6.0  
 **סטטוס:** ✅ פעיל ומתועד
+
+---
+
+## 🔄 שינויים אחרונים (דצמבר 2025)
+
+### Refactor - איחוד מערכות איתחול
+
+**תאריך:** 4 בדצמבר 2025
+
+**שינויים מרכזיים:**
+1. **העברת `core-systems.js` ל-`init-system` package**
+   - `UnifiedAppInitializer` עבר מ-`base` package ל-`init-system` package
+   - נטען אחרון (loadOrder: 22) - אחרי כל המערכות
+   - תלויות הופחתו מ-25 ל-1 (`base` בלבד)
+
+2. **הסרת `advanced-notifications` package**
+   - Package deprecated וריק הוסר מהמערכת
+
+3. **ביטול כפילויות**
+   - `unified-app-initializer.js` הועבר לארכיון
+   - הוסרה תמיכה ב-`initializeApplication` (ללא תמיכה לאחור)
+
+4. **תיקון DOMContentLoaded**
+   - תיקון לבעיית טעינה מאוחרת - בודק `document.readyState` ומריץ איתחול ישירות אם נדרש
+
+**תוצאות:**
+- ✅ הפחתת תלויות: 25 → 1 (96% הפחתה)
+- ✅ איחוד מערכות: 2 → 1 מערכת איתחול
+- ✅ סדר טעינה מיטוב: `init-system` נטען אחרון
+- ✅ 40 עמודים עודכנו בהצלחה
+
+**דוחות:**
+- `documentation/05-REPORTS/INIT_REFACTOR_COMPLETION_REPORT.md` - דוח סיום מלא
+- `documentation/05-REPORTS/INIT_PERFORMANCE_COMPARISON.md` - דוח ביצועים
+
+---
+
+## 📚 תיעוד API
+
+### תיעוד API מלא
+
+**📖 תיעוד API מסודר ומפורט:**
+`documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM_API.md`
+
+התיעוד כולל:
+- כל המתודות של `UnifiedAppInitializer`
+- כל הפרמטרים והערכים המוחזרים
+- דוגמאות שימוש מפורטות
+- טיפול בשגיאות
+- Global functions
 
 ---
 

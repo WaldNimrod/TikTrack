@@ -631,41 +631,10 @@ async function updateEditTickerInfo() {
             },
           );
         } else {
-          if (typeof window.showConfirmationDialog === 'function') {
-            window.showConfirmationDialog(
-              'שינוי טיקר לתכנון',
-              'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
-              () => {
-                if (typeof window.showWarningNotification === 'function') {
-                  window.showWarningNotification(
-                    'פיצ\'ר לא נתמך',
-                    'שינוי טיקר לתכנון לא נתמך עדיין. הטיקר יוחזר למצבו המקורי.',
-                  );
-                }
-                // Use DataCollectionService to set value if available
-            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
-              window.DataCollectionService.setValue('editTradePlanTickerId', originalTradePlan.ticker_id, 'int');
-            } else {
-              const tickerIdEl = document.getElementById('editTradePlanTickerId');
-              if (tickerIdEl) tickerIdEl.value = originalTradePlan.ticker_id;
-            }
-                updateEditTickerInfo();
-              },
-              () => {
-                // Use DataCollectionService to set value if available
-            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
-              window.DataCollectionService.setValue('editTradePlanTickerId', originalTradePlan.ticker_id, 'int');
-            } else {
-              const tickerIdEl = document.getElementById('editTradePlanTickerId');
-              if (tickerIdEl) tickerIdEl.value = originalTradePlan.ticker_id;
-            }
-                updateEditTickerInfo();
-              },
-            );
-          } else {
             // Fallback למקרה שמערכת התראות לא זמינה
-            const confirmed = typeof showConfirmationDialog === 'function' ? 
-              await new Promise(resolve => {
+            let confirmed = false;
+            if (typeof showConfirmationDialog === 'function') {
+              confirmed = await new Promise(resolve => {
                 showConfirmationDialog(
                   'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
                   () => resolve(true),
@@ -674,9 +643,9 @@ async function updateEditTickerInfo() {
                   'שנה',
                   'ביטול'
                 );
-              }) : 
-              (typeof window.showConfirmationDialog === 'function') ?
-              await new Promise(resolve => {
+              });
+            } else if (typeof window.showConfirmationDialog === 'function') {
+              confirmed = await new Promise(resolve => {
                 window.showConfirmationDialog(
                   'שינוי טיקר',
                   'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
@@ -684,58 +653,10 @@ async function updateEditTickerInfo() {
                   () => resolve(false),
                   'warning'
                 );
-              }) :
-              (window.showConfirmationDialog ? 
-                await new Promise((resolve) => {
-                  window.showConfirmationDialog(
-                    'שינוי טיקר',
-                    'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
-                    () => resolve(true),
-                    () => resolve(false),
-                    'warning'
-                  );
-                }) :
-                (window.showConfirmationDialog ? 
-                  await new Promise((resolve) => {
-                    window.showConfirmationDialog(
-                      'שינוי טיקר',
-                      'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
-                      () => resolve(true),
-                      () => resolve(false),
-                      'warning'
-                    );
-                  }) :
-                  (window.showConfirmationDialog ? 
-                    await new Promise((resolve) => {
-                      window.showConfirmationDialog(
-                        'שינוי טיקר',
-                        'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
-                        () => resolve(true),
-                        () => resolve(false),
-                        'warning'
-                      );
-                    }) :
-                    (window.showConfirmationDialog ? 
-                      await new Promise((resolve) => {
-                        window.showConfirmationDialog(
-                          'שינוי טיקר',
-                          'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
-                          () => resolve(true),
-                          () => resolve(false),
-                          'warning'
-                        );
-                      }) :
-                      (window.showConfirmationDialog ? 
-                        await new Promise((resolve) => {
-                          window.showConfirmationDialog(
-                            'שינוי טיקר',
-                            'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
-                            () => resolve(true),
-                            () => resolve(false),
-                            'warning'
-                          );
-                        }) :
-                        window.confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?')));
+              });
+            } else {
+              confirmed = window.confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
+            }
             if (confirmed) {
               if (typeof window.showWarningNotification === 'function') {
                 window.showWarningNotification(
@@ -765,7 +686,6 @@ async function updateEditTickerInfo() {
         }
       }
     }
-  }
 
   // מציאת הטיקר בנתונים
   let ticker = null;
@@ -4496,3 +4416,5 @@ window.registerTradePlansTables = function() {
         defaultSort: { columnIndex: 1, direction: 'desc', key: 'created_at' }
     });
 };
+// Expose updateTradePlansTable to window (must be after function definition)
+window.updateTradePlansTable = updateTradePlansTable;

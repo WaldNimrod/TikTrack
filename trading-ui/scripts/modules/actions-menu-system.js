@@ -268,6 +268,7 @@ class ActionsMenuSystem {
                     case 'VIEW': icon = '👁️'; break;
                     case 'ADD': icon = '➕'; break;
                     case 'MENU': icon = '⚙️'; break;
+                    case 'DASHBOARD': icon = '📊'; break;
                     default: icon = '⚙️'; break;
                 }
             }
@@ -277,7 +278,8 @@ class ActionsMenuSystem {
             if (escapedOnclick) {
                 // Escape single quotes (since we use single quotes for the attribute wrapper)
                 escapedOnclick = escapedOnclick.replace(/'/g, '&#39;');
-                // Double quotes are OK inside single-quoted attribute
+                // Also escape double quotes to prevent parsing issues
+                escapedOnclick = escapedOnclick.replace(/"/g, '&quot;');
             }
             
             // Use single quotes for the data-onclick attribute value - allows double quotes inside without escaping
@@ -774,6 +776,7 @@ window.createActionsMenu = function(buttons) {
                 case 'DELETE': icon = '🗑️'; break;
                 case 'VIEW': icon = '👁️'; break;
                 case 'ADD': icon = '➕'; break;
+                case 'DASHBOARD': icon = '📊'; break;
                 default: icon = '⚙️'; break;
             }
         }

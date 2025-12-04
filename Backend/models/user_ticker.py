@@ -46,6 +46,8 @@ class UserTicker(BaseModel):
                         comment="Custom asset type for this user")
     status = Column(String(20), default='open', nullable=False,
                    comment="User-ticker association status: open, closed, cancelled")
+    # Note: created_at is inherited from BaseModel, but we override it here for timezone support
+    # The server_default should work, but we'll set it explicitly in code to be safe
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False,
                        comment="When the ticker was added to user's list")
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), nullable=True,

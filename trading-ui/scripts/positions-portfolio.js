@@ -384,24 +384,57 @@ async function populatePositionsAccountSelector(autoSelectDefault = false) {
             try {
                 let defaultAccountId = null;
                 
-                if (typeof window.getPreference === 'function') {
-                    const prefValue = await window.getPreference('default_trading_account');
-                    
-                    if (prefValue) {
-                        const parsed = parseInt(prefValue);
-                        if (!isNaN(parsed)) {
-                            defaultAccountId = parsed;
-                        } else {
-                            const tradingAccount = window.trading_accountsData.find(acc => acc.name === prefValue);
-                            if (tradingAccount) {
-                                defaultAccountId = tradingAccount.id;
+                // Try PreferencesCore first (preferred method)
+                if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                    try {
+                        const prefValue = await window.PreferencesCore.getPreference('default_trading_account');
+                        if (prefValue) {
+                            const parsed = parseInt(prefValue);
+                            if (!isNaN(parsed)) {
+                                defaultAccountId = parsed;
+                                window.Logger.info(`✅ Got default account from PreferencesCore: ${defaultAccountId}`, { page: 'trading_accounts' });
                             }
                         }
+                    } catch (e) {
+                        window.Logger.warn('⚠️ Error getting default account from PreferencesCore:', e, { page: 'trading_accounts' });
                     }
                 }
                 
-                if (!defaultAccountId || !selector.querySelector(`option[value="${defaultAccountId}"]`)) {
-                    defaultAccountId = selector.options[1].value;
+                // Fallback to window.getPreference if PreferencesCore didn't work
+                if (!defaultAccountId && typeof window.getPreference === 'function') {
+                    try {
+                        const prefValue = await window.getPreference('default_trading_account');
+                        if (prefValue) {
+                            const parsed = parseInt(prefValue);
+                            if (!isNaN(parsed)) {
+                                defaultAccountId = parsed;
+                                window.Logger.info(`✅ Got default account from window.getPreference: ${defaultAccountId}`, { page: 'trading_accounts' });
+                            } else {
+                                const tradingAccount = window.trading_accountsData.find(acc => acc.name === prefValue);
+                                if (tradingAccount) {
+                                    defaultAccountId = tradingAccount.id;
+                                    window.Logger.info(`✅ Found default account by name: ${defaultAccountId}`, { page: 'trading_accounts' });
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        window.Logger.warn('⚠️ Error getting default account from window.getPreference:', e, { page: 'trading_accounts' });
+                    }
+                }
+                
+                // Verify that the default account exists in the selector options
+                const defaultOption = selector.querySelector(`option[value="${defaultAccountId}"]`);
+                if (!defaultAccountId || !defaultOption) {
+                    // Fallback to first available account (skip the empty "בחר חשבון..." option)
+                    if (selector.options.length > 1) {
+                        defaultAccountId = selector.options[1].value;
+                        window.Logger.info(`ℹ️ No valid default account in preferences, using first account (ID: ${defaultAccountId})`, { page: 'trading_accounts' });
+                    } else {
+                        window.Logger.warn('⚠️ No accounts available to select', { page: 'trading_accounts' });
+                        return; // No accounts to select
+                    }
+                } else {
+                    window.Logger.info(`🔄 Auto-selecting default account from preferences (ID: ${defaultAccountId})`, { page: 'trading_accounts' });
                 }
                 
                 // Use DataCollectionService to set value if available
@@ -648,8 +681,14 @@ window.syncPositionsTablePagination = syncPositionsTablePagination;
  * @param {Array} positions - Array of position objects
  */
 function renderPositionsTable(positions) {
+    window.Logger.info('🔵 [renderPositionsTable] START', { 
+        positionsCount: positions?.length || 0,
+        hasTableMapping: !!(window.TABLE_COLUMN_MAPPINGS?.['positions']),
+        page: 'trading_accounts' 
+    });
     const tableBody = document.querySelector('#positionsTable tbody');
     if (!tableBody) {
+        window.Logger.warn('⚠️ [renderPositionsTable] Table body not found', { page: 'trading_accounts' });
         return;
     }
     
@@ -670,16 +709,39 @@ function renderPositionsTable(positions) {
         tableBody.textContent = '';
         const row = document.createElement('tr');
         const cell = document.createElement('td');
+        // Count columns: 8 data columns + 1 actions column = 9 total
         cell.colSpan = 9;
         cell.className = 'empty';
         cell.textContent = message;
         row.appendChild(cell);
         tableBody.appendChild(row);
+        window.Logger.info('🔵 [renderPositionsTable] No positions, showing empty message', { 
+            message, 
+            page: 'trading_accounts' 
+        });
         return;
     }
     
     // Use FieldRendererService for consistent rendering
     const FieldRenderer = window.FieldRendererService;
+    
+    // Get table column mapping from TABLE_COLUMN_MAPPINGS (ensures correct column order)
+    const tableMapping = window.TABLE_COLUMN_MAPPINGS?.['positions'] || [
+        'ticker_symbol',           // 0 - סימבול
+        'ticker_name',             // 1 - נוכחי (שם הטיקר)
+        'quantity',                // 2 - כמות
+        'side',                     // 3 - צד
+        'average_price_net',        // 4 - מחיר ממוצע
+        'market_value',            // 5 - שווי שוק
+        'unrealized_pl',           // 6 - רווח/הפסד לא מוכר
+        'percent_of_account',      // 7 - אחוז מהחשבון
+    ];
+    window.Logger.info('🔵 [renderPositionsTable] Using table mapping', { 
+        mappingLength: tableMapping.length,
+        mapping: tableMapping,
+        usingDefault: !window.TABLE_COLUMN_MAPPINGS?.['positions'],
+        page: 'trading_accounts' 
+    });
     
     const isIndexPage = window.location.pathname.includes('index') ||
         document.body.classList.contains('index-page') ||
@@ -695,81 +757,134 @@ function renderPositionsTable(positions) {
         const unrealizedPlPercent = position.unrealized_pl_percent || 0;
         const percentAccount = position.percent_of_account || 0;
         
-        // Render ticker info using FieldRendererService
-        let tickerHtml = `<strong>${position.ticker_symbol || 'N/A'}</strong>`;
-        if (position.ticker_name) {
-            tickerHtml += `<br><small>${position.ticker_name}</small>`;
-        }
-        if (FieldRenderer && FieldRenderer.renderTickerInfo) {
-            try {
-                let renderedTicker = FieldRenderer.renderTickerInfo({
-                    symbol: position.ticker_symbol,
-                    name: position.ticker_name,
-                    current_price: position.market_price,
-                    daily_change: null, // Not available in position data
-                    daily_change_percent: null
-                }, 'ticker-info-compact');
-
-                if (isIndexPage && typeof renderedTicker === 'string') {
-                    renderedTicker = renderedTicker.replace(/<span class="text-muted small">[\s\S]*?<\/span>/, '');
+        // Build row using TABLE_COLUMN_MAPPINGS order
+        html += '<tr data-position-id="' + (position.ticker_id || '') + '" data-account-id="' + (position.trading_account_id || '') + '">';
+        
+        // Render each column according to TABLE_COLUMN_MAPPINGS order
+        tableMapping.forEach((fieldName, columnIndex) => {
+            let cellContent = '';
+            let cellClass = '';
+            
+            switch (fieldName) {
+            case 'ticker_symbol':
+                cellClass = 'col-symbol';
+                const tickerLink = position.ticker_id ? 
+                    `<a href="#" onclick="if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('ticker', ${position.ticker_id}, { mode: 'view' }); return false; }" class="entity-trade-link">${position.ticker_symbol || 'N/A'}</a>` :
+                    position.ticker_symbol || 'N/A';
+                cellContent = `<strong>${tickerLink}</strong>`;
+                break;
+                
+            case 'ticker_name':
+                cellClass = 'col-ticker';
+                let tickerHtml = `<strong>${position.ticker_symbol || 'N/A'}</strong>`;
+                if (position.ticker_name) {
+                    tickerHtml += `<br><small>${position.ticker_name}</small>`;
                 }
-
-                tickerHtml = renderedTicker;
-            } catch (e) {
-                window.Logger.warn('Error rendering ticker info:', e, { page: "trading_accounts" });
-            }
-        }
-        
-        // Render side using FieldRendererService
-        let sideHtml = `<span class="badge badge-${side}">${side === 'long' ? 'לונג' : side === 'short' ? 'שורט' : 'סגור'}</span>`;
-        if (FieldRenderer && FieldRenderer.renderSide) {
-            try {
-                sideHtml = FieldRenderer.renderSide(side);
-            } catch (e) {
-                window.Logger.warn('Error rendering side:', e, { page: "trading_accounts" });
-            }
-        }
-        
-        // Ticker symbol as link
-        const tickerLink = position.ticker_id ? 
-            `<a href="#" onclick="if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('ticker', ${position.ticker_id}, { mode: 'view' }); return false; }" class="entity-trade-link">${position.ticker_symbol || 'N/A'}</a>` :
-            position.ticker_symbol || 'N/A';
-        
-        // Render quantity with # and sign
-        const quantitySign = quantity > 0 ? '+' : quantity < 0 ? '-' : '';
-        const quantityClass = quantity > 0 ? 'text-success' : quantity < 0 ? 'text-danger' : '';
-        const quantityDisplay = `<span class="${quantityClass}">#${quantitySign}${Math.abs(quantity).toLocaleString()}</span>`;
-        
-        html += `
-            <tr data-position-id="${position.ticker_id}" data-account-id="${position.trading_account_id}">
-                <td class="col-symbol"><strong>${tickerLink}</strong></td>
-                <td class="col-ticker">${tickerHtml}</td>
-                <td class="col-quantity">${quantityDisplay}</td>
-                <td class="col-side">${sideHtml}</td>
-                <td class="col-avg-price">
-                    ${position.average_price_net ? `$${position.average_price_net.toFixed(2)}` : 'N/A'}
-                </td>
-                <td class="col-market-value">
-                    ${formatCurrencyHebrew(marketValue, false, true)}
-                </td>
-                <td class="col-unrealized-pl">
-                    ${marketValue ? `
+                if (FieldRenderer && FieldRenderer.renderTickerInfo) {
+                    try {
+                        let renderedTicker = FieldRenderer.renderTickerInfo({
+                            symbol: position.ticker_symbol,
+                            name: position.ticker_name,
+                            current_price: position.market_price,
+                            daily_change: null,
+                            daily_change_percent: null
+                        }, 'ticker-info-compact');
+                        if (isIndexPage && typeof renderedTicker === 'string') {
+                            renderedTicker = renderedTicker.replace(/<span class="text-muted small">[\s\S]*?<\/span>/, '');
+                        }
+                        tickerHtml = renderedTicker;
+                    } catch (e) {
+                        window.Logger.warn('Error rendering ticker info:', e, { page: "trading_accounts" });
+                    }
+                }
+                cellContent = tickerHtml;
+                break;
+                
+            case 'quantity':
+                cellClass = 'col-quantity';
+                const quantitySign = quantity > 0 ? '+' : quantity < 0 ? '-' : '';
+                const quantityClass = quantity > 0 ? 'text-success' : quantity < 0 ? 'text-danger' : '';
+                cellContent = `<span class="${quantityClass}">#${quantitySign}${Math.abs(quantity).toLocaleString()}</span>`;
+                break;
+                
+            case 'side':
+                cellClass = 'col-side';
+                let sideHtml = `<span class="badge badge-${side}">${side === 'long' ? 'לונג' : side === 'short' ? 'שורט' : 'סגור'}</span>`;
+                if (FieldRenderer && FieldRenderer.renderSide) {
+                    try {
+                        sideHtml = FieldRenderer.renderSide(side);
+                    } catch (e) {
+                        window.Logger.warn('Error rendering side:', e, { page: "trading_accounts" });
+                    }
+                }
+                cellContent = sideHtml;
+                break;
+                
+            case 'average_price_net':
+                cellClass = 'col-avg-price';
+                if (FieldRenderer && FieldRenderer.renderAmount) {
+                    cellContent = FieldRenderer.renderAmount(position.average_price_net || 0, '$', 2, false);
+                } else {
+                    cellContent = position.average_price_net ? `$${position.average_price_net.toFixed(2)}` : 'N/A';
+                }
+                break;
+                
+            case 'market_value':
+                cellClass = 'col-market-value';
+                cellContent = formatCurrencyHebrew(marketValue, false, true);
+                break;
+                
+            case 'unrealized_pl':
+                cellClass = 'col-unrealized-pl';
+                if (marketValue) {
+                    cellContent = `
                         <div class="portfolio-pl-value ${unrealizedPl >= 0 ? 'text-success' : 'text-danger'}">
                             <div class="pl-amount">${formatCurrencyHebrew(unrealizedPl, true, true)}</div>
                             <div class="pl-percent">${unrealizedPlPercent.toFixed(2)}%${unrealizedPlPercent >= 0 ? '+' : '-'}</div>
                         </div>
-                    ` : 'לא זמין'}
-                </td>
-                <td class="col-percent-account">
-                    ${percentAccount.toFixed(2)}%
-                </td>
-                <td class="col-actions actions-cell">
-                    ${window.createActionsMenu ? window.createActionsMenu([
-                      { type: 'VIEW', onclick: `window.showPositionDetails && window.showPositionDetails(${position.trading_account_id}, ${position.ticker_id})`, title: 'פרטי פוזיציה' }
-                    ]) : '<!-- Actions menu not available -->'}
-                </td>
-            </tr>
-        `;
+                    `;
+                } else {
+                    cellContent = 'לא זמין';
+                }
+                break;
+                
+            case 'percent_of_account':
+                cellClass = 'col-percent-account';
+                cellContent = percentAccount.toFixed(2) + '%';
+                break;
+                
+            default:
+                // Fallback: use FieldRendererService if available
+                const value = position[fieldName];
+                if (FieldRenderer && FieldRenderer.renderField) {
+                    try {
+                        cellContent = FieldRenderer.renderField(value, fieldName, 'positions');
+                    } catch (e) {
+                        cellContent = value || '';
+                    }
+                } else {
+                    cellContent = value || '';
+                }
+                break;
+            }
+            
+            html += `<td class="${cellClass}">${cellContent}</td>`;
+        });
+        
+        // Add actions column (not in mapping, always last)
+        html += '<td class="col-actions actions-cell">';
+        html += window.createActionsMenu ? window.createActionsMenu([
+            { type: 'VIEW', onclick: `window.showPositionDetails && window.showPositionDetails(${position.trading_account_id}, ${position.ticker_id})`, title: 'פרטי פוזיציה' }
+        ]) : '<!-- Actions menu not available -->';
+        html += '</td>';
+        
+        html += '</tr>';
+    });
+    
+    window.Logger.info('🔵 [renderPositionsTable] Generated HTML', { 
+        htmlLength: html.length,
+        rowsCount: positions.length,
+        page: 'trading_accounts' 
     });
     
     // Update table HTML
@@ -778,6 +893,10 @@ function renderPositionsTable(positions) {
     const doc = parser.parseFromString(html, 'text/html');
     doc.body.childNodes.forEach(node => {
         tableBody.appendChild(node.cloneNode(true));
+    });
+    window.Logger.info('🔵 [renderPositionsTable] Table updated', { 
+        finalRowsCount: tableBody.querySelectorAll('tr').length,
+        page: 'trading_accounts' 
     });
 }
 

@@ -760,7 +760,10 @@ async function setCurrentEntityColorFromPage() {
           }
         }
       } else {
-        if (window.Logger) { window.Logger.warn(`⚠️ No mapping found for page class: ${pageClass}`, { page: "color-scheme" }); }
+        // Don't warn for test pages - they don't need color scheme mapping
+        if (!pageClass.includes('test') && !pageClass.includes('Test') && window.Logger) {
+          window.Logger.warn(`⚠️ No mapping found for page class: ${pageClass}`, { page: "color-scheme" });
+        }
       }
     }
   } catch (error) {
@@ -856,7 +859,8 @@ const PAGE_TO_ENTITY_MAPPING = {
   'css-management-page': 'development',
   'chart-management-page': 'development',
   'cache-management-page': 'development',
-  'background-tasks-page': 'development'
+  'background-tasks-page': 'development',
+  'test-widgets-overlay-page': 'development' // Test widgets overlay page
 };
 
 async function getEntityColorFromPreferences(entityType, variant = 'primary') {

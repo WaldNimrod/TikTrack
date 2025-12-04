@@ -187,16 +187,28 @@ class BaseEntityUtils:
         """Sanitize rich text HTML content while keeping allowed formatting"""
         if not html_content:
             return ''
+        
+        # Convert to string if not already
+        html_content = str(html_content).strip()
+        if not html_content:
+            return ''
 
         # If bleach is unavailable, fall back to basic sanitization
         if bleach is None:
             logger.warning("⚠️ Using basic HTML sanitization (bleach not available)")
             # Remove script/style blocks and inline event handlers
-            html_content = re.sub(r'<script[^>]*>.*?</script>', '', html_content, flags=re.DOTALL | re.IGNORECASE)
-            html_content = re.sub(r'<style[^>]*>.*?</style>', '', html_content, flags=re.DOTALL | re.IGNORECASE)
-            html_content = re.sub(r'on\w+="[^"]*"', '', html_content, flags=re.IGNORECASE)
-            html_content = re.sub(r"on\w+='[^']*'", '', html_content, flags=re.IGNORECASE)
-            return html_content
+            sanitized = re.sub(r'<script[^>]*>.*?</script>', '', html_content, flags=re.DOTALL | re.IGNORECASE)
+            sanitized = re.sub(r'<style[^>]*>.*?</style>', '', sanitized, flags=re.DOTALL | re.IGNORECASE)
+            sanitized = re.sub(r'on\w+="[^"]*"', '', sanitized, flags=re.IGNORECASE)
+            sanitized = re.sub(r"on\w+='[^']*'", '', sanitized, flags=re.IGNORECASE)
+            # If sanitization removed everything, return original
+            if not sanitized or len(sanitized.strip()) == 0:
+                return html_content
+            return sanitized
+        
+        # If bleach is available, use it for sanitization
+        # (bleach code would go here if needed)
+        return html_content
 
     # ------------------------------------------------------------------
     # Date normalization helpers

@@ -501,7 +501,7 @@ class TickerService:
         
         ticker = Ticker(**ticker_data)
         db.add(ticker)
-        db.commit()
+        db.flush()  # Use flush instead of commit - let the decorator handle the commit
         db.refresh(ticker)
         return ticker
     
@@ -537,7 +537,7 @@ class TickerService:
         for key, value in ticker_data.items():
             setattr(ticker, key, value)
         
-        db.commit()
+        db.flush()  # Use flush instead of commit - let the decorator handle the commit
         db.refresh(ticker)
         return ticker
     
@@ -986,7 +986,7 @@ class TickerService:
         
         if user_ticker.status != new_status:
             user_ticker.status = new_status
-            db.commit()
+            db.flush()  # Use flush instead of commit - let the caller/decorator handle the commit
         
         return True
     
@@ -1034,7 +1034,7 @@ class TickerService:
         # Update status if different
         if ticker.status != new_status:
             ticker.status = new_status
-            db.commit()
+            db.flush()  # Use flush instead of commit - let the decorator handle the commit
         
         return True
     

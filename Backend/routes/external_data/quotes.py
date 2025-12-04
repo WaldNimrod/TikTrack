@@ -389,7 +389,7 @@ def refresh_ticker_quote(ticker_id):
             
             if quote_data and quote_data.price:
                 # Quote fetched and saved successfully
-                # Invalidate backend cache for entity details
+                # Invalidate backend cache for entity details and all technical indicators
                 try:
                     from services.advanced_cache_service import advanced_cache_service
                     from services.entity_details_service import EntityDetailsService
@@ -402,7 +402,14 @@ def refresh_ticker_quote(ticker_id):
                     # Also use the service's own invalidation method
                     EntityDetailsService.invalidate_entity_cache('ticker', ticker_id)
                     
-                    logger.info(f"✅ Invalidated cache for ticker {ticker_id}")
+                    # Invalidate technical indicators cache to force recalculation
+                    # These are calculated on-demand and cached, so we need to clear them
+                    advanced_cache_service.invalidate(f"ticker_{ticker_id}_week52")
+                    advanced_cache_service.invalidate(f"ticker_{ticker_id}_volatility_30")
+                    advanced_cache_service.invalidate(f"ticker_{ticker_id}_ma_20")
+                    advanced_cache_service.invalidate(f"ticker_{ticker_id}_ma_150")
+                    
+                    logger.info(f"✅ Invalidated cache for ticker {ticker_id} (including technical indicators)")
                 except Exception as cache_error:
                     logger.warning(f"Could not invalidate cache: {cache_error}", exc_info=True)
                 

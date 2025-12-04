@@ -43,7 +43,8 @@ const BUTTON_ICONS = {
   SORT: '/trading-ui/images/icons/tabler/arrows-sort.svg',
   COPY: '/trading-ui/images/icons/tabler/copy.svg',
   MENU: '/trading-ui/images/icons/tabler/settings.svg',
-  BACK: '/trading-ui/images/icons/tabler/arrow-right.svg' // RTL - חץ ימינה
+  BACK: '/trading-ui/images/icons/tabler/arrow-right.svg', // RTL - חץ ימינה
+  DASHBOARD: '/trading-ui/images/icons/tabler/gauge.svg'
 };
 
 const BUTTON_TEXTS = {
@@ -76,7 +77,8 @@ const BUTTON_TEXTS = {
   SORT: 'מיון',
   COPY: 'העתק',
   MENU: 'תפריט',
-  BACK: 'חזור'
+  BACK: 'חזור',
+  DASHBOARD: 'דשבורד'
 };
 
 /**

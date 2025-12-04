@@ -309,13 +309,50 @@ def create_note():
             related_type_id = request.form.get('related_type_id')
             related_id = request.form.get('related_id')
         else:
-            # Get data from JSON
-            data = request.get_json()
-            logger.debug(f"🔍 DEBUG: Full request JSON data: {data}")
+            # Get data from JSON - try multiple methods
+            # IMPORTANT: Use get_data() directly to bypass normalization that might affect content
+            data = None
+            try:
+                # First try: get raw data and parse manually (bypasses _normalized_get_json)
+                raw_data = request.get_data(as_text=True)
+                if raw_data:
+                    import json
+                    data = json.loads(raw_data)
+                    logger.info(f"🔍 DEBUG: Manual JSON parse from get_data() returned: {data}")
+                else:
+                    logger.warning(f"⚠️ get_data() returned empty, trying get_json()")
+                    # Fallback: try get_json (with normalization)
+                    data = request.get_json(force=True, silent=True)
+                    logger.info(f"🔍 DEBUG: get_json(force=True, silent=True) returned: {data}")
+            except Exception as e:
+                logger.warning(f"⚠️ Manual JSON parse failed: {e}, trying get_json()")
+                # Final fallback: try get_json
+                try:
+                    data = request.get_json(force=True, silent=True)
+                    logger.info(f"🔍 DEBUG: get_json fallback returned: {data}")
+                except Exception as e2:
+                    logger.error(f"❌ get_json also failed: {e2}")
+                    data = None
             
-            content = data.get('content', '') if data else ''
-            logger.debug(f"🔍 DEBUG: Content from JSON - type: {type(content)}, length: {len(content) if content else 0}")
-            logger.debug(f"🔍 DEBUG: Content value: {content[:100] if content else 'None'}...")
+            logger.info(f"🔍 DEBUG: Final data: {data}")
+            logger.info(f"🔍 DEBUG: Request content-type: {request.content_type}")
+            logger.info(f"🔍 DEBUG: Request is_json: {request.is_json}")
+            
+            # Extract content - handle both 'content' and potential other field names
+            content = None
+            if data:
+                content = data.get('content') or data.get('note') or data.get('text') or ''
+                # Convert to string if not already
+                if content is not None:
+                    content = str(content).strip()
+                else:
+                    content = ''
+            else:
+                logger.error(f"❌ No data received from request!")
+                content = ''
+            
+            logger.info(f"🔍 DEBUG: Content from JSON - type: {type(content)}, length: {len(content) if content else 0}")
+            logger.info(f"🔍 DEBUG: Content value: {content[:100] if content else 'None'}...")
             
             # Check content before sanitization
             if not content or len(content.strip()) == 0:
@@ -327,16 +364,31 @@ def create_note():
                     "version": "1.0"
                 }), 400
             
-            # Sanitize HTML content
+            # Sanitize HTML content - but preserve original if sanitization fails
             if content:
+                original_content = content
                 original_length = len(content)
-                content = BaseEntityUtils.sanitize_rich_text(content)
-                if content and len(content) != original_length:
-                    logger.warning(f"⚠️ Content length changed after sanitization: {original_length} -> {len(content)}")
-                logger.info(f"📝 Content extracted from JSON: length={len(content) if content else 0}, has_content={bool(content)}")
+                sanitized_content = BaseEntityUtils.sanitize_rich_text(content)
+                # Check if sanitization removed all content
+                if sanitized_content and len(sanitized_content.strip()) > 0:
+                    content = sanitized_content
+                    if len(content) != original_length:
+                        logger.warning(f"⚠️ Content length changed after sanitization: {original_length} -> {len(content)}")
+                    logger.info(f"📝 Content extracted from JSON: length={len(content) if content else 0}, has_content={bool(content)}")
+                else:
+                    # Sanitization removed all content - use original if it was valid
+                    logger.warning(f"⚠️ Sanitization removed all content, using original")
+                    content = original_content.strip() if original_content else ''
+                    if not content or len(content.strip()) == 0:
+                        logger.error(f"❌ Content is empty after sanitization. Original: {original_content[:50]}")
+                        return jsonify({
+                            "status": "error",
+                            "error": {"message": "Note content is required and cannot be empty"},
+                            "version": "1.0"
+                        }), 400
             else:
                 logger.error(f"❌ Content is None - cannot sanitize. Request data: {data}")
-                content = None
+                content = ''
             
             related_type_id = data.get('related_type_id') if data else None
             related_id = data.get('related_id') if data else None

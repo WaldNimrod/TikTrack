@@ -1,3 +1,34 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This file defines the PACKAGE MANIFEST structure.
+ * 
+ * MAIN STRUCTURE:
+ * - PACKAGE_MANIFEST - Main manifest object with all packages
+ * 
+ * PACKAGE STRUCTURE:
+ * Each package has:
+ * - id: Package identifier
+ * - name: Display name
+ * - description: Package description
+ * - version: Package version
+ * - critical: Whether package is critical
+ * - loadOrder: Loading order (1 = first, higher = later)
+ * - dependencies: Array of package IDs this package depends on
+ * - scripts: Array of script objects
+ *   - file: Script file path
+ *   - globalCheck: Global variable to check for script availability
+ *   - description: Script description
+ *   - required: Whether script is required
+ *   - loadOrder: Script loading order within package
+ * 
+ * TOTAL PACKAGES: 25 (after removing advanced-notifications)
+ * 
+ * ==========================================
+ */
+
 /**
  * Package Manifest - TikTrack Initialization System
  * Central package manifest for dependency management and health checks
@@ -7,6 +38,19 @@
  *
  * This file defines the PACKAGE STRUCTURE for the monitoring system.
  * When you add new scripts to pages, you MUST update this file to avoid monitoring errors.
+ * 
+ * **שינוי חשוב (דצמבר 2025):**
+ * - `core-systems.js` הועבר מ-`base` package ל-`init-system` package
+ * - `init-system` תלוי רק ב-`base` package (1 תלות במקום 25)
+ * - `advanced-notifications` package הוסר (deprecated, ריק)
+ * 
+ * @fileoverview מניפסט מרכזי לכל החבילות במערכת
+ * @version 1.6.0
+ * @author TikTrack Development Team
+ * @created October 2025
+ * @updated December 2025 - Refactored initialization system
+ * 
+ * @see {@link documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md|Unified Initialization System Documentation}
  *
  * 🔧 COMPLETE WORKFLOW FOR ADDING NEW SCRIPTS:
  * ============================================
@@ -297,13 +341,14 @@ const PACKAGE_MANIFEST = {
         required: false,
         loadOrder: 20
       },
-      {
-        file: 'modules/core-systems.js',
-        globalCheck: 'window.UnifiedAppInitializer',
-        description: 'Unified initialization system - single entry point (required for all pages)',
-        required: true,
-        loadOrder: 21
-      }
+      // core-systems.js moved to init-system package
+      // {
+      //   file: 'modules/core-systems.js',
+      //   globalCheck: 'window.UnifiedAppInitializer',
+      //   description: 'Unified initialization system - single entry point (required for all pages)',
+      //   required: true,
+      //   loadOrder: 21
+      // }
     ],
     estimatedSize: '~280KB',
     initTime: '~150ms'
@@ -1634,21 +1679,21 @@ const PACKAGE_MANIFEST = {
   // 16. ADVANCED-NOTIFICATIONS PACKAGE - Advanced notifications
   // ⚠️ DEPRECATED: This package contains scripts that are already in base package
   // notification-system.js and warning-system.js are already loaded in base package
-  // This package is kept for backward compatibility but should not be used
-  'advanced-notifications': {
-    id: 'advanced-notifications',
-    name: 'Advanced Notifications Package',
-    description: '⚠️ DEPRECATED: Scripts already in base package. Use base package instead.',
-    version: '1.5.0',
-    critical: false,
-    loadOrder: 16,
-    dependencies: ['base'],
-    scripts: [], // ⚠️ Scripts removed - already in base package
-    estimatedSize: '~0KB',
-    initTime: '~0ms',
-    deprecated: true,
-    notes: 'This package is deprecated. notification-system.js and warning-system.js are already loaded in base package (loadOrder 2 and 5). Do not use this package.'
-  },
+  // advanced-notifications package removed - deprecated, empty package
+  // 'advanced-notifications': {
+  //   id: 'advanced-notifications',
+  //   name: 'Advanced Notifications Package',
+  //   description: '⚠️ DEPRECATED: Scripts already in base package. Use base package instead.',
+  //   version: '1.5.0',
+  //   critical: false,
+  //   loadOrder: 16,
+  //   dependencies: ['base'],
+  //   scripts: [], // ⚠️ Scripts removed - already in base package
+  //   estimatedSize: '~0KB',
+  //   initTime: '~0ms',
+  //   deprecated: true,
+  //   notes: 'This package is deprecated. notification-system.js and warning-system.js are already loaded in base package (loadOrder 2 and 5). Do not use this package.'
+  // },
 
 
   // 17. ENTITY DETAILS PACKAGE - Entity details
@@ -1882,7 +1927,7 @@ const PACKAGE_MANIFEST = {
     version: '1.5.0',
     critical: false,
     loadOrder: 22, // Changed from 20 to 22 to load after all other packages (dashboard-widgets 19.5, tradingview-charts 19, tradingview-widgets 21, watch-lists 20)
-    dependencies: ['base', 'crud', 'services', 'ui-advanced', 'modules', 'preferences', 'validation', 'conditions', 'external-data', 'charts', 'logs', 'cache', 'entity-services', 'helper', 'system-management', 'management', 'dev-tools', 'advanced-notifications', 'entity-details', 'info-summary', 'dashboard-widgets', 'tradingview-widgets', 'tradingview-charts', 'watch-lists', 'ai-analysis'],
+    dependencies: ['base'], // Only base is required for Logger and basic systems
     scripts: [
       {
         file: 'init-system/package-manifest.js',
@@ -1913,32 +1958,39 @@ const PACKAGE_MANIFEST = {
         loadOrder: 4
       },
       {
+        file: 'modules/core-systems.js',
+        globalCheck: 'window.UnifiedAppInitializer',
+        description: 'Unified initialization system - single entry point (required for all pages)',
+        required: true,
+        loadOrder: 5
+      },
+      {
         file: 'init-system/all-pages-monitoring-test.js',
         globalCheck: 'window.allPagesMonitoringTest',
         description: 'Automatic check of all pages',
         required: false,
-        loadOrder: 5
+        loadOrder: 6
       },
       {
         file: 'init-system/pages-standardization-plan.js',
         globalCheck: 'window.pagesStandardizationPlan',
         description: 'Standardization plan for all pages',
         required: false,
-        loadOrder: 6
+        loadOrder: 7
       },
       {
         file: 'init-system/dependency-analyzer.js',
         globalCheck: 'window.dependencyAnalyzer',
         description: 'Dependencies analysis in package manifest',
         required: false,
-        loadOrder: 7
+        loadOrder: 8
       },
       {
         file: 'init-system/load-order-validator.js',
         globalCheck: 'window.loadOrderValidator',
         description: 'Actual loading order check in pages',
         required: false,
-        loadOrder: 8
+        loadOrder: 9
       },
       // unified-app-initializer.js removed - initialization now handled by core-systems.js
     ],

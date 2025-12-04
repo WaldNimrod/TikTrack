@@ -107,13 +107,15 @@
       window.WidgetOverlayService.setupOverlayHover(
         listElement,
         '.unified-pending-list-item, .trade-create-widget-item',
-        '.unified-pending-details, .trade-create-widget-details, [data-overlay="true"]',
+        '[data-overlay="true"]',
         {
           hoverClass: 'is-hovered',
           gap: 8,
           minWidth: 280,
           maxWidth: 400,
-          zIndex: 1050
+          zIndex: 1050,
+          useAnimations: true, // Enable GSAP animations
+          transitionDuration: 200
         }
       );
       state.overlaySetup[combination] = true;

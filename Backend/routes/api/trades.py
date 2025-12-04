@@ -277,6 +277,9 @@ def get_trades_by_account(trading_account_id: int):
 def create_trade():
     """Create a new trade"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         normalizer = _get_date_normalizer()
         data = request.get_json() or {}
         
@@ -293,8 +296,41 @@ def create_trade():
             data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
         
         db: Session = g.db
+        
+        # Verify trading_account belongs to user if provided
+        if 'trading_account_id' in data and user_id is not None:
+            from models.trading_account import TradingAccount
+            account = db.query(TradingAccount).filter(
+                TradingAccount.id == data['trading_account_id'],
+                TradingAccount.user_id == user_id
+            ).first()
+            if not account:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Trading account not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
+        
+        # Verify ticker belongs to user if provided
+        if 'ticker_id' in data and user_id is not None:
+            from models.ticker import Ticker
+            from models.user_ticker import UserTicker
+            # Check if user has access to this ticker
+            user_ticker = db.query(UserTicker).filter(
+                UserTicker.user_id == user_id,
+                UserTicker.ticker_id == data['ticker_id']
+            ).first()
+            if not user_ticker:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Ticker not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
+        
         normalized_payload = normalizer.normalize_input_payload(data)
-        trade = TradeService.create(db, normalized_payload)
+        trade = TradeService.create(db, normalized_payload, user_id=user_id)
         trade_dict = normalizer.normalize_output(trade.to_dict() if hasattr(trade, 'to_dict') else {})
         return jsonify({
             "status": "success",

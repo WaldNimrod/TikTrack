@@ -202,13 +202,16 @@
       window.WidgetOverlayService.setupOverlayHover(
         listElement,
         '.recent-items-widget-item',
-        '.recent-items-widget-details-container, [data-overlay="true"]',
+        '[data-overlay="true"]',
         {
           hoverClass: 'is-hovered',
-          gap: 8,
+          gap: 8, // Standard gap
           minWidth: 280,
           maxWidth: 400,
-          zIndex: 1050
+          zIndex: 1050,
+          useAnimations: true, // Enable GSAP animations
+          transitionDuration: 100, // Faster animation (reduced from 200)
+          placement: 'bottom-start' // Will auto-flip to top if needed
         }
       );
       state.overlaySetup[listKey] = true;
@@ -453,7 +456,7 @@
           </div>
         </div>
         <!-- Details Section - Hidden by default, shown on hover -->
-        <div class="recent-items-widget-details-container" data-overlay="true">
+        <div class="recent-items-widget-details" data-overlay="true" data-role="widget-detail" data-entity-id="${tradeId}">
           <div class="recent-items-widget-details-content">
             ${side ? `
               <div class="recent-items-widget-details-row">
@@ -572,7 +575,7 @@
           </div>
         </div>
         <!-- Details Section - Hidden by default, shown on hover -->
-        <div class="recent-items-widget-details-container" data-overlay="true">
+        <div class="recent-items-widget-details" data-overlay="true" data-role="widget-detail" data-entity-id="${planId}">
           <div class="recent-items-widget-details-content">
             ${symbol ? `
               <div class="recent-items-widget-details-row">

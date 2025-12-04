@@ -109,10 +109,12 @@ trading-ui/
 - `provider` - LLM provider ('gemini' | 'perplexity')
 - `variables_json` - User-provided variables
 - `prompt_text` - Final prompt sent to LLM
-- `response_text` - LLM response
-- `response_json` - Parsed JSON (if applicable)
+- `response_text` - LLM response (**נשמר במסד הנתונים**)
+- `response_json` - Parsed JSON (if applicable) (**נשמר במסד הנתונים**)
 - `status` - Request status ('pending' | 'completed' | 'failed')
 - `error_message` - Error message if failed
+
+**הערה חשובה:** `response_text` ו-`response_json` נשמרים במסד הנתונים ולא רק במטמון של הפרונטאנד. זה מאפשר גישה לתוצאות גם בניתוחים חוזרים וגם בעת צפייה מאוחרת.
 
 #### user_llm_providers
 - `id` - Primary key
@@ -138,10 +140,13 @@ User → Frontend (ai-analysis.html)
   → LLMProviderManager.send_prompt()
   → Gemini/Perplexity Provider
   → Response parsing
-  → Save to DB (ai_analysis_requests)
-  → Return to Frontend
+  → Save to DB (ai_analysis_requests) - כולל response_text ו-response_json
+  → Return to Frontend (עם response_text ב-API response)
   → AIResultRenderer.render()
+  → Frontend cache (אופציונלי - למהירות)
 ```
+
+**הערה חשובה:** `response_text` ו-`response_json` נשמרים במסד הנתונים, כך שהתוצאות זמינות גם בניתוחים חוזרים וגם בעת צפייה מאוחרת.
 
 ### 2. טעינת תבניות
 

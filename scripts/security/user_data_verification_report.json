@@ -1,0 +1,35 @@
+{
+  "nimrod": {
+    "trading_accounts": 0,
+    "trades": 0,
+    "trade_plans": 0,
+    "executions": 0,
+    "cash_flows": 0,
+    "alerts": 0,
+    "notes": 0,
+    "user_tickers": 0,
+    "ai_analysis_requests": 0
+  },
+  "admin": {
+    "trading_accounts": 3,
+    "trades": 80,
+    "trade_plans": 120,
+    "executions": 161,
+    "cash_flows": 22,
+    "alerts": 60,
+    "notes": 85,
+    "user_tickers": 52,
+    "ai_analysis_requests": 10
+  },
+  "user": {
+    "trading_accounts": 0,
+    "trades": 0,
+    "trade_plans": 0,
+    "executions": 0,
+    "cash_flows": 0,
+    "alerts": 0,
+    "notes": 0,
+    "user_tickers": 0,
+    "ai_analysis_requests": 0
+  }
+}

@@ -284,6 +284,120 @@
                     </div>
                 </div>
                 <!-- UI Content Section 3 End -->
+
+                <!-- Floating UI + GSAP Animations Demo Section -->
+                <div class="content-section" id="animationsSection" data-section="animationsSection">
+                    <div class="section-header">
+                        <h2>🎬 דוגמאות אנימציות Floating UI + GSAP</h2>
+                        <p class="text-muted">דוגמאות חיות של מיקום overlay ואנימציות חלקות</p>
+                    </div>
+                    <div class="section-body">
+                        <div class="row g-4">
+                            <!-- Overlay Positioning Demo -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">1. Overlay Positioning (Floating UI)</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>מיקום חכם של overlay עם Floating UI - מטפל ב-transform, overflow, viewport boundaries</p>
+                                        <ul class="list-group list-group-flush" id="positioningDemoList">
+                                            <li class="list-group-item" data-widget-overlay="true">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span>פריט 1 - Hover עליי</span>
+                                                    <small class="text-muted">מיקום אוטומטי</small>
+                                                </div>
+                                                <div class="widget-details-container" data-overlay="true" style="display: none;">
+                                                    <div class="p-3">
+                                                        <h6>פרטים נוספים</h6>
+                                                        <p class="mb-0">Overlay זה ממוקם אוטומטית באמצעות Floating UI</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item" data-widget-overlay="true">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span>פריט 2 - Hover עליי</span>
+                                                    <small class="text-muted">מיקום אוטומטי</small>
+                                                </div>
+                                                <div class="widget-details-container" data-overlay="true" style="display: none;">
+                                                    <div class="p-3">
+                                                        <h6>פרטים נוספים</h6>
+                                                        <p class="mb-0">Overlay זה ממוקם אוטומטית באמצעות Floating UI</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fade Animation Demo -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">2. Fade In/Out Animation (GSAP)</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>אנימציית fade חלקה עם GSAP</p>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-primary" onclick="demoFadeIn()">Fade In</button>
+                                            <button class="btn btn-secondary" onclick="demoFadeOut()">Fade Out</button>
+                                        </div>
+                                        <div id="fadeDemo" class="mt-3 p-3 bg-light rounded" style="opacity: 0; display: none;">
+                                            <p class="mb-0">אנימציית Fade עם GSAP</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Slide Animation Demo -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">3. Slide Animation (GSAP)</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>אנימציית slide חלקה עם GSAP</p>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-primary" onclick="demoSlideIn()">Slide In</button>
+                                            <button class="btn btn-secondary" onclick="demoSlideOut()">Slide Out</button>
+                                        </div>
+                                        <div id="slideDemo" class="mt-3 p-3 bg-light rounded" style="transform: translateY(-20px); opacity: 0; display: none;">
+                                            <p class="mb-0">אנימציית Slide עם GSAP</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Combined Demo -->
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">4. Combined (Floating UI + GSAP)</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>שילוב של מיקום חכם ואנימציות חלקות</p>
+                                        <ul class="list-group list-group-flush" id="combinedDemoList">
+                                            <li class="list-group-item" data-widget-overlay="true">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span>פריט משולב - Hover</span>
+                                                    <small class="text-muted">מיקום + אנימציה</small>
+                                                </div>
+                                                <div class="widget-details-container" data-overlay="true" style="display: none;">
+                                                    <div class="p-3">
+                                                        <h6>פרטים נוספים</h6>
+                                                        <p class="mb-0">Overlay עם מיקום חכם ואנימציות GSAP</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Floating UI + GSAP Animations Demo Section End -->
             </div>
         </div>
         <div class="page-bottom-spacing"></div>
@@ -568,9 +682,16 @@
     <!-- =============================================================== -->
 
     <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+    
+    <!-- Designs Animations Demo -->
+    <script src="scripts/designs-animations-demo.js?v=1.0.0"></script> <!-- Floating UI + GSAP animations demo -->
+
+    <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 89 | Unique Scripts Loaded: 89 -->
+    <!-- 📊 Total Scripts Processed: 90 | Unique Scripts Loaded: 90 -->
     <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
 </body>
 </html>

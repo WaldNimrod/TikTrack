@@ -237,7 +237,7 @@
 /* Base overlay styles are in _widget-overlay.css */
 /* Widget-specific styles below */
 
-.recent-items-widget-details-container {
+.recent-items-widget-details {
   /* Inherits base styles from _widget-overlay.css */
   /* Widget-specific overrides can be added here if needed */
 }

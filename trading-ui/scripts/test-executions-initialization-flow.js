@@ -308,7 +308,189 @@
   console.log('\n');
 
   // ============================================================================
-  // 6. סיכום וניתוח
+  // 6. בדיקת תהליך ה-preloading
+  // ============================================================================
+  console.log('🔄 שלב 6: בדיקת תהליך ה-preloading');
+  console.log('───────────────────────────────────────────────────────────────');
+  
+  // בדיקת executionsSections34Data
+  const hasSections34Data = !!window.executionsSections34Data;
+  logEvent('executionsSections34Data Check', {
+    exists: hasSections34Data
+  });
+  
+  if (hasSections34Data) {
+    const tradeCreationLoaded = window.executionsSections34Data.tradeCreation?.loaded || false;
+    const tradeCreationData = window.executionsSections34Data.tradeCreation?.data;
+    const suggestionsLoaded = window.executionsSections34Data.suggestions?.loaded || false;
+    const suggestionsData = window.executionsSections34Data.suggestions?.data;
+    
+    logEvent('Trade Creation Preload Status', {
+      loaded: tradeCreationLoaded,
+      dataExists: !!tradeCreationData,
+      dataLength: tradeCreationData?.length || 0
+    });
+    
+    logEvent('Suggestions Preload Status', {
+      loaded: suggestionsLoaded,
+      dataExists: !!suggestionsData,
+      dataKeys: suggestionsData ? Object.keys(suggestionsData).length : 0
+    });
+    
+    if (!tradeCreationLoaded && !suggestionsLoaded) {
+      logIssue('warning', 'נתוני סקשנים 3+4 לא נטענו', {
+        suggestion: 'יש לבדוק למה preloadSections34Data לא הופעל'
+      });
+    }
+  } else {
+    logIssue('warning', 'executionsSections34Data לא קיים', {
+      suggestion: 'יש לבדוק למה המשתנה לא אותחל'
+    });
+  }
+  
+  // בדיקת waitForMainTableAndPreload
+  const hasWaitForMainTable = typeof window.waitForMainTableAndPreload === 'function';
+  logEvent('waitForMainTableAndPreload Check', {
+    exists: hasWaitForMainTable
+  });
+  
+  // בדיקת preloadSections34Data
+  const hasPreloadSections34 = typeof window.preloadSections34Data === 'function';
+  logEvent('preloadSections34Data Check', {
+    exists: hasPreloadSections34
+  });
+  
+  // בדיקת event listener ל-executions:loaded
+  // זה לא אפשרי לבדוק ישירות, אבל נבדוק אם יש קוד שמאזין
+  const hasExecutionsLoadedListener = (() => {
+    if (typeof window.waitForMainTableAndPreload === 'function') {
+      const funcStr = window.waitForMainTableAndPreload.toString();
+      return funcStr.includes('executions:loaded');
+    }
+    return false;
+  })();
+  
+  if (!hasExecutionsLoadedListener) {
+    logIssue('warning', 'לא נמצא event listener ל-executions:loaded', {
+      suggestion: 'יש לוודא ש-waitForMainTableAndPreload מאזין ל-executions:loaded'
+    });
+  }
+  
+  console.log('\n');
+
+  // ============================================================================
+  // 7. בדיקת רינדור אשכולות
+  // ============================================================================
+  console.log('🎨 שלב 7: בדיקת רינדור אשכולות');
+  console.log('───────────────────────────────────────────────────────────────');
+  
+  // בדיקת DOM elements
+  const tradeCreationSection = document.getElementById('tradeCreationClustersSection');
+  const tradeCreationTableBody = document.getElementById('executionTradeCreationClustersTableBody');
+  const suggestionsSection = document.querySelector('[data-section="suggestions"]') || document.getElementById('suggestionsSection');
+  
+  logEvent('DOM Elements Check', {
+    tradeCreationSectionExists: !!tradeCreationSection,
+    tradeCreationTableBodyExists: !!tradeCreationTableBody,
+    suggestionsSectionExists: !!suggestionsSection
+  });
+  
+  // בדיקת מצב סקשנים
+  if (tradeCreationSection) {
+    const sectionBody = tradeCreationSection.querySelector('.section-body');
+    const isOpen = sectionBody && window.getComputedStyle(sectionBody).display !== 'none';
+    logEvent('Trade Creation Section State', {
+      isOpen,
+      hasBody: !!sectionBody
+    });
+    
+    // בדיקת שורות בטבלה
+    if (tradeCreationTableBody) {
+      const rows = tradeCreationTableBody.querySelectorAll('tr');
+      logEvent('Trade Creation Table Rows', {
+        count: rows.length
+      });
+      
+      if (rows.length === 0 && window.executionsSections34Data?.tradeCreation?.loaded && 
+          window.executionsSections34Data.tradeCreation.data?.length > 0) {
+        logIssue('warning', 'אשכולות לא מוצגים למרות שיש נתונים', {
+          dataCount: window.executionsSections34Data.tradeCreation.data.length,
+          suggestion: 'יש לבדוק למה renderClusters לא נקרא'
+        });
+      }
+    }
+  }
+  
+  // בדיקת initializeTradeCreationClustersSection
+  const hasInitializeTradeCreation = (() => {
+    if (typeof window.initializeExecutionsPage === 'function') {
+      const initStr = window.initializeExecutionsPage.toString();
+      return initStr.includes('initializeTradeCreationClustersSection');
+    }
+    return false;
+  })();
+  
+  logEvent('initializeTradeCreationClustersSection Check', {
+    exists: hasInitializeTradeCreation
+  });
+  
+  // בדיקת MutationObserver
+  const hasMutationObserverForTradeCreation = (() => {
+    if (typeof window.initializeExecutionsPage === 'function') {
+      const initStr = window.initializeExecutionsPage.toString();
+      return initStr.includes('MutationObserver') && initStr.includes('tradeCreation');
+    }
+    return false;
+  })();
+  
+  if (hasMutationObserverForTradeCreation) {
+    logEvent('MutationObserver for Trade Creation', {
+      exists: true,
+      note: 'MutationObserver משמש לזיהוי פתיחת סקשן על ידי המשתמש'
+    });
+  }
+  
+  console.log('\n');
+
+  // ============================================================================
+  // 8. בדיקת timing של כל השלבים
+  // ============================================================================
+  console.log('⏱️  שלב 8: בדיקת timing של כל השלבים');
+  console.log('───────────────────────────────────────────────────────────────');
+  
+  // נבדוק את הזמנים של כל האירועים
+  const eventsByTime = monitor.events.sort((a, b) => a.time - b.time);
+  logEvent('Events Timeline', {
+    totalEvents: eventsByTime.length,
+    firstEvent: eventsByTime[0]?.name,
+    lastEvent: eventsByTime[eventsByTime.length - 1]?.name,
+    totalTime: eventsByTime[eventsByTime.length - 1]?.time - eventsByTime[0]?.time || 0
+  });
+  
+  // נבדוק אם יש פערים גדולים בין אירועים
+  const largeGaps = [];
+  for (let i = 1; i < eventsByTime.length; i++) {
+    const gap = eventsByTime[i].time - eventsByTime[i - 1].time;
+    if (gap > 1000) {
+      largeGaps.push({
+        from: eventsByTime[i - 1].name,
+        to: eventsByTime[i].name,
+        gap: gap
+      });
+    }
+  }
+  
+  if (largeGaps.length > 0) {
+    logIssue('warning', 'פערים גדולים בין אירועים', {
+      gaps: largeGaps,
+      suggestion: 'יש לבדוק למה יש עיכובים גדולים'
+    });
+  }
+  
+  console.log('\n');
+
+  // ============================================================================
+  // 9. סיכום וניתוח
   // ============================================================================
   console.log('═══════════════════════════════════════════════════════════════');
   console.log('📊 סיכום ניטור');
@@ -373,6 +555,13 @@
   if (timeoutCount > 3 || eventListenerCount > 5) {
     console.log('   4. יש לפשט את הקוד ולהסיר סיבוכיות יתר');
   }
+  if (hasSections34Data && (!window.executionsSections34Data.tradeCreation?.loaded || !window.executionsSections34Data.suggestions?.loaded)) {
+    console.log('   5. יש לבדוק למה preloadSections34Data לא הושלם');
+  }
+  if (tradeCreationTableBody && tradeCreationTableBody.querySelectorAll('tr').length === 0 && 
+      window.executionsSections34Data?.tradeCreation?.data?.length > 0) {
+    console.log('   6. יש לבדוק למה renderClusters לא נקרא למרות שיש נתונים');
+  }
   if (errors === 0 && warnings === 0 && totalDuplicates === 0) {
     console.log('   ✅ הכל תקין! העמוד ממש את מערכת האיתחול המאוחדת נכון.');
   }
@@ -395,4 +584,5 @@
     duplicates: monitor.duplicates
   };
 })();
+
 

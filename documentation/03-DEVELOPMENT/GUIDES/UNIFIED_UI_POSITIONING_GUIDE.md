@@ -237,15 +237,59 @@ Floating UI נטען מ-CDN:
 
 ### טעינת GSAP
 
-GSAP נטען מ-CDN (אופציונלי):
+GSAP נטען מ-CDN (אופציונלי) דרך package-manifest.js:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 ```
 
+**סדר טעינה:**
+- Floating UI (loadOrder: 16.5)
+- **GSAP (loadOrder: 16.6)** ← נטען מיד אחרי Floating UI
+- Unified UI Positioning Service (loadOrder: 8.15)
+- Widget Overlay Service (loadOrder: 8.2)
+
 ### אנימציות
 
-אם GSAP זמין, המערכת משתמשת בו לאנימציות. אחרת, משתמשים ב-CSS transitions.
+אם GSAP זמין, המערכת משתמשת בו לאנימציות חלקות. אחרת, משתמשים ב-CSS transitions אוטומטית.
+
+**סוגי אנימציות:**
+- **Fade in/out** - אנימציית שקיפות (opacity)
+- **Slide** - אנימציית החלקה (translateY)
+- **Scale** - אנימציית גודל (scale)
+
+**דוגמאות קוד:**
+
+```javascript
+// אנימציית show עם GSAP
+window.UnifiedUIPositioning.animateElement(overlay, 'show', {
+  duration: 0.2, // 200ms
+  onComplete: () => {
+    console.log('Animation complete');
+  }
+});
+
+// אנימציית hide עם GSAP
+window.UnifiedUIPositioning.animateElement(overlay, 'hide', {
+  duration: 0.15, // 150ms
+  onComplete: () => {
+    overlay.style.display = 'none';
+  }
+});
+
+// בדיקת זמינות GSAP
+if (window.UnifiedUIPositioning.isGSAPAvailable()) {
+  // GSAP animations available - smooth animations
+} else {
+  // Fallback to CSS transitions
+}
+```
+
+**Fallback:**
+אם GSAP לא נטען, המערכת משתמשת ב-CSS transitions אוטומטית:
+```css
+transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
+```
 
 ---
 

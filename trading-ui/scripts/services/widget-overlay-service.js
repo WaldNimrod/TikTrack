@@ -151,6 +151,24 @@
       return;
     }
 
+    // Use Unified UI Positioning Service if available (with animations)
+    if (window.UnifiedUIPositioning && window.UnifiedUIPositioning.setupOverlay) {
+      const config = {
+        hoverClass: options.hoverClass || 'is-hovered',
+        transitionDuration: options.transitionDuration || 200,
+        closeDelay: options.closeDelay || 150,
+        gap: options.gap || 8,
+        minWidth: options.minWidth || 280,
+        maxWidth: options.maxWidth || 400,
+        zIndex: options.zIndex || 1050,
+        useAnimations: options.useAnimations !== false, // Default true - enable GSAP animations
+        ...options
+      };
+      
+      return window.UnifiedUIPositioning.setupOverlay(listElement, itemSelector, detailsSelector, config);
+    }
+
+    // Fallback to original implementation if UnifiedUIPositioning not available
     const config = {
       hoverClass: options.hoverClass || 'is-hovered',
       transitionDuration: options.transitionDuration || 200,
@@ -199,6 +217,45 @@
       if (window.TestWidgetsOverlayLogger) {
         window.TestWidgetsOverlayLogger.logMouseEvent('mouseenter', event, item, details);
       }
+
+      // Close all other overlays in this list before opening new one
+      const allItems = listElement.querySelectorAll(itemSelector);
+      allItems.forEach(otherItem => {
+        if (otherItem !== item) {
+          // Remove hover class
+          otherItem.classList.remove(config.hoverClass);
+          
+          // Find and close its overlay
+          const otherDetails = otherItem.querySelector(detailsSelector);
+          if (otherDetails && otherDetails.style.display !== 'none') {
+            // Cancel any pending timeout for this item
+            const otherTimeout = overlayConfig.closeTimeouts.get(otherItem);
+            if (otherTimeout) {
+              clearTimeout(otherTimeout);
+              overlayConfig.closeTimeouts.delete(otherItem);
+            }
+            
+            // Close immediately
+            otherItem.classList.remove(config.hoverClass);
+            otherDetails.style.opacity = '0';
+            setTimeout(() => {
+              if (window.WidgetZIndexManager) {
+                window.WidgetZIndexManager.unregisterOverlay(otherDetails);
+              }
+              otherDetails.style.display = 'none';
+              otherDetails.style.visibility = '';
+              otherDetails.style.pointerEvents = '';
+              otherDetails.style.position = '';
+              otherDetails.style.top = '';
+              otherDetails.style.left = '';
+              otherDetails.style.right = '';
+              otherDetails.style.width = '';
+              otherDetails.style.zIndex = '';
+              otherDetails.style.opacity = '';
+            }, config.transitionDuration || 200);
+          }
+        }
+      });
 
       // Cancel any pending close timeout for this item
       const existingTimeout = overlayConfig.closeTimeouts.get(item);

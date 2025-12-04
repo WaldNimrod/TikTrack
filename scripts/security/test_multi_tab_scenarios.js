@@ -181,3 +181,4 @@ if (typeof require !== 'undefined' && require.main === module) {
   runAllTests().catch(console.error);
 }
 
+

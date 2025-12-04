@@ -1355,32 +1355,13 @@ function normalizeAmountBySubtype(amount, type, subtype) {
 }
 
 /**
- * Calculate activity statistics from visible rows
+ * Calculate activity statistics from processed movements
  * @returns {Object} Statistics object with cash flows and executions data
  */
 function calculateActivityStatistics() {
-  const tbody = document.querySelector('#accountActivityTable tbody');
-  if (!tbody) {
-    return { cashFlows: {}, executions: {} };
-  }
-
-  // Get all visible rows (not loading, not empty, not hidden by filter)
-  const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => {
-    // Exclude loading/empty rows
-    if (row.classList.contains('loading') ||
-            row.querySelector('td.loading') ||
-            row.style.display === 'none' ||
-            row.getAttribute('style')?.includes('display: none')) {
-      return false;
-    }
-    // Must have movement data
-    return row.getAttribute('data-movement-type');
-  });
-
-  if (rows.length === 0) {
-    return { cashFlows: {}, executions: {} };
-  }
-
+  // Use processedMovements as the source of truth (all movements, not just visible ones)
+  const allMovements = window.accountActivityState?.processedMovements || [];
+  
   // Get filter date range - use filterSystem.currentFilters.dateRange (standard way)
   const dateRange = (window.filterSystem && window.filterSystem.currentFilters && window.filterSystem.currentFilters.dateRange)
     || window.selectedDateRangeForFilter
@@ -1390,7 +1371,7 @@ function calculateActivityStatistics() {
 
   // Get account opening date for "כל זמן" case
   let accountOpeningDate = null;
-  if (window.accountActivityState.selectedAccountId && window.trading_accountsData) {
+  if (window.accountActivityState?.selectedAccountId && window.trading_accountsData) {
     const account = window.trading_accountsData.find(acc => acc.id === window.accountActivityState.selectedAccountId);
     if (account && account.created_at) {
       const parsed = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(account.created_at) : new Date(account.created_at);
@@ -1413,6 +1394,31 @@ function calculateActivityStatistics() {
     startDate = accountOpeningDate;
   }
 
+  // Create empty stats structure with all required fields
+  const emptyStats = {
+    totalCount: 0,
+    totalAmount: 0,
+    positiveAmount: 0,
+    negativeAmount: 0,
+    positiveCount: 0,
+    negativeCount: 0,
+    bySubtype: {},
+    firstRecord: null,
+    lastRecord: null,
+    dateRange: { start: startDate, end: endDate },
+    overallPercentageChange: 0,
+    overallAmountChange: 0,
+    overallAnnualizedChange: 0,
+    currency: 'USD',
+  };
+
+  if (!allMovements || allMovements.length === 0) {
+    window.Logger.info('📊 אין תנועות מחושבות לחישוב סטטיסטיקות', { page: 'trading_accounts' });
+    return { cashFlows: emptyStats, executions: emptyStats };
+  }
+
+  window.Logger.info(`📊 חישוב סטטיסטיקות מ-${allMovements.length} תנועות מחושבות`, { page: 'trading_accounts' });
+
   // Log date range for debugging
   window.Logger.info('📅 טווח זמן לחישוב סטטיסטיקות:', { page: 'trading_accounts' });
   window.Logger.info(`  - פילטר נבחר: ${dateRange}`, { page: 'trading_accounts' });
@@ -1424,26 +1430,62 @@ function calculateActivityStatistics() {
   }
   window.Logger.info(`  - תאריך פתיחת חשבון: ${accountOpeningDate ? accountOpeningDate.toISOString().split('T')[0] : 'null'}`, { page: 'trading_accounts' });
 
-  // Separate rows by type
-  const cashFlowRows = rows.filter(row => row.getAttribute('data-movement-type') === 'cash_flow');
-  const executionRows = rows.filter(row => row.getAttribute('data-movement-type') === 'execution');
+  // Separate movements by type
+  const cashFlowMovements = allMovements.filter(m => m.type === 'cash_flow');
+  const executionMovements = allMovements.filter(m => m.type === 'execution');
 
-  // Filter by date range
-  const filterByDateRange = (rowsList, start, end) => rowsList.filter(row => {
-    const rowDateStr = row.getAttribute('data-movement-date');
-    if (!rowDateStr) {return false;}
-    const rowDate = new Date(rowDateStr);
-    if (start && rowDate < start) {return false;}
-    if (end && rowDate > end) {return false;}
+  // Filter by date range - only filter if we have explicit date range from filter (not default "כל זמן")
+  const filterByDateRange = (movementsList, start, end) => movementsList.filter(movement => {
+    if (!movement.date) {return false;}
+    
+    // Use dateUtils for consistent date parsing
+    let rowDate;
+    if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+      rowDate = window.dateUtils.toDateObject(movement.date);
+    } else {
+      rowDate = new Date(movement.date);
+    }
+    
+    if (!rowDate || Number.isNaN(rowDate.getTime())) {return false;}
+    
+    // Only filter if we have explicit start date (meaning user selected a date range, not "כל זמן")
+    if (start) {
+      // Set start of day for comparison
+      const rowDateOnly = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+      const startDateOnly = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      if (rowDateOnly < startDateOnly) {return false;}
+    }
+    
+    // Only filter by end date if we have explicit end date (not today by default for "כל זמן")
+    if (end && dateRange !== 'כל זמן') {
+      // Set end of day for comparison
+      const rowDateOnly = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+      const endDateOnly = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+      if (rowDateOnly > endDateOnly) {return false;}
+    }
+    
     return true;
   });
 
-  const filteredCashFlowRows = startDate || endDate ? filterByDateRange(cashFlowRows, startDate, endDate) : cashFlowRows;
-  const filteredExecutionRows = startDate || endDate ? filterByDateRange(executionRows, startDate, endDate) : executionRows;
+  // Only apply date filter if user selected a specific date range (not "כל זמן")
+  const shouldFilterByDate = dateRange !== 'כל זמן' && (startDate || (endDate && dateRange !== 'כל זמן'));
+  const filteredCashFlowMovements = shouldFilterByDate ? filterByDateRange(cashFlowMovements, startDate, endDate) : cashFlowMovements;
+  const filteredExecutionMovements = shouldFilterByDate ? filterByDateRange(executionMovements, startDate, endDate) : executionMovements;
+  
+  window.Logger.info(`📊 תנועות מסננות: ${filteredCashFlowMovements.length} cash flows, ${filteredExecutionMovements.length} executions`, { page: 'trading_accounts' });
 
   // Helper to calculate statistics for a type
-  const calculateStatsForType = (filteredRows, typeName) => {
-    if (filteredRows.length === 0) {
+  const calculateStatsForType = (filteredMovements, typeName) => {
+    if (!filteredMovements || filteredMovements.length === 0) {
+      window.Logger.info(`📊 ${typeName} - אין תנועות מסוננות`, { page: 'trading_accounts' });
+      // Get currency from account or default to USD
+      let defaultCurrency = 'USD';
+      if (window.accountActivityState?.selectedAccountId && window.trading_accountsData) {
+        const account = window.trading_accountsData.find(acc => acc.id === window.accountActivityState.selectedAccountId);
+        if (account && account.currency) {
+          defaultCurrency = account.currency;
+        }
+      }
       return {
         totalCount: 0,
         totalAmount: 0,
@@ -1455,20 +1497,24 @@ function calculateActivityStatistics() {
         firstRecord: null,
         lastRecord: null,
         dateRange: { start: startDate, end: endDate },
+        overallPercentageChange: 0,
+        overallAmountChange: 0,
+        overallAnnualizedChange: 0,
+        currency: defaultCurrency,
       };
     }
 
     // Log dateRange for debugging
     window.Logger.info(`  - stats.dateRange: start=${startDate ? new Date(startDate).toISOString().split('T')[0] : 'null'}, end=${endDate ? new Date(endDate).toISOString().split('T')[0] : 'null'}`, { page: 'trading_accounts' });
 
-    // Get amounts and dates
-    const movements = filteredRows.map(row => ({
-      id: row.getAttribute('data-movement-id'),
-      type: row.getAttribute('data-movement-type'),
-      subtype: row.getAttribute('data-movement-subtype'),
-      amount: parseFloat(row.getAttribute('data-movement-amount') || '0'),
-      date: row.getAttribute('data-movement-date'),
-      currency: row.getAttribute('data-currency-symbol') || 'USD',
+    // Map movements to format needed for statistics (already have the data, just normalize it)
+    const movements = filteredMovements.map(m => ({
+      id: m.id,
+      type: m.type,
+      subtype: m.sub_type || m.subtype || m.action || '',
+      amount: parseFloat(m.amount || '0'),
+      date: m.date,
+      currency: m.currency_symbol || m.currency || 'USD',
     }));
 
     // Sort by date (oldest first)
@@ -1620,7 +1666,7 @@ function calculateActivityStatistics() {
     }
 
     return {
-      totalCount: filteredRows.length,
+      totalCount: filteredMovements.length,
       totalAmount,
       positiveAmount: positiveAmounts,
       negativeAmount: negativeAmounts,
@@ -1637,8 +1683,8 @@ function calculateActivityStatistics() {
     };
   };
 
-  const cashFlowsStats = calculateStatsForType(filteredCashFlowRows, 'cash_flow');
-  const executionsStats = calculateStatsForType(filteredExecutionRows, 'execution');
+  const cashFlowsStats = calculateStatsForType(filteredCashFlowMovements, 'cash_flow');
+  const executionsStats = calculateStatsForType(filteredExecutionMovements, 'execution');
 
   return {
     cashFlows: cashFlowsStats,
@@ -1658,12 +1704,7 @@ function updateActivityStatistics() {
 
   const stats = calculateActivityStatistics();
 
-  // Show card if we have data
-  if (stats.cashFlows.totalCount === 0 && stats.executions.totalCount === 0) {
-    statsCard.style.display = 'none';
-    return;
-  }
-
+  // Always show card, even if no data (will show "אין נתונים להצגה")
   statsCard.style.display = 'block';
 
   // Calculate overall statistics (combining cash flows + executions)
@@ -2261,7 +2302,8 @@ function renderStatisticsColumn(stats, typeName) {
  * @returns {string} HTML string
  */
 function renderStatisticsSummaryColumn1(stats, typeName) {
-  if (!stats || stats.totalCount === 0) {
+  // Check if stats is empty object or has no totalCount
+  if (!stats || typeof stats !== 'object' || Object.keys(stats).length === 0 || stats.totalCount === undefined || stats.totalCount === null || stats.totalCount === 0) {
     return '<div class="statistics-empty">אין נתונים להצגה</div>';
   }
 
@@ -2338,7 +2380,8 @@ function renderStatisticsSummaryColumn1(stats, typeName) {
  * @returns {string} HTML string
  */
 function renderStatisticsSummaryColumn2(stats, typeName) {
-  if (!stats || stats.totalCount === 0) {
+  // Check if stats is empty object or has no totalCount
+  if (!stats || typeof stats !== 'object' || Object.keys(stats).length === 0 || stats.totalCount === undefined || stats.totalCount === null || stats.totalCount === 0) {
     return '<div class="statistics-empty">אין נתונים להצגה</div>';
   }
 
@@ -2596,8 +2639,9 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
  * @returns {string} HTML string
  */
 function renderBreakdownBySubtype(stats, typeName, column) {
+  // Always render breakdown section, even if empty (will show empty state)
   if (!stats || !stats.bySubtype || Object.keys(stats.bySubtype).length === 0) {
-    return '';
+    return '<div class="statistics-empty">אין נתונים להצגה</div>';
   }
 
   const currency = stats.currency || 'USD';

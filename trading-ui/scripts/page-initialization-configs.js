@@ -2079,7 +2079,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.runAPITests',
         'window.runUITests',
       ],
-      pageSpecificScripts: ['scripts/crud-testing-enhanced.js'],
+      pageSpecificScripts: ['scripts/crud-testing-enhanced.js', 'scripts/crud-automated-test-runner.js'],
       description: 'דשבורד בדיקות CRUD - בדיקות API ו-UI אוטומטיות',
       lastModified: '2025-10-26',
       pageType: 'development',
@@ -2802,6 +2802,35 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       customInitializers: [
         async pageConfig => {
           window.Logger.info('🎯 Initializing TradingView Widgets Showcase...', {
+            page: 'page-initialization-configs',
+          });
+        },
+      ],
+    },
+
+    'test-widgets-overlay': {
+      name: 'Test Widgets Overlay',
+      packages: ['base', 'services', 'dashboard-widgets', 'init-system'],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.UnifiedUIPositioning',
+        'window.WidgetOverlayService',
+        'window.RecentItemsWidget',
+        'window.UnifiedPendingActionsWidget',
+        'window.TagWidget',
+      ],
+      description: 'עמוד בדיקה לוויג\'טים עם Floating UI ו-GSAP - overlay positioning ואנימציות',
+      lastModified: '2025-12-03',
+      pageType: 'test',
+      preloadAssets: [],
+      cacheStrategy: 'none',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger.info('🧪 Initializing Test Widgets Overlay page...', {
             page: 'page-initialization-configs',
           });
         },

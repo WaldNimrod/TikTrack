@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-12-03T02:29:22.810865",
+  "generated_at": "2025-12-04T15:32:10.486940",
   "users": [
     {
       "id": 10,
@@ -60,9 +60,9 @@
   "tables": [
     {
       "table_name": "trading_accounts",
-      "total_records": 5,
+      "total_records": 3,
       "records_by_user": {
-        "1": 5
+        "10": 3
       },
       "records_without_user_id": [],
       "records_with_invalid_user_id": [],
@@ -70,9 +70,9 @@
     },
     {
       "table_name": "trades",
-      "total_records": 81,
+      "total_records": 80,
       "records_by_user": {
-        "1": 81
+        "10": 80
       },
       "records_without_user_id": [],
       "records_with_invalid_user_id": [],
@@ -80,9 +80,9 @@
     },
     {
       "table_name": "trade_plans",
-      "total_records": 121,
+      "total_records": 120,
       "records_by_user": {
-        "1": 121
+        "10": 120
       },
       "records_without_user_id": [],
       "records_with_invalid_user_id": [],
@@ -90,9 +90,9 @@
     },
     {
       "table_name": "executions",
-      "total_records": 407,
+      "total_records": 161,
       "records_by_user": {
-        "1": 407
+        "10": 161
       },
       "records_without_user_id": [],
       "records_with_invalid_user_id": [],
@@ -100,9 +100,9 @@
     },
     {
       "table_name": "cash_flows",
-      "total_records": 101,
+      "total_records": 22,
       "records_by_user": {
-        "1": 101
+        "10": 22
       },
       "records_without_user_id": [],
       "records_with_invalid_user_id": [],
@@ -110,9 +110,9 @@
     },
     {
       "table_name": "alerts",
-      "total_records": 58,
+      "total_records": 60,
       "records_by_user": {
-        "1": 58
+        "10": 60
       },
       "records_without_user_id": [],
       "records_with_invalid_user_id": [],
@@ -120,9 +120,9 @@
     },
     {
       "table_name": "notes",
-      "total_records": 100,
+      "total_records": 85,
       "records_by_user": {
-        "1": 100
+        "10": 85
       },
       "records_without_user_id": [],
       "records_with_invalid_user_id": [],
@@ -130,9 +130,9 @@
     },
     {
       "table_name": "user_tickers",
-      "total_records": 89,
+      "total_records": 52,
       "records_by_user": {
-        "1": 89
+        "10": 52
       },
       "records_without_user_id": [],
       "records_with_invalid_user_id": [],
@@ -140,37 +140,28 @@
     },
     {
       "table_name": "preference_profiles",
-      "total_records": 2,
+      "total_records": 1,
       "records_by_user": {
-        "0": 1,
         "1": 1
-      },
-      "records_without_user_id": [],
-      "records_with_invalid_user_id": [
-        {
-          "user_id": 0,
-          "record_ids": [
-            0
-          ],
-          "total_count": 1
-        }
-      ],
-      "needs_fixing": true
-    },
-    {
-      "table_name": "user_preferences",
-      "total_records": 120,
-      "records_by_user": {
-        "1": 120
       },
       "records_without_user_id": [],
       "records_with_invalid_user_id": [],
       "needs_fixing": false
     },
     {
-      "table_name": "ai_analysis_requests",
+      "table_name": "user_preferences",
       "total_records": 0,
       "records_by_user": {},
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "ai_analysis_requests",
+      "total_records": 10,
+      "records_by_user": {
+        "10": 10
+      },
       "records_without_user_id": [],
       "records_with_invalid_user_id": [],
       "needs_fixing": false
@@ -190,19 +181,17 @@
     },
     {
       "table_name": "import_sessions",
-      "total_records": 6,
-      "records_by_user": {
-        "1": 6
-      },
+      "total_records": 0,
+      "records_by_user": {},
       "records_without_user_id": [],
       "records_with_invalid_user_id": [],
       "needs_fixing": false
     },
     {
       "table_name": "tags",
-      "total_records": 38,
+      "total_records": 7,
       "records_by_user": {
-        "1": 38
+        "1": 7
       },
       "records_without_user_id": [],
       "records_with_invalid_user_id": [],
@@ -210,9 +199,9 @@
     },
     {
       "table_name": "tag_categories",
-      "total_records": 8,
+      "total_records": 2,
       "records_by_user": {
-        "1": 8
+        "1": 2
       },
       "records_without_user_id": [],
       "records_with_invalid_user_id": [],
@@ -221,8 +210,8 @@
   ],
   "summary": {
     "total_tables_checked": 15,
-    "tables_with_issues": 1,
-    "total_records": 1140,
-    "records_needing_fix": 5
+    "tables_with_issues": 0,
+    "total_records": 607,
+    "records_needing_fix": 4
   }
 }

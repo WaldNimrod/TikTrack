@@ -262,6 +262,14 @@ const PACKAGE_MANIFEST = {
         external: true
       },
       {
+        file: 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js',
+        globalCheck: 'window.gsap',
+        description: 'GSAP - GreenSock Animation Platform (for smooth animations)',
+        required: false, // Optional - UnifiedUIPositioningService has CSS transitions fallback
+        loadOrder: 16.6,
+        external: true
+      },
+      {
         file: 'event-handler-manager.js',
         globalCheck: 'window.EventHandlerManager',
         description: 'Central event management system',

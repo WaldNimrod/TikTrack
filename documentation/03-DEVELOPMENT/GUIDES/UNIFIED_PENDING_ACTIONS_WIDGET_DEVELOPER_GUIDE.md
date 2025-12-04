@@ -81,7 +81,12 @@
 - [WIDGET_OVERLAY_SERVICE_GUIDE.md](WIDGET_OVERLAY_SERVICE_GUIDE.md) - Widget Overlay Service
 - [UNIFIED_UI_POSITIONING_GUIDE.md](UNIFIED_UI_POSITIONING_GUIDE.md) - Unified UI Positioning Service (Floating UI)
 
-**הערה:** `WidgetOverlayService` משתמש ב-`Unified UI Positioning Service` למיקום חכם באמצעות Floating UI (עם fallback אוטומטי).
+**הערה:** `WidgetOverlayService` משתמש ב-`Unified UI Positioning Service` למיקום חכם באמצעות Floating UI (עם fallback אוטומטי). האנימציות מבוצעות באמצעות GSAP (אופציונלי) עם fallback ל-CSS transitions.
+
+**אנימציות:**
+- אנימציות fade in/out חלקות בעת פתיחה/סגירה של overlay
+- משך אנימציה: 200ms (ברירת מחדל)
+- ראה [UNIFIED_UI_POSITIONING_GUIDE.md](UNIFIED_UI_POSITIONING_GUIDE.md) - פרק GSAP Integration
 
 כל פריט מציג:
 - **Header Section** - תמיד גלוי: שם, תאריך, סכום, כפתורי פעולה

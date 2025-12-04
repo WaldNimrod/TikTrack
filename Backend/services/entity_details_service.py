@@ -507,31 +507,31 @@ class EntityDetailsService:
                                 from services.external_data.atr_calculator import ATRCalculator
                                 from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
                                 
-                            user_id = EntityDetailsService._get_default_user_id()
-                            atr_calculator = ATRCalculator(db)
-                            # Get provider ID for adapter
-                            from models.external_data import ExternalDataProvider
-                            provider = db.query(ExternalDataProvider).filter(
-                                ExternalDataProvider.name == 'yahoo_finance'
-                            ).first()
-                            if provider:
-                                adapter = YahooFinanceAdapter(db, provider.id)
-                            else:
-                                adapter = YahooFinanceAdapter(db, 1)  # Fallback to provider ID 1
-                            
-                            atr_result = atr_calculator.get_atr_with_fallback(
-                                ticker_id=entity.ticker.id,
-                                adapter=adapter,
-                                user_id=user_id,
-                                db_session=db
-                            )
-                            
-                            if atr_result and atr_result.atr:
-                                entity_dict['ticker']['atr'] = atr_result.atr
-                                entity_dict['ticker']['atr_period'] = atr_result.period
-                                if atr_result.warnings:
-                                    entity_dict['ticker']['atr_warnings'] = atr_result.warnings
-                        except Exception as atr_error:
+                                user_id = EntityDetailsService._get_default_user_id()
+                                atr_calculator = ATRCalculator(db)
+                                # Get provider ID for adapter
+                                from models.external_data import ExternalDataProvider
+                                provider = db.query(ExternalDataProvider).filter(
+                                    ExternalDataProvider.name == 'yahoo_finance'
+                                ).first()
+                                if provider:
+                                    adapter = YahooFinanceAdapter(db, provider.id)
+                                else:
+                                    adapter = YahooFinanceAdapter(db, 1)  # Fallback to provider ID 1
+                                
+                                atr_result = atr_calculator.get_atr_with_fallback(
+                                    ticker_id=entity.ticker.id,
+                                    adapter=adapter,
+                                    user_id=user_id,
+                                    db_session=db
+                                )
+                                
+                                if atr_result and atr_result.atr:
+                                    entity_dict['ticker']['atr'] = atr_result.atr
+                                    entity_dict['ticker']['atr_period'] = atr_result.period
+                                    if atr_result.warnings:
+                                        entity_dict['ticker']['atr_warnings'] = atr_result.warnings
+                            except Exception as atr_error:
                                 logger.warning(f"Error calculating ATR for ticker {entity.ticker.id}: {atr_error}")
                         
                         # Calculate 52W range

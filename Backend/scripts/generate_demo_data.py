@@ -28,6 +28,7 @@ import sys
 import os
 import random
 import argparse
+import json
 from datetime import datetime, timedelta, date
 from typing import Dict, List, Optional, Tuple, Any
 from decimal import Decimal
@@ -51,6 +52,7 @@ from models.note import Note
 from models.currency import Currency
 from models.user import User
 from models.note_relation_type import NoteRelationType
+from models.user_ticker import UserTicker
 
 # ============================================================================
 # Configuration
@@ -386,6 +388,18 @@ class DatabaseValidator:
                 error_type='missing_data',
                 details="לא נמצא טיקר SPY. ודא ששלב 1 (ניקוי נתונים) הושלם בהצלחה"
             )
+        
+        # Check for AI templates (optional but recommended)
+        try:
+            from models.ai_analysis import AIPromptTemplate
+            template_count = self.db.query(AIPromptTemplate).filter(
+                AIPromptTemplate.is_active == True
+            ).count()
+            if template_count == 0:
+                print("   ⚠️  אין תבניות AI פעילות - ניתוחי AI לא יווצרו")
+        except ImportError:
+            # AI Analysis models might not exist - that's okay
+            pass
 
 
 # ============================================================================
@@ -485,21 +499,24 @@ class DataRelationshipManager:
 class DemoDataGenerator:
     """יוצר נתוני דוגמה מלאים למערכת"""
     
-    def __init__(self, db_session: Session, config: Dict[str, Any], dry_run: bool = False):
+    def __init__(self, db_session: Session, config: Dict[str, Any], dry_run: bool = False, verbose: bool = False):
         self.db = db_session
         self.config = config
         self.dry_run = dry_run
+        self.verbose = verbose
         self.date_gen = DateDistributionGenerator()
         self.relationship_manager = DataRelationshipManager(db_session)
         self.created_count = {
             'tickers': 0,
+            'user_tickers': 0,
             'accounts': 0,
             'trade_plans': 0,
             'trades': 0,
             'executions': 0,
             'cash_flows': 0,
             'alerts': 0,
-            'notes': 0
+            'notes': 0,
+            'ai_analysis': 0
         }
         
         # Cache for lookup
@@ -521,6 +538,7 @@ class DemoDataGenerator:
             
             # Create in order (respecting dependencies)
             self._create_tickers()
+            self._create_user_tickers()  # Create user_tickers associations
             self._create_trading_accounts()
             self._create_trade_plans()
             self._create_trades()
@@ -528,6 +546,7 @@ class DemoDataGenerator:
             self._create_cash_flows()
             self._create_alerts()
             self._create_notes()
+            self._create_ai_analysis()  # Create AI analysis requests
             
             # Commit all
             self.db.commit()
@@ -670,6 +689,48 @@ class DemoDataGenerator:
         self.created_count['tickers'] = created
         print(f"   ✅ נוצרו {created} טיקרים")
     
+    def _create_user_tickers(self) -> None:
+        """יוצר שיוכי טיקרים למשתמש דרך user_tickers"""
+        print(f"\n🔗 יוצר שיוכי טיקרים למשתמש...")
+        
+        if not self.user_cache:
+            raise DataGenerationError('user_tickers', "משתמש לא נמצא")
+        
+        # Get all tickers (including SPY)
+        all_tickers = self.db.query(Ticker).all()
+        
+        if not all_tickers:
+            print("   ⚠️  אין טיקרים לשיוך")
+            return
+        
+        created = 0
+        for ticker in all_tickers:
+            try:
+                # Check if association already exists
+                existing = self.db.query(UserTicker).filter(
+                    UserTicker.user_id == self.user_cache.id,
+                    UserTicker.ticker_id == ticker.id
+                ).first()
+                
+                if not existing:
+                    from sqlalchemy.sql import func
+                    user_ticker = UserTicker(
+                        user_id=self.user_cache.id,
+                        ticker_id=ticker.id,
+                        status='open',
+                        created_at=func.now()
+                    )
+                    self.db.add(user_ticker)
+                    created += 1
+            except Exception as e:
+                if self.verbose:
+                    print(f"   ⚠️  שגיאה ביצירת שיוך טיקר {ticker.symbol}: {e}")
+                continue
+        
+        self.db.flush()
+        self.created_count['user_tickers'] = created
+        print(f"   ✅ נוצרו {created} שיוכי טיקרים למשתמש")
+    
     def _create_trading_accounts(self) -> None:
         """יוצר חשבונות מסחר"""
         print(f"\n💼 יוצר {self.config['trading_accounts']['count']} חשבונות מסחר...")
@@ -688,9 +749,13 @@ class DemoDataGenerator:
         if not other_currency:
             other_currency = usd_currency  # Fallback
         
+        if not self.user_cache:
+            raise DataGenerationError('trading_accounts', "משתמש לא נמצא")
+        
         # Account 1: Primary (70% activity, all swing)
         # CRITICAL: Primary account MUST be in USD currency
         account1 = TradingAccount(
+            user_id=self.user_cache.id,
             name="חשבון מסחר ראשי",
             currency_id=usd_currency.id,  # MUST be USD - never use other_currency here!
             status='open',
@@ -702,6 +767,7 @@ class DemoDataGenerator:
         
         # Account 2: Other currency (long-term investments)
         account2 = TradingAccount(
+            user_id=self.user_cache.id,
             name=f"חשבון מסחר {other_currency.symbol}",
             currency_id=other_currency.id,
             status='open',
@@ -843,6 +909,7 @@ class DemoDataGenerator:
             ) if status == 'cancelled' else None
             
             trade_plan = TradePlan(
+                user_id=self.user_cache.id,
                 trading_account_id=account.id,
                 ticker_id=ticker.id,
                 investment_type=investment_type,
@@ -912,6 +979,7 @@ class DemoDataGenerator:
                 total_pl = round(plan.planned_amount * pl_percent / 100, 2)
             
             trade = Trade(
+                user_id=self.user_cache.id,
                 trading_account_id=plan.trading_account_id,
                 ticker_id=plan.ticker_id,
                 trade_plan_id=plan.id,
@@ -965,6 +1033,7 @@ class DemoDataGenerator:
                 total_pl = round(planned_amount * pl_percent / 100, 2)
             
             trade = Trade(
+                user_id=self.user_cache.id,
                 trading_account_id=account.id,
                 ticker_id=ticker.id,
                 trade_plan_id=None,
@@ -1148,6 +1217,7 @@ class DemoDataGenerator:
         for account in self.relationship_manager.accounts:
             # Initial deposit
             deposit = CashFlow(
+                user_id=self.user_cache.id,
                 trading_account_id=account.id,
                 type='deposit',
                 amount=account.opening_balance or 100000,
@@ -1167,6 +1237,7 @@ class DemoDataGenerator:
                 amount = round(random.uniform(1000, 20000), 2)
                 
                 cash_flow = CashFlow(
+                    user_id=self.user_cache.id,
                     trading_account_id=account.id,
                     type=flow_type,
                     amount=amount if flow_type == 'deposit' else -amount,
@@ -1191,6 +1262,7 @@ class DemoDataGenerator:
                     )
                     
                     dividend = CashFlow(
+                        user_id=self.user_cache.id,
                         trading_account_id=account.id,
                         type='dividend',
                         amount=round(random.uniform(100, 1000), 2),
@@ -1209,6 +1281,7 @@ class DemoDataGenerator:
                 fee_date = self.date_gen.generate_date('random')
                 
                 fee = CashFlow(
+                    user_id=self.user_cache.id,
                     trading_account_id=account.id,
                     type='fee',
                     amount=-round(random.uniform(5, 50), 2),
@@ -1452,6 +1525,7 @@ class DemoDataGenerator:
             )
             
             note = Note(
+                user_id=self.user_cache.id,
                 content=content,
                 related_type_id=NOTE_RELATED_TYPES['ticker'],
                 related_id=ticker.id
@@ -1484,6 +1558,7 @@ class DemoDataGenerator:
             )
             
             note = Note(
+                user_id=self.user_cache.id,
                 content=content,
                 related_type_id=NOTE_RELATED_TYPES['trade'],
                 related_id=trade.id
@@ -1512,6 +1587,7 @@ class DemoDataGenerator:
             )
             
             note = Note(
+                user_id=self.user_cache.id,
                 content=content,
                 related_type_id=NOTE_RELATED_TYPES['trade_plan'],
                 related_id=plan.id
@@ -1531,6 +1607,7 @@ class DemoDataGenerator:
             content = template.format(account_name=account.name)
             
             note = Note(
+                user_id=self.user_cache.id,
                 content=content,
                 related_type_id=NOTE_RELATED_TYPES['trading_account'],
                 related_id=account.id
@@ -1540,6 +1617,110 @@ class DemoDataGenerator:
         
         self.created_count['notes'] = created
         print(f"   ✅ נוצרו {created} הערות")
+    
+    def _create_ai_analysis(self) -> None:
+        """יוצר ניתוחי AI לדוגמה"""
+        print(f"\n🤖 יוצר ניתוחי AI לדוגמה...")
+        
+        if not self.user_cache:
+            raise DataGenerationError('ai_analysis', "משתמש לא נמצא")
+        
+        # Get AI templates
+        try:
+            from models.ai_analysis import AIAnalysisRequest, AIPromptTemplate
+            
+            templates = self.db.query(AIPromptTemplate).filter(
+                AIPromptTemplate.is_active == True
+            ).limit(5).all()
+            
+            if not templates:
+                print("   ⚠️  אין תבניות AI פעילות - מדלג על יצירת ניתוחי AI")
+                return
+            
+            # Create 5-10 AI analysis requests
+            count = min(10, len(templates) * 2)
+            created = 0
+            
+            # Get some entities for context
+            trades = self.relationship_manager.trades[:5] if self.relationship_manager.trades else []
+            tickers = self.relationship_manager.tickers[:5] if self.relationship_manager.tickers else []
+            trade_plans = self.relationship_manager.trade_plans[:5] if self.relationship_manager.trade_plans else []
+            
+            for i in range(count):
+                template = random.choice(templates)
+                
+                # Generate variables based on template
+                variables = {}
+                try:
+                    template_vars = json.loads(template.variables_json) if template.variables_json else {}
+                    for var_name, var_def in template_vars.items():
+                        if isinstance(var_def, dict) and 'type' in var_def:
+                            var_type = var_def.get('type', 'string')
+                            if var_type == 'string':
+                                variables[var_name] = f"דוגמה {i+1}"
+                            elif var_type == 'number':
+                                variables[var_name] = random.randint(1, 100)
+                            elif var_type == 'ticker_id' and tickers:
+                                variables[var_name] = random.choice(tickers).id
+                            elif var_type == 'trade_id' and trades:
+                                variables[var_name] = random.choice(trades).id
+                            elif var_type == 'trade_plan_id' and trade_plans:
+                                variables[var_name] = random.choice(trade_plans).id
+                            else:
+                                variables[var_name] = f"דוגמה {i+1}"
+                except (json.JSONDecodeError, TypeError):
+                    variables = {"example": f"דוגמה {i+1}"}
+                
+                # Generate prompt text (simplified)
+                prompt_text = template.prompt_text
+                for key, value in variables.items():
+                    prompt_text = prompt_text.replace(f"{{{key}}}", str(value))
+                
+                # Generate response text (simulated)
+                response_text = f"זהו ניתוח AI לדוגמה #{i+1} עבור תבנית {template.name_he or template.name}. הניתוח כולל הערכה של המצב הנוכחי והמלצות לפעולה."
+                
+                # Random status
+                status = random.choice(['completed', 'completed', 'completed', 'pending', 'failed'])
+                error_message = None
+                if status == 'failed':
+                    error_message = "שגיאה לדוגמה בניתוח AI"
+                
+                # Random provider
+                provider = random.choice(['gemini', 'perplexity'])
+                
+                # Generate date
+                analysis_date = self.date_gen.generate_date_in_range(
+                    self.date_gen.now - timedelta(days=30),
+                    self.date_gen.now
+                )
+                
+                ai_analysis = AIAnalysisRequest(
+                    user_id=self.user_cache.id,
+                    template_id=template.id,
+                    provider=provider,
+                    variables_json=json.dumps(variables, ensure_ascii=False),
+                    prompt_text=prompt_text,
+                    response_text=response_text if status == 'completed' else None,
+                    response_json=None,
+                    status=status,
+                    error_message=error_message,
+                    created_at=analysis_date
+                )
+                
+                self.db.add(ai_analysis)
+                created += 1
+            
+            self.db.flush()
+            self.created_count['ai_analysis'] = created
+            print(f"   ✅ נוצרו {created} ניתוחי AI")
+            
+        except ImportError:
+            # AI Analysis models might not exist - skip
+            if self.verbose:
+                print(f"   ⚠️  AI Analysis models לא נמצאו - מדלג על יצירת ניתוחי AI")
+        except Exception as e:
+            if self.verbose:
+                print(f"   ⚠️  שגיאה ביצירת ניתוחי AI: {e}")
 
 
 # ============================================================================
@@ -1601,7 +1782,7 @@ def main():
             return
         
         # Generate data
-        generator = DemoDataGenerator(db, DEMO_CONFIG, dry_run=args.dry_run)
+        generator = DemoDataGenerator(db, DEMO_CONFIG, dry_run=args.dry_run, verbose=args.verbose)
         results = generator.generate_all()
         
         print("\n" + "=" * 70)

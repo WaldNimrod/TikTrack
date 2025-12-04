@@ -264,3 +264,4 @@ if (crudResult && window.CacheSyncManager?.invalidateByAction) {
 **תאריך בדיקה:** 03 דצמבר 2025  
 **בודק:** Auto (AI Assistant)  
 **גרסה:** 1.0.0
+

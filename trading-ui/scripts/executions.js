@@ -953,7 +953,7 @@ async function loadExecutionsData(options = {}) {
       page: "executions" 
     });
     syncExecutionsPagination(executionsData);
-    
+
     // CRITICAL: Update allExecutions for table rendering
     updateExecutionsGlobalData(executionsData);
 
@@ -977,16 +977,7 @@ async function loadExecutionsData(options = {}) {
       detail: { count: executionsData.length }
     }));
     
-    // Also trigger preload directly after a short delay to ensure table is rendered
-    window.Logger?.info('⏰ Scheduling direct preload trigger in 1 second', { page: "executions" });
-    setTimeout(() => {
-      window.Logger?.info('⏰ Direct preload trigger fired', { page: "executions" });
-      if (window.waitForMainTableAndPreload && typeof window.waitForMainTableAndPreload === 'function') {
-        window.waitForMainTableAndPreload();
-      } else {
-        window.Logger?.warn('⚠️ waitForMainTableAndPreload function not available', { page: "executions" });
-      }
-    }, 1000);
+    // Preload is triggered by executions:loaded event listener
   } catch (error) {
     window.Logger.error('❌ Error in loadExecutionsData', {
       page: "executions",
@@ -1561,7 +1552,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
     if (tempRow) {
         // Clone the entire row including all attributes and children
         const row = tempRow.cloneNode(true);
-        tbody.appendChild(row);
+    tbody.appendChild(row);
     }
   });
 
@@ -1959,20 +1950,10 @@ window.initializeExecutionsPage = async function() {
   
   // הגדרת מודלים שלא נסגרים בלחיצה על הרקע
   setupModalConfigurations();
-  
-  // CRITICAL: Load executions data - this must be called to populate the main table
-  if (typeof window.loadExecutionsData === 'function') {
-    window.Logger.info('📥 Loading executions data from initializeExecutionsPage...', { page: "executions" });
-    try {
-      await window.loadExecutionsData();
-      window.Logger.info('✅ Executions data loaded from initializeExecutionsPage', { page: "executions" });
-    } catch (error) {
-      window.Logger.error('❌ Failed to load executions data in initializeExecutionsPage', { 
-        error: error?.message,
-        page: "executions" 
-      });
-    }
-  }
+
+  // REMOVED: loadExecutionsData call - now handled by page-initialization-configs.js customInitializers
+  // This prevents duplicate data loading calls
+  // The unified initialization system calls loadExecutionsData through customInitializers
 
   // Initialize trade creation section - UPDATED: Use preloaded data if available
   // REFACTORED: Uses shared ExecutionClusteringService and ExecutionClusterHelpers
@@ -1985,8 +1966,10 @@ window.initializeExecutionsPage = async function() {
     let clustersData = [];
     
     const initializeTradeCreationClustersSection = async () => {
-      if (tradeCreationInitialized) {
-        return;
+      // Allow re-initialization if data is available but not rendered
+      const hasRenderedRows = document.querySelector('#executionTradeCreationClustersTableBody tr');
+      if (tradeCreationInitialized && hasRenderedRows) {
+        return; // Already initialized and rendered
       }
       
       tradeCreationInitialized = true;
@@ -2035,7 +2018,7 @@ window.initializeExecutionsPage = async function() {
                    !window.executionsSections34Data.tradeCreation?.loaded ? 'tradeCreation not loaded' :
                    !window.executionsSections34Data.tradeCreation?.data ? 'tradeCreation data is null' : 'unknown'
         });
-        await loadAndRenderClusters();
+      await loadAndRenderClusters();
       }
       
       // Setup event handlers (one time only)
@@ -2322,55 +2305,24 @@ window.initializeExecutionsPage = async function() {
       }
     };
     
-    // Check if section is open after sections are restored
-    const checkAndInitialize = () => {
-      // Re-fetch section in case DOM wasn't ready earlier
-      const section = document.getElementById('tradeCreationClustersSection');
-      const sectionBody = section?.querySelector('.section-body');
-      if (sectionBody && window.getComputedStyle(sectionBody).display !== 'none') {
-        window.Logger?.info('✅ Trade creation section is open, initializing...', { page: 'executions' });
+    // SIMPLIFIED: Use unified initialization system - sectionDefaultStates handles initial state
+    // Data is preloaded regardless of section state
+    // Initialize immediately if data is available (even if section is closed)
+    // Also use MutationObserver to detect when user opens the section
+    
+    // Check if data is already preloaded and initialize immediately
+    if (window.executionsSections34Data?.tradeCreation?.loaded && window.executionsSections34Data.tradeCreation.data) {
+      window.Logger?.info('✅ Trade creation data preloaded, initializing section...', { page: 'executions' });
         initializeTradeCreationClustersSection();
-      } else {
-        window.Logger?.debug('⏸️ Trade creation section is closed, waiting...', { 
-          page: 'executions',
-          sectionExists: !!section,
-          sectionBodyExists: !!sectionBody,
-          display: sectionBody ? window.getComputedStyle(sectionBody).display : 'N/A'
-        });
       }
-    };
     
-    // Check immediately if section is already open (for initial load)
-    // Use multiple timeouts to catch different timing scenarios
-    setTimeout(() => {
-      window.Logger?.debug('🔍 First check for trade creation section', { page: 'executions' });
-      checkAndInitialize();
-    }, 100);
-    
-    setTimeout(() => {
-      window.Logger?.debug('🔍 Second check for trade creation section', { page: 'executions' });
-      checkAndInitialize();
-    }, 500);
-    
-    // After sections are restored, check again if section is open
-    if (window.sectionsRestored) {
-      setTimeout(() => {
-        window.Logger?.debug('🔍 Third check (sections already restored)', { page: 'executions' });
-        checkAndInitialize();
-      }, 200);
-    } else {
-      window.addEventListener('sections:restored', () => {
-        window.Logger?.debug('🔍 Sections restored event received, checking trade creation section', { page: 'executions' });
-        setTimeout(checkAndInitialize, 200);
-      }, { once: true });
-    }
-    
-    // Use MutationObserver to detect when section opens (doesn't interfere with toggle system)
+    // Use MutationObserver to detect when user opens the section
     const sectionBody = tradeCreationSection?.querySelector('.section-body');
     if (sectionBody) {
       const observer = new MutationObserver(() => {
-        if (!tradeCreationInitialized && window.getComputedStyle(sectionBody).display !== 'none') {
-          setTimeout(initializeTradeCreationClustersSection, 100);
+        if (window.getComputedStyle(sectionBody).display !== 'none') {
+          window.Logger?.info('✅ Trade creation section opened, initializing...', { page: 'executions' });
+          initializeTradeCreationClustersSection();
         }
       });
       observer.observe(sectionBody, {
@@ -2575,183 +2527,36 @@ window.initializeExecutionsPage = async function() {
 
   // Wait for main table to be displayed, then preload sections 3+4
   let preloadTriggered = false;
+  // SIMPLIFIED: Wait for executions:loaded event from unified system
+  // The unified initialization system ensures the main table is loaded before this event fires
   const waitForMainTableAndPreload = () => {
-    window.Logger?.info('🔍 waitForMainTableAndPreload() called', { 
-      page: "executions",
-      preloadTriggered,
-      retryCount: waitForMainTableAndPreload.retryCount || 0
-    });
-    
     if (preloadTriggered) {
       window.Logger?.info('⏭️ Preload already triggered, skipping', { page: "executions" });
       return;
     }
     
-    const mainTable = document.getElementById('executionsTable');
-    const mainTableBody = mainTable?.querySelector('tbody');
-    const mainSection = document.querySelector('[data-section="main"]') || document.getElementById('main');
-    const mainSectionBody = mainSection?.querySelector('.section-body');
-    const isMainSectionVisible = mainSectionBody && window.getComputedStyle(mainSectionBody).display !== 'none';
-    
-    // Check if table has rows OR if section is visible (table might be empty but section is open)
-    const hasRows = mainTableBody && mainTableBody.querySelectorAll('tr[data-execution-id]').length > 0;
-    const hasTableElement = !!mainTable;
-    const rowCount = mainTableBody ? mainTableBody.querySelectorAll('tr').length : 0;
-    
-    window.Logger?.info('🔍 Checking main table status', { 
-      page: "executions",
-      hasTableElement,
-      hasRows,
-      rowCount,
-      isMainSectionVisible,
-      mainSectionExists: !!mainSection,
-      mainSectionBodyExists: !!mainSectionBody
-    });
-    
-    if ((hasRows || (isMainSectionVisible && hasTableElement)) && !preloadTriggered) {
-      preloadTriggered = true;
-      window.Logger?.info('✅ Main table displayed, starting sections 3+4 preload', { 
-        hasRows,
-        rowCount,
-        isMainSectionVisible,
-        hasTableElement,
+    preloadTriggered = true;
+    window.Logger?.info('✅ Starting sections 3+4 preload after main table loaded', { page: "executions" });
+    preloadSections34Data().catch(error => {
+      window.Logger?.error('❌ Failed to preload sections 3+4', { 
+        error: error?.message,
+        errorStack: error?.stack,
         page: "executions" 
       });
-      preloadSections34Data().catch(error => {
-        window.Logger?.error('❌ Failed to preload sections 3+4', { 
-          error: error?.message,
-          errorStack: error?.stack,
-          page: "executions" 
-        });
-        preloadTriggered = false; // Allow retry on error
-      });
-    } else if (!preloadTriggered) {
-      // Retry after a short delay (max 20 attempts = 4 seconds)
-      const retryCount = waitForMainTableAndPreload.retryCount || 0;
-      if (retryCount < 20) {
-        waitForMainTableAndPreload.retryCount = retryCount + 1;
-        window.Logger?.info(`⏳ Retrying waitForMainTableAndPreload (attempt ${retryCount + 1}/20)`, { page: "executions" });
-        setTimeout(waitForMainTableAndPreload, 200);
-      } else {
-        window.Logger?.warn('⚠️ Main table not detected after 20 retries, preloading anyway', { 
-          page: "executions",
-          hasTableElement,
-          hasRows,
-          isMainSectionVisible
-        });
-        preloadTriggered = true;
-        preloadSections34Data().catch(error => {
-          window.Logger?.error('❌ Failed to preload sections 3+4', { 
-            error: error?.message,
-            errorStack: error?.stack,
-            page: "executions" 
-          });
-        });
-      }
-    }
+      preloadTriggered = false; // Allow retry on error
+    });
   };
 
   // Export function to window for external calls
   window.waitForMainTableAndPreload = waitForMainTableAndPreload;
   window.preloadSections34Data = preloadSections34Data;
   
-  window.Logger?.info('✅ Functions exported to window', { 
-    page: "executions",
-    waitForMainTableAndPreload: typeof window.waitForMainTableAndPreload,
-    preloadSections34Data: typeof window.preloadSections34Data
-  });
-  
-  // Check if table already exists (in case data was loaded before this code ran)
-  const checkTableNow = () => {
-    const mainTable = document.getElementById('executionsTable');
-    const mainTableBody = mainTable?.querySelector('tbody');
-    const hasRows = mainTableBody && mainTableBody.querySelectorAll('tr[data-execution-id]').length > 0;
-    const hasTableElement = !!mainTable;
-    
-    window.Logger?.info('🔍 Checking if table already exists', { 
-      page: "executions",
-      hasTableElement,
-      hasRows,
-      tableBodyExists: !!mainTableBody
-    });
-    
-    if (hasTableElement && (hasRows || mainTableBody)) {
-      window.Logger?.info('✅ Table already exists, triggering preload immediately', { page: "executions" });
-      waitForMainTableAndPreload();
-      return true;
-    }
-    return false;
-  };
-  
-  // Check immediately
-  if (!checkTableNow()) {
-    // Start checking after a short delay to allow table to render
-    window.Logger?.info('⏰ Table not found, scheduling waitForMainTableAndPreload in 500ms', { 
-      page: "executions",
-      waitForMainTableAndPreloadExists: typeof waitForMainTableAndPreload === 'function'
-    });
-    
-    const timeoutId = setTimeout(() => {
-      window.Logger?.info('⏰ waitForMainTableAndPreload timer fired', { 
-        page: "executions",
-        waitForMainTableAndPreloadExists: typeof waitForMainTableAndPreload === 'function'
-      });
-      try {
-        waitForMainTableAndPreload();
-      } catch (error) {
-        window.Logger?.error('❌ Error in waitForMainTableAndPreload', { 
-          error: error?.message,
-          errorStack: error?.stack,
-          page: "executions" 
-        });
-      }
-    }, 500);
-    
-    window.Logger?.info('✅ setTimeout scheduled', { 
-      page: "executions",
-      timeoutId,
-      delay: 500
-    });
-  }
-
-  // Also listen for table update events
-  window.Logger?.info('👂 Setting up table:updated event listener', { page: "executions" });
-  document.addEventListener('table:updated', (event) => {
-    window.Logger?.debug('📊 table:updated event received', { 
-      page: "executions",
-      tableId: event.detail?.tableId,
-      tableType: event.detail?.tableType,
-      preloadTriggered
-    });
-    if (event.detail?.tableId === 'executionsTable' || event.detail?.tableType === 'executions') {
-      if (!preloadTriggered) {
-        window.Logger?.info('📊 Main table updated, checking if sections 3+4 need preloading', { page: "executions" });
-        setTimeout(waitForMainTableAndPreload, 100);
-      }
-    }
-  }, { once: false });
-
-  // Also listen for pagination events
-  window.Logger?.info('👂 Setting up pagination:ready event listener', { page: "executions" });
-  document.addEventListener('pagination:ready', (event) => {
-    window.Logger?.debug('📊 pagination:ready event received', { 
-      page: "executions",
-      preloadTriggered
-    });
-    if (!preloadTriggered) {
-      window.Logger?.info('📊 Pagination ready, checking if sections 3+4 need preloading', { page: "executions" });
-      setTimeout(waitForMainTableAndPreload, 100);
-    }
-  }, { once: false });
-  
-  // Also trigger after loadExecutionsData completes
-  window.Logger?.info('👂 Setting up custom event listener for executions:loaded', { page: "executions" });
+  // SIMPLIFIED: Listen only for executions:loaded event from unified system
+  // This event is fired after the main table is fully loaded and rendered
   document.addEventListener('executions:loaded', () => {
-    window.Logger?.info('📊 executions:loaded event received, checking if sections 3+4 need preloading', { page: "executions" });
-    if (!preloadTriggered) {
-      setTimeout(waitForMainTableAndPreload, 100);
-    }
-  }, { once: false });
+    window.Logger?.info('📊 executions:loaded event received, triggering sections 3+4 preload', { page: "executions" });
+    waitForMainTableAndPreload();
+  }, { once: true });
 
   // Load trade suggestions - UPDATED: Use preloaded data if available
   // Uses MutationObserver to detect when section opens (no interference with global toggle system)
@@ -2799,27 +2604,22 @@ window.initializeExecutionsPage = async function() {
       }
     };
     
-    // Check if section is open after sections are restored
-    const checkAndRender = () => {
-      const sectionBody = suggestionsSection?.querySelector('.section-body');
-      if (sectionBody && window.getComputedStyle(sectionBody).display !== 'none') {
-        renderSuggestions();
-      }
-    };
+    // SIMPLIFIED: Initialize immediately if data is available (even if section is closed)
+    // Also use MutationObserver to detect when user opens the section
     
-    // After sections are restored, check if section is open
-    if (window.sectionsRestored) {
-      setTimeout(checkAndRender, 100);
-    } else {
-      window.addEventListener('sections:restored', () => setTimeout(checkAndRender, 100), { once: true });
+    // Check if data is already preloaded and initialize immediately
+    if (window.executionsSections34Data?.suggestions?.loaded && window.executionsSections34Data.suggestions.data) {
+      window.Logger?.info('✅ Suggestions data preloaded, initializing section...', { page: "executions" });
+      renderSuggestions();
     }
     
-    // Use MutationObserver to detect when section opens (doesn't interfere with toggle system)
+    // Use MutationObserver to detect when user opens the section
     const sectionBody = suggestionsSection?.querySelector('.section-body');
     if (sectionBody) {
       const observer = new MutationObserver(() => {
-        if (!suggestionsRendered && window.getComputedStyle(sectionBody).display !== 'none') {
-          setTimeout(renderSuggestions, 100);
+        if (window.getComputedStyle(sectionBody).display !== 'none') {
+          window.Logger?.info('✅ Suggestions section opened, rendering...', { page: "executions" });
+          renderSuggestions();
         }
       });
       observer.observe(sectionBody, {

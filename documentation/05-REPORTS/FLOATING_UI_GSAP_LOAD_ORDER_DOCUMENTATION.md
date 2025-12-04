@@ -16,9 +16,9 @@
 - **required:** false (אופציונלי - יש fallback)
 - **globalCheck:** `window.computePosition`
 
-#### GSAP (להתווסף)
+#### GSAP (✅ נוסף)
 - **קובץ:** `https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js`
-- **loadOrder:** 16.6 (להתווסף)
+- **loadOrder:** 16.6
 - **מיקום:** אחרי Floating UI (16.5), לפני event-handler-manager (17)
 - **required:** false (אופציונלי - יש fallback)
 - **globalCheck:** `window.gsap`

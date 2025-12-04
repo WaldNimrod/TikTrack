@@ -115,17 +115,36 @@ class CRUDEnhancedTester {
         apiUrl: '/api/trades/',
         pageUrl: '/trades',
         hasCRUD: true,
-        testData: {
-          trading_account_id: 1,
-          ticker_id: 1,
-          status: 'open',
-          investment_type: 'swing',
-          side: 'Long',
-          notes: 'CRUD Test Record - Safe to delete',
+        // testData will be populated dynamically with actual IDs
+        testData: null,
+        getTestData: async function() {
+          // Get actual IDs from user's data
+          const accountsRes = await fetch('/api/trading-accounts/');
+          const accountsData = await accountsRes.json();
+          const accounts = accountsData.data || [];
+          const accountId = accounts.length > 0 ? accounts[0].id : null;
+          
+          const tickersRes = await fetch('/api/tickers/');
+          const tickersData = await tickersRes.json();
+          const tickers = tickersData.data || [];
+          const tickerId = tickers.length > 0 ? tickers[0].id : null;
+          
+          if (!accountId || !tickerId) {
+            throw new Error('No trading account or ticker available for testing');
+          }
+          
+          return {
+            trading_account_id: accountId,
+            ticker_id: tickerId,
+            status: 'open',
+            investment_type: 'swing',
+            side: 'Long',
+            notes: 'CRUD Test Record - Safe to delete',
+          };
         },
         expectedButtons: ['הוסף טרייד', 'ערוך', 'מחק'],
         tableSelector: '#tradesTable',
-        modalSelector: '#addTradeModal',
+        modalSelector: '#tradesModal',
         priority: 1, // הכי קריטי
       },
 
@@ -147,7 +166,7 @@ class CRUDEnhancedTester {
         },
         expectedButtons: ['הוסף התראה', 'ערוך', 'מחק'],
         tableSelector: '#alertsTable',
-        modalSelector: '#addAlertModal',
+        modalSelector: '#alertsModal',
         priority: 2,
       },
 
@@ -159,7 +178,7 @@ class CRUDEnhancedTester {
         hasCRUD: true,
         slaMs: 5000,
         testData: {
-          symbol: `TEST${Math.floor(Math.random() * 10000)}`,
+          symbol: `T${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`,
           name: 'CRUD Test Ticker - Safe to delete',
           type: 'stock',
           currency_id: 1,
@@ -167,7 +186,7 @@ class CRUDEnhancedTester {
         },
         expectedButtons: ['הוסף טיקר', 'ערוך', 'מחק'],
         tableSelector: '#tickersTable',
-        modalSelector: '#addTickerModal',
+        modalSelector: '#tickersModal',
         priority: 2,
       },
 
@@ -186,7 +205,7 @@ class CRUDEnhancedTester {
         },
         expectedButtons: ['הוסף חשבון', 'ערוך', 'מחק'],
         tableSelector: '#accountsTable',
-        modalSelector: '#addAccountModal',
+        modalSelector: '#tradingAccountsModal',
         priority: 2,
       },
 
@@ -196,19 +215,33 @@ class CRUDEnhancedTester {
         apiUrl: '/api/executions/',
         pageUrl: '/executions',
         hasCRUD: true,
-        testData: {
-          trade_id: 1,
-          action: 'buy',
-          date: new Date().toISOString(),
-          quantity: 100,
-          price: 150.5,
-          fee: 1.5,
-          source: 'manual',
-          notes: 'CRUD Test Execution - Safe to delete',
+        // testData will be populated dynamically with actual IDs
+        testData: null,
+        getTestData: async function() {
+          // Get actual trade ID from user's data
+          const tradesRes = await fetch('/api/trades/');
+          const tradesData = await tradesRes.json();
+          const trades = tradesData.data || [];
+          const tradeId = trades.length > 0 ? trades[0].id : null;
+          
+          if (!tradeId) {
+            throw new Error('No trade available for testing');
+          }
+          
+          return {
+            trade_id: tradeId,
+            action: 'buy',
+            date: new Date().toISOString(),
+            quantity: 100,
+            price: 150.5,
+            fee: 1.5,
+            source: 'manual',
+            notes: 'CRUD Test Execution - Safe to delete',
+          };
         },
         expectedButtons: ['הוסף ביצוע', 'ערוך', 'מחק'],
         tableSelector: '#executionsTable',
-        modalSelector: '#addExecutionModal',
+        modalSelector: '#executionsModal',
         priority: 2,
       },
 
@@ -218,19 +251,33 @@ class CRUDEnhancedTester {
         apiUrl: '/api/cash-flows/',
         pageUrl: '/cash_flows',
         hasCRUD: true,
-        testData: {
-          trading_account_id: 1,
-          type: 'deposit',
-          amount: 1000.0,
-          date: new Date().toISOString().split('T')[0],
-          description: 'CRUD Test Cash Flow - Safe to delete',
-          currency_id: 1,
-          usd_rate: 1.0,
-          source: 'manual',
+        // testData will be populated dynamically with actual IDs
+        testData: null,
+        getTestData: async function() {
+          // Get actual trading_account ID from user's data
+          const accountsRes = await fetch('/api/trading-accounts/');
+          const accountsData = await accountsRes.json();
+          const accounts = accountsData.data || [];
+          const accountId = accounts.length > 0 ? accounts[0].id : null;
+          
+          if (!accountId) {
+            throw new Error('No trading account available for testing');
+          }
+          
+          return {
+            trading_account_id: accountId,
+            type: 'deposit',
+            amount: 1000.0,
+            date: new Date().toISOString().split('T')[0],
+            description: 'CRUD Test Cash Flow - Safe to delete',
+            currency_id: 1,
+            usd_rate: 1.0,
+            source: 'manual',
+          };
         },
         expectedButtons: ['הוסף תזרים', 'ערוך', 'מחק'],
         tableSelector: '#cashFlowsTable',
-        modalSelector: '#addCashFlowModal',
+        modalSelector: '#cashFlowModal',
         priority: 2,
       },
 
@@ -240,20 +287,40 @@ class CRUDEnhancedTester {
         apiUrl: '/api/trade-plans/',
         pageUrl: '/trade_plans',
         hasCRUD: true,
-        testData: {
-          trading_account_id: 1,
-          ticker_id: 1,
-          investment_type: 'swing',
-          side: 'Long',
-          status: 'open',
-          planned_amount: 1000,
-          entry_conditions: 'CRUD Test Entry Conditions',
-          target_price: 155.0,
-          reasons: 'CRUD Test Trade Plan - Safe to delete',
+        // testData will be populated dynamically with actual IDs
+        testData: null,
+        getTestData: async function() {
+          // Get actual IDs from user's data
+          const accountsRes = await fetch('/api/trading-accounts/');
+          const accountsData = await accountsRes.json();
+          const accounts = accountsData.data || [];
+          const accountId = accounts.length > 0 ? accounts[0].id : null;
+          
+          const tickersRes = await fetch('/api/tickers/');
+          const tickersData = await tickersRes.json();
+          const tickers = tickersData.data || [];
+          const tickerId = tickers.length > 0 ? tickers[0].id : null;
+          
+          if (!accountId || !tickerId) {
+            throw new Error('No trading account or ticker available for testing');
+          }
+          
+          return {
+            trading_account_id: accountId,
+            ticker_id: tickerId,
+            investment_type: 'swing',
+            side: 'Long',
+            status: 'open',
+            planned_amount: 1000,
+            entry_price: 150.0,
+            entry_conditions: 'CRUD Test Entry Conditions',
+            target_price: 155.0,
+            reasons: 'CRUD Test Trade Plan - Safe to delete',
+          };
         },
         expectedButtons: ['הוסף תוכנית', 'ערוך', 'מחק'],
         tableSelector: '#tradePlansTable',
-        modalSelector: '#addTradePlanModal',
+        modalSelector: '#tradePlansModal',
         priority: 2,
       },
 
@@ -270,7 +337,7 @@ class CRUDEnhancedTester {
         },
         expectedButtons: ['הוסף הערה', 'ערוך', 'מחק'],
         tableSelector: '#notesTable',
-        modalSelector: '#addNoteModal',
+        modalSelector: '#notesModal',
         priority: 3,
       },
 
@@ -601,8 +668,21 @@ class CRUDEnhancedTester {
       }
 
       // 3. בדיקת CREATE (15 נקודות) - רק לישויות עם CRUD
-      if (entity.hasCRUD && entity.testData) {
-        const createResult = await this.testAPICreate(entity.apiUrl, entity.testData);
+      if (entity.hasCRUD) {
+        // Get test data - support both static and dynamic
+        let testData = entity.testData;
+        if (!testData && entity.getTestData && typeof entity.getTestData === 'function') {
+          try {
+            testData = await entity.getTestData();
+          } catch (error) {
+            issues.push(`Failed to get test data: ${error.message}`);
+            console.log(`❌ ${entityName}: Failed to get test data - ${error.message}`);
+            testData = null;
+          }
+        }
+        
+        if (testData) {
+          const createResult = await this.testAPICreate(entity.apiUrl, testData);
         if (createResult.success) {
           score += 15;
           testRecordId = createResult.id;
@@ -628,6 +708,10 @@ class CRUDEnhancedTester {
               curl: createResult.curl,
             });
         }
+        } else {
+          issues.push(`No test data available for CREATE`);
+          console.log(`⚠️ ${entityName}: No test data available`);
+        }
       } else {
         // אם אין CRUD, נותנים נקודות
         score += 15;
@@ -638,13 +722,14 @@ class CRUDEnhancedTester {
       if (testRecordId && entity.hasCRUD) {
         // הימנעות משדות יחסים שאינם מחרוזות (למשל notes ב-Ticker הוא יחס), נעדכן שדות בטוחים
         let updateData;
+        const baseTestData = entity.testData || (entity.getTestData ? await entity.getTestData().catch(() => ({})) : {});
         if (entityName === 'tickers') {
           updateData = {
             name: 'CRUD Test Ticker - Updated',
             remarks: 'UPDATED by CRUD Test - Safe to delete',
           };
         } else {
-          updateData = { ...entity.testData, notes: 'UPDATED by CRUD Test - Safe to delete' };
+          updateData = { ...baseTestData, notes: 'UPDATED by CRUD Test - Safe to delete' };
         }
         const updateResult = await this.testAPIUpdate(entity.apiUrl, testRecordId, updateData);
         if (updateResult.success) {

@@ -100,7 +100,8 @@
       const middleware = [
         offset(config.gap),
         flip({
-          fallbackPlacements: ['top-start', 'bottom-start', 'top-end', 'bottom-end']
+          fallbackPlacements: ['top-start', 'bottom-start', 'top-end', 'bottom-end'],
+          fallbackAxisSideDirection: 'best-fit'
         }),
         shift({
           padding: config.gap,
@@ -199,7 +200,7 @@
     const floatingWidth = Math.max(floatingElement.offsetWidth || config.minWidth, config.minWidth);
     const floatingHeight = floatingElement.offsetHeight || 150;
     
-    // Position below reference element
+    // Position below reference element (align with item bottom, not next item)
     let top = referenceRect.bottom + config.gap;
     let left = referenceRect.left;
     let right = 'auto';
@@ -293,14 +294,14 @@
     };
 
     if (hasGSAP && action === 'show') {
-      // GSAP show animation
+      // GSAP show animation (faster, no vertical offset for better alignment)
       gsap.fromTo(element, 
-        { opacity: 0, y: -10 },
+        { opacity: 0 },
         { 
-          opacity: 1, 
-          y: 0, 
+          opacity: 1,
           duration: config.duration,
-          ease: config.ease
+          ease: config.ease,
+          onComplete: config.onComplete
         }
       );
     } else if (hasGSAP && action === 'hide') {
@@ -376,12 +377,89 @@
         return;
       }
 
-      const details = item.querySelector(detailsSelector) || 
-                     listElement.querySelector(`${detailsSelector}[data-item-id="${item.dataset.itemId || ''}"]`);
+      // Try multiple ways to find details element
+      let details = item.querySelector(detailsSelector);
+      
+      // If not found, try without attribute selector
+      if (!details && detailsSelector.includes('[')) {
+        const baseSelector = detailsSelector.split('[')[0];
+        details = item.querySelector(baseSelector);
+      }
+      
+      // If still not found, try with data-overlay attribute
+      if (!details) {
+        details = item.querySelector('[data-overlay="true"]');
+      }
+      
+      // Last resort: search in listElement
+      if (!details) {
+        details = listElement.querySelector(`${detailsSelector}[data-item-id="${item.dataset.itemId || ''}"]`);
+      }
       
       if (!details) {
+        window.Logger?.warn?.('UnifiedUIPositioning: Details element not found', {
+          itemSelector,
+          detailsSelector,
+          item: item.className,
+          page: 'unified-ui-positioning-service'
+        });
         return;
       }
+
+      // Close all other overlays in this list before opening new one
+      const allItems = listElement.querySelectorAll(itemSelector);
+      allItems.forEach(otherItem => {
+        if (otherItem !== item) {
+          // Remove hover class
+          otherItem.classList.remove(config.hoverClass);
+          
+          // Find and close its overlay
+          const otherDetails = otherItem.querySelector(detailsSelector) || 
+                              listElement.querySelector(`${detailsSelector}[data-item-id="${otherItem.dataset.itemId || ''}"]`);
+          if (otherDetails && otherDetails.style.display !== 'none') {
+            // Cancel any pending timeout for this item
+            const otherTimeout = overlayConfig.closeTimeouts.get(otherItem);
+            if (otherTimeout) {
+              clearTimeout(otherTimeout);
+              overlayConfig.closeTimeouts.delete(otherItem);
+            }
+            
+            // Close immediately
+            if (config.useAnimations) {
+              animateElement(otherDetails, 'hide', {
+                duration: config.transitionDuration / 1000,
+                onComplete: () => {
+                  if (window.WidgetZIndexManager) {
+                    window.WidgetZIndexManager.unregisterOverlay(otherDetails);
+                  }
+                  otherDetails.style.display = 'none';
+                  otherDetails.style.position = '';
+                  otherDetails.style.top = '';
+                  otherDetails.style.left = '';
+                  otherDetails.style.right = '';
+                  otherDetails.style.width = '';
+                  otherDetails.style.zIndex = '';
+                  otherDetails.style.visibility = '';
+                  otherDetails.style.opacity = '';
+                }
+              });
+            } else {
+              if (window.WidgetZIndexManager) {
+                window.WidgetZIndexManager.unregisterOverlay(otherDetails);
+              }
+              otherDetails.style.display = 'none';
+              otherDetails.style.position = '';
+              otherDetails.style.top = '';
+              otherDetails.style.left = '';
+              otherDetails.style.right = '';
+              otherDetails.style.width = '';
+              otherDetails.style.zIndex = '';
+              otherDetails.style.visibility = '';
+              otherDetails.style.opacity = '';
+            }
+          }
+        }
+      });
 
       // Cancel any pending close timeout
       const existingTimeout = overlayConfig.closeTimeouts.get(item);
@@ -401,28 +479,38 @@
         details.style.opacity = '1';
       }
 
-      // Position overlay
-      requestAnimationFrame(async () => {
-        await positionElement(item, details, {
-          placement: config.placement,
-          gap: config.gap,
-          minWidth: config.minWidth,
-          maxWidth: config.maxWidth,
-          zIndex: config.zIndex
-        });
-        
-        // Animate if enabled
-        if (config.useAnimations) {
-          animateElement(details, 'show', {
-            duration: config.transitionDuration / 1000
-          });
-        }
-        
-        // Auto-inspect if debugger available
-        if (window.WidgetOverlayDebugger) {
-          window.WidgetOverlayDebugger.inspectOverlay(item, details);
-        }
+      // Determine placement based on item position in list
+      let placement = config.placement || 'bottom-start';
+      const allItems = Array.from(listElement.querySelectorAll(itemSelector));
+      const itemIndex = allItems.indexOf(item);
+      const isLastItem = itemIndex === allItems.length - 1;
+      const isSecondToLast = itemIndex === allItems.length - 2;
+      
+      // If item is near the end of the list, prefer top placement
+      if (isLastItem || isSecondToLast) {
+        placement = 'top-start';
+      }
+
+      // Position overlay immediately (no delay)
+      await positionElement(item, details, {
+        placement: placement,
+        gap: config.gap,
+        minWidth: config.minWidth,
+        maxWidth: config.maxWidth,
+        zIndex: config.zIndex
       });
+      
+      // Animate if enabled (faster animation)
+      if (config.useAnimations) {
+        animateElement(details, 'show', {
+          duration: (config.transitionDuration || 100) / 1000
+        });
+      }
+      
+      // Auto-inspect if debugger available
+      if (window.WidgetOverlayDebugger) {
+        window.WidgetOverlayDebugger.inspectOverlay(item, details);
+      }
 
       // Handle hover on overlay itself
       const handleOverlayEnter = () => {

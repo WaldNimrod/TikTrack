@@ -61,6 +61,10 @@
 <!-- Note: UnifiedUIPositioningService has fallback if not loaded -->
 <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js"></script>
 
+<!-- GSAP (Optional - for smooth animations) -->
+<!-- Note: UnifiedUIPositioningService has CSS transitions fallback if not loaded -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
 <!-- Core System Scripts -->
 <script src="scripts/console-cleanup.js"></script>
 <script src="scripts/translation-utils.js"></script>

@@ -1265,10 +1265,19 @@ class DemoDataGenerator:
             print(f"      - מקושרים לטריידים: {with_trade}/{created}")
     
     def _create_cash_flows(self) -> None:
-        """יוצר תזרימי מזומן"""
+        """יוצר תזרימי מזומן עם מגוון מייצג של סוגים"""
         print(f"\n💰 יוצר תזרימי מזומן...")
         
         created = 0
+        cash_flow_types_created = {
+            'deposit': 0,
+            'withdrawal': 0,
+            'dividend': 0,
+            'fee': 0,
+            'interest': 0,
+            'transfer_in': 0,
+            'transfer_out': 0
+        }
         
         for account in self.relationship_manager.accounts:
             # Initial deposit
@@ -1285,6 +1294,7 @@ class DemoDataGenerator:
             )
             self.db.add(deposit)
             created += 1
+            cash_flow_types_created['deposit'] += 1
             
             # Random deposits and withdrawals over time
             for _ in range(random.randint(3, 8)):
@@ -1305,6 +1315,7 @@ class DemoDataGenerator:
                 )
                 self.db.add(cash_flow)
                 created += 1
+                cash_flow_types_created[flow_type] += 1
             
             # Dividends from closed trades
             closed_trades = [t for t in self.relationship_manager.trades 
@@ -1331,6 +1342,7 @@ class DemoDataGenerator:
                     )
                     self.db.add(dividend)
                     created += 1
+                    cash_flow_types_created['dividend'] += 1
             
             # Fees
             for _ in range(random.randint(2, 5)):
@@ -1349,9 +1361,76 @@ class DemoDataGenerator:
                 )
                 self.db.add(fee)
                 created += 1
+                cash_flow_types_created['fee'] += 1
+            
+            # Interest (for accounts with positive balance)
+            for _ in range(random.randint(1, 3)):
+                interest_date = self.date_gen.generate_date('random')
+                
+                interest = CashFlow(
+                    user_id=self.user_cache.id,
+                    trading_account_id=account.id,
+                    type='interest',
+                    amount=round(random.uniform(10, 200), 2),
+                    date=interest_date,
+                    currency_id=account.currency_id,
+                    usd_rate=1.0,
+                    source='manual',
+                    description="ריבית על יתרה"
+                )
+                self.db.add(interest)
+                created += 1
+                cash_flow_types_created['interest'] += 1
+            
+            # Transfer in (from another account)
+            if len(self.relationship_manager.accounts) > 1:
+                for _ in range(random.randint(0, 2)):
+                    transfer_date = self.date_gen.generate_date('random')
+                    other_account = random.choice([a for a in self.relationship_manager.accounts if a.id != account.id])
+                    
+                    transfer_in = CashFlow(
+                        user_id=self.user_cache.id,
+                        trading_account_id=account.id,
+                        type='transfer_in',
+                        amount=round(random.uniform(5000, 15000), 2),
+                        date=transfer_date,
+                        currency_id=account.currency_id,
+                        usd_rate=1.0,
+                        source='manual',
+                        description=f"העברה מחשבון {other_account.name}"
+                    )
+                    self.db.add(transfer_in)
+                    created += 1
+                    cash_flow_types_created['transfer_in'] += 1
+            
+            # Transfer out (to another account)
+            if len(self.relationship_manager.accounts) > 1:
+                for _ in range(random.randint(0, 2)):
+                    transfer_date = self.date_gen.generate_date('random')
+                    other_account = random.choice([a for a in self.relationship_manager.accounts if a.id != account.id])
+                    
+                    transfer_out = CashFlow(
+                        user_id=self.user_cache.id,
+                        trading_account_id=account.id,
+                        type='transfer_out',
+                        amount=-round(random.uniform(5000, 15000), 2),
+                        date=transfer_date,
+                        currency_id=account.currency_id,
+                        usd_rate=1.0,
+                        source='manual',
+                        description=f"העברה לחשבון {other_account.name}"
+                    )
+                    self.db.add(transfer_out)
+                    created += 1
+                    cash_flow_types_created['transfer_out'] += 1
         
         self.created_count['cash_flows'] = created
+        
+        # Report cash flow types created
+        types_summary = ", ".join([f"{k}: {v}" for k, v in cash_flow_types_created.items() if v > 0])
         print(f"   ✅ נוצרו {created} תזרימי מזומן")
+        if self.verbose:
+            print(f"      - סוגים: {types_summary}")
     
     def _create_alerts(self) -> None:
         """יוצר התראות מרשימות ומפורטות"""

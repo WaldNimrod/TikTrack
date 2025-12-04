@@ -1,29 +1,25 @@
 /**
- * Widget Overlay Service - TikTrack
- * ==================================
+ * Widget Overlay Service - Simplified Version
+ * ===========================================
  *
- * Shared service for widget hover overlay functionality.
- * Used by widgets that need to display expandable details on hover.
- *
- * This service provides:
- * - Overlay positioning (RTL/LTR support)
- * - Hover event handling
- * - Overlay lifecycle management
- *
- * Documentation: See documentation/03-DEVELOPMENT/GUIDES/WIDGET_STANDARDS_SUMMARY.md
- *
- * Function Index:
- * - positionOverlay(item, details, options) - Position overlay relative to item
- * - setupOverlayHover(listElement, itemSelector, detailsSelector, options) - Setup hover handlers
+ * SIMPLE APPROACH:
+ * - Each li is the active area
+ * - mouseenter on li = open overlay
+ * - mouseleave from li (going outside) = close overlay
+ * - No gap bridges, no mousemove handlers, no complexity
  */
 
 ;(function widgetOverlayServiceFactory() {
   'use strict';
 
+  // Track active overlays for cleanup
+  const activeOverlays = new WeakMap();
+
   /**
-   * Calculate and position overlay using fixed positioning to extend beyond container
+   * Calculate and position overlay using Unified UI Positioning Service
+   * Falls back to manual positioning if Unified UI Positioning not available
    */
-  function positionOverlay(item, details, options = {}) {
+  async function positionOverlay(item, details, options = {}) {
     if (!item || !details) {
       return;
     }
@@ -32,10 +28,24 @@
       gap: options.gap || 8,
       minWidth: options.minWidth || 280,
       maxWidth: options.maxWidth || 400,
-      zIndex: options.zIndex || 9999,
+      zIndex: options.zIndex || 1050,
+      placement: options.placement || 'bottom-start',
       ...options
     };
 
+    // Use Unified UI Positioning Service if available
+    if (window.UnifiedUIPositioning && window.UnifiedUIPositioning.isAvailable()) {
+      return await window.UnifiedUIPositioning.positionElement(item, details, {
+        placement: config.placement,
+        gap: config.gap,
+        minWidth: config.minWidth,
+        maxWidth: config.maxWidth,
+        zIndex: config.zIndex,
+        strategy: 'fixed'
+      });
+    }
+
+    // Fallback to manual positioning (original logic)
     const itemRect = item.getBoundingClientRect();
     const isRTL = document.documentElement.dir === 'rtl' || 
                   getComputedStyle(document.body).direction === 'rtl';
@@ -49,10 +59,13 @@
       details.style.display = 'block';
     }
     
-    const overlayWidth = details.offsetWidth || config.minWidth;
+    // Force reflow to get actual dimensions
+    void details.offsetWidth;
+    
+    const overlayWidth = Math.max(details.offsetWidth || config.minWidth, config.minWidth);
     const overlayHeight = details.offsetHeight || 150;
     
-    // Position below item
+    // Position below item (viewport-relative)
     let top = itemRect.bottom + config.gap;
     let left = itemRect.left;
     let right = 'auto';
@@ -64,47 +77,73 @@
     }
     
     // Check if overlay goes beyond viewport bottom
-    if (top + overlayHeight > window.innerHeight) {
+    if (top + overlayHeight > window.innerHeight - config.gap) {
       // Position above item instead
       top = itemRect.top - overlayHeight - config.gap;
-      // If still doesn't fit, position at viewport top
-      if (top < 0) {
+      if (top < config.gap) {
         top = config.gap;
       }
     }
     
     // Check horizontal overflow
-    if (!isRTL && left + overlayWidth > window.innerWidth) {
-      left = window.innerWidth - overlayWidth - config.gap;
-      if (left < config.gap) left = config.gap;
-    } else if (isRTL && typeof right === 'number' && right + overlayWidth > window.innerWidth) {
-      right = window.innerWidth - overlayWidth - config.gap;
-      if (right < config.gap) right = config.gap;
+    if (!isRTL) {
+      if (left + overlayWidth > window.innerWidth - config.gap) {
+        left = window.innerWidth - overlayWidth - config.gap;
+      }
+      if (left < config.gap) {
+        left = config.gap;
+      }
+    } else {
+      if (typeof right === 'number') {
+        if (right + overlayWidth > window.innerWidth - config.gap) {
+          right = window.innerWidth - overlayWidth - config.gap;
+        }
+        if (right < config.gap) {
+          right = config.gap;
+        }
+      }
     }
     
     // Apply fixed positioning
     details.style.position = 'fixed';
     details.style.top = `${top}px`;
+    details.style.bottom = 'auto';
+    details.style.margin = '0';
+    details.style.transform = 'none';
+    
     if (isRTL) {
-      details.style.right = `${right}px`;
+      details.style.right = typeof right === 'number' ? `${right}px` : 'auto';
       details.style.left = 'auto';
     } else {
       details.style.left = `${left}px`;
       details.style.right = 'auto';
     }
+    
+    // Set width constraints
     details.style.width = `${overlayWidth}px`;
     details.style.maxWidth = `${config.maxWidth}px`;
     details.style.minWidth = `${config.minWidth}px`;
-    details.style.zIndex = config.zIndex;
+    
+    // Force reflow
+    void details.offsetHeight;
+    
+    // Use WidgetZIndexManager for dynamic z-index management
+    if (window.WidgetZIndexManager) {
+      const zIndex = window.WidgetZIndexManager.registerOverlay(details, item);
+      details.style.zIndex = zIndex;
+    } else {
+      details.style.zIndex = config.zIndex;
+    }
     
     if (!wasVisible) {
       details.style.visibility = '';
-      details.style.display = '';
+      details.style.opacity = '1';
     }
   }
 
   /**
-   * Setup hover handlers for widget items with overlay details
+   * Setup hover handlers - SIMPLE VERSION
+   * Each li is the active area, mouseenter/mouseleave handle everything
    */
   function setupOverlayHover(listElement, itemSelector, detailsSelector, options = {}) {
     if (!listElement) {
@@ -115,17 +154,59 @@
     const config = {
       hoverClass: options.hoverClass || 'is-hovered',
       transitionDuration: options.transitionDuration || 200,
+      closeDelay: options.closeDelay || 150, // Delay before closing overlay (ms)
+      gap: options.gap || 8,
+      minWidth: options.minWidth || 280,
+      maxWidth: options.maxWidth || 400,
+      zIndex: options.zIndex || 1050,
       ...options
     };
 
-    // Use event delegation for better performance
-    listElement.addEventListener('mouseenter', function(event) {
-      const item = event.target.closest(itemSelector);
-      if (!item) return;
+    // Store config for cleanup
+    const overlayConfig = {
+      listElement,
+      itemSelector,
+      detailsSelector,
+      config,
+      handlers: {},
+      closeTimeouts: new WeakMap() // Track close timeouts per item
+    };
+    
+    // Log overlay setup
+    if (window.TestWidgetsOverlayLogger) {
+      window.TestWidgetsOverlayLogger.logOverlaySetup(listElement, itemSelector, detailsSelector, config);
+    }
+
+    // SIMPLE mouse enter handler - only on li items
+    const handleMouseEnter = function(event) {
+      if (!event || !event.target) {
+        return;
+      }
+      
+      // Find the li item that contains the target (or is the target)
+      const item = event.target.closest ? event.target.closest(itemSelector) : null;
+      
+      if (!item) {
+        return;
+      }
 
       const details = item.querySelector(detailsSelector);
-      if (!details) return;
+      if (!details) {
+        return;
+      }
+      
+      // Log mouse event
+      if (window.TestWidgetsOverlayLogger) {
+        window.TestWidgetsOverlayLogger.logMouseEvent('mouseenter', event, item, details);
+      }
 
+      // Cancel any pending close timeout for this item
+      const existingTimeout = overlayConfig.closeTimeouts.get(item);
+      if (existingTimeout) {
+        clearTimeout(existingTimeout);
+        overlayConfig.closeTimeouts.delete(item);
+      }
+      
       // Mark item as hovered
       item.classList.add(config.hoverClass);
       
@@ -134,87 +215,233 @@
       details.style.visibility = 'visible';
       details.style.pointerEvents = 'auto';
       
-      // Position overlay using requestAnimationFrame to ensure DOM is ready
-      requestAnimationFrame(() => {
-        positionOverlay(item, details, config);
-        // Trigger opacity transition
-        setTimeout(() => {
-          if (item.classList.contains(config.hoverClass)) {
-            details.style.opacity = '1';
-            details.style.transform = 'translateY(0)';
-          }
-        }, 10);
+      // Position overlay - always recalculate position (item might have moved due to scroll)
+      // Use Unified UI Positioning Service if available, otherwise use manual positioning
+      requestAnimationFrame(async () => {
+        await positionOverlay(item, details, config);
+        
+        // Auto-inspect positioning if debugger is available
+        if (window.WidgetOverlayDebugger) {
+          window.WidgetOverlayDebugger.inspectOverlay(item, details);
+        }
+        
+        if (window.TestWidgetsOverlayLogger) {
+          window.TestWidgetsOverlayLogger.logElementPosition(item, 'Item after positioning');
+          window.TestWidgetsOverlayLogger.logElementPosition(details, 'Overlay after positioning');
+        }
       });
       
       // Handle hover on overlay itself to keep it open
       if (!details.dataset.hoverListenersAttached) {
-        details.addEventListener('mouseenter', () => {
+        const handleOverlayEnter = () => {
           item.classList.add(config.hoverClass);
           details.style.opacity = '1';
-        });
+        };
         
-        details.addEventListener('mouseleave', (e) => {
+        const handleOverlayLeave = (e) => {
           const relatedTarget = e.relatedTarget;
-          if (!relatedTarget || !item.contains(relatedTarget)) {
+          // Only close if mouse is going outside (not to another item)
+          if (!relatedTarget || (!item.contains(relatedTarget) && !relatedTarget.closest(itemSelector))) {
             item.classList.remove(config.hoverClass);
             details.style.opacity = '0';
-            // Reset positioning after transition
             setTimeout(() => {
               if (!item.classList.contains(config.hoverClass)) {
+                if (window.WidgetZIndexManager) {
+                  window.WidgetZIndexManager.unregisterOverlay(details);
+                }
+                
+                details.style.display = 'none';
                 details.style.position = '';
                 details.style.top = '';
                 details.style.left = '';
                 details.style.right = '';
                 details.style.width = '';
                 details.style.zIndex = '';
+                details.style.visibility = '';
+                details.style.opacity = '';
               }
             }, config.transitionDuration);
           }
-        });
+        };
+        
+        details.addEventListener('mouseenter', handleOverlayEnter);
+        details.addEventListener('mouseleave', handleOverlayLeave);
         
         details.dataset.hoverListenersAttached = 'true';
       }
-    }, true); // Use capture phase
+    };
 
-    listElement.addEventListener('mouseleave', function(event) {
-      const item = event.target.closest(itemSelector);
-      if (!item) return;
+    // SIMPLE mouse leave handler - only when leaving li item (going outside)
+    const handleMouseLeave = function(event) {
+      if (!event || !event.target) {
+        return;
+      }
+      
+      // Find the li item that contains the target (or is the target)
+      const item = event.target.closest ? event.target.closest(itemSelector) : null;
+      
+      if (!item) {
+        return;
+      }
 
       const relatedTarget = event.relatedTarget;
       const details = item.querySelector(detailsSelector);
       
-      // Check if mouse is moving to overlay
+      // Check if mouse is moving to overlay (keep it open)
       if (details && relatedTarget && details.contains(relatedTarget)) {
-        return; // Keep overlay visible
+        return;
       }
       
-      item.classList.remove(config.hoverClass);
+      // Check if mouse is moving to another item (don't close)
+      if (relatedTarget && relatedTarget.closest && relatedTarget.closest(itemSelector)) {
+        return;
+      }
       
-      // Hide overlay
-      if (details) {
-        details.style.opacity = '0';
-        // Reset positioning after transition
-        setTimeout(() => {
-          if (!item.classList.contains(config.hoverClass)) {
-            details.style.position = '';
-            details.style.top = '';
-            details.style.left = '';
-            details.style.right = '';
-            details.style.width = '';
-            details.style.zIndex = '';
+      // Mouse is leaving the item - going outside
+      // Add delay before closing (default 150ms)
+      const closeDelay = config.closeDelay || 150;
+      
+      // Cancel any existing timeout for this item
+      const existingTimeout = overlayConfig.closeTimeouts.get(item);
+      if (existingTimeout) {
+        clearTimeout(existingTimeout);
+      }
+      
+      // Set new timeout for closing
+      const closeTimeout = setTimeout(() => {
+        overlayConfig.closeTimeouts.delete(item);
+        
+        // Double-check that mouse is still not over item or overlay
+        if (!item.classList.contains(config.hoverClass)) {
+          item.classList.remove(config.hoverClass);
+          
+          // Hide overlay
+          if (details) {
+            details.style.opacity = '0';
+            setTimeout(() => {
+              if (!item.classList.contains(config.hoverClass)) {
+                if (window.WidgetZIndexManager) {
+                  window.WidgetZIndexManager.unregisterOverlay(details);
+                }
+                
+                details.style.display = 'none';
+                details.style.position = '';
+                details.style.top = '';
+                details.style.left = '';
+                details.style.right = '';
+                details.style.width = '';
+                details.style.zIndex = '';
+                details.style.visibility = '';
+                details.style.opacity = '';
+              }
+            }, config.transitionDuration);
           }
-        }, config.transitionDuration);
+        }
+      }, closeDelay);
+      
+      overlayConfig.closeTimeouts.set(item, closeTimeout);
+    };
+
+    // Store handlers
+    overlayConfig.handlers.mouseenter = handleMouseEnter;
+    overlayConfig.handlers.mouseleave = handleMouseLeave;
+
+    // Simple event delegation - listen on list, react to events on li items
+    listElement.addEventListener('mouseenter', handleMouseEnter, true);
+    listElement.addEventListener('mouseleave', handleMouseLeave, true);
+
+    // Store for cleanup
+    activeOverlays.set(listElement, overlayConfig);
+
+    window.Logger?.info?.('WidgetOverlayService: Hover handlers attached (simple mode)', {
+      listElement: listElement.id || listElement.className,
+      itemSelector,
+      detailsSelector,
+      page: 'widget-overlay-service'
+    });
+  }
+
+  /**
+   * Update overlay position (for scroll/resize events)
+   */
+  function updatePosition(item, details, options = {}) {
+    if (!item || !details) {
+      return;
+    }
+    
+    if (details.style.display === 'none' || details.style.visibility === 'hidden') {
+      return;
+    }
+    
+    positionOverlay(item, details, options);
+  }
+
+  /**
+   * Destroy overlay handlers and cleanup
+   */
+  function destroy(listElement) {
+    if (!listElement) {
+      return;
+    }
+
+    const overlayConfig = activeOverlays.get(listElement);
+    if (!overlayConfig) {
+      return;
+    }
+    
+    // Remove event listeners
+    if (overlayConfig.handlers.mouseenter) {
+      listElement.removeEventListener('mouseenter', overlayConfig.handlers.mouseenter, true);
+    }
+    if (overlayConfig.handlers.mouseleave) {
+      listElement.removeEventListener('mouseleave', overlayConfig.handlers.mouseleave, true);
+    }
+
+    // Clear all pending close timeouts
+    if (overlayConfig.closeTimeouts) {
+      const items = listElement.querySelectorAll(overlayConfig.itemSelector);
+      items.forEach(item => {
+        const timeout = overlayConfig.closeTimeouts.get(item);
+        if (timeout) {
+          clearTimeout(timeout);
+        }
+      });
+    }
+    
+    // Cleanup all overlay listeners
+    const items = listElement.querySelectorAll(overlayConfig.itemSelector);
+    items.forEach(item => {
+      const details = item.querySelector(overlayConfig.detailsSelector);
+      if (details && details.dataset.hoverListenersAttached === 'true') {
+        // Remove overlay event listeners
+        const overlayEnter = details.onmouseenter;
+        const overlayLeave = details.onmouseleave;
+        if (overlayEnter) {
+          details.removeEventListener('mouseenter', overlayEnter);
+        }
+        if (overlayLeave) {
+          details.removeEventListener('mouseleave', overlayLeave);
+        }
+        delete details.dataset.hoverListenersAttached;
       }
-    }, true); // Use capture phase
+    });
+
+    activeOverlays.delete(listElement);
+
+    window.Logger?.info?.('WidgetOverlayService: Handlers removed', {
+      listElement: listElement.id || listElement.className,
+      page: 'widget-overlay-service'
+    });
   }
 
   // Export public API
   window.WidgetOverlayService = {
     positionOverlay,
-    setupOverlayHover
+    setupOverlayHover,
+    updatePosition,
+    destroy
   };
 
-  window.Logger?.info?.('✅ Widget Overlay Service loaded', { page: 'widget-overlay-service' });
+  window.Logger?.info?.('✅ Widget Overlay Service loaded (simple mode)', { page: 'widget-overlay-service' });
 })();
-
 

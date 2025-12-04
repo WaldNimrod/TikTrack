@@ -930,15 +930,76 @@ class TickerService:
         return updated_count
     
     @staticmethod
-    def update_ticker_status_auto(db: Session, ticker_id: int) -> bool:
+    def update_user_ticker_status(db: Session, user_id: int, ticker_id: int) -> bool:
         """
-        Update ticker status automatically based on linked trades and trade plans
+        Update user-ticker association status based on user's trades/plans
         
         Status logic:
-        1. If cancelled - ignore (user manually cancelled)
-        2. If not cancelled - check for open trades or trade plans
+        1. If manually cancelled - don't update (user manually cancelled)
+        2. If not cancelled - check for open trades or trade plans for this user
            - If has open trades/plans -> status = 'open'
            - If no open trades/plans -> status = 'closed'
+        
+        Args:
+            db: Database session
+            user_id: User ID
+            ticker_id: Ticker ID
+            
+        Returns:
+            bool: True if updated successfully, False if association not found
+            
+        Example:
+            >>> TickerService.update_user_ticker_status(db_session, 1, 5)
+            True
+        """
+        from models.user_ticker import UserTicker
+        from models.trade import Trade
+        from models.trade_plan import TradePlan
+        
+        user_ticker = db.query(UserTicker).filter(
+            UserTicker.user_id == user_id,
+            UserTicker.ticker_id == ticker_id
+        ).first()
+        
+        if not user_ticker:
+            return False
+        
+        # Don't update if manually cancelled
+        if user_ticker.status == 'cancelled':
+            return True
+        
+        # Check for open trades for this user
+        open_trades = db.query(Trade).filter(
+            Trade.ticker_id == ticker_id,
+            Trade.user_id == user_id,
+            Trade.status == 'open'
+        ).count()
+        
+        # Check for open trade plans for this user
+        open_plans = db.query(TradePlan).filter(
+            TradePlan.ticker_id == ticker_id,
+            TradePlan.user_id == user_id,
+            TradePlan.status == 'open'
+        ).count()
+        
+        new_status = 'open' if (open_trades > 0 or open_plans > 0) else 'closed'
+        
+        if user_ticker.status != new_status:
+            user_ticker.status = new_status
+            db.commit()
+        
+        return True
+    
+    @staticmethod
+    def update_ticker_status_auto(db: Session, ticker_id: int) -> bool:
+        """
+        Update ticker overall status based on all user associations
+        
+        Status logic:
+        1. If cancelled - don't update (user manually cancelled)
+        2. Check all user-ticker associations for this ticker
+           - If any user has status = 'open' -> ticker status = 'open'
+           - If no user has status = 'open' -> ticker status = 'closed'
         
         Args:
             db (Session): Database connection
@@ -951,35 +1012,24 @@ class TickerService:
             >>> TickerService.update_ticker_status_auto(db_session, 1)
             True
         """
-        from models.trade import Trade
-        from models.trade_plan import TradePlan
+        from models.user_ticker import UserTicker
         
         # Check if ticker exists
         ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
         if not ticker:
             return False
         
-        # If ticker is cancelled, don't update status (user manually cancelled)
+        # If ticker is cancelled, don't update
         if ticker.status == 'cancelled':
             return True
         
-        # Check if there are open trades
-        open_trades_count = db.query(Trade).filter(
-            Trade.ticker_id == ticker_id,
-            Trade.status == 'open'
+        # Check if any user has this ticker with status 'open'
+        open_associations = db.query(UserTicker).filter(
+            UserTicker.ticker_id == ticker_id,
+            UserTicker.status == 'open'
         ).count()
         
-        # Check if there are open trade plans
-        open_plans_count = db.query(TradePlan).filter(
-            TradePlan.ticker_id == ticker_id,
-            TradePlan.status == 'open'
-        ).count()
-        
-        # Determine new status
-        if open_trades_count > 0 or open_plans_count > 0:
-            new_status = 'open'
-        else:
-            new_status = 'closed'
+        new_status = 'open' if open_associations > 0 else 'closed'
         
         # Update status if different
         if ticker.status != new_status:
@@ -1106,20 +1156,39 @@ class TickerService:
     def get_user_tickers(db: Session, user_id: int) -> List[Ticker]:
         """
         Get all tickers for a specific user (through user_tickers junction table)
+        Includes custom fields (name_custom, type_custom, status) from user_tickers
+        
+        Optimized to avoid N+1 queries by loading associations in a single query.
         
         Args:
             db: Database session
             user_id: User ID
             
         Returns:
-            List[Ticker]: List of tickers for the user
+            List[Ticker]: List of tickers for the user with custom fields attached
         """
         from models.user_ticker import UserTicker
-        return db.query(Ticker).join(
-            UserTicker, Ticker.id == UserTicker.ticker_id
-        ).filter(
+        from sqlalchemy.orm import joinedload
+        
+        # Load tickers with user_ticker associations in a single query
+        user_tickers = db.query(UserTicker).filter(
             UserTicker.user_id == user_id
+        ).options(
+            joinedload(UserTicker.ticker)
         ).all()
+        
+        # Extract tickers and attach custom fields
+        tickers = []
+        for user_ticker in user_tickers:
+            if user_ticker.ticker:
+                ticker = user_ticker.ticker
+                # Attach custom fields as dynamic attributes
+                ticker.name_custom = user_ticker.name_custom
+                ticker.type_custom = user_ticker.type_custom
+                ticker.user_ticker_status = user_ticker.status
+                tickers.append(ticker)
+        
+        return tickers
     
     @staticmethod
     def get_all_tickers(db: Session) -> List[Ticker]:

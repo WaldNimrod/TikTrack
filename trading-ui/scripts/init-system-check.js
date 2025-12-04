@@ -69,13 +69,19 @@ class InitSystemCheck {
         // יצירת כפתור הבדיקה
         const monitoringButton = document.createElement('li');
         monitoringButton.className = 'tiktrack-nav-item';
-        monitoringButton.innerHTML = `
+        const buttonHTML = `
             <a href="#" class="tiktrack-nav-link" id="initSystemCheckBtn" 
                title="ניטור מערכת איתחול"
                data-onclick="initSystemCheck?.runPageCheck(event)">
                 <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">🔍</span>
             </a>
         `;
+        monitoringButton.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(buttonHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          monitoringButton.appendChild(node.cloneNode(true));
+        });
 
         // הוספת הכפתור בסוף הרשימה
         navList.appendChild(monitoringButton);

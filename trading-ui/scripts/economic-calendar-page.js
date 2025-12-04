@@ -878,7 +878,12 @@
             </table>
         `;
 
-        container.innerHTML = tableHTML;
+        container.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(tableHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          container.appendChild(node.cloneNode(true));
+        });
         
         // Initialize icons in the rendered table (async, don't block)
         initializeIcons().catch(() => {

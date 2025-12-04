@@ -9,6 +9,7 @@ from config.database import get_db
 from services.ai_analysis_service import AIAnalysisService, PromptTemplateService
 from services.llm_providers.llm_provider_manager import LLMProviderManager
 from routes.api.base_entity_utils import BaseEntityUtils
+from routes.api.base_entity_decorators import require_authentication
 from services.date_normalization_service import DateNormalizationService
 import logging
 from typing import Dict, Any
@@ -22,34 +23,21 @@ ai_analysis_service = AIAnalysisService()
 provider_manager = LLMProviderManager()
 
 
-def get_current_user_id() -> int:
-    """Get current user ID from session"""
-    # Try session first
-    user_id = session.get('user_id')
-    if user_id:
-        logger.debug(f"get_current_user_id: Found user_id={user_id} in session")
-        return user_id
-    
-    # Try g.user_id
-    user_id = getattr(g, 'user_id', None)
-    if user_id:
-        logger.debug(f"get_current_user_id: Found user_id={user_id} in g")
-        return user_id
-    
-    # Fallback to default user (development mode)
-    user_id = 1
-    logger.debug(f"get_current_user_id: No user_id in session or g, using default user_id={user_id}")
-    return user_id
-
-
 @ai_analysis_bp.route('/generate', methods=['POST'])
+@require_authentication()
 def generate_analysis():
     """Create new AI analysis"""
     db: Session = next(get_db())
     normalizer = None
     
     try:
-        user_id = get_current_user_id()
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
         data = request.get_json() or {}
         
         template_id = data.get('template_id')
@@ -136,13 +124,20 @@ def get_templates():
 
 
 @ai_analysis_bp.route('/history', methods=['GET'])
+@require_authentication()
 def get_history():
     """Get analysis history"""
     db: Session = next(get_db())
     normalizer = None
     
     try:
-        user_id = get_current_user_id()
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
         normalizer = BaseEntityUtils.get_request_normalizer(request, fallback_user_id=user_id)
         
         limit = request.args.get('limit', type=int, default=50)
@@ -185,13 +180,20 @@ def get_history():
 
 
 @ai_analysis_bp.route('/history/<int:request_id>', methods=['GET'])
+@require_authentication()
 def get_analysis_by_id(request_id: int):
     """Get specific analysis by ID"""
     db: Session = next(get_db())
     normalizer = None
     
     try:
-        user_id = get_current_user_id()
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
         normalizer = BaseEntityUtils.get_request_normalizer(request, fallback_user_id=user_id)
         
         request_obj = ai_analysis_service.get_analysis_by_id(
@@ -226,13 +228,20 @@ def get_analysis_by_id(request_id: int):
 
 
 @ai_analysis_bp.route('/history/<int:request_id>/availability', methods=['GET'])
+@require_authentication()
 def check_analysis_availability(request_id: int):
     """Check availability of analysis response (cache and notes)"""
     db: Session = next(get_db())
     normalizer = None
     
     try:
-        user_id = get_current_user_id()
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
         normalizer = BaseEntityUtils.get_request_normalizer(request, fallback_user_id=user_id)
         
         # Get analysis
@@ -304,12 +313,19 @@ def check_analysis_availability(request_id: int):
 
 
 @ai_analysis_bp.route('/history/availability/batch', methods=['POST'])
+@require_authentication()
 def check_analysis_availability_batch():
     """Check availability for multiple analyses (cache and notes)"""
     db: Session = next(get_db())
     
     try:
-        user_id = get_current_user_id()
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
         logger.debug(f"Checking availability batch for user_id={user_id}")
         
         data = request.get_json() or {}
@@ -474,13 +490,21 @@ def check_analysis_availability_batch():
 
 
 @ai_analysis_bp.route('/delete-all', methods=['DELETE'])
+@require_authentication()
 def delete_all_analyses():
     """Delete all AI analysis records - Admin/dev utility"""
     db: Session = next(get_db())
     
     try:
         from models.ai_analysis import AIAnalysisRequest
-        user_id = get_current_user_id()
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required"},
+                "version": "1.0"
+            }), 401
         
         logger.info("=== DELETE ALL AI ANALYSES START ===")
         logger.info(f"Deleting all analyses for user_id={user_id}")
@@ -534,12 +558,19 @@ def delete_all_analyses():
 
 
 @ai_analysis_bp.route('/llm-provider', methods=['GET', 'POST'])
+@require_authentication()
 def manage_llm_provider():
     """Get or update LLM provider settings"""
     db: Session = next(get_db())
     
     try:
-        user_id = get_current_user_id()
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
         
         if request.method == 'GET':
             # Get settings

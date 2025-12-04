@@ -60,26 +60,30 @@
  * 2. Check console for "✅ MyNewScript loaded successfully"
  * 3. Run monitoring system to verify no errors
  *
- * 📋 PACKAGE STRUCTURE (Updated October 2025):
+ * 📋 PACKAGE STRUCTURE (Updated December 2025):
  * ============================================
  *
- * 1. BASE (13 scripts) - Required for all pages
- * 2. SERVICES (6 scripts) - General services
- * 3. UI-ADVANCED (3 scripts) - Advanced interface
- * 4. CRUD (6 scripts) - Pages with tables
- * 5. PREFERENCES (3 scripts) - Preferences
+ * 1. BASE (28+ scripts) - Required for all pages
+ *    - Includes: Bootstrap JS, Floating UI (optional), core systems
+ * 2. SERVICES (25+ scripts) - General services
+ *    - Includes: UnifiedUIPositioningService (uses Floating UI with fallback)
+ * 3. UI-ADVANCED (5 scripts) - Advanced interface
+ * 4. CRUD (3 scripts) - Pages with tables
+ * 5. PREFERENCES (15 scripts) - Preferences
  * 6. VALIDATION (1 script) - Validation
- * 7. EXTERNAL-DATA (4 scripts) - External data
- * 8. LOGS (4 scripts) - Logs
+ * 7. EXTERNAL-DATA (3 scripts) - External data
+ * 8. LOGS (3 scripts) - Logs
  * 9. CACHE (2 scripts) - Cache
- * 10. ENTITY-SERVICES (9 scripts) - Entity services
- * 11. HELPER (4 scripts) - Helper
- * 12. MANAGEMENT (5 scripts) - Management
- * 13. INIT (3 scripts) - Initialization
+ * 10. ENTITY-SERVICES (15+ scripts) - Entity services
+ * 11. HELPER (5 scripts) - Helper
+ * 12. MANAGEMENT (2 scripts) - Management
+ * 13. INIT (8 scripts) - Initialization
+ * 14. DASHBOARD-WIDGETS (8 scripts) - Dashboard widgets
+ * 15. MODULES (25+ scripts) - Modules and modals
  *
- * @version 1.5.0
+ * @version 1.6.0
  * @created October 2025
- * @updated November 2025
+ * @updated December 2025
  * @author TikTrack Development Team
  */
 
@@ -250,6 +254,14 @@ const PACKAGE_MANIFEST = {
         external: true
       },
       {
+        file: 'https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js',
+        globalCheck: 'window.computePosition',
+        description: 'Floating UI DOM - Smart positioning library (for overlay/tooltip positioning)',
+        required: false, // Optional - UnifiedUIPositioningService has fallback
+        loadOrder: 16.5,
+        external: true
+      },
+      {
         file: 'event-handler-manager.js',
         globalCheck: 'window.EventHandlerManager',
         description: 'Central event management system',
@@ -357,8 +369,8 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'services/executions-data.js',
-        globalCheck: 'window.loadExecutionsData',
-        description: 'Executions data service',
+        globalCheck: 'window.ExecutionsData',
+        description: 'Executions data service (API + Cache + CRUD)',
         required: false,
         loadOrder: 5.2
       },
@@ -405,11 +417,32 @@ const PACKAGE_MANIFEST = {
         loadOrder: 8.1
       },
       {
+        file: 'services/widget-z-index-manager.js',
+        globalCheck: 'window.WidgetZIndexManager',
+        description: 'Central z-index manager for widget overlays',
+        required: false,
+        loadOrder: 8.1
+      },
+      {
+        file: 'services/unified-ui-positioning-service.js',
+        globalCheck: 'window.UnifiedUIPositioning',
+        description: 'Unified UI positioning service using Floating UI (with fallback)',
+        required: false,
+        loadOrder: 8.15
+      },
+      {
         file: 'services/widget-overlay-service.js',
         globalCheck: 'window.WidgetOverlayService',
         description: 'Central widget overlay service for hover details',
         required: false,
         loadOrder: 8.2
+      },
+      {
+        file: 'services/widget-overlay-debugger.js',
+        globalCheck: 'window.WidgetOverlayDebugger',
+        description: 'Visual debugging tool for widget overlay positioning issues',
+        required: false,
+        loadOrder: 8.3
       },
       {
         file: 'services/table-sort-value-adapter.js',
@@ -735,7 +768,7 @@ const PACKAGE_MANIFEST = {
         file: 'modal-configs/notes-config.js',
         globalCheck: 'window.notesModalConfig',
         description: 'Notes modal configuration',
-        required: false, // Not required for tag-management page
+        required: false, // Not required for tag-management page. Required for ai-analysis page (loaded via ai-analysis package)
         loadOrder: 22
       },
       {
@@ -1820,6 +1853,13 @@ const PACKAGE_MANIFEST = {
         description: 'AI analysis export service',
         required: true,
         loadOrder: 5
+      },
+      {
+        file: 'modal-configs/notes-config.js',
+        globalCheck: 'window.notesModalConfig',
+        description: 'Notes modal configuration (required for Save as Note feature)',
+        required: true,
+        loadOrder: 6
       }
     ],
     estimatedSize: '~80KB',
@@ -1937,10 +1977,13 @@ const PACKAGE_MANIFEST = {
       // - PendingActionsCacheService (shared cache management)
       {
         file: 'widgets/unified-pending-actions-widget.js',
-        globalCheck: 'window.UnifiedPendingActionsWidget',
-        description: 'Unified widget for pending assignments and creations',
-        required: true,
-        loadOrder: 4.5
+      },
+      {
+        file: 'widgets/widget-monitor.js',
+        globalCheck: 'window.WidgetMonitor',
+        description: 'Widget monitoring and debugging system',
+        required: false,
+        loadOrder: 99 // Load after all widgets
       },
       {
         file: 'widgets/tag-widget.js',

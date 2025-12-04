@@ -278,12 +278,15 @@ function updateSummaryStats(data, currencySymbol) {
             const htmlContent = window.FieldRendererService?.renderAmount
                 ? window.FieldRendererService.renderAmount(numericBalance, currencySymbol, 2, true)
                 : '<span class="text-muted">לא זמין</span>';
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = htmlContent;
             balanceEl.textContent = '';
-            while (tempDiv.firstChild) {
-                balanceEl.appendChild(tempDiv.firstChild);
-            }
+            // Convert HTML string to DOM elements safely
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            const fragment = document.createDocumentFragment();
+            Array.from(doc.body.childNodes).forEach(node => {
+                fragment.appendChild(node.cloneNode(true));
+            });
+            balanceEl.appendChild(fragment);
         } else {
             balanceEl.textContent = '';
             const span = document.createElement('span');
@@ -302,12 +305,15 @@ function updateSummaryStats(data, currencySymbol) {
             const htmlContent = window.FieldRendererService?.renderAmount
                 ? window.FieldRendererService.renderAmount(numericPnL, currencySymbol, 2, true)
                 : '<span class="text-muted">לא זמין</span>';
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = htmlContent;
             totalPnLEl.textContent = '';
-            while (tempDiv.firstChild) {
-                totalPnLEl.appendChild(tempDiv.firstChild);
-            }
+            // Convert HTML string to DOM elements safely
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            const fragment = document.createDocumentFragment();
+            Array.from(doc.body.childNodes).forEach(node => {
+                fragment.appendChild(node.cloneNode(true));
+            });
+            totalPnLEl.appendChild(fragment);
         } else {
             totalPnLEl.textContent = '';
             const span = document.createElement('span');
@@ -457,12 +463,15 @@ function updateRecentTradePlans(tradePlans = [], currencySymbol) {
             const numericValue = toNumber(value);
             if (Number.isFinite(numericValue) && window.FieldRendererService?.renderAmount) {
                 const htmlContent = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, true);
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = htmlContent;
                 amountWrapper.textContent = '';
-                while (tempDiv.firstChild) {
-                    amountWrapper.appendChild(tempDiv.firstChild);
-                }
+                // Convert HTML string to DOM elements safely
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+                const fragment = document.createDocumentFragment();
+                Array.from(doc.body.childNodes).forEach(node => {
+                    fragment.appendChild(node.cloneNode(true));
+                });
+                amountWrapper.appendChild(fragment);
             } else {
                 amountWrapper.textContent = 'לא זמין';
             }
@@ -554,11 +563,14 @@ function updateRecentTrades(trades = [], currencySymbol) {
             const sideHtml = window.FieldRendererService.renderSide(side);
             if (sideHtml) {
                 const sideSpan = document.createElement('span');
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = sideHtml;
-                while (tempDiv.firstChild) {
-                    sideSpan.appendChild(tempDiv.firstChild);
-                }
+                // Convert HTML string to DOM elements safely
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(sideHtml, 'text/html');
+                const fragment = document.createDocumentFragment();
+                Array.from(doc.body.childNodes).forEach(node => {
+                    fragment.appendChild(node.cloneNode(true));
+                });
+                sideSpan.appendChild(fragment);
                 metaRow.appendChild(sideSpan);
             }
         }
@@ -588,12 +600,15 @@ function updateRecentTrades(trades = [], currencySymbol) {
             const numericValue = toNumber(value);
             if (Number.isFinite(numericValue) && window.FieldRendererService?.renderAmount) {
                 const htmlContent = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, true);
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = htmlContent;
                 amountWrapper.textContent = '';
-                while (tempDiv.firstChild) {
-                    amountWrapper.appendChild(tempDiv.firstChild);
-                }
+                // Convert HTML string to DOM elements safely
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+                const fragment = document.createDocumentFragment();
+                Array.from(doc.body.childNodes).forEach(node => {
+                    fragment.appendChild(node.cloneNode(true));
+                });
+                amountWrapper.appendChild(fragment);
             } else {
                 amountWrapper.textContent = 'לא זמין';
             }
@@ -659,11 +674,14 @@ function updateActiveAlerts(alerts = []) {
             const statusHtml = window.FieldRendererService?.renderStatus?.(alert.status, 'alert');
             const statusSpan = document.createElement('span');
             if (statusHtml && statusHtml.includes('<')) {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = statusHtml;
-                while (tempDiv.firstChild) {
-                    statusSpan.appendChild(tempDiv.firstChild);
-                }
+                // Convert HTML string to DOM elements safely
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(statusHtml, 'text/html');
+                const fragment = document.createDocumentFragment();
+                Array.from(doc.body.childNodes).forEach(node => {
+                    fragment.appendChild(node.cloneNode(true));
+                });
+                statusSpan.appendChild(fragment);
             } else {
                 statusSpan.textContent = statusHtml || alert.status;
             }
@@ -674,11 +692,14 @@ function updateActiveAlerts(alerts = []) {
             const priorityHtml = window.FieldRendererService?.renderPriority?.(alert.priority);
             const prioritySpan = document.createElement('span');
             if (priorityHtml && priorityHtml.includes('<')) {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = priorityHtml;
-                while (tempDiv.firstChild) {
-                    prioritySpan.appendChild(tempDiv.firstChild);
-                }
+                // Convert HTML string to DOM elements safely
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(priorityHtml, 'text/html');
+                const fragment = document.createDocumentFragment();
+                Array.from(doc.body.childNodes).forEach(node => {
+                    fragment.appendChild(node.cloneNode(true));
+                });
+                prioritySpan.appendChild(fragment);
             } else {
                 prioritySpan.textContent = alert.priority;
             }
@@ -783,20 +804,26 @@ function updatePortfolioSummary({ accounts = [], trades = [], cashFlows = [] }, 
     
     const span2 = document.createElement('span');
     const totalValueHtml = renderAmountHelper(totalValue);
-    const tempDiv2 = document.createElement('div');
-    tempDiv2.innerHTML = `שווי כולל: ${totalValueHtml}`;
-    while (tempDiv2.firstChild) {
-        span2.appendChild(tempDiv2.firstChild);
-    }
+    // Convert HTML string to DOM elements safely
+    const parser2 = new DOMParser();
+    const doc2 = parser2.parseFromString(`שווי כולל: ${totalValueHtml}`, 'text/html');
+    const fragment2 = document.createDocumentFragment();
+    Array.from(doc2.body.childNodes).forEach(node => {
+        fragment2.appendChild(node.cloneNode(true));
+    });
+    span2.appendChild(fragment2);
     wrapper.appendChild(span2);
     
     const span3 = document.createElement('span');
     const avgValueHtml = renderAmountHelper(avgValue);
-    const tempDiv3 = document.createElement('div');
-    tempDiv3.innerHTML = `שווי ממוצע לחשבון: ${avgValueHtml}`;
-    while (tempDiv3.firstChild) {
-        span3.appendChild(tempDiv3.firstChild);
-    }
+    // Convert HTML string to DOM elements safely
+    const parser3 = new DOMParser();
+    const doc3 = parser3.parseFromString(`שווי ממוצע לחשבון: ${avgValueHtml}`, 'text/html');
+    const fragment3 = document.createDocumentFragment();
+    Array.from(doc3.body.childNodes).forEach(node => {
+        fragment3.appendChild(node.cloneNode(true));
+    });
+    span3.appendChild(fragment3);
     wrapper.appendChild(span3);
     
     const span4 = document.createElement('span');
@@ -805,11 +832,14 @@ function updatePortfolioSummary({ accounts = [], trades = [], cashFlows = [] }, 
     
     const span5 = document.createElement('span');
     const pnlHtml = renderAmountHelper(pnl);
-    const tempDiv5 = document.createElement('div');
-    tempDiv5.innerHTML = `P/L כולל: ${pnlHtml}`;
-    while (tempDiv5.firstChild) {
-        span5.appendChild(tempDiv5.firstChild);
-    }
+    // Convert HTML string to DOM elements safely
+    const parser5 = new DOMParser();
+    const doc5 = parser5.parseFromString(`P/L כולל: ${pnlHtml}`, 'text/html');
+    const fragment5 = document.createDocumentFragment();
+    Array.from(doc5.body.childNodes).forEach(node => {
+        fragment5.appendChild(node.cloneNode(true));
+    });
+    span5.appendChild(fragment5);
     wrapper.appendChild(span5);
     
     container.appendChild(wrapper);
@@ -1430,12 +1460,13 @@ async function replaceIconsWithIconSystem() {
                 });
                 
                 // Replace img with rendered icon
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = iconHTML;
-                const newIcon = tempDiv.firstElementChild;
+                // Convert HTML string to DOM elements safely
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(iconHTML, 'text/html');
+                const newIcon = doc.body.firstElementChild;
                 
                 if (newIcon) {
-                    img.parentNode.replaceChild(newIcon, img);
+                    img.parentNode.replaceChild(newIcon.cloneNode(true), img);
                 }
             } catch (error) {
                 if (window.Logger) {

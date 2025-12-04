@@ -15,6 +15,122 @@
 let authToken = null;
 let currentUser = null;
 
+// Setup storage event listener for multi-tab logout/login sync
+if (typeof window.addEventListener === 'function') {
+  window.addEventListener('storage', async (event) => {
+    // Check if it's our auth event (logout/login)
+    if (event.key === 'tiktrack_auth_event' && event.newValue) {
+      try {
+        const authEvent = JSON.parse(event.newValue);
+        if (authEvent.type === 'logout') {
+          // Logout event from another tab - clear local state and redirect
+          console.log('🔔 Logout event received from another tab');
+          
+          // Clear local state
+          authToken = null;
+          currentUser = null;
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('currentUser');
+          localStorage.removeItem('savedUsername');
+          localStorage.removeItem('savedPassword');
+          localStorage.removeItem('rememberCredentials');
+          
+          // Clear sessionStorage
+          try {
+            sessionStorage.removeItem('redirectAfterLogin');
+            const sessionKeys = Object.keys(sessionStorage);
+            sessionKeys.forEach(key => {
+              if (key.startsWith('tiktrack_') || key.includes('auth') || key.includes('user')) {
+                sessionStorage.removeItem(key);
+              }
+            });
+          } catch (error) {
+            console.warn('Error clearing sessionStorage during logout from other tab:', error);
+          }
+          
+          // Clear all cache layers
+          try {
+            if (window.UnifiedCacheManager?.clearAll) {
+              await window.UnifiedCacheManager.clearAll();
+            }
+            if (window.CacheSyncManager?.clearAll) {
+              await window.CacheSyncManager.clearAll();
+            }
+            // Clear IndexedDB cache databases
+            if (window.indexedDB && window.indexedDB.databases) {
+              const databases = await window.indexedDB.databases();
+              for (const db of databases) {
+                if (db.name && db.name.includes('TikTrack') && 
+                    (db.name.includes('cache') || db.name === 'unified-cache' || db.name === 'tiktrack-cache')) {
+                  const deleteReq = window.indexedDB.deleteDatabase(db.name);
+                  deleteReq.onsuccess = () => console.log(`Cleared IndexedDB: ${db.name}`);
+                }
+              }
+            }
+          } catch (error) {
+            console.warn('Error clearing cache during logout from other tab:', error);
+          }
+          
+          // Clear dashboard data state
+          if (window.dashboardDataState) {
+            window.dashboardDataState.data = { trades: [], alerts: [], accounts: [], cashFlows: [] };
+            window.dashboardDataState.lastLoadedAt = null;
+          }
+          
+          // Update header display
+          if (window.headerSystem?.updateUserDisplay) {
+            window.headerSystem.updateUserDisplay();
+          }
+          
+          // Dispatch logout event for current tab
+          window.dispatchEvent(new CustomEvent('logout:success'));
+          window.dispatchEvent(new CustomEvent('user:logged-out'));
+          
+          // Redirect to login if not already there
+          if (!window.location.pathname.includes('login.html') && 
+              !window.location.pathname.includes('register.html')) {
+            window.location.href = 'login.html';
+          }
+        } else if (authEvent.type === 'login') {
+          // Login event from another tab - update local state
+          console.log('🔔 Login event received from another tab');
+          
+          // Check if it's a different user - if so, clear cache and reload
+          const currentUserId = currentUser?.id;
+          const newUserId = authEvent.userId;
+          
+          if (currentUserId && newUserId && currentUserId !== newUserId) {
+            console.log(`⚠️ Different user logged in (${currentUserId} → ${newUserId}). Clearing cache and reloading.`);
+            // Clear all cache layers for user switch
+            try {
+              if (window.UnifiedCacheManager?.clearAll) {
+                await window.UnifiedCacheManager.clearAll();
+              }
+              if (window.CacheSyncManager?.clearAll) {
+                await window.CacheSyncManager.clearAll();
+              }
+              // Clear dashboard data state
+              if (window.dashboardDataState) {
+                window.dashboardDataState.data = { trades: [], alerts: [], accounts: [], cashFlows: [] };
+                window.dashboardDataState.lastLoadedAt = null;
+              }
+            } catch (error) {
+              console.warn('Error clearing cache during user switch:', error);
+            }
+          }
+          
+          // Reload user data from server
+          if (typeof checkAuthentication === 'function') {
+            await checkAuthentication();
+          }
+        }
+      } catch (error) {
+        console.error('Error processing auth event from storage:', error);
+      }
+    }
+  });
+}
+
 // פונקציות התחברות
 async function login(username, password) {
   // Use relative URL to work with both development (8080) and production (5001)
@@ -214,6 +330,23 @@ async function logout() {
   currentUser = null;
   localStorage.removeItem('authToken');
   localStorage.removeItem('currentUser');
+  localStorage.removeItem('savedUsername');
+  localStorage.removeItem('savedPassword');
+  localStorage.removeItem('rememberCredentials');
+  
+  // Clear sessionStorage (redirectAfterLogin, etc.)
+  try {
+    sessionStorage.removeItem('redirectAfterLogin');
+    // Clear any other sessionStorage keys that might contain user data
+    const sessionKeys = Object.keys(sessionStorage);
+    sessionKeys.forEach(key => {
+      if (key.startsWith('tiktrack_') || key.includes('auth') || key.includes('user')) {
+        sessionStorage.removeItem(key);
+      }
+    });
+  } catch (error) {
+    console.warn('Error clearing sessionStorage during logout:', error);
+  }
 
   // Clear all cache layers
   try {
@@ -248,7 +381,23 @@ async function logout() {
     window.headerSystem.updateUserDisplay();
   }
 
-  // Dispatch logout event
+  // Broadcast logout event to other tabs via localStorage
+  try {
+    const logoutEvent = {
+      type: 'logout',
+      timestamp: new Date().toISOString(),
+      source: 'auth.js'
+    };
+    localStorage.setItem('tiktrack_auth_event', JSON.stringify(logoutEvent));
+    // Clear immediately so next change will trigger event again
+    setTimeout(() => {
+      localStorage.removeItem('tiktrack_auth_event');
+    }, 100);
+  } catch (error) {
+    console.warn('Error broadcasting logout event to other tabs:', error);
+  }
+
+  // Dispatch logout event (for current tab)
   window.dispatchEvent(new CustomEvent('logout:success'));
   window.dispatchEvent(new CustomEvent('user:logged-out'));
 
@@ -352,7 +501,24 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
 
       showLoginSuccess('התחברות הצליחה! מעביר לדשבורד...');
 
-      // Dispatch login success event
+      // Broadcast login event to other tabs via localStorage
+      try {
+        const loginEvent = {
+          type: 'login',
+          timestamp: new Date().toISOString(),
+          source: 'auth.js',
+          userId: currentUser?.id
+        };
+        localStorage.setItem('tiktrack_auth_event', JSON.stringify(loginEvent));
+        // Clear immediately so next change will trigger event again
+        setTimeout(() => {
+          localStorage.removeItem('tiktrack_auth_event');
+        }, 100);
+      } catch (error) {
+        console.warn('Error broadcasting login event to other tabs:', error);
+      }
+
+      // Dispatch login success event (for current tab)
       window.dispatchEvent(new CustomEvent('login:success'));
       window.dispatchEvent(new CustomEvent('user:logged-in'));
 
@@ -404,6 +570,22 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
         authToken = 'session_based'; // Session-based auth
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
         localStorage.setItem('authToken', authToken);
+        
+        // Broadcast login event to other tabs
+        try {
+          const loginEvent = {
+            type: 'login',
+            timestamp: new Date().toISOString(),
+            source: 'auth.js',
+            userId: currentUser?.id
+          };
+          localStorage.setItem('tiktrack_auth_event', JSON.stringify(loginEvent));
+          setTimeout(() => {
+            localStorage.removeItem('tiktrack_auth_event');
+          }, 100);
+        } catch (error) {
+          console.warn('Error broadcasting login event to other tabs:', error);
+        }
         
         if (onAuthenticated && typeof onAuthenticated === 'function') {
           onAuthenticated();

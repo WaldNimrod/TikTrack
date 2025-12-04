@@ -919,21 +919,53 @@ class YahooFinanceAdapter:
     def _cache_quote_by_ticker(self, quote: QuoteData, ticker: Ticker):
         """Cache quote in database by ticker object"""
         try:
-            logger.info(f"🔄 _cache_quote called for ticker: {ticker.symbol} (ID: {ticker.id})")
+            logger.info(f"🔄 _cache_quote_by_ticker called for ticker: {ticker.symbol} (ID: {ticker.id})")
             
-            # Create or update quote
-            db_quote = MarketDataQuote(
-                ticker_id=ticker.id,
-                provider_id=self.provider_id,
-                asof_utc=quote.asof_utc or datetime.now(timezone.utc),
-                price=quote.price,
-                change_pct_day=quote.change_pct_day or quote.change_pct,
-                change_amount_day=quote.change_amount,
-                volume=quote.volume,
-                currency=quote.currency,
-                source=quote.source,
-                is_stale=False,
-                quality_score=1.0,
+            # Check if quote already exists (within last hour to avoid duplicates)
+            cutoff_time = datetime.now(timezone.utc) - timedelta(hours=1)
+            existing_quote = self.db_session.query(MarketDataQuote).filter(
+                MarketDataQuote.ticker_id == ticker.id,
+                MarketDataQuote.provider_id == self.provider_id,
+                MarketDataQuote.fetched_at >= cutoff_time
+            ).order_by(MarketDataQuote.fetched_at.desc()).first()
+            
+            if existing_quote:
+                # Update existing quote
+                logger.info(f"🔄 Updating existing quote for {ticker.symbol}")
+                existing_quote.asof_utc = quote.asof_utc or datetime.now(timezone.utc)
+                existing_quote.price = quote.price
+                existing_quote.change_pct_day = quote.change_pct_day or quote.change_pct
+                existing_quote.change_amount_day = quote.change_amount
+                existing_quote.volume = quote.volume
+                existing_quote.currency = quote.currency
+                existing_quote.source = quote.source
+                existing_quote.is_stale = False
+                existing_quote.quality_score = 1.0
+                existing_quote.open_price = quote.open_price
+                existing_quote.change_pct_from_open = quote.change_pct_from_open
+                existing_quote.change_amount_from_open = quote.change_amount_from_open
+                existing_quote.high_price = quote.high_price
+                existing_quote.low_price = quote.low_price
+                existing_quote.close_price = quote.close_price
+                existing_quote.atr = quote.atr
+                existing_quote.atr_period = quote.atr_period or 14
+                existing_quote.fetched_at = datetime.now(timezone.utc)
+                db_quote = existing_quote
+            else:
+                # Create new quote
+                logger.info(f"💾 Creating new quote for {ticker.symbol}")
+                db_quote = MarketDataQuote(
+                    ticker_id=ticker.id,
+                    provider_id=self.provider_id,
+                    asof_utc=quote.asof_utc or datetime.now(timezone.utc),
+                    price=quote.price,
+                    change_pct_day=quote.change_pct_day or quote.change_pct,
+                    change_amount_day=quote.change_amount,
+                    volume=quote.volume,
+                    currency=quote.currency,
+                    source=quote.source,
+                    is_stale=False,
+                    quality_score=1.0,
                     # Open price data
                     open_price=quote.open_price,
                     change_pct_from_open=quote.change_pct_from_open,
@@ -946,9 +978,7 @@ class YahooFinanceAdapter:
                     atr=quote.atr,
                     atr_period=quote.atr_period or 14
                 )
-            
-            logger.info(f"💾 Adding quote to database: {ticker.symbol} = ${quote.price} ({quote.currency})")
-            self.db_session.add(db_quote)
+                self.db_session.add(db_quote)
             
             # Also update quotes_last table as required by specification Section 3.1
             self._update_quotes_last(ticker.id, quote)
@@ -959,13 +989,15 @@ class YahooFinanceAdapter:
             logger.info(f"✅ Successfully cached quote for {ticker.symbol}: ${quote.price}")
             
         except SQLAlchemyError as e:
-            logger.error(f"❌ SQLAlchemy error caching quote for ticker {ticker.id}: {e}")
+            logger.error(f"❌ SQLAlchemy error caching quote for ticker {ticker.id}: {e}", exc_info=True)
             logger.error(f"🔄 Rolling back transaction for {ticker.symbol}")
             self.db_session.rollback()
+            raise  # Re-raise to be caught by caller
         except Exception as e:
-            logger.error(f"❌ Unexpected error caching quote for ticker {ticker.id}: {e}")
+            logger.error(f"❌ Unexpected error caching quote for ticker {ticker.id}: {e}", exc_info=True)
             logger.error(f"🔄 Rolling back transaction for {ticker.symbol}")
             self.db_session.rollback()
+            raise  # Re-raise to be caught by caller
     
     def _log_refresh_operation(self, **kwargs):
         """Log refresh operation details"""
@@ -1461,6 +1493,101 @@ class YahooFinanceAdapter:
         except Exception as e:
             logger.error(f"Error getting historical OHLC data for {symbol}: {e}")
             return []
+    
+    def fetch_and_save_historical_quotes(self, ticker: Ticker, days_back: int = 150) -> int:
+        """
+        Fetch historical quotes and save them to database
+        
+        Args:
+            ticker: Ticker object
+            days_back: Number of days to fetch (default 150 for MA 150 calculation)
+            
+        Returns:
+            Number of quotes saved
+        """
+        try:
+            provider_symbol = self._get_provider_symbol(ticker)
+            logger.info(f"📊 Fetching {days_back} days of historical data for {ticker.symbol} (provider: {provider_symbol})")
+            
+            # Get historical OHLC data
+            historical_data = self._get_historical_ohlc_data(provider_symbol, days_back=days_back)
+            
+            if not historical_data:
+                logger.warning(f"⚠️ No historical data fetched for {ticker.symbol}")
+                return 0
+            
+            saved_count = 0
+            skipped_count = 0
+            
+            # Save each historical quote to database
+            for data_point in historical_data:
+                try:
+                    # Check if quote already exists for this date
+                    # Use date comparison (ignore time) to avoid duplicates
+                    from sqlalchemy import func
+                    quote_date = data_point['date']
+                    if isinstance(quote_date, datetime):
+                        # Extract date part only (ignore time)
+                        quote_date_only = quote_date.date()
+                        existing_quote = self.db_session.query(MarketDataQuote).filter(
+                            MarketDataQuote.ticker_id == ticker.id,
+                            MarketDataQuote.provider_id == self.provider_id,
+                            func.date(MarketDataQuote.asof_utc) == quote_date_only
+                        ).first()
+                    else:
+                        # Fallback to exact match
+                        existing_quote = self.db_session.query(MarketDataQuote).filter(
+                            MarketDataQuote.ticker_id == ticker.id,
+                            MarketDataQuote.provider_id == self.provider_id,
+                            MarketDataQuote.asof_utc == data_point['date']
+                        ).first()
+                    
+                    if existing_quote:
+                        # Update existing quote with historical data
+                        existing_quote.price = data_point['close']  # Use close as price
+                        existing_quote.close_price = data_point['close']
+                        existing_quote.open_price = data_point['open']
+                        existing_quote.high_price = data_point['high']
+                        existing_quote.low_price = data_point['low']
+                        existing_quote.volume = None  # Historical data may not have volume
+                        existing_quote.fetched_at = datetime.now(timezone.utc)
+                        existing_quote.updated_at = datetime.now(timezone.utc)
+                        skipped_count += 1
+                    else:
+                        # Create new historical quote
+                        historical_quote = MarketDataQuote(
+                            ticker_id=ticker.id,
+                            provider_id=self.provider_id,
+                            asof_utc=data_point['date'],
+                            price=data_point['close'],  # Use close as price
+                            close_price=data_point['close'],
+                            open_price=data_point['open'],
+                            high_price=data_point['high'],
+                            low_price=data_point['low'],
+                            volume=None,  # Historical data may not have volume
+                            currency='USD',  # Default, can be updated
+                            source='yahoo_finance',
+                            is_stale=False,
+                            quality_score=1.0,
+                            fetched_at=datetime.now(timezone.utc)
+                        )
+                        self.db_session.add(historical_quote)
+                        saved_count += 1
+                    
+                except Exception as e:
+                    logger.warning(f"Error saving historical quote for {ticker.symbol} on {data_point['date']}: {e}")
+                    continue
+            
+            # Commit all changes
+            self.db_session.commit()
+            logger.info(f"✅ Saved {saved_count} new historical quotes and updated {skipped_count} existing quotes for {ticker.symbol}")
+            
+            return saved_count + skipped_count
+            
+        except Exception as e:
+            logger.error(f"Error fetching and saving historical quotes for {ticker.symbol}: {e}", exc_info=True)
+            self.db_session.rollback()
+            return 0
     
     def _calculate_atr(self, historical_data: List[Dict[str, Any]], period: int = 14) -> Optional[float]:
         """

@@ -122,3 +122,5 @@
   console.log('📝 Usage: Run generateTickerDashboardScripts() in console to generate script tags');
 })();
 
+
+

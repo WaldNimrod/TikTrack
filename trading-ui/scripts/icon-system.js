@@ -355,10 +355,10 @@
          * @returns {string} Prepared inline SVG HTML
          */
         _prepareInlineSVG(svgContent, size, alt, className, style) {
-            // Create a temporary div to parse and modify SVG
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = svgContent.trim();
-            const svgElement = tempDiv.querySelector('svg');
+            // Parse SVG using DOMParser
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(svgContent.trim(), 'image/svg+xml');
+            const svgElement = doc.documentElement;
 
             if (!svgElement) {
                 return svgContent; // Return original if parsing fails

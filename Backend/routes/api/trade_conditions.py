@@ -52,13 +52,20 @@ def get_trade_conditions(trade_id):
         
         try:
             normalizer = _get_date_normalizer()
+            
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
 
-            # Check if trade exists
-            trade = db_session.query(Trade).filter(Trade.id == trade_id).first()
+            # Check if trade exists and belongs to user
+            query = db_session.query(Trade).filter(Trade.id == trade_id)
+            if user_id is not None:
+                query = query.filter(Trade.user_id == user_id)
+            trade = query.first()
             if not trade:
                 payload = BaseEntityUtils.create_error_payload(
                     normalizer,
-                    f'Trade with ID {trade_id} not found',
+                    f'Trade with ID {trade_id} not found or does not belong to user',
                     {"code": "TRADE_NOT_FOUND"}
                 )
                 return jsonify(payload), 404
@@ -123,12 +130,20 @@ def create_trade_condition(trade_id):
         
         try:
             normalizer = _get_date_normalizer()
-            # Check if trade exists
-            trade = db_session.query(Trade).filter(Trade.id == trade_id).first()
+            
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
+            # Check if trade exists and belongs to user
+            query = db_session.query(Trade).filter(Trade.id == trade_id)
+            if user_id is not None:
+                query = query.filter(Trade.user_id == user_id)
+            trade = query.first()
             if not trade:
                 payload = BaseEntityUtils.create_error_payload(
                     normalizer,
-                    f'Trade with ID {trade_id} not found',
+                    f'Trade with ID {trade_id} not found or does not belong to user',
                     {"code": "TRADE_NOT_FOUND"}
                 )
                 return jsonify(payload), 404
@@ -208,6 +223,12 @@ def get_trade_condition(condition_id):
         
         try:
             normalizer = _get_date_normalizer()
+            
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
+            # Get condition and verify trade belongs to user
             condition = db_session.query(TradeCondition).filter(
                 TradeCondition.id == condition_id
             ).first()
@@ -219,6 +240,20 @@ def get_trade_condition(condition_id):
                     {"code": "CONDITION_NOT_FOUND"}
                 )
                 return jsonify(payload), 404
+            
+            # Verify trade belongs to user
+            if user_id is not None:
+                trade = db_session.query(Trade).filter(
+                    Trade.id == condition.trade_id,
+                    Trade.user_id == user_id
+                ).first()
+                if not trade:
+                    payload = BaseEntityUtils.create_error_payload(
+                        normalizer,
+                        f'Trade condition with ID {condition_id} does not belong to user',
+                        {"code": "ACCESS_DENIED"}
+                    )
+                    return jsonify(payload), 403
             
             # Convert to dictionary with alert stats
             stats_map = AlertService.get_condition_alert_stats(db_session, [condition.id], 'trade')
@@ -261,6 +296,10 @@ def update_trade_condition(condition_id):
         db_session = next(get_db())
         
         try:
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
             condition = db_session.query(TradeCondition).filter(
                 TradeCondition.id == condition_id
             ).first()
@@ -272,6 +311,20 @@ def update_trade_condition(condition_id):
                     {"code": "CONDITION_NOT_FOUND"}
                 )
                 return jsonify(payload), 404
+            
+            # Verify trade belongs to user
+            if user_id is not None:
+                trade = db_session.query(Trade).filter(
+                    Trade.id == condition.trade_id,
+                    Trade.user_id == user_id
+                ).first()
+                if not trade:
+                    payload = BaseEntityUtils.create_error_payload(
+                        normalizer,
+                        f'Trade condition with ID {condition_id} does not belong to user',
+                        {"code": "ACCESS_DENIED"}
+                    )
+                    return jsonify(payload), 403
             
             # Add trade_id to data for validation
             data['trade_id'] = condition.trade_id
@@ -344,6 +397,10 @@ def delete_trade_condition(condition_id):
         db_session = next(get_db())
         
         try:
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
             condition = db_session.query(TradeCondition).filter(
                 TradeCondition.id == condition_id
             ).first()
@@ -355,6 +412,20 @@ def delete_trade_condition(condition_id):
                     {"code": "CONDITION_NOT_FOUND"}
                 )
                 return jsonify(payload), 404
+            
+            # Verify trade belongs to user
+            if user_id is not None:
+                trade = db_session.query(Trade).filter(
+                    Trade.id == condition.trade_id,
+                    Trade.user_id == user_id
+                ).first()
+                if not trade:
+                    payload = BaseEntityUtils.create_error_payload(
+                        normalizer,
+                        f'Trade condition with ID {condition_id} does not belong to user',
+                        {"code": "ACCESS_DENIED"}
+                    )
+                    return jsonify(payload), 403
             
             # Delete condition
             db_session.delete(condition)
@@ -390,6 +461,10 @@ def test_trade_condition(condition_id):
         db_session = next(get_db())
         
         try:
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
             condition = db_session.query(TradeCondition).filter(
                 TradeCondition.id == condition_id
             ).first()
@@ -402,15 +477,16 @@ def test_trade_condition(condition_id):
                 )
                 return jsonify(payload), 404
             
-            # Get trade to get ticker
-            trade = db_session.query(Trade).filter(
-                Trade.id == condition.trade_id
-            ).first()
+            # Verify trade belongs to user
+            query = db_session.query(Trade).filter(Trade.id == condition.trade_id)
+            if user_id is not None:
+                query = query.filter(Trade.user_id == user_id)
+            trade = query.first()
             
             if not trade:
                 payload = BaseEntityUtils.create_error_payload(
                     normalizer,
-                    'Trade not found',
+                    'Trade not found or does not belong to user',
                     {"code": "TRADE_NOT_FOUND"}
                 )
                 return jsonify(payload), 404
@@ -495,6 +571,10 @@ def validate_trade_condition():
 def inherit_conditions_from_plan():
     """Inherit conditions from a trade plan to a trade"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        from flask import g
+        user_id = getattr(g, 'user_id', None)
+        
         data = request.get_json()
         if not data:
             return jsonify({
@@ -517,22 +597,28 @@ def inherit_conditions_from_plan():
         db_session = next(get_db())
         
         try:
-            # Check if trade exists
-            trade = db_session.query(Trade).filter(Trade.id == trade_id).first()
+            # Check if trade exists and belongs to user
+            query = db_session.query(Trade).filter(Trade.id == trade_id)
+            if user_id is not None:
+                query = query.filter(Trade.user_id == user_id)
+            trade = query.first()
             if not trade:
                 return jsonify({
                     'status': 'error',
-                    'message': f'Trade with ID {trade_id} not found',
+                    'message': f'Trade with ID {trade_id} not found or does not belong to user',
                     'error_code': 'TRADE_NOT_FOUND'
                 }), 404
             
-            # Check if plan exists
+            # Check if plan exists and belongs to user
             from models.trade_plan import TradePlan
-            plan = db_session.query(TradePlan).filter(TradePlan.id == plan_id).first()
+            query = db_session.query(TradePlan).filter(TradePlan.id == plan_id)
+            if user_id is not None:
+                query = query.filter(TradePlan.user_id == user_id)
+            plan = query.first()
             if not plan:
                 return jsonify({
                     'status': 'error',
-                    'message': f'Trade plan with ID {plan_id} not found',
+                    'message': f'Trade plan with ID {plan_id} not found or does not belong to user',
                     'error_code': 'PLAN_NOT_FOUND'
                 }), 404
             
@@ -615,6 +701,10 @@ def inherit_conditions_from_plan():
 def create_bulk_trade_conditions():
     """Create multiple trade conditions at once"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        from flask import g
+        user_id = getattr(g, 'user_id', None)
+        
         data = request.get_json()
         if not data or 'conditions' not in data:
             return jsonify({
@@ -637,12 +727,15 @@ def create_bulk_trade_conditions():
         db_session = next(get_db())
         
         try:
-            # Check if trade exists
-            trade = db_session.query(Trade).filter(Trade.id == trade_id).first()
+            # Check if trade exists and belongs to user
+            query = db_session.query(Trade).filter(Trade.id == trade_id)
+            if user_id is not None:
+                query = query.filter(Trade.user_id == user_id)
+            trade = query.first()
             if not trade:
                 return jsonify({
                     'status': 'error',
-                    'message': f'Trade with ID {trade_id} not found',
+                    'message': f'Trade with ID {trade_id} not found or does not belong to user',
                     'error_code': 'TRADE_NOT_FOUND'
                 }), 404
             
@@ -728,6 +821,10 @@ def evaluate_condition(condition_id):
         db_session = next(get_db())
         
         try:
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
             # Get condition with relationships
             condition = db_session.query(TradeCondition).filter(
                 TradeCondition.id == condition_id
@@ -740,6 +837,20 @@ def evaluate_condition(condition_id):
                     {"code": "CONDITION_NOT_FOUND"}
                 )
                 return jsonify(payload), 404
+            
+            # Verify trade belongs to user
+            if user_id is not None:
+                trade = db_session.query(Trade).filter(
+                    Trade.id == condition.trade_id,
+                    Trade.user_id == user_id
+                ).first()
+                if not trade:
+                    payload = BaseEntityUtils.create_error_payload(
+                        normalizer,
+                        f'Trade condition with ID {condition_id} does not belong to user',
+                        {"code": "ACCESS_DENIED"}
+                    )
+                    return jsonify(payload), 403
             
             # Import and use ConditionEvaluator
             from services.condition_evaluator import ConditionEvaluator
@@ -825,6 +936,10 @@ def get_evaluation_history(condition_id):
         db_session = next(get_db())
         
         try:
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
             # Check if condition exists
             condition = db_session.query(TradeCondition).filter(
                 TradeCondition.id == condition_id
@@ -838,11 +953,28 @@ def get_evaluation_history(condition_id):
                 )
                 return jsonify(payload), 404
             
-            # Get alerts related to this condition
+            # Verify trade belongs to user
+            if user_id is not None:
+                trade = db_session.query(Trade).filter(
+                    Trade.id == condition.trade_id,
+                    Trade.user_id == user_id
+                ).first()
+                if not trade:
+                    payload = BaseEntityUtils.create_error_payload(
+                        normalizer,
+                        f'Trade condition with ID {condition_id} does not belong to user',
+                        {"code": "ACCESS_DENIED"}
+                    )
+                    return jsonify(payload), 403
+            
+            # Get alerts related to this condition (filtered by user_id)
             from models.alert import Alert
-            alerts = db_session.query(Alert).filter(
+            query = db_session.query(Alert).filter(
                 Alert.related_id == condition_id
-            ).order_by(Alert.triggered_at.desc()).limit(50).all()
+            )
+            if user_id is not None:
+                query = query.filter(Alert.user_id == user_id)
+            alerts = query.order_by(Alert.triggered_at.desc()).limit(50).all()
             
             # Convert to evaluation history format
             history = []
@@ -885,11 +1017,24 @@ def get_evaluation_history(condition_id):
 def create_condition_alert(condition_id):
     """Create alert manually for a condition"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        from flask import g
+        user_id = getattr(g, 'user_id', None)
+        
         db_session = next(get_db())
         try:
             condition = db_session.query(TradeCondition).filter(TradeCondition.id == condition_id).first()
             if not condition:
                 return jsonify({'status': 'error', 'message': f'Trade condition with ID {condition_id} not found'}), 404
+            
+            # Verify trade belongs to user
+            if user_id is not None:
+                trade = db_session.query(Trade).filter(
+                    Trade.id == condition.trade_id,
+                    Trade.user_id == user_id
+                ).first()
+                if not trade:
+                    return jsonify({'status': 'error', 'message': f'Trade condition with ID {condition_id} does not belong to user'}), 403
             
             # Check if alert already exists
             alert_service = AlertService(db_session)
@@ -940,8 +1085,22 @@ def create_condition_alert(condition_id):
 def delete_condition_alert(condition_id):
     """Delete alert for a condition"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        from flask import g
+        user_id = getattr(g, 'user_id', None)
+        
         db_session = next(get_db())
         try:
+            # Verify condition belongs to user
+            condition = db_session.query(TradeCondition).filter(TradeCondition.id == condition_id).first()
+            if condition and user_id is not None:
+                trade = db_session.query(Trade).filter(
+                    Trade.id == condition.trade_id,
+                    Trade.user_id == user_id
+                ).first()
+                if not trade:
+                    return jsonify({'status': 'error', 'message': f'Trade condition with ID {condition_id} does not belong to user'}), 403
+            
             alert_service = AlertService(db_session)
             
             deleted_count = alert_service.delete_condition_alerts(db_session, trade_condition_id=condition_id)
@@ -968,11 +1127,24 @@ def delete_condition_alert(condition_id):
 def toggle_condition_alert(condition_id):
     """Toggle alert creation for a condition"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        from flask import g
+        user_id = getattr(g, 'user_id', None)
+        
         db_session = next(get_db())
         try:
             condition = db_session.query(TradeCondition).filter(TradeCondition.id == condition_id).first()
             if not condition:
                 return jsonify({'status': 'error', 'message': f'Trade condition with ID {condition_id} not found'}), 404
+            
+            # Verify trade belongs to user
+            if user_id is not None:
+                trade = db_session.query(Trade).filter(
+                    Trade.id == condition.trade_id,
+                    Trade.user_id == user_id
+                ).first()
+                if not trade:
+                    return jsonify({'status': 'error', 'message': f'Trade condition with ID {condition_id} does not belong to user'}), 403
             
             # Toggle auto_generate_alerts
             condition.auto_generate_alerts = not condition.auto_generate_alerts

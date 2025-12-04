@@ -317,3 +317,5 @@ if (require.main === module) {
 
 module.exports = { main, getAllHTMLFiles, getAllJSFiles, getPageName, loadsScript };
 
+
+

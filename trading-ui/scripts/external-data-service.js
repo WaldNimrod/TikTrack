@@ -560,7 +560,12 @@ class ExternalDataService {
       // Show loading state
       if (refreshBtn) {
         refreshBtn.disabled = true;
-        refreshBtn.innerHTML = '<span class="action-icon">⏳</span> מרענן...';
+        refreshBtn.textContent = '';
+        const span = document.createElement('span');
+        span.className = 'action-icon';
+        span.textContent = '⏳';
+        refreshBtn.appendChild(span);
+        refreshBtn.appendChild(document.createTextNode(' מרענן...'));
       }
 
       // Get symbols for open and closed tickers (not cancelled)
@@ -624,7 +629,13 @@ class ExternalDataService {
             // Fallback already set
           }
         }
-        refreshBtn.innerHTML = refreshIcon + ' רענן מחירים';
+        refreshBtn.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(refreshIcon, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            refreshBtn.appendChild(node.cloneNode(true));
+        });
+        refreshBtn.appendChild(document.createTextNode(' רענן מחירים'));
       }
     }
   }

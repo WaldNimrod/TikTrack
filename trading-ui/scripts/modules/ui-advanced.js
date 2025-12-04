@@ -520,14 +520,28 @@ function getStatusBorderColor(status) {
  * @returns {string} קוד הצבע
  */
 // Save reference to centralized function before defining local function
-const _originalGetEntityBackgroundColor = typeof window.getEntityBackgroundColor === 'function' 
-  ? window.getEntityBackgroundColor 
-  : null;
+// IMPORTANT: Save the reference immediately to avoid circular dependency
+// If window.getEntityBackgroundColor is not yet defined, we'll check it at call time
+let _originalGetEntityBackgroundColor = null;
+
+// Initialize the reference - use a getter function to check at call time, not definition time
+function _getOriginalGetEntityBackgroundColor() {
+  if (!_originalGetEntityBackgroundColor && typeof window.getEntityBackgroundColor === 'function') {
+    // Store the reference only once to avoid recursion
+    const original = window.getEntityBackgroundColor;
+    // Verify it's not pointing to this function to prevent infinite recursion
+    if (original !== getEntityBackgroundColor) {
+      _originalGetEntityBackgroundColor = original;
+    }
+  }
+  return _originalGetEntityBackgroundColor;
+}
 
 function getEntityBackgroundColor(entityType) {
   // Use centralized Color Scheme System if available (use saved reference to avoid recursion)
-  if (_originalGetEntityBackgroundColor) {
-    return _originalGetEntityBackgroundColor(entityType);
+  const originalFn = _getOriginalGetEntityBackgroundColor();
+  if (originalFn) {
+    return originalFn(entityType);
   }
   // Fallback to local implementation (should not happen in production)
   if (!entityType) {

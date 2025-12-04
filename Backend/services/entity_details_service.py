@@ -25,7 +25,7 @@ from models.note import Note
 from models.note_relation_type import NoteRelationType
 from models.currency import Currency
 from services.validation_service import ValidationService
-from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
+from services.advanced_cache_service import cache_for, cache_with_deps, advanced_cache_service
 from services.smart_query_optimizer import optimize_query, profile_query
 from services.account_activity_service import AccountActivityService
 from services.position_portfolio_service import PositionPortfolioService
@@ -507,23 +507,31 @@ class EntityDetailsService:
                                 from services.external_data.atr_calculator import ATRCalculator
                                 from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
                                 
-                                user_id = EntityDetailsService._get_default_user_id()
-                                atr_calculator = ATRCalculator(db)
-                                adapter = YahooFinanceAdapter(db)
-                                
-                                atr_result = atr_calculator.get_atr_with_fallback(
-                                    ticker_id=entity.ticker.id,
-                                    adapter=adapter,
-                                    user_id=user_id,
-                                    db_session=db
-                                )
-                                
-                                if atr_result and atr_result.atr:
-                                    entity_dict['ticker']['atr'] = atr_result.atr
-                                    entity_dict['ticker']['atr_period'] = atr_result.period
-                                    if atr_result.warnings:
-                                        entity_dict['ticker']['atr_warnings'] = atr_result.warnings
-                            except Exception as atr_error:
+                            user_id = EntityDetailsService._get_default_user_id()
+                            atr_calculator = ATRCalculator(db)
+                            # Get provider ID for adapter
+                            from models.external_data import ExternalDataProvider
+                            provider = db.query(ExternalDataProvider).filter(
+                                ExternalDataProvider.name == 'yahoo_finance'
+                            ).first()
+                            if provider:
+                                adapter = YahooFinanceAdapter(db, provider.id)
+                            else:
+                                adapter = YahooFinanceAdapter(db, 1)  # Fallback to provider ID 1
+                            
+                            atr_result = atr_calculator.get_atr_with_fallback(
+                                ticker_id=entity.ticker.id,
+                                adapter=adapter,
+                                user_id=user_id,
+                                db_session=db
+                            )
+                            
+                            if atr_result and atr_result.atr:
+                                entity_dict['ticker']['atr'] = atr_result.atr
+                                entity_dict['ticker']['atr_period'] = atr_result.period
+                                if atr_result.warnings:
+                                    entity_dict['ticker']['atr_warnings'] = atr_result.warnings
+                        except Exception as atr_error:
                                 logger.warning(f"Error calculating ATR for ticker {entity.ticker.id}: {atr_error}")
                         
                         # Calculate 52W range
@@ -720,7 +728,15 @@ class EntityDetailsService:
                             
                             user_id = EntityDetailsService._get_default_user_id()
                             atr_calculator = ATRCalculator(db)
-                            adapter = YahooFinanceAdapter(db)
+                            # Get provider ID for adapter
+                            from models.external_data import ExternalDataProvider
+                            provider = db.query(ExternalDataProvider).filter(
+                                ExternalDataProvider.name == 'yahoo_finance'
+                            ).first()
+                            if provider:
+                                adapter = YahooFinanceAdapter(db, provider.id)
+                            else:
+                                adapter = YahooFinanceAdapter(db, 1)  # Fallback to provider ID 1
                             
                             atr_result = atr_calculator.get_atr_with_fallback(
                                 ticker_id=entity_id,
@@ -737,71 +753,137 @@ class EntityDetailsService:
                         except Exception as atr_error:
                             logger.warning(f"Error calculating ATR for ticker {entity_id}: {atr_error}")
                     
-                    # Calculate 52W range
+                    # Calculate 52W range - with cache
                     try:
                         from services.external_data.week52_calculator import Week52Calculator
+                        from services.advanced_cache_service import advanced_cache_service
                         
                         week52_calculator = Week52Calculator(db)
-                        week52_result = week52_calculator.calculate_52w_range(
-                            ticker_id=entity_id,
-                            db_session=db
-                        )
+                        
+                        # Check cache for 52W range
+                        week52_cache_key = f"ticker_{entity_id}_week52"
+                        week52_result = advanced_cache_service.get(week52_cache_key)
+                        
+                        if week52_result is None:
+                            # Calculate 52W range
+                            week52_result = week52_calculator.calculate_52w_range(
+                                ticker_id=entity_id,
+                                db_session=db
+                            )
+                            if week52_result:
+                                # Cache result for 1 hour (3600 seconds)
+                                week52_dict = {
+                                    'high': week52_result.high,
+                                    'low': week52_result.low,
+                                    'warnings': week52_result.warnings if hasattr(week52_result, 'warnings') else []
+                                }
+                                advanced_cache_service.set(week52_cache_key, week52_dict, ttl=3600)
+                                logger.info(f"✅ 52W range calculated and cached for ticker {entity_id}: high={week52_result.high:.2f}, low={week52_result.low:.2f}")
+                            else:
+                                logger.warning(f"⚠️ 52W range calculation returned None for ticker {entity_id}")
+                        else:
+                            logger.info(f"✅ 52W range retrieved from cache for ticker {entity_id}: high={week52_result['high']:.2f}, low={week52_result['low']:.2f}")
                         
                         if week52_result:
-                            entity_dict['week52_high'] = week52_result.high
-                            entity_dict['week52_low'] = week52_result.low
-                            if week52_result.warnings:
-                                entity_dict['week52_warnings'] = week52_result.warnings
+                            if isinstance(week52_result, dict):
+                                entity_dict['week52_high'] = week52_result['high']
+                                entity_dict['week52_low'] = week52_result['low']
+                                if week52_result.get('warnings'):
+                                    entity_dict['week52_warnings'] = week52_result['warnings']
+                            else:
+                                entity_dict['week52_high'] = week52_result.high
+                                entity_dict['week52_low'] = week52_result.low
+                                if week52_result.warnings:
+                                    entity_dict['week52_warnings'] = week52_result.warnings
                     except Exception as week52_error:
-                        logger.warning(f"Error calculating 52W range for ticker {entity_id}: {week52_error}")
+                        logger.warning(f"Error calculating 52W range for ticker {entity_id}: {week52_error}", exc_info=True)
                     
-                    # Calculate volatility
+                    # Calculate volatility - with cache
                     try:
                         from services.external_data.technical_indicators_calculator import TechnicalIndicatorsCalculator
+                        from services.advanced_cache_service import advanced_cache_service
                         
                         tech_calculator = TechnicalIndicatorsCalculator(db)
-                        volatility_result = tech_calculator.calculate_volatility(
-                            ticker_id=entity_id,
-                            period=30,  # 30 days default
-                            db_session=db
-                        )
+                        
+                        # Check cache for volatility
+                        volatility_cache_key = f"ticker_{entity_id}_volatility_30"
+                        volatility_result = advanced_cache_service.get(volatility_cache_key)
+                        
+                        if volatility_result is None:
+                            # Calculate volatility
+                            volatility_result = tech_calculator.calculate_volatility(
+                                ticker_id=entity_id,
+                                period=30,  # 30 days default
+                                db_session=db
+                            )
+                            if volatility_result is not None:
+                                # Cache result for 1 hour (3600 seconds)
+                                advanced_cache_service.set(volatility_cache_key, volatility_result, ttl=3600)
+                                logger.info(f"✅ Volatility calculated and cached for ticker {entity_id}: {volatility_result:.2f}%")
+                            else:
+                                logger.warning(f"⚠️ Volatility calculation returned None for ticker {entity_id}")
+                        else:
+                            logger.info(f"✅ Volatility retrieved from cache for ticker {entity_id}: {volatility_result:.2f}%")
                         
                         if volatility_result is not None:
                             entity_dict['volatility'] = volatility_result
                     except Exception as volatility_error:
-                        logger.warning(f"Error calculating volatility for ticker {entity_id}: {volatility_error}")
+                        logger.warning(f"Error calculating volatility for ticker {entity_id}: {volatility_error}", exc_info=True)
                     
-                    # Calculate Moving Averages (MA 20 and MA 150)
+                    # Calculate Moving Averages (MA 20 and MA 150) - with cache
                     try:
                         from services.external_data.technical_indicators_calculator import TechnicalIndicatorsCalculator
+                        from services.advanced_cache_service import advanced_cache_service
                         
                         tech_calculator = TechnicalIndicatorsCalculator(db)
                         
                         logger.info(f"📊 Starting MA calculation for ticker {entity_id} (symbol: {entity.symbol})")
                         
-                        # Calculate SMA 20
-                        sma_20 = tech_calculator.calculate_sma(
-                            ticker_id=entity_id,
-                            period=20,
-                            db_session=db
-                        )
+                        # Check cache for MA 20
+                        ma20_cache_key = f"ticker_{entity_id}_ma_20"
+                        sma_20 = advanced_cache_service.get(ma20_cache_key)
+                        
+                        if sma_20 is None:
+                            # Calculate SMA 20
+                            sma_20 = tech_calculator.calculate_sma(
+                                ticker_id=entity_id,
+                                period=20,
+                                db_session=db
+                            )
+                            if sma_20 is not None:
+                                # Cache result for 1 hour (3600 seconds)
+                                advanced_cache_service.set(ma20_cache_key, sma_20, ttl=3600)
+                                logger.info(f"✅ MA 20 calculated and cached for ticker {entity_id}: {sma_20:.2f}")
+                            else:
+                                logger.warning(f"⚠️ MA 20 calculation returned None for ticker {entity_id}")
+                        else:
+                            logger.info(f"✅ MA 20 retrieved from cache for ticker {entity_id}: {sma_20:.2f}")
+                        
                         if sma_20 is not None:
                             entity_dict['ma_20'] = sma_20
-                            logger.info(f"✅ MA 20 calculated for ticker {entity_id}: {sma_20:.2f}")
-                        else:
-                            logger.warning(f"⚠️ MA 20 calculation returned None for ticker {entity_id}")
                         
-                        # Calculate SMA 150
-                        sma_150 = tech_calculator.calculate_sma(
-                            ticker_id=entity_id,
-                            period=150,
-                            db_session=db
-                        )
+                        # Check cache for MA 150
+                        ma150_cache_key = f"ticker_{entity_id}_ma_150"
+                        sma_150 = advanced_cache_service.get(ma150_cache_key)
+                        
+                        if sma_150 is None:
+                            # Calculate SMA 150
+                            sma_150 = tech_calculator.calculate_sma(
+                                ticker_id=entity_id,
+                                period=150,
+                                db_session=db
+                            )
+                            if sma_150 is not None:
+                                # Cache result for 1 hour (3600 seconds)
+                                advanced_cache_service.set(ma150_cache_key, sma_150, ttl=3600)
+                                logger.info(f"✅ MA 150 calculated and cached for ticker {entity_id}: {sma_150:.2f}")
+                            else:
+                                logger.warning(f"⚠️ MA 150 calculation returned None for ticker {entity_id}")
+                        else:
+                            logger.info(f"✅ MA 150 retrieved from cache for ticker {entity_id}: {sma_150:.2f}")
+                        
                         if sma_150 is not None:
                             entity_dict['ma_150'] = sma_150
-                            logger.info(f"✅ MA 150 calculated for ticker {entity_id}: {sma_150:.2f}")
-                        else:
-                            logger.warning(f"⚠️ MA 150 calculation returned None for ticker {entity_id}")
                     except Exception as ma_error:
                         logger.warning(f"Error calculating moving averages for ticker {entity_id}: {ma_error}", exc_info=True)
                     
@@ -2341,18 +2423,30 @@ class EntityDetailsService:
             entity_id (int): ID of the entity
         """
         try:
-            # Clear entity details cache
-            cache_key = f"get_entity_details_{entity_type}_{entity_id}"
-            invalidate_cache(cache_key)
+            from services.advanced_cache_service import advanced_cache_service
             
-            # Clear linked items cache
-            linked_cache_key = f"get_linked_items_{entity_type}_{entity_id}"
-            invalidate_cache(linked_cache_key)
+            # The cache key is generated by cache_for decorator using MD5 hash
+            # Pattern: "Backend.services.entity_details_service.get_entity_details:*"
+            # We need to invalidate by pattern since we don't know the exact hash
+            pattern = f"Backend.services.entity_details_service.get_entity_details:*"
+            advanced_cache_service.invalidate_pattern(pattern)
             
-            logger.debug(f"Invalidated cache for {entity_type} {entity_id}")
+            # Also invalidate linked items cache
+            linked_pattern = f"Backend.services.entity_details_service.get_linked_items:*"
+            advanced_cache_service.invalidate_pattern(linked_pattern)
+            
+            # Invalidate calculation results cache (MA, Volatility, 52W)
+            if entity_type == 'ticker':
+                advanced_cache_service.delete(f"ticker_{entity_id}_ma_20")
+                advanced_cache_service.delete(f"ticker_{entity_id}_ma_150")
+                advanced_cache_service.delete(f"ticker_{entity_id}_volatility_30")
+                advanced_cache_service.delete(f"ticker_{entity_id}_week52")
+                logger.info(f"✅ Invalidated calculation cache for ticker {entity_id}")
+            
+            logger.info(f"✅ Invalidated cache for {entity_type} {entity_id} using pattern matching")
             
         except Exception as e:
-            logger.error(f"Error invalidating cache for {entity_type} {entity_id}: {str(e)}")
+            logger.error(f"Error invalidating cache for {entity_type} {entity_id}: {str(e)}", exc_info=True)
     
     @staticmethod
     def get_supported_entity_types() -> List[str]:

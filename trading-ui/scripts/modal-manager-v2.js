@@ -1289,6 +1289,44 @@ class ModalManagerV2 {
                 window.initializeExternalIdFields();
             }
             
+            // Handle prefill data in add mode (before showing modal)
+            if (mode === 'add' && options?.prefill) {
+                window.Logger?.info('📝 [ModalManagerV2] Handling prefill data in add mode', {
+                    modalId,
+                    prefillKeys: Object.keys(options.prefill),
+                    page: 'modal-manager-v2'
+                });
+                
+                // Map prefill keys to form field names if needed
+                // For notes modal, map noteContent -> content, noteRelatedType -> related_type_id, etc.
+                const prefillData = { ...options.prefill };
+                
+                // Map note-specific prefill keys to form field names
+                if (modalId === 'notesModal') {
+                    if (prefillData.noteContent !== undefined) {
+                        prefillData.content = prefillData.noteContent;
+                        delete prefillData.noteContent;
+                    }
+                    if (prefillData.noteRelatedType !== undefined) {
+                        prefillData.related_type_id = prefillData.noteRelatedType;
+                        delete prefillData.noteRelatedType;
+                    }
+                    if (prefillData.noteRelatedObject !== undefined) {
+                        prefillData.related_id = prefillData.noteRelatedObject;
+                        delete prefillData.noteRelatedObject;
+                    }
+                }
+                
+                window.Logger?.info('📝 [ModalManagerV2] Mapped prefill data', {
+                    modalId,
+                    mappedPrefillKeys: Object.keys(prefillData),
+                    page: 'modal-manager-v2'
+                });
+                
+                // Populate form with prefill data
+                await this.populateForm(modalElement, prefillData);
+            }
+            
             // מילוי נתונים אם במצב עריכה/צפייה (אחרי populateSelects!)
             if (mode === 'edit' && entityData) {
                 await this.populateForm(modalElement, entityData);
@@ -1362,9 +1400,17 @@ class ModalManagerV2 {
                 if (modalId === 'tradePlansModal') {
                     console.log('🔍 [TradePlan Edit] Starting post-populateForm updates...');
                     
-                    // Log current field values
+                    // Log current field values - use DataCollectionService if available
                     const logFieldValues = () => {
-                        const fields = {
+                        const fields = window.DataCollectionService ? {
+                            ticker: window.DataCollectionService.getValue('tradePlanTicker', 'text', ''),
+                            price: window.DataCollectionService.getValue('tradePlanEntryPrice', 'number', ''),
+                            quantity: window.DataCollectionService.getValue('tradePlanQuantity', 'number', ''),
+                            amount: window.DataCollectionService.getValue('planAmount', 'number', ''),
+                            stop: window.DataCollectionService.getValue('tradePlanStopLoss', 'number', ''),
+                            target: window.DataCollectionService.getValue('tradePlanTakeProfit', 'number', ''),
+                            side: window.DataCollectionService.getValue('tradePlanSide', 'text', '')
+                        } : {
                             ticker: modalElement.querySelector('#tradePlanTicker')?.value,
                             price: modalElement.querySelector('#tradePlanEntryPrice')?.value,
                             quantity: modalElement.querySelector('#tradePlanQuantity')?.value,
@@ -1463,9 +1509,17 @@ class ModalManagerV2 {
                 if (modalId === 'tradesModal') {
                     console.log('🔍 [Trade Edit] Starting post-populateForm updates...');
                     
-                    // Log current field values
+                    // Log current field values - use DataCollectionService if available
                     const logFieldValues = () => {
-                        const fields = {
+                        const fields = window.DataCollectionService ? {
+                            ticker: window.DataCollectionService.getValue('tradeTicker', 'text', ''),
+                            price: window.DataCollectionService.getValue('tradeEntryPrice', 'number', ''),
+                            quantity: window.DataCollectionService.getValue('tradeQuantity', 'number', ''),
+                            amount: window.DataCollectionService.getValue('tradeTotalInvestment', 'number', ''),
+                            stop: window.DataCollectionService.getValue('tradeStopLoss', 'number', ''),
+                            target: window.DataCollectionService.getValue('tradeTakeProfit', 'number', ''),
+                            side: window.DataCollectionService.getValue('tradeSide', 'text', '')
+                        } : {
                             ticker: modalElement.querySelector('#tradeTicker')?.value,
                             price: modalElement.querySelector('#tradeEntryPrice')?.value,
                             quantity: modalElement.querySelector('#tradeQuantity')?.value,
@@ -2491,7 +2545,11 @@ class ModalManagerV2 {
                         // In add mode or no type selected - disable the field
                         alertRelatedObjectField.disabled = true;
                         alertRelatedObjectField.setAttribute('disabled', 'disabled');
-                        alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                        alertRelatedObjectField.textContent = '';
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = 'בחר אובייקט...';
+                        alertRelatedObjectField.appendChild(option);
                         console.log('⚠️ alertRelatedObject disabled (add mode or no type selected)');
                     } else {
                         // Field might be enabled by populateForm - don't disable it
@@ -4922,7 +4980,11 @@ class ModalManagerV2 {
         if (typeof window.setCurrencyExchangeSummary === 'function') {
             window.setCurrencyExchangeSummary(null);
         } else if (netAmountField) {
-            netAmountField.innerHTML = '<div class="text-muted small">הצמד יוצג לאחר שמירה.</div>';
+            netAmountField.textContent = '';
+            const div = document.createElement('div');
+            div.className = 'text-muted small';
+            div.textContent = 'הצמד יוצג לאחר שמירה.';
+            netAmountField.appendChild(div);
         }
         
         console.log('🔵 Fields found:', {
@@ -5174,7 +5236,12 @@ class ModalManagerV2 {
             
             // Update net amount display field
             if (netAmountField) {
-                netAmountField.innerHTML = summaryHTML;
+                netAmountField.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(summaryHTML, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    netAmountField.appendChild(node.cloneNode(true));
+                });
                 console.log('✅ Net amount field updated with detailed summary');
             } else {
                 console.warn('⚠️ netAmountField not found');
@@ -6584,8 +6651,9 @@ class ModalManagerV2 {
      */
     insertModalIntoDOM(modalHTML) {
         // יצירת אלמנט זמני
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = modalHTML;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(modalHTML, 'text/html');
+        const tempDiv = doc.body;
         
         const modalElement = tempDiv.firstElementChild;
         
@@ -6768,7 +6836,11 @@ class ModalManagerV2 {
             if (alertRelatedObjectField) {
                 alertRelatedObjectField.disabled = true;
                 alertRelatedObjectField.setAttribute('disabled', 'disabled');
-                alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                alertRelatedObjectField.textContent = '';
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'בחר אובייקט...';
+                alertRelatedObjectField.appendChild(option);
             }
 
             if (alertTickerField && data.ticker_id) {
@@ -6957,7 +7029,9 @@ class ModalManagerV2 {
         
         if (!tickerId) {
             tickerDisplay && (tickerDisplay.textContent = '-');
-            tickerInfo && (tickerInfo.innerHTML = '');
+            if (tickerInfo) {
+                tickerInfo.textContent = '';
+            }
             
             if (typeof window.clearAlertTickerInfo === 'function') {
                 window.clearAlertTickerInfo();
@@ -6994,25 +7068,44 @@ class ModalManagerV2 {
             }
             if (tickerInfo) {
                 if (window.FieldRendererService && typeof window.FieldRendererService.renderTickerInfo === 'function') {
-                    tickerInfo.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
+                    tickerInfo.textContent = '';
+                    const tickerHTML = window.FieldRendererService.renderTickerInfo(ticker);
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(tickerHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        tickerInfo.appendChild(node.cloneNode(true));
+                    });
                 } else {
-                    tickerInfo.innerHTML = `
-                        <div class="ticker-info-display">
-                            <div class="d-flex flex-wrap align-items-center gap-2">
-                                <strong>${(ticker.currency_symbol || '$')}${(ticker.current_price || 0).toFixed(2)}</strong>
-                                <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
-                                    ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
-                                </span>
-                                <span class="text-muted small">נפח: ${(ticker.volume || 0).toLocaleString('he-IL')}</span>
-                            </div>
-                        </div>
-                    `;
+                    tickerInfo.textContent = '';
+                    const container = document.createElement('div');
+                    container.className = 'ticker-info-display';
+                    const flexDiv = document.createElement('div');
+                    flexDiv.className = 'd-flex flex-wrap align-items-center gap-2';
+                    const strong = document.createElement('strong');
+                    strong.textContent = `${(ticker.currency_symbol || '$')}${(ticker.current_price || 0).toFixed(2)}`;
+                    flexDiv.appendChild(strong);
+                    const changeSpan = document.createElement('span');
+                    changeSpan.className = (ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger';
+                    changeSpan.textContent = `${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)`;
+                    flexDiv.appendChild(changeSpan);
+                    const volumeSpan = document.createElement('span');
+                    volumeSpan.className = 'text-muted small';
+                    volumeSpan.textContent = `נפח: ${(ticker.volume || 0).toLocaleString('he-IL')}`;
+                    flexDiv.appendChild(volumeSpan);
+                    container.appendChild(flexDiv);
+                    tickerInfo.appendChild(container);
                 }
             }
         } catch (error) {
             console.warn('⚠️ Error loading ticker info (fallback):', error);
             tickerDisplay && (tickerDisplay.textContent = 'שגיאה בטעינת טיקר');
-            tickerInfo && (tickerInfo.innerHTML = '<small class="text-muted">לא ניתן לטעון פרטי טיקר</small>');
+            if (tickerInfo) {
+                tickerInfo.textContent = '';
+                const small = document.createElement('small');
+                small.className = 'text-muted';
+                small.textContent = 'לא ניתן לטעון פרטי טיקר';
+                tickerInfo.appendChild(small);
+            }
             window.Logger?.error?.('❌ [updateAlertTickerDisplay] Fallback failed', {
                 tickerId,
                 error: error?.message || error
@@ -7068,7 +7161,7 @@ class ModalManagerV2 {
             const items = result.data || result || [];
             
             // ניקוי ה-select
-            alertRelatedObjectField.innerHTML = '';
+            alertRelatedObjectField.textContent = '';
             
             // הוספת אופציה ריקה
             const emptyOption = document.createElement('option');
@@ -7235,7 +7328,7 @@ class ModalManagerV2 {
             }
             
             // ניקוי ה-select
-            noteRelatedObjectField.innerHTML = '';
+            noteRelatedObjectField.textContent = '';
             
             // הוספת אופציה ריקה
             const emptyOption = document.createElement('option');
@@ -7343,6 +7436,24 @@ class ModalManagerV2 {
             });
             
             console.log(`✅ Populated noteRelatedObject with ${items.length} items for type ${relatedTypeId}`);
+            
+            // Set the selected value if provided
+            if (selectedRelatedId) {
+                const selectedValue = String(selectedRelatedId);
+                noteRelatedObjectField.value = selectedValue;
+                console.log(`✅ Set noteRelatedObject value to: ${selectedValue}`);
+                
+                // Verify the value was set correctly
+                if (noteRelatedObjectField.value !== selectedValue) {
+                    console.warn(`⚠️ Value ${selectedValue} was not set correctly, current value: ${noteRelatedObjectField.value}`);
+                    // Try to find matching option
+                    const matchingOption = Array.from(noteRelatedObjectField.options).find(opt => opt.value === selectedValue);
+                    if (matchingOption) {
+                        noteRelatedObjectField.value = matchingOption.value;
+                        console.log(`✅ Found and set matching option: ${matchingOption.value} (${matchingOption.textContent})`);
+                    }
+                }
+            }
             
             // Debug: Check what was actually added to the select
             const allOptions = noteRelatedObjectField.querySelectorAll('option');

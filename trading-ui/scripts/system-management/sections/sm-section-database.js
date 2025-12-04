@@ -117,7 +117,12 @@ class SMDatabaseSection extends SMBaseSection {
 
     try {
       const databaseHtml = this.createDatabaseHTML(data);
-      this.container.innerHTML = databaseHtml;
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(databaseHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Database section rendered successfully');
       
@@ -810,7 +815,11 @@ class SMDatabaseSection extends SMBaseSection {
           `${backup.name} - ${backup.created_at} (${SMUIComponents.formatBytes(backup.size)})`
         ).join('\n');
         
-        alert(`רשימת גיבויים:\n${backupsList}`);
+        if (window.showInfoNotification) {
+          window.showInfoNotification(`רשימת גיבויים:\n${backupsList}`, 'info');
+        } else {
+          alert(`רשימת גיבויים:\n${backupsList}`);
+        }
       } else {
         throw new Error(result.message || 'Failed to list backups');
       }

@@ -211,7 +211,7 @@ function updateLogDisplay() {
     const recentLogs = logs.slice(-50); // Show last 50 entries
     
     // Clear existing content
-    logContainer.innerHTML = '';
+    logContainer.textContent = '';
     
     // Add log entries
     recentLogs.forEach(log => {
@@ -219,11 +219,19 @@ function updateLogDisplay() {
         logElement.className = `log-entry log-${log.level.toLowerCase()}`;
         
         const timestamp = new Date(log.timestamp).toLocaleString('he-IL');
-        logElement.innerHTML = `
-            <span class="log-timestamp">${timestamp}</span>
-            <span class="log-level">${log.level}</span>
-            <span class="log-message">${log.message}</span>
-        `;
+        logElement.textContent = '';
+        const timestampSpan = document.createElement('span');
+        timestampSpan.className = 'log-timestamp';
+        timestampSpan.textContent = timestamp;
+        logElement.appendChild(timestampSpan);
+        const levelSpan = document.createElement('span');
+        levelSpan.className = 'log-level';
+        levelSpan.textContent = log.level;
+        logElement.appendChild(levelSpan);
+        const messageSpan = document.createElement('span');
+        messageSpan.className = 'log-message';
+        messageSpan.textContent = log.message;
+        logElement.appendChild(messageSpan);
         
         logContainer.appendChild(logElement);
     });

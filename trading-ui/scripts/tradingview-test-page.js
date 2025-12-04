@@ -37,10 +37,12 @@
                             <strong>LineSeries:</strong> ${lib?.LineSeries ? '✅' : '❌'}
                         `;
                         const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = infoHTML;
-                        while (tempDiv.firstChild) {
-                            info.appendChild(tempDiv.firstChild);
-                        }
+                        tempDiv.textContent = '';
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(infoHTML, 'text/html');
+                        doc.body.childNodes.forEach(node => {
+                            info.appendChild(node.cloneNode(true));
+                        });
                         
                         return true;
                     } else {
@@ -84,11 +86,11 @@
                         <strong>Colors:</strong> ${JSON.stringify(colors, null, 2)}
                     `;
                     info.textContent = '';
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = infoHTML;
-                    while (tempDiv.firstChild) {
-                        info.appendChild(tempDiv.firstChild);
-                    }
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(infoHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        info.appendChild(node.cloneNode(true));
+                    });
                     
                     return true;
                 } catch (error) {
@@ -130,11 +132,11 @@
                         - applyTheme: ${typeof adapter.applyTheme === 'function' ? '✅' : '❌'}
                     `;
                     info.textContent = '';
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = infoHTML;
-                    while (tempDiv.firstChild) {
-                        info.appendChild(tempDiv.firstChild);
-                    }
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(infoHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        info.appendChild(node.cloneNode(true));
+                    });
                     
                     return true;
                 } catch (error) {
@@ -158,7 +160,7 @@
                     requestAnimationFrame(() => {
                         try {
                             // Clear container first
-                            container.innerHTML = '';
+                            container.textContent = '';
                             
                             // Quick checks
                             if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
@@ -263,7 +265,7 @@
                 return new Promise((resolve) => {
                     requestAnimationFrame(() => {
                         try {
-                            container.innerHTML = '';
+                            container.textContent = '';
                             
                             if (container.clientWidth === 0 || container.clientHeight === 0) {
                                 requestAnimationFrame(() => {
@@ -335,7 +337,7 @@
                 return new Promise((resolve) => {
                     requestAnimationFrame(() => {
                         try {
-                            container.innerHTML = '';
+                            container.textContent = '';
                             
                             if (container.clientWidth === 0 || container.clientHeight === 0) {
                                 requestAnimationFrame(() => {
@@ -410,7 +412,7 @@
                 return new Promise((resolve) => {
                     requestAnimationFrame(() => {
                         try {
-                            container.innerHTML = '';
+                            container.textContent = '';
                             
                             if (container.clientWidth === 0 || container.clientHeight === 0) {
                                 requestAnimationFrame(() => {
@@ -518,11 +520,11 @@
                         <strong>All Colors:</strong> ${JSON.stringify(colors, null, 2)}
                     `;
                     info.textContent = '';
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = infoHTML;
-                    while (tempDiv.firstChild) {
-                        info.appendChild(tempDiv.firstChild);
-                    }
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(infoHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        info.appendChild(node.cloneNode(true));
+                    });
                     
                     return true;
                 } catch (error) {
@@ -565,11 +567,11 @@
                         <strong>Preferences:</strong> ${JSON.stringify(theme.preferences, null, 2)}
                     `;
                     info.textContent = '';
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = infoHTML;
-                    while (tempDiv.firstChild) {
-                        info.appendChild(tempDiv.firstChild);
-                    }
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(infoHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        info.appendChild(node.cloneNode(true));
+                    });
                     
                     return hasPreferences;
                 } catch (error) {
@@ -619,11 +621,11 @@
                         <strong>Note:</strong> הגרפים תמיד משמאל לימין - זה בסדר. רק טקסט צריך להיות RTL.
                     `;
                     info.textContent = '';
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = infoHTML;
-                    while (tempDiv.firstChild) {
-                        info.appendChild(tempDiv.firstChild);
-                    }
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(infoHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        info.appendChild(node.cloneNode(true));
+                    });
                     
                     return true;
                 } catch (error) {
@@ -904,7 +906,13 @@
                         // Fallback already set
                     }
                 }
-                copyBtn.innerHTML = hourglassIcon + ' מעתיק...';
+                copyBtn.textContent = '';
+                const parser = new DOMParser();
+                const iconDoc = parser.parseFromString(hourglassIcon, 'text/html');
+                iconDoc.body.childNodes.forEach(node => {
+                    copyBtn.appendChild(node.cloneNode(true));
+                });
+                copyBtn.appendChild(document.createTextNode(' מעתיק...'));
             }
             
             testResults.endTime = new Date();
@@ -992,7 +1000,13 @@
                         // Fallback already set
                     }
                 }
-                copyBtn.innerHTML = infoIcon + ' הועתק!';
+                copyBtn.textContent = '';
+                const parser = new DOMParser();
+                const iconDoc = parser.parseFromString(infoIcon, 'text/html');
+                iconDoc.body.childNodes.forEach(node => {
+                    copyBtn.appendChild(node.cloneNode(true));
+                });
+                copyBtn.appendChild(document.createTextNode(' הועתק!'));
                 setTimeout(async () => {
                     let infoIcon2 = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">';
                     if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
@@ -1002,7 +1016,13 @@
                             // Fallback already set
                         }
                     }
-                    copyBtn.innerHTML = infoIcon2 + ' העתק לוג מפורט';
+                    copyBtn.textContent = '';
+                    const parser = new DOMParser();
+                    const iconDoc = parser.parseFromString(infoIcon2, 'text/html');
+                    iconDoc.body.childNodes.forEach(node => {
+                        copyBtn.appendChild(node.cloneNode(true));
+                    });
+                    copyBtn.appendChild(document.createTextNode(' העתק לוג מפורט'));
                 }, 2000);
             }
             
@@ -1033,7 +1053,13 @@
                         // Fallback already set
                     }
                 }
-                copyBtn.innerHTML = iconHTML + ' העתק לוג מפורט';
+                copyBtn.textContent = '';
+                const parser = new DOMParser();
+                const iconDoc = parser.parseFromString(iconHTML, 'text/html');
+                iconDoc.body.childNodes.forEach(node => {
+                    copyBtn.appendChild(node.cloneNode(true));
+                });
+                copyBtn.appendChild(document.createTextNode(' העתק לוג מפורט'));
             }
         }
     }

@@ -92,3 +92,5 @@ setTimeout(() => {
 - `trading-ui/scripts/init-system/dev-tools/page-template-generator.js` - כלי יצירת קוד טעינה
 - `documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md` - תיעוד מערכת האיתחול
 
+
+

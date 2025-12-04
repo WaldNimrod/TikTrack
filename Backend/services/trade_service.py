@@ -277,6 +277,16 @@ class TradeService:
         db.commit()
         db.refresh(trade)
         logger.info(f"Created trade: {trade.id} for ticker {trade.ticker_id}")
+        
+        # Update user-ticker and ticker status
+        try:
+            from services.ticker_service import TickerService
+            if trade.user_id and trade.ticker_id:
+                TickerService.update_user_ticker_status(db, trade.user_id, trade.ticker_id)
+                TickerService.update_ticker_status_auto(db, trade.ticker_id)
+        except Exception as e:
+            logger.warning(f"Could not update ticker status after creating trade: {e}")
+        
         return trade
     
     @staticmethod
@@ -313,12 +323,25 @@ class TradeService:
         if not is_valid:
             raise ValueError(f"Validation failed: {'; '.join(errors)}")
         
+        # Track if status changed
+        old_status = trade.status
+        
         for key, value in data.items():
             if hasattr(trade, key):
                 setattr(trade, key, value)
         
         db.commit()
         logger.info(f"Updated trade: {trade.id}")
+        
+        # Update user-ticker and ticker status if status changed
+        try:
+            from services.ticker_service import TickerService
+            if trade.user_id and trade.ticker_id and old_status != trade.status:
+                TickerService.update_user_ticker_status(db, trade.user_id, trade.ticker_id)
+                TickerService.update_ticker_status_auto(db, trade.ticker_id)
+        except Exception as e:
+            logger.warning(f"Could not update ticker status after updating trade: {e}")
+        
         return trade
     
     @staticmethod
@@ -402,14 +425,15 @@ class TradeService:
             db.refresh(trade)
             logger.info(f"Closed trade: {trade_id}")
             
-            # Update ticker active_trades status (triggers will handle this automatically)
-            # But we can also call the manual update for immediate consistency
+            # Update user-ticker and ticker status
             try:
-                from app import update_ticker_open_status
-                update_ticker_open_status(trade.ticker_id)
-                logger.info(f"Updated ticker {trade.ticker_id} active_trades status after closing trade")
+                from services.ticker_service import TickerService
+                if trade.user_id and trade.ticker_id:
+                    TickerService.update_user_ticker_status(db, trade.user_id, trade.ticker_id)
+                    TickerService.update_ticker_status_auto(db, trade.ticker_id)
+                    logger.info(f"Updated ticker {trade.ticker_id} status after closing trade")
             except Exception as e:
-                logger.warning(f"Could not update ticker active_trades status: {e}")
+                logger.warning(f"Could not update ticker status after closing trade: {e}")
             
             return trade
         return None
@@ -426,13 +450,15 @@ class TradeService:
             db.refresh(trade)
             logger.info(f"Cancelled trade: {trade_id}")
             
-            # Update ticker active_trades status (triggers will handle this automatically)
+            # Update user-ticker and ticker status
             try:
-                from app import update_ticker_open_status
-                update_ticker_open_status(trade.ticker_id)
-                logger.info(f"Updated ticker {trade.ticker_id} active_trades status after cancelling trade")
+                from services.ticker_service import TickerService
+                if trade.user_id and trade.ticker_id:
+                    TickerService.update_user_ticker_status(db, trade.user_id, trade.ticker_id)
+                    TickerService.update_ticker_status_auto(db, trade.ticker_id)
+                    logger.info(f"Updated ticker {trade.ticker_id} status after cancelling trade")
             except Exception as e:
-                logger.warning(f"Could not update ticker active_trades status: {e}")
+                logger.warning(f"Could not update ticker status after cancelling trade: {e}")
             
             return trade
         return None

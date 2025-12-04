@@ -4,7 +4,7 @@
  */
 
 // document.addEventListener('DOMContentLoaded', function() {
-//     console.log('=== Dynamic Colors Display Page Loaded ===');
+//     Logger.info('=== Dynamic Colors Display Page Loaded ===');
 
     // Initialize color scheme system
     if (window.generateNumericValueCSS) {
@@ -156,7 +156,12 @@ function injectSection1Content() {
 
     const sectionElement = document.getElementById('section1-content');
     if (sectionElement) {
-        sectionElement.innerHTML = sectionContent;
+        sectionElement.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(sectionContent, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            sectionElement.appendChild(node.cloneNode(true));
+        });
     }
 }
 
@@ -260,7 +265,12 @@ function injectSection2Content() {
 
     const sectionElement = document.getElementById('section2-content');
     if (sectionElement) {
-        sectionElement.innerHTML = sectionContent;
+        sectionElement.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(sectionContent, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            sectionElement.appendChild(node.cloneNode(true));
+        });
     }
 }
 
@@ -420,7 +430,12 @@ function injectSection3Content() {
 
     const sectionElement = document.getElementById('section3-content');
     if (sectionElement) {
-        sectionElement.innerHTML = sectionContent;
+        sectionElement.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(sectionContent, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            sectionElement.appendChild(node.cloneNode(true));
+        });
     }
 }
 
@@ -603,7 +618,12 @@ element.classList.add('entity-' + entityType);</pre>
 
     const sectionElement = document.getElementById('section4-content');
     if (sectionElement) {
-        sectionElement.innerHTML = sectionContent;
+        sectionElement.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(sectionContent, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            sectionElement.appendChild(node.cloneNode(true));
+        });
     }
 }
 

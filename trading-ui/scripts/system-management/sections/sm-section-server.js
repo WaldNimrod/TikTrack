@@ -146,7 +146,12 @@ class SMServerSection extends SMBaseSection {
 
     try {
       const serverHtml = this.createServerHTML(data);
-      this.container.innerHTML = serverHtml;
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(serverHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Server section rendered successfully');
       

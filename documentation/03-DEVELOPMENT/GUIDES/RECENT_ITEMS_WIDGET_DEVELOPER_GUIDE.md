@@ -292,6 +292,18 @@ window.RecentItemsWidget.init('recentItemsWidgetContainer', {
 
 ### Hover Overlay
 
+הווידג'ט משתמש ב-**WidgetOverlayService** המרכזי לניהול overlay של פרטים נוספים.
+
+**מבנה HTML נדרש:**
+- `data-widget-overlay="true"` על ה-item
+- `data-overlay="true"` על ה-details container
+
+**תיעוד:**
+- [WIDGET_OVERLAY_SERVICE_GUIDE.md](WIDGET_OVERLAY_SERVICE_GUIDE.md) - Widget Overlay Service
+- [UNIFIED_UI_POSITIONING_GUIDE.md](UNIFIED_UI_POSITIONING_GUIDE.md) - Unified UI Positioning Service (Floating UI)
+
+**הערה:** `WidgetOverlayService` משתמש ב-`Unified UI Positioning Service` למיקום חכם באמצעות Floating UI (עם fallback אוטומטי).
+
 ה-overlay מוצג אוטומטית על hover על כל פריט. ה-overlay מציג:
 - פרטים נוספים שלא מוצגים ב-header
 - מידע מפורט על הטרייד/תוכנית

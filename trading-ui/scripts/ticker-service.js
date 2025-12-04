@@ -486,7 +486,11 @@ function updateTickerSelect(selectId, tickers, placeholder = 'בחר טיקר...
     return;
   }
 
-  select.innerHTML = `<option value="">${placeholder}</option>`;
+  select.textContent = '';
+  const option = document.createElement('option');
+  option.value = '';
+  option.textContent = placeholder;
+  select.appendChild(option);
 
   tickers.forEach(ticker => {
     const option = document.createElement('option');
@@ -510,20 +514,42 @@ function updateTickerSelect(selectId, tickers, placeholder = 'בחר טיקר...
  */
 async function loadTickersForTradePlan() {
   try {
-    const response = await fetch('/api/tickers/');
+    // Use /api/tickers/my to get only user's tickers
+    const response = await fetch('/api/tickers/my');
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      // Fallback to /api/tickers/ if /my fails
+      const fallbackResponse = await fetch('/api/tickers/');
+      if (!fallbackResponse.ok) {
+        throw new Error(`HTTP error! status: ${fallbackResponse.status}`);
+      }
+      const fallbackData = await fallbackResponse.json();
+      var tickers = fallbackData.data || fallbackData;
+    } else {
+      const data = await response.json();
+      var tickers = data.data || data;
     }
 
-    const data = await response.json();
-    const tickers = data.data || data;
+    // סינון טיקרים - רק פתוח או סגור (ברמת user_ticker_status או status)
+    let activeTickers = tickers.filter(ticker => {
+      const status = ticker.user_ticker_status || ticker.status;
+      return status === 'open' || status === 'closed';
+    });
 
-    // סינון טיקרים - רק פתוח או סגור
-    const activeTickers = tickers.filter(ticker =>
-      ticker.status === 'open' || ticker.status === 'closed',
-    );
-
-    // Loaded active tickers
+    // Sort tickers alphabetically using centralized business logic
+    if (window.tickersData && typeof window.tickersData.sortTickersAlphabetically === 'function') {
+      activeTickers = window.tickersData.sortTickersAlphabetically(activeTickers);
+    } else {
+      // Fallback sorting if service not available
+      activeTickers.sort((a, b) => {
+        const symbolA = (a.symbol || a.ticker_symbol || '').toUpperCase();
+        const symbolB = (b.symbol || b.ticker_symbol || '').toUpperCase();
+        const symbolCompare = symbolA.localeCompare(symbolB, 'he', { numeric: true, sensitivity: 'base' });
+        if (symbolCompare !== 0) return symbolCompare;
+        const nameA = (a.name || '').toUpperCase();
+        const nameB = (b.name || '').toUpperCase();
+        return nameA.localeCompare(nameB, 'he', { numeric: true, sensitivity: 'base' });
+      });
+    }
 
     // עדכון רשימת הטיקרים
     console.log('🔄 tickerService.loadTickersForTradePlan: Updating ticker select...');
@@ -532,13 +558,18 @@ async function loadTickersForTradePlan() {
       console.log(`🔧 tickerService.loadTickersForTradePlan: Ticker select found, current value: "${tickerSelect.value}"`);
       
       // Clear existing options except the first one
-      tickerSelect.innerHTML = '<option value="">בחר טיקר</option>';
+      tickerSelect.textContent = '';
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'בחר טיקר';
+      tickerSelect.appendChild(option);
       
-      // Add ticker options
+      // Add ticker options - use custom name if available
       activeTickers.forEach(ticker => {
         const option = document.createElement('option');
         option.value = ticker.id;
-        option.textContent = `${ticker.symbol} - ${ticker.name || ticker.symbol}`;
+        const displayName = ticker.name_custom || ticker.name || ticker.symbol;
+        option.textContent = `${ticker.symbol} - ${displayName}`;
         tickerSelect.appendChild(option);
       });
       

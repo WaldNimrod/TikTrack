@@ -143,7 +143,12 @@ class ConstraintsMonitor {
         const tableFilter = document.getElementById('table-filter');
         tableFilter.innerHTML.textContent = '';
         const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = '\'<option value="">כל הטבלאות</option>\'';
+        tempDiv.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString('<option value="">כל הטבלאות</option>', 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tempDiv.appendChild(node.cloneNode(true));
+        });
         while (tempDiv.firstChild) {
             tableFilter.innerHTML.appendChild(tempDiv.firstChild);
         }
@@ -216,7 +221,12 @@ class ConstraintsMonitor {
         // Insert using tempDiv
         content.textContent = '';
         const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
+        tempDiv.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tempDiv.appendChild(node.cloneNode(true));
+        });
         while (tempDiv.firstChild) {
           content.appendChild(tempDiv.firstChild);
         }
@@ -279,7 +289,12 @@ class ConstraintsMonitor {
             `;
         });
         
-        content.innerHTML = html;
+        content.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            content.appendChild(node.cloneNode(true));
+        });
     }
 
     renderByTypeLayer() {
@@ -340,7 +355,12 @@ class ConstraintsMonitor {
             `;
         });
         
-        content.innerHTML = html;
+        content.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            content.appendChild(node.cloneNode(true));
+        });
     }
 
     renderCurrentLayer() {
@@ -392,13 +412,21 @@ class ConstraintsMonitor {
         }
         
         if (filteredConstraints.length === 0) {
-            tbody.innerHTML = `
+            tbody.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
                 <tr>
                     <td colspan="7" class="text-center text-muted">
                         <i class="fas fa-search"></i> לא נמצאו אילוצים המתאימים לפילטרים
                     </td>
                 </tr>
-            `;
+            `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        tbody.appendChild(fragment);
             return;
         }
         
@@ -441,7 +469,15 @@ class ConstraintsMonitor {
             `;
         });
         
-        tbody.innerHTML = html;
+        tbody.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<table><tbody>${html}</tbody></table>`, 'text/html');
+        const tempTbody = doc.body.querySelector('tbody');
+        if (tempTbody) {
+            Array.from(tempTbody.children).forEach(row => {
+                tbody.appendChild(row.cloneNode(true));
+            });
+        }
     }
 
     setupEventListeners() {
@@ -553,16 +589,21 @@ class ConstraintsMonitor {
             const messagesContainer = document.getElementById('messages');
             const alertClass = type === 'error' ? 'alert-danger' : 'alert-success';
             
-            messagesContainer.innerHTML = `
-                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-                    ${message}
-                    <button data-button-type="CLOSE" data-variant="small" data-attributes="data-bs-dismiss='alert' type='button'"></button>
-                </div>
-            `;
+            messagesContainer.textContent = '';
+            const alert = document.createElement('div');
+            alert.className = `alert ${alertClass} alert-dismissible fade show`;
+            alert.setAttribute('role', 'alert');
+            alert.textContent = message;
+            const closeBtn = document.createElement('button');
+            closeBtn.setAttribute('data-button-type', 'CLOSE');
+            closeBtn.setAttribute('data-variant', 'small');
+            closeBtn.setAttribute('data-attributes', "data-bs-dismiss='alert' type='button'");
+            alert.appendChild(closeBtn);
+            messagesContainer.appendChild(alert);
             
             // Auto-hide after 5 seconds
             setTimeout(() => {
-                messagesContainer.innerHTML = '';
+                messagesContainer.textContent = '';
             }, 5000);
         }
     }
@@ -810,7 +851,19 @@ window.toggleConstraint = async function(constraintName) {
       });
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      confirmed = confirm(confirmMessage);
+      if (window.showConfirmationDialog) {
+        confirmed = await new Promise((resolve) => {
+          window.showConfirmationDialog(
+            'אישור',
+            confirmMessage,
+            () => resolve(true),
+            () => resolve(false),
+            'info'
+          );
+        });
+      } else {
+        confirmed = confirm(confirmMessage);
+      }
     }
     
     if (confirmed) {
@@ -1379,7 +1432,12 @@ function displayValidationResults(results) {
     
     html += '</div>';
     
-    resultsContainer.innerHTML = html;
+    resultsContainer.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        resultsContainer.appendChild(node.cloneNode(true));
+    });
 }
 
 /**

@@ -1516,148 +1516,38 @@ async function renderCashFlowsTable() {
           return `<span class="text-truncate-preview" title="${escape(fallbackPlain)}">${escape(truncated)}</span>`;
         })();
 
-            row.innerHTML = `
-            <td class="trade-cell" data-trade-id="${cashFlow.trade_id || ''}">
-                ${tradeCell}
-            </td>
-            <td class="col-account ticker-cell" data-account="${cashFlow.trading_account_id || accountName || ''}">
-                <div class="table-cell-flex">
-                    <span class="entity-trading_account-badge entity-account-badge entity-badge-base">
-                        ${accountName}
-                    </span>
-                </div>
-            </td>
-            <td class="col-type type-cell" data-type="${cashFlow.type || ''}" dir="rtl">${typeDisplay}</td>
-            <td class="col-amount text-end">
-                ${amountDisplay}
-            </td>
-            <td class="col-date table-cell-center" data-date="${cashFlow.date || ''}">${(() => {
-              const dateValue = cashFlow.date;
-              if (!dateValue) {
-                return '<span class="date-text">-</span>';
-              }
-              // Use FieldRendererService.renderDate for consistent date formatting
-              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-                const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(dateValue) : dateValue;
-                return `<span class="date-text">${window.FieldRendererService.renderDate(dateEnvelope || dateValue, false)}</span>`;
-              }
-              // Fallback to dateUtils or formatDate
-              if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
-                const dateEnvelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(dateValue) : dateValue;
-                return `<span class="date-text">${window.dateUtils.formatDate(dateEnvelope || dateValue, { includeTime: false })}</span>`;
-              }
-              // Last fallback
-              try {
-                const dateObj = dateValue instanceof Date ? dateValue : new Date(dateValue);
-                if (!Number.isNaN(dateObj.getTime())) {
-                  const formatted = window.formatDate ? window.formatDate(dateObj, false) : dateObj.toLocaleDateString('he-IL');
-                  return `<span class="date-text">${formatted}</span>`;
-                }
-              } catch (error) {
-                window.Logger?.warn('⚠️ cash_flows date formatting failed', { error, cashFlowId: cashFlow?.id }, { page: 'cash_flows' });
-              }
-              return '<span class="date-text">-</span>';
-            })()}</td>
-            <td class="col-description">${descriptionDisplay}</td>
-            <td class="col-source">${window.translateCashFlowSource ?
-    window.translateCashFlowSource(cashFlow.source) :
-    cashFlow.source}</td>
-            ${(() => {
-              // Prefer FieldRendererService.renderDate for consistent date formatting (same as notes page)
-              const rawDate = cashFlow.updated_at || cashFlow.date || cashFlow.created_at || null;
-              
-              if (!rawDate) {
-                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-              }
-
-              // Use FieldRendererService.renderDate for proper date formatting (handles DateEnvelope, Date objects, strings)
-              let dateDisplay = '';
-              let epoch = null;
-
-              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-                // Use FieldRendererService to render date with time (same as notes page)
-                dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
-                
-                // Get epoch for sorting
-                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-                  const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
-                  epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
-                } else if (rawDate instanceof Date) {
-                  epoch = rawDate.getTime();
-                } else if (typeof rawDate === 'string') {
-                  const parsed = Date.parse(rawDate);
-                  epoch = Number.isNaN(parsed) ? null : parsed;
-                } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
-                  epoch = rawDate.epochMs;
-                }
-              } else {
-                // Fallback: work directly with date envelope objects or raw values (same as notes page)
-                const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
-                  ? window.dateUtils.ensureDateEnvelope(rawDate)
-                  : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
-                    ? rawDate
-                    : null;
-
-                // Derive epoch milliseconds
-                epoch = (() => {
-                  if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-                    return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
-                  }
-                  if (envelope && typeof envelope.epochMs === 'number') {
-                    return envelope.epochMs;
-                  }
-                  if (rawDate instanceof Date) {
-                    return rawDate.getTime();
-                  }
-                  if (typeof rawDate === 'string') {
-                    const parsed = Date.parse(rawDate);
-                    return Number.isNaN(parsed) ? null : parsed;
-                  }
-                  return null;
-                })();
-
-                if (epoch === null || Number.isNaN(epoch)) {
-                  return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-                }
-
-                // Build date display using unified date utilities
-                dateDisplay = (() => {
-                  if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
-                    return window.dateUtils.formatDateTime(envelope || rawDate);
-                  }
-                  if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
-                    return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
-                  }
-                  try {
-                    const dateObj = new Date(epoch);
-                    return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    }));
-                  } catch (err) {
-                    window.Logger?.warn('⚠️ cash_flows updated-cell date formatting failed', { err, cashFlowId: cashFlow?.id }, { page: 'cash_flows' });
-                    return 'לא מוגדר';
-                  }
-                })();
-              }
-
-              if (!dateDisplay || dateDisplay === '-') {
-                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-              }
-
-              return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
-            })()}
-            <td class="col-actions actions-cell actions-4-items">
-              ${actionsMenu}
-            </td>
-        `;
+    // Build row HTML with all cells
+    row.textContent = '';
+    const rowHTML = `
+      <td class="trade-cell">${tradeCell}</td>
+      <td class="account-cell">${accountName}</td>
+      <td class="type-cell" dir="rtl">${typeDisplay}</td>
+      <td class="amount-cell" dir="ltr">${amountDisplay}</td>
+      <td class="date-cell" data-date="${cashFlow.date ? (window.dateUtils?.getEpochMilliseconds ? window.dateUtils.getEpochMilliseconds(window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(cashFlow.date) : cashFlow.date) : '') : ''}">
+        ${cashFlow.date ? (window.FieldRendererService?.renderDate ? window.FieldRendererService.renderDate(cashFlow.date, false) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(cashFlow.date, { includeTime: false }) : cashFlow.date)) : '-'}
+      </td>
+      <td class="description-cell">${descriptionDisplay}</td>
+      <td class="source-cell">${cashFlow.source || '-'}</td>
+      <td class="updated-cell" data-date="${cashFlow.updated_at ? (window.dateUtils?.getEpochMilliseconds ? window.dateUtils.getEpochMilliseconds(window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(cashFlow.updated_at) : cashFlow.updated_at) : '') : ''}">
+        ${cashFlow.updated_at ? (window.FieldRendererService?.renderDate ? window.FieldRendererService.renderDate(cashFlow.updated_at, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(cashFlow.updated_at, { includeTime: true }) : cashFlow.updated_at)) : '-'}
+      </td>
+      <td class="actions-cell" data-entity-id="${cashFlow.id}">${actionsMenu}</td>
+    `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+    const tempRow = doc.body.querySelector('tr');
+    if (tempRow) {
+        Array.from(tempRow.children).forEach(cell => {
+            row.appendChild(cell.cloneNode(true));
+        });
+    }
     tbody.appendChild(row);
   });
 
   setupExchangeRowInteractions();
+
+  // Render unified forex exchanges table
+  renderUnifiedForexExchangesTable(dataToRender);
 
   // עדכון מספר הפריטים - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
   if (window.updateTableCount) {
@@ -1925,7 +1815,15 @@ function renderUnifiedForexExchangesTable(sourceRows) {
   if (!tableBody) return;
   const groups = groupUnifiedExchanges(sourceRows);
   if (!groups || groups.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="7" class="text-center">אין המרות מטבע להצגה.</td></tr>`;
+    tableBody.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<tr><td colspan="7" class="text-center">אין המרות מטבע להצגה.</td></tr>`, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        tableBody.appendChild(fragment);
     return;
   }
   const fmtAmt = (amt, curIdOrSymbol) => {
@@ -1977,7 +1875,7 @@ function renderUnifiedForexExchangesTable(sourceRows) {
     if (toId) items.push({ type: 'VIEW', onclick: `showCashFlowDetails(${toId})`, title: 'פתח צד To' });
     return window.createActionsMenu(items) || '';
   };
-  tableBody.innerHTML = '';
+  tableBody.textContent = '';
   groups.forEach(g => {
     const date = g.to?.date || g.from?.date || g.to?.updated_at || g.from?.updated_at || null;
     const fromAmt = g.from?.amount || 0;
@@ -1990,15 +1888,66 @@ function renderUnifiedForexExchangesTable(sourceRows) {
     const idDisplay = g.id || '-';
     const actions = buildActions(g.id, g.from?.id, g.to?.id);
     const row = document.createElement('tr');
-    row.innerHTML = `
-      <td class="table-cell-center">${fmtDate(date)}</td>
-      <td>${accountName}</td>
-      <td dir="ltr">${fmtAmt(fromAmt, fromSym)}</td>
-      <td dir="ltr">${fmtAmt(toAmt, toSym)}</td>
-      <td dir="ltr">${rateDisplay}</td>
-      <td dir="ltr">${idDisplay}</td>
-      <td class="text-center">${actions}</td>
-    `;
+    
+    // Date cell
+    const dateCell = document.createElement('td');
+    dateCell.className = 'table-cell-center';
+    dateCell.textContent = fmtDate(date);
+    row.appendChild(dateCell);
+    
+    // Account cell
+    const accountCell = document.createElement('td');
+    accountCell.textContent = accountName;
+    row.appendChild(accountCell);
+    
+    // From amount cell
+    const fromCell = document.createElement('td');
+    fromCell.setAttribute('dir', 'ltr');
+    fromCell.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(fmtAmt(fromAmt, fromSym), 'text/html');
+    doc.body.childNodes.forEach(node => {
+        fromCell.appendChild(node.cloneNode(true));
+    });
+    row.appendChild(fromCell);
+    
+    // To amount cell
+    const toCell = document.createElement('td');
+    toCell.setAttribute('dir', 'ltr');
+    toCell.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(fmtAmt(toAmt, toSym), 'text/html');
+    doc.body.childNodes.forEach(node => {
+        toCell.appendChild(node.cloneNode(true));
+    });
+    row.appendChild(toCell);
+    
+    // Rate cell
+    const rateCell = document.createElement('td');
+    rateCell.setAttribute('dir', 'ltr');
+    rateCell.textContent = rateDisplay;
+    row.appendChild(rateCell);
+    
+    // ID cell
+    const idCell = document.createElement('td');
+    idCell.setAttribute('dir', 'ltr');
+    idCell.textContent = idDisplay;
+    row.appendChild(idCell);
+    
+    // Actions cell
+    const actionsCell = document.createElement('td');
+    actionsCell.className = 'text-center';
+    if (actions) {
+      const parser = new DOMParser();
+      const actionsDoc = parser.parseFromString(actions, 'text/html');
+      const actionsFragment = document.createDocumentFragment();
+      Array.from(actionsDoc.body.childNodes).forEach(node => {
+        actionsFragment.appendChild(node.cloneNode(true));
+      });
+      actionsCell.appendChild(actionsFragment);
+    }
+    row.appendChild(actionsCell);
+    
     tableBody.appendChild(row);
   });
 }
@@ -2140,7 +2089,7 @@ function setCurrencyExchangeSummary(summary) {
     return;
   }
 
-  container.innerHTML = window.FieldRendererService.renderExchangePairCards(summary, {
+  const htmlContent = window.FieldRendererService.renderExchangePairCards(summary, {
     renderAction: (flow) => {
       if (!flow?.id) {
         return '';
@@ -2151,6 +2100,15 @@ function setCurrencyExchangeSummary(summary) {
       return '';
     }
   });
+  
+  if (htmlContent) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+    container.textContent = '';
+    Array.from(doc.body.childNodes).forEach(node => {
+      container.appendChild(node.cloneNode(true));
+    });
+  }
 }
 
 /**
@@ -2194,7 +2152,7 @@ function hydrateCashFlowExchangeDisplay(cashFlowId) {
     return;
   }
 
-  container.innerHTML = window.FieldRendererService.renderExchangePairCards(record.exchange_pair_summary, {
+  const htmlContent = window.FieldRendererService.renderExchangePairCards(record.exchange_pair_summary, {
     currentId: record.id,
     renderAction: (flow) => {
       if (!flow?.id) {
@@ -2203,6 +2161,15 @@ function hydrateCashFlowExchangeDisplay(cashFlowId) {
       return `<button class="btn btn-sm btn-outline-primary" data-onclick="showCashFlowDetails(${flow.id})">פתח רשומה</button>`;
     }
   });
+  
+  if (htmlContent) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+    container.textContent = '';
+    Array.from(doc.body.childNodes).forEach(node => {
+      container.appendChild(node.cloneNode(true));
+    });
+  }
 }
 
 // פונקציות הועברו ל-translation-utils.js:

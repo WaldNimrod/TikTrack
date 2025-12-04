@@ -69,6 +69,24 @@
 3. **Create Plans** - יצירת תוכניות מטריידים
 4. **Create Trades** - יצירת טריידים מביצועים
 
+### Hover Overlay
+
+הווידג'ט משתמש ב-**WidgetOverlayService** המרכזי לניהול overlay של פרטים נוספים.
+
+**מבנה HTML נדרש:**
+- `data-widget-overlay="true"` על ה-item
+- `data-overlay="true"` על ה-details container
+
+**תיעוד:**
+- [WIDGET_OVERLAY_SERVICE_GUIDE.md](WIDGET_OVERLAY_SERVICE_GUIDE.md) - Widget Overlay Service
+- [UNIFIED_UI_POSITIONING_GUIDE.md](UNIFIED_UI_POSITIONING_GUIDE.md) - Unified UI Positioning Service (Floating UI)
+
+**הערה:** `WidgetOverlayService` משתמש ב-`Unified UI Positioning Service` למיקום חכם באמצעות Floating UI (עם fallback אוטומטי).
+
+כל פריט מציג:
+- **Header Section** - תמיד גלוי: שם, תאריך, סכום, כפתורי פעולה
+- **Details Section** - מוצג על hover: פרטים נוספים (חשבון, פעולה, הצעות שיוך, וכו')
+
 ---
 
 ## 🔌 API

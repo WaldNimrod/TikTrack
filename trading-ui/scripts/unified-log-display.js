@@ -138,7 +138,8 @@ class UnifiedLogDisplay {
     render() {
         if (!this.container) return;
 
-        this.container.innerHTML = `
+        this.container.textContent = '';
+        const containerHTML = `
             <div class="unified-log-display" data-log-type="${this.options.logType || ''}">
                 <!-- Header -->
                 <div class="log-display-header d-flex justify-content-between align-items-center">
@@ -312,6 +313,11 @@ class UnifiedLogDisplay {
                 </div>
             </div>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(containerHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            this.container.appendChild(node.cloneNode(true));
+        });
 
         // Attach event listeners
         this.attachEventListeners();
@@ -527,7 +533,8 @@ class UnifiedLogDisplay {
             pageDisplay = '-';
         }
 
-        row.innerHTML = `
+        row.textContent = '';
+        const rowHTML = `
             <td class="timestamp-cell">${timestamp}</td>
             <td class="type-cell">${typeDisplay}</td>
             <td class="title-cell">${title}</td>
@@ -555,6 +562,14 @@ class UnifiedLogDisplay {
                 })()}
             </td>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+        const tempRow = doc.body.querySelector('tr');
+        if (tempRow) {
+            Array.from(tempRow.children).forEach(cell => {
+                row.appendChild(cell.cloneNode(true));
+            });
+        }
         
         // Add event listeners for action buttons (if needed for fallback)
         const viewBtn = row.querySelector('.view-details-btn');
@@ -615,7 +630,14 @@ class UnifiedLogDisplay {
             const testBtn = document.createElement('button');
             testBtn.className = 'btn btn-action';
             // Use sync fallback for icon (debug code doesn't need async)
-            testBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info" class="icon">';
+            testBtn.textContent = '';
+            const img = document.createElement('img');
+            img.src = '/trading-ui/images/icons/tabler/info-circle.svg';
+            img.width = 16;
+            img.height = 16;
+            img.alt = 'info';
+            img.className = 'icon';
+            testBtn.appendChild(img);
             testBtn.style.position = 'absolute';
             testBtn.style.top = '-1000px';
             testBtn.style.left = '-1000px';
@@ -1286,16 +1308,20 @@ ${message}`;
         const tbody = this.container.querySelector('.log-table-body');
         if (!tbody) return;
         
-        tbody.innerHTML = '';
+        tbody.textContent = '';
         
         if (!data || data.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="7" class="text-center text-muted">
-                        <i class="fas fa-info-circle"></i> אין נתונים להצגה
-                    </td>
-                </tr>
-            `;
+            tbody.textContent = '';
+            const emptyRow = document.createElement('tr');
+            const emptyCell = document.createElement('td');
+            emptyCell.colSpan = 7;
+            emptyCell.className = 'text-center text-muted';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-info-circle';
+            emptyCell.appendChild(icon);
+            emptyCell.appendChild(document.createTextNode(' אין נתונים להצגה'));
+            emptyRow.appendChild(emptyCell);
+            tbody.appendChild(emptyRow);
             return;
         }
         
@@ -1319,7 +1345,7 @@ ${message}`;
         }
         
         if (this.container) {
-            this.container.innerHTML = '';
+            this.container.textContent = '';
         }
     }
 }
@@ -1414,7 +1440,10 @@ window.debugActionButtons = function() {
     console.log('🎨 Checking CSS conflicts...');
     const testBtn = document.createElement('button');
     testBtn.className = 'btn btn-action';
-    testBtn.innerHTML = '<i class="fas fa-info"></i>';
+    testBtn.textContent = '';
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-info';
+    testBtn.appendChild(icon);
     testBtn.style.position = 'absolute';
     testBtn.style.top = '-1000px';
     testBtn.style.left = '-1000px';

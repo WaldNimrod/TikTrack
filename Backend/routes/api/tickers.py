@@ -58,16 +58,33 @@ def _get_tickers_normalizer() -> DateNormalizationService:
 @tickers_bp.route('/', methods=['GET'])
 @handle_database_session()
 def get_tickers():
-    """Get all tickers - enhanced with market data"""
+    """Get tickers for the current user - enhanced with market data"""
     db: Session = g.db
+    user_id = getattr(g, 'user_id', None) or request.args.get('user_id', type=int)
+    
+    if not user_id:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User ID required"},
+            "version": "1.0"
+        }), 400
+    
     try:
-        tickers = TickerService.get_all(db)
+        tickers = TickerService.get_user_tickers(db, user_id)
         
         # Convert tickers to dict with market data
         tickers_data = []
         for ticker in tickers:
             try:
                 ticker_dict = ticker.to_dict()
+                
+                # Add custom fields from user_ticker association
+                if hasattr(ticker, 'name_custom'):
+                    ticker_dict['name_custom'] = ticker.name_custom
+                if hasattr(ticker, 'type_custom'):
+                    ticker_dict['type_custom'] = ticker.type_custom
+                if hasattr(ticker, 'user_ticker_status'):
+                    ticker_dict['user_ticker_status'] = ticker.user_ticker_status
                 
                 # Add market data fields if they exist (dynamically added by TickerService)
                 try:
@@ -146,6 +163,14 @@ def get_my_tickers():
         for ticker in tickers:
             try:
                 ticker_dict = ticker.to_dict()
+                
+                # Add custom fields from user_ticker association
+                if hasattr(ticker, 'name_custom'):
+                    ticker_dict['name_custom'] = ticker.name_custom
+                if hasattr(ticker, 'type_custom'):
+                    ticker_dict['type_custom'] = ticker.type_custom
+                if hasattr(ticker, 'user_ticker_status'):
+                    ticker_dict['user_ticker_status'] = ticker.user_ticker_status
                 
                 # Add market data fields if they exist
                 try:
@@ -342,27 +367,88 @@ def create_ticker():
         
         # Use the session from the decorator (in g.db)
         db: Session = g.db
+        user_id = getattr(g, 'user_id', None)
         
-        # Extract provider_symbols if provided (optional field)
+        if not user_id:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User ID required"},
+                "version": "1.0"
+            }), 400
+        
+        # Extract custom fields and provider_symbols
+        name_custom = data.pop('name_custom', None)
+        type_custom = data.pop('type_custom', None)
         provider_symbols = data.pop('provider_symbols', None)
         
-        # Create the ticker first
-        try:
-            ticker = TickerService.create(db, data)
-        except Exception as e:
-            error_msg = str(e)
-            if "UNIQUE constraint failed" in error_msg and "tickers.symbol" in error_msg:
+        # Check if ticker already exists
+        from models.ticker import Ticker
+        from models.user_ticker import UserTicker
+        
+        existing_ticker = db.query(Ticker).filter(
+            Ticker.symbol == data.get('symbol')
+        ).first()
+        
+        if existing_ticker:
+            # Check if user already has this ticker
+            existing_association = db.query(UserTicker).filter(
+                UserTicker.user_id == user_id,
+                UserTicker.ticker_id == existing_ticker.id
+            ).first()
+            
+            if existing_association:
                 return jsonify({
                     "status": "error",
-                    "error": {"message": f"טיקר עם סמל '{data.get('symbol', '')}' כבר קיים במערכת"},
+                    "error": {"message": "טיקר זה כבר נמצא ברשימה שלך"},
                     "version": "1.0"
                 }), 400
-            else:
-                return jsonify({
-                    "status": "error",
-                    "error": {"message": f"שגיאה ביצירת טיקר: {error_msg}"},
-                    "version": "1.0"
-                }), 400
+            
+            # Create association with custom fields
+            user_ticker = UserTicker(
+                user_id=user_id,
+                ticker_id=existing_ticker.id,
+                name_custom=name_custom,
+                type_custom=type_custom,
+                status='open'
+            )
+            db.add(user_ticker)
+            db.commit()
+            ticker = existing_ticker
+        else:
+            # Create new ticker
+            try:
+                ticker = TickerService.create(db, data)
+            except Exception as e:
+                error_msg = str(e)
+                if "UNIQUE constraint failed" in error_msg and "tickers.symbol" in error_msg:
+                    return jsonify({
+                        "status": "error",
+                        "error": {"message": f"טיקר עם סמל '{data.get('symbol', '')}' כבר קיים במערכת"},
+                        "version": "1.0"
+                    }), 400
+                else:
+                    return jsonify({
+                        "status": "error",
+                        "error": {"message": f"שגיאה ביצירת טיקר: {error_msg}"},
+                        "version": "1.0"
+                    }), 400
+            
+            # Create association with custom fields
+            user_ticker = UserTicker(
+                user_id=user_id,
+                ticker_id=ticker.id,
+                name_custom=name_custom,
+                type_custom=type_custom,
+                status='open'
+            )
+            db.add(user_ticker)
+            db.commit()
+            
+            # Update ticker status
+            try:
+                TickerService.update_ticker_status_auto(db, ticker.id)
+            except Exception as e:
+                logger.warning(f"Could not update ticker status after creation: {e}")
         
         # Create provider symbol mappings if provided
         if provider_symbols and isinstance(provider_symbols, dict):
@@ -519,10 +605,31 @@ def update_ticker(ticker_id: int):
                     "version": "1.0"
                 }), 400
         
-        # Extract provider_symbols if provided (optional field)
+        # Extract custom fields and provider_symbols
+        name_custom = data.pop('name_custom', None)
+        type_custom = data.pop('type_custom', None)
         provider_symbols = data.pop('provider_symbols', None)
         
-        # Update ticker
+        user_id = getattr(g, 'user_id', None)
+        
+        # Update custom fields in user_tickers if provided
+        if user_id and (name_custom is not None or type_custom is not None):
+            from models.user_ticker import UserTicker
+            user_ticker = db.query(UserTicker).filter(
+                UserTicker.user_id == user_id,
+                UserTicker.ticker_id == ticker_id
+            ).first()
+            
+            if user_ticker:
+                if name_custom is not None:
+                    user_ticker.name_custom = name_custom
+                if type_custom is not None:
+                    user_ticker.type_custom = type_custom
+                db.commit()
+        
+        # Update ticker (only general fields - custom fields updated above)
+        # Only admin can update general ticker fields
+        # For now, allow update but in future add admin check
         ticker = TickerService.update(db, ticker_id, data)
         if ticker:
             # Update provider symbol mappings if provided
@@ -619,10 +726,18 @@ def get_ticker_provider_symbols(ticker_id: int):
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after deleting ticker
 def delete_ticker(ticker_id: int):
-    """Delete ticker"""
+    """Cancel user-ticker association (user cancels their association, not delete ticker)"""
     try:
         # Use the session from the decorator (in g.db)
         db: Session = g.db
+        user_id = getattr(g, 'user_id', None)
+        
+        if not user_id:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User ID required"},
+                "version": "1.0"
+            }), 400
         
         # Check that ticker exists
         ticker = TickerService.get_by_id(db, ticker_id)
@@ -633,43 +748,40 @@ def delete_ticker(ticker_id: int):
                 "version": "1.0"
             }), 404
         
-        # Check active_trades constraint - prevent deletion if ticker has active trades
-        if ticker.active_trades:
+        # Cancel user-ticker association (not delete ticker)
+        from models.user_ticker import UserTicker
+        user_ticker = db.query(UserTicker).filter(
+            UserTicker.user_id == user_id,
+            UserTicker.ticker_id == ticker_id
+        ).first()
+        
+        if not user_ticker:
             return jsonify({
                 "status": "error",
-                "error": {"message": "Cannot delete ticker with active trades. Please close all open trades first."},
+                "error": {"message": "Ticker not in your list"},
                 "version": "1.0"
-            }), 400
+            }), 404
         
-        # Check linked items
-        linked_items = TickerService.check_linked_items(db, ticker_id)
-        if linked_items['has_linked_items']:
-            return jsonify({
-                "status": "error",
-                "error": {"message": "Cannot delete ticker with linked items (trades, trade plans, notes, or alerts)"},
-                "version": "1.0"
-            }), 400
+        # Update status to cancelled
+        user_ticker.status = 'cancelled'
+        db.commit()
         
-        # Tag cleanup is handled automatically by SQLAlchemy event listeners
+        # Update ticker overall status
+        try:
+            TickerService.update_ticker_status_auto(db, ticker_id)
+        except Exception as e:
+            logger.warning(f"Could not update ticker status after cancelling association: {e}")
         
-        # Delete ticker
-        success = TickerService.delete(db, ticker_id)
-        if success:
-            # CACHE DISABLED - No need to clear cache
-            
-            # Prepare response
-            response_data = {
-                "status": "success",
-                "message": "Ticker deleted successfully",
-                "version": "1.0"
-            }
-            
-            return jsonify(response_data)
-        return jsonify({
-            "status": "error",
-            "error": {"message": "Failed to delete ticker"},
+        # CACHE DISABLED - No need to clear cache
+        
+        # Prepare response
+        response_data = {
+            "status": "success",
+            "message": "Ticker removed from your list",
             "version": "1.0"
-        }), 500
+        }
+        
+        return jsonify(response_data)
     except Exception as e:
         logger.error(f"Error deleting ticker {ticker_id}: {str(e)}")
         return jsonify({
@@ -1010,6 +1122,73 @@ def add_ticker_to_user(ticker_id: int):
         return jsonify({
             "status": "error",
             "error": {"message": f"Failed to add ticker to user: {str(e)}"},
+            "version": "1.0"
+        }), 500
+
+@tickers_bp.route('/<int:ticker_id>/admin-delete', methods=['DELETE'])
+@handle_database_session()
+@api_endpoint(cache_ttl=0, rate_limit=30)
+def admin_delete_ticker(ticker_id: int):
+    """Admin-only: Delete ticker from main table"""
+    db: Session = g.db
+    user_id = getattr(g, 'user_id', None)
+    
+    if not user_id:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Authentication required"},
+            "version": "1.0"
+        }), 401
+    
+    # Check admin permissions (user_id == 1 is admin, or check role if exists)
+    from models.user import User
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user or (user_id != 1 and not (hasattr(user, 'role') and user.role == 'admin')):
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Admin access required"},
+            "version": "1.0"
+        }), 403
+    
+    try:
+        # Check for active associations
+        from models.user_ticker import UserTicker
+        active_associations = db.query(UserTicker).filter(
+            UserTicker.ticker_id == ticker_id,
+            UserTicker.status == 'open'
+        ).count()
+        
+        if active_associations > 0:
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Cannot delete: {active_associations} active user associations"},
+                "version": "1.0"
+            }), 400
+        
+        # Delete all associations
+        db.query(UserTicker).filter(UserTicker.ticker_id == ticker_id).delete()
+        
+        # Delete ticker (cascade will handle related data)
+        ticker = TickerService.get_by_id(db, ticker_id)
+        if ticker:
+            success = TickerService.delete(db, ticker_id)
+            if success:
+                return jsonify({
+                    "status": "success",
+                    "message": "Ticker deleted successfully",
+                    "version": "1.0"
+                })
+        
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Ticker not found"},
+            "version": "1.0"
+        }), 404
+    except Exception as e:
+        logger.error(f"Error deleting ticker {ticker_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
             "version": "1.0"
         }), 500
 

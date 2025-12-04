@@ -441,13 +441,13 @@ class CodeQualityDashboard {
             html += '</tbody></table></div></div>';
         }
 
-        // Insert using tempDiv
+        // Insert using DOMParser
         resultsElement.textContent = '';
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        while (tempDiv.firstChild) {
-          resultsElement.appendChild(tempDiv.firstChild);
-        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          resultsElement.appendChild(node.cloneNode(true));
+        });
 
         // Update stats
         const withCoverageElement = document.getElementById('errorHandlingWithCoverage');
@@ -521,13 +521,13 @@ class CodeQualityDashboard {
             html += '</tbody></table></div></div>';
         }
 
-        // Insert using tempDiv
+        // Insert using DOMParser
         resultsElement.textContent = '';
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        while (tempDiv.firstChild) {
-          resultsElement.appendChild(tempDiv.firstChild);
-        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          resultsElement.appendChild(node.cloneNode(true));
+        });
 
         // Update stats
         const withDocsElement = document.getElementById('jsdocWithDocs');
@@ -601,13 +601,13 @@ class CodeQualityDashboard {
             html += '</tbody></table></div></div>';
         }
 
-        // Insert using tempDiv
+        // Insert using DOMParser
         resultsElement.textContent = '';
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        while (tempDiv.firstChild) {
-          resultsElement.appendChild(tempDiv.firstChild);
-        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          resultsElement.appendChild(node.cloneNode(true));
+        });
 
         // Update stats
         const compliantElement = document.getElementById('namingCompliant');
@@ -680,13 +680,13 @@ class CodeQualityDashboard {
             html += '</tbody></table></div></div>';
         }
 
-        // Insert using tempDiv
+        // Insert using DOMParser
         resultsElement.textContent = '';
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        while (tempDiv.firstChild) {
-          resultsElement.appendChild(tempDiv.firstChild);
-        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          resultsElement.appendChild(node.cloneNode(true));
+        });
 
         // Update stats
         const withIndexElement = document.getElementById('filesWithIndex');
@@ -765,7 +765,13 @@ class CodeQualityDashboard {
             options.push(`<option value="${category}">${category}</option>`);
         });
 
-        categorySelect.innerHTML = options.join('');
+        categorySelect.textContent = '';
+        const parser = new DOMParser();
+        const optionsHTML = options.join('');
+        const doc = parser.parseFromString(optionsHTML, 'text/html');
+        doc.body.querySelectorAll('option').forEach(option => {
+          categorySelect.appendChild(option.cloneNode(true));
+        });
 
         // Use DataCollectionService to set value if available
         const valueToSet = categories.includes(currentValue) ? currentValue : 'all';
@@ -799,11 +805,14 @@ class CodeQualityDashboard {
         this.filteredDuplicateItems = filtered;
 
         if (filtered.length === 0) {
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="text-center text-muted">לא נמצאו כפילויות עבור המסננים שנבחרו</td>
-                </tr>
-            `;
+            tableBody.textContent = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 6;
+            cell.className = 'text-center text-muted';
+            cell.textContent = 'לא נמצאו כפילויות עבור המסננים שנבחרו';
+            row.appendChild(cell);
+            tableBody.appendChild(row);
             this.renderDuplicateDetails();
             return;
         }
@@ -822,7 +831,12 @@ class CodeQualityDashboard {
             `;
         }).join('');
 
-        tableBody.innerHTML = rows;
+        tableBody.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(rows, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          tableBody.appendChild(node.cloneNode(true));
+        });
         this.bindDuplicateRowEvents();
 
         // Ensure first item details are shown by default
@@ -869,7 +883,11 @@ class CodeQualityDashboard {
         }
 
         if (!duplicate) {
-            panel.innerHTML = '<div class="text-center text-muted">בחר רשומה כדי לראות פרטים מלאים</div>';
+            panel.textContent = '';
+            const div = document.createElement('div');
+            div.className = 'text-center text-muted';
+            div.textContent = 'בחר רשומה כדי לראות פרטים מלאים';
+            panel.appendChild(div);
             return;
         }
 
@@ -877,7 +895,8 @@ class CodeQualityDashboard {
         const confidence = this.formatPercentage(duplicate.confidence);
         const recommendation = duplicate.recommendation;
 
-        panel.innerHTML = `
+        panel.textContent = '';
+        const panelHTML = `
             <div class="card">
                 <div class="card-body">
                     <div class="row g-3">
@@ -917,6 +936,11 @@ class CodeQualityDashboard {
                 </div>
             </div>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(panelHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          panel.appendChild(node.cloneNode(true));
+        });
     }
 
     updateSimilarityDisplay(rawValue) {
@@ -1081,7 +1105,13 @@ class CodeQualityDashboard {
                         // Fallback already set
                     }
                 }
-                element.innerHTML = `<div class="text-center text-muted">${loaderIcon} טוען...</div>`;
+                element.textContent = '';
+                const loadingHTML = `<div class="text-center text-muted">${loaderIcon} טוען...</div>`;
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(loadingHTML, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                  element.appendChild(node.cloneNode(true));
+                });
             }
         });
 
@@ -1095,7 +1125,13 @@ class CodeQualityDashboard {
                     // Fallback already set
                 }
             }
-            duplicateDetails.innerHTML = `<div class="text-center text-muted">${loaderIcon} טוען כפילויות...</div>`;
+            duplicateDetails.textContent = '';
+            const loadingHTML = `<div class="text-center text-muted">${loaderIcon} טוען כפילויות...</div>`;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(loadingHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+              duplicateDetails.appendChild(node.cloneNode(true));
+            });
         }
     }
 
@@ -1107,13 +1143,25 @@ class CodeQualityDashboard {
         sections.forEach(sectionId => {
             const element = document.getElementById(sectionId);
             if (element) {
-                element.innerHTML = `<div class="text-center text-danger">❌ ${message}</div>`;
+                element.textContent = '';
+                const errorHTML = `<div class="text-center text-danger">❌ ${message}</div>`;
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(errorHTML, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                  element.appendChild(node.cloneNode(true));
+                });
             }
         });
 
         const duplicateDetails = document.getElementById('duplicateDetailsPanel');
         if (duplicateDetails) {
-            duplicateDetails.innerHTML = `<div class="text-center text-danger">❌ ${message}</div>`;
+            duplicateDetails.textContent = '';
+            const errorHTML = `<div class="text-center text-danger">❌ ${message}</div>`;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(errorHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+              duplicateDetails.appendChild(node.cloneNode(true));
+            });
         }
     }
 
@@ -1188,7 +1236,11 @@ window.runDuplicateCheck = async function() {
             }
             const detailsElement = document.getElementById('duplicateDetailsPanel');
             if (detailsElement) {
-                detailsElement.innerHTML = '<div class="text-center text-danger">❌ לא ניתן להציג פרטי כפילויות</div>';
+                detailsElement.textContent = '';
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'text-center text-danger';
+                errorDiv.textContent = '❌ לא ניתן להציג פרטי כפילויות';
+                detailsElement.appendChild(errorDiv);
             }
             if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification('שגיאה', 'בדיקת הכפילויות נכשלה');

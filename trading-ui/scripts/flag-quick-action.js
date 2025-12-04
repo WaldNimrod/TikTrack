@@ -196,7 +196,7 @@
     function createFlagPaletteElement() {
         const palette = document.createElement('div');
         palette.className = 'flag-palette-popup';
-        palette.innerHTML = `
+        const paletteHTML = `
             <div class="flag-palette-header">בחר צבע דגל</div>
             <div class="flag-palette-colors">
                 ${getFlagColors().map(color => `
@@ -217,6 +217,12 @@
                 </button>
             </div>
         `;
+        palette.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(paletteHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          palette.appendChild(node.cloneNode(true));
+        });
         return palette;
     }
 
@@ -256,6 +262,8 @@
     window.Logger?.info?.('✅ FlagQuickAction loaded successfully', PAGE_LOG_CONTEXT);
 
 })();
+
+
 
 
 

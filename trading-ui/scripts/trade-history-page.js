@@ -345,13 +345,14 @@
         const noResults = document.getElementById('noTradesMessage');
         
         if (filteredTrades.length === 0) {
-            tbody.innerHTML = '';
+            tbody.textContent = '';
             noResults.style.display = 'block';
             return;
         }
         
         noResults.style.display = 'none';
-        tbody.innerHTML = filteredTrades.map(trade => {
+        tbody.textContent = '';
+        const rowsHTML = filteredTrades.map(trade => {
             const sideText = trade.side || '-';
             const investmentTypeText = getInvestmentTypeText(trade.investment_type);
             
@@ -388,6 +389,15 @@
                 </tr>
             `;
         }).join('');
+        
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<table><tbody>${rowsHTML}</tbody></table>`, 'text/html');
+        const tempTbody = doc.body.querySelector('tbody');
+        if (tempTbody) {
+            Array.from(tempTbody.children).forEach(row => {
+                tbody.appendChild(row.cloneNode(true));
+            });
+        }
     }
 
     /**
@@ -908,12 +918,26 @@
         const totalPLEl = document.getElementById('statTotalPL');
         const totalPLPercentEl = document.getElementById('statTotalPLPercent');
         if (totalPLEl && window.FieldRendererService) {
-            totalPLEl.innerHTML = window.FieldRendererService.renderAmount(statistics.totalPL, '$', 0, true);
+            totalPLEl.textContent = '';
+            const amountHTML = window.FieldRendererService.renderAmount(statistics.totalPL, '$', 0, true);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(amountHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                totalPLEl.appendChild(node.cloneNode(true));
+            });
             totalPLEl.classList.remove('loading');
             
             if (totalPLPercentEl) {
                 const percent = window.FieldRendererService.renderNumericValue(statistics.totalPLPercent, '%', true);
-                totalPLPercentEl.innerHTML = `(${percent})`;
+                totalPLPercentEl.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`(${percent})`, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        totalPLPercentEl.appendChild(fragment);
                 totalPLPercentEl.classList.remove('loading');
                 if (statistics.totalPL >= 0) {
                     totalPLPercentEl.classList.add('positive');
@@ -924,7 +948,13 @@
         // Return percent
         const returnPercentEl = document.getElementById('statReturnPercent');
         if (returnPercentEl && window.FieldRendererService) {
-            returnPercentEl.innerHTML = window.FieldRendererService.renderNumericValue(statistics.totalPLPercent, '%', true);
+            returnPercentEl.textContent = '';
+            const percentHTML = window.FieldRendererService.renderNumericValue(statistics.totalPLPercent, '%', true);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(percentHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                returnPercentEl.appendChild(node.cloneNode(true));
+            });
             returnPercentEl.classList.remove('loading');
             if (statistics.totalPLPercent >= 0) {
                 returnPercentEl.classList.add('positive');
@@ -955,10 +985,19 @@
         // Side
         const sideEl = document.getElementById('tradeSide');
         if (sideEl) {
+            sideEl.textContent = '';
             if (window.FieldRendererService && typeof window.FieldRendererService.renderSide === 'function') {
-                sideEl.innerHTML = window.FieldRendererService.renderSide(trade.side);
+                const sideHTML = window.FieldRendererService.renderSide(trade.side);
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(sideHTML, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    sideEl.appendChild(node.cloneNode(true));
+                });
             } else {
-                sideEl.innerHTML = `<span class="badge bg-success">${trade.side || '-'}</span>`;
+                const span = document.createElement('span');
+                span.className = 'badge bg-success';
+                span.textContent = trade.side || '-';
+                sideEl.appendChild(span);
             }
             sideEl.classList.remove('loading');
         }
@@ -966,8 +1005,14 @@
         // Investment type
         const investmentTypeEl = document.getElementById('tradeInvestmentType');
         if (investmentTypeEl) {
+            investmentTypeEl.textContent = '';
             if (window.FieldRendererService && typeof window.FieldRendererService.renderType === 'function') {
-                investmentTypeEl.innerHTML = window.FieldRendererService.renderType(trade.investment_type);
+                const typeHTML = window.FieldRendererService.renderType(trade.investment_type);
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(typeHTML, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    investmentTypeEl.appendChild(node.cloneNode(true));
+                });
             } else {
                 investmentTypeEl.textContent = getInvestmentTypeText(trade.investment_type);
             }
@@ -1031,16 +1076,22 @@
         // Conditions
         const conditionsEl = document.getElementById('tradeConditions');
         if (conditionsEl && conditions && Array.isArray(conditions)) {
+            conditionsEl.textContent = '';
             if (conditions.length > 0) {
-                conditionsEl.innerHTML = conditions.map(cond => 
-                    `<div><a href="#" data-onclick="showConditionDetails(${cond.id}); return false;">${cond.description}</a></div>`
-                ).join('');
+                conditions.forEach(cond => {
+                    const div = document.createElement('div');
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.setAttribute('data-onclick', `showConditionDetails(${cond.id}); return false;`);
+                    link.textContent = cond.description;
+                    div.appendChild(link);
+                    conditionsEl.appendChild(div);
+                });
             } else {
-                conditionsEl.innerHTML.textContent = '';
-        const div = document.createElement('div');
-        div.className = 'text-muted';
-        div.textContent = '-';
-        conditionsEl.innerHTML.appendChild(div);
+                const div = document.createElement('div');
+                div.className = 'text-muted';
+                div.textContent = '-';
+                conditionsEl.appendChild(div);
             }
             conditionsEl.classList.remove('loading');
         }
@@ -1054,12 +1105,35 @@
                 : '<span class="text-muted">-</span>';
             const totalPL = window.FieldRendererService.renderAmount(trade.total_pl || trade.realized_pl || 0, '$', 0, true);
             
-            // Use textContent for better security, or create elements properly
-            plel.innerHTML = `
-                <div>ממומש: ${realizedPL}</div>
-                <div>לא ממומש: ${unrealizedPL}</div>
-                <div><strong>סה"כ: ${totalPL}</strong></div>
-            `;
+            plel.textContent = '';
+            const div1 = document.createElement('div');
+            div1.textContent = 'ממומש: ';
+            const parser1 = new DOMParser();
+            const doc1 = parser1.parseFromString(realizedPL, 'text/html');
+            doc1.body.childNodes.forEach(node => {
+                div1.appendChild(node.cloneNode(true));
+            });
+            plel.appendChild(div1);
+            
+            const div2 = document.createElement('div');
+            div2.textContent = 'לא ממומש: ';
+            const parser2 = new DOMParser();
+            const doc2 = parser2.parseFromString(unrealizedPL, 'text/html');
+            doc2.body.childNodes.forEach(node => {
+                div2.appendChild(node.cloneNode(true));
+            });
+            plel.appendChild(div2);
+            
+            const div3 = document.createElement('div');
+            const strong = document.createElement('strong');
+            strong.textContent = 'סה"כ: ';
+            const parser3 = new DOMParser();
+            const doc3 = parser3.parseFromString(totalPL, 'text/html');
+            doc3.body.childNodes.forEach(node => {
+                strong.appendChild(node.cloneNode(true));
+            });
+            div3.appendChild(strong);
+            plel.appendChild(div3);
             // Note: This is a specific P/L display for a single trade, not a summary element
             // Consider using InfoSummarySystem if this becomes a summary of multiple trades
             plel.classList.remove('loading');
@@ -1225,7 +1299,14 @@
             `;
         }));
 
-        timelineEl.innerHTML = stepsHTML.join('');
+        timelineEl.textContent = '';
+        const parser = new DOMParser();
+        stepsHTML.forEach(stepHTML => {
+            const doc = parser.parseFromString(stepHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                timelineEl.appendChild(node.cloneNode(true));
+            });
+        });
         timelineEl.classList.remove('loading');
     }
 
@@ -1482,7 +1563,14 @@
             `;
         }));
 
-        tbodyEl.innerHTML = rowsHTML.join('');
+        tbodyEl.textContent = '';
+        const parser = new DOMParser();
+        rowsHTML.forEach(rowHTML => {
+            const doc = parser.parseFromString(rowHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                tbodyEl.appendChild(node.cloneNode(true));
+            });
+        });
     }
 
     /**

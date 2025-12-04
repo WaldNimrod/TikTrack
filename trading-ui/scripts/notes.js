@@ -512,7 +512,49 @@ async function deleteNote(id) {
       );
     } else {
       // Fallback to simple confirm
-      if (!confirm('האם אתה בטוח שברצונך למחוק את ההערה?')) {
+      let confirmed = false;
+      if (window.showDeleteWarning) {
+        confirmed = await new Promise((resolve) => {
+          window.showDeleteWarning(
+            'האם אתה בטוח שברצונך למחוק את ההערה?',
+            () => resolve(true),
+            () => resolve(false)
+          );
+        });
+      } else if (window.showConfirmationDialog) {
+        confirmed = await new Promise((resolve) => {
+          window.showConfirmationDialog(
+            'מחיקת הערה',
+            'האם אתה בטוח שברצונך למחוק את ההערה?',
+            () => resolve(true),
+            () => resolve(false),
+            'danger'
+          );
+        });
+      } else {
+        if (window.showDeleteWarning) {
+          confirmed = await new Promise((resolve) => {
+            window.showDeleteWarning(
+              'האם אתה בטוח שברצונך למחוק את ההערה?',
+              () => resolve(true),
+              () => resolve(false)
+            );
+          });
+        } else if (window.showConfirmationDialog) {
+          confirmed = await new Promise((resolve) => {
+            window.showConfirmationDialog(
+              'מחיקת הערה',
+              'האם אתה בטוח שברצונך למחוק את ההערה?',
+              () => resolve(true),
+              () => resolve(false),
+              'danger'
+            );
+          });
+        } else {
+          confirmed = confirm('האם אתה בטוח שברצונך למחוק את ההערה?');
+        }
+      }
+      if (!confirmed) {
         return;
       }
       confirmDeleteNote(id);

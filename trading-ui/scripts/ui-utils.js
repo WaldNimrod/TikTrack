@@ -524,7 +524,19 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
       );
     });
   } else {
-    confirmed = window.confirm(`האם אתה בטוח שברצונך לבטל את ${entityLabel} "${displayName}"?`);
+    if (window.showConfirmationDialog) {
+      confirmed = await new Promise((resolve) => {
+        window.showConfirmationDialog(
+          'ביטול',
+          `האם אתה בטוח שברצונך לבטל את ${entityLabel} "${displayName}"?`,
+          () => resolve(true),
+          () => resolve(false),
+          'warning'
+        );
+      });
+    } else {
+      confirmed = window.confirm(`האם אתה בטוח שברצונך לבטל את ${entityLabel} "${displayName}"?`);
+    }
   }
 
   if (!confirmed) {
@@ -824,9 +836,22 @@ function showSecondConfirmationModal(message, onConfirm) {
     window.showConfirmationDialog('אישור', message, onConfirm, () => {});
   } else {
     // Fallback למקרה שמערכת התראות לא זמינה
-    const confirmed = window.confirm(message);
-    if (confirmed) {
-      onConfirm();
+    let confirmed = false;
+    if (window.showConfirmationDialog) {
+      window.showConfirmationDialog(
+        'אישור',
+        message,
+        () => {
+          confirmed = true;
+          onConfirm();
+        },
+        () => {}
+      );
+    } else {
+      confirmed = window.confirm(message);
+      if (confirmed) {
+        onConfirm();
+      }
     }
   }
 }
@@ -963,37 +988,38 @@ async function handleApiResponseWithRefresh(response, options = {}) {
 function getPageDataFunctions() {
   const currentPage = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
   
+  // Define function mappings - check at call time, not definition time
   const pageFunctions = {
     'tickers': {
-      loadData: window.loadTickersData,
-      updateActive: window.updateActiveTradesField
+      get loadData() { return typeof window.loadTickersData === 'function' ? window.loadTickersData : null; },
+      get updateActive() { return typeof window.updateActiveTradesField === 'function' ? window.updateActiveTradesField : null; }
     },
     'trades': {
-      loadData: window.loadTradesData,
-      updateActive: window.updateActiveTradesField
+      get loadData() { return typeof window.loadTradesData === 'function' ? window.loadTradesData : null; },
+      get updateActive() { return typeof window.updateActiveTradesField === 'function' ? window.updateActiveTradesField : null; }
     },
     'trading_accounts': {
-      loadData: window.loadTradingAccountsDataForTradingAccountsPage,
+      get loadData() { return typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function' ? window.loadTradingAccountsDataForTradingAccountsPage : null; },
       updateActive: null
     },
     'alerts': {
-      loadData: window.loadAlertsData,
+      get loadData() { return typeof window.loadAlertsData === 'function' ? window.loadAlertsData : null; },
       updateActive: null
     },
     'trade_plans': {
-      loadData: window.loadTradePlansData,
+      get loadData() { return typeof window.loadTradePlansData === 'function' ? window.loadTradePlansData : null; },
       updateActive: null
     },
     'executions': {
-      loadData: window.loadExecutionsData,
+      get loadData() { return typeof window.loadExecutionsData === 'function' ? window.loadExecutionsData : null; },
       updateActive: null
     },
     'cash_flows': {
-      loadData: window.loadCashFlowsData,
+      get loadData() { return typeof window.loadCashFlowsData === 'function' ? window.loadCashFlowsData : null; },
       updateActive: null
     },
     'notes': {
-      loadData: window.loadNotesData,
+      get loadData() { return typeof window.loadNotesData === 'function' ? window.loadNotesData : null; },
       updateActive: null
     }
   };
@@ -1367,18 +1393,27 @@ window.restoreAllSectionStates = async function () {
           }
         } else {
           // No saved state - apply default state from page config
-          // Special case: trade-creation section should be closed by default (lazy loading)
-          const shouldBeClosed = sectionId === 'trade-creation';
-          const finalState = shouldBeClosed ? 'closed' : defaultState;
+          // Check sectionDefaultStates first, then fallback to sectionsDefaultState
+          const sectionSpecificDefault = pageConfig?.sectionDefaultStates?.[sectionId];
+          const finalDefaultState = sectionSpecificDefault || defaultState;
+          const finalState = finalDefaultState === 'closed' ? 'closed' : 'open';
           
           if (finalState === 'open') {
             sectionBody.style.display = 'block';
             if (icon) { icon.textContent = '▲'; }
-            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" default state OPEN (no cache)`, { page: "ui-utils" }); }
+            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" default state OPEN (no cache)`, { 
+              page: "ui-utils",
+              sectionSpecificDefault,
+              finalDefaultState
+            }); }
           } else {
             sectionBody.style.display = 'none';
             if (icon) { icon.textContent = '▼'; }
-            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" default state CLOSED (no cache)`, { page: "ui-utils" }); }
+            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" default state CLOSED (no cache)`, { 
+              page: "ui-utils",
+              sectionSpecificDefault,
+              finalDefaultState
+            }); }
           }
         }
       }
@@ -1787,7 +1822,12 @@ function loadTableActionButtons(tableId, entityType, config = {}) {
     // Insert buttons HTML using tempDiv
     actionsCell.textContent = '';
     const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = buttonsHtml;
+    tempDiv.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(buttonsHtml, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tempDiv.appendChild(node.cloneNode(true));
+    });
     while (tempDiv.firstChild) {
       actionsCell.appendChild(tempDiv.firstChild);
     }
@@ -2370,11 +2410,13 @@ function updatePageSummaryStats(pageName, data, countElementId = null) {
       // מערכת סיכום נתונים לא זמינה
       const summaryStatsElement = document.getElementById('summaryStats');
       if (summaryStatsElement) {
-        summaryStatsElement.innerHTML = `
-          <div style="color: #dc3545; font-weight: bold;">
-            ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
-          </div>
-        `;
+        summaryStatsElement.textContent = '';
+        summaryStatsElement.textContent = '';
+        const errorDiv = document.createElement('div');
+        errorDiv.style.color = '#dc3545';
+        errorDiv.style.fontWeight = 'bold';
+        errorDiv.textContent = '⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף';
+        summaryStatsElement.appendChild(errorDiv);
       }
     }
     
@@ -2558,7 +2600,14 @@ function showLoadingState(componentId) {
         if (!component.querySelector('.loading-spinner')) {
             const spinner = document.createElement('div');
             spinner.className = 'loading-spinner';
-            spinner.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">טוען...</span></div>';
+            const spinnerDiv = document.createElement('div');
+            spinnerDiv.className = 'spinner-border spinner-border-sm';
+            spinnerDiv.setAttribute('role', 'status');
+            const span = document.createElement('span');
+            span.className = 'visually-hidden';
+            span.textContent = 'טוען...';
+            spinnerDiv.appendChild(span);
+            spinner.appendChild(spinnerDiv);
             component.appendChild(spinner);
         }
     }

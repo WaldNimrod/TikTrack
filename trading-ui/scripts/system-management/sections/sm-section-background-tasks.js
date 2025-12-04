@@ -156,7 +156,12 @@ class SMBackgroundTasksSection extends SMBaseSection {
 
     try {
       const backgroundTasksHtml = this.createBackgroundTasksHTML(data);
-      this.container.innerHTML = backgroundTasksHtml;
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(backgroundTasksHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Background tasks section rendered successfully');
       
@@ -836,7 +841,11 @@ class SMBackgroundTasksSection extends SMBaseSection {
    */
   static viewTaskLogs() {
     console.log('📋 Viewing task logs');
-    alert('פתיחת לוגי משימות רקע');
+    if (window.showInfoNotification) {
+      window.showInfoNotification('פתיחת לוגי משימות רקע', 'info');
+    } else {
+      alert('פתיחת לוגי משימות רקע');
+    }
   }
 
   /**
@@ -939,7 +948,11 @@ class SMBackgroundTasksSection extends SMBaseSection {
    */
   static viewTaskDetails(taskId) {
     console.log(`📋 Viewing task details for ${taskId}`);
-    alert(`פתיחת פרטי משימה: ${taskId}`);
+    if (window.showInfoNotification) {
+      window.showInfoNotification(`פתיחת פרטי משימה: ${taskId}`, 'info');
+    } else {
+      alert(`פתיחת פרטי משימה: ${taskId}`);
+    }
   }
 
   /**
@@ -948,7 +961,11 @@ class SMBackgroundTasksSection extends SMBaseSection {
    */
   static showAllHistory() {
     console.log('📋 Showing all tasks history');
-    alert('פתיחת כל היסטוריית המשימות');
+    if (window.showInfoNotification) {
+      window.showInfoNotification('פתיחת כל היסטוריית המשימות', 'info');
+    } else {
+      alert('פתיחת כל היסטוריית המשימות');
+    }
   }
 }
 

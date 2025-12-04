@@ -207,7 +207,11 @@
             // Show error message in container
             const container = document.getElementById('emotionalPatternsChartContainer');
             if (container) {
-                container.innerHTML = '<div class="text-muted text-center p-3">שגיאה בטעינת הגרף</div>';
+                container.textContent = '';
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'text-muted text-center p-3';
+                errorDiv.textContent = 'שגיאה בטעינת הגרף';
+                container.appendChild(errorDiv);
             }
         }
     }
@@ -262,7 +266,7 @@
             entries = entries.slice(0, 10);
 
             // Clear container
-            container.innerHTML = '';
+            container.textContent = '';
 
             // Render entries
             for (const entry of entries) {
@@ -365,7 +369,10 @@
         }
 
         // Build HTML
-        item.innerHTML = `
+        item.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     ${iconHtml}
@@ -374,7 +381,12 @@
                 </div>
                 <small class="text-muted">${entry.has_trade_link ? entry.trade_display : 'ללא קישור'}</small>
             </div>
-        `;
+        `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        item.appendChild(fragment);
 
         return item;
     }
@@ -394,7 +406,7 @@
             const insights = generateMockInsights();
 
             // Clear container
-            container.innerHTML = '';
+            container.textContent = '';
 
             // Render insights
             for (const insight of insights) {
@@ -457,10 +469,16 @@
             }
         }
 
-        alert.innerHTML = `
+        alert.textContent = '';
+        const alertHTML = `
             ${iconHtml}
             <strong>${insight.title}:</strong> ${insight.message}
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(alertHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            alert.appendChild(node.cloneNode(true));
+        });
 
         return alert;
     }
@@ -490,7 +508,12 @@
                             // Fallback already set
                         }
                     }
-                    iconSpan.innerHTML = iconHTML;
+                    iconSpan.textContent = '';
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(iconHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                      iconSpan.appendChild(node.cloneNode(true));
+                    });
                 }
             }
 
@@ -645,7 +668,12 @@
                     // Fallback already set
                 }
             }
-            noticeIcon.innerHTML = iconHTML;
+            noticeIcon.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(iconHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                noticeIcon.appendChild(node.cloneNode(true));
+            });
         }
     }
 

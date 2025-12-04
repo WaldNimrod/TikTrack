@@ -292,3 +292,5 @@ AIAnalysisState.history.unshift(result);
 **גרסה:** 1.0.0
 
 
+
+

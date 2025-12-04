@@ -1436,7 +1436,8 @@ class CRUDEnhancedTester {
     if (result.score < 50) scoreClass = 'text-danger';
     else if (result.score < 80) scoreClass = 'text-warning';
 
-    row.innerHTML = `
+    row.textContent = '';
+    const rowHTML = `
             <td>
                 <strong>${result.displayName}</strong><br>
                 <small class="text-muted">${result.entity}</small>
@@ -1458,6 +1459,14 @@ class CRUDEnhancedTester {
                 }
             </td>
         `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+    const tempRow = doc.body.querySelector('tr');
+    if (tempRow) {
+        Array.from(tempRow.children).forEach(cell => {
+            row.appendChild(cell.cloneNode(true));
+        });
+    }
 
     tableBody.appendChild(row);
 
@@ -1502,7 +1511,8 @@ class CRUDEnhancedTester {
       else if (report.summary.overallScore < 80) alertClass = 'alert-warning';
 
       summaryElement.className = `alert ${alertClass}`;
-      summaryElement.innerHTML = `
+      summaryElement.textContent = '';
+      const summaryHTML = `
                 <h5>ציון כללי: ${report.summary.overallScore}/100</h5>
                 <p>
                     <strong>${report.summary.passedEntities}</strong> עמודים עברו בהצלחה מתוך <strong>${report.summary.totalEntities}</strong> | 
@@ -1510,24 +1520,36 @@ class CRUDEnhancedTester {
                     זמן כולל: <strong>${report.summary.totalTestTime}</strong> שניות
                 </p>
             `;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(summaryHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          summaryElement.appendChild(node.cloneNode(true));
+      });
     }
 
     // עמודים תקינים
     const healthyPagesElement = document.getElementById('healthyPagesList');
     if (healthyPagesElement) {
       const healthyPages = report.allResults.filter(r => r.score >= 80);
-      healthyPagesElement.innerHTML = healthyPages
+      healthyPagesElement.textContent = '';
+      const healthyPagesHTML = healthyPages
         .map(
           page =>
             `<span class="badge bg-success me-2 mb-2">${page.displayName} (${page.score}/100)</span>`
         )
         .join('');
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(healthyPagesHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          healthyPagesElement.appendChild(node.cloneNode(true));
+      });
     }
 
     // עמודים בעייתיים
     const problematicPagesElement = document.getElementById('problematicPagesList');
     if (problematicPagesElement) {
-      problematicPagesElement.innerHTML = report.problematicPages
+      problematicPagesElement.textContent = '';
+      const problematicPagesHTML = report.problematicPages
         .map(
           page => `
                 <div class="card mb-3">
@@ -1560,12 +1582,18 @@ class CRUDEnhancedTester {
             `
         )
         .join('');
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(problematicPagesHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          problematicPagesElement.appendChild(node.cloneNode(true));
+      });
     }
 
     // המלצות תיקון
     const recommendationsElement = document.getElementById('recommendationsList');
     if (recommendationsElement) {
-      recommendationsElement.innerHTML = report.recommendations
+      recommendationsElement.textContent = '';
+      const recommendationsHTML = report.recommendations
         .map(
           rec => `
                 <div class="alert alert-warning">
@@ -1577,6 +1605,11 @@ class CRUDEnhancedTester {
             `
         )
         .join('');
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(recommendationsHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          recommendationsElement.appendChild(node.cloneNode(true));
+      });
     }
   }
 
@@ -1932,7 +1965,12 @@ window.runDeepTestingForProblematic = async function () {
             </div>
         `;
 
-    deepReportCard.innerHTML = reportContent;
+    deepReportCard.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(reportContent, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        deepReportCard.appendChild(node.cloneNode(true));
+    });
   }
 };
 

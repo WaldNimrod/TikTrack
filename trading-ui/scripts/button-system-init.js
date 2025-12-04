@@ -716,9 +716,9 @@ class AdvancedButtonSystem {
                 // Check if we got inline SVG (not img tag)
                 if (inlineSVG && inlineSVG.includes('<svg')) {
                     // Replace img with inline SVG
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = inlineSVG;
-                    const svgElement = tempDiv.firstElementChild;
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(inlineSVG, 'image/svg+xml');
+                    const svgElement = doc.documentElement;
                     
                     if (svgElement && svgElement.tagName === 'svg') {
                         img.replaceWith(svgElement);

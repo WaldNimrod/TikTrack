@@ -214,15 +214,22 @@ class IndexPageEnhancements {
     showChartError(chartId) {
         const chartContainer = document.getElementById(chartId);
         if (chartContainer) {
-            chartContainer.innerHTML = `
-                <div class="chart-error">
-                    <i class="bi bi-exclamation-triangle text-warning"></i>
-                    <p class="mt-2">שגיאה בטעינת הגרף</p>
-                    <button class="btn btn-sm btn-outline-primary" onclick="window.refreshChart('${chartId}')">
-                        נסה שוב
-                    </button>
-                </div>
-            `;
+            chartContainer.textContent = '';
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'chart-error';
+            const icon = document.createElement('i');
+            icon.className = 'bi bi-exclamation-triangle text-warning';
+            errorDiv.appendChild(icon);
+            const p = document.createElement('p');
+            p.className = 'mt-2';
+            p.textContent = 'שגיאה בטעינת הגרף';
+            errorDiv.appendChild(p);
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-sm btn-outline-primary';
+            btn.textContent = 'נסה שוב';
+            btn.onclick = () => window.refreshChart(chartId);
+            errorDiv.appendChild(btn);
+            chartContainer.appendChild(errorDiv);
         }
     }
     
@@ -355,7 +362,10 @@ class IndexPageEnhancements {
             if (actions && !actions.querySelector('.refresh-indicator')) {
                 const refreshButton = document.createElement('button');
                 refreshButton.className = 'btn btn-sm btn-outline-secondary refresh-indicator';
-                refreshButton.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+                refreshButton.textContent = '';
+                const icon = document.createElement('i');
+                icon.className = 'bi bi-arrow-clockwise';
+                refreshButton.appendChild(icon);
                 refreshButton.title = 'רענן סקשן';
                 refreshButton.onclick = () => this.refreshSection(header);
                 actions.appendChild(refreshButton);
@@ -594,9 +604,15 @@ class IndexPageEnhancements {
         if (statsContainer) {
             const progressBar = document.createElement('div');
             progressBar.className = 'progress mt-2';
-            progressBar.innerHTML = `
-                <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-            `;
+            progressBar.textContent = '';
+            const progressBarInner = document.createElement('div');
+            progressBarInner.className = 'progress-bar';
+            progressBarInner.setAttribute('role', 'progressbar');
+            progressBarInner.style.width = '0%';
+            progressBarInner.setAttribute('aria-valuenow', '0');
+            progressBarInner.setAttribute('aria-valuemin', '0');
+            progressBarInner.setAttribute('aria-valuemax', '100');
+            progressBar.appendChild(progressBarInner);
             statsContainer.appendChild(progressBar);
         }
     }
@@ -610,7 +626,10 @@ class IndexPageEnhancements {
             if (!stat.querySelector('.trend-indicator')) {
                 const indicator = document.createElement('span');
                 indicator.className = 'trend-indicator ms-2';
-                indicator.innerHTML = '<i class="bi bi-arrow-up text-success"></i>';
+                indicator.textContent = '';
+                const icon = document.createElement('i');
+                icon.className = 'bi bi-arrow-up text-success';
+                indicator.appendChild(icon);
                 stat.appendChild(indicator);
             }
         });

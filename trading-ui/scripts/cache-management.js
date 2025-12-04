@@ -16,7 +16,7 @@
  * @lastUpdated 15 אוקטובר 2025
  */
 
-console.log('⚙️ Cache Management Page - JavaScript loaded');
+Logger.info('⚙️ Cache Management Page - JavaScript loaded');
 
 // Cache Management Page Class
 class CacheManagementPage {
@@ -40,11 +40,11 @@ class CacheManagementPage {
      */
     async init() {
         if (this.isInitialized) {
-            console.log('⚠️ Cache Management Page already initialized');
+            Logger.info('⚠️ Cache Management Page already initialized');
             return;
         }
 
-        console.log('🚀 Cache Management Page - Initializing...');
+        Logger.info('🚀 Cache Management Page - Initializing...');
 
         try {
             // Initialize cache systems
@@ -69,10 +69,10 @@ class CacheManagementPage {
             this.checkForValidationResults();
             
             this.isInitialized = true;
-            console.log('✅ Cache Test Page Refactored - Initialized successfully');
+            Logger.info('✅ Cache Test Page Refactored - Initialized successfully');
             
         } catch (error) {
-            console.error('❌ Failed to initialize Cache Test Page:', error);
+            Logger.error('❌ Failed to initialize Cache Test Page:', error);
             this.handleActionError('שגיאה באתחול העמוד', error.message);
         }
     }
@@ -82,7 +82,7 @@ class CacheManagementPage {
      * אתחול מערכות המטמון
      */
     async initializeCacheSystem() {
-        console.log('🔄 Initializing cache systems...');
+        Logger.info('🔄 Initializing cache systems...');
         
         if (!window.UnifiedCacheManager) {
             throw new Error('UnifiedCacheManager not available');
@@ -90,7 +90,7 @@ class CacheManagementPage {
         
         if (!window.UnifiedCacheManager.initialized) {
             await window.UnifiedCacheManager.initialize();
-            console.log('✅ UnifiedCacheManager initialized');
+            Logger.info('✅ UnifiedCacheManager initialized');
         }
         
         // Log initialization
@@ -107,7 +107,7 @@ class CacheManagementPage {
      * אתחול תצוגת לוגים
      */
     async initializeLogDisplay() {
-        console.log('🔄 Initializing unified log display...');
+        Logger.info('🔄 Initializing unified log display...');
         
         const logContainer = document.getElementById('unifiedLogDisplay');
         if (!logContainer) {
@@ -128,12 +128,16 @@ class CacheManagementPage {
                 });
                 
                 await logDisplay.initialize();
-                console.log('✅ Unified log display initialized');
+                Logger.info('✅ Unified log display initialized');
                 
             } catch (error) {
-                console.error('❌ Failed to initialize log display:', error);
+                Logger.error('❌ Failed to initialize log display:', error);
                 // Fallback: show basic log info
-                logContainer.innerHTML = '<p class="text-muted">לוגים לא זמינים</p>';
+                logContainer.textContent = '';
+                const p = document.createElement('p');
+                p.className = 'text-muted';
+                p.textContent = 'לוגים לא זמינים';
+                logContainer.appendChild(p);
             }
         }
     }
@@ -168,7 +172,7 @@ class CacheManagementPage {
                 modules: ['cache', 'notifications', 'logs'],
                 cleanup: () => this.cleanup()
             };
-            console.log('✅ Registered with PAGE_CONFIGS');
+            Logger.info('✅ Registered with PAGE_CONFIGS');
         }
     }
 
@@ -182,7 +186,7 @@ class CacheManagementPage {
             const storedResults = sessionStorage.getItem(validationKey);
             
             if (storedResults) {
-                console.log('🔍 Found validation results from previous session');
+                Logger.info('🔍 Found validation results from previous session');
                 
                 const validationData = JSON.parse(storedResults);
                 const feedback = document.getElementById('clearingFeedback');
@@ -196,7 +200,7 @@ class CacheManagementPage {
                 }
             }
         } catch (error) {
-            console.error('❌ Error checking validation results:', error);
+            Logger.error('❌ Error checking validation results:', error);
         }
     }
 
@@ -236,7 +240,12 @@ class CacheManagementPage {
             </div>
         `;
         
-        feedbackElement.innerHTML = displayHtml;
+        feedbackElement.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(displayHtml, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            feedbackElement.appendChild(node.cloneNode(true));
+        });
         feedbackElement.className = 'action-feedback alert alert-info';
     }
 
@@ -250,7 +259,7 @@ class CacheManagementPage {
         if (this.isLoading) return;
         
         this.isLoading = true;
-        console.log('📊 Refreshing cache statistics...');
+        Logger.info('📊 Refreshing cache statistics...');
 
         try {
             await Promise.all([
@@ -263,10 +272,10 @@ class CacheManagementPage {
             // Update last update time
             this.updateElement('lastUpdate', new Date().toLocaleTimeString('he-IL'));
             
-            console.log('✅ Cache statistics refreshed');
+            Logger.info('✅ Cache statistics refreshed');
             
         } catch (error) {
-            console.error('❌ Error refreshing cache stats:', error);
+            Logger.error('❌ Error refreshing cache stats:', error);
             this.handleActionError('שגיאה ברענון סטטיסטיקות', error.message);
         } finally {
             this.isLoading = false;
@@ -279,7 +288,7 @@ class CacheManagementPage {
      */
     async updateMonitoringStats() {
         if (!window.UnifiedCacheManager) {
-            console.warn('UnifiedCacheManager not available for updateMonitoringStats');
+            Logger.warn('UnifiedCacheManager not available for updateMonitoringStats');
             return;
         }
 
@@ -304,7 +313,7 @@ class CacheManagementPage {
             this.updateElement('backendChange', 'עדכני');
             
         } catch (error) {
-            console.error('❌ Error updating monitoring stats:', error);
+            Logger.error('❌ Error updating monitoring stats:', error);
         }
     }
 
@@ -324,7 +333,7 @@ class CacheManagementPage {
             backend: 'Backend'
         };
 
-        tbody.innerHTML = '';
+        tbody.textContent = '';
 
         for (const layer of layers) {
             try {
@@ -332,7 +341,7 @@ class CacheManagementPage {
                 const row = this.createLayerTableRow(layer, layerStats, layerNames[layer]);
                 tbody.appendChild(row);
             } catch (error) {
-                console.error(`Error getting stats for layer ${layer}:`, error);
+                Logger.error(`Error getting stats for layer ${layer}:`, error);
                 const row = this.createLayerTableRow(layer, {}, layerNames[layer], true);
                 tbody.appendChild(row);
             }
@@ -346,7 +355,10 @@ class CacheManagementPage {
     createLayerTableRow(layer, stats, name, error = false) {
         const row = document.createElement('tr');
         
-        row.innerHTML = `
+        row.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
             <td><strong>${name}</strong></td>
             <td><span class="badge bg-secondary">${error ? '--' : (stats.entries || 0)}</span></td>
             <td>${error ? '--' : this.formatBytes(stats.size || 0)}</td>
@@ -357,7 +369,12 @@ class CacheManagementPage {
                     <i class="fas fa-broom"></i>
                 </button>
             </td>
-        `;
+        `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        row.appendChild(fragment);
         
         return row;
     }
@@ -396,7 +413,7 @@ class CacheManagementPage {
                 this.updateElement('totalCacheSize', this.formatBytes(totalSize));
             }
         } catch (error) {
-            console.error('Error updating performance metrics:', error);
+            Logger.error('Error updating performance metrics:', error);
         }
     }
 
@@ -411,7 +428,7 @@ class CacheManagementPage {
             this.updateElement('systemHealth', isHealthy ? 'טוב' : 'בעיה');
             
         } catch (error) {
-            console.error('Error updating system health:', error);
+            Logger.error('Error updating system health:', error);
             this.updateElement('systemHealth', 'שגיאה');
         }
     }
@@ -423,7 +440,7 @@ class CacheManagementPage {
      * ביצוע ניקוי מטמון עם ולידציה
      */
     async executeCacheClearing(level) {
-        console.log(`🧹 Executing cache clearing: ${level}`);
+        Logger.info(`🧹 Executing cache clearing: ${level}`);
         
         const validateAfter = document.getElementById('enableValidation')?.checked || false;
         const feedback = document.getElementById('clearingFeedback');
@@ -449,7 +466,7 @@ class CacheManagementPage {
             }
             
         } catch (error) {
-            console.error('Cache clearing error:', error);
+            Logger.error('Cache clearing error:', error);
             this.handleActionError('שגיאה בניקוי מטמון', error.message);
             this.showFeedback(feedback, `שגיאה: ${error.message}`, 'error');
         }
@@ -460,7 +477,7 @@ class CacheManagementPage {
      * ביצוע אופטימיזציה
      */
     async executeOptimization(type) {
-        console.log(`⚡ Executing optimization: ${type}`);
+        Logger.info(`⚡ Executing optimization: ${type}`);
         
         const feedback = document.getElementById('optimizationFeedback');
         
@@ -475,7 +492,7 @@ class CacheManagementPage {
             this.showFeedback(feedback, `אופטימיזציה ${type} הושלמה`, 'success');
             
         } catch (error) {
-            console.error('Optimization error:', error);
+            Logger.error('Optimization error:', error);
             this.handleActionError('שגיאה באופטימיזציה', error.message);
             this.showFeedback(feedback, `שגיאה: ${error.message}`, 'error');
         }
@@ -486,7 +503,7 @@ class CacheManagementPage {
      * ביצוע סינכרון
      */
     async executeSynchronization(type) {
-        console.log(`🔄 Executing synchronization: ${type}`);
+        Logger.info(`🔄 Executing synchronization: ${type}`);
         
         const feedback = document.getElementById('syncFeedback');
         
@@ -501,7 +518,7 @@ class CacheManagementPage {
             this.showFeedback(feedback, `סינכרון ${type} הושלם`, 'success');
             
         } catch (error) {
-            console.error('Synchronization error:', error);
+            Logger.error('Synchronization error:', error);
             this.handleActionError('שגיאה בסינכרון', error.message);
             this.showFeedback(feedback, `שגיאה: ${error.message}`, 'error');
         }
@@ -512,7 +529,7 @@ class CacheManagementPage {
      * ביצוע תחזוקה
      */
     async executeMaintenance(action) {
-        console.log(`🔧 Executing maintenance: ${action}`);
+        Logger.info(`🔧 Executing maintenance: ${action}`);
         
         const feedback = document.getElementById('maintenanceFeedback');
         
@@ -527,7 +544,7 @@ class CacheManagementPage {
             this.showFeedback(feedback, `תחזוקה ${action} הושלמה`, 'success');
             
         } catch (error) {
-            console.error('Maintenance error:', error);
+            Logger.error('Maintenance error:', error);
             this.handleActionError('שגיאה בתחזוקה', error.message);
             this.showFeedback(feedback, `שגיאה: ${error.message}`, 'error');
         }
@@ -540,7 +557,7 @@ class CacheManagementPage {
      * הרצת כל הבדיקות
      */
     async runAllTests() {
-        console.log('🧪 Running all cache tests...');
+        Logger.info('🧪 Running all cache tests...');
         
         try {
             const results = {
@@ -559,7 +576,7 @@ class CacheManagementPage {
             }
             
         } catch (error) {
-            console.error('Tests execution error:', error);
+            Logger.error('Tests execution error:', error);
             this.handleActionError('שגיאה בהרצת בדיקות', error.message);
         }
     }
@@ -704,7 +721,7 @@ class CacheManagementPage {
      * פתיחת דפדפן מטמון
      */
     openCacheBrowser() {
-        console.log('🔍 Opening cache browser...');
+        Logger.info('🔍 Opening cache browser...');
         // Implementation for cache browser
         this.handleActionSuccess('פתיחת דפדפן מטמון', 'Browser opened');
     }
@@ -714,7 +731,7 @@ class CacheManagementPage {
      * ייצוא נתוני מטמון
      */
     async exportCacheData() {
-        console.log('📤 Exporting cache data...');
+        Logger.info('📤 Exporting cache data...');
         
         try {
             if (window.UnifiedCacheManager) {
@@ -734,7 +751,7 @@ class CacheManagementPage {
                 this.handleActionSuccess('נתוני מטמון יוצאו בהצלחה');
             }
         } catch (error) {
-            console.error('Export error:', error);
+            Logger.error('Export error:', error);
             this.handleActionError('שגיאה בייצוא נתונים', error.message);
         }
     }
@@ -744,7 +761,7 @@ class CacheManagementPage {
      * ייבוא נתוני מטמון
      */
     importCacheData() {
-        console.log('📥 Import cache data - Not implemented yet');
+        Logger.info('📥 Import cache data - Not implemented yet');
         this.handleActionError('ייבוא נתונים', 'פונקציה עדיין לא מומשה');
     }
 
@@ -755,7 +772,7 @@ class CacheManagementPage {
      * סינון לוגים
      */
     filterLogs(level) {
-        console.log(`📋 Filtering logs by level: ${level}`);
+        Logger.info(`📋 Filtering logs by level: ${level}`);
         
         if (window.UnifiedLogDisplay) {
             // Filter through UnifiedLogDisplay
@@ -800,12 +817,14 @@ class CacheManagementPage {
         
         if (btn) {
             btn.classList.toggle('active', this.autoRefresh);
-            btn.innerHTML = this.autoRefresh ? 
-                '<i class="fas fa-pause"></i> עצור רענון אוטומטי' :
-                '<i class="fas fa-play"></i> רענון אוטומטי';
+            btn.textContent = '';
+            const icon = document.createElement('i');
+            icon.className = this.autoRefresh ? 'fas fa-pause' : 'fas fa-play';
+            btn.appendChild(icon);
+            btn.appendChild(document.createTextNode(' ' + (this.autoRefresh ? 'עצור רענון אוטומטי' : 'רענון אוטומטי')));
         }
         
-        console.log(`Auto-refresh ${this.autoRefresh ? 'enabled' : 'disabled'}`);
+        Logger.info(`Auto-refresh ${this.autoRefresh ? 'enabled' : 'disabled'}`);
     }
 
     /**
@@ -829,7 +848,7 @@ class CacheManagementPage {
      * טיפול בהצלחת פעולה עם מערכת הודעות
      */
     handleActionSuccess(message, details = null) {
-        console.log('✅ Action Success:', message, details);
+        Logger.info('✅ Action Success:', message, details);
         
         // Use unified notification system
         if (typeof window.showFinalSuccessNotification === 'function') {
@@ -846,7 +865,7 @@ class CacheManagementPage {
         } else if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification(message, details);
         } else {
-            console.log('Success:', message);
+            Logger.info('Success:', message);
         }
         
         // Log to unified system
@@ -858,13 +877,13 @@ class CacheManagementPage {
      * טיפול בשגיאת פעולה עם מערכת הודעות
      */
     handleActionError(message, details = null) {
-        console.error('❌ Action Error:', message, details);
+        Logger.error('❌ Action Error:', message, details);
         
         // Use unified notification system
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification(message, details);
         } else {
-            console.error('Error:', message);
+            Logger.error('Error:', message);
         }
         
         // Log to unified system
@@ -1139,7 +1158,7 @@ class CacheManagementPage {
             clearInterval(this.statsInterval);
         }
         this.isInitialized = false;
-        console.log('🧹 Cache Management Page cleaned up');
+        Logger.info('🧹 Cache Management Page cleaned up');
     }
 }
 
@@ -1494,14 +1513,20 @@ async function copyDetailedLog() {
                 window.showSuccessNotification('לוג מפורט הועתק ללוח', 'הלוג מכיל את כל מה שרואה המשתמש בעמוד ניהול המטמון');
             } else if (typeof window.showNotification === 'function') {
                 window.showNotification('לוג מפורט הועתק ללוח', 'success');
+            } else if (window.showSuccessNotification) {
+                window.showSuccessNotification('לוג מפורט הועתק ללוח!');
+            } else if (window.showInfoNotification) {
+                window.showInfoNotification('לוג מפורט הועתק ללוח!', 'success');
             } else {
                 alert('לוג מפורט הועתק ללוח!');
             }
         }
     } catch (error) {
-        console.error('שגיאה בהעתקת הלוג המפורט:', error);
+        Logger.error('שגיאה בהעתקת הלוג המפורט:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה בהעתקת הלוג', error.message);
+        } else if (window.showInfoNotification) {
+            window.showInfoNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
         } else {
             alert('שגיאה בהעתקת הלוג: ' + error.message);
         }
@@ -1534,4 +1559,4 @@ if (document.readyState === 'loading') {
     }
 }
 
-console.log('⚙️ Cache Management Page - JavaScript ready');
+Logger.info('⚙️ Cache Management Page - JavaScript ready');

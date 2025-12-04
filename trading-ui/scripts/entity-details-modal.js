@@ -1019,7 +1019,12 @@ class EntityDetailsModal {
                 </span>
             `;
             
-            titleElement.innerHTML = titleHTML;
+            titleElement.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(titleHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                titleElement.appendChild(node.cloneNode(true));
+            });
             
             if (window.Logger) {
                 window.Logger.info('🎯 Nested modal - simple title set', { entityLabel, iconPath, finalEntityType, titleText }, { page: "entity-details-modal" });
@@ -1069,7 +1074,12 @@ class EntityDetailsModal {
             });
             
             window.Logger.info('🎯 Setting title to:', { entityLabel, entityId: finalEntityId, iconPath, finalEntityType, titleText }, { page: "entity-details-modal" });
-            titleElement.innerHTML = titleHTML;
+            titleElement.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(titleHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                titleElement.appendChild(node.cloneNode(true));
+            });
             
             console.log('🔍🔍🔍 [updateModalTitle] After setting titleHTML', {
                 titleElementAfter: titleElement?.innerHTML?.substring(0, 100),
@@ -1212,7 +1222,12 @@ class EntityDetailsModal {
             }
         }
         
-        buttonsContainer.innerHTML = buttonsHtml;
+        buttonsContainer.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(buttonsHtml, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            buttonsContainer.appendChild(node.cloneNode(true));
+        });
         
         // עבור ticker - מסתירים גם את כפתור החזרה
         const backButton = document.getElementById('entityDetailsBackBtn');
@@ -1248,7 +1263,12 @@ class EntityDetailsModal {
         // Insert rendered content using tempDiv
         contentElement.textContent = '';
         const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = renderedContent;
+        tempDiv.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(renderedContent, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tempDiv.appendChild(node.cloneNode(true));
+        });
         while (tempDiv.firstChild) {
           contentElement.appendChild(tempDiv.firstChild);
         }

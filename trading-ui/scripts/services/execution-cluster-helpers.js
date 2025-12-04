@@ -397,11 +397,11 @@
       </div>
     `;
     card.textContent = '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = cardHTML;
-    while (tempDiv.firstChild) {
-      card.appendChild(tempDiv.firstChild);
-    }
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(cardHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      card.appendChild(node.cloneNode(true));
+    });
 
     // Hover handlers are now managed by unified-pending-actions-widget.js
     // No need to add them here - the widget handles all hover events
@@ -488,7 +488,9 @@
     }
 
     return `
-      <li class="list-group-item trade-create-widget-item" data-cluster-id="${cluster.cluster_id}">
+      <li class="list-group-item trade-create-widget-item" 
+          data-cluster-id="${cluster.cluster_id}"
+          data-widget-overlay="true">
         <div class="trade-create-widget-top d-flex flex-wrap align-items-center gap-2">
           <div class="d-flex align-items-center gap-2">
             <span class="badge ${sideBadgeClass}">${sideBadgeText}</span>
@@ -526,7 +528,10 @@
           </span>
           ${accountBadge}
         </div>
-        <div class="trade-create-widget-details" data-role="widget-detail" data-cluster-id="${cluster.cluster_id}">
+        <div class="trade-create-widget-details" 
+             data-overlay="true" 
+             data-role="widget-detail" 
+             data-cluster-id="${cluster.cluster_id}">
           <div class="trade-create-widget-stats text-muted small mb-2 d-flex flex-wrap gap-2">
             <span>שווי כולל: ${totalValueDisplay}</span>
             <span>•</span>

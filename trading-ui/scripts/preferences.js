@@ -661,7 +661,7 @@ window.loadProfilesToDropdown = async function() {
         }
         
         // נקה את הרשימה
-        profileSelect.innerHTML = '';
+        profileSelect.textContent = '';
         
         if (profiles && profiles.length > 0) {
             profiles.forEach(profile => {

@@ -450,7 +450,12 @@ class InfoSummarySystem {
       }
     });
     
-    container.innerHTML = html;
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      container.appendChild(node.cloneNode(true));
+    });
     
     // Use Logger.debug instead of console.log to avoid cluttering console
     // Only log in debug mode

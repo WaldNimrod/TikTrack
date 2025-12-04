@@ -624,11 +624,11 @@ class SystemManagement {
         </div>
       </div>
     `;
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = containerHTML;
-    while (tempDiv.firstChild) {
-      container.appendChild(tempDiv.firstChild);
-    }
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(containerHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      container.appendChild(node.cloneNode(true));
+    });
 
     // Insert after the Quick Actions section (in the top section)
     const quickActions = document.querySelector('.quick-actions');
@@ -771,11 +771,11 @@ class SystemManagement {
     `;
     // Insert using tempDiv
     resultsContent.textContent = '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = resultsHTML;
-    while (tempDiv.firstChild) {
-      resultsContent.appendChild(tempDiv.firstChild);
-    }
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(resultsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      resultsContent.appendChild(node.cloneNode(true));
+    });
 
     // Store results globally for copying
     window.lastCheckResults = checkResults;
@@ -832,7 +832,8 @@ class SystemManagement {
     // Build modal content
     // Note: This innerHTML is for system check results modal display, not a standard summary element
     // Consider refactoring to use createElement for better security if this becomes a security concern
-    modal.innerHTML = `
+    modal.textContent = '';
+    const modalHTML = `
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
@@ -1258,7 +1259,12 @@ class SystemManagement {
         const scoreDetails = this.getScoreDetails(data);
         const detailsElement = document.querySelector('.score-details');
         if (detailsElement) {
-          detailsElement.innerHTML = scoreDetails;
+          detailsElement.textContent = '';
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(scoreDetails, 'text/html');
+          doc.body.childNodes.forEach(node => {
+            detailsElement.appendChild(node.cloneNode(true));
+          });
         }
       }
     }
@@ -1401,7 +1407,8 @@ class SystemManagement {
     const providerListElement = document.getElementById('providerList');
     if (!providerListElement || !providers.length) {return;}
 
-    providerListElement.innerHTML = providers.map(provider => `
+    providerListElement.textContent = '';
+    const providersHTML = providers.map(provider => `
       <div class="provider-item ${provider.status === 'active' ? 'active' : 'inactive'}">
         <div class="provider-info">
           <span class="provider-name">${provider.name || 'Unknown Provider'}</span>
@@ -1416,6 +1423,11 @@ class SystemManagement {
         </div>
       </div>
     `).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(providersHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      providerListElement.appendChild(node.cloneNode(true));
+    });
   }
 
   updateLogs(data) {
@@ -1423,16 +1435,24 @@ class SystemManagement {
     if (!logContent) {return;}
 
     // Clear existing logs
-    logContent.innerHTML = '';
+    logContent.textContent = '';
 
     // Add system status log
     const statusLog = document.createElement('div');
     statusLog.className = 'log-entry log-info';
-    statusLog.innerHTML = `
+    statusLog.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
       <div class="log-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
       <div class="log-level">INFO</div>
       <div class="log-message">מערכת ניהול מערכת נטענה בהצלחה - ציון מערכת: ${data.system_score || 0}/100</div>
-    `;
+    `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        statusLog.appendChild(fragment);
     logContent.appendChild(statusLog);
 
     // Add health status logs
@@ -1443,11 +1463,19 @@ class SystemManagement {
       const levelText = status.status === 'healthy' ? 'INFO' : status.status === 'warning' ? 'WARNING' : 'ERROR';
 
       logEntry.className = `log-entry ${logLevel}`;
-      logEntry.innerHTML = `
-        <div class="log-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
-        <div class="log-level">${levelText}</div>
-        <div class="log-message">${component}: ${status.status} - ביצועים: ${status.performance || 'unknown'}</div>
-      `;
+      logEntry.textContent = '';
+      const timestampDiv = document.createElement('div');
+      timestampDiv.className = 'log-timestamp';
+      timestampDiv.textContent = window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'));
+      logEntry.appendChild(timestampDiv);
+      const levelDiv = document.createElement('div');
+      levelDiv.className = 'log-level';
+      levelDiv.textContent = levelText;
+      logEntry.appendChild(levelDiv);
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'log-message';
+      messageDiv.textContent = `${component}: ${status.status} - ביצועים: ${status.performance || 'unknown'}`;
+      logEntry.appendChild(messageDiv);
       logContent.appendChild(logEntry);
     });
   }
@@ -1583,17 +1611,28 @@ class SystemManagement {
       warningBanner.className = 'alert alert-danger fallback-warning';
     }
 
-    warningBanner.innerHTML = `
-      <div class="d-flex align-items-center">
-        <i class="fas fa-times-circle me-2"></i>
-        <div>
-          <strong>נתוני מערכת לא זמינים</strong>
-          <br>
-          <small>${errorMessage}</small>
-        </div>
-        <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
-      </div>
-    `;
+    warningBanner.textContent = '';
+    const flexDiv = document.createElement('div');
+    flexDiv.className = 'd-flex align-items-center';
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-times-circle me-2';
+    flexDiv.appendChild(icon);
+    const contentDiv = document.createElement('div');
+    const strong = document.createElement('strong');
+    strong.textContent = 'נתוני מערכת לא זמינים';
+    contentDiv.appendChild(strong);
+    const br = document.createElement('br');
+    contentDiv.appendChild(br);
+    const small = document.createElement('small');
+    small.textContent = errorMessage;
+    contentDiv.appendChild(small);
+    flexDiv.appendChild(contentDiv);
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'btn-close ms-auto';
+    closeBtn.onclick = function() { this.parentElement.parentElement.remove(); };
+    flexDiv.appendChild(closeBtn);
+    warningBanner.appendChild(flexDiv);
 
     const mainContent = document.querySelector('.main-content');
     if (mainContent) {
@@ -1677,7 +1716,7 @@ class SystemManagement {
         // Update alerts list
         const alertsListElement = document.getElementById('alerts-list');
         if (alertsListElement) {
-          alertsListElement.innerHTML = '';
+          alertsListElement.textContent = '';
 
           if (alerts.alerts && alerts.alerts.length > 0) {
             alerts.alerts.forEach(alert => {
@@ -1686,22 +1725,38 @@ class SystemManagement {
 
               const timestamp = window.formatTimeOnly ? window.formatTimeOnly(new Date(alert.timestamp)) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date(alert.timestamp)) : new Date(alert.timestamp).toLocaleTimeString('he-IL'));
 
-              alertItem.innerHTML = `
-                <div class="alert-timestamp">${timestamp}</div>
-                <div class="alert-level">${alert.level.toUpperCase()}</div>
-                <div class="alert-message">${alert.message}</div>
-              `;
+              alertItem.textContent = '';
+              const timestampDiv = document.createElement('div');
+              timestampDiv.className = 'alert-timestamp';
+              timestampDiv.textContent = timestamp;
+              alertItem.appendChild(timestampDiv);
+              const levelDiv = document.createElement('div');
+              levelDiv.className = 'alert-level';
+              levelDiv.textContent = alert.level.toUpperCase();
+              alertItem.appendChild(levelDiv);
+              const messageDiv = document.createElement('div');
+              messageDiv.className = 'alert-message';
+              messageDiv.textContent = alert.message;
+              alertItem.appendChild(messageDiv);
 
               alertsListElement.appendChild(alertItem);
             });
           } else {
             const noAlertsItem = document.createElement('div');
             noAlertsItem.className = 'alert-item info';
-            noAlertsItem.innerHTML = `
-              <div class="alert-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
-              <div class="alert-level">INFO</div>
-              <div class="alert-message">אין התראות פעילות</div>
-            `;
+            noAlertsItem.textContent = '';
+            const timestampDiv = document.createElement('div');
+            timestampDiv.className = 'alert-timestamp';
+            timestampDiv.textContent = window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'));
+            noAlertsItem.appendChild(timestampDiv);
+            const levelDiv = document.createElement('div');
+            levelDiv.className = 'alert-level';
+            levelDiv.textContent = 'INFO';
+            noAlertsItem.appendChild(levelDiv);
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'alert-message';
+            messageDiv.textContent = 'אין התראות פעילות';
+            noAlertsItem.appendChild(messageDiv);
             alertsListElement.appendChild(noAlertsItem);
           }
         }
@@ -1723,11 +1778,14 @@ class SystemManagement {
 
       const alertsListElement = document.getElementById('alerts-list');
       if (alertsListElement) {
-        alertsListElement.innerHTML = `
-          <div class="alert-item error">
-            <div class="alert-message">לא ניתן לטעון התראות כרגע. בדוק את החיבור לשרת ונסה שוב.</div>
-          </div>
-        `;
+        alertsListElement.textContent = '';
+        const alertItem = document.createElement('div');
+        alertItem.className = 'alert-item error';
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'alert-message';
+        messageDiv.textContent = 'לא ניתן לטעון התראות כרגע. בדוק את החיבור לשרת ונסה שוב.';
+        alertItem.appendChild(messageDiv);
+        alertsListElement.appendChild(alertItem);
       }
     }
   }

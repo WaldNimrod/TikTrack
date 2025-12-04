@@ -52,7 +52,9 @@
     initialized: false,
     activeAction: 'assign', // 'assign' | 'create'
     activeEntity: 'plans',  // 'plans' | 'trades'
-    config: { ...DEFAULT_CONFIG }
+    config: { ...DEFAULT_CONFIG },
+    dataCache: {}, // Cache for combination data to avoid multiple fetches
+    overlaySetup: {} // Track which lists have overlay setup
   };
 
   // ===== DOM Elements Cache =====
@@ -88,36 +90,61 @@
   }
   
   /**
-   * Get data for a specific combination using shared services
+   * Setup overlay hover for a list element (only once per list)
+   * @param {HTMLElement} listElement - The list element to setup overlay for
+   * @param {string} combination - Combination key for tracking
+   */
+  function setupOverlayForList(listElement, combination) {
+    if (!window.WidgetOverlayService || !listElement || state.overlaySetup[combination]) {
+      return;
+    }
+    
+    // Destroy existing handlers first to prevent duplicates
+    window.WidgetOverlayService.destroy(listElement);
+    
+    // Use requestAnimationFrame to ensure DOM is ready
+    requestAnimationFrame(() => {
+      window.WidgetOverlayService.setupOverlayHover(
+        listElement,
+        '.unified-pending-list-item, .trade-create-widget-item',
+        '.unified-pending-details, .trade-create-widget-details, [data-overlay="true"]',
+        {
+          hoverClass: 'is-hovered',
+          gap: 8,
+          minWidth: 280,
+          maxWidth: 400,
+          zIndex: 1050
+        }
+      );
+      state.overlaySetup[combination] = true;
+    });
+  }
+
+  /**
+   * Get data for a specific combination using shared services (with caching)
    */
   async function getDataForCombination(combination) {
+    // Return cached data if available
+    if (state.dataCache[combination] !== undefined) {
+      return state.dataCache[combination];
+    }
     try {
       if (combination === 'createTrades') {
         if (!window.ExecutionClusteringService) {
-          window.Logger?.warn?.('ExecutionClusteringService not available', { combination, page: 'index' });
+          window.Logger?.warn?.('ExecutionClusteringService not available', { combination, page: 'unified-pending-actions-widget' });
           return [];
         }
-        window.Logger?.debug?.('Getting cached clusters for createTrades', { page: 'index' });
+        // Getting cached clusters for createTrades
         const clusters = await window.ExecutionClusteringService.getCachedClusters();
-        window.Logger?.debug?.('Cached clusters result', { 
-          clustersLength: clusters?.length || 0,
-          clusters: clusters ? 'exists' : 'null',
-          page: 'index' 
-        });
         if (!clusters || clusters.length === 0) {
-          window.Logger?.debug?.('No clusters found in cache, returning empty array', { page: 'index' });
+          state.dataCache[combination] = [];
           return [];
         }
         const dismissed = await window.PendingActionsCacheService.getDismissed('trade-creation-clusters');
         const filtered = clusters
           .filter(cluster => !dismissed.has(cluster.cluster_id))
           .slice(0, state.config.defaultItemsLimit);
-        window.Logger?.debug?.('Filtered clusters result', { 
-          originalLength: clusters.length,
-          dismissedCount: dismissed.size,
-          filteredLength: filtered.length,
-          page: 'index' 
-        });
+        state.dataCache[combination] = filtered;
         return filtered;
       }
       
@@ -145,6 +172,8 @@
             return true;
           })
           .slice(0, state.config.defaultItemsLimit);
+        state.dataCache[combination] = result;
+        return result;
       }
       
       if (combination === 'assignPlans') {
@@ -160,6 +189,8 @@
             return dismissKey && !dismissedItems.has(dismissKey);
           })
           .slice(0, state.config.defaultItemsLimit);
+        state.dataCache[combination] = result;
+        return result;
       }
       
       if (combination === 'createPlans') {
@@ -174,11 +205,16 @@
             return dismissKey && !dismissedItems.has(dismissKey);
           })
           .slice(0, state.config.defaultItemsLimit);
+        state.dataCache[combination] = result;
+        return result;
       }
     } catch (error) {
-      window.Logger?.error?.('Error getting data for combination', { error, combination, page: 'index' });
+      window.Logger?.error?.('Error getting data for combination', { error, combination, page: 'unified-pending-actions-widget' });
+      state.dataCache[combination] = [];
+      return [];
     }
     
+    state.dataCache[combination] = [];
     return [];
   }
   
@@ -191,7 +227,7 @@
       const data = await getDataForCombination(combination);
       return Array.isArray(data) && data.length > 0;
     } catch (error) {
-      window.Logger?.error?.('Failed to check data for combination', { error, combination, page: 'index' });
+      window.Logger?.error?.('Failed to check data for combination', { error, combination, page: 'unified-pending-actions-widget' });
       return false;
     }
   }
@@ -209,14 +245,14 @@
     try {
       if (combination === 'createTrades') {
         if (window.ExecutionClusteringService) {
-          window.Logger?.info?.('Fetching clusters for createTrades', { page: 'index' });
+          window.Logger?.info?.('Fetching clusters for createTrades', { page: 'unified-pending-actions-widget' });
           const clusters = await window.ExecutionClusteringService.fetchClusters({ force: true });
           window.Logger?.info?.('Clusters fetched', { 
             clustersLength: clusters?.length || 0,
-            page: 'index' 
+            page: 'unified-pending-actions-widget' 
           });
         } else {
-          window.Logger?.warn?.('ExecutionClusteringService not available for createTrades', { page: 'index' });
+          window.Logger?.warn?.('ExecutionClusteringService not available for createTrades', { page: 'unified-pending-actions-widget' });
         }
       } else if (combination === 'assignTrades') {
         if (window.ExecutionAssignmentService) {
@@ -232,7 +268,7 @@
         }
       }
     } catch (error) {
-      window.Logger?.error?.('Failed to load combination data', { error, combination, page: 'index' });
+      window.Logger?.error?.('Failed to load combination data', { error, combination, page: 'unified-pending-actions-widget' });
       showError(combination, error.message || 'שגיאה בטעינת נתונים');
     } finally {
       setLoading(combination, false);
@@ -254,8 +290,9 @@
         if (window.ExecutionClusterHelpers?.renderClusterListItem) {
           const selectedIds = window.ExecutionClusteringService?.getSelection?.(item.cluster_id) || new Set(item.execution_ids || []);
           return window.ExecutionClusterHelpers.renderClusterListItem(item, selectedIds, {
-            onSelectionChange: (clusterId, executionId, isChecked) => {
-              const currentCluster = window.ExecutionClusteringService?.getCachedClusters()?.find(c => c.cluster_id === clusterId);
+            onSelectionChange: async (clusterId, executionId, isChecked) => {
+              const clusters = await window.ExecutionClusteringService?.getCachedClusters() || [];
+              const currentCluster = clusters.find(c => c.cluster_id === clusterId);
               if (!currentCluster) return;
               let currentSelection = window.ExecutionClusteringService?.getSelection?.(clusterId);
               if (!currentSelection) {
@@ -311,7 +348,11 @@
         const value = execution.value || (execution.quantity && execution.price ? execution.quantity * execution.price : null);
         
         const FieldRenderer = window.FieldRendererService;
-        const symbol = ticker.symbol || (executionId ? `ביצוע #${executionId}` : 'לא זמין');
+        // Try multiple ways to get ticker symbol
+        // Note: getTickerSymbol may return a Promise, so we need to handle it synchronously
+        // For now, we'll use the ticker symbol from the data or fallback to ID
+        const symbol = ticker?.symbol || execution?.ticker_symbol || execution?.ticker?.symbol || 
+                       (executionId ? `ביצוע #${executionId}` : 'לא זמין');
         const dateLabel = date && FieldRenderer?.renderDateShort 
           ? FieldRenderer.renderDateShort(date)
           : (date ? (typeof date === 'object' && date.display ? date.display : String(date).substring(0, 10)) : '');
@@ -322,10 +363,13 @@
           ? FieldRenderer.renderAmount(Number(value) || 0, '$', 2, true)
           : (value !== undefined && value !== null ? `$${Number(value).toFixed(2)}` : 'לא זמין');
         
-        const executionIconPath = window.IconSystem?.getEntityIcon ? window.IconSystem.getEntityIcon('execution') : 'images/icons/entities/executions.svg';
+        // Note: IconSystem.getEntityIcon returns a Promise, so we use fallback path directly
+        const executionIconPath = 'images/icons/entities/executions.svg';
         
         return `
-          <li class="list-group-item unified-pending-list-item" data-execution-id="${executionId}">
+          <li class="list-group-item unified-pending-list-item" 
+              data-execution-id="${executionId}"
+              data-widget-overlay="true">
             <!-- Header Section - Always Visible (like Recent Items) -->
             <div class="unified-pending-item-header">
               <div class="unified-pending-item-title">
@@ -360,7 +404,7 @@
               </div>
             </div>
             <!-- Details Section - Hidden by default, shown on hover -->
-            <div class="unified-pending-details" data-role="widget-detail" data-execution-id="${executionId}">
+            <div class="unified-pending-details" data-overlay="true" data-role="widget-detail" data-execution-id="${executionId}">
               <div class="unified-pending-details-content">
                 ${symbol ? `
                   <div class="unified-pending-details-row">
@@ -428,7 +472,11 @@
         
         const FieldRenderer = window.FieldRendererService;
         const ticker = trade.ticker || {};
-        const symbol = ticker.symbol || (tradeId ? `טרייד #${tradeId}` : 'לא זמין');
+        // Try multiple ways to get ticker symbol
+        // Note: getTickerSymbol may return a Promise, so we need to handle it synchronously
+        // For now, we'll use the ticker symbol from the data or fallback to ID
+        const symbol = ticker?.symbol || trade?.ticker_symbol || trade?.symbol || 
+                       (tradeId ? `טרייד #${tradeId}` : 'לא זמין');
         const status = trade.status || '';
         const date = trade.created_at || trade.opened_at || trade.entry_date;
         const amount = trade.position?.market_value ?? trade.position?.amount ?? trade.amount ?? trade.total_pl ?? trade.entry_price;
@@ -443,10 +491,14 @@
           ? FieldRenderer.renderAmount(Number(amount) || 0, '$', 2, true)
           : (amount !== undefined && amount !== null ? `$${Number(amount).toFixed(2)}` : 'לא זמין');
         
-        const tradeIconPath = window.IconSystem?.getEntityIcon ? window.IconSystem.getEntityIcon('trade') : 'images/icons/entities/trades.svg';
+        // Note: IconSystem.getEntityIcon returns a Promise, so we use fallback path directly
+        const tradeIconPath = 'images/icons/entities/trades.svg';
         
         return `
-          <li class="list-group-item unified-pending-list-item" data-trade-id="${tradeId}" data-plan-id="${planId}">
+          <li class="list-group-item unified-pending-list-item" 
+              data-trade-id="${tradeId}" 
+              data-plan-id="${planId}"
+              data-widget-overlay="true">
             <!-- Header Section - Always Visible (like Recent Items) -->
             <div class="unified-pending-item-header">
               <div class="unified-pending-item-title">
@@ -483,7 +535,7 @@
               </div>
             </div>
             <!-- Details Section - Hidden by default, shown on hover -->
-            <div class="unified-pending-details" data-role="widget-detail" data-trade-id="${tradeId}">
+            <div class="unified-pending-details" data-overlay="true" data-role="widget-detail" data-trade-id="${tradeId}">
               <div class="unified-pending-details-content">
                 ${symbol ? `
                   <div class="unified-pending-details-row">
@@ -542,7 +594,11 @@
         const amount = trade.position?.market_value ?? trade.position?.amount ?? trade.amount ?? trade.total_pl ?? trade.entry_price;
         
         const FieldRenderer = window.FieldRendererService;
-        const symbol = ticker.symbol || (tradeId ? `טרייד #${tradeId}` : 'לא זמין');
+        // Try multiple ways to get ticker symbol
+        // Note: getTickerSymbol may return a Promise, so we need to handle it synchronously
+        // For now, we'll use the ticker symbol from the data or fallback to ID
+        const symbol = ticker?.symbol || trade?.ticker_symbol || trade?.symbol || 
+                       (tradeId ? `טרייד #${tradeId}` : 'לא זמין');
         const dateLabel = date && FieldRenderer?.renderDateShort 
           ? FieldRenderer.renderDateShort(date)
           : (date ? (typeof date === 'object' && date.display ? date.display : String(date).substring(0, 10)) : '');
@@ -553,10 +609,13 @@
           ? FieldRenderer.renderAmount(Number(amount) || 0, '$', 2, true)
           : (amount !== undefined && amount !== null ? `$${Number(amount).toFixed(2)}` : 'לא זמין');
         
-        const tradeIconPath = window.IconSystem?.getEntityIcon ? window.IconSystem.getEntityIcon('trade') : 'images/icons/entities/trades.svg';
+        // Note: IconSystem.getEntityIcon returns a Promise, so we use fallback path directly
+        const tradeIconPath = 'images/icons/entities/trades.svg';
         
         return `
-          <li class="list-group-item unified-pending-list-item" data-trade-id="${tradeId}">
+          <li class="list-group-item unified-pending-list-item" 
+              data-trade-id="${tradeId}"
+              data-widget-overlay="true">
             <!-- Header Section - Always Visible (like Recent Items) -->
             <div class="unified-pending-item-header">
               <div class="unified-pending-item-title">
@@ -591,7 +650,7 @@
               </div>
             </div>
             <!-- Details Section - Hidden by default, shown on hover -->
-            <div class="unified-pending-details" data-role="widget-detail" data-trade-id="${tradeId}">
+            <div class="unified-pending-details" data-overlay="true" data-role="widget-detail" data-trade-id="${tradeId}">
               <div class="unified-pending-details-content">
                 ${symbol ? `
                   <div class="unified-pending-details-row">
@@ -627,7 +686,7 @@
         `;
       }
     } catch (error) {
-      window.Logger?.error?.('Failed to render item', { error, combination, item, page: 'index' });
+      window.Logger?.error?.('Failed to render item', { error, combination, item, page: 'unified-pending-actions-widget' });
     }
     
     return '';
@@ -644,13 +703,6 @@
     if (!list) return;
     
     const data = await getDataForCombination(combination);
-    
-    window.Logger?.debug?.('getDataForCombination result', { 
-      combination, 
-      dataLength: data.length,
-      hasData: data.length > 0,
-      page: 'index' 
-    });
     
     // Hide loading
     setLoading(combination, false);
@@ -669,39 +721,32 @@
     
     // Render items
     if (!list || !list.parentNode) {
-      window.Logger?.warn?.('List element not in DOM', { combination, page: 'index' });
+      window.Logger?.warn?.('List element not in DOM', { combination, page: 'unified-pending-actions-widget' });
       return;
     }
     
-    window.Logger?.debug?.('Rendering combination', { 
-      combination, 
-      dataLength: data.length,
-      page: 'index' 
-    });
     
     const html = data.map(item => renderListItem(item, combination)).filter(Boolean).join('');
     
     if (!html) {
-      window.Logger?.debug?.('No HTML generated for combination', { combination, dataLength: data.length, page: 'index' });
       showEmptyState(combination);
       hideList(combination);
       updateCount(combination, 0);
       return;
     }
     
-    // Set HTML content using tempDiv
+    // Set HTML content using DOMParser
     list.textContent = '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-    while (tempDiv.firstChild) {
-      list.appendChild(tempDiv.firstChild);
-    }
-    window.Logger?.debug?.('List HTML set', { combination, htmlLength: html.length, page: 'index' });
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      list.appendChild(node.cloneNode(true));
+    });
     
     // Dispatch event to trigger height equalization after content update
     window.dispatchEvent(new CustomEvent('widgetContentUpdated'));
     
-    // Wait for DOM to update before initializing buttons
+    // Wait for DOM to update before initializing buttons and overlay
     requestAnimationFrame(() => {
       if (list && list.parentNode && list.innerHTML) {
         // Initialize buttons only if list has content and is in DOM
@@ -709,9 +754,13 @@
           try {
             window.ButtonSystem.initializeButtons(list);
           } catch (error) {
-            window.Logger?.warn?.('Failed to initialize buttons', { combination, error, page: 'index' });
+            window.Logger?.warn?.('Failed to initialize buttons', { combination, error, page: 'unified-pending-actions-widget' });
           }
         }
+        
+        // Setup overlay hover AFTER items are rendered and buttons initialized
+        // Setup overlay using shared function (only once per list)
+        setupOverlayForList(list, combination);
       }
     });
     
@@ -762,25 +811,14 @@
    * Cache DOM elements
    */
   function cacheElements() {
-    window.Logger?.debug?.('cacheElements: Looking for container', { 
-      containerId: CONTAINER_ID,
-      containerExists: !!document.getElementById(CONTAINER_ID),
-      page: 'index' 
-    });
-    
     elements.container = document.getElementById(CONTAINER_ID);
     if (!elements.container) {
       window.Logger?.error?.('cacheElements: Container not found', { 
         containerId: CONTAINER_ID,
-        page: 'index' 
+        page: 'unified-pending-actions-widget' 
       });
       return false;
     }
-    
-    window.Logger?.debug?.('cacheElements: Container found', { 
-      containerId: CONTAINER_ID,
-      page: 'index' 
-    });
     
     elements.title = elements.container.querySelector('#unifiedPendingActionsWidgetTitle');
     elements.badge = elements.container.querySelector('#unifiedPendingActionsWidgetBadge');
@@ -826,7 +864,7 @@
   /**
    * Set active tabs
    */
-  function setActiveAction(action) {
+  async function setActiveAction(action) {
     state.activeAction = action;
     
     if (elements.actionTabAssign) {
@@ -839,11 +877,24 @@
     // Update entity tabs visibility and active state
     updateEntityTabsVisibility();
     
+    // Update counts visibility for all combinations
+    const combinations = ['assignPlans', 'assignTrades', 'createPlans', 'createTrades'];
+    await Promise.all(combinations.map(async (comb) => {
+      const data = await getDataForCombination(comb);
+      const activeCombination = getCombinationKey(state.activeAction, state.activeEntity);
+      const isActive = comb === activeCombination;
+      const countEl = elements.count[comb];
+      if (countEl) {
+        countEl.textContent = String(data.length);
+        countEl.classList.toggle('d-none', data.length === 0 || !isActive);
+      }
+    }));
+    
     // Load data for new combination
-    loadCombinationData(state.activeAction, state.activeEntity);
+    await loadCombinationData(state.activeAction, state.activeEntity);
   }
   
-  function setActiveEntity(entity) {
+  async function setActiveEntity(entity) {
     state.activeEntity = entity;
     
     if (elements.entityTabPlans) {
@@ -856,8 +907,21 @@
     // Update active pane
     updateActivePane();
     
+    // Update counts visibility for all combinations
+    const combinations = ['assignPlans', 'assignTrades', 'createPlans', 'createTrades'];
+    await Promise.all(combinations.map(async (comb) => {
+      const data = await getDataForCombination(comb);
+      const activeCombination = getCombinationKey(state.activeAction, state.activeEntity);
+      const isActive = comb === activeCombination;
+      const countEl = elements.count[comb];
+      if (countEl) {
+        countEl.textContent = String(data.length);
+        countEl.classList.toggle('d-none', data.length === 0 || !isActive);
+      }
+    }));
+    
     // Load data for new combination
-    loadCombinationData(state.activeAction, state.activeEntity);
+    await loadCombinationData(state.activeAction, state.activeEntity);
   }
   
   function updateEntityTabsVisibility() {
@@ -967,108 +1031,17 @@
           }
         });
 
-        // Hover handlers for overlay positioning
-        list.addEventListener('mouseenter', handleItemHover, true);
-        list.addEventListener('mouseleave', handleItemHover, true);
+        // Overlay setup is now done in renderCombination after items are rendered
+        // This code is kept for backward compatibility but should not be needed
       }
     });
   }
 
   /**
-   * Handle hover on widget items - fixed positioning to escape container boundaries
+   * Handle hover on widget items
+   * NOTE: This function is no longer used - overlay is handled by WidgetOverlayService
+   * Kept for reference but can be removed in future cleanup
    */
-  function handleItemHover(event) {
-    const item = event.target.closest('.unified-pending-list-item, .trade-create-widget-item');
-    if (!item) {
-      return;
-    }
-
-    const details = item.querySelector('.unified-pending-details, .trade-create-widget-details, [data-role="widget-detail"]');
-    
-    if (event.type === 'mouseenter') {
-      item.classList.add('is-hovered');
-      
-      // Position overlay as fixed to escape all container boundaries
-      if (details) {
-        const itemRect = item.getBoundingClientRect();
-        const isRTL = document.documentElement.dir === 'rtl' || document.documentElement.getAttribute('dir') === 'rtl';
-        
-        // Show overlay temporarily to get dimensions
-        details.style.display = 'block';
-        details.style.visibility = 'hidden';
-        const overlayWidth = Math.max(details.offsetWidth || 300, 280);
-        const overlayHeight = details.offsetHeight || 150;
-        details.style.visibility = '';
-        
-        // Position below item (or above if not enough space)
-        let top = itemRect.bottom + 8;
-        if (top + overlayHeight > window.innerHeight - 20) {
-          // Not enough space below - position above
-          top = itemRect.top - overlayHeight - 8;
-          if (top < 20) {
-            // Not enough space above either - position at top of viewport
-            top = 20;
-          }
-        }
-        
-        // Position horizontally
-        let left = itemRect.left;
-        let right = 'auto';
-        if (isRTL) {
-          right = window.innerWidth - itemRect.right;
-          left = 'auto';
-          // Check if overlay goes beyond viewport
-          if (right + overlayWidth > window.innerWidth - 20) {
-            right = 20;
-          }
-        } else {
-          if (left + overlayWidth > window.innerWidth - 20) {
-            left = window.innerWidth - overlayWidth - 20;
-          }
-          if (left < 20) {
-            left = 20;
-          }
-        }
-        
-        // Set fixed position
-        details.style.position = 'fixed';
-        details.style.top = `${top}px`;
-        if (isRTL) {
-          details.style.right = `${right}px`;
-          details.style.left = 'auto';
-        } else {
-          details.style.left = `${left}px`;
-          details.style.right = 'auto';
-        }
-        details.style.width = `${overlayWidth}px`;
-        details.style.zIndex = '1050';
-      }
-    } else if (event.type === 'mouseleave') {
-      // Check if mouse is moving to overlay
-      const relatedTarget = event.relatedTarget;
-      if (details && relatedTarget && details.contains(relatedTarget)) {
-        // Mouse is moving to overlay, keep it visible
-        return;
-      }
-      
-      item.classList.remove('is-hovered');
-      
-      // Hide overlay after transition
-      if (details) {
-        setTimeout(() => {
-          if (!item.classList.contains('is-hovered')) {
-            details.style.display = 'none';
-            details.style.position = '';
-            details.style.top = '';
-            details.style.left = '';
-            details.style.right = '';
-            details.style.width = '';
-            details.style.zIndex = '';
-          }
-        }, 200);
-      }
-    }
-  }
 
   /**
    * Handle APPROVE action - open modal for creation/assignment
@@ -1078,7 +1051,7 @@
     event.stopPropagation();
     
     const combination = getCombinationKey(state.activeAction, state.activeEntity);
-    window.Logger?.info?.('Handling APPROVE action', { combination, page: 'index' });
+    window.Logger?.info?.('Handling APPROVE action', { combination, page: 'unified-pending-actions-widget' });
     
     if (combination === 'createTrades') {
       // Handle trade creation from cluster
@@ -1179,7 +1152,7 @@
     event.stopPropagation();
     
     const combination = getCombinationKey(state.activeAction, state.activeEntity);
-    window.Logger?.info?.('Handling REJECT action', { combination, page: 'index' });
+    window.Logger?.info?.('Handling REJECT action', { combination, page: 'unified-pending-actions-widget' });
     
     if (combination === 'createTrades') {
       const clusterId = item.dataset.clusterId;
@@ -1268,7 +1241,32 @@
     const countEl = elements.count[combination];
     if (countEl) {
       countEl.textContent = String(count);
-      countEl.classList.toggle('d-none', count === 0);
+      // Show/hide based on count and active combination
+      const activeCombination = getCombinationKey(state.activeAction, state.activeEntity);
+      const isActive = combination === activeCombination;
+      countEl.classList.toggle('d-none', count === 0 || !isActive);
+      
+      // Apply color classes based on combination type
+      // Entity combinations (Trade/Plan) - Primary color
+      // Action combinations (Assign/Create) - Secondary color
+      countEl.classList.remove('badge-primary', 'badge-secondary', 'entity-trade', 'entity-trade_plan');
+      
+      if (combination === 'assignPlans' || combination === 'assignTrades') {
+        // Action: Assign - Secondary color (orange)
+        countEl.classList.add('badge-secondary');
+        countEl.style.backgroundColor = 'var(--brand-secondary-color, #fc5a06)';
+        countEl.style.color = '#fff';
+      } else if (combination === 'createPlans') {
+        // Entity: Plan - Green color (#28a745)
+        countEl.classList.add('entity-trade_plan');
+        countEl.style.backgroundColor = '#28a745';
+        countEl.style.color = '#fff';
+      } else if (combination === 'createTrades') {
+        // Entity: Trade - Primary color (turquoise #26baac)
+        countEl.classList.add('entity-trade');
+        countEl.style.backgroundColor = 'var(--brand-primary-color, #26baac)';
+        countEl.style.color = '#fff';
+      }
     }
     
     // Update total badge with sum of all 4 combinations
@@ -1280,6 +1278,21 @@
       const totalCount = assignPlansCount + assignTradesCount + createPlansCount + createTradesCount;
       elements.badge.textContent = String(totalCount);
     }
+    
+    // Update visibility of all count badges based on active combination
+    const activeCombination = getCombinationKey(state.activeAction, state.activeEntity);
+    const combinations = ['assignPlans', 'assignTrades', 'createPlans', 'createTrades'];
+    
+    // Update all counts
+    await Promise.all(combinations.map(async (comb) => {
+      const el = elements.count[comb];
+      if (el) {
+        const combCount = comb === combination ? count : (await getDataForCombination(comb)).length;
+        const isActive = comb === activeCombination;
+        el.textContent = String(combCount);
+        el.classList.toggle('d-none', combCount === 0 || !isActive);
+      }
+    }));
   }
   
   function hideAllTabs() {
@@ -1336,7 +1349,7 @@
       hasTradePlanService: !!window.TradePlanAssignmentService,
       hasCacheService: !!window.PendingActionsCacheService,
       hasClusterHelpers: !!window.ExecutionClusterHelpers,
-      page: 'index'
+      page: 'unified-pending-actions-widget'
     });
     
     return false;
@@ -1350,15 +1363,8 @@
      * Initialize widget
      */
     async init(containerId = CONTAINER_ID, config = {}) {
-      window.Logger?.info?.('🔵🔵🔵 UnifiedPendingActionsWidget.init() CALLED', { 
-        containerId, 
-        config,
-        initialized: state.initialized,
-        page: 'index' 
-      });
-      
       if (state.initialized) {
-        window.Logger?.warn?.('UnifiedPendingActionsWidget: Already initialized', { page: 'index' });
+        window.Logger?.warn?.('UnifiedPendingActionsWidget: Already initialized', { page: 'unified-pending-actions-widget' });
         return;
       }
       
@@ -1367,26 +1373,13 @@
       state.activeAction = config.defaultAction || DEFAULT_CONFIG.defaultAction;
       state.activeEntity = config.defaultEntity || DEFAULT_CONFIG.defaultEntity;
       
-      window.Logger?.info?.('🔵🔵🔵 UnifiedPendingActionsWidget: Configuration merged', { 
-        config: state.config,
-        activeAction: state.activeAction,
-        activeEntity: state.activeEntity,
-        page: 'index' 
-      });
-      
       // Cache elements
       const elementsCached = cacheElements();
-      window.Logger?.info?.('🔵🔵🔵 UnifiedPendingActionsWidget: cacheElements() result', { 
-        elementsCached,
-        containerId,
-        page: 'index' 
-      });
       
       if (!elementsCached) {
         window.Logger?.error?.('UnifiedPendingActionsWidget: Container not found', { 
           containerId,
-          containerExists: !!document.getElementById(containerId),
-          page: 'index' 
+          page: 'unified-pending-actions-widget' 
         });
         return;
       }
@@ -1400,7 +1393,7 @@
           hasTradePlanService: !!window.TradePlanAssignmentService,
           hasCacheService: !!window.PendingActionsCacheService,
           hasClusterHelpers: !!window.ExecutionClusterHelpers,
-          page: 'index' 
+          page: 'unified-pending-actions-widget' 
         });
         // Continue anyway - we'll handle missing services gracefully
       }
@@ -1419,7 +1412,6 @@
       await loadCombinationData(state.activeAction, state.activeEntity);
       
       state.initialized = true;
-      window.Logger?.info?.('UnifiedPendingActionsWidget: Initialization complete', { page: 'index' });
     },
     
     /**
@@ -1427,7 +1419,7 @@
      */
     async render() {
       if (!state.initialized) {
-        window.Logger?.warn?.('UnifiedPendingActionsWidget: Cannot render - not initialized', { page: 'index' });
+        window.Logger?.warn?.('UnifiedPendingActionsWidget: Cannot render - not initialized', { page: 'unified-pending-actions-widget' });
         return;
       }
       
@@ -1448,7 +1440,7 @@
      */
     async refresh() {
       if (!state.initialized) {
-        window.Logger?.warn?.('UnifiedPendingActionsWidget: Cannot refresh - not initialized', { page: 'index' });
+        window.Logger?.warn?.('UnifiedPendingActionsWidget: Cannot refresh - not initialized', { page: 'unified-pending-actions-widget' });
         return;
       }
       
@@ -1512,6 +1504,15 @@
         elements.entityTabTrades = newTab;
       }
       
+      // Cleanup overlay handlers from WidgetOverlayService
+      if (window.WidgetOverlayService) {
+        Object.values(elements.list).forEach(list => {
+          if (list) {
+            window.WidgetOverlayService.destroy(list);
+          }
+        });
+      }
+      
       // Clear all lists
       Object.values(elements.list).forEach(list => {
         if (list) {
@@ -1519,7 +1520,11 @@
         }
       });
       
-      window.Logger?.info?.('UnifiedPendingActionsWidget: Destroyed and cleaned up', { page: 'index' });
+      // Clear caches
+      state.dataCache = {};
+      state.overlaySetup = {};
+      
+      window.Logger?.info?.('UnifiedPendingActionsWidget: Destroyed and cleaned up', { page: 'unified-pending-actions-widget' });
     },
     
     version: '2.0.0'

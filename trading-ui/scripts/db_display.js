@@ -188,7 +188,15 @@ function updateTableDisplay(data, tableType, containerId) {
     const headersHTML = createTableHeaders(data);
     thead.textContent = '';
     const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = headersHTML;
+    tempDiv.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<table><thead>${headersHTML}</thead></table>`, 'text/html');
+    const tempThead = doc.body.querySelector('thead');
+    if (tempThead) {
+        Array.from(tempThead.children).forEach(child => {
+            thead.appendChild(child.cloneNode(true));
+        });
+    }
     while (tempDiv.firstChild) {
       thead.appendChild(tempDiv.firstChild);
     }
@@ -198,7 +206,15 @@ function updateTableDisplay(data, tableType, containerId) {
   const tbodyHTML = createTableBodyHTML(data, tableType);
 
   // Update table body
-  tbody.innerHTML = tbodyHTML;
+  tbody.textContent = '';
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`<table><tbody>${tbodyHTML}</tbody></table>`, 'text/html');
+  const tempTbody = doc.body.querySelector('tbody');
+  if (tempTbody) {
+      Array.from(tempTbody.children).forEach(child => {
+          tbody.appendChild(child.cloneNode(true));
+      });
+  }
 }
 
 /**
@@ -310,7 +326,14 @@ function showLoadingState(tableType) {
   if (tableContainer) {
     const tbody = tableContainer.querySelector('tbody');
     if (tbody) {
-      tbody.innerHTML = '<tr><td colspan="100" class="text-center">Loading data...</td></tr>';
+      tbody.textContent = '';
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 100;
+      cell.className = 'text-center';
+      cell.textContent = 'Loading data...';
+      row.appendChild(cell);
+      tbody.appendChild(row);
     }
   }
 }
@@ -326,7 +349,15 @@ function showErrorState(tableType, errorMessage) {
   if (tableContainer) {
     const tbody = tableContainer.querySelector('tbody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="100" class="text-center text-danger">Error: ${errorMessage}</td></tr>`;
+      tbody.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<tr><td colspan="100" class="text-center text-danger">Error: ${errorMessage}</td></tr>`, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        tbody.appendChild(fragment);
     }
   }
 }

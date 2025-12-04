@@ -134,6 +134,9 @@ def get_trades():
     """Get all trades with filtering options - enhanced with market data"""
     db: Session = g.db
     
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
     # Get filtering parameters
     trading_account_id = request.args.get('trading_account_id', type=int)
     status = request.args.get('status')
@@ -153,14 +156,14 @@ def get_trades():
         # If there are filtering parameters, use appropriate function
         if trading_account_id and status:
             logger.info(f"Filtering trades by trading_account_id={trading_account_id} and status={status}")
-            trades = TradeService.get_by_account_and_status(db, trading_account_id, status)
+            trades = TradeService.get_by_account_and_status(db, trading_account_id, status, user_id=user_id)
             logger.info(f"Found {len(trades)} trades for account {trading_account_id} with status {status}")
         elif trading_account_id:
-            trades = TradeService.get_by_account(db, trading_account_id)
+            trades = TradeService.get_by_account(db, trading_account_id, user_id=user_id)
         elif status:
-            trades = TradeService.get_by_status(db, status)
+            trades = TradeService.get_by_status(db, status, user_id=user_id)
         else:
-            trades = TradeService.get_all(db)
+            trades = TradeService.get_all(db, user_id=user_id)
         
         # Convert trades to dict with market data and position data
         trade_dicts = []
@@ -239,11 +242,14 @@ def get_trade(trade_id: int):
     return jsonify(response), status_code
 
 @trades_bp.route('/account/<int:trading_account_id>', methods=['GET'])
+@handle_database_session()
 def get_trades_by_account(trading_account_id: int):
     """Get trades by account"""
     try:
-        db: Session = next(get_db())
-        trades = TradeService.get_by_account(db, trading_account_id)
+        db: Session = g.db
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        trades = TradeService.get_by_account(db, trading_account_id, user_id=user_id)
         normalizer = _get_date_normalizer()
         data = normalizer.normalize_output([trade.to_dict() for trade in trades])
         return jsonify({

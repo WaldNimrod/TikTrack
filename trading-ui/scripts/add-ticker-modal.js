@@ -232,11 +232,11 @@
             </div>
         `).join('');
         resultsContainer.textContent = '';
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = resultsHTML;
-        while (tempDiv.firstChild) {
-          resultsContainer.appendChild(tempDiv.firstChild);
-        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(resultsHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          resultsContainer.appendChild(node.cloneNode(true));
+        });
 
         // Add click handlers
         resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
@@ -255,7 +255,7 @@
     function clearSearchResults() {
         const resultsContainer = document.getElementById('tickerSearchResults');
         if (resultsContainer) {
-            resultsContainer.innerHTML = '';
+            resultsContainer.textContent = '';
         }
         searchResults = [];
     }

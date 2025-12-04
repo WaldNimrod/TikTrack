@@ -455,7 +455,11 @@ async function copySystemManagementDetailedLog() {
         const copyBtn = document.querySelector('.copy-detailed-log-btn');
         if (copyBtn) {
             const originalText = copyBtn.innerHTML;
-            copyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מייצר לוג...';
+            copyBtn.textContent = '';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-spinner fa-spin';
+            copyBtn.appendChild(icon);
+            copyBtn.appendChild(document.createTextNode(' מייצר לוג...'));
             copyBtn.disabled = true;
             
             try {
@@ -478,7 +482,12 @@ async function copySystemManagementDetailedLog() {
                     console.log('✅ Detailed log copied to clipboard');
                 }
             } finally {
-                copyBtn.innerHTML = originalText;
+                copyBtn.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(originalText, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    copyBtn.appendChild(node.cloneNode(true));
+                });
                 copyBtn.disabled = false;
             }
         } else {

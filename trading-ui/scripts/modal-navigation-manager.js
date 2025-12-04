@@ -1037,11 +1037,17 @@ class ModalNavigationUI {
     if (stack.length <= 1) {
       container.style.display = 'none';
       container.style.visibility = 'hidden';
-      container.innerHTML = '';
+      container.textContent = '';
       return;
     }
 
-    container.innerHTML = this._renderBreadcrumb(stack, modalElement.id);
+    const breadcrumbHTML = this._renderBreadcrumb(stack, modalElement.id);
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(breadcrumbHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      container.appendChild(node.cloneNode(true));
+    });
     container.style.display = 'block';
     container.style.visibility = 'visible';
     container.style.opacity = '1';

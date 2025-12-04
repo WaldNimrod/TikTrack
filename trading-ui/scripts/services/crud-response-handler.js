@@ -605,12 +605,22 @@ class CRUDResponseHandler {
                     .then(() => {
                         if (typeof window.showNotification === 'function') {
                             window.showNotification('פרטי השגיאה הועתקו ללוח', 'success');
+                        } else if (window.showSuccessNotification) {
+                            window.showSuccessNotification('פרטי השגיאה הועתקו ללוח');
+                        } else if (window.showInfoNotification) {
+                            window.showInfoNotification('פרטי השגיאה הועתקו ללוח', 'success');
                         } else {
                             alert('פרטי השגיאה הועתקו ללוח');
                         }
                     })
                     .catch(() => {
-                        alert('שגיאה בהעתקה ללוח');
+                        if (window.showErrorNotification) {
+                            window.showErrorNotification('שגיאה בהעתקה ללוח');
+                        } else if (window.showInfoNotification) {
+                            window.showInfoNotification('שגיאה בהעתקה ללוח', 'error');
+                        } else {
+                            alert('שגיאה בהעתקה ללוח');
+                        }
                     });
             }
         };
@@ -635,13 +645,13 @@ class CRUDResponseHandler {
         small.textContent = message;
         errorCell.appendChild(small);
         errorCell.appendChild(document.createElement('br'));
-        // Insert retry and copy buttons using tempDiv
+        // Insert retry and copy buttons using DOMParser
         const buttonsHTML = retryBtn + copyBtn;
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = buttonsHTML;
-        while (tempDiv.firstChild) {
-          errorCell.appendChild(tempDiv.firstChild);
-        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(buttonsHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          errorCell.appendChild(node.cloneNode(true));
+        });
         errorRow.appendChild(errorCell);
         tbody.appendChild(errorRow);
     }

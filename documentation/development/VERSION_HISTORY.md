@@ -227,3 +227,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-02T22:09:45+00:00 | 1.3.74.0 | 1.3.73.0 | 18714a889bfee6f0e9f0cc2f0ff9c77b8a409630 | 6ee117c6f7a3cab6d7d68a2ee2e4fe9915a7dfc7 | patch | Improve ticker selector fallback logic |
 | 2025-12-02T23:14:34+00:00 | 1.3.75.0 | 1.3.74.0 | c9aae2f03f4199f36f26978fcf9e06c149b59541 | 18714a889bfee6f0e9f0cc2f0ff9c77b8a409630 | patch | Fix table rendering for trade plans and trades pages - standardize with createElement pattern |
 | 2025-12-03T00:17:10+00:00 | 1.3.76.0 | 1.3.75.0 | ac4efc531c2d0b8ecc0567a8a684ed0cbbf9d995 | c9aae2f03f4199f36f26978fcf9e06c149b59541 | patch | Fix login page: remove header and fix redirect to dashboard |
+| 2025-12-04T13:33:32+00:00 | 1.3.77.0 | 1.3.76.0 | 820fc9f423b89c8a00f550acf59792684b293e27 | ac4efc531c2d0b8ecc0567a8a684ed0cbbf9d995 | patch | User-Ticker integration: custom fields, two-tier status, user-specific tickers |

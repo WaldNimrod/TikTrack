@@ -19,6 +19,7 @@
 - יישור כפתורים בפוטרים (RTL).
 - ✅ **בוצע (11.2025):** צבעי כותרות דינמיים.
 - 🔶 **חשוב:** מינוח אחיד בכל המערכת.
+- 🟦 **עתידי (אופציונלי):** החלפת Bootstrap Tooltips ב-Floating UI - Bootstrap Tooltips עובדים טוב כרגע, אך ניתן לשקול מעבר ל-Floating UI בעתיד למעטפת אחידה אחת. ראה: `documentation/03-DEVELOPMENT/PLANS/EXTERNAL_UI_LIBRARIES_PLAN.md`
 
 ### 1.2 FUTURE_DEVELOPMENT_ROADMAP – שיפורי נגישות
 - 🟦 **עתידי:** תמיכה בקוראי מסך.

@@ -82,20 +82,52 @@ def get_execution(execution_id: int):
 def create_execution():
     """Create new execution"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         data = request.get_json()
         logger.info(f"Received execution data: {data}")
         normalizer = _get_date_normalizer()
         db: Session = g.db
+        
+        # Set user_id if authenticated
+        if user_id is not None and 'user_id' not in data:
+            data['user_id'] = user_id
         
         # Validate data against constraints
         logger.info("Validating execution data before creation")
         # Auto-fill ticker_id from trade if not provided but trade_id exists
         if not data.get('ticker_id') and data.get('trade_id'):
             from models.trade import Trade
-            trade = db.query(Trade).filter(Trade.id == data['trade_id']).first()
+            query = db.query(Trade).filter(Trade.id == data['trade_id'])
+            if user_id is not None:
+                query = query.filter(Trade.user_id == user_id)
+            trade = query.first()
+            if not trade:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Trade not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
             if trade and trade.ticker_id:
                 data['ticker_id'] = trade.ticker_id
                 logger.info(f"Auto-filled ticker_id {trade.ticker_id} from trade {data['trade_id']}")
+        
+        # Verify trading_account belongs to user if provided
+        if 'trading_account_id' in data and user_id is not None:
+            from models.trading_account import TradingAccount
+            account = db.query(TradingAccount).filter(
+                TradingAccount.id == data['trading_account_id'],
+                TradingAccount.user_id == user_id
+            ).first()
+            if not account:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Trading account not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
         
         # Sanitize HTML content for notes field
         if 'notes' in data and data['notes']:
@@ -143,10 +175,15 @@ def create_execution():
 def update_execution(execution_id: int):
     """Update execution"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         data = request.get_json()
         normalizer = _get_date_normalizer()
         db: Session = g.db
-        execution = db.query(Execution).filter(Execution.id == execution_id).first()
+        
+        # Verify execution belongs to user
+        execution = execution_service.get_by_id(db, execution_id, user_id=user_id)
         if execution:
             # Validate data against constraints
             logger.info("Validating execution data before update")
@@ -206,8 +243,13 @@ def update_execution(execution_id: int):
 def delete_execution(execution_id: int):
     """Delete execution"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         db: Session = g.db
-        execution = db.query(Execution).filter(Execution.id == execution_id).first()
+        
+        # Verify execution belongs to user
+        execution = execution_service.get_by_id(db, execution_id, user_id=user_id)
         if execution:
             # Tag cleanup is handled automatically by SQLAlchemy event listeners
             db.delete(execution)
@@ -333,10 +375,15 @@ def suggest_trades_for_execution(execution_id: int):
     """Get trade suggestions for a specific execution"""
     normalizer = None
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         db: Session = g.db
         preferences_service = PreferencesService()
         normalizer = BaseEntityUtils.get_request_normalizer(request, preferences_service=preferences_service)
-        execution = db.query(Execution).filter(Execution.id == execution_id).first()
+        
+        # Verify execution belongs to user
+        execution = execution_service.get_by_id(db, execution_id, user_id=user_id)
         
         if not execution:
             error_payload = BaseEntityUtils.create_error_payload(normalizer, "Execution not found")

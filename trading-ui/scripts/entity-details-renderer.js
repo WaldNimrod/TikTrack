@@ -1747,8 +1747,9 @@ class EntityDetailsRenderer {
             }
         }
 
-        const statusDisplay = FieldRenderer?.renderStatus
-            ? FieldRenderer.renderStatus(tradePlanData.status, 'trade_plan')
+        // Use FieldRendererService directly (always available via BASE package)
+        const statusDisplay = window.FieldRendererService?.renderStatus
+            ? window.FieldRendererService.renderStatus(tradePlanData.status, 'trade_plan')
             : (tradePlanData.status || 'לא זמין');
 
         return `
@@ -2077,12 +2078,15 @@ class EntityDetailsRenderer {
                     `;
                 }).join('');
 
-            // Insert rows using tempDiv
+            // Insert rows using DOMParser
             tableBody.textContent = '';
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = rows;
-            while (tempDiv.firstChild) {
-              tableBody.appendChild(tempDiv.firstChild);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(`<table><tbody>${rows}</tbody></table>`, 'text/html');
+            const tempTbody = doc.body.querySelector('tbody');
+            if (tempTbody) {
+              Array.from(tempTbody.children).forEach(row => {
+                tableBody.appendChild(row.cloneNode(true));
+              });
             }
         };
 
@@ -2828,18 +2832,44 @@ class EntityDetailsRenderer {
             // Create linked badge with ID for alerts and notes
             let linkedBadge;
             if (entityType === 'alert' || entityType === 'note') {
-                // Add ID below entity type
+                // Use renderLinkedEntity to get icon, then add ID below
+                const baseBadge = window.FieldRendererService.renderLinkedEntity(
+                    item.type,
+                    item.id,
+                    cleanName,
+                    {
+                        renderMode: 'linked-items-table',
+                        status: item.status
+                    }
+                );
+                
+                // Extract icon and label from baseBadge, then add ID
                 const escapedLabel = this._escapeHtml(entityLabel);
                 const escapedName = this._escapeHtml(cleanName);
                 const escapedId = this._escapeHtml(`#${itemId}`);
                 
-                linkedBadge = `
-                    <div class="linked-items-table-link d-flex flex-column align-items-start gap-1">
-                        <span class="linked-items-table-label fw-semibold text-body">${escapedLabel}</span>
-                        <span class="linked-items-table-name text-muted small">${escapedId}</span>
-                        <span class="linked-items-table-name text-muted small">${escapedName}</span>
-                    </div>
-                `;
+                // If baseBadge contains icon, use it; otherwise create simple structure
+                if (baseBadge && baseBadge.includes('<img') || baseBadge.includes('<svg')) {
+                    linkedBadge = `
+                        <div class="linked-items-table-link d-flex flex-column align-items-start gap-1">
+                            ${baseBadge}
+                            <span class="linked-items-table-name text-muted small">${escapedId}</span>
+                        </div>
+                    `;
+                } else {
+                    // Fallback: create structure with icon
+                    const iconPath = entityType === 'alert' ? '/trading-ui/images/icons/entities/alerts.svg' : '/trading-ui/images/icons/entities/notes.svg';
+                    linkedBadge = `
+                        <div class="linked-items-table-link d-flex align-items-center gap-2">
+                            <img src="${iconPath}" width="20" height="20" alt="${escapedLabel}" class="linked-items-table-icon">
+                            <div class="d-flex flex-column align-items-start gap-1">
+                                <span class="linked-items-table-label fw-semibold text-body">${escapedLabel}</span>
+                                <span class="linked-items-table-name text-muted small">${escapedId}</span>
+                                <span class="linked-items-table-name text-muted small">${escapedName}</span>
+                            </div>
+                        </div>
+                    `;
+                }
             } else {
                 // Use standard renderLinkedEntity for other types
                 linkedBadge = window.FieldRendererService.renderLinkedEntity(
@@ -5016,7 +5046,7 @@ class EntityDetailsRenderer {
         // אם אין נתונים - ננקה את הטבלה (זה תקין אחרי מחיקה)
         if (sortedData.length === 0) {
             console.log('ℹ️ [updateLinkedItemsTableBody] Empty sorted data - clearing table (this is normal after deletion)');
-            tbody.innerHTML = '';
+            tbody.textContent = '';
             
             // Initialize tooltips and buttons even for empty table
             this._initializeFilterTooltips(tableId);
@@ -5037,7 +5067,7 @@ class EntityDetailsRenderer {
         });
         
         // ניקוי הטבלה
-        tbody.innerHTML = '';
+        tbody.textContent = '';
         
         console.log('🔍 [updateLinkedItemsTableBody] After clearing tbody', {
             tbodyRowsAfter: tbody.querySelectorAll('tr').length,

@@ -190,7 +190,14 @@ async function loadCurrencies() {
     // הצגת שגיאה למשתמש
     const tbody = document.querySelector('#currenciesTable tbody');
     if (tbody) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת נתונים: ' + error.message + '</td></tr>';
+      tbody.textContent = '';
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 6;
+      cell.className = 'text-center text-danger';
+      cell.textContent = 'שגיאה בטעינת נתונים: ' + error.message;
+      row.appendChild(cell);
+      tbody.appendChild(row);
     }
   }
 }
@@ -300,11 +307,11 @@ function renderCurrenciesTable() {
   const tbody = document.querySelector('#currenciesTable tbody');
   if (!tbody) {return;}
 
-  tbody.innerHTML = '';
+  tbody.textContent = '';
 
   currenciesData.forEach(currency => {
     const row = document.createElement('tr');
-    row.innerHTML = `
+    const rowHTML = `
             <td>${currency.id}</td>
             <td><strong>${currency.symbol}</strong></td>
             <td>${currency.name}</td>
@@ -315,6 +322,15 @@ function renderCurrenciesTable() {
                 <button data-button-type="DELETE" data-onclick="deleteCurrency(${currency.id})"></button>
             </td>
         `;
+    row.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+    const tempRow = doc.body.querySelector('tr');
+    if (tempRow) {
+        Array.from(tempRow.children).forEach(cell => {
+            row.appendChild(cell.cloneNode(true));
+        });
+    }
     tbody.appendChild(row);
   });
 

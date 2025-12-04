@@ -760,11 +760,11 @@ function displayLinkedItems(linkedItems) {
   if (contentDiv) {
     // Insert using tempDiv
     contentDiv.textContent = '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-    while (tempDiv.firstChild) {
-      contentDiv.appendChild(tempDiv.firstChild);
-    }
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      contentDiv.appendChild(node.cloneNode(true));
+    });
   }
   
   } catch (error) {
@@ -865,40 +865,49 @@ async function loadExecutionsData(options = {}) {
   const { force = false, ttl = window.ExecutionsData?.TTL || 45000 } = options;
 
   try {
-    window.Logger.info('Loading executions data via ExecutionsData service', { page: "executions" });
+    window.Logger.info('🔄 Loading executions data via ExecutionsData service', { 
+      page: "executions",
+      force,
+      ttl,
+      ExecutionsDataAvailable: !!window.ExecutionsData,
+      loadExecutionsDataAvailable: !!(window.ExecutionsData?.loadExecutionsData)
+    });
 
-    let rawExecutions;
-    if (typeof window.ExecutionsData?.loadExecutionsData === 'function') {
-      window.Logger.debug('📦 Using ExecutionsData service', { page: "executions" });
-      rawExecutions = await window.ExecutionsData.loadExecutionsData({ force, ttl });
-      window.Logger.debug('📦 ExecutionsData returned', { 
-        count: Array.isArray(rawExecutions) ? rawExecutions.length : 0,
-        type: typeof rawExecutions,
-        page: "executions" 
+    // Use ExecutionsData service - this is the correct way per the service specification
+    if (!window.ExecutionsData) {
+      const error = new Error('ExecutionsData service not available - required for executions page');
+      window.Logger.error('❌ ExecutionsData service not found', { 
+        page: "executions",
+        error: error.message,
+        windowKeys: Object.keys(window).filter(k => k.toLowerCase().includes('execution'))
       });
-    } else {
-      window.Logger.warn('⚠️ ExecutionsData service not available, using direct fetch', { page: "executions" });
-      const base = window.location?.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const response = await fetch(`${base}/api/executions/?_t=${Date.now()}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache'
-        }
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`סטטוס: ${response.status} - ${errorText}`);
-      }
-
-      const data = await response.json();
-      rawExecutions = data?.data || data;
-      window.Logger.debug('📦 Direct fetch returned', { 
-        count: Array.isArray(rawExecutions) ? rawExecutions.length : 0,
-        page: "executions" 
-      });
+      throw error;
     }
+    
+    if (!window.ExecutionsData.loadExecutionsData) {
+      const error = new Error('ExecutionsData.loadExecutionsData method not available');
+      window.Logger.error('❌ ExecutionsData.loadExecutionsData method not found', { 
+        page: "executions",
+        error: error.message,
+        ExecutionsDataKeys: Object.keys(window.ExecutionsData || {})
+      });
+      throw error;
+    }
+    
+    window.Logger.debug('📦 Calling ExecutionsData.loadExecutionsData', { 
+      page: "executions",
+      options: { force, ttl }
+    });
+    
+    const rawExecutions = await window.ExecutionsData.loadExecutionsData({ force, ttl });
+    
+    window.Logger.debug('📦 ExecutionsData.loadExecutionsData returned', { 
+      count: Array.isArray(rawExecutions) ? rawExecutions.length : 0,
+      type: typeof rawExecutions,
+      isArray: Array.isArray(rawExecutions),
+      firstItem: rawExecutions?.[0] ? Object.keys(rawExecutions[0]) : null,
+      page: "executions" 
+    });
 
     executionsData = Array.isArray(rawExecutions)
       ? rawExecutions.map(execution => ({
@@ -908,9 +917,10 @@ async function loadExecutionsData(options = {}) {
       : [];
     window.executionsData = executionsData; // עדכון הנתונים הגלובליים
     
-    window.Logger.info('✅ Executions data loaded', { 
+    window.Logger.info('✅ Executions data loaded successfully', { 
       count: executionsData.length,
-      page: "executions" 
+      page: "executions",
+      sampleIds: executionsData.slice(0, 3).map(e => e.id)
     });
 
     if (window.headerSystem && window.headerSystem.currentFilters) {
@@ -943,6 +953,9 @@ async function loadExecutionsData(options = {}) {
       page: "executions" 
     });
     syncExecutionsPagination(executionsData);
+    
+    // CRITICAL: Update allExecutions for table rendering
+    updateExecutionsGlobalData(executionsData);
 
     if (typeof window.registerExecutionsTables === 'function') {
       window.registerExecutionsTables();
@@ -954,8 +967,52 @@ async function loadExecutionsData(options = {}) {
       count: executionsData.length,
       page: "executions" 
     });
+    
+    // Dispatch event to trigger sections 3+4 preload
+    window.Logger?.info('📢 Dispatching executions:loaded event', { 
+      page: "executions",
+      count: executionsData.length
+    });
+    document.dispatchEvent(new CustomEvent('executions:loaded', {
+      detail: { count: executionsData.length }
+    }));
+    
+    // Also trigger preload directly after a short delay to ensure table is rendered
+    window.Logger?.info('⏰ Scheduling direct preload trigger in 1 second', { page: "executions" });
+    setTimeout(() => {
+      window.Logger?.info('⏰ Direct preload trigger fired', { page: "executions" });
+      if (window.waitForMainTableAndPreload && typeof window.waitForMainTableAndPreload === 'function') {
+        window.waitForMainTableAndPreload();
+      } else {
+        window.Logger?.warn('⚠️ waitForMainTableAndPreload function not available', { page: "executions" });
+      }
+    }, 1000);
   } catch (error) {
-    handleApiError(error, 'ביצועים');
+    window.Logger.error('❌ Error in loadExecutionsData', {
+      page: "executions",
+      error: error?.message || String(error),
+      errorName: error?.name,
+      errorStack: error?.stack,
+      errorType: typeof error,
+      ExecutionsDataAvailable: !!window.ExecutionsData,
+      loadExecutionsDataAvailable: !!(window.ExecutionsData?.loadExecutionsData),
+      CacheTTLGuardAvailable: !!window.CacheTTLGuard,
+      UnifiedCacheManagerAvailable: !!window.UnifiedCacheManager,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Show user-friendly error message
+    const userMessage = error?.message || 'שגיאה בטעינת ביצועים';
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בביצועים', `${userMessage} – נסה שוב מאוחר יותר`);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בביצועים – נסה שוב מאוחר יותר', 'error');
+    }
+    
+    // Also call handleApiError for additional error handling
+    if (typeof handleApiError === 'function') {
+      handleApiError(error, 'ביצועים');
+    }
   }
 }
 
@@ -991,6 +1048,23 @@ function syncExecutionsPagination(executionsData) {
     if (paginationInstance) {
       paginationInstance.setData(executionsData);
       window.Logger.debug('✅ Pagination instance setData called', { page: "executions" });
+      
+      // CRITICAL: Call handleExecutionsPageRender after setData to render the first page
+      const firstPageData = paginationInstance.getCurrentPageData();
+      if (firstPageData && firstPageData.length > 0) {
+        window.Logger.debug('🔄 Calling handleExecutionsPageRender for first page', { 
+          page: "executions",
+          count: firstPageData.length 
+        });
+        handleExecutionsPageRender({ 
+          pageData: firstPageData, 
+          pagination: {
+            currentPage: paginationInstance.currentPage || 1,
+            totalPages: paginationInstance.totalPages || 1,
+            totalItems: paginationInstance.totalItems || 0
+          }
+        });
+      }
     } else {
       window.Logger.debug('⚠️ No pagination instance, using updateExecutionsTableMain', { page: "executions" });
       updateExecutionsTableMain(executionsData, { skipCounters: true, skipSummary: true, internal: true });
@@ -1057,8 +1131,8 @@ function getExecutionsPaginationOptions() {
  * @param {Object} params.pagination - Pagination info
  * @returns {void}
  */
-function handleExecutionsPageRender({ pageData, pagination }) {
-  updateExecutionsTableMain(pageData, { skipCounters: true, skipSummary: true, internal: true });
+async function handleExecutionsPageRender({ pageData, pagination }) {
+  await updateExecutionsTableMain(pageData, { skipCounters: true, skipSummary: true, internal: true });
   if (window.setPageTableData) {
     window.setPageTableData('executions', pageData, {
       tableId: 'executionsTable',
@@ -1252,7 +1326,8 @@ async function updateExecutionsTableMain(executions, options = {}) {
     tickers = [];
   }
 
-  tbody.innerHTML = executions.map(execution => {
+  tbody.textContent = '';
+  executions.forEach(execution => {
     // מציאת הטרייד המקושר (אופציונלי)
     const trade = trades.find(t => t.id === execution.trade_id);
     let symbol = 'לא מוגדר';
@@ -1309,7 +1384,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
          </div>`
       : '-';
 
-    return `
+    const rowHTML = `
             <tr data-execution-id="${execution.id}" class="execution-row">
                 <td class="trade-cell" data-trade-id="${execution.trade_id || ''}">
                     ${tradeCell}
@@ -1480,7 +1555,15 @@ async function updateExecutionsTableMain(executions, options = {}) {
                 </td>
             </tr>
         `;
-  }).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<table><tbody>${rowHTML}</tbody></table>`, 'text/html');
+    const tempRow = doc.body.querySelector('tr');
+    if (tempRow) {
+        // Clone the entire row including all attributes and children
+        const row = tempRow.cloneNode(true);
+        tbody.appendChild(row);
+    }
+  });
 
   // צביעת רשומות חדשות
   if (newExecutionIds.length > 0) {
@@ -1876,11 +1959,25 @@ window.initializeExecutionsPage = async function() {
   
   // הגדרת מודלים שלא נסגרים בלחיצה על הרקע
   setupModalConfigurations();
+  
+  // CRITICAL: Load executions data - this must be called to populate the main table
+  if (typeof window.loadExecutionsData === 'function') {
+    window.Logger.info('📥 Loading executions data from initializeExecutionsPage...', { page: "executions" });
+    try {
+      await window.loadExecutionsData();
+      window.Logger.info('✅ Executions data loaded from initializeExecutionsPage', { page: "executions" });
+    } catch (error) {
+      window.Logger.error('❌ Failed to load executions data in initializeExecutionsPage', { 
+        error: error?.message,
+        page: "executions" 
+      });
+    }
+  }
 
-  // Initialize trade creation section - lazy loading when section opens
+  // Initialize trade creation section - UPDATED: Use preloaded data if available
   // REFACTORED: Uses shared ExecutionClusteringService and ExecutionClusterHelpers
   // Uses MutationObserver to detect when section opens (no interference with global toggle system)
-  const tradeCreationSection = document.getElementById('trade-creation') || document.querySelector('[data-section="trade-creation"]');
+  const tradeCreationSection = document.getElementById('tradeCreationClustersSection') || document.querySelector('[data-section="trade-creation"]');
   if (tradeCreationSection) {
     let tradeCreationInitialized = false;
     let clusterSelectionState = new Map(); // Map<clusterId, Set<executionId>>
@@ -1905,8 +2002,41 @@ window.initializeExecutionsPage = async function() {
         return;
       }
       
-      // Initial load
-      await loadAndRenderClusters();
+      // Use preloaded data if available, otherwise load
+      window.Logger?.info('🔍 Checking preloaded data for trade creation', { 
+        page: 'executions',
+        hasData: !!window.executionsSections34Data,
+        tradeCreationLoaded: window.executionsSections34Data?.tradeCreation?.loaded,
+        tradeCreationDataExists: !!window.executionsSections34Data?.tradeCreation?.data,
+        tradeCreationDataLength: window.executionsSections34Data?.tradeCreation?.data?.length || 0
+      });
+      
+      if (window.executionsSections34Data?.tradeCreation?.loaded && window.executionsSections34Data.tradeCreation.data) {
+        window.Logger?.info('✅ Rendering trade creation clusters from preloaded data', { 
+          count: window.executionsSections34Data.tradeCreation.data.length,
+          page: 'executions' 
+        });
+        clustersData = window.executionsSections34Data.tradeCreation.data;
+        
+        // Initialize selection state for clusters
+        clustersData.forEach(cluster => {
+          if (!clusterSelectionState.has(cluster.cluster_id)) {
+            const executionIds = cluster.executions?.map(exec => exec.id) || cluster.execution_ids || [];
+            clusterSelectionState.set(cluster.cluster_id, new Set(executionIds));
+          }
+        });
+        
+        renderClusters(clustersData);
+      } else {
+        // Fallback to loading if preload didn't complete
+        window.Logger?.warn('⚠️ Preloaded data not available, loading clusters...', { 
+          page: 'executions',
+          reason: !window.executionsSections34Data ? 'executionsSections34Data not initialized' :
+                   !window.executionsSections34Data.tradeCreation?.loaded ? 'tradeCreation not loaded' :
+                   !window.executionsSections34Data.tradeCreation?.data ? 'tradeCreation data is null' : 'unknown'
+        });
+        await loadAndRenderClusters();
+      }
       
       // Setup event handlers (one time only)
       container.addEventListener('change', handleClusterCheckboxChange);
@@ -1938,8 +2068,15 @@ window.initializeExecutionsPage = async function() {
           clustersData = await window.ExecutionClusteringService.fetchClusters({ force: options.force || false });
           
           // Filter out dismissed clusters
-          const dismissedSet = window.ExecutionClusteringService.getDismissedClusters() || new Set();
+          const dismissedSet = await window.ExecutionClusteringService.getDismissedClusters();
+          if (!(dismissedSet instanceof Set)) {
+            window.Logger?.warn('⚠️ getDismissedClusters did not return a Set', { dismissedSet, page: 'executions' });
+          }
           const visibleClusters = clustersData.filter(cluster => !dismissedSet.has(cluster.cluster_id));
+          
+          // Update preloaded data
+          window.executionsSections34Data.tradeCreation.data = visibleClusters;
+          window.executionsSections34Data.tradeCreation.loaded = true;
           
           // Initialize selection state for new clusters
           visibleClusters.forEach(cluster => {
@@ -1967,7 +2104,13 @@ window.initializeExecutionsPage = async function() {
       function renderClusters(clusters) {
         if (!container) return;
         
-        container.innerHTML = '';
+        const tbody = container.querySelector('#executionTradeCreationClustersTableBody') || container.querySelector('tbody');
+        if (!tbody) {
+          window.Logger?.error('❌ Table body not found for clusters', { page: 'executions' });
+          return;
+        }
+        
+        tbody.textContent = '';
         
         if (errorEl) errorEl.classList.add('d-none');
         
@@ -1979,35 +2122,84 @@ window.initializeExecutionsPage = async function() {
         
         if (emptyEl) emptyEl.classList.add('d-none');
         
-        const fragment = document.createDocumentFragment();
-        
         clusters.forEach(cluster => {
           const selectedIds = clusterSelectionState.get(cluster.cluster_id) || new Set();
-          if (!window.ExecutionClusterHelpers?.renderClusterCard) {
-            window.Logger?.error('❌ ExecutionClusterHelpers.renderClusterCard not available', { page: 'executions' });
-            return;
+          const summary = window.ExecutionClusterHelpers?.computeSelectionSummary 
+            ? window.ExecutionClusterHelpers.computeSelectionSummary(cluster, selectedIds)
+            : { totalQuantity: 0, totalValue: 0, averagePrice: null, selectedCount: 0 };
+          
+          const dateRange = cluster.stats?.date_range || {};
+          const dateRangeText = dateRange.start && dateRange.end 
+            ? `${window.FieldRendererService?.renderDateShort?.(dateRange.start) || ''} - ${window.FieldRendererService?.renderDateShort?.(dateRange.end) || ''}`
+            : '';
+          
+          const tickerSymbol = cluster.ticker?.symbol || 'לא מוגדר';
+          const accountName = cluster.trading_account?.name || 'ללא חשבון';
+          const sideText = cluster.side === 'long' ? 'לונג' : 'שורט';
+          const sideClass = cluster.side === 'long' ? 'badge-long' : 'badge-short';
+          
+          const totalValueDisplay = summary.totalValue ? `$${summary.totalValue.toFixed(2)}` : '-';
+          const averagePriceDisplay = summary.averagePrice ? `$${summary.averagePrice.toFixed(4)}` : '-';
+          
+          const row = document.createElement('tr');
+          row.dataset.clusterId = cluster.cluster_id;
+          row.textContent = '';
+          const rowHTML = `
+            <td class="ticker-cell">
+              ${window.FieldRendererService?.renderLinkedEntity 
+                ? window.FieldRendererService.renderLinkedEntity('ticker', cluster.ticker?.id, tickerSymbol, { short: true }) || tickerSymbol
+                : `<strong>${tickerSymbol}</strong>`}
+            </td>
+            <td class="account-cell">
+              ${window.FieldRendererService?.renderLinkedEntity && cluster.trading_account?.id
+                ? window.FieldRendererService.renderLinkedEntity('trading_account', cluster.trading_account.id, accountName, { short: true }) || accountName
+                : accountName}
+            </td>
+            <td class="side-cell">
+              <span class="badge ${sideClass}">${sideText}</span>
+            </td>
+            <td class="count-cell">${cluster.stats?.execution_count || 0}</td>
+            <td class="quantity-cell">${summary.totalQuantity.toLocaleString('en-US')}</td>
+            <td class="value-cell">${totalValueDisplay}</td>
+            <td class="price-cell">${averagePriceDisplay}</td>
+            <td class="date-cell">${dateRangeText}</td>
+            <td class="actions-cell">
+              <button
+                data-button-type="APPROVE"
+                data-variant="small"
+                data-role="create-trade"
+                data-cluster-id="${cluster.cluster_id}"
+                data-text="פתח טרייד חדש"
+                title="יצירת טרייד חדש עבור הביצועים הנבחרים">
+              </button>
+              <button
+                data-button-type="REFRESH"
+                data-variant="small"
+                data-role="refresh-cluster"
+                data-cluster-id="${cluster.cluster_id}"
+                data-text="רענן אשכול"
+                title="טעינת נתונים מחדש לאשכול">
+              </button>
+              <button
+                data-button-type="REJECT"
+                data-variant="small"
+                data-role="dismiss-cluster"
+                data-cluster-id="${cluster.cluster_id}"
+                data-text="התעלם"
+                title="הסתרת האשכול מהממשק">
+              </button>
+            </td>
+          `;
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+          const tempRow = doc.body.querySelector('tr');
+          if (tempRow) {
+              Array.from(tempRow.children).forEach(cell => {
+                  row.appendChild(cell.cloneNode(true));
+              });
           }
-          
-          const context = {
-            clusterId: cluster.cluster_id,
-            executionIds: null,
-            summary: null
-          };
-          
-          const card = window.ExecutionClusterHelpers.renderClusterCard(cluster, selectedIds, {
-            context: context,
-            onRefresh: async (clusterId) => {
-              await loadAndRenderClusters({ force: true });
-            },
-            onDismiss: async (clusterId) => {
-              await loadAndRenderClusters({ force: true });
-            }
-          });
-          
-          fragment.appendChild(card);
+          tbody.appendChild(row);
         });
-        
-        container.appendChild(fragment);
         
         // Initialize buttons
         if (window.ButtonSystem?.initializeButtons) {
@@ -2062,7 +2254,7 @@ window.initializeExecutionsPage = async function() {
           const totalValueDisplay = summary.totalValue ? `$${summary.totalValue.toFixed(2)}` : '-';
           const averagePriceDisplay = summary.averagePrice ? `$${summary.averagePrice.toFixed(4)}` : '-';
           
-          summaryEl.innerHTML = `
+          const summaryHTML = `
             ${window.ExecutionClusterHelpers.renderSummaryBadge('כמות', summary.totalQuantity.toLocaleString('en-US'))}
             ${window.ExecutionClusterHelpers.renderSummaryBadge('שווי', totalValueDisplay)}
             ${window.ExecutionClusterHelpers.renderSummaryBadge('מחיר ממוצע', averagePriceDisplay)}
@@ -2070,6 +2262,12 @@ window.initializeExecutionsPage = async function() {
             ${window.ExecutionClusterHelpers.renderSummaryBadge('נבחרו', `${summary.selectedCount}/${cluster.stats.execution_count}`)}
             ${dateRangeText ? `<span class="badge bg-body-secondary text-body trade-create-summary-badge">טווח: ${dateRangeText}</span>` : ''}
           `;
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(summaryHTML, 'text/html');
+          summaryEl.textContent = '';
+          doc.body.childNodes.forEach(node => {
+            summaryEl.appendChild(node.cloneNode(true));
+          });
         }
       }
       
@@ -2126,17 +2324,45 @@ window.initializeExecutionsPage = async function() {
     
     // Check if section is open after sections are restored
     const checkAndInitialize = () => {
-      const sectionBody = tradeCreationSection?.querySelector('.section-body');
+      // Re-fetch section in case DOM wasn't ready earlier
+      const section = document.getElementById('tradeCreationClustersSection');
+      const sectionBody = section?.querySelector('.section-body');
       if (sectionBody && window.getComputedStyle(sectionBody).display !== 'none') {
+        window.Logger?.info('✅ Trade creation section is open, initializing...', { page: 'executions' });
         initializeTradeCreationClustersSection();
+      } else {
+        window.Logger?.debug('⏸️ Trade creation section is closed, waiting...', { 
+          page: 'executions',
+          sectionExists: !!section,
+          sectionBodyExists: !!sectionBody,
+          display: sectionBody ? window.getComputedStyle(sectionBody).display : 'N/A'
+        });
       }
     };
     
-    // After sections are restored, check if section is open
+    // Check immediately if section is already open (for initial load)
+    // Use multiple timeouts to catch different timing scenarios
+    setTimeout(() => {
+      window.Logger?.debug('🔍 First check for trade creation section', { page: 'executions' });
+      checkAndInitialize();
+    }, 100);
+    
+    setTimeout(() => {
+      window.Logger?.debug('🔍 Second check for trade creation section', { page: 'executions' });
+      checkAndInitialize();
+    }, 500);
+    
+    // After sections are restored, check again if section is open
     if (window.sectionsRestored) {
-      setTimeout(checkAndInitialize, 100);
+      setTimeout(() => {
+        window.Logger?.debug('🔍 Third check (sections already restored)', { page: 'executions' });
+        checkAndInitialize();
+      }, 200);
     } else {
-      window.addEventListener('sections:restored', () => setTimeout(checkAndInitialize, 100), { once: true });
+      window.addEventListener('sections:restored', () => {
+        window.Logger?.debug('🔍 Sections restored event received, checking trade creation section', { page: 'executions' });
+        setTimeout(checkAndInitialize, 200);
+      }, { once: true });
     }
     
     // Use MutationObserver to detect when section opens (doesn't interfere with toggle system)
@@ -2216,43 +2442,384 @@ window.initializeExecutionsPage = async function() {
     }
   });
 
-  // Load trade suggestions - LAZY LOADING: נטען רק כשהמשתמש מגיע לסקשן
+  // ========================================
+  // Preload sections 3+4 data after main table is displayed
+  // ========================================
+  window.Logger?.info('🔧 Setting up sections 3+4 preloading system...', { page: "executions" });
+  
+  // Global state for sections 3+4 data
+  window.executionsSections34Data = {
+    tradeCreation: {
+      loaded: false,
+      data: null,
+      error: null
+    },
+    suggestions: {
+      loaded: false,
+      data: null,
+      error: null
+    }
+  };
+
+  /**
+   * Load data for sections 3+4 in parallel after main table is displayed
+   * This ensures data is ready when user opens the sections
+   */
+  async function preloadSections34Data() {
+    window.Logger?.info('🚀 preloadSections34Data() called', { 
+      page: "executions",
+      tradeCreationLoaded: window.executionsSections34Data?.tradeCreation?.loaded || false,
+      suggestionsLoaded: window.executionsSections34Data?.suggestions?.loaded || false,
+      executionsSections34DataExists: !!window.executionsSections34Data
+    });
+    
+    if (!window.executionsSections34Data) {
+      window.Logger?.error('❌ executionsSections34Data not initialized!', { page: "executions" });
+      return;
+    }
+    
+    if (window.executionsSections34Data.tradeCreation.loaded && window.executionsSections34Data.suggestions.loaded) {
+      window.Logger?.info('✅ Sections 3+4 data already loaded', { page: "executions" });
+      return;
+    }
+
+    window.Logger?.info('🔄 Preloading sections 3+4 data in parallel...', { 
+      page: "executions",
+      ExecutionClusteringServiceAvailable: !!window.ExecutionClusteringService,
+      ExecutionAssignmentServiceAvailable: !!window.ExecutionAssignmentService
+    });
+
+    // Load both sections in parallel
+    const [tradeCreationResult, suggestionsResult] = await Promise.allSettled([
+      // Load trade creation clusters
+      (async () => {
+        try {
+          if (!window.ExecutionClusteringService) {
+            throw new Error('ExecutionClusteringService not available');
+          }
+          const clusters = await window.ExecutionClusteringService.fetchClusters({ force: false });
+          const dismissedSet = await window.ExecutionClusteringService.getDismissedClusters();
+          const visibleClusters = clusters.filter(cluster => !dismissedSet.has(cluster.cluster_id));
+          window.executionsSections34Data.tradeCreation.data = visibleClusters;
+          window.executionsSections34Data.tradeCreation.loaded = true;
+          window.Logger?.info('✅ Trade creation clusters preloaded', { 
+            count: visibleClusters.length, 
+            page: "executions" 
+          });
+          return visibleClusters;
+        } catch (error) {
+          window.executionsSections34Data.tradeCreation.error = error;
+          window.Logger?.error('❌ Failed to preload trade creation clusters', { 
+            error: error?.message, 
+            page: "executions" 
+          });
+          throw error;
+        }
+      })(),
+      // Load trade suggestions
+      (async () => {
+        try {
+          if (!window.ExecutionAssignmentService) {
+            throw new Error('ExecutionAssignmentService not available');
+          }
+          const highlights = await window.ExecutionAssignmentService.fetchHighlights({
+            force: false,
+            limit: 100,
+            suggestions: 5
+          });
+          const suggestionsData = {};
+          if (highlights && highlights.length > 0) {
+            highlights.forEach(highlight => {
+              if (highlight.execution_id && highlight.suggestions && highlight.suggestions.length > 0) {
+                suggestionsData[highlight.execution_id] = {
+                  execution: highlight.execution,
+                  suggestions: highlight.suggestions || []
+                };
+              }
+            });
+          }
+          window.executionsSections34Data.suggestions.data = suggestionsData;
+          window.executionsSections34Data.suggestions.loaded = true;
+          window.Logger?.info('✅ Trade suggestions preloaded', { 
+            count: Object.keys(suggestionsData).length, 
+            page: "executions" 
+          });
+          return suggestionsData;
+        } catch (error) {
+          window.executionsSections34Data.suggestions.error = error;
+          window.Logger?.error('❌ Failed to preload trade suggestions', { 
+            error: error?.message, 
+            page: "executions" 
+          });
+          throw error;
+        }
+      })()
+    ]);
+
+    window.Logger?.info('✅ Sections 3+4 preloading completed', { 
+      tradeCreation: tradeCreationResult.status,
+      suggestions: suggestionsResult.status,
+      tradeCreationValue: tradeCreationResult.status === 'fulfilled' ? 'loaded' : tradeCreationResult.reason?.message,
+      suggestionsValue: suggestionsResult.status === 'fulfilled' ? 'loaded' : suggestionsResult.reason?.message,
+      page: "executions" 
+    });
+    
+    if (suggestionsResult.status === 'rejected') {
+      window.Logger?.warn('⚠️ Suggestions preload failed', { 
+        error: suggestionsResult.reason?.message,
+        errorStack: suggestionsResult.reason?.stack,
+        page: "executions" 
+      });
+    }
+  }
+
+  // Wait for main table to be displayed, then preload sections 3+4
+  let preloadTriggered = false;
+  const waitForMainTableAndPreload = () => {
+    window.Logger?.info('🔍 waitForMainTableAndPreload() called', { 
+      page: "executions",
+      preloadTriggered,
+      retryCount: waitForMainTableAndPreload.retryCount || 0
+    });
+    
+    if (preloadTriggered) {
+      window.Logger?.info('⏭️ Preload already triggered, skipping', { page: "executions" });
+      return;
+    }
+    
+    const mainTable = document.getElementById('executionsTable');
+    const mainTableBody = mainTable?.querySelector('tbody');
+    const mainSection = document.querySelector('[data-section="main"]') || document.getElementById('main');
+    const mainSectionBody = mainSection?.querySelector('.section-body');
+    const isMainSectionVisible = mainSectionBody && window.getComputedStyle(mainSectionBody).display !== 'none';
+    
+    // Check if table has rows OR if section is visible (table might be empty but section is open)
+    const hasRows = mainTableBody && mainTableBody.querySelectorAll('tr[data-execution-id]').length > 0;
+    const hasTableElement = !!mainTable;
+    const rowCount = mainTableBody ? mainTableBody.querySelectorAll('tr').length : 0;
+    
+    window.Logger?.info('🔍 Checking main table status', { 
+      page: "executions",
+      hasTableElement,
+      hasRows,
+      rowCount,
+      isMainSectionVisible,
+      mainSectionExists: !!mainSection,
+      mainSectionBodyExists: !!mainSectionBody
+    });
+    
+    if ((hasRows || (isMainSectionVisible && hasTableElement)) && !preloadTriggered) {
+      preloadTriggered = true;
+      window.Logger?.info('✅ Main table displayed, starting sections 3+4 preload', { 
+        hasRows,
+        rowCount,
+        isMainSectionVisible,
+        hasTableElement,
+        page: "executions" 
+      });
+      preloadSections34Data().catch(error => {
+        window.Logger?.error('❌ Failed to preload sections 3+4', { 
+          error: error?.message,
+          errorStack: error?.stack,
+          page: "executions" 
+        });
+        preloadTriggered = false; // Allow retry on error
+      });
+    } else if (!preloadTriggered) {
+      // Retry after a short delay (max 20 attempts = 4 seconds)
+      const retryCount = waitForMainTableAndPreload.retryCount || 0;
+      if (retryCount < 20) {
+        waitForMainTableAndPreload.retryCount = retryCount + 1;
+        window.Logger?.info(`⏳ Retrying waitForMainTableAndPreload (attempt ${retryCount + 1}/20)`, { page: "executions" });
+        setTimeout(waitForMainTableAndPreload, 200);
+      } else {
+        window.Logger?.warn('⚠️ Main table not detected after 20 retries, preloading anyway', { 
+          page: "executions",
+          hasTableElement,
+          hasRows,
+          isMainSectionVisible
+        });
+        preloadTriggered = true;
+        preloadSections34Data().catch(error => {
+          window.Logger?.error('❌ Failed to preload sections 3+4', { 
+            error: error?.message,
+            errorStack: error?.stack,
+            page: "executions" 
+          });
+        });
+      }
+    }
+  };
+
+  // Export function to window for external calls
+  window.waitForMainTableAndPreload = waitForMainTableAndPreload;
+  window.preloadSections34Data = preloadSections34Data;
+  
+  window.Logger?.info('✅ Functions exported to window', { 
+    page: "executions",
+    waitForMainTableAndPreload: typeof window.waitForMainTableAndPreload,
+    preloadSections34Data: typeof window.preloadSections34Data
+  });
+  
+  // Check if table already exists (in case data was loaded before this code ran)
+  const checkTableNow = () => {
+    const mainTable = document.getElementById('executionsTable');
+    const mainTableBody = mainTable?.querySelector('tbody');
+    const hasRows = mainTableBody && mainTableBody.querySelectorAll('tr[data-execution-id]').length > 0;
+    const hasTableElement = !!mainTable;
+    
+    window.Logger?.info('🔍 Checking if table already exists', { 
+      page: "executions",
+      hasTableElement,
+      hasRows,
+      tableBodyExists: !!mainTableBody
+    });
+    
+    if (hasTableElement && (hasRows || mainTableBody)) {
+      window.Logger?.info('✅ Table already exists, triggering preload immediately', { page: "executions" });
+      waitForMainTableAndPreload();
+      return true;
+    }
+    return false;
+  };
+  
+  // Check immediately
+  if (!checkTableNow()) {
+    // Start checking after a short delay to allow table to render
+    window.Logger?.info('⏰ Table not found, scheduling waitForMainTableAndPreload in 500ms', { 
+      page: "executions",
+      waitForMainTableAndPreloadExists: typeof waitForMainTableAndPreload === 'function'
+    });
+    
+    const timeoutId = setTimeout(() => {
+      window.Logger?.info('⏰ waitForMainTableAndPreload timer fired', { 
+        page: "executions",
+        waitForMainTableAndPreloadExists: typeof waitForMainTableAndPreload === 'function'
+      });
+      try {
+        waitForMainTableAndPreload();
+      } catch (error) {
+        window.Logger?.error('❌ Error in waitForMainTableAndPreload', { 
+          error: error?.message,
+          errorStack: error?.stack,
+          page: "executions" 
+        });
+      }
+    }, 500);
+    
+    window.Logger?.info('✅ setTimeout scheduled', { 
+      page: "executions",
+      timeoutId,
+      delay: 500
+    });
+  }
+
+  // Also listen for table update events
+  window.Logger?.info('👂 Setting up table:updated event listener', { page: "executions" });
+  document.addEventListener('table:updated', (event) => {
+    window.Logger?.debug('📊 table:updated event received', { 
+      page: "executions",
+      tableId: event.detail?.tableId,
+      tableType: event.detail?.tableType,
+      preloadTriggered
+    });
+    if (event.detail?.tableId === 'executionsTable' || event.detail?.tableType === 'executions') {
+      if (!preloadTriggered) {
+        window.Logger?.info('📊 Main table updated, checking if sections 3+4 need preloading', { page: "executions" });
+        setTimeout(waitForMainTableAndPreload, 100);
+      }
+    }
+  }, { once: false });
+
+  // Also listen for pagination events
+  window.Logger?.info('👂 Setting up pagination:ready event listener', { page: "executions" });
+  document.addEventListener('pagination:ready', (event) => {
+    window.Logger?.debug('📊 pagination:ready event received', { 
+      page: "executions",
+      preloadTriggered
+    });
+    if (!preloadTriggered) {
+      window.Logger?.info('📊 Pagination ready, checking if sections 3+4 need preloading', { page: "executions" });
+      setTimeout(waitForMainTableAndPreload, 100);
+    }
+  }, { once: false });
+  
+  // Also trigger after loadExecutionsData completes
+  window.Logger?.info('👂 Setting up custom event listener for executions:loaded', { page: "executions" });
+  document.addEventListener('executions:loaded', () => {
+    window.Logger?.info('📊 executions:loaded event received, checking if sections 3+4 need preloading', { page: "executions" });
+    if (!preloadTriggered) {
+      setTimeout(waitForMainTableAndPreload, 100);
+    }
+  }, { once: false });
+
+  // Load trade suggestions - UPDATED: Use preloaded data if available
   // Uses MutationObserver to detect when section opens (no interference with global toggle system)
   const suggestionsSection = document.getElementById('suggestions');
   if (suggestionsSection && typeof loadTradeSuggestionsForAll === 'function') {
-    let suggestionsLoaded = false;
+    let suggestionsRendered = false;
     
-    const loadSuggestions = () => {
-      if (!suggestionsLoaded) {
-        suggestionsLoaded = true;
-        loadTradeSuggestionsForAll().catch(error => {
+    const renderSuggestions = async () => {
+      if (suggestionsRendered) {
+        return;
+      }
+      
+      suggestionsRendered = true;
+      
+      // Use preloaded data if available
+      window.Logger?.info('🔍 Checking preloaded data for suggestions', { 
+        page: "executions",
+        hasData: !!window.executionsSections34Data,
+        suggestionsLoaded: window.executionsSections34Data?.suggestions?.loaded,
+        suggestionsDataExists: !!window.executionsSections34Data?.suggestions?.data,
+        suggestionsDataKeys: window.executionsSections34Data?.suggestions?.data ? Object.keys(window.executionsSections34Data.suggestions.data).length : 0
+      });
+      
+      if (window.executionsSections34Data?.suggestions?.loaded && window.executionsSections34Data.suggestions.data) {
+        window.Logger?.info('✅ Rendering suggestions from preloaded data', { 
+          count: Object.keys(window.executionsSections34Data.suggestions.data).length,
+          page: "executions" 
+        });
+        tradeSuggestionsData = window.executionsSections34Data.suggestions.data;
+        tradeSuggestionsFlatList = buildTradeSuggestionsFlatList(tradeSuggestionsData);
+        renderTradeSuggestionsSection(tradeSuggestionsData, tradeSuggestionsFlatList);
+        updateSuggestionsCount(Object.keys(tradeSuggestionsData).length);
+      } else {
+        // Fallback to loading if preload didn't complete
+        window.Logger?.warn('⚠️ Preloaded data not available, loading suggestions...', { 
+          page: "executions",
+          reason: !window.executionsSections34Data ? 'executionsSections34Data not initialized' :
+                   !window.executionsSections34Data.suggestions?.loaded ? 'suggestions not loaded' :
+                   !window.executionsSections34Data.suggestions?.data ? 'suggestions data is null' : 'unknown'
+        });
+        await loadTradeSuggestionsForAll().catch(error => {
           window.Logger?.warn('⚠️ Failed to load trade suggestions:', error, { page: "executions" });
-          suggestionsLoaded = false; // Allow retry
+          suggestionsRendered = false; // Allow retry
         });
       }
     };
     
     // Check if section is open after sections are restored
-    const checkAndLoad = () => {
+    const checkAndRender = () => {
       const sectionBody = suggestionsSection?.querySelector('.section-body');
       if (sectionBody && window.getComputedStyle(sectionBody).display !== 'none') {
-        loadSuggestions();
+        renderSuggestions();
       }
     };
     
     // After sections are restored, check if section is open
     if (window.sectionsRestored) {
-      setTimeout(checkAndLoad, 100);
+      setTimeout(checkAndRender, 100);
     } else {
-      window.addEventListener('sections:restored', () => setTimeout(checkAndLoad, 100), { once: true });
+      window.addEventListener('sections:restored', () => setTimeout(checkAndRender, 100), { once: true });
     }
     
     // Use MutationObserver to detect when section opens (doesn't interfere with toggle system)
     const sectionBody = suggestionsSection?.querySelector('.section-body');
     if (sectionBody) {
       const observer = new MutationObserver(() => {
-        if (!suggestionsLoaded && window.getComputedStyle(sectionBody).display !== 'none') {
-          setTimeout(loadSuggestions, 100);
+        if (!suggestionsRendered && window.getComputedStyle(sectionBody).display !== 'none') {
+          setTimeout(renderSuggestions, 100);
         }
       });
       observer.observe(sectionBody, {
@@ -2271,13 +2838,9 @@ window.initializeExecutionsPage = async function() {
   // }, 30000);
 };
 
-// Fallback for direct access (backward compatibility)
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', window.initializeExecutionsPage);
-} else {
-  // DOM already loaded, initialize immediately
-  window.initializeExecutionsPage();
-}
+// REMOVED: Fallback initialization - now handled by UnifiedAppInitializer via page-initialization-configs.js
+// The unified initialization system calls initializeExecutionsPage through customInitializers
+// This prevents duplicate initialization calls
 
 /**
  * Setup modal configurations (backdrop, keyboard)
@@ -2561,7 +3124,11 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
         });
       } else {
         // Fallback to local implementation
-        tradeSelect.innerHTML = '<option value="">בחר טרייד...</option>';
+        tradeSelect.textContent = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'בחר טרייד...';
+        tradeSelect.appendChild(defaultOption);
 
         // הוספת טריידים
         filteredTrades.forEach(trade => {
@@ -2947,13 +3514,25 @@ async function displayExecutionTickerInfo(ticker) {
   // Use FieldRendererService.renderTickerInfo for consistent rendering
   if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
     const tickerInfoHtml = await window.FieldRendererService.renderTickerInfo(ticker, 'ticker-info-display');
-    tickerInfoDiv.innerHTML = tickerInfoHtml;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(tickerInfoHtml, 'text/html');
+    tickerInfoDiv.textContent = '';
+    doc.body.childNodes.forEach(node => {
+      tickerInfoDiv.appendChild(node.cloneNode(true));
+    });
   } else if (window.renderTickerInfo) {
     const tickerInfoHtml = await window.renderTickerInfo(ticker, 'ticker-info-display');
-    tickerInfoDiv.innerHTML = tickerInfoHtml;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(tickerInfoHtml, 'text/html');
+    tickerInfoDiv.textContent = '';
+    doc.body.childNodes.forEach(node => {
+      tickerInfoDiv.appendChild(node.cloneNode(true));
+    });
   } else {
     // Fallback if renderTickerInfo not available
-    tickerInfoDiv.innerHTML = `
+    tickerInfoDiv.textContent = '';
+    const parser = new DOMParser();
+    const fallbackHTML = `
       <div class="ticker-info-display">
         <div class="row">
           <div class="col-md-6">
@@ -3031,7 +3610,11 @@ async function calculateExecutionValues(formType) {
           const sign = result.total >= 0 ? '' : '-';
           // Use textContent instead of innerHTML for better security and consistency
           const formattedValue = `${sign}$${Math.abs(result.total).toFixed(2)}`;
-          totalElement.innerHTML = `<strong>${result.label || 'סה"כ:'}</strong> ${formattedValue}`;
+          totalElement.textContent = '';
+          const strong = document.createElement('strong');
+          strong.textContent = result.label || 'סה"כ:';
+          totalElement.appendChild(strong);
+          totalElement.appendChild(document.createTextNode(' ' + formattedValue));
         }
         return;
       }
@@ -3077,7 +3660,11 @@ async function calculateExecutionValues(formType) {
     const totalElement = document.getElementById(`${prefix}Total`);
     if (totalElement) {
       const sign = total >= 0 ? '' : '-';
-      totalElement.innerHTML = `<strong>${label}</strong> ${sign}$${Math.abs(total).toFixed(2)}`;
+      totalElement.textContent = '';
+      const strong = document.createElement('strong');
+      strong.textContent = label;
+      totalElement.appendChild(strong);
+      totalElement.appendChild(document.createTextNode(' ' + sign + '$' + Math.abs(total).toFixed(2)));
     }
   }
 }
@@ -3312,7 +3899,7 @@ function updateExecutionsTableForTradeModal(executions) {
       return;
     }
 
-    tableBody.innerHTML = '';
+    tableBody.textContent = '';
 
     executions.forEach(execution => {
       const row = document.createElement('tr');
@@ -3331,7 +3918,7 @@ function updateExecutionsTableForTradeModal(executions) {
         ? '<span class="badge bg-success">הושלם</span>'
         : '<span class="badge bg-warning">ממתין</span>';
 
-      row.innerHTML = `
+      const rowHTML = `
                 <td>${window.renderExecutionDate ? window.renderExecutionDate(execution.date) : execution.date}</td>
                 <td>${typeBadge}</td>
                 <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
@@ -3340,6 +3927,12 @@ function updateExecutionsTableForTradeModal(executions) {
                 <td>${window.formatPrice ? window.formatPrice(execution.total) : (execution.total ? `$${parseFloat(execution.total).toFixed(2)}` : '-')}</td>
                 <td>${statusBadge}</td>
             `;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(rowHTML, 'text/html');
+      const tbody = doc.body.querySelector('tbody') || doc.body;
+      tbody.childNodes.forEach(node => {
+        row.appendChild(node.cloneNode(true));
+      });
 
       tableBody.appendChild(row);
     });
@@ -3761,7 +4354,7 @@ window.loadExecutionsData = async function(options = {}) {
   // This matches the standard pattern used in trades.js and other pages
   await originalLoadExecutionsData({ ...options, force: true });
 
-  // עדכון הנתונים הגלובליים לאחר טעינה
+  // עדכון הנתונים הגלובליים לאחר טעינה - CRITICAL: This updates allExecutions which is needed for table rendering
   if (window.executionsData && window.executionsData.length > 0) {
     updateExecutionsGlobalData(window.executionsData);
 
@@ -3978,7 +4571,14 @@ function updateTickersSummaryTable(tickers = null) {
   const dataToShow = tickers || tickersSummaryData;
 
   if (!dataToShow || dataToShow.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="6" class="text-center">לא נמצאו טיקרים רלוונטיים</td></tr>';
+    tableBody.textContent = '';
+    const emptyRow = document.createElement('tr');
+    const emptyCell = document.createElement('td');
+    emptyCell.colSpan = 6;
+    emptyCell.className = 'text-center';
+    emptyCell.textContent = 'לא נמצאו טיקרים רלוונטיים';
+    emptyRow.appendChild(emptyCell);
+    tableBody.appendChild(emptyRow);
     document.getElementById('tickersCount').textContent = '0 טיקרים';
     return;
   }
@@ -3987,7 +4587,7 @@ function updateTickersSummaryTable(tickers = null) {
   document.getElementById('tickersCount').textContent = `${dataToShow.length} טיקרים`;
 
   // ניקוי הטבלה
-  tableBody.innerHTML = '';
+  tableBody.textContent = '';
 
   // הוספת שורות
   dataToShow.forEach(ticker => {
@@ -4024,7 +4624,7 @@ function updateTickersSummaryTable(tickers = null) {
       statusClass = 'text-primary';
     }
 
-    row.innerHTML = `
+    const rowHTML = `
             <td><strong>${ticker.symbol}</strong></td>
             <td>${ticker.name}</td>
             <td><span class="${statusClass}">${ticker.status}</span></td>
@@ -4035,6 +4635,12 @@ function updateTickersSummaryTable(tickers = null) {
                 <button data-button-type="ADD" data-variant="small" data-icon="➕" data-classes="btn-outline-success table-btn-small" data-onclick="addExecutionForTicker(${ticker.id})" title="הוסף עסקה"></button>
             </td>
         `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowHTML, 'text/html');
+    const tbody = doc.body.querySelector('tbody') || doc.body;
+    tbody.childNodes.forEach(node => {
+      row.appendChild(node.cloneNode(true));
+    });
 
     tableBody.appendChild(row);
   });
@@ -4211,7 +4817,11 @@ async function updateTickersList(mode, showClosedTrades = false) {
     const tickerSelect = document.getElementById('executionTicker');
 
     if (tickerSelect) {
-      tickerSelect.innerHTML = '<option value="">בחר טיקר...</option>';
+      tickerSelect.textContent = '';
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'בחר טיקר...';
+      tickerSelect.appendChild(defaultOption);
       filteredTickers.forEach(ticker => {
         const option = document.createElement('option');
         option.value = ticker.id;
@@ -4303,7 +4913,29 @@ async function deleteExecution(executionId) {
             );
         } else {
             // Fallback to simple confirm
-            if (!confirm('האם אתה בטוח שברצונך למחוק את הביצוע?')) {
+            let confirmed = false;
+            if (window.showDeleteWarning) {
+                confirmed = await new Promise((resolve) => {
+                    window.showDeleteWarning(
+                        'האם אתה בטוח שברצונך למחוק את הביצוע?',
+                        () => resolve(true),
+                        () => resolve(false)
+                    );
+                });
+            } else if (window.showConfirmationDialog) {
+                confirmed = await new Promise((resolve) => {
+                    window.showConfirmationDialog(
+                        'מחיקת ביצוע',
+                        'האם אתה בטוח שברצונך למחוק את הביצוע?',
+                        () => resolve(true),
+                        () => resolve(false),
+                        'danger'
+                    );
+                });
+            } else {
+                confirmed = confirm('האם אתה בטוח שברצונך למחוק את הביצוע?');
+            }
+            if (!confirmed) {
                 return;
             }
             await performExecutionDeletion(executionId);
@@ -4578,13 +5210,19 @@ function renderTradeSuggestionsSection(suggestionsData, flatList = null) {
     
     if (!tradeSuggestionsFlatList || tradeSuggestionsFlatList.length === 0) {
         tradeSuggestionsFlatList = [];
-        container.innerHTML = `
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i>
-                <strong>אין המלצות זמינות</strong><br>
-                כל הביצועים משוייכים לטריידים או שאין טריידים מתאימים.
-            </div>
-        `;
+        container.textContent = '';
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-info';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-info-circle';
+        alert.appendChild(icon);
+        const strong = document.createElement('strong');
+        strong.textContent = 'אין המלצות זמינות';
+        alert.appendChild(strong);
+        const br = document.createElement('br');
+        alert.appendChild(br);
+        alert.appendChild(document.createTextNode('כל הביצועים משוייכים לטריידים או שאין טריידים מתאימים.'));
+        container.appendChild(alert);
         return;
     }
     
@@ -4633,27 +5271,12 @@ function renderTradeSuggestionsSection(suggestionsData, flatList = null) {
             </table>
         </div>
     `;
-    
-    container.innerHTML = html;
-    
-    // Ensure table is registered with unified system
-    if (window.UnifiedTableSystem && window.UnifiedTableSystem.registry && typeof window.registerExecutionsTables === 'function') {
-        try {
-            if (!window.UnifiedTableSystem.registry.isRegistered('trade_suggestions')) {
-                window.registerExecutionsTables();
-            }
-        } catch (error) {
-            window.Logger?.warn('⚠️ Failed to register trade_suggestions table:', error, { page: "executions" });
-        }
-    }
-    
-    // Setup select all checkbox handler
-    const selectAllCheckbox = document.getElementById('selectAllSuggestions');
-    if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', function(e) {
-            toggleAllSuggestions(e.target.checked);
-        });
-    }
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+    });
 
     initializeTradeSuggestionsPagination(tradeSuggestionsFlatList);
 }
@@ -5148,7 +5771,14 @@ function renderTradeSuggestionsPageRows(pageData) {
     const selectAllCheckbox = document.getElementById('selectAllSuggestions');
 
     if (!Array.isArray(pageData) || pageData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="12" class="text-center text-muted">אין המלצות זמינות</td></tr>';
+        tbody.textContent = '';
+        const emptyRow = document.createElement('tr');
+        const emptyCell = document.createElement('td');
+        emptyCell.colSpan = 12;
+        emptyCell.className = 'text-center text-muted';
+        emptyCell.textContent = 'אין המלצות זמינות';
+        emptyRow.appendChild(emptyCell);
+        tbody.appendChild(emptyRow);
         if (selectAllCheckbox) {
             selectAllCheckbox.checked = false;
         }
@@ -5169,7 +5799,20 @@ function renderTradeSuggestionsPageRows(pageData) {
         lastExecutionId = executionId;
     });
 
-    tbody.innerHTML = rows.join('');
+    tbody.textContent = '';
+    rows.forEach(rowHTML => {
+      const row = document.createElement('tr');
+      row.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+    const tempRow = doc.body.querySelector('tr');
+    if (tempRow) {
+        Array.from(tempRow.children).forEach(cell => {
+            row.appendChild(cell.cloneNode(true));
+        });
+    }
+      tbody.appendChild(row);
+    });
     if (selectAllCheckbox) {
         selectAllCheckbox.checked = false;
     }

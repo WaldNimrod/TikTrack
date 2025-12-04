@@ -351,9 +351,18 @@
       // Render simple table body if exists
       const tbody = container.querySelector('tbody');
       if (!tbody) return;
-      tbody.innerHTML = rows.map(r => (
+      const rowsHTML = rows.map(r => (
         `<tr><td>${r.group}</td><td>${r.name}</td><td>${String(r.value)}</td></tr>`
       )).join('');
+      tbody.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(`<table><tbody>${rowsHTML}</tbody></table>`, 'text/html');
+      const tempTbody = doc.body.querySelector('tbody');
+      if (tempTbody) {
+        Array.from(tempTbody.children).forEach(row => {
+          tbody.appendChild(row.cloneNode(true));
+        });
+      }
     }
 
     /**

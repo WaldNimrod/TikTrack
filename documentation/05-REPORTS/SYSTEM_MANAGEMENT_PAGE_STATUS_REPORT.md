@@ -316,3 +316,5 @@ document.getElementById('refreshSystemDataBtn')?.addEventListener('click', () =>
 **תאריך:** 2025-01-27
 
 
+
+

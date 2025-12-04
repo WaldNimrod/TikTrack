@@ -113,3 +113,5 @@ PageTemplateGenerator.generateScriptTagsForPage("ticker-dashboard")
 
 או עדכן ידנית לפי המניפסט ב-`package-manifest.js`.
 
+
+

@@ -112,7 +112,8 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = `
+    this.textContent = '';
+    const componentHTML = `
       <div class="active-alerts" data-role="container">
         <div class="active-alerts__header">
           <div class="active-alerts__title-group">
@@ -142,6 +143,11 @@ class ActiveAlertsComponent extends HTMLElement {
         </div>
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(componentHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        this.appendChild(node.cloneNode(true));
+    });
 
     this.cacheElements();
     this.initializeFilters();
@@ -200,12 +206,18 @@ class ActiveAlertsComponent extends HTMLElement {
       iconClassName: 'active-alerts__filter-icon',
     });
 
-    container.innerHTML = `
+    container.textContent = '';
+    const filtersHTML = `
       <div class="active-alerts__filters-inner">
         ${allButtonHtml}
         ${entityButtonsHtml}
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(filtersHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+    });
 
     const buttons = container.querySelectorAll('button[data-type]');
     buttons.forEach(button => {
@@ -556,7 +568,7 @@ class ActiveAlertsComponent extends HTMLElement {
       return;
     }
 
-    listContainer.innerHTML = '';
+    listContainer.textContent = '';
 
     const filteredAlerts = this.getFilteredAlerts(true);
     if (!filteredAlerts.length) {
@@ -802,7 +814,12 @@ class ActiveAlertsComponent extends HTMLElement {
           relatedMeta,
         );
         if (html) {
-          container.innerHTML = html;
+          container.textContent = '';
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          doc.body.childNodes.forEach(node => {
+              container.appendChild(node.cloneNode(true));
+          });
           const linkedElement = container.firstElementChild;
           if (linkedElement) {
             linkedElement.classList.add('active-alerts__linked-entity');
@@ -859,7 +876,12 @@ class ActiveAlertsComponent extends HTMLElement {
         });
         
         const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = iconHTML;
+        tempDiv.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(iconHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tempDiv.appendChild(node.cloneNode(true));
+        });
         const icon = tempDiv.firstElementChild;
         if (icon) {
           headerLine.appendChild(icon);
@@ -1256,7 +1278,13 @@ class ActiveAlertsComponent extends HTMLElement {
     // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
     if (window.FieldRendererService?.renderStatus) {
       const wrapper = document.createElement('span');
-      wrapper.innerHTML = window.FieldRendererService.renderStatus(status, relatedType);
+      wrapper.textContent = '';
+      const statusHTML = window.FieldRendererService.renderStatus(status, relatedType);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(statusHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          wrapper.appendChild(node.cloneNode(true));
+      });
       return wrapper.firstElementChild;
     }
 
@@ -1281,7 +1309,13 @@ class ActiveAlertsComponent extends HTMLElement {
     // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
     if (window.FieldRendererService?.renderSide) {
       const wrapper = document.createElement('span');
-      wrapper.innerHTML = window.FieldRendererService.renderSide(side);
+      wrapper.textContent = '';
+      const sideHTML = window.FieldRendererService.renderSide(side);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(sideHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          wrapper.appendChild(node.cloneNode(true));
+      });
       return wrapper.firstElementChild;
     }
 
@@ -1299,7 +1333,13 @@ class ActiveAlertsComponent extends HTMLElement {
 
     if (window.FieldRendererService && typeof window.FieldRendererService.renderType === 'function') {
       const wrapper = document.createElement('span');
-      wrapper.innerHTML = window.FieldRendererService.renderType(investmentType);
+      wrapper.textContent = '';
+      const typeHTML = window.FieldRendererService.renderType(investmentType);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(typeHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          wrapper.appendChild(node.cloneNode(true));
+      });
       return wrapper.firstElementChild;
     }
 

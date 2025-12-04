@@ -381,3 +381,5 @@ window.PendingActionsCacheService = {
 - ✅ המודולים הישנים נמחקו לגמרה
 - ✅ כל הבדיקות עוברות
 
+
+

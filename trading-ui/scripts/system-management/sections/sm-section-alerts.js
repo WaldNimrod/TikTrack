@@ -95,7 +95,12 @@ class SMAlertsSection extends SMBaseSection {
 
     try {
       const alertsHtml = this.createAlertsHTML({ alerts, summary: null, history: null });
-      this.container.innerHTML = alertsHtml;
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(alertsHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Alerts section rendered successfully');
       
@@ -885,7 +890,11 @@ class SMAlertsSection extends SMBaseSection {
    */
   static showAllAlerts() {
     console.log('📋 Showing all alerts');
-    alert('פתיחת כל ההתראות');
+    if (window.showInfoNotification) {
+      window.showInfoNotification('פתיחת כל ההתראות', 'info');
+    } else {
+      alert('פתיחת כל ההתראות');
+    }
   }
 
   /**
@@ -894,7 +903,11 @@ class SMAlertsSection extends SMBaseSection {
    */
   static showAllHistory() {
     console.log('📋 Showing all alerts history');
-    alert('פתיחת כל היסטוריית ההתראות');
+    if (window.showInfoNotification) {
+      window.showInfoNotification('פתיחת כל היסטוריית ההתראות', 'info');
+    } else {
+      alert('פתיחת כל היסטוריית ההתראות');
+    }
   }
 }
 

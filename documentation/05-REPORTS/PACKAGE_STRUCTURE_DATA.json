@@ -1,0 +1,630 @@
+{
+  "packages": {
+    "my-package": {
+      "id": "my-package",
+      "name": "My Package",
+      "description": "My new script",
+      "load_order": null,
+      "critical": false,
+      "dependencies": [],
+      "scripts": [],
+      "script_count": 0
+    },
+    "my-page": {
+      "id": "my-page",
+      "name": "my-page",
+      "description": "",
+      "load_order": null,
+      "critical": false,
+      "dependencies": [],
+      "scripts": [],
+      "script_count": 0
+    },
+    "ui-advanced": {
+      "id": "ui-advanced",
+      "name": "UI Advanced Package",
+      "description": "Advanced user interface",
+      "load_order": 3.0,
+      "critical": false,
+      "dependencies": [
+        "base",
+        "services",
+        "modules"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "tag-management": {
+      "id": "tag-management",
+      "name": "Tag Management Page Package",
+      "description": "Dedicated logic for tag management page",
+      "load_order": 5.2,
+      "critical": false,
+      "dependencies": [
+        "base",
+        "services",
+        "modules",
+        "ui-advanced",
+        "crud",
+        "preferences"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "external-data": {
+      "id": "external-data",
+      "name": "External Data Package",
+      "description": "External data systems",
+      "load_order": 7.0,
+      "critical": false,
+      "dependencies": [
+        "base",
+        "services"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "entity-services": {
+      "id": "entity-services",
+      "name": "Entity Services Package",
+      "description": "Entity services",
+      "load_order": 10.0,
+      "critical": false,
+      "dependencies": [
+        "base",
+        "services"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "system-management": {
+      "id": "system-management",
+      "name": "System Management Package",
+      "description": "Advanced system management",
+      "load_order": 12.0,
+      "critical": false,
+      "dependencies": [
+        "base",
+        "services"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "dev-tools": {
+      "id": "dev-tools",
+      "name": "Development Tools Package",
+      "description": "Development and debugging tools",
+      "load_order": 14.0,
+      "critical": false,
+      "dependencies": [
+        "base",
+        "services"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "advanced-notifications": {
+      "id": "advanced-notifications",
+      "name": "Advanced Notifications Package",
+      "description": "⚠️ DEPRECATED: Scripts already in base package. Use base package instead.",
+      "load_order": 16.0,
+      "critical": false,
+      "dependencies": [
+        "base"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "entity-details": {
+      "id": "entity-details",
+      "name": "Entity Details Package",
+      "description": "Entity details systems",
+      "load_order": 17.0,
+      "critical": false,
+      "dependencies": [
+        "base",
+        "services",
+        "ui-advanced",
+        "crud",
+        "preferences",
+        "entity-services"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "info-summary": {
+      "id": "info-summary",
+      "name": "Info Summary Package",
+      "description": "Unified data summary system for all pages",
+      "load_order": 18.0,
+      "critical": false,
+      "dependencies": [
+        "base",
+        "services"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "tradingview-charts": {
+      "id": "tradingview-charts",
+      "name": "TradingView Charts Package",
+      "description": "TradingView Lightweight Charts system",
+      "load_order": 19.0,
+      "critical": false,
+      "dependencies": [
+        "base"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "watch-lists": {
+      "id": "watch-lists",
+      "name": "Watch Lists Package",
+      "description": "Watch lists management system (UI layer only - mockup mode)",
+      "load_order": 20.0,
+      "critical": false,
+      "dependencies": [
+        "base",
+        "services",
+        "ui-advanced",
+        "crud",
+        "entity-services"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "ai-analysis": {
+      "id": "ai-analysis",
+      "name": "AI Analysis Package",
+      "description": "AI analysis system with LLM integration",
+      "load_order": 20.5,
+      "critical": false,
+      "dependencies": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "preferences",
+        "entity-services"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "init-system": {
+      "id": "init-system",
+      "name": "Initialization Package",
+      "description": "Initialization and monitoring systems",
+      "load_order": 22.0,
+      "critical": false,
+      "dependencies": [
+        "base",
+        "crud",
+        "services",
+        "ui-advanced",
+        "modules",
+        "preferences",
+        "validation",
+        "conditions",
+        "external-data",
+        "charts",
+        "logs",
+        "cache",
+        "entity-services",
+        "helper",
+        "system-management",
+        "management",
+        "dev-tools",
+        "advanced-notifications",
+        "entity-details",
+        "info-summary",
+        "dashboard-widgets",
+        "tradingview-widgets",
+        "tradingview-charts",
+        "watch-lists",
+        "ai-analysis"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "dashboard-widgets": {
+      "id": "dashboard-widgets",
+      "name": "Dashboard Widgets",
+      "description": "Widgets and dashboard interfaces (Pending Executions, Trade Creation)",
+      "load_order": 19.5,
+      "critical": false,
+      "dependencies": [
+        "base",
+        "services",
+        "ui-advanced",
+        "entity-services",
+        "modules",
+        "entity-details"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "dashboard": {
+      "id": "dashboard-modules",
+      "name": "Dashboard Modules",
+      "description": "Dashboard-specific modules including trade creation support",
+      "load_order": 6.1,
+      "critical": false,
+      "dependencies": [
+        "modules",
+        "validation"
+      ],
+      "scripts": [],
+      "script_count": 0
+    },
+    "tradingview-widgets": {
+      "id": "tradingview-widgets",
+      "name": "TradingView Widgets Package",
+      "description": "Central system for managing TradingView widgets",
+      "load_order": 21.0,
+      "critical": false,
+      "dependencies": [
+        "base",
+        "preferences"
+      ],
+      "scripts": [],
+      "script_count": 0
+    }
+  },
+  "issues": [
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "ui-advanced",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "ui-advanced",
+      "issue": "תלות ב-package לא קיים: services",
+      "recommendation": "להוסיף את services או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "ui-advanced",
+      "issue": "תלות ב-package לא קיים: modules",
+      "recommendation": "להוסיף את modules או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "tag-management",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "tag-management",
+      "issue": "תלות ב-package לא קיים: services",
+      "recommendation": "להוסיף את services או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "tag-management",
+      "issue": "תלות ב-package לא קיים: modules",
+      "recommendation": "להוסיף את modules או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "tag-management",
+      "issue": "תלות ב-package לא קיים: crud",
+      "recommendation": "להוסיף את crud או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "tag-management",
+      "issue": "תלות ב-package לא קיים: preferences",
+      "recommendation": "להוסיף את preferences או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "external-data",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "external-data",
+      "issue": "תלות ב-package לא קיים: services",
+      "recommendation": "להוסיף את services או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "entity-services",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "entity-services",
+      "issue": "תלות ב-package לא קיים: services",
+      "recommendation": "להוסיף את services או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "system-management",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "system-management",
+      "issue": "תלות ב-package לא קיים: services",
+      "recommendation": "להוסיף את services או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "dev-tools",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "dev-tools",
+      "issue": "תלות ב-package לא קיים: services",
+      "recommendation": "להוסיף את services או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "advanced-notifications",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "entity-details",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "entity-details",
+      "issue": "תלות ב-package לא קיים: services",
+      "recommendation": "להוסיף את services או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "entity-details",
+      "issue": "תלות ב-package לא קיים: crud",
+      "recommendation": "להוסיף את crud או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "entity-details",
+      "issue": "תלות ב-package לא קיים: preferences",
+      "recommendation": "להוסיף את preferences או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "info-summary",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "info-summary",
+      "issue": "תלות ב-package לא קיים: services",
+      "recommendation": "להוסיף את services או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "tradingview-charts",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "watch-lists",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "watch-lists",
+      "issue": "תלות ב-package לא קיים: services",
+      "recommendation": "להוסיף את services או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "watch-lists",
+      "issue": "תלות ב-package לא קיים: crud",
+      "recommendation": "להוסיף את crud או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "ai-analysis",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "ai-analysis",
+      "issue": "תלות ב-package לא קיים: services",
+      "recommendation": "להוסיף את services או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "ai-analysis",
+      "issue": "תלות ב-package לא קיים: modules",
+      "recommendation": "להוסיף את modules או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "ai-analysis",
+      "issue": "תלות ב-package לא קיים: preferences",
+      "recommendation": "להוסיף את preferences או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "init-system",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "init-system",
+      "issue": "תלות ב-package לא קיים: crud",
+      "recommendation": "להוסיף את crud או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "init-system",
+      "issue": "תלות ב-package לא קיים: services",
+      "recommendation": "להוסיף את services או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "init-system",
+      "issue": "תלות ב-package לא קיים: modules",
+      "recommendation": "להוסיף את modules או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "init-system",
+      "issue": "תלות ב-package לא קיים: preferences",
+      "recommendation": "להוסיף את preferences או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "init-system",
+      "issue": "תלות ב-package לא קיים: validation",
+      "recommendation": "להוסיף את validation או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "init-system",
+      "issue": "תלות ב-package לא קיים: conditions",
+      "recommendation": "להוסיף את conditions או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "init-system",
+      "issue": "תלות ב-package לא קיים: charts",
+      "recommendation": "להוסיף את charts או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "init-system",
+      "issue": "תלות ב-package לא קיים: logs",
+      "recommendation": "להוסיף את logs או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "init-system",
+      "issue": "תלות ב-package לא קיים: cache",
+      "recommendation": "להוסיף את cache או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "init-system",
+      "issue": "תלות ב-package לא קיים: helper",
+      "recommendation": "להוסיף את helper או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "init-system",
+      "issue": "תלות ב-package לא קיים: management",
+      "recommendation": "להוסיף את management או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "dashboard-widgets",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "dashboard-widgets",
+      "issue": "תלות ב-package לא קיים: services",
+      "recommendation": "להוסיף את services או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "dashboard-widgets",
+      "issue": "תלות ב-package לא קיים: modules",
+      "recommendation": "להוסיף את modules או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "dashboard",
+      "issue": "תלות ב-package לא קיים: modules",
+      "recommendation": "להוסיף את modules או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "dashboard",
+      "issue": "תלות ב-package לא קיים: validation",
+      "recommendation": "להוסיף את validation או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "tradingview-widgets",
+      "issue": "תלות ב-package לא קיים: base",
+      "recommendation": "להוסיף את base או להסיר את התלות"
+    },
+    {
+      "type": "dependency",
+      "severity": "high",
+      "package": "tradingview-widgets",
+      "issue": "תלות ב-package לא קיים: preferences",
+      "recommendation": "להוסיף את preferences או להסיר את התלות"
+    }
+  ],
+  "summary": {
+    "total_packages": 18,
+    "total_scripts": 0,
+    "total_issues": 50
+  }
+}

@@ -10,13 +10,13 @@
     "notes": "Final sm-section-server fix"
   },
   "development": {
-    "version": "1.3.76.0",
+    "version": "1.3.77.0",
     "major": 1,
     "minor": 3,
-    "patch": 76,
+    "patch": 77,
     "build": 0,
-    "commit": "ac4efc531c2d0b8ecc0567a8a684ed0cbbf9d995",
-    "updated_at": "2025-12-03T00:17:10+00:00",
-    "notes": "Fix login page: remove header and fix redirect to dashboard"
+    "commit": "820fc9f423b89c8a00f550acf59792684b293e27",
+    "updated_at": "2025-12-04T13:33:32+00:00",
+    "notes": "User-Ticker integration: custom fields, two-tier status, user-specific tickers"
   }
 }

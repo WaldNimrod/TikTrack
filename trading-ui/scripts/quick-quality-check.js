@@ -162,7 +162,12 @@ class QuickQualityCheckManager {
             
             // Create modal element
             const modalElement = document.createElement('div');
-            modalElement.innerHTML = modalHtml;
+            modalElement.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(modalHtml, 'text/html');
+            doc.body.childNodes.forEach(node => {
+              modalElement.appendChild(node.cloneNode(true));
+            });
             modalElement.className = 'modal fade';
             modalElement.id = 'quickQualityCheckModal';
             modalElement.setAttribute('tabindex', '-1');

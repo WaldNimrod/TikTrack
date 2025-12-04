@@ -106,3 +106,5 @@ window.createAIAnalysisCacheEntries = createAIAnalysisCacheEntries;
 console.log('✅ Helper script loaded. Run: createAIAnalysisCacheEntries()');
 
 
+
+

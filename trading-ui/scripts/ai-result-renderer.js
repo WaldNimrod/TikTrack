@@ -47,7 +47,11 @@
       }
 
       if (!analysisResult || !analysisResult.response_text) {
-        container.innerHTML = '<div class="alert alert-warning">אין תוצאות להצגה</div>';
+        container.textContent = '';
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-warning';
+        alert.textContent = 'אין תוצאות להצגה';
+        container.appendChild(alert);
         return;
       }
 
@@ -61,13 +65,22 @@
           htmlContent = this.convertMarkdownBasic(analysisResult.response_text);
         }
 
-        container.innerHTML = htmlContent;
+        container.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlContent, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            container.appendChild(node.cloneNode(true));
+        });
         container.className = 'markdown-body';
 
         window.Logger?.info('Results rendered', { page: 'ai-analysis', requestId: analysisResult.id });
       } catch (error) {
         window.Logger?.error('Error rendering results', error, { page: 'ai-analysis' });
-        container.innerHTML = '<div class="alert alert-danger">שגיאה בהצגת תוצאות</div>';
+        container.textContent = '';
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-danger';
+        alert.textContent = 'שגיאה בהצגת תוצאות';
+        container.appendChild(alert);
       }
     },
 

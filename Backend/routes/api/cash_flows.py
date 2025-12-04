@@ -332,12 +332,15 @@ def delete_imported_cash_flows():
 def get_cash_flow(cash_flow_id: int):
     """Get cash flow by ID"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        from flask import g
+        user_id = getattr(g, 'user_id', None)
+        
         db: Session = next(get_db())
         normalizer = _get_date_normalizer()
-        cash_flow = db.query(CashFlow).options(
-            joinedload(CashFlow.account),
-            joinedload(CashFlow.currency)
-        ).filter(CashFlow.id == cash_flow_id).first()
+        
+        # Use service to get cash flow with user_id filtering
+        cash_flow = cash_flow_service.get_by_id(db, cash_flow_id, user_id=user_id)
         
         if cash_flow:
             cf_dict = cash_flow.to_dict()
@@ -392,11 +395,32 @@ def get_cash_flow(cash_flow_id: int):
 def create_cash_flow():
     """Create new cash flow"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         logger.info("=== CREATE CASH FLOW START ===")
         data = request.get_json()
         logger.info(f"Received data: {data}")
         # Use the session from the decorator (in g.db)
         db: Session = g.db
+        
+        # Set user_id if authenticated
+        if user_id is not None and 'user_id' not in data:
+            data['user_id'] = user_id
+        
+        # Verify trading_account belongs to user if provided
+        if 'trading_account_id' in data and user_id is not None:
+            from models.trading_account import TradingAccount
+            account = db.query(TradingAccount).filter(
+                TradingAccount.id == data['trading_account_id'],
+                TradingAccount.user_id == user_id
+            ).first()
+            if not account:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Trading account not found or does not belong to user"},
+                    "version": "1.0"
+                }), 404
         
         # Set default values
         if 'currency_id' not in data or data['currency_id'] is None:
@@ -524,10 +548,15 @@ def create_cash_flow():
 def update_cash_flow(cash_flow_id: int):
     """Update cash flow"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         data = request.get_json()
         # Use the session from the decorator (in g.db)
         db: Session = g.db
-        cash_flow = db.query(CashFlow).filter(CashFlow.id == cash_flow_id).first()
+        
+        # Verify cash flow belongs to user
+        cash_flow = cash_flow_service.get_by_id(db, cash_flow_id, user_id=user_id)
         
         if cash_flow:
             # Set default values for update
@@ -666,9 +695,14 @@ def update_cash_flow(cash_flow_id: int):
 def delete_cash_flow(cash_flow_id: int):
     """Delete cash flow"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         # Use the session from the decorator (in g.db)
         db: Session = g.db
-        cash_flow = db.query(CashFlow).filter(CashFlow.id == cash_flow_id).first()
+        
+        # Verify cash flow belongs to user
+        cash_flow = cash_flow_service.get_by_id(db, cash_flow_id, user_id=user_id)
         
         if cash_flow:
             # Tag cleanup is handled automatically by SQLAlchemy event listeners

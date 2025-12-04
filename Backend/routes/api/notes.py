@@ -5,6 +5,7 @@ from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, invalidate_cache
 from services.date_normalization_service import DateNormalizationService
 from services.preferences_service import PreferencesService
+from services.business_logic import NoteBusinessService
 import logging
 import os
 import uuid
@@ -245,6 +246,12 @@ def get_note(note_id: int):
 def create_note():
     """Create new note"""
     try:
+        # Log initial request details
+        logger.info(f"🔄 Creating note - Request method: {request.method}, Content-Type: {request.content_type}")
+        logger.debug(f"📋 Request JSON: {request.get_json() if request.is_json else 'Not JSON'}")
+        logger.debug(f"📋 Request form: {dict(request.form) if request.form else 'No form data'}")
+        logger.debug(f"📋 Request files: {list(request.files.keys()) if request.files else 'No files'}")
+        
         # Use the session from the decorator (in g.db)
         db: Session = g.db
         
@@ -257,6 +264,7 @@ def create_note():
             if file and file.filename:
                 # Check file size
                 if file.content_length and file.content_length > MAX_FILE_SIZE:
+                    logger.warning(f"⚠️ File too large: {file.content_length} bytes")
                     return jsonify({
                         "status": "error",
                         "error": {"message": "File too large. Maximum size is 512KB"},
@@ -265,30 +273,78 @@ def create_note():
                 
                 attachment_filename = save_uploaded_file(file)
                 if not attachment_filename:
+                    logger.warning(f"⚠️ Invalid file type: {file.filename}")
                     return jsonify({
                         "status": "error",
                         "error": {"message": "Invalid file type. Allowed: JPG, PNG, GIF, PDF"},
                         "version": "1.0"
                     }), 400
+                logger.info(f"📎 Attachment saved: {attachment_filename}")
             
             # Get data from form data
             content = request.form.get('content', '')
+            logger.debug(f"🔍 DEBUG: Content from form - type: {type(content)}, length: {len(content) if content else 0}")
+            logger.debug(f"🔍 DEBUG: Content preview: {content[:100] if content else 'None'}...")
+            
+            # Check content before sanitization
+            if not content or len(content.strip()) == 0:
+                logger.warning(f"⚠️ Empty content received from form. Request form keys: {list(request.form.keys())}")
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Note content is required"},
+                    "version": "1.0"
+                }), 400
+            
             # Sanitize HTML content
-            content = BaseEntityUtils.sanitize_rich_text(content)
+            if content:
+                original_length = len(content)
+                content = BaseEntityUtils.sanitize_rich_text(content)
+                if content and len(content) != original_length:
+                    logger.warning(f"⚠️ Content length changed after sanitization: {original_length} -> {len(content)}")
+                logger.info(f"📝 Content extracted from form: length={len(content) if content else 0}, has_content={bool(content)}")
+            else:
+                logger.error(f"❌ Content is None from form - cannot sanitize. Request form keys: {list(request.form.keys())}")
+                content = None
+            
             related_type_id = request.form.get('related_type_id')
             related_id = request.form.get('related_id')
         else:
             # Get data from JSON
             data = request.get_json()
-            content = data.get('content', '')
+            logger.debug(f"🔍 DEBUG: Full request JSON data: {data}")
+            
+            content = data.get('content', '') if data else ''
+            logger.debug(f"🔍 DEBUG: Content from JSON - type: {type(content)}, length: {len(content) if content else 0}")
+            logger.debug(f"🔍 DEBUG: Content value: {content[:100] if content else 'None'}...")
+            
+            # Check content before sanitization
+            if not content or len(content.strip()) == 0:
+                logger.warning(f"⚠️ Empty content received from JSON. Request data keys: {list(data.keys()) if data else 'None'}")
+                logger.debug(f"🔍 DEBUG: Full request data: {data}")
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Note content is required"},
+                    "version": "1.0"
+                }), 400
+            
             # Sanitize HTML content
-            content = BaseEntityUtils.sanitize_rich_text(content)
-            related_type_id = data.get('related_type_id')
-            related_id = data.get('related_id')
-            attachment_filename = data.get('attachment')
+            if content:
+                original_length = len(content)
+                content = BaseEntityUtils.sanitize_rich_text(content)
+                if content and len(content) != original_length:
+                    logger.warning(f"⚠️ Content length changed after sanitization: {original_length} -> {len(content)}")
+                logger.info(f"📝 Content extracted from JSON: length={len(content) if content else 0}, has_content={bool(content)}")
+            else:
+                logger.error(f"❌ Content is None - cannot sanitize. Request data: {data}")
+                content = None
+            
+            related_type_id = data.get('related_type_id') if data else None
+            related_id = data.get('related_id') if data else None
+            attachment_filename = data.get('attachment') if data else None
         
         # Determine relation using related_type_id and related_id
         if not related_type_id or not related_id:
+            logger.warning(f"⚠️ Missing relation data - related_type_id: {related_type_id}, related_id: {related_id}")
             return jsonify({
                 "status": "error",
                 "error": {"message": "Note must have related_type_id and related_id"},
@@ -298,26 +354,55 @@ def create_note():
         # Validate related_type_id
         valid_types = [1, 2, 3, 4]  # account, trade, trade_plan, ticker
         if int(related_type_id) not in valid_types:
+            logger.warning(f"⚠️ Invalid related_type_id: {related_type_id}")
             return jsonify({
                 "status": "error",
                 "error": {"message": "Invalid related_type_id. Must be: 1 (account), 2 (trade), 3 (trade_plan), or 4 (ticker)"},
                 "version": "1.0"
             }), 400
         
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        logger.debug(f"🔍 DEBUG: User ID from context: {user_id}, Type: {type(user_id)}")
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required"},
+                "version": "1.0"
+            }), 401
+        logger.info(f"✅ User ID verified: {user_id}")
+        
+        # Validate content exists before creating note_data
+        if not content or (isinstance(content, str) and len(content.strip()) == 0):
+            logger.error(f"❌ Content is empty or None - cannot create note. Content type: {type(content)}, Content value: {content[:100] if content else 'None'}")
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Note content is required and cannot be empty"},
+                "version": "1.0"
+            }), 400
+        
         # Create note with new structure
         note_data = {
+            'user_id': user_id,
             'content': content,
             'attachment': attachment_filename,
             'related_type_id': related_type_id,
             'related_id': related_id
         }
+        content_length = len(content) if content else 0
+        logger.debug(f"📋 Note data prepared: user_id={note_data['user_id']}, content_length={content_length}, related_type_id={note_data['related_type_id']}, related_id={note_data['related_id']}")
+        logger.info(f"✅ Note data prepared with: content_length={content_length}, related_type_id={related_type_id}, related_id={related_id}, user_id={user_id}")
         
-        # Validate data against constraints
-        logger.info("Validating note data before creation")
-        is_valid, errors = ValidationService.validate_data(db, 'notes', note_data)
-        if not is_valid:
-            error_message = "; ".join(errors)
-            logger.error(f"Note validation failed: {error_message}")
+        # Initialize Business Logic Service and validate
+        logger.info("🔄 Validating note data using Business Logic Layer")
+        note_service = NoteBusinessService(db_session=db)
+        validation_result = note_service.validate(note_data)
+        
+        if not validation_result['is_valid']:
+            error_message = "; ".join(validation_result['errors'])
+            logger.error(f"❌ Note business validation failed: {error_message}")
+            logger.debug(f"🔍 DEBUG: Validation result: {validation_result}")
             # Delete file if validation failed
             if attachment_filename:
                 delete_uploaded_file(attachment_filename)
@@ -327,10 +412,17 @@ def create_note():
                 "version": "1.0"
             }), 400
         
+        logger.info(f"✅ Validation passed: {validation_result['is_valid']}")
+        logger.debug(f"🔍 DEBUG: Validation result: {validation_result}")
+        
+        # Create note in database
+        logger.info("💾 Creating note in database...")
         note = Note(**note_data)
         db.add(note)
         db.commit()
         db.refresh(note)
+        
+        logger.info(f"✅ Note created successfully: id={note.id}")
         normalizer = _get_notes_normalizer()
         payload = normalizer.normalize_output(note.to_dict())
         return jsonify({
@@ -341,7 +433,7 @@ def create_note():
             "version": "1.0"
         }), 201
     except Exception as e:
-        logger.error(f"Error creating note: {str(e)}")
+        logger.error(f"❌ Error creating note: {str(e)}", exc_info=True)
         # Delete file if there was an error creating the note
         if 'attachment_filename' in locals() and attachment_filename:
             delete_uploaded_file(attachment_filename)

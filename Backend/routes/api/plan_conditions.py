@@ -225,14 +225,22 @@ def get_plan_conditions(plan_id):
         db_session = next(get_db())
 
         try:
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
             # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
             # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
 
-            plan = db_session.query(TradePlan).filter(TradePlan.id == plan_id).first()
+            # Check if trade plan exists and belongs to user
+            query = db_session.query(TradePlan).filter(TradePlan.id == plan_id)
+            if user_id is not None:
+                query = query.filter(TradePlan.user_id == user_id)
+            plan = query.first()
             if not plan:
                 payload = BaseEntityUtils.create_error_payload(
                     normalizer,
-                    f'Trade plan with ID {plan_id} not found',
+                    f'Trade plan with ID {plan_id} not found or does not belong to user',
                     {"code": "PLAN_NOT_FOUND"}
                 )
                 return jsonify(payload), 404
@@ -299,12 +307,20 @@ def create_plan_condition(plan_id):
             # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
             # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
             normalizer = _get_date_normalizer()
-            # Check if trade plan exists
-            plan = db_session.query(TradePlan).filter(TradePlan.id == plan_id).first()
+            
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
+            # Check if trade plan exists and belongs to user
+            query = db_session.query(TradePlan).filter(TradePlan.id == plan_id)
+            if user_id is not None:
+                query = query.filter(TradePlan.user_id == user_id)
+            plan = query.first()
             if not plan:
                 payload = BaseEntityUtils.create_error_payload(
                     normalizer,
-                    f'Trade plan with ID {plan_id} not found',
+                    f'Trade plan with ID {plan_id} not found or does not belong to user',
                     {"code": "PLAN_NOT_FOUND"}
                 )
                 return jsonify(payload), 404
@@ -392,6 +408,10 @@ def get_plan_condition(condition_id):
             # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
             # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
             
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
             condition = db_session.query(PlanCondition).filter(
                 PlanCondition.id == condition_id
             ).first()
@@ -403,6 +423,20 @@ def get_plan_condition(condition_id):
                     {"code": "CONDITION_NOT_FOUND"}
                 )
                 return jsonify(payload), 404
+            
+            # Verify trade plan belongs to user
+            if user_id is not None:
+                plan = db_session.query(TradePlan).filter(
+                    TradePlan.id == condition.trade_plan_id,
+                    TradePlan.user_id == user_id
+                ).first()
+                if not plan:
+                    payload = BaseEntityUtils.create_error_payload(
+                        normalizer,
+                        f'Plan condition with ID {condition_id} does not belong to user',
+                        {"code": "ACCESS_DENIED"}
+                    )
+                    return jsonify(payload), 403
             
             # Convert to dictionary
             condition_dict = condition.to_dict()
@@ -447,6 +481,10 @@ def update_plan_condition(condition_id):
             # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
             # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
             
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
             condition = db_session.query(PlanCondition).filter(
                 PlanCondition.id == condition_id
             ).first()
@@ -458,6 +496,20 @@ def update_plan_condition(condition_id):
                     {"code": "CONDITION_NOT_FOUND"}
                 )
                 return jsonify(payload), 404
+            
+            # Verify trade plan belongs to user
+            if user_id is not None:
+                plan = db_session.query(TradePlan).filter(
+                    TradePlan.id == condition.trade_plan_id,
+                    TradePlan.user_id == user_id
+                ).first()
+                if not plan:
+                    payload = BaseEntityUtils.create_error_payload(
+                        normalizer,
+                        f'Plan condition with ID {condition_id} does not belong to user',
+                        {"code": "ACCESS_DENIED"}
+                    )
+                    return jsonify(payload), 403
             
             # Add trade_plan_id to data for validation
             data['trade_plan_id'] = condition.trade_plan_id
@@ -538,6 +590,10 @@ def delete_plan_condition(condition_id):
             # Note: Tables are created via SQLAlchemy models (Base.metadata.create_all)
             # _ensure_conditions_tables is deprecated - was using SQLite syntax, incompatible with PostgreSQL
             
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
             condition = db_session.query(PlanCondition).filter(
                 PlanCondition.id == condition_id
             ).first()
@@ -549,6 +605,20 @@ def delete_plan_condition(condition_id):
                     {"code": "CONDITION_NOT_FOUND"}
                 )
                 return jsonify(payload), 404
+            
+            # Verify trade plan belongs to user
+            if user_id is not None:
+                plan = db_session.query(TradePlan).filter(
+                    TradePlan.id == condition.trade_plan_id,
+                    TradePlan.user_id == user_id
+                ).first()
+                if not plan:
+                    payload = BaseEntityUtils.create_error_payload(
+                        normalizer,
+                        f'Plan condition with ID {condition_id} does not belong to user',
+                        {"code": "ACCESS_DENIED"}
+                    )
+                    return jsonify(payload), 403
             
             # Check if condition is inherited by trade conditions
             from models.trade_condition import TradeCondition
@@ -610,6 +680,10 @@ def test_plan_condition(condition_id):
         db_session = next(get_db())
         
         try:
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
             condition = db_session.query(PlanCondition).filter(
                 PlanCondition.id == condition_id
             ).first()
@@ -622,15 +696,16 @@ def test_plan_condition(condition_id):
                 )
                 return jsonify(payload), 404
             
-            # Get trade plan to get ticker
-            plan = db_session.query(TradePlan).filter(
-                TradePlan.id == condition.trade_plan_id
-            ).first()
+            # Verify trade plan belongs to user
+            query = db_session.query(TradePlan).filter(TradePlan.id == condition.trade_plan_id)
+            if user_id is not None:
+                query = query.filter(TradePlan.user_id == user_id)
+            plan = query.first()
             
             if not plan:
                 payload = BaseEntityUtils.create_error_payload(
                     normalizer,
-                    'Trade plan not found',
+                    'Trade plan not found or does not belong to user',
                     {"code": "PLAN_NOT_FOUND"}
                 )
                 return jsonify(payload), 404
@@ -737,12 +812,19 @@ def create_bulk_plan_conditions():
         db_session = next(get_db())
         
         try:
-            # Check if trade plan exists
-            plan = db_session.query(TradePlan).filter(TradePlan.id == plan_id).first()
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
+            # Check if trade plan exists and belongs to user
+            query = db_session.query(TradePlan).filter(TradePlan.id == plan_id)
+            if user_id is not None:
+                query = query.filter(TradePlan.user_id == user_id)
+            plan = query.first()
             if not plan:
                 return jsonify({
                     'status': 'error',
-                    'message': f'Trade plan with ID {plan_id} not found',
+                    'message': f'Trade plan with ID {plan_id} not found or does not belong to user',
                     'error_code': 'PLAN_NOT_FOUND'
                 }), 404
             
@@ -827,6 +909,10 @@ def evaluate_condition(condition_id):
         db_session = next(get_db())
         
         try:
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
             # Get condition with relationships
             condition = db_session.query(PlanCondition).filter(
                 PlanCondition.id == condition_id
@@ -839,6 +925,20 @@ def evaluate_condition(condition_id):
                     {"code": "CONDITION_NOT_FOUND"}
                 )
                 return jsonify(payload), 404
+            
+            # Verify trade plan belongs to user
+            if user_id is not None:
+                plan = db_session.query(TradePlan).filter(
+                    TradePlan.id == condition.trade_plan_id,
+                    TradePlan.user_id == user_id
+                ).first()
+                if not plan:
+                    payload = BaseEntityUtils.create_error_payload(
+                        normalizer,
+                        f'Plan condition with ID {condition_id} does not belong to user',
+                        {"code": "ACCESS_DENIED"}
+                    )
+                    return jsonify(payload), 403
             
             # Import and use ConditionEvaluator
             from services.condition_evaluator import ConditionEvaluator
@@ -880,12 +980,16 @@ def evaluate_all_conditions():
         db_session = next(get_db())
         
         try:
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
             # Import and use ConditionEvaluator
             from services.condition_evaluator import ConditionEvaluator
             evaluator = ConditionEvaluator(db_session)
             
-            # Evaluate all active conditions
-            results = evaluator.evaluate_all_active_conditions()
+            # Evaluate all active conditions (filtered by user_id if provided)
+            results = evaluator.evaluate_all_active_conditions(user_id=user_id)
             
             # Filter only plan conditions
             plan_results = [r for r in results if r.get('condition_type') == 'plan']
@@ -923,6 +1027,10 @@ def get_evaluation_history(condition_id):
         db_session = next(get_db())
         
         try:
+            # Get user_id from Flask context (set by auth middleware)
+            from flask import g
+            user_id = getattr(g, 'user_id', None)
+            
             # Check if condition exists
             condition = db_session.query(PlanCondition).filter(
                 PlanCondition.id == condition_id
@@ -935,11 +1043,27 @@ def get_evaluation_history(condition_id):
                     'error_code': 'CONDITION_NOT_FOUND'
                 }), 404
             
-            # Get alerts related to this condition
+            # Verify trade plan belongs to user
+            if user_id is not None:
+                plan = db_session.query(TradePlan).filter(
+                    TradePlan.id == condition.trade_plan_id,
+                    TradePlan.user_id == user_id
+                ).first()
+                if not plan:
+                    return jsonify({
+                        'status': 'error',
+                        'message': f'Plan condition with ID {condition_id} does not belong to user',
+                        'error_code': 'ACCESS_DENIED'
+                    }), 403
+            
+            # Get alerts related to this condition (filtered by user_id)
             from models.alert import Alert
-            alerts = db_session.query(Alert).filter(
+            query = db_session.query(Alert).filter(
                 Alert.related_id == condition_id
-            ).order_by(Alert.triggered_at.desc()).limit(50).all()
+            )
+            if user_id is not None:
+                query = query.filter(Alert.user_id == user_id)
+            alerts = query.order_by(Alert.triggered_at.desc()).limit(50).all()
             
             # Convert to evaluation history format
             history = []
@@ -985,6 +1109,10 @@ def create_condition_alert(condition_id):
     """Create alert manually for a condition"""
     normalizer = _get_date_normalizer()
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        from flask import g
+        user_id = getattr(g, 'user_id', None)
+        
         db_session = next(get_db())
         try:
             condition = db_session.query(PlanCondition).filter(PlanCondition.id == condition_id).first()
@@ -994,6 +1122,19 @@ def create_condition_alert(condition_id):
                     f'Plan condition with ID {condition_id} not found'
                 )
                 return jsonify(payload), 404
+            
+            # Verify trade plan belongs to user
+            if user_id is not None:
+                plan = db_session.query(TradePlan).filter(
+                    TradePlan.id == condition.trade_plan_id,
+                    TradePlan.user_id == user_id
+                ).first()
+                if not plan:
+                    payload = BaseEntityUtils.create_error_payload(
+                        normalizer,
+                        f'Plan condition with ID {condition_id} does not belong to user'
+                    )
+                    return jsonify(payload), 403
             
             # Check if alert already exists
             alert_service = AlertService(db_session)
@@ -1018,6 +1159,10 @@ def create_condition_alert(condition_id):
                 'status': 'open',
                 'is_triggered': 'false'
             }
+            
+            # Set user_id if authenticated
+            if user_id is not None:
+                alert_data['user_id'] = user_id
             
             alert = alert_service.create_or_update_alert_for_condition(
                 db_session, condition_id, 'plan', alert_data
@@ -1054,8 +1199,27 @@ def create_condition_alert(condition_id):
 def delete_condition_alert(condition_id):
     """Delete alert for a condition"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        from flask import g
+        user_id = getattr(g, 'user_id', None)
+        
         db_session = next(get_db())
         try:
+            # Verify condition belongs to user
+            condition = db_session.query(PlanCondition).filter(PlanCondition.id == condition_id).first()
+            if condition and user_id is not None:
+                plan = db_session.query(TradePlan).filter(
+                    TradePlan.id == condition.trade_plan_id,
+                    TradePlan.user_id == user_id
+                ).first()
+                if not plan:
+                    normalizer = _get_date_normalizer()
+                    payload = BaseEntityUtils.create_error_payload(
+                        normalizer,
+                        f'Plan condition with ID {condition_id} does not belong to user'
+                    )
+                    return jsonify(payload), 403
+            
             alert_service = AlertService(db_session)
             
             deleted_count = alert_service.delete_condition_alerts(db_session, plan_condition_id=condition_id)

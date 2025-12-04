@@ -257,7 +257,7 @@ class ServerMonitor {
     const logsContainer = document.getElementById('logsContainer');
     if (!logsContainer) return;
     
-    logsContainer.innerHTML = '';
+    logsContainer.textContent = '';
     
     this.logs.forEach(log => {
       const logElement = this.createLogElement(log);
@@ -273,7 +273,10 @@ class ServerMonitor {
     const timeAgo = this.getTimeAgo(log.timestamp);
     const iconClass = this.getLogIcon(log.type);
     
-    logElement.innerHTML = `
+    logElement.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
       <div class="log-icon">
         <i class="${iconClass}"></i>
       </div>
@@ -282,7 +285,12 @@ class ServerMonitor {
         <div class="log-message">${log.message}</div>
         <div class="log-time">${timeAgo}</div>
       </div>
-    `;
+    `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        logElement.appendChild(fragment);
     
     return logElement;
   }
@@ -758,7 +766,7 @@ class ServerMonitor {
   updateSystemInfo(data) {
     const systemInfo = document.getElementById('systemInfo');
     if (systemInfo && data) {
-      systemInfo.innerHTML = `
+      const systemInfoHTML = `
         <div class="info-item">
           <span class="info-label">גרסת Python:</span>
           <span class="info-value">${data.python_version || 'לא ידוע'}</span>
@@ -772,6 +780,12 @@ class ServerMonitor {
           <span class="info-value">${data.uptime || 'לא ידוע'}</span>
         </div>
       `;
+      systemInfo.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(systemInfoHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        systemInfo.appendChild(node.cloneNode(true));
+      });
     }
   }
 }

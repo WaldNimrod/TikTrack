@@ -163,6 +163,17 @@
           const response = await fetch(buildUrl('/api/ai-analysis/templates'));
 
           if (!response.ok) {
+            // Handle 401 authentication errors
+            if (response.status === 401) {
+              window.Logger?.warn?.('⚠️ Authentication required - redirecting to login', PAGE_LOG_CONTEXT);
+              if (window.NotificationSystem) {
+                window.NotificationSystem.showError('נדרשת התחברות', 'system');
+              }
+              setTimeout(() => {
+                window.location.href = 'login.html';
+              }, 1000);
+              throw new Error('Authentication required');
+            }
             throw new Error(`HTTP error! status: ${response.status}`);
           }
 
@@ -408,6 +419,18 @@
       });
 
       if (!response.ok) {
+        // Handle 401 authentication errors
+        if (response.status === 401) {
+          window.Logger?.warn?.('⚠️ Authentication required - redirecting to login', PAGE_LOG_CONTEXT);
+          if (window.NotificationSystem) {
+            window.NotificationSystem.showError('נדרשת התחברות', 'system');
+          }
+          // Redirect to login
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000);
+          throw new Error('Authentication required');
+        }
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
@@ -457,6 +480,17 @@
           });
 
           if (!response.ok) {
+            // Handle 401 authentication errors
+            if (response.status === 401) {
+              window.Logger?.warn?.('⚠️ Authentication required - redirecting to login', PAGE_LOG_CONTEXT);
+              if (window.NotificationSystem) {
+                window.NotificationSystem.showError('נדרשת התחברות', 'system');
+              }
+              setTimeout(() => {
+                window.location.href = 'login.html';
+              }, 1000);
+              throw new Error('Authentication required');
+            }
             throw new Error(`HTTP error! status: ${response.status}`);
           }
 
@@ -526,6 +560,17 @@
           });
 
           if (!response.ok) {
+            // Handle 401 authentication errors
+            if (response.status === 401) {
+              window.Logger?.warn?.('⚠️ Authentication required - redirecting to login', PAGE_LOG_CONTEXT);
+              if (window.NotificationSystem) {
+                window.NotificationSystem.showError('נדרשת התחברות', 'system');
+              }
+              setTimeout(() => {
+                window.location.href = 'login.html';
+              }, 1000);
+              throw new Error('Authentication required');
+            }
             throw new Error(`HTTP error! status: ${response.status}`);
           }
 
@@ -573,6 +618,18 @@
       });
 
       if (!response.ok) {
+        // Handle 401 authentication errors
+        if (response.status === 401) {
+          window.Logger?.warn?.('⚠️ Authentication required - redirecting to login', PAGE_LOG_CONTEXT);
+          if (window.NotificationSystem) {
+            window.NotificationSystem.showError('נדרשת התחברות', 'system');
+          }
+          // Redirect to login
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000);
+          throw new Error('Authentication required');
+        }
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
@@ -658,9 +715,10 @@
       // Convert markdown to HTML first
       const htmlContent = await convertMarkdownToHTML(analysisResult.response_text);
 
-      // Create a temporary div to render HTML
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = htmlContent;
+      // Parse HTML using DOMParser
+      const parser = new DOMParser();
+      const htmlDoc = parser.parseFromString(htmlContent, 'text/html');
+      const tempDiv = htmlDoc.body;
       tempDiv.style.position = 'absolute';
       tempDiv.style.left = '-9999px';
       document.body.appendChild(tempDiv);

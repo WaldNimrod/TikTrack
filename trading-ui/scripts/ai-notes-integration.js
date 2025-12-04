@@ -45,7 +45,19 @@
      * Save analysis as note
      */
     async saveAsNote(analysisResult) {
+      window.Logger?.info('AINotesIntegration.saveAsNote called', { 
+        page: 'ai-analysis',
+        hasAnalysisResult: !!analysisResult,
+        hasResponseText: !!analysisResult?.response_text,
+        analysisId: analysisResult?.id
+      });
+      
       if (!analysisResult || !analysisResult.response_text) {
+        window.Logger?.warn('No analysis result or response_text to save', { 
+          page: 'ai-analysis',
+          hasAnalysisResult: !!analysisResult,
+          hasResponseText: !!analysisResult?.response_text
+        });
         if (window.NotificationSystem) {
           window.NotificationSystem.showError('אין תוצאות לשמירה', 'system');
         }
@@ -54,59 +66,60 @@
 
       try {
         // Show selection modal for related type
+        window.Logger?.info('Showing related type selector', { page: 'ai-analysis' });
         const relatedType = await this.showRelatedTypeSelector();
         if (!relatedType) {
+          window.Logger?.info('User cancelled related type selection', { page: 'ai-analysis' });
           return; // User cancelled
         }
+        
+        window.Logger?.info('User selected related type', { 
+          page: 'ai-analysis',
+          relatedType
+        });
 
         // Show selection modal for related object
+        window.Logger?.info('Showing related object selector', { 
+          page: 'ai-analysis',
+          relatedType
+        });
         const relatedId = await this.showRelatedObjectSelector(relatedType);
         if (!relatedId) {
+          window.Logger?.info('User cancelled related object selection', { page: 'ai-analysis' });
           return; // User cancelled
         }
+        
+        window.Logger?.info('User selected related object', { 
+          page: 'ai-analysis',
+          relatedType,
+          relatedId
+        });
 
         // Convert markdown to HTML
+        window.Logger?.info('Converting markdown to HTML', { 
+          page: 'ai-analysis',
+          responseTextLength: analysisResult.response_text?.length || 0
+        });
         const htmlContent = await this.convertMarkdownToHTML(analysisResult.response_text);
 
-        // Use NotesData service to create note
-        if (window.NotesData && window.NotesData.createNote) {
-          const payload = {
-            content: htmlContent,
-            related_type_id: parseInt(relatedType, 10),
-            related_id: parseInt(relatedId, 10),
-          };
-
-          const response = await window.NotesData.createNote({ payload });
-
-          // Handle response with CRUDResponseHandler if available
-          if (window.CRUDResponseHandler) {
-            await window.CRUDResponseHandler.handleSaveResponse(response, {
-              modalId: null,
-              successMessage: 'הערה נשמרה בהצלחה!',
-              entityName: 'הערה',
-              reloadFn: () => {
-                // Optional: reload notes if needed
-              },
-              requiresHardReload: false,
-            });
-          } else {
-            // Fallback notification
-            if (window.NotificationSystem) {
-              window.NotificationSystem.showSuccess('הערה נשמרה בהצלחה!', 'business');
-            }
-          }
-
-          window.Logger?.info('Analysis saved as note', {
-            page: 'ai-analysis',
-            relatedType,
-            relatedId,
-          });
-        } else {
-          // Fallback: open modal
-          await this.openNoteModal(htmlContent, relatedType, relatedId);
-        }
+        // Always open notes modal with pre-filled data (don't save directly)
+        // This allows user to review and edit before saving
+        window.Logger?.info('Opening notes modal with pre-filled data', { 
+          page: 'ai-analysis',
+          relatedType,
+          relatedId,
+          htmlContentLength: htmlContent?.length || 0
+        });
+        await this.openNoteModal(htmlContent, relatedType, relatedId);
+        
+        window.Logger?.info('Notes modal opened successfully', { page: 'ai-analysis' });
       } catch (error) {
-        window.Logger?.error('Error saving analysis as note', error, { page: 'ai-analysis' });
+        window.Logger?.error('Error saving analysis as note', error, { 
+          page: 'ai-analysis',
+          analysisId: analysisResult?.id,
+          errorMessage: error?.message,
+          errorStack: error?.stack
+        });
         if (window.NotificationSystem) {
           window.NotificationSystem.showError('שגיאה בשמירת הערה', 'system');
         }
@@ -149,20 +162,57 @@
         `;
 
         try {
+          window.Logger?.info('Opening related type selector modal', { page: 'ai-analysis' });
+          
           // Use window.createAndShowModal helper which integrates with ModalManagerV2
           await window.createAndShowModal(modalHTML, modalId, { backdrop: false, keyboard: true });
 
           const modalElement = document.getElementById(modalId);
           if (!modalElement) {
+            window.Logger?.warn('Related type selector modal element not found', { page: 'ai-analysis' });
             resolve(null);
             return;
           }
 
-          const confirmBtn = document.getElementById('aiNoteRelatedTypeConfirm');
+          // Wait for Button System to process buttons (they may get new IDs)
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Find confirm button - may have dynamic ID from Button System
+          // Try multiple strategies to find the button
+          let confirmBtn = document.getElementById('aiNoteRelatedTypeConfirm');
+          if (!confirmBtn) {
+            // Try to find by data attribute or button type
+            confirmBtn = modalElement.querySelector('button[data-button-type="PRIMARY"]');
+          }
+          if (!confirmBtn) {
+            // Try to find by text content
+            const allButtons = modalElement.querySelectorAll('button');
+            confirmBtn = Array.from(allButtons).find(btn => btn.textContent?.trim() === 'אישור');
+          }
+          
           const select = document.getElementById('aiNoteRelatedTypeSelect');
+
+          if (!confirmBtn) {
+            window.Logger?.error('Confirm button not found in related type selector modal', { page: 'ai-analysis' });
+            resolve(null);
+            return;
+          }
+          
+          if (!select) {
+            window.Logger?.error('Select element not found in related type selector modal', { page: 'ai-analysis' });
+            resolve(null);
+            return;
+          }
+
+          window.Logger?.info('Found elements in related type selector modal', { 
+            page: 'ai-analysis',
+            confirmBtnId: confirmBtn.id,
+            selectId: select.id
+          });
 
           // Helper function to hide and cleanup modal
           const hideAndCleanup = async () => {
+            window.Logger?.info('Hiding and cleaning up related type selector modal', { page: 'ai-analysis' });
             // Hide modal using ModalManagerV2 or Bootstrap
             if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
               await window.ModalManagerV2.hideModal(modalId);
@@ -183,17 +233,37 @@
 
           const handleConfirm = async () => {
             const selectedValue = select.value;
+            window.Logger?.info('User confirmed related type selection', { 
+              page: 'ai-analysis',
+              selectedValue
+            });
+            if (!selectedValue) {
+              if (window.NotificationSystem) {
+                window.NotificationSystem.showError('נא לבחור סוג אובייקט', 'system');
+              }
+              return;
+            }
             await hideAndCleanup();
             resolve(selectedValue || null);
           };
 
           const handleCancel = async () => {
+            window.Logger?.info('User cancelled related type selection', { page: 'ai-analysis' });
             await hideAndCleanup();
             resolve(null);
           };
 
-          confirmBtn.addEventListener('click', handleConfirm);
+          // Remove old listeners by cloning (if button was already processed)
+          const newConfirmBtn = confirmBtn.cloneNode(true);
+          confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+          
+          newConfirmBtn.addEventListener('click', handleConfirm);
           modalElement.addEventListener('hidden.bs.modal', handleCancel);
+          
+          window.Logger?.info('Event listeners attached to related type selector modal', { 
+            page: 'ai-analysis',
+            confirmBtnId: newConfirmBtn.id
+          });
         } catch (error) {
           window.Logger?.error('Error showing related type selector modal', error, { page: 'ai-analysis' });
           resolve(null);
@@ -245,17 +315,62 @@
         `;
 
         try {
+          window.Logger?.info('Opening related object selector modal', { 
+            page: 'ai-analysis',
+            relatedType,
+            typeLabel: typeInfo.label
+          });
+          
           // Use window.createAndShowModal helper which integrates with ModalManagerV2
           await window.createAndShowModal(modalHTML, modalId, { backdrop: false, keyboard: true });
 
           const modalElement = document.getElementById(modalId);
           if (!modalElement) {
+            window.Logger?.warn('Related object selector modal element not found', { page: 'ai-analysis' });
             resolve(null);
             return;
           }
 
-          const confirmBtn = document.getElementById('aiNoteRelatedObjectConfirm');
+          // Wait for Button System to process buttons and SelectPopulatorService to populate select
+          await new Promise(resolve => setTimeout(resolve, 700));
+          
+          // Find confirm button - may have dynamic ID from Button System
+          // Try multiple strategies to find the button
+          let confirmBtn = document.getElementById('aiNoteRelatedObjectConfirm');
+          if (!confirmBtn) {
+            // Try to find by button type (Button System may have replaced it)
+            const primaryButtons = modalElement.querySelectorAll('button[data-button-type="PRIMARY"]');
+            // Get the last PRIMARY button (should be the confirm button)
+            if (primaryButtons.length > 0) {
+              confirmBtn = primaryButtons[primaryButtons.length - 1];
+            }
+          }
+          if (!confirmBtn) {
+            // Try to find by text content
+            const allButtons = modalElement.querySelectorAll('button');
+            confirmBtn = Array.from(allButtons).find(btn => btn.textContent?.trim() === 'אישור');
+          }
+          
           const select = document.getElementById('aiNoteRelatedObjectSelect');
+          
+          if (!confirmBtn) {
+            window.Logger?.error('Confirm button not found in related object selector modal', { page: 'ai-analysis' });
+            resolve(null);
+            return;
+          }
+          
+          if (!select) {
+            window.Logger?.error('Select element not found in related object selector modal', { page: 'ai-analysis' });
+            resolve(null);
+            return;
+          }
+          
+          window.Logger?.info('Found elements in related object selector modal', { 
+            page: 'ai-analysis',
+            confirmBtnId: confirmBtn.id,
+            selectId: select.id,
+            selectOptionsCount: select.options.length
+          });
 
           // Populate select using SelectPopulatorService
           try {
@@ -285,7 +400,11 @@
               if (response.ok) {
                 const data = await response.json();
                 const items = Array.isArray(data?.data) ? data.data : [];
-                select.innerHTML = `<option value="">בחר ${typeInfo.label}...</option>`;
+                select.textContent = '';
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = `בחר ${typeInfo.label}...`;
+                select.appendChild(option);
                 items.forEach((item) => {
                   const option = document.createElement('option');
                   if (relatedType === '4') {
@@ -301,7 +420,11 @@
             }
           } catch (error) {
             window.Logger?.warn('Error populating related object select', error, { page: 'ai-analysis' });
-            select.innerHTML = `<option value="">שגיאה בטעינת ${typeInfo.label}</option>`;
+            select.textContent = '';
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = `שגיאה בטעינת ${typeInfo.label}`;
+            select.appendChild(option);
           }
 
           // Helper function to hide and cleanup modal
@@ -326,6 +449,11 @@
 
           const handleConfirm = async () => {
             const selectedValue = select.value;
+            window.Logger?.info('User confirmed related object selection', { 
+              page: 'ai-analysis',
+              selectedValue,
+              relatedType
+            });
             if (!selectedValue) {
               if (window.NotificationSystem) {
                 window.NotificationSystem.showError('נא לבחור אובייקט', 'system');
@@ -338,12 +466,22 @@
           };
 
           const handleCancel = async () => {
+            window.Logger?.info('User cancelled related object selection', { page: 'ai-analysis' });
             await hideAndCleanup();
             resolve(null);
           };
 
-          confirmBtn.addEventListener('click', handleConfirm);
+          // Remove old listeners by cloning (if button was already processed)
+          const newConfirmBtn = confirmBtn.cloneNode(true);
+          confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+          
+          newConfirmBtn.addEventListener('click', handleConfirm);
           modalElement.addEventListener('hidden.bs.modal', handleCancel);
+          
+          window.Logger?.info('Event listeners attached to related object selector modal', { 
+            page: 'ai-analysis',
+            confirmBtnId: newConfirmBtn.id
+          });
         } catch (error) {
           window.Logger?.error('Error showing related object selector modal', error, { page: 'ai-analysis' });
           resolve(null);
@@ -374,25 +512,46 @@
      * Open notes modal with pre-filled content
      */
     async openNoteModal(content, relatedType, relatedId) {
-      if (!window.NotesData || !window.ModalManagerV2) {
-        // Fallback: save directly
-        await window.AIAnalysisData?.saveAsNote(
-          { response_text: content },
-          relatedType,
-          relatedId
-        );
+      if (!window.ModalManagerV2) {
+        window.Logger?.warn('ModalManagerV2 not available for opening notes modal', { page: 'ai-analysis' });
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showError('לא ניתן לפתוח מודול הערות', 'system');
+        }
         return;
       }
 
-      // Open modal with pre-filled data
-      if (window.ModalManagerV2.showModal) {
-        await window.ModalManagerV2.showModal('notesModal', 'add', {
+      window.Logger?.info('Opening notes modal with pre-filled data', {
+        page: 'ai-analysis',
+        relatedType,
+        relatedId,
+        hasContent: !!content
+      });
+
+      // Open modal with pre-filled data using ModalManagerV2
+      // ModalManagerV2 will handle prefill automatically via populateForm
+      try {
+        window.Logger?.info('Opening notes modal with prefill data', {
+          page: 'ai-analysis',
+          relatedType,
+          relatedId,
+          hasContent: !!content,
+          contentLength: content?.length || 0
+        });
+        
+        await window.ModalManagerV2.showModal('notesModal', 'add', null, {
           prefill: {
             noteContent: content,
             noteRelatedType: relatedType,
             noteRelatedObject: relatedId,
           },
         });
+        
+        window.Logger?.info('Notes modal opened successfully', { page: 'ai-analysis' });
+      } catch (error) {
+        window.Logger?.error('Error opening notes modal', error, { page: 'ai-analysis' });
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showError('שגיאה בפתיחת מודול הערות', 'system');
+        }
       }
     },
   };

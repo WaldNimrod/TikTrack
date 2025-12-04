@@ -237,15 +237,21 @@ class AIAnalysisService:
             db: Database session
             template_id: Template ID
             variables: User-provided variables
-            user_id: User ID
+            user_id: User ID (required - must be authenticated)
             provider: LLM provider ('gemini' or 'perplexity')
             
         Returns:
             AIAnalysisRequest object
             
         Raises:
-            ValueError: If template not found or invalid
+            ValueError: If template not found or invalid, or user_id is None
         """
+        if not user_id:
+            logger.error("❌ generate_analysis: user_id is None or invalid - authentication required")
+            raise ValueError("User ID is required for generating analysis")
+        
+        logger.debug(f"🔍 generate_analysis: user_id={user_id}, template_id={template_id}, provider={provider}")
+        
         # Set db_session for business service
         self.business_service.db_session = db
         
@@ -337,13 +343,10 @@ class AIAnalysisService:
                 setattr(request, 'error_message', 'No response text received from LLM provider')
                 logger.error("No response text received from LLM provider")
             else:
-                # Success - DO NOT save response_text to DB (save to frontend cache instead)
-                # Only save metadata - response_text will be saved to frontend cache
-                # Store response_text temporarily in request object for API response
-                # but it will NOT be saved to database
-                request._temp_response_text = response.get('text')  # Temporary, not saved to DB
+                # Success - Save response_text to DB
+                request.response_text = response.get('text')  # Save to DB
                 if response.get('json'):
-                    request._temp_response_json = json.dumps(response['json'])  # Temporary, not saved to DB
+                    request.response_json = json.dumps(response['json'])  # Save to DB
                 setattr(request, 'status', 'completed')
             
         except Exception as e:
@@ -369,7 +372,7 @@ class AIAnalysisService:
         
         Args:
             db: Database session
-            user_id: User ID
+            user_id: User ID (required - must be authenticated)
             limit: Maximum number of results
             offset: Offset for pagination
             template_id: Filter by template ID
@@ -379,6 +382,12 @@ class AIAnalysisService:
         Returns:
             Tuple of (list of requests, total count)
         """
+        if not user_id:
+            logger.error("❌ get_analysis_history: user_id is None or invalid - authentication required")
+            return [], 0
+        
+        logger.debug(f"🔍 get_analysis_history: user_id={user_id}, limit={limit}, offset={offset}")
+        
         query = db.query(AIAnalysisRequest).filter(
             AIAnalysisRequest.user_id == user_id
         )
@@ -411,11 +420,17 @@ class AIAnalysisService:
         Args:
             db: Database session
             request_id: Request ID
-            user_id: User ID (for authorization)
+            user_id: User ID (required - must be authenticated, for authorization)
             
         Returns:
             Request or None if not found or not authorized
         """
+        if not user_id:
+            logger.error(f"❌ get_analysis_by_id: user_id is None or invalid - authentication required for request_id={request_id}")
+            return None
+        
+        logger.debug(f"🔍 get_analysis_by_id: user_id={user_id}, request_id={request_id}")
+        
         return db.query(AIAnalysisRequest).options(
             joinedload(AIAnalysisRequest.template)
         ).filter(
@@ -436,7 +451,7 @@ class AIAnalysisService:
         
         Args:
             db: Database session
-            user_id: User ID
+            user_id: User ID (required - must be authenticated)
             provider: Provider name ('gemini' or 'perplexity')
             api_key: API key (will be encrypted)
             validate: Whether to validate API key
@@ -444,6 +459,15 @@ class AIAnalysisService:
         Returns:
             Dictionary with success status and validation result
         """
+        if not user_id:
+            logger.error(f"❌ update_llm_provider_settings: user_id is None or invalid - authentication required for provider={provider}")
+            return {
+                'success': False,
+                'message': 'User ID is required'
+            }
+        
+        logger.debug(f"🔍 update_llm_provider_settings: user_id={user_id}, provider={provider}")
+        
         # Validate API key if requested
         if validate:
             is_valid = self.provider_manager.validate_api_key(provider, api_key)
@@ -493,11 +517,17 @@ class AIAnalysisService:
         
         Args:
             db: Database session
-            user_id: User ID
+            user_id: User ID (required - must be authenticated)
             
         Returns:
             UserLLMProvider or None
         """
+        if not user_id:
+            logger.error("❌ get_llm_provider_settings: user_id is None or invalid - authentication required")
+            return None
+        
+        logger.debug(f"🔍 get_llm_provider_settings: user_id={user_id}")
+        
         return db.query(UserLLMProvider).filter(
             UserLLMProvider.user_id == user_id
         ).first()

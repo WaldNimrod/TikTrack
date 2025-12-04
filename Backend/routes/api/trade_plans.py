@@ -41,11 +41,14 @@ def get_trade_plan(plan_id: int):
     return jsonify(response), status_code
 
 @trade_plans_bp.route('/account/<int:trading_account_id>', methods=['GET'])
+@handle_database_session()
 def get_trade_plans_by_account(trading_account_id: int):
     """Get trade plans by account"""
     try:
-        db: Session = next(get_db())
-        plans = TradePlanService.get_by_account(db, trading_account_id)
+        db: Session = g.db
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        plans = TradePlanService.get_by_account(db, trading_account_id, user_id=user_id)
         normalizer = _get_date_normalizer()
         payload = BaseEntityUtils.create_success_payload(
             normalizer,
@@ -61,8 +64,6 @@ def get_trade_plans_by_account(trading_account_id: int):
             "שגיאה בטעינת תכנונים לחשבון"
         )
         return jsonify(payload), 500
-    finally:
-        db.close()
 
 @trade_plans_bp.route('/', methods=['POST'])
 @handle_database_session(auto_commit=True, auto_close=True)

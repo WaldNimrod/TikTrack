@@ -311,7 +311,7 @@
                     <div class="row g-2 mb-3">
                         <div class="col-12">
                             <div class="d-flex gap-2 flex-wrap">
-                                <button data-button-type="PRIMARY" data-variant="full" data-text="שמור כהערה" data-onclick="window.AIAnalysisManager?.saveAsNote()" id="saveAsNoteBtnModal">
+                                <button type="button" data-button-type="PRIMARY" data-variant="full" data-text="שמור כהערה" data-onclick="window.AIAnalysisManager?.saveAsNote()" id="saveAsNoteBtnModal">
                                     <span>שמור כהערה</span>
                                 </button>
                                 <button data-button-type="SECONDARY" data-variant="full" data-text="ייצא ל-PDF" data-onclick="window.AIAnalysisManager?.exportToPDF()" id="exportPDFBtnModal">
@@ -607,6 +607,8 @@
     <script src="scripts/ai-notes-integration.js?v=1.0.0"></script> <!-- AI analysis notes integration -->
     <!-- [96] Load Order: 96 -->
     <script src="scripts/ai-export-service.js?v=1.0.0"></script> <!-- AI analysis export service -->
+    <!-- [97] Load Order: 97 -->
+    <script src="scripts/modal-configs/notes-config.js?v=1.0.0"></script> <!-- Notes modal configuration (required for Save as Note feature) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 9/9: INITIALIZATION PACKAGE ===== -->
@@ -615,13 +617,13 @@
     <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary, dashboard-widgets, tradingview-widgets, tradingview-charts, watch-lists, ai-analysis -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [97] Load Order: 97 -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- Package manifest -->
     <!-- [98] Load Order: 98 -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- Page initialization configurations -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- Package manifest -->
     <!-- [99] Load Order: 99 -->
-    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- Initialization system check -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- Page initialization configurations -->
     <!-- [100] Load Order: 100 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- Initialization system check -->
+    <!-- [101] Load Order: 101 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- Page monitoring functions -->
 
     <!-- =============================================================== -->
@@ -631,7 +633,7 @@
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 100 | Unique Scripts Loaded: 100 -->
+    <!-- 📊 Total Scripts Processed: 101 | Unique Scripts Loaded: 101 -->
     <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
 </body>
 </html>

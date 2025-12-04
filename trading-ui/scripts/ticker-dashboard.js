@@ -90,6 +90,453 @@
     }
 
     /**
+     * Check which data is missing for ticker dashboard
+     * @param {Object} tickerData - Ticker data object
+     * @returns {Object} Object with missing data details
+     */
+    function checkMissingData(tickerData) {
+        const missing = {
+            hasLatestQuote: false,
+            hasPrice: false,
+            hasATR: false,
+            hasWeek52: false,
+            hasVolatility: false,
+            hasMA20: false,
+            hasMA150: false,
+            missingFields: [],
+            missingCalculations: []
+        };
+
+        // Check for latest quote (critical for all data)
+        const hasLatestQuote = tickerData && (
+            tickerData.current_price !== undefined || 
+            tickerData.price !== undefined ||
+            tickerData.daily_change !== undefined ||
+            tickerData.volume !== undefined
+        );
+        missing.hasLatestQuote = hasLatestQuote;
+
+        if (!hasLatestQuote) {
+            missing.missingFields.push('נתוני מחיר נוכחי');
+            missing.missingCalculations.push('מחיר, שינוי יומי, נפח מסחר');
+        } else {
+            missing.hasPrice = true;
+        }
+
+        // Check ATR
+        if (!tickerData || tickerData.atr === null || tickerData.atr === undefined) {
+            missing.hasATR = false;
+            missing.missingCalculations.push('ATR (Average True Range)');
+        } else {
+            missing.hasATR = true;
+        }
+
+        // Check 52W
+        if (!tickerData || 
+            (tickerData.week52_high === null || tickerData.week52_high === undefined) ||
+            (tickerData.week52_low === null || tickerData.week52_low === undefined)) {
+            missing.hasWeek52 = false;
+            missing.missingCalculations.push('52W High/Low (שיא ושפל 52 שבועות)');
+        } else {
+            missing.hasWeek52 = true;
+        }
+
+        // Check Volatility
+        if (!tickerData || tickerData.volatility === null || tickerData.volatility === undefined) {
+            missing.hasVolatility = false;
+            missing.missingCalculations.push('תנודתיות (Volatility)');
+        } else {
+            missing.hasVolatility = true;
+        }
+
+        // Check MA 20
+        if (!tickerData || tickerData.ma_20 === null || tickerData.ma_20 === undefined) {
+            missing.hasMA20 = false;
+            missing.missingCalculations.push('ממוצע נע 20 (MA 20)');
+        } else {
+            missing.hasMA20 = true;
+        }
+
+        // Check MA 150
+        if (!tickerData || tickerData.ma_150 === null || tickerData.ma_150 === undefined) {
+            missing.hasMA150 = false;
+            missing.missingCalculations.push('ממוצע נע 150 (MA 150)');
+        } else {
+            missing.hasMA150 = true;
+        }
+
+        // Determine if data is critical (missing latest quote)
+        missing.isCritical = !hasLatestQuote;
+        missing.hasAnyMissing = missing.missingFields.length > 0 || missing.missingCalculations.length > 0;
+
+        return missing;
+    }
+
+    /**
+     * Show confirmation dialog for missing data
+     * @param {Object} missingData - Missing data details
+     * @param {string} tickerSymbol - Ticker symbol
+     * @returns {Promise<boolean>} True if user approved, false otherwise
+     */
+    async function showMissingDataConfirmation(missingData, tickerSymbol) {
+        return new Promise((resolve) => {
+            // Build detailed message
+            let message = `חסרים נתונים לטיקר ${tickerSymbol}:\n\n`;
+            
+            if (missingData.missingFields.length > 0) {
+                message += `שדות חסרים:\n`;
+                missingData.missingFields.forEach(field => {
+                    message += `  • ${field}\n`;
+                });
+                message += `\n`;
+            }
+
+            if (missingData.missingCalculations.length > 0) {
+                message += `חישובים חסרים:\n`;
+                missingData.missingCalculations.forEach(calc => {
+                    message += `  • ${calc}\n`;
+                });
+                message += `\n`;
+            }
+
+            message += `האם ברצונך לטעון את הנתונים מהספק החיצוני (Yahoo Finance)?\n\n`;
+            message += `זה עשוי לקחת מספר שניות.`;
+
+            // Use showConfirmationDialog from warning-system.js if available
+            if (typeof window.showConfirmationDialog === 'function') {
+                window.showConfirmationDialog(
+                    'נתונים חסרים',
+                    message,
+                    () => {
+                        resolve(true);
+                    },
+                    () => {
+                        resolve(false);
+                    },
+                    'warning'
+                );
+            } else {
+                // Fallback to browser confirm
+                if (window.showConfirmationDialog) {
+                    window.showConfirmationDialog(
+                        'אישור',
+                        message,
+                        () => resolve(true),
+                        () => resolve(false),
+                        'info'
+                    );
+                } else {
+                    const confirmed = confirm(message);
+                    resolve(confirmed);
+                }
+            }
+        });
+    }
+
+    /**
+     * Fetch data from external provider with progress tracking
+     * @param {number} tickerId - Ticker ID
+     * @param {string} tickerSymbol - Ticker symbol
+     * @returns {Promise<Object>} Updated ticker data
+     */
+    async function fetchDataFromProvider(tickerId, tickerSymbol) {
+        try {
+            if (window.Logger) {
+                window.Logger.info('🔄 Starting data fetch from external provider', { tickerId, tickerSymbol, page: 'ticker-dashboard' });
+            }
+
+            // Show progress notification
+            let progressNotification = null;
+            if (window.NotificationSystem) {
+                progressNotification = window.NotificationSystem.showInfo(
+                    'טוען נתונים',
+                    `מתחיל טעינת נתונים עבור ${tickerSymbol}...`,
+                    { duration: 0, persistent: true }
+                );
+            }
+
+            // Step 1: Fetch latest quote
+            if (window.Logger) {
+                window.Logger.info('📊 Step 1/4: Fetching latest quote...', { tickerId, page: 'ticker-dashboard' });
+            }
+            if (progressNotification && window.NotificationSystem && window.NotificationSystem.updateNotification) {
+                window.NotificationSystem.updateNotification(progressNotification, {
+                    message: `טוען מחיר נוכחי עבור ${tickerSymbol}...`
+                });
+            }
+
+            // Use ExternalDataService to fetch quote
+            let quoteData = null;
+            if (window.ExternalDataService && typeof window.ExternalDataService.getQuote === 'function') {
+                try {
+                    quoteData = await window.ExternalDataService.getQuote(tickerSymbol, { forceRefresh: true });
+                    if (window.Logger) {
+                        window.Logger.info('✅ Quote fetched successfully', { tickerId, hasPrice: !!quoteData?.price, page: 'ticker-dashboard' });
+                    }
+                } catch (quoteError) {
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ Error fetching quote, trying API endpoint', { error: quoteError.message, page: 'ticker-dashboard' });
+                    }
+                }
+            }
+
+            // Fallback: Try API endpoint directly
+            if (!quoteData) {
+                try {
+                    const response = await fetch(`/api/external-data/yahoo/quote/${tickerSymbol}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.status === 'success' && data.data) {
+                            quoteData = data.data;
+                            if (window.Logger) {
+                                window.Logger.info('✅ Quote fetched via API endpoint', { tickerId, page: 'ticker-dashboard' });
+                            }
+                        }
+                    }
+                } catch (apiError) {
+                    if (window.Logger) {
+                        window.Logger.error('❌ Error fetching quote via API', { error: apiError.message, page: 'ticker-dashboard' });
+                    }
+                }
+            }
+
+            // Step 2: Trigger historical data fetch (for MA, Volatility, 52W calculations)
+            if (window.Logger) {
+                window.Logger.info('📊 Step 2/4: Triggering historical data fetch...', { tickerId, page: 'ticker-dashboard' });
+            }
+            if (progressNotification && window.NotificationSystem && window.NotificationSystem.updateNotification) {
+                window.NotificationSystem.updateNotification(progressNotification, {
+                    message: `טוען נתונים היסטוריים עבור ${tickerSymbol}...`
+                });
+            }
+
+            // Note: Historical data is typically fetched by backend scheduler
+            // We can trigger a refresh endpoint if available
+            try {
+                const refreshResponse = await fetch(`/api/external-data/quotes/${tickerId}/refresh`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ force_refresh: true })
+                });
+
+                if (refreshResponse.ok) {
+                    if (window.Logger) {
+                        window.Logger.info('✅ Historical data refresh triggered', { tickerId, page: 'ticker-dashboard' });
+                    }
+                } else if (refreshResponse.status === 501) {
+                    // Feature not implemented - this is expected
+                    if (window.Logger) {
+                        window.Logger.info('ℹ️ Historical data refresh not implemented, will use existing data', { tickerId, page: 'ticker-dashboard' });
+                    }
+                }
+            } catch (refreshError) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Could not trigger historical data refresh', { error: refreshError.message, page: 'ticker-dashboard' });
+                }
+            }
+
+            // Step 3: Wait a bit for backend to process, then reload data
+            if (window.Logger) {
+                window.Logger.info('📊 Step 3/4: Waiting for data processing...', { tickerId, page: 'ticker-dashboard' });
+            }
+            if (progressNotification && window.NotificationSystem && window.NotificationSystem.updateNotification) {
+                window.NotificationSystem.updateNotification(progressNotification, {
+                    message: `מעבד נתונים עבור ${tickerSymbol}...`
+                });
+            }
+
+            // Wait 3 seconds for backend to process and save data
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            // Step 4: Reload ticker data with force refresh
+            if (window.Logger) {
+                window.Logger.info('📊 Step 4/4: Reloading ticker data...', { tickerId, page: 'ticker-dashboard' });
+            }
+            if (progressNotification && window.NotificationSystem && window.NotificationSystem.updateNotification) {
+                window.NotificationSystem.updateNotification(progressNotification, {
+                    message: `מעדכן נתונים עבור ${tickerSymbol}...`
+                });
+            }
+
+            // Invalidate cache - both frontend and backend
+            if (window.UnifiedCacheManager) {
+                // Invalidate frontend cache
+                await window.UnifiedCacheManager.invalidate(`ticker-dashboard-${tickerId}`, 'memory');
+                await window.UnifiedCacheManager.invalidate(`entity-details-ticker-${tickerId}`, 'memory');
+                await window.UnifiedCacheManager.invalidate(`ticker-user-activity-${tickerId}`, 'memory');
+                await window.UnifiedCacheManager.invalidate(`ticker-conditions-${tickerId}`, 'memory');
+                
+                // Backend cache is invalidated by the refresh endpoint itself
+                // No need for separate cache invalidation call
+            }
+
+            // Reload data
+            if (window.TickerDashboardData) {
+                const updatedData = await window.TickerDashboardData.loadTickerDashboardData(tickerId, { forceRefresh: true });
+                
+                // Close progress notification
+                if (progressNotification && window.NotificationSystem && window.NotificationSystem.closeNotification) {
+                    window.NotificationSystem.closeNotification(progressNotification);
+                } else if (progressNotification && window.NotificationSystem) {
+                    // Fallback: try to remove by ID if closeNotification not available
+                    try {
+                        if (progressNotification.remove) {
+                            progressNotification.remove();
+                        }
+                    } catch (e) {
+                        // Ignore
+                    }
+                }
+
+                if (window.Logger) {
+                    window.Logger.info('✅ Data fetch completed', { 
+                        tickerId, 
+                        hasData: !!updatedData,
+                        hasPrice: !!updatedData?.current_price || !!updatedData?.price,
+                        hasATR: !!updatedData?.atr,
+                        hasWeek52: !!updatedData?.week52_high,
+                        hasVolatility: !!updatedData?.volatility,
+                        hasMA20: !!updatedData?.ma_20,
+                        hasMA150: !!updatedData?.ma_150,
+                        page: 'ticker-dashboard' 
+                    });
+                }
+
+                // Show success notification
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showSuccess(
+                        'טעינת נתונים הושלמה',
+                        `הנתונים עבור ${tickerSymbol} נטענו בהצלחה`
+                    );
+                }
+
+                return updatedData;
+            } else {
+                throw new Error('TickerDashboardData service not available');
+            }
+
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('❌ Error fetching data from provider', { 
+                    tickerId, 
+                    tickerSymbol,
+                    error: error.message, 
+                    stack: error.stack,
+                    page: 'ticker-dashboard' 
+                });
+            }
+
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError(
+                    'שגיאה בטעינת נתונים',
+                    `שגיאה בטעינת נתונים עבור ${tickerSymbol}: ${error.message}`
+                );
+            }
+
+            throw error;
+        }
+    }
+
+    /**
+     * Validate data availability before rendering
+     * @param {Object} tickerData - Ticker data to validate
+     * @param {string} tickerSymbol - Ticker symbol
+     * @returns {Promise<boolean>} True if data is available or user approved fetch, false otherwise
+     */
+    async function validateDataBeforeRender(tickerData, tickerSymbol) {
+        // Check for missing data
+        const missingData = checkMissingData(tickerData);
+
+        // If no missing data, proceed
+        if (!missingData.hasAnyMissing) {
+            if (window.Logger) {
+                window.Logger.info('✅ All required data available', { tickerId, tickerSymbol, page: 'ticker-dashboard' });
+            }
+            return true;
+        }
+
+        // If critical data is missing (no latest quote), always ask
+        if (missingData.isCritical) {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ Critical data missing (no latest quote)', { 
+                    tickerId, 
+                    tickerSymbol,
+                    missingFields: missingData.missingFields,
+                    page: 'ticker-dashboard' 
+                });
+            }
+
+            // Show confirmation
+            const approved = await showMissingDataConfirmation(missingData, tickerSymbol);
+            
+            if (!approved) {
+                if (window.Logger) {
+                    window.Logger.info('ℹ️ User declined to fetch missing data', { tickerId, tickerSymbol, page: 'ticker-dashboard' });
+                }
+                return false;
+            }
+
+            // Fetch data from provider
+            try {
+                const updatedData = await fetchDataFromProvider(tickerId, tickerSymbol);
+                if (updatedData) {
+                    tickerData = updatedData;
+                    return true;
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('❌ Failed to fetch data from provider', { error: error.message, page: 'ticker-dashboard' });
+                }
+                return false;
+            }
+        }
+
+        // If only non-critical data is missing (calculations), ask but allow proceeding
+        if (missingData.missingCalculations.length > 0) {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ Some calculations missing', { 
+                    tickerId, 
+                    tickerSymbol,
+                    missingCalculations: missingData.missingCalculations,
+                    page: 'ticker-dashboard' 
+                });
+            }
+
+            // Show confirmation
+            const approved = await showMissingDataConfirmation(missingData, tickerSymbol);
+            
+            if (approved) {
+                // Fetch data from provider
+                try {
+                    const updatedData = await fetchDataFromProvider(tickerId, tickerSymbol);
+                    if (updatedData) {
+                        tickerData = updatedData;
+                        return true;
+                    }
+                } catch (error) {
+                    if (window.Logger) {
+                        window.Logger.error('❌ Failed to fetch data from provider', { error: error.message, page: 'ticker-dashboard' });
+                    }
+                    // Continue anyway with existing data
+                }
+            }
+        }
+
+        // Proceed with existing data (some calculations may be missing)
+        return true;
+    }
+
+    /**
      * Get ticker ID from URL parameters
      * @returns {Promise<number|null>} Ticker ID
      */
@@ -229,6 +676,29 @@
             
             if (!tickerData) {
                 throw new Error('Failed to load ticker data - tickerData is null or undefined');
+            }
+            
+            // Validate data availability before rendering
+            const tickerSymbol = tickerData.symbol || tickerData.ticker_symbol || `טיקר #${tickerId}`;
+            const canProceed = await validateDataBeforeRender(tickerData, tickerSymbol);
+            
+            if (!canProceed) {
+                // User declined to fetch critical data - show error and stop
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError(
+                        'נתונים חסרים',
+                        `לא ניתן להציג את הדשבורד ללא נתוני מחיר נוכחי עבור ${tickerSymbol}`
+                    );
+                }
+                if (typeof window.hideLoadingState === 'function') {
+                    window.hideLoadingState('ticker-dashboard-top');
+                }
+                return; // Stop initialization
+            }
+            
+            // Update tickerData if it was refreshed
+            if (tickerData && (tickerData.current_price !== undefined || tickerData.price !== undefined)) {
+                // Data is available, proceed with rendering
             }
             
             // Store tickerData in window.tickerDashboard for debugging

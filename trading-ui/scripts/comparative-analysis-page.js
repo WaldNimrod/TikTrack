@@ -51,12 +51,14 @@ function initializeSeriesControls() {
             `;
     }).join('');
     
-    // Insert using tempDiv
+    // Insert using DOMParser
     container.textContent = '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = checkboxesHTML;
-    while (tempDiv.firstChild) {
-        container.appendChild(tempDiv.firstChild);
+    if (checkboxesHTML) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(checkboxesHTML, 'text/html');
+        Array.from(doc.body.childNodes).forEach(node => {
+            container.appendChild(node.cloneNode(true));
+        });
     }
 }
 
@@ -1494,12 +1496,14 @@ function updateComparisonTable(filters) {
         '<th class="text-end">מקס בנקודה</th>' +
         '<th class="text-end">סה"כ קניות</th>';
     
-    // Insert header using tempDiv
+    // Insert header using DOMParser
     thead.textContent = '';
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = headerHTML;
-    while (tempDiv.firstChild) {
-        thead.appendChild(tempDiv.firstChild);
+    if (headerHTML) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(headerHTML, 'text/html');
+        Array.from(doc.body.childNodes).forEach(node => {
+            thead.appendChild(node.cloneNode(true));
+        });
     }
     
     // Calculate colspan for summary and info rows
@@ -1612,12 +1616,15 @@ function updateComparisonTable(filters) {
             </tr>
         `;
         
-        // Insert rows using tempDiv
+        // Insert rows using DOMParser
         tbody.textContent = '';
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = dataRows + summaryRow;
-        while (tempDiv.firstChild) {
-            tbody.appendChild(tempDiv.firstChild);
+        const rowsHTML = dataRows + summaryRow;
+        if (rowsHTML) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(rowsHTML, 'text/html');
+            Array.from(doc.body.childNodes).forEach(node => {
+                tbody.appendChild(node.cloneNode(true));
+            });
         }
         
         // Fade in
@@ -1650,7 +1657,15 @@ function updateComparisonTable(filters) {
         filterInfo.style.opacity = '0';
         setTimeout(() => {
             const filterText = formatFilterInfo(filters.recordFilters);
-            filterInfo.innerHTML = `<strong>פרמטרי סינון:</strong> ${filterText}`;
+            filterInfo.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<strong>פרמטרי סינון:</strong> ${filterText}`, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        filterInfo.appendChild(fragment);
             filterInfo.style.opacity = '1';
         }, 150);
     }
@@ -1661,7 +1676,11 @@ function updateComparisonTable(filters) {
         comparisonInfo.style.opacity = '0';
         setTimeout(() => {
             const comparisonText = formatComparisonInfo(filters.comparisonParameters);
-            comparisonInfo.innerHTML = `<strong>פרמטרי השוואה:</strong> ${comparisonText}`;
+            comparisonInfo.textContent = '';
+            const strong = document.createElement('strong');
+            strong.textContent = 'פרמטרי השוואה:';
+            comparisonInfo.appendChild(strong);
+            comparisonInfo.appendChild(document.createTextNode(` ${comparisonText}`));
             comparisonInfo.style.opacity = '1';
         }, 150);
     }
@@ -1674,7 +1693,8 @@ function updateHeatmap(filters) {
     
     if (!tbody) return;
     
-    tbody.innerHTML = data.map((item, index) => {
+    tbody.textContent = '';
+    data.forEach((item, index) => {
         // Calculate percentages for investment values
         const totalMaxInvestment = data.reduce((sum, it) => sum + (it.maxInvestmentAtPoint || 0), 0);
         const totalTotalPurchases = data.reduce((sum, it) => sum + (it.totalPurchases || 0), 0);
@@ -1690,7 +1710,7 @@ function updateHeatmap(filters) {
             ? ((item.totalPL / item.totalInvestment) * 100) 
             : null;
         
-        return `
+        const rowHTML = `
         <tr class="heatmap-row" data-category="${item.category}" data-index="${index}" 
             onmouseover="showHeatmapTooltip(event, ${JSON.stringify(item).replace(/"/g, '&quot;')})"
             onmouseout="hideHeatmapTooltip()"
@@ -1704,7 +1724,17 @@ function updateHeatmap(filters) {
             <td class="text-end" style="${getColorStyle(item.totalPurchasesPercentile, item.totalPurchases || 0)}" data-value="${item.totalPurchases || 0}">${formatInvestmentWithPercent(item.totalPurchases || 0, totalPurchasesPercent)}</td>
         </tr>
     `;
-    }).join('');
+        
+        // Convert HTML string to DOM elements safely
+        if (rowHTML) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(rowHTML, 'text/html');
+            const row = doc.body.querySelector('tr');
+            if (row) {
+                tbody.appendChild(row.cloneNode(true));
+            }
+        }
+    });
     
     // Add hover effects
     tbody.querySelectorAll('.heatmap-row').forEach(row => {
@@ -1738,15 +1768,22 @@ function showHeatmapTooltip(event, item) {
         box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     `;
     // Note: This is a tooltip for a mockup page, not a standard summary element
-    tooltip.innerHTML = `
-        <strong>${item.category}</strong><br>
-        טריידים: ${item.trades}<br>
-        P/L ממוצע: ${formatCurrency(item.avgPL)}<br>
-        P/L כולל: ${formatCurrency(item.totalPL)}<br>
-        אחוז הצלחה: ${item.successRate}%<br>
-        מקס בנקודה: ${formatCurrency(item.maxInvestmentAtPoint || 0)}<br>
-        סה"כ קניות: ${formatCurrency(item.totalPurchases || 0)}
-    `;
+    tooltip.textContent = '';
+    const strong = document.createElement('strong');
+    strong.textContent = item.category;
+    tooltip.appendChild(strong);
+    tooltip.appendChild(document.createElement('br'));
+    tooltip.appendChild(document.createTextNode(`טריידים: ${item.trades}`));
+    tooltip.appendChild(document.createElement('br'));
+    tooltip.appendChild(document.createTextNode(`P/L ממוצע: ${formatCurrency(item.avgPL)}`));
+    tooltip.appendChild(document.createElement('br'));
+    tooltip.appendChild(document.createTextNode(`P/L כולל: ${formatCurrency(item.totalPL)}`));
+    tooltip.appendChild(document.createElement('br'));
+    tooltip.appendChild(document.createTextNode(`אחוז הצלחה: ${item.successRate}%`));
+    tooltip.appendChild(document.createElement('br'));
+    tooltip.appendChild(document.createTextNode(`מקס בנקודה: ${formatCurrency(item.maxInvestmentAtPoint || 0)}`));
+    tooltip.appendChild(document.createElement('br'));
+    tooltip.appendChild(document.createTextNode(`סה"כ קניות: ${formatCurrency(item.totalPurchases || 0)}`));
     
     document.body.appendChild(tooltip);
     
@@ -1830,7 +1867,7 @@ function updateVisualHeatmap(filters) {
     }
     
     // Clear grid
-    grid.innerHTML = '';
+    grid.textContent = '';
     
     // Create cells
     sortedData.forEach((item, index) => {
@@ -1873,11 +1910,21 @@ function updateVisualHeatmap(filters) {
             formattedValue = value.toString();
         }
         
-        cell.innerHTML = `
-            <div class="heatmap-cell-label">${item.category}</div>
-            <div class="heatmap-cell-value">${formattedValue}</div>
-            ${currentSortBy === 'totalPL' ? `<div class="heatmap-cell-percent">${item.successRate}% הצלחה</div>` : ''}
-        `;
+        cell.textContent = '';
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'heatmap-cell-label';
+        labelDiv.textContent = item.category;
+        cell.appendChild(labelDiv);
+        const valueDiv = document.createElement('div');
+        valueDiv.className = 'heatmap-cell-value';
+        valueDiv.textContent = formattedValue;
+        cell.appendChild(valueDiv);
+        if (currentSortBy === 'totalPL') {
+            const percentDiv = document.createElement('div');
+            percentDiv.className = 'heatmap-cell-percent';
+            percentDiv.textContent = `${item.successRate}% הצלחה`;
+            cell.appendChild(percentDiv);
+        }
         
         // Add hover tooltip
         cell.addEventListener('mouseenter', (e) => {
@@ -1917,15 +1964,22 @@ function showVisualHeatmapTooltip(event, item) {
     
     const tooltipEl = document.getElementById('visual-heatmap-tooltip');
     // Note: This is a tooltip for a mockup page, not a standard summary element
-    tooltipEl.innerHTML = `
-        <strong>${item.category}</strong><br>
-        P/L כולל: ${formatCurrency(item.totalPL)}<br>
-        P/L ממוצע: ${formatCurrency(item.avgPL)}<br>
-        אחוז הצלחה: ${item.successRate}%<br>
-        טריידים: ${item.trades}<br>
-        מקס בנקודה: ${formatCurrency(item.maxInvestmentAtPoint || 0)}<br>
-        סה"כ קניות: ${formatCurrency(item.totalPurchases || 0)}
-    `;
+    tooltipEl.textContent = '';
+    const strong = document.createElement('strong');
+    strong.textContent = item.category;
+    tooltipEl.appendChild(strong);
+    tooltipEl.appendChild(document.createElement('br'));
+    tooltipEl.appendChild(document.createTextNode(`P/L כולל: ${formatCurrency(item.totalPL)}`));
+    tooltipEl.appendChild(document.createElement('br'));
+    tooltipEl.appendChild(document.createTextNode(`P/L ממוצע: ${formatCurrency(item.avgPL)}`));
+    tooltipEl.appendChild(document.createElement('br'));
+    tooltipEl.appendChild(document.createTextNode(`אחוז הצלחה: ${item.successRate}%`));
+    tooltipEl.appendChild(document.createElement('br'));
+    tooltipEl.appendChild(document.createTextNode(`טריידים: ${item.trades}`));
+    tooltipEl.appendChild(document.createElement('br'));
+    tooltipEl.appendChild(document.createTextNode(`מקס בנקודה: ${formatCurrency(item.maxInvestmentAtPoint || 0)}`));
+    tooltipEl.appendChild(document.createElement('br'));
+    tooltipEl.appendChild(document.createTextNode(`סה"כ קניות: ${formatCurrency(item.totalPurchases || 0)}`));
     tooltipEl.classList.add('show');
     
     // Position tooltip
@@ -2166,7 +2220,16 @@ async function initComparisonChart() {
                         // Fallback already set
                     }
                 }
-                loading.innerHTML = alertIcon + ' שגיאה בטעינת גרף';
+                loading.textContent = '';
+                // alertIcon is already HTML string from IconSystem or fallback
+                if (alertIcon) {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(alertIcon, 'text/html');
+                    Array.from(doc.body.childNodes).forEach(node => {
+                        loading.appendChild(node.cloneNode(true));
+                    });
+                }
+                loading.appendChild(document.createTextNode(' שגיאה בטעינת גרף'));
                 loading.style.color = '#dc3545';
             }
         }
@@ -2196,7 +2259,15 @@ function updateChartLegend() {
     }
     });
     
-    legend.innerHTML = legendItems.join('');
+    legend.textContent = '';
+    const legendHTML = legendItems.join('');
+    if (legendHTML) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(legendHTML, 'text/html');
+        Array.from(doc.body.childNodes).forEach(node => {
+            legend.appendChild(node.cloneNode(true));
+        });
+    }
 }
 
 
@@ -2932,9 +3003,13 @@ async function loadTradingAccounts() {
         // Try to use trading-accounts-data service
         if (window.tradingAccountsData && typeof window.tradingAccountsData.loadTradingAccountsData === 'function') {
             const accounts = await window.tradingAccountsData.loadTradingAccountsData();
-            select.innerHTML = accounts.map(acc => 
-                `<option value="${acc.id}">${acc.name || `Account #${acc.id}`}</option>`
-            ).join('');
+            select.textContent = '';
+            accounts.forEach(acc => {
+                const option = document.createElement('option');
+                option.value = acc.id;
+                option.textContent = acc.name || `Account #${acc.id}`;
+                select.appendChild(option);
+            });
         } else {
             // Fallback: fetch from API with caching
             const cacheKey = window.createCacheKey ? 
@@ -2945,9 +3020,13 @@ async function loadTradingAccounts() {
             if (window.UnifiedCacheManager) {
                 const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
                 if (cachedData) {
-                    select.innerHTML = cachedData.map(acc => 
-                        `<option value="${acc.id}">${acc.name || `Account #${acc.id}`}</option>`
-                    ).join('');
+                    select.textContent = '';
+                    cachedData.forEach(acc => {
+                        const option = document.createElement('option');
+                        option.value = acc.id;
+                        option.textContent = acc.name || `Account #${acc.id}`;
+                        select.appendChild(option);
+                    });
                     return;
                 }
             }
@@ -2955,9 +3034,13 @@ async function loadTradingAccounts() {
             try {
                 const data = await window.safeApiCall('/api/trading-accounts/');
                 const accounts = data.data || data || [];
-                select.innerHTML = accounts.map(acc => 
-                    `<option value="${acc.id}">${acc.name || `Account #${acc.id}`}</option>`
-                ).join('');
+                select.textContent = '';
+                accounts.forEach(acc => {
+                    const option = document.createElement('option');
+                    option.value = acc.id;
+                    option.textContent = acc.name || `Account #${acc.id}`;
+                    select.appendChild(option);
+                });
                 
                 // Save to cache
                 if (window.UnifiedCacheManager) {
@@ -2965,11 +3048,13 @@ async function loadTradingAccounts() {
                 }
             } catch (apiError) {
                 // Error already handled by safeApiCall, fallback to mock data
-                select.innerHTML = `
-                    <option value="1">Account #1</option>
-                    <option value="2">Account #2</option>
-                    <option value="3">Account #3</option>
-                `;
+                select.textContent = '';
+                [1, 2, 3].forEach(id => {
+                    const option = document.createElement('option');
+                    option.value = id;
+                    option.textContent = `Account #${id}`;
+                    select.appendChild(option);
+                });
             }
         }
         
@@ -2996,11 +3081,13 @@ async function loadTradingAccounts() {
         // Mock data fallback
         const select = document.getElementById('recordFilterTradingAccounts');
         if (select) {
-            select.innerHTML = `
-                <option value="1">Account #1</option>
-                <option value="2">Account #2</option>
-                <option value="3">Account #3</option>
-            `;
+            select.textContent = '';
+            [1, 2, 3].forEach(id => {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = `Account #${id}`;
+                select.appendChild(option);
+            });
         }
     }
 }
@@ -3023,9 +3110,13 @@ async function loadTradingMethods() {
             try {
                 const methods = await window.ConditionsCRUDManager.getTradingMethods();
                 if (methods && methods.length > 0) {
-                    select.innerHTML = methods.map(method => 
-                        `<option value="${method.id}">${method.name_he || method.name || `Method #${method.id}`}</option>`
-                    ).join('');
+                    select.textContent = '';
+                    methods.forEach(method => {
+                        const option = document.createElement('option');
+                        option.value = method.id;
+                        option.textContent = method.name_he || method.name || `Method #${method.id}`;
+                        select.appendChild(option);
+                    });
                     if (window.Logger) {
                         window.Logger.info('✅ Trading methods loaded via ConditionsCRUDManager', { page: 'comparative-analysis-page' });
                     }
@@ -3040,14 +3131,21 @@ async function loadTradingMethods() {
         // Mock data fallback (always available for mockup)
         // Note: In a real implementation, you might want to try direct API call here
         // but for mockup purposes, we use mock data directly
-        select.innerHTML = `
-            <option value="1">ממוצעים נעים</option>
-            <option value="2">ניתוח נפח</option>
-            <option value="3">תמיכה והתנגדות</option>
-            <option value="4">קווי מגמה</option>
-            <option value="5">דפוסים טכניים</option>
-            <option value="6">פיבונאצ'י</option>
-        `;
+        select.textContent = '';
+        const methods = [
+            { value: '1', text: 'ממוצעים נעים' },
+            { value: '2', text: 'ניתוח נפח' },
+            { value: '3', text: 'תמיכה והתנגדות' },
+            { value: '4', text: 'קווי מגמה' },
+            { value: '5', text: 'דפוסים טכניים' },
+            { value: '6', text: 'פיבונאצ'י' }
+        ];
+        methods.forEach(method => {
+            const option = document.createElement('option');
+            option.value = method.value;
+            option.textContent = method.text;
+            select.appendChild(option);
+        });
         if (window.Logger) {
             window.Logger.info('✅ Trading methods loaded (mock data)', { page: 'comparative-analysis-page' });
         }
@@ -3055,14 +3153,21 @@ async function loadTradingMethods() {
         // Silent fallback to mock data
         const select = document.getElementById('comparisonTradingMethods');
         if (select) {
-            select.innerHTML = `
-                <option value="1">ממוצעים נעים</option>
-                <option value="2">ניתוח נפח</option>
-                <option value="3">תמיכה והתנגדות</option>
-                <option value="4">קווי מגמה</option>
-                <option value="5">דפוסים טכניים</option>
-                <option value="6">פיבונאצ'י</option>
-            `;
+            select.textContent = '';
+            const methods = [
+                { value: '1', text: 'ממוצעים נעים' },
+                { value: '2', text: 'ניתוח נפח' },
+                { value: '3', text: 'תמיכה והתנגדות' },
+                { value: '4', text: 'קווי מגמה' },
+                { value: '5', text: 'דפוסים טכניים' },
+                { value: '6', text: 'פיבונאצ'י' }
+            ];
+            methods.forEach(method => {
+                const option = document.createElement('option');
+                option.value = method.value;
+                option.textContent = method.text;
+                select.appendChild(option);
+            });
         }
     }
 }
@@ -3080,9 +3185,13 @@ async function loadTickers() {
         // Try to use tickers-data service
         if (window.tickersData && typeof window.tickersData.loadTickersData === 'function') {
             const tickers = await window.tickersData.loadTickersData();
-            select.innerHTML = tickers.map(ticker => 
-                `<option value="${ticker.id}">${ticker.symbol || `Ticker #${ticker.id}`}</option>`
-            ).join('');
+            select.textContent = '';
+            tickers.forEach(ticker => {
+                const option = document.createElement('option');
+                option.value = ticker.id;
+                option.textContent = ticker.symbol || `Ticker #${ticker.id}`;
+                select.appendChild(option);
+            });
         } else {
             // Fallback: fetch from API with caching
             const cacheKey = window.createCacheKey ? 
@@ -3093,9 +3202,13 @@ async function loadTickers() {
             if (window.UnifiedCacheManager) {
                 const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
                 if (cachedData) {
-                    select.innerHTML = cachedData.map(ticker => 
-                        `<option value="${ticker.id}">${ticker.symbol || `Ticker #${ticker.id}`}</option>`
-                    ).join('');
+                    select.textContent = '';
+                    cachedData.forEach(ticker => {
+                        const option = document.createElement('option');
+                        option.value = ticker.id;
+                        option.textContent = ticker.symbol || `Ticker #${ticker.id}`;
+                        select.appendChild(option);
+                    });
                     return;
                 }
             }
@@ -3103,9 +3216,13 @@ async function loadTickers() {
             try {
                 const data = await window.safeApiCall('/api/tickers/');
                 const tickers = data.data || data || [];
-                select.innerHTML = tickers.map(ticker => 
-                    `<option value="${ticker.id}">${ticker.symbol || `Ticker #${ticker.id}`}</option>`
-                ).join('');
+                select.textContent = '';
+                tickers.forEach(ticker => {
+                    const option = document.createElement('option');
+                    option.value = ticker.id;
+                    option.textContent = ticker.symbol || `Ticker #${ticker.id}`;
+                    select.appendChild(option);
+                });
                 
                 // Save to cache
                 if (window.UnifiedCacheManager) {
@@ -3113,13 +3230,20 @@ async function loadTickers() {
                 }
             } catch (apiError) {
                 // Error already handled by safeApiCall, fallback to mock data
-                select.innerHTML = `
-                    <option value="1">AAPL</option>
-                    <option value="2">TSLA</option>
-                    <option value="3">MSFT</option>
-                    <option value="4">GOOGL</option>
-                    <option value="5">AMZN</option>
-                `;
+                select.textContent = '';
+                const tickerSymbols = [
+                    { value: '1', text: 'AAPL' },
+                    { value: '2', text: 'TSLA' },
+                    { value: '3', text: 'MSFT' },
+                    { value: '4', text: 'GOOGL' },
+                    { value: '5', text: 'AMZN' }
+                ];
+                tickerSymbols.forEach(ticker => {
+                    const option = document.createElement('option');
+                    option.value = ticker.value;
+                    option.textContent = ticker.text;
+                    select.appendChild(option);
+                });
             }
         }
         
@@ -3142,13 +3266,20 @@ async function loadTickers() {
         // Mock data fallback
         const select = document.getElementById('comparisonTickers');
         if (select) {
-            select.innerHTML = `
-                <option value="1">AAPL</option>
-                <option value="2">TSLA</option>
-                <option value="3">MSFT</option>
-                <option value="4">GOOGL</option>
-                <option value="5">AMZN</option>
-            `;
+            select.textContent = '';
+            const tickerSymbols = [
+                { value: '1', text: 'AAPL' },
+                { value: '2', text: 'TSLA' },
+                { value: '3', text: 'MSFT' },
+                { value: '4', text: 'GOOGL' },
+                { value: '5', text: 'AMZN' }
+            ];
+            tickerSymbols.forEach(ticker => {
+                const option = document.createElement('option');
+                option.value = ticker.value;
+                option.textContent = ticker.text;
+                select.appendChild(option);
+            });
         }
     }
 }

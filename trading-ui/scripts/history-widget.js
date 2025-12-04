@@ -159,12 +159,12 @@
                     '$',
                     false
                 );
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = htmlContent;
                 totalValueElement.textContent = '';
-                while (tempDiv.firstChild) {
-                    totalValueElement.appendChild(tempDiv.firstChild);
-                }
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    totalValueElement.appendChild(node.cloneNode(true));
+                });
                 // Update color based on value
                 totalValueElement.className = 'chart-label-value ' + (totalValue >= 0 ? 'text-success' : 'text-danger');
             } else if (totalValueElement) {
@@ -180,12 +180,12 @@
                     '%',
                     true
                 );
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = htmlContent;
                 changePercentElement.textContent = '';
-                while (tempDiv.firstChild) {
-                    changePercentElement.appendChild(tempDiv.firstChild);
-                }
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    changePercentElement.appendChild(node.cloneNode(true));
+                });
                 changePercentElement.className = 'chart-label-value ' + (finalChangePercent >= 0 ? 'text-success' : 'text-danger');
             } else if (changePercentElement) {
                 changePercentElement.textContent = finalChangePercent > 0 ? `+${finalChangePercent.toFixed(2)}%` : `${finalChangePercent.toFixed(2)}%`;
@@ -400,14 +400,22 @@
                 { ticker: 'ALAB', fullName: 'ASTERA LABS INC', dailyPL: -46.0, change: 6.00, lastPrice: 147.80, priceChangePercent: 4.23 }
             ];
 
-            tbody.innerHTML = '';
+            tbody.textContent = '';
             
             dailyData.forEach(item => {
                 const row = document.createElement('tr');
                 
                 // Instrument (Ticker + Full Name)
                 const instrumentCell = document.createElement('td');
-                instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class="text-muted small">${item.fullName}</div>`;
+                instrumentCell.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<div><strong>${item.ticker}</strong></div><div class="text-muted small">${item.fullName}</div>`, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        instrumentCell.appendChild(fragment);
                 row.appendChild(instrumentCell);
                 
                 // Daily P&L / Change
@@ -429,14 +437,35 @@
                     changeHtml = item.change > 0 ? `+${item.change.toFixed(2)}` : `${item.change.toFixed(3)}`;
                 }
                 
-                plChangeCell.innerHTML = `<div>${plHtml}</div><div class="small">${changeHtml}</div>`;
+                plChangeCell.textContent = '';
+                const plDiv = document.createElement('div');
+                const parser = new DOMParser();
+                const plDoc = parser.parseFromString(plHtml, 'text/html');
+                plDoc.body.childNodes.forEach(node => {
+                    plDiv.appendChild(node.cloneNode(true));
+                });
+                plChangeCell.appendChild(plDiv);
+                const changeDiv = document.createElement('div');
+                changeDiv.className = 'small';
+                changeDiv.textContent = changeHtml;
+                plChangeCell.appendChild(changeDiv);
                 row.appendChild(plChangeCell);
                 
                 // Last Price (with percentage change)
                 const lastPriceCell = document.createElement('td');
                 const priceColor = item.priceChangePercent >= 0 ? 'text-success' : 'text-danger';
                 const priceSign = item.priceChangePercent >= 0 ? '+' : '';
-                lastPriceCell.innerHTML = `<div class="${priceColor}"><strong>${item.lastPrice.toFixed(2)}</strong></div><div class="small ${priceColor}">${priceSign}${item.priceChangePercent.toFixed(2)}%</div>`;
+                lastPriceCell.textContent = '';
+                const priceDiv = document.createElement('div');
+                priceDiv.className = priceColor;
+                const strong = document.createElement('strong');
+                strong.textContent = item.lastPrice.toFixed(2);
+                priceDiv.appendChild(strong);
+                lastPriceCell.appendChild(priceDiv);
+                const percentDiv = document.createElement('div');
+                percentDiv.className = `small ${priceColor}`;
+                percentDiv.textContent = `${priceSign}${item.priceChangePercent.toFixed(2)}%`;
+                lastPriceCell.appendChild(percentDiv);
                 row.appendChild(lastPriceCell);
                 
                 tbody.appendChild(row);
@@ -487,14 +516,23 @@
                 { ticker: 'QUBT', fullName: 'QUANTUM COMPUTIN...', unrealizedPL: -1380, mktVal: 5730, lastPrice: 11.49, priceChangePercent: 12.60 }
             ];
 
-            tbody.innerHTML = '';
+            tbody.textContent = '';
             
             plData.forEach(item => {
                 const row = document.createElement('tr');
                 
                 // Instrument (Ticker + Full Name)
                 const instrumentCell = document.createElement('td');
-                instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class="text-muted small">${item.fullName}</div>`;
+                instrumentCell.textContent = '';
+                const tickerDiv = document.createElement('div');
+                const strong = document.createElement('strong');
+                strong.textContent = item.ticker;
+                tickerDiv.appendChild(strong);
+                instrumentCell.appendChild(tickerDiv);
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'text-muted small';
+                nameDiv.textContent = item.fullName;
+                instrumentCell.appendChild(nameDiv);
                 row.appendChild(instrumentCell);
                 
                 // Unrealized P&L / Market Value
@@ -503,17 +541,34 @@
                 const plValue = formatValue(item.unrealizedPL);
                 const mktValValue = formatValue(item.mktVal);
                 
-                plMktValCell.innerHTML = `
-                    <div class="${plColor}"><strong>${plValue}K</strong></div>
-                    <div class="small text-muted">${mktValValue}K</div>
-                `;
+                plMktValCell.textContent = '';
+                const plDiv = document.createElement('div');
+                plDiv.className = plColor;
+                const plStrong = document.createElement('strong');
+                plStrong.textContent = `${plValue}K`;
+                plDiv.appendChild(plStrong);
+                plMktValCell.appendChild(plDiv);
+                const mktValDiv = document.createElement('div');
+                mktValDiv.className = 'small text-muted';
+                mktValDiv.textContent = `${mktValValue}K`;
+                plMktValCell.appendChild(mktValDiv);
                 row.appendChild(plMktValCell);
                 
                 // Last Price (with percentage change)
                 const lastPriceCell = document.createElement('td');
                 const priceColor = item.priceChangePercent >= 0 ? 'text-success' : 'text-danger';
                 const priceSign = item.priceChangePercent >= 0 ? '+' : '';
-                lastPriceCell.innerHTML = `<div class="${priceColor}"><strong>${item.lastPrice.toFixed(2)}</strong></div><div class="small ${priceColor}">${priceSign}${item.priceChangePercent.toFixed(2)}%</div>`;
+                lastPriceCell.textContent = '';
+                const priceDiv = document.createElement('div');
+                priceDiv.className = priceColor;
+                const strong = document.createElement('strong');
+                strong.textContent = item.lastPrice.toFixed(2);
+                priceDiv.appendChild(strong);
+                lastPriceCell.appendChild(priceDiv);
+                const percentDiv = document.createElement('div');
+                percentDiv.className = `small ${priceColor}`;
+                percentDiv.textContent = `${priceSign}${item.priceChangePercent.toFixed(2)}%`;
+                lastPriceCell.appendChild(percentDiv);
                 row.appendChild(lastPriceCell);
                 
                 tbody.appendChild(row);
@@ -553,14 +608,23 @@
                 { ticker: 'IBIT', fullName: 'ISHARES BITCOIN TRU...', mktVal: 25300, position: 500, lastPrice: 50.62, priceChangePercent: 5.52 }
             ];
 
-            tbody.innerHTML = '';
+            tbody.textContent = '';
             
             marketValueData.forEach(item => {
                 const row = document.createElement('tr');
                 
                 // Instrument (Ticker + Full Name)
                 const instrumentCell = document.createElement('td');
-                instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class="text-muted small">${item.fullName}</div>`;
+                instrumentCell.textContent = '';
+                const tickerDiv = document.createElement('div');
+                const strong = document.createElement('strong');
+                strong.textContent = item.ticker;
+                tickerDiv.appendChild(strong);
+                instrumentCell.appendChild(tickerDiv);
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'text-muted small';
+                nameDiv.textContent = item.fullName;
+                instrumentCell.appendChild(nameDiv);
                 row.appendChild(instrumentCell);
                 
                 // Market Value / Position
@@ -568,17 +632,33 @@
                 const mktValValue = formatValue(item.mktVal);
                 const positionValue = item.position >= 1000 ? `${(item.position / 1000).toFixed(2)}K` : item.position.toString();
                 
-                mktValPositionCell.innerHTML = `
-                    <div><strong>${mktValValue}K</strong></div>
-                    <div class="small text-muted">${positionValue}</div>
-                `;
+                mktValPositionCell.textContent = '';
+                const mktValDiv = document.createElement('div');
+                const mktValStrong = document.createElement('strong');
+                mktValStrong.textContent = `${mktValValue}K`;
+                mktValDiv.appendChild(mktValStrong);
+                mktValPositionCell.appendChild(mktValDiv);
+                const positionDiv = document.createElement('div');
+                positionDiv.className = 'small text-muted';
+                positionDiv.textContent = positionValue;
+                mktValPositionCell.appendChild(positionDiv);
                 row.appendChild(mktValPositionCell);
                 
                 // Last Price (with percentage change)
                 const lastPriceCell = document.createElement('td');
                 const priceColor = item.priceChangePercent >= 0 ? 'text-success' : 'text-danger';
                 const priceSign = item.priceChangePercent >= 0 ? '+' : '';
-                lastPriceCell.innerHTML = `<div class="${priceColor}"><strong>${item.lastPrice.toFixed(2)}</strong></div><div class="small ${priceColor}">${priceSign}${item.priceChangePercent.toFixed(2)}%</div>`;
+                lastPriceCell.textContent = '';
+                const priceDiv = document.createElement('div');
+                priceDiv.className = priceColor;
+                const strong = document.createElement('strong');
+                strong.textContent = item.lastPrice.toFixed(2);
+                priceDiv.appendChild(strong);
+                lastPriceCell.appendChild(priceDiv);
+                const percentDiv = document.createElement('div');
+                percentDiv.className = `small ${priceColor}`;
+                percentDiv.textContent = `${priceSign}${item.priceChangePercent.toFixed(2)}%`;
+                lastPriceCell.appendChild(percentDiv);
                 row.appendChild(lastPriceCell);
                 
                 tbody.appendChild(row);
@@ -708,14 +788,20 @@
             
             if (menuHtml) {
                 // Parse and modify the HTML to add text to buttons
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = menuHtml;
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(menuHtml, 'text/html');
+                const tempDiv = doc.body;
                 
                 const menuButtons = tempDiv.querySelectorAll('.actions-menu-item');
                 formattedButtons.forEach((button, index) => {
                     if (menuButtons[index] && button._iconHtml && button._text) {
                         // Replace icon with icon + text
-                        menuButtons[index].innerHTML = `${button._iconHtml} ${button._text}`;
+                        menuButtons[index].textContent = '';
+                        const parser2 = new DOMParser();
+                        const iconDoc = parser2.parseFromString(`${button._iconHtml} ${button._text}`, 'text/html');
+                        iconDoc.body.childNodes.forEach(node => {
+                            menuButtons[index].appendChild(node.cloneNode(true));
+                        });
                     }
                 });
                 
@@ -848,7 +934,12 @@
             
             // Custom create actions menu with icons and text
             const actionsMenuHTML = await createQuickLinksActionsMenu(quickLinksButtons);
-            container.innerHTML = actionsMenuHTML;
+            container.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(actionsMenuHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                container.appendChild(node.cloneNode(true));
+            });
             
             // Setup positioning that checks available space
             setupQuickLinksPositioning();

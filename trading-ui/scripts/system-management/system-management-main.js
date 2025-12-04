@@ -403,7 +403,11 @@ class SystemManagementMain {
       const refreshBtn = document.createElement('button');
       refreshBtn.id = 'global-refresh-btn';
       refreshBtn.className = 'btn btn-sm btn-outline-primary';
-      refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> רענן הכל';
+      refreshBtn.textContent = '';
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-sync-alt';
+      refreshBtn.appendChild(icon);
+      refreshBtn.appendChild(document.createTextNode(' רענן הכל'));
       refreshBtn.title = 'רענן את כל הסקשנים';
       headerActions.appendChild(refreshBtn);
     }
@@ -421,7 +425,11 @@ class SystemManagementMain {
       const toggleBtn = document.createElement('button');
       toggleBtn.id = 'global-toggle-btn';
       toggleBtn.className = 'btn btn-sm btn-outline-secondary';
-      toggleBtn.innerHTML = '<i class="fas fa-eye"></i> הצג/הסתר הכל';
+      toggleBtn.textContent = '';
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-eye';
+      toggleBtn.appendChild(icon);
+      toggleBtn.appendChild(document.createTextNode(' הצג/הסתר הכל'));
       toggleBtn.title = 'הצג/הסתר את כל הסקשנים';
       headerActions.appendChild(toggleBtn);
     }

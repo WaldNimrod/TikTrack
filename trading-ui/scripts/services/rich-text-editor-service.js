@@ -277,7 +277,7 @@ class RichTextEditorService {
                     return existingQuill;
                 }
                 // אם יש container אבל אין instance, נמחק אותו ונאתחל מחדש
-                container.innerHTML = '';
+                container.textContent = '';
             }
 
             // אתחול Quill - Quill יוצר את ה-HTML בעצמו
@@ -349,8 +349,13 @@ class RichTextEditorService {
             // Sanitization לפני הגדרה
             const sanitizedHtml = this.sanitizeHTML(html || '');
 
-            // הגדרת תוכן
-            quill.root.innerHTML = sanitizedHtml;
+            // הגדרת תוכן - Quill משתמש ב-innerHTML פנימית, אבל אנחנו מפרסים עם DOMParser קודם
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(sanitizedHtml, 'text/html');
+            quill.root.textContent = '';
+            doc.body.childNodes.forEach(node => {
+                quill.root.appendChild(node.cloneNode(true));
+            });
 
         } catch (error) {
             console.error(`❌ RichTextEditorService: שגיאה בהגדרת תוכן ל-"${editorId}":`, error);
@@ -387,7 +392,7 @@ class RichTextEditorService {
                 }
 
                 // Clear container content and restore base classes
-                container.innerHTML = '';
+                container.textContent = '';
                 container.classList.remove('ql-container', 'ql-snow');
                 container.removeAttribute('data-placeholder');
             }

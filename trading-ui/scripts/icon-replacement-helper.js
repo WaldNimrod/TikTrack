@@ -51,6 +51,7 @@ async function replaceIconsInContext(context = document, options = {}) {
         'info-circle.svg': { type: 'button', name: 'info-circle' },
         'x.svg': { type: 'button', name: 'close' },
         'alert-triangle.svg': { type: 'button', name: 'warning' },
+        'warning.svg': { type: 'button', name: 'warning' }, // Legacy - maps to alert-triangle
         'loader.svg': { type: 'button', name: 'loader' },
         'refresh.svg': { type: 'button', name: 'refresh' },
         'sliders.svg': { type: 'button', name: 'sliders' },
@@ -60,8 +61,10 @@ async function replaceIconsInContext(context = document, options = {}) {
         'filter.svg': { type: 'button', name: 'filter' },
         'search.svg': { type: 'button', name: 'search' },
         'settings.svg': { type: 'button', name: 'menu' },
+        'menu.svg': { type: 'button', name: 'menu' }, // Legacy - maps to settings
         'check.svg': { type: 'button', name: 'check' },
-        'trash.svg': { type: 'button', name: 'delete' }
+        'trash.svg': { type: 'button', name: 'delete' },
+        'delete.svg': { type: 'button', name: 'delete' } // Legacy - maps to trash
     };
 
     // Find all img tags with icon paths (both absolute and relative)
@@ -93,11 +96,11 @@ async function replaceIconsInContext(context = document, options = {}) {
                 });
                 
                 // Replace img with rendered icon
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = iconHTML;
-                const newIcon = tempDiv.firstElementChild;
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(iconHTML, 'text/html');
+                const newIcon = doc.body.firstElementChild;
                 
-                if (newIcon) {
+                if (newIcon && img.parentNode) {
                     // Preserve data attributes
                     Array.from(img.attributes).forEach(attr => {
                         if (attr.name.startsWith('data-')) {
@@ -106,6 +109,14 @@ async function replaceIconsInContext(context = document, options = {}) {
                     });
                     newIcon.dataset.iconReplaced = 'true';
                     img.parentNode.replaceChild(newIcon, img);
+                } else if (!img.parentNode) {
+                    // Icon element was removed from DOM before replacement - not critical, just debug
+                    if (window.Logger) {
+                        window.Logger.debug('Icon element has no parent node (likely removed from DOM)', { 
+                            icon: iconFileName, 
+                            context: context.tagName || 'document' 
+                        });
+                    }
                 }
             } catch (error) {
                 if (window.Logger) {
@@ -130,9 +141,10 @@ async function replaceIconsInHTMLString(htmlString) {
         await window.IconSystem.initialize();
     }
 
-    // Create a temporary container
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlString;
+    // Parse HTML using DOMParser
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+    const tempDiv = doc.body;
     
     // Replace icons in the temporary container
     await replaceIconsInContext(tempDiv);

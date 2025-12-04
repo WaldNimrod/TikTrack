@@ -35,25 +35,166 @@ let accountActivityPaginationInstance = null;
 window.initAccountActivity = function(autoSelectDefault = false) {
   window.Logger.info('🔧 אתחול מערכת תנועות חשבון', { page: 'trading_accounts' });
 
-  // Populate account selector when accounts are loaded
-  if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
-    populateAccountSelector(autoSelectDefault);
-  }
-
-  // Setup event listeners
+  // Setup event listeners FIRST (before populating selector)
   const selector = document.getElementById('accountActivitySelector');
   if (selector) {
-    selector.addEventListener('change', handleAccountSelection);
+    // Remove existing listeners to prevent duplicates
+    const newSelector = selector.cloneNode(true);
+    selector.parentNode.replaceChild(newSelector, selector);
+    // Re-attach listener to new element
+    const newSelectorElement = document.getElementById('accountActivitySelector');
+    if (newSelectorElement) {
+      newSelectorElement.addEventListener('change', handleAccountSelection);
+    }
   }
 
-  // Listen for account data updates
+  // Listen for account data updates (only once)
   if (window.addEventListener) {
-    window.addEventListener('accountsLoaded', async () => {
-      // On accounts loaded event, auto-select default account from preferences
-      await populateAccountSelector(true);
+    // Remove existing listener if any
+    window.removeEventListener('accountsLoaded', window._accountActivityAccountsLoadedHandler);
+    // Create new handler
+    window._accountActivityAccountsLoadedHandler = async () => {
+      // On accounts loaded event, populate selector only if not already populated
+      const currentSelector = document.getElementById('accountActivitySelector');
+      if (currentSelector && currentSelector.options.length <= 1) {
+        await populateAccountSelector(autoSelectDefault);
+      }
+    };
+    window.addEventListener('accountsLoaded', window._accountActivityAccountsLoadedHandler);
+
+    // Populate account selector when accounts are already loaded
+    if (window.trading_accountsData && Array.isArray(window.trading_accountsData) && window.trading_accountsData.length > 0) {
+      populateAccountSelector(autoSelectDefault);
+    }
+
+    // Listen for filter date range changes to update date range display
+    window.addEventListener('filterDateRangeChanged', (event) => {
+      const dateRange = event.detail?.dateRange || window.selectedDateRangeForFilter;
+      if (dateRange && window.accountActivityState.activityData) {
+        // Update date range display when filter changes
+        updateActivitySummary(window.accountActivityState.activityData);
+      }
     });
+
+    // Listen for filter updates from header system
+    const checkFilterUpdates = () => {
+      const currentDateRange = window.selectedDateRangeForFilter;
+      if (currentDateRange && window.accountActivityState.activityData) {
+        updateActivitySummary(window.accountActivityState.activityData);
+      }
+    };
+
+    // Check periodically for filter updates (when filter system might not dispatch events)
+    setInterval(checkFilterUpdates, 2000);
+  }
+
+  // Setup section open listeners after DOM is ready
+  // Use setTimeout to ensure DOM elements exist
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => setupSectionOpenListeners(), 500);
+    });
+  } else {
+    setTimeout(() => setupSectionOpenListeners(), 500);
   }
 };
+
+/**
+ * Setup event listeners for section opening - ensures data is loaded when section opens
+ */
+function setupSectionOpenListeners() {
+  // Listen for account-activity-summary section opening
+  const accountActivitySummarySection = document.querySelector('[data-section="account-activity-summary"]');
+  if (accountActivitySummarySection) {
+    // Use MutationObserver to watch for section body display changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+          const sectionBody = accountActivitySummarySection.querySelector('.section-body');
+          if (sectionBody) {
+            const isVisible = sectionBody.style.display !== 'none' && 
+                             window.getComputedStyle(sectionBody).display !== 'none';
+            if (isVisible) {
+              window.Logger.info('📂 account-activity-summary section opened', { page: 'trading_accounts' });
+              // Check if selector is populated and account is selected
+              const selector = document.getElementById('accountActivitySelector');
+              if (selector && selector.value) {
+                const accountId = parseInt(selector.value);
+                if (accountId && !isNaN(accountId)) {
+                  // Ensure activity data is loaded
+                  if (!window.accountActivityState.activityData) {
+                    window.Logger.info(`🔄 Loading account activity data on section open for account ${accountId}`, { page: 'trading_accounts' });
+                    window.loadAccountActivity(accountId).catch(error => {
+                      window.Logger.error('❌ Error loading account activity on section open:', error, { page: 'trading_accounts' });
+                    });
+                  }
+                }
+              } else {
+                // Selector not populated yet - wait a bit and try again
+                setTimeout(() => {
+                  const selector2 = document.getElementById('accountActivitySelector');
+                  if (selector2 && selector2.options.length > 1 && !selector2.value) {
+                    // Auto-select first account if no account selected
+                    selector2.value = selector2.options[1].value;
+                    handleAccountSelection({ target: selector2 });
+                  }
+                }, 500);
+              }
+            }
+          }
+        }
+      });
+    });
+
+    // Observe section body for style changes
+    const sectionBody = accountActivitySummarySection.querySelector('.section-body');
+    if (sectionBody) {
+      observer.observe(sectionBody, { attributes: true, attributeFilter: ['style'] });
+    }
+  }
+
+  // Listen for account-activity-table section opening
+  const accountActivityTableSection = document.querySelector('[data-section="account-activity-table"]');
+  if (accountActivityTableSection) {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+          const sectionBody = accountActivityTableSection.querySelector('.section-body');
+          if (sectionBody) {
+            const isVisible = sectionBody.style.display !== 'none' && 
+                             window.getComputedStyle(sectionBody).display !== 'none';
+            if (isVisible) {
+              window.Logger.info('📂 account-activity-table section opened', { page: 'trading_accounts' });
+              // Update date range display
+              const selector = document.getElementById('accountActivitySelector');
+              if (selector && selector.value) {
+                const accountId = parseInt(selector.value);
+                if (accountId && !isNaN(accountId)) {
+                  // Ensure activity data is loaded and date range is updated
+                  if (!window.accountActivityState.activityData) {
+                    window.loadAccountActivity(accountId).catch(error => {
+                      window.Logger.error('❌ Error loading account activity on table section open:', error, { page: 'trading_accounts' });
+                    });
+                  } else {
+                    // Just update date range display
+                    if (typeof updateActivitySummary === 'function') {
+                      updateActivitySummary(window.accountActivityState.activityData);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+    });
+
+    const sectionBody = accountActivityTableSection.querySelector('.section-body');
+    if (sectionBody) {
+      observer.observe(sectionBody, { attributes: true, attributeFilter: ['style'] });
+    }
+  }
+}
 
 /**
  * Populate account selector dropdown
@@ -153,10 +294,16 @@ async function handleAccountSelection(event) {
 
   window.accountActivityState.selectedAccountId = accountId;
 
-  // Show section bodies
+  // Show section bodies and ensure they're visible
   const summaryBody = document.querySelector('[data-section="account-activity-summary"] .section-body');
   if (summaryBody) {
     summaryBody.style.display = 'block';
+    summaryBody.classList.remove('d-none');
+    // Ensure statistics card is visible
+    const statsCard = document.getElementById('accountActivityStatisticsCard');
+    if (statsCard) {
+      statsCard.classList.remove('d-none');
+    }
     setTimeout(() => {
       setupStatisticsFilterHook();
     }, 500);
@@ -164,6 +311,7 @@ async function handleAccountSelection(event) {
   const tableBody = document.querySelector('[data-section="account-activity-table"] .section-body');
   if (tableBody) {
     tableBody.style.display = 'block';
+    tableBody.classList.remove('d-none');
   }
 
   // Load activity data
@@ -184,14 +332,12 @@ async function loadAccountActivity(accountId) {
   try {
     window.Logger.info(`📡 טעינת תנועות חשבון ${accountId}`, { page: 'trading_accounts' });
 
-    // Check cache first - BUT bypass cache to ensure fresh data with executions
+    // Check cache first using UnifiedCacheManager (following cache strategy from unified-cache-manager.js)
     const cacheKey = `account-activity-${accountId}`;
-    // TEMPORARY: Bypass cache to ensure executions are loaded
-    // TODO: Remove this after confirming executions are loaded correctly
-    const BYPASS_CACHE = true;
-
-    if (window.UnifiedCacheManager && !BYPASS_CACHE) {
-      const cached = await window.UnifiedCacheManager.get(cacheKey);
+    
+    // Use UnifiedCacheManager with proper TTL (60 seconds as defined in cache config: 'account-activity-*')
+    if (window.UnifiedCacheManager) {
+      const cached = await window.UnifiedCacheManager.get(cacheKey, { ttl: 60000 });
       if (cached) {
         window.Logger.info('✅ נתונים מהמטמון', { page: 'trading_accounts' });
         window.accountActivityState.activityData = cached;
@@ -199,12 +345,6 @@ async function loadAccountActivity(accountId) {
         updateActivitySummary(cached);
         window.accountActivityState.isLoading = false;
         return;
-      }
-    } else if (BYPASS_CACHE) {
-      window.Logger.info('🔄 Bypassing cache - loading fresh data from API', { page: 'trading_accounts' });
-      // Clear cache for this account to ensure fresh data
-      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-        await window.UnifiedCacheManager.remove(cacheKey);
       }
     }
 
@@ -422,13 +562,30 @@ function populateAccountActivityTable(data) {
   });
 
   // Render rows with pagination
-  syncAccountActivityPagination(allMovements);
+  const paginationPromise = syncAccountActivityPagination(allMovements);
 
   // Update footer with currency balances
   updateCurrencyBalancesFooter(data);
 
-  // Update statistics card
-  updateActivityStatistics();
+  // Update statistics card - wait for pagination to complete if it returns a promise
+  if (paginationPromise && typeof paginationPromise.then === 'function') {
+    paginationPromise.then(() => {
+      // Wait a bit more for DOM to be fully updated
+      setTimeout(() => {
+        updateActivityStatistics();
+      }, 100);
+    }).catch(() => {
+      // Fallback - update immediately even if pagination fails
+      setTimeout(() => {
+        updateActivityStatistics();
+      }, 100);
+    });
+  } else {
+    // No promise - update immediately with a small delay to ensure DOM is ready
+    setTimeout(() => {
+      updateActivityStatistics();
+    }, 100);
+  }
 
   window.Logger.info(`✅ טבלה עודכנה עם ${allMovements.length} תנועות`, { page: 'trading_accounts', keepInfo: true });
 }
@@ -451,39 +608,47 @@ function renderMovementRow(movement, runningBalance) {
   );
   row.setAttribute('data-movement-amount', amountForStats.toString());
 
-  const movementDateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(movement.date) : null;
+  // Ensure date envelope for consistent date handling
+  const movementDateEnvelope = window.dateUtils?.ensureDateEnvelope 
+    ? window.dateUtils.ensureDateEnvelope(movement.date) 
+    : (movement.date && typeof movement.date === 'object' && (movement.date.epochMs || movement.date.utc || movement.date.local))
+      ? movement.date
+      : null;
+  
   const movementDateValue = movementDateEnvelope?.utc || movementDateEnvelope?.local || movement.date || '';
   row.setAttribute('data-movement-date', movementDateValue);
   row.setAttribute('data-movement-id', movement.id || '');
   row.setAttribute('data-currency-symbol', movement.currency_symbol || 'USD');
 
-  // Date - using FieldRendererService.renderDate
+  // Date - using FieldRendererService.renderDate (following standard pattern from trades.js, trade_plans.js, etc.)
   const dateCell = document.createElement('td');
   dateCell.className = 'col-date';
   dateCell.setAttribute('data-date', movementDateValue);
-  if (window.FieldRendererService && window.FieldRendererService.renderDate) {
-    const dateHTML = window.FieldRendererService.renderDate(movementDateEnvelope || movement.date);
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = dateHTML;
-    while (tempDiv.firstChild) {
-      dateCell.appendChild(tempDiv.firstChild);
-    }
+  
+  // Use FieldRendererService.renderDate - prefer envelope if available, otherwise use raw date
+  // Following the pattern from trades.js line 1084: FieldRendererService.renderDate(rawDate, false)
+  if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+    // Prefer envelope if available (it's already normalized), otherwise use raw date
+    // renderDate returns a string (not HTML), so we set it directly as textContent
+    const dateToRender = movementDateEnvelope || movement.date;
+    const dateDisplay = window.FieldRendererService.renderDate(dateToRender, false);
+    dateCell.textContent = dateDisplay || '-';
   } else {
+    // Fallback: use dateUtils for consistent date formatting
     if (movementDateEnvelope && window.dateUtils?.formatDate) {
-      dateCell.textContent = window.dateUtils.formatDate(movementDateEnvelope);
-    } else {
-      // Use dateUtils for consistent date parsing
-      if (movementDateValue) {
-        let dateObj;
-        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
-          dateObj = window.dateUtils.toDateObject(movementDateValue);
-        } else {
-          dateObj = new Date(movementDateValue);
-        }
-        // Use FieldRendererService or dateUtils for consistent date formatting
-        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-          dateCell.textContent = window.FieldRendererService.renderDate(dateObj, false);
-        } else if (window.dateUtils?.formatDate) {
+      dateCell.textContent = window.dateUtils.formatDate(movementDateEnvelope, { includeTime: false });
+    } else if (movementDateValue && window.dateUtils?.formatDate) {
+      dateCell.textContent = window.dateUtils.formatDate(movementDateValue, { includeTime: false });
+    } else if (movementDateValue) {
+      // Last resort: use dateUtils.toDateObject for parsing
+      let dateObj;
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        dateObj = window.dateUtils.toDateObject(movementDateValue);
+      } else {
+        dateObj = new Date(movementDateValue);
+      }
+      if (dateObj && !Number.isNaN(dateObj.getTime())) {
+        if (window.dateUtils?.formatDate) {
           dateCell.textContent = window.dateUtils.formatDate(dateObj, { includeTime: false });
         } else {
           dateCell.textContent = dateObj.toLocaleDateString('he-IL');
@@ -491,6 +656,8 @@ function renderMovementRow(movement, runningBalance) {
       } else {
         dateCell.textContent = '-';
       }
+    } else {
+      dateCell.textContent = '-';
     }
   }
   row.appendChild(dateCell);
@@ -529,21 +696,26 @@ function renderMovementRow(movement, runningBalance) {
     // Use renderType for cash flow subtypes (deposit, withdrawal, fee, etc.)
     if (window.FieldRendererService && window.FieldRendererService.renderType) {
       const typeHTML = window.FieldRendererService.renderType(subTypeValue, normalizedAmountForColor);
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = typeHTML;
-      while (tempDiv.firstChild) {
-        subtypeCell.appendChild(tempDiv.firstChild);
-      }
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(typeHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        subtypeCell.appendChild(node.cloneNode(true));
+      });
     } else {
       subtypeCell.textContent = getSubtypeDisplay(movement.sub_type || movement.subtype);
     }
   } else {
     // Use renderAction for execution actions (buy/sell) - with amount for color
     if (window.FieldRendererService && window.FieldRendererService.renderAction) {
-      subtypeCell.innerHTML = window.FieldRendererService.renderAction(
+      const actionHTML = window.FieldRendererService.renderAction(
         movement.sub_type || movement.subtype || movement.action,
         movement.amount, // Pass amount for color determination
       );
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(actionHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        subtypeCell.appendChild(node.cloneNode(true));
+      });
     } else {
       subtypeCell.textContent = getSubtypeDisplay(movement.sub_type || movement.subtype || movement.action);
     }
@@ -558,7 +730,19 @@ function renderMovementRow(movement, runningBalance) {
     // Show only the ticker symbol (clickable link to details)
     const symbol = movement.ticker_symbol.trim();
     if (symbol && window.showEntityDetails && movement.ticker_id) {
-      tickerCell.innerHTML = `<span style="cursor: pointer; color: var(--primary-color, #26baac); text-decoration: underline;" onclick="if (window.showEntityDetails) { window.showEntityDetails('ticker', ${movement.ticker_id}); return false; }" title="לחץ לצפייה בפרטי הטיקר">${symbol}</span>`;
+      const span = document.createElement('span');
+      span.style.cursor = 'pointer';
+      span.style.color = 'var(--primary-color, #26baac)';
+      span.style.textDecoration = 'underline';
+      span.onclick = function() {
+        if (window.showEntityDetails) {
+          window.showEntityDetails('ticker', movement.ticker_id);
+          return false;
+        }
+      };
+      span.title = 'לחץ לצפייה בפרטי הטיקר';
+      span.textContent = symbol;
+      tickerCell.appendChild(span);
     } else {
       tickerCell.textContent = symbol;
     }
@@ -587,7 +771,12 @@ function renderMovementRow(movement, runningBalance) {
   const displayAmount = normalizedAmountForColor;
 
   if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
-    amountCell.innerHTML = window.FieldRendererService.renderAmount(displayAmount, currencySymbol, 0);
+    const amountHTML = window.FieldRendererService.renderAmount(displayAmount, currencySymbol, 0);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(amountHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      amountCell.appendChild(node.cloneNode(true));
+    });
   } else {
     amountCell.textContent = formatAmount(displayAmount);
     if (displayAmount < 0) {
@@ -608,7 +797,12 @@ function renderMovementRow(movement, runningBalance) {
   const balanceCell = document.createElement('td');
   balanceCell.className = 'col-balance';
   if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
-    balanceCell.innerHTML = window.FieldRendererService.renderAmount(runningBalance || 0, currencySymbol, 0);
+    const balanceHTML = window.FieldRendererService.renderAmount(runningBalance || 0, currencySymbol, 0);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(balanceHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      balanceCell.appendChild(node.cloneNode(true));
+    });
   } else {
     balanceCell.textContent = formatAmount(runningBalance || 0);
     balanceCell.textContent += ' ' + currencySymbol;
@@ -619,13 +813,23 @@ function renderMovementRow(movement, runningBalance) {
   const actionsCell = document.createElement('td');
   actionsCell.className = 'col-actions actions-cell';
   if (isOpeningBalance) {
-    actionsCell.innerHTML = '<span class="text-muted">-</span>';
+    const span = document.createElement('span');
+    span.className = 'text-muted';
+    span.textContent = '-';
+    actionsCell.appendChild(span);
   } else {
-    actionsCell.innerHTML = `
-        <button class="btn btn-sm" onclick="openMovementDetails(${movement.id}, '${movement.type}')" title="פרטים" style="width: 2.5em; height: 2.5em; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
-            👁️
-        </button>
-    `;
+    const button = document.createElement('button');
+    button.className = 'btn btn-sm';
+    button.onclick = function() { openMovementDetails(movement.id, movement.type); };
+    button.title = 'פרטים';
+    button.style.width = '2.5em';
+    button.style.height = '2.5em';
+    button.style.padding = '0';
+    button.style.display = 'inline-flex';
+    button.style.alignItems = 'center';
+    button.style.justifyContent = 'center';
+    button.textContent = '👁️';
+    actionsCell.appendChild(button);
   }
   row.appendChild(actionsCell);
 
@@ -639,7 +843,14 @@ function renderAccountActivityRows(movements) {
   const safeMovements = Array.isArray(movements) ? movements : [];
 
   if (!safeMovements.length) {
-    tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין תנועות לחשבון זה</td></tr>';
+    tbody.textContent = '';
+    const emptyRow = document.createElement('tr');
+    const emptyCell = document.createElement('td');
+    emptyCell.colSpan = 8;
+    emptyCell.className = 'text-center';
+    emptyCell.textContent = 'אין תנועות לחשבון זה';
+    emptyRow.appendChild(emptyCell);
+    tbody.appendChild(emptyRow);
     return;
   }
 
@@ -649,7 +860,7 @@ function renderAccountActivityRows(movements) {
     fragment.appendChild(row);
   });
 
-  tbody.innerHTML = '';
+  tbody.textContent = '';
   tbody.appendChild(fragment);
 }
 
@@ -666,25 +877,28 @@ function syncAccountActivityPagination(movements) {
       });
 
       if (paginationPromise && typeof paginationPromise.then === 'function') {
-        paginationPromise
+        return paginationPromise
           .then(instance => {
             accountActivityPaginationInstance = instance;
+            return instance;
           })
           .catch(error => {
             window.Logger?.warn('syncAccountActivityPagination: falling back to direct render', { error, page: 'trading_accounts' });
             renderAccountActivityRows(safeMovements);
+            return null;
           });
       } else if (!paginationPromise) {
         renderAccountActivityRows(safeMovements);
       }
 
-      return;
+      return paginationPromise || Promise.resolve();
     } catch (error) {
       window.Logger?.warn('syncAccountActivityPagination: pagination system error', { error, page: 'trading_accounts' });
     }
   }
 
   renderAccountActivityRows(safeMovements);
+  return Promise.resolve();
 }
 
 window.syncAccountActivityPagination = syncAccountActivityPagination;
@@ -697,7 +911,10 @@ function updateActivitySummary(data) {
   const tableTitleDateRange = document.getElementById('accountActivityDateRange');
   const summaryDateRange = document.getElementById('accountActivitySelectedRange');
   if (tableTitleDateRange || summaryDateRange) {
-    const dateRange = window.selectedDateRangeForFilter || 'כל זמן';
+    // Use filterSystem.currentFilters.dateRange (standard way to get date range)
+    const dateRange = (window.filterSystem && window.filterSystem.currentFilters && window.filterSystem.currentFilters.dateRange) 
+      || window.selectedDateRangeForFilter 
+      || 'כל זמן';
     let startDate = null;
     // Use dateUtils for consistent date handling
     let endDate;
@@ -729,36 +946,39 @@ function updateActivitySummary(data) {
       startDate = accountOpeningDate;
     }
 
-    // Format date range for title
+    // Format date range for title using FieldRendererService.renderDate (standard date rendering)
     let dateRangeDisplay = '';
     if (startDate && endDate) {
-      const formatDateFn = window.dateUtils?.formatDate || window.formatDate;
-      const startDateFormatted = typeof formatDateFn === 'function'
-        ? formatDateFn(startDate)
-        : startDate.toLocaleDateString('he-IL', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        });
-      const endDateFormatted = typeof formatDateFn === 'function'
-        ? formatDateFn(endDate)
-        : endDate.toLocaleDateString('he-IL', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        }) === new Date().toLocaleDateString('he-IL', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        })
-          ? 'היום'
-          : typeof formatDateFn === 'function'
-            ? formatDateFn(endDate)
+      // Use FieldRendererService.renderDate for consistent date formatting
+      let startDateFormatted, endDateFormatted;
+      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+        startDateFormatted = window.FieldRendererService.renderDate(startDate, false);
+        endDateFormatted = window.FieldRendererService.renderDate(endDate, false);
+      } else {
+        const formatDateFn = window.dateUtils?.formatDate || window.formatDate;
+        startDateFormatted = typeof formatDateFn === 'function'
+          ? formatDateFn(startDate, { includeTime: false })
+          : startDate.toLocaleDateString('he-IL', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          });
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const endDateOnly = new Date(endDate);
+        endDateOnly.setHours(0, 0, 0, 0);
+        if (endDateOnly.getTime() === today.getTime()) {
+          endDateFormatted = 'היום';
+        } else {
+          endDateFormatted = typeof formatDateFn === 'function'
+            ? formatDateFn(endDate, { includeTime: false })
             : endDate.toLocaleDateString('he-IL', {
               year: 'numeric',
               month: '2-digit',
               day: '2-digit',
             });
+        }
+      }
 
       dateRangeDisplay = `${startDateFormatted} - ${endDateFormatted}`;
     } else if (dateRange !== 'כל זמן') {
@@ -787,8 +1007,11 @@ function updateActivitySummary(data) {
     const currencies = data && data.currencies ? data.currencies.length : 0;
 
     // Get date range information (always calculate, even if no data)
+    // Use filterSystem.currentFilters.dateRange (standard way to get date range)
     let dateRangeText = '';
-    const dateRange = window.selectedDateRangeForFilter || 'כל זמן';
+    const dateRange = (window.filterSystem && window.filterSystem.currentFilters && window.filterSystem.currentFilters.dateRange) 
+      || window.selectedDateRangeForFilter 
+      || 'כל זמן';
     let startDate = null;
     // Use dateUtils for consistent date handling
     let endDate;
@@ -820,16 +1043,23 @@ function updateActivitySummary(data) {
       startDate = accountOpeningDate;
     }
 
-    // Format dates and calculate days
+    // Format dates and calculate days using FieldRendererService.renderDate (standard date rendering)
     if (startDate && endDate) {
       const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-      const formatDateFn = window.dateUtils?.formatDate || window.formatDate;
-      const startDateFormatted = typeof formatDateFn === 'function'
-        ? formatDateFn(startDate)
-        : startDate.toLocaleDateString('he-IL');
-      const endDateFormatted = typeof formatDateFn === 'function'
-        ? formatDateFn(endDate)
-        : endDate.toLocaleDateString('he-IL');
+      // Use FieldRendererService.renderDate for consistent date formatting
+      let startDateFormatted, endDateFormatted;
+      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+        startDateFormatted = window.FieldRendererService.renderDate(startDate, false);
+        endDateFormatted = window.FieldRendererService.renderDate(endDate, false);
+      } else {
+        const formatDateFn = window.dateUtils?.formatDate || window.formatDate;
+        startDateFormatted = typeof formatDateFn === 'function'
+          ? formatDateFn(startDate, { includeTime: false })
+          : startDate.toLocaleDateString('he-IL');
+        endDateFormatted = typeof formatDateFn === 'function'
+          ? formatDateFn(endDate, { includeTime: false })
+          : endDate.toLocaleDateString('he-IL');
+      }
 
       dateRangeText = ` | ${startDateFormatted} - ${endDateFormatted} (${daysDiff} ימים)`;
     } else if (dateRange !== 'כל זמן') {
@@ -875,14 +1105,28 @@ function updateCurrencyBalancesFooter(data) {
       summaryHTML += `<div><strong>${symbol}:</strong> ${formatAmount(balance)}</div>`;
     }
   });
-  summaryCell.innerHTML = summaryHTML;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(summaryHTML, 'text/html');
+  summaryCell.textContent = '';
+  doc.body.childNodes.forEach(node => {
+    summaryCell.appendChild(node.cloneNode(true));
+  });
 
   // Base currency total using FieldRendererService
   const baseSymbol = getCurrencySymbol(data.base_currency || 'USD');
   if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
-    baseTotalCell.innerHTML = `<strong>${window.FieldRendererService.renderAmount(data.base_currency_total || 0, baseSymbol, 0)}</strong>`;
+    const amountHTML = window.FieldRendererService.renderAmount(data.base_currency_total || 0, baseSymbol, 0);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<strong>${amountHTML}</strong>`, 'text/html');
+    baseTotalCell.textContent = '';
+    doc.body.childNodes.forEach(node => {
+      baseTotalCell.appendChild(node.cloneNode(true));
+    });
   } else {
-    baseTotalCell.innerHTML = `<strong>${formatAmount(data.base_currency_total || 0)} ${baseSymbol}</strong>`;
+    baseTotalCell.textContent = '';
+    const strong = document.createElement('strong');
+    strong.textContent = `${formatAmount(data.base_currency_total || 0)} ${baseSymbol}`;
+    baseTotalCell.appendChild(strong);
   }
 
   // Show rates used if available
@@ -927,7 +1171,14 @@ function openMovementDetails(movementId, movementType) {
 function clearActivityTable() {
   const tbody = document.querySelector('#accountActivityTable tbody');
   if (tbody) {
-    tbody.innerHTML = '<tr><td colspan="8" class="loading">בחר חשבון מסחר להצגת תנועות...</td></tr>';
+    tbody.textContent = '';
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = 8;
+    cell.className = 'loading';
+    cell.textContent = 'בחר חשבון מסחר להצגת תנועות...';
+    row.appendChild(cell);
+    tbody.appendChild(row);
   }
 
   const footer = document.getElementById('accountActivityFooter');
@@ -947,7 +1198,14 @@ function clearActivityTable() {
 function showErrorInTable(message) {
   const tbody = document.querySelector('#accountActivityTable tbody');
   if (tbody) {
-    tbody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">${message}</td></tr>`;
+    tbody.textContent = '';
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = 8;
+    cell.className = 'text-center text-danger';
+    cell.textContent = message;
+    row.appendChild(cell);
+    tbody.appendChild(row);
   }
 }
 
@@ -1123,8 +1381,10 @@ function calculateActivityStatistics() {
     return { cashFlows: {}, executions: {} };
   }
 
-  // Get filter date range
-  const dateRange = window.selectedDateRangeForFilter || 'כל זמן';
+  // Get filter date range - use filterSystem.currentFilters.dateRange (standard way)
+  const dateRange = (window.filterSystem && window.filterSystem.currentFilters && window.filterSystem.currentFilters.dateRange)
+    || window.selectedDateRangeForFilter
+    || 'כל זמן';
   let startDate = null;
   let endDate = new Date(); // Today
 
@@ -1414,12 +1674,24 @@ function updateActivityStatistics() {
   // Column 2: ממוצע לפעולה + שנתי משוער (for all records with breakdown)
   const overallContent = document.getElementById('overallStatisticsContent');
   if (overallContent) {
-    overallContent.innerHTML = renderStatisticsSummaryColumn1(overallStats, 'סיכום כללי');
+    const html1 = renderStatisticsSummaryColumn1(overallStats, 'סיכום כללי');
+    const parser = new DOMParser();
+    const doc1 = parser.parseFromString(html1, 'text/html');
+    overallContent.textContent = '';
+    doc1.body.childNodes.forEach(node => {
+      overallContent.appendChild(node.cloneNode(true));
+    });
   }
 
   const overallContent2 = document.getElementById('overallStatisticsContent2');
   if (overallContent2) {
-    overallContent2.innerHTML = renderStatisticsSummaryColumn2(overallStats, 'סיכום כללי');
+    const html2 = renderStatisticsSummaryColumn2(overallStats, 'סיכום כללי');
+    const parser2 = new DOMParser();
+    const doc2 = parser2.parseFromString(html2, 'text/html');
+    overallContent2.textContent = '';
+    doc2.body.childNodes.forEach(node => {
+      overallContent2.appendChild(node.cloneNode(true));
+    });
   }
 
   // Render cash flows: main summary - TWO cards, split content
@@ -1428,26 +1700,50 @@ function updateActivityStatistics() {
   const cashFlowsContent = document.getElementById('cashFlowsStatisticsContent');
   if (cashFlowsContent) {
     // Column 1: מספר רשומות + סה"כ סכום
-    cashFlowsContent.innerHTML = renderStatisticsSummaryColumn1(stats.cashFlows, 'תזרימי מזומנים');
+    const html3 = renderStatisticsSummaryColumn1(stats.cashFlows, 'תזרימי מזומנים');
+    const parser3 = new DOMParser();
+    const doc3 = parser3.parseFromString(html3, 'text/html');
+    cashFlowsContent.textContent = '';
+    doc3.body.childNodes.forEach(node => {
+      cashFlowsContent.appendChild(node.cloneNode(true));
+    });
   }
 
   const cashFlowsContent2 = document.getElementById('cashFlowsStatisticsContent2');
   if (cashFlowsContent2) {
     // Column 2: ממוצע לפעולה + שנתי משוער
-    cashFlowsContent2.innerHTML = renderStatisticsSummaryColumn2(stats.cashFlows, 'תזרימי מזומנים');
+    const html4 = renderStatisticsSummaryColumn2(stats.cashFlows, 'תזרימי מזומנים');
+    const parser4 = new DOMParser();
+    const doc4 = parser4.parseFromString(html4, 'text/html');
+    cashFlowsContent2.textContent = '';
+    doc4.body.childNodes.forEach(node => {
+      cashFlowsContent2.appendChild(node.cloneNode(true));
+    });
   }
 
   // Render cash flows breakdown by subtype in two columns
   const cashFlowsBreakdown1 = document.getElementById('cashFlowsBreakdownContent1');
   if (cashFlowsBreakdown1) {
     const cashFlowsColumn1 = splitCashFlowsByColumn(stats.cashFlows, 1);
-    cashFlowsBreakdown1.innerHTML = renderBreakdownBySubtype(cashFlowsColumn1, 'תזרימי מזומנים', 1);
+    const html5 = renderBreakdownBySubtype(cashFlowsColumn1, 'תזרימי מזומנים', 1);
+    const parser5 = new DOMParser();
+    const doc5 = parser5.parseFromString(html5, 'text/html');
+    cashFlowsBreakdown1.textContent = '';
+    doc5.body.childNodes.forEach(node => {
+      cashFlowsBreakdown1.appendChild(node.cloneNode(true));
+    });
   }
 
   const cashFlowsBreakdown2 = document.getElementById('cashFlowsBreakdownContent2');
   if (cashFlowsBreakdown2) {
     const cashFlowsColumn2 = splitCashFlowsByColumn(stats.cashFlows, 2);
-    cashFlowsBreakdown2.innerHTML = renderBreakdownBySubtype(cashFlowsColumn2, 'תזרימי מזומנים', 2);
+    const html6 = renderBreakdownBySubtype(cashFlowsColumn2, 'תזרימי מזומנים', 2);
+    const parser6 = new DOMParser();
+    const doc6 = parser6.parseFromString(html6, 'text/html');
+    cashFlowsBreakdown2.textContent = '';
+    doc6.body.childNodes.forEach(node => {
+      cashFlowsBreakdown2.appendChild(node.cloneNode(true));
+    });
   }
 
   // Render executions: main summary - TWO cards, split content (same structure as cash flows)
@@ -1456,26 +1752,50 @@ function updateActivityStatistics() {
   const executionsContentBuy = document.getElementById('executionsStatisticsContentBuy');
   if (executionsContentBuy) {
     // Column 1: מספר רשומות + סה"כ סכום (full stats)
-    executionsContentBuy.innerHTML = renderStatisticsSummaryColumn1(stats.executions, 'ביצועים');
+    const html7 = renderStatisticsSummaryColumn1(stats.executions, 'ביצועים');
+    const parser7 = new DOMParser();
+    const doc7 = parser7.parseFromString(html7, 'text/html');
+    executionsContentBuy.textContent = '';
+    doc7.body.childNodes.forEach(node => {
+      executionsContentBuy.appendChild(node.cloneNode(true));
+    });
   }
 
   const executionsContentSell = document.getElementById('executionsStatisticsContentSell');
   if (executionsContentSell) {
     // Column 2: ממוצע לפעולה + שנתי משוער (full stats with breakdown)
-    executionsContentSell.innerHTML = renderStatisticsSummaryColumn2(stats.executions, 'ביצועים');
+    const html8 = renderStatisticsSummaryColumn2(stats.executions, 'ביצועים');
+    const parser8 = new DOMParser();
+    const doc8 = parser8.parseFromString(html8, 'text/html');
+    executionsContentSell.textContent = '';
+    doc8.body.childNodes.forEach(node => {
+      executionsContentSell.appendChild(node.cloneNode(true));
+    });
   }
 
   // Render executions breakdown by subtype (buy/sell)
   const executionsBreakdown1 = document.getElementById('executionsBreakdownContent1');
   if (executionsBreakdown1) {
     const executionsBuy = splitExecutionsByAction(stats.executions, 'buy');
-    executionsBreakdown1.innerHTML = renderBreakdownBySubtype(executionsBuy, 'ביצועים', 'buy');
+    const html9 = renderBreakdownBySubtype(executionsBuy, 'ביצועים', 'buy');
+    const parser9 = new DOMParser();
+    const doc9 = parser9.parseFromString(html9, 'text/html');
+    executionsBreakdown1.textContent = '';
+    doc9.body.childNodes.forEach(node => {
+      executionsBreakdown1.appendChild(node.cloneNode(true));
+    });
   }
 
   const executionsBreakdown2 = document.getElementById('executionsBreakdownContent2');
   if (executionsBreakdown2) {
     const executionsSell = splitExecutionsByAction(stats.executions, 'sell');
-    executionsBreakdown2.innerHTML = renderBreakdownBySubtype(executionsSell, 'ביצועים', 'sell');
+    const html10 = renderBreakdownBySubtype(executionsSell, 'ביצועים', 'sell');
+    const parser10 = new DOMParser();
+    const doc10 = parser10.parseFromString(html10, 'text/html');
+    executionsBreakdown2.textContent = '';
+    doc10.body.childNodes.forEach(node => {
+      executionsBreakdown2.appendChild(node.cloneNode(true));
+    });
   }
 
   // Update activity summary header (with date range)

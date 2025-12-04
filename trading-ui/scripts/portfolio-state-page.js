@@ -70,9 +70,9 @@ async function toggleCardDetails(cardId) {
                     alt: chevron.getAttribute('alt') || 'toggle',
                     class: chevron.getAttribute('class') || 'icon'
                 });
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = iconHTML;
-                const newIcon = tempDiv.firstElementChild;
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(iconHTML, 'text/html');
+                const newIcon = doc.body.firstElementChild;
                 if (newIcon) {
                     chevron.parentNode.replaceChild(newIcon, chevron);
                 }
@@ -263,12 +263,11 @@ function populateAccountFilterMenu() {
 function loadInvestmentTypes() {
     const investmentSelect = document.getElementById('filterInvestmentType');
     if (investmentSelect) {
-        investmentSelect.innerHTML.textContent = '';
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = '\'<option value="">הכל</option>\'';
-        while (tempDiv.firstChild) {
-            investmentSelect.innerHTML.appendChild(tempDiv.firstChild);
-        }
+        investmentSelect.textContent = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'הכל';
+        investmentSelect.appendChild(defaultOption);
         INVESTMENT_TYPES.forEach(type => {
             const option = document.createElement('option');
             option.value = type.value;
@@ -1339,12 +1338,28 @@ function updateTradesTable() {
     if (!tbody) return;
     
     if (filteredTrades.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="13" class="text-center text-muted">אין טריידים להצגה</td></tr>';
+        tbody.textContent = '';
+        const emptyRow = document.createElement('tr');
+        const emptyCell = document.createElement('td');
+        emptyCell.colSpan = 13;
+        emptyCell.className = 'text-center text-muted';
+        emptyCell.textContent = 'אין טריידים להצגה';
+        emptyRow.appendChild(emptyCell);
+        tbody.appendChild(emptyRow);
         document.getElementById('trades-summary').textContent = 'אין טריידים';
         return;
     }
     
-    tbody.innerHTML = filteredTrades.map(trade => renderTradeRow(trade)).join('');
+    tbody.textContent = '';
+    const parser = new DOMParser();
+    filteredTrades.forEach(trade => {
+        const rowHTML = renderTradeRow(trade);
+        const doc = parser.parseFromString(rowHTML, 'text/html');
+        const row = doc.body.querySelector('tr');
+        if (row) {
+            tbody.appendChild(row);
+        }
+    });
     
                 // Update summary using InfoSummarySystem (only if container exists)
                 if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS['portfolio-state-page']) {
@@ -1369,10 +1384,18 @@ function updateTradesTable() {
                         const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
                         return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
                     };
-                    summaryElement.innerHTML = `
+                    summaryElement.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
                         <strong>סה"כ טריידים: ${filteredTrades.length}</strong> | 
                         <strong>סה"כ P/L: ${renderNumericValue(totalPL, '$')}</strong>
-                    `;
+                    `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        summaryElement.appendChild(fragment);
                 }
     
     // Note: Action buttons are now created directly in renderTradeRow() using createActionsMenu()
@@ -1386,32 +1409,44 @@ function updateSummaryCards(data) {
         const totalCashEl = document.getElementById('total-cash-balance');
         const cashBalanceTotalEl = document.getElementById('cash-balance-total');
         if (totalCashEl) {
-            totalCashEl.innerHTML = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
+            totalCashEl.textContent = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
         }
         if (cashBalanceTotalEl) {
-            cashBalanceTotalEl.innerHTML = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
+            cashBalanceTotalEl.textContent = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
         }
     } else {
         // Use FieldRendererService directly
-        document.getElementById('total-cash-balance').innerHTML = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
-        document.getElementById('cash-balance-total').innerHTML = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
+        const totalCashBalanceEl = document.getElementById('total-cash-balance');
+        const cashBalanceTotalEl2 = document.getElementById('cash-balance-total');
+        if (totalCashBalanceEl) {
+            totalCashBalanceEl.textContent = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
+        }
+        if (cashBalanceTotalEl2) {
+            cashBalanceTotalEl2.textContent = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
+        }
     }
     
     // Cash balance by account
     const cashByAccount = document.getElementById('cash-balance-by-account');
     if (cashByAccount && data.cash_balance_by_account) {
-        cashByAccount.innerHTML = data.cash_balance_by_account.map(acc => `
-                <div class="d-flex justify-content-between mb-1 text-small">
-                    <span>${acc.account_name}:</span>
-                    <span>${window.FieldRendererService.renderAmount(acc.balance, '$', 0, false)}</span>
-                </div>
-            `).join('');
+        cashByAccount.textContent = '';
+        data.cash_balance_by_account.forEach(acc => {
+            const div = document.createElement('div');
+            div.className = 'd-flex justify-content-between mb-1 text-small';
+            const span1 = document.createElement('span');
+            span1.textContent = `${acc.account_name}:`;
+            const span2 = document.createElement('span');
+            span2.textContent = window.FieldRendererService.renderAmount(acc.balance, '$', 0, false);
+            div.appendChild(span1);
+            div.appendChild(span2);
+            cashByAccount.appendChild(div);
+        });
     }
     
     // Portfolio value - using FieldRendererService
     const portfolioValueEl = document.getElementById('total-portfolio-value');
     if (portfolioValueEl) {
-        portfolioValueEl.innerHTML = window.FieldRendererService.renderAmount(data.total_portfolio_value, '$', 0, false);
+        portfolioValueEl.textContent = window.FieldRendererService.renderAmount(data.total_portfolio_value, '$', 0, false);
     }
     
     // P/L - using FieldRendererService
@@ -1421,16 +1456,16 @@ function updateSummaryCards(data) {
     const unrealizedPlEl = document.getElementById('unrealized-pl');
     
     if (totalPlEl) {
-        totalPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_pl, '$', 0, true);
+        totalPlEl.textContent = window.FieldRendererService.renderAmount(data.total_pl, '$', 0, true);
     }
     if (totalPlDetailEl) {
-        totalPlDetailEl.innerHTML = window.FieldRendererService.renderAmount(data.total_pl, '$', 0, true);
+        totalPlDetailEl.textContent = window.FieldRendererService.renderAmount(data.total_pl, '$', 0, true);
     }
     if (realizedPlEl) {
-        realizedPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_realized_pl, '$', 0, true);
+        realizedPlEl.textContent = window.FieldRendererService.renderAmount(data.total_realized_pl, '$', 0, true);
     }
     if (unrealizedPlEl) {
-        unrealizedPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_unrealized_pl, '$', 0, true);
+        unrealizedPlEl.textContent = window.FieldRendererService.renderAmount(data.total_unrealized_pl, '$', 0, true);
     }
     
     // Calculate P/L percentage with zero-division check
@@ -1455,7 +1490,8 @@ function updateSummaryCards(data) {
     } else {
         const plPercentNum = parseFloat(plPercent);
             if (window.FieldRendererService) {
-                plPercentEl.innerHTML = `(${window.FieldRendererService.renderNumericValue(plPercentNum, '%', true)})`;
+                const renderedValue = window.FieldRendererService.renderNumericValue(plPercentNum, '%', true);
+                plPercentEl.textContent = `(${renderedValue})`;
             } else {
                 // Fallback
                 plPercentEl.textContent = `(${plPercentNum >= 0 ? '+' : ''}${plPercent}%)`;
@@ -1476,15 +1512,19 @@ function updateSummaryCards(data) {
     // Positions by account
     const positionsByAccount = document.getElementById('positions-by-account');
     if (positionsByAccount && data.positions_count_by_account) {
-        positionsByAccount.innerHTML = data.positions_count_by_account.map(acc => {
+        positionsByAccount.textContent = '';
+        data.positions_count_by_account.forEach(acc => {
             const accountName = allTradingAccounts.find(a => a.id === acc.account_id)?.name || `Account #${acc.account_id}`;
-            return `
-                <div class="d-flex justify-content-between mb-1 text-small">
-                    <span>${accountName}:</span>
-                    <span>${acc.count}</span>
-                </div>
-            `;
-        }).join('');
+            const div = document.createElement('div');
+            div.className = 'd-flex justify-content-between mb-1 text-small';
+            const span1 = document.createElement('span');
+            span1.textContent = `${accountName}:`;
+            const span2 = document.createElement('span');
+            span2.textContent = acc.count;
+            div.appendChild(span1);
+            div.appendChild(span2);
+            positionsByAccount.appendChild(div);
+        });
     }
 }
 
@@ -2929,8 +2969,14 @@ function compareDates() {
     };
     
     // Update headers
-    document.getElementById('comparison-date1-header').innerHTML = formatDate(date1);
-    document.getElementById('comparison-date2-header').innerHTML = formatDate(date2);
+    const date1Header = document.getElementById('comparison-date1-header');
+    const date2Header = document.getElementById('comparison-date2-header');
+    if (date1Header) {
+        date1Header.textContent = formatDate(date1);
+    }
+    if (date2Header) {
+        date2Header.textContent = formatDate(date2);
+    }
     
     // Show comparison table and hide placeholder
     document.getElementById('comparison-table-wrapper').style.display = 'block';
@@ -2947,7 +2993,9 @@ function compareDates() {
     ];
     
     const tbody = document.getElementById('comparison-table-body');
-    tbody.innerHTML = comparisonData.map(item => {
+    tbody.textContent = '';
+    const parser = new DOMParser();
+    comparisonData.forEach(item => {
         const change = item.value1 - item.value2;
         const changePercent = ((change / item.value2) * 100).toFixed(1);
         
@@ -2961,23 +3009,54 @@ function compareDates() {
             changeDisplay = `${changeAmount} (${changePercentHtml})`;
         } else {
             // Fallback
-        const isPositive = change >= 0;
-        const changeClass = isPositive ? 'text-success' : 'text-danger';
-        const changeSign = isPositive ? '+' : '';
+            const isPositive = change >= 0;
+            const changeClass = isPositive ? 'text-success' : 'text-danger';
+            const changeSign = isPositive ? '+' : '';
             value1Display = formatCurrency(item.value1);
             value2Display = formatCurrency(item.value2);
-            changeDisplay = `<span class="${changeClass}">${changeSign}${formatCurrency(change)} (${changeSign}${changePercent}%)</span>`;
+            const changeSpan = document.createElement('span');
+            changeSpan.className = changeClass;
+            changeSpan.textContent = `${changeSign}${formatCurrency(change)} (${changeSign}${changePercent}%)`;
+            changeDisplay = changeSpan.outerHTML;
         }
         
-        return `
-            <tr>
-                <td>${item.metric}</td>
-                <td>${value1Display}</td>
-                <td>${value2Display}</td>
-                <td>${changeDisplay}</td>
-            </tr>
-        `;
-    }).join('');
+        const row = document.createElement('tr');
+        const metricCell = document.createElement('td');
+        metricCell.textContent = item.metric;
+        row.appendChild(metricCell);
+        
+        const value1Cell = document.createElement('td');
+        if (window.FieldRendererService) {
+            value1Cell.textContent = value1Display;
+        } else {
+            value1Cell.textContent = value1Display;
+        }
+        row.appendChild(value1Cell);
+        
+        const value2Cell = document.createElement('td');
+        if (window.FieldRendererService) {
+            value2Cell.textContent = value2Display;
+        } else {
+            value2Cell.textContent = value2Display;
+        }
+        row.appendChild(value2Cell);
+        
+        const changeCell = document.createElement('td');
+        if (window.FieldRendererService) {
+            changeCell.textContent = changeDisplay;
+        } else {
+            const doc = parser.parseFromString(changeDisplay, 'text/html');
+            const span = doc.body.querySelector('span');
+            if (span) {
+                changeCell.appendChild(span);
+            } else {
+                changeCell.textContent = changeDisplay;
+            }
+        }
+        row.appendChild(changeCell);
+        
+        tbody.appendChild(row);
+    });
 }
 
 // Remove comparison date
@@ -3157,7 +3236,14 @@ async function waitForScripts() {
                 if (!tbody) return;
                 
                 if (filteredTrades.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="13" class="text-center text-muted">אין טריידים להצגה</td></tr>';
+                    tbody.textContent = '';
+                    const emptyRow = document.createElement('tr');
+                    const emptyCell = document.createElement('td');
+                    emptyCell.colSpan = 13;
+                    emptyCell.className = 'text-center text-muted';
+                    emptyCell.textContent = 'אין טריידים להצגה';
+                    emptyRow.appendChild(emptyCell);
+                    tbody.appendChild(emptyRow);
                     const summaryElement = document.getElementById('trades-summary');
                     if (summaryElement) {
                         summaryElement.textContent = 'אין טריידים';
@@ -3165,7 +3251,16 @@ async function waitForScripts() {
                     return;
                 }
                 
-                tbody.innerHTML = filteredTrades.map(trade => renderTradeRow(trade)).join('');
+                tbody.textContent = '';
+                const parser = new DOMParser();
+                filteredTrades.forEach(trade => {
+                    const rowHTML = renderTradeRow(trade);
+                    const doc = parser.parseFromString(rowHTML, 'text/html');
+                    const row = doc.body.querySelector('tr');
+                    if (row) {
+                        tbody.appendChild(row);
+                    }
+                });
                 
                 // Update summary using InfoSummarySystem (only if container exists)
                 if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS['portfolio-state-page']) {
@@ -3182,18 +3277,29 @@ async function waitForScripts() {
                 const totalPL = filteredTrades.reduce((sum, t) => sum + (t.position_pl_value || 0), 0);
                 const summaryElement = document.getElementById('trades-summary');
                 if (summaryElement) {
-                    const renderNumericValue = (value, suffix = '%', showSign = true) => {
-                        if (window.FieldRendererService?.renderNumericValue) {
-                            return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
-                        }
-                        const sign = showSign && value >= 0 ? '+' : '';
-                        const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
-                        return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
-                    };
-                    summaryElement.innerHTML = `
-                        <strong>סה"כ טריידים: ${filteredTrades.length}</strong> | 
-                        <strong>סה"כ P/L: ${renderNumericValue(totalPL, '$')}</strong>
-                    `;
+                    summaryElement.textContent = '';
+                    const strong1 = document.createElement('strong');
+                    strong1.textContent = `סה"כ טריידים: ${filteredTrades.length}`;
+                    summaryElement.appendChild(strong1);
+                    
+                    const separator = document.createTextNode(' | ');
+                    summaryElement.appendChild(separator);
+                    
+                    const strong2 = document.createElement('strong');
+                    strong2.textContent = 'סה"כ P/L: ';
+                    summaryElement.appendChild(strong2);
+                    
+                    const plValue = window.FieldRendererService?.renderNumericValue 
+                        ? window.FieldRendererService.renderNumericValue(totalPL, '$', true)
+                        : `${totalPL >= 0 ? '+' : ''}${totalPL.toFixed(2)}$`;
+                    const plSpan = document.createElement('span');
+                    if (window.FieldRendererService) {
+                        plSpan.textContent = plValue;
+                    } else {
+                        plSpan.className = totalPL >= 0 ? 'text-success' : totalPL < 0 ? 'text-danger' : 'text-muted';
+                        plSpan.textContent = plValue;
+                    }
+                    strong2.appendChild(plSpan);
                 }
                 
                 // Note: Action buttons are now created directly in renderTradeRow() using createActionsMenu()

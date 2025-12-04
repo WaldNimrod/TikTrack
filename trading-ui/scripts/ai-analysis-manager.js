@@ -215,11 +215,59 @@
         });
         
         // Also add click handler directly to button as backup
-        const btn = document.getElementById('generateAnalysisBtnModal');
+        // Try multiple ways to find the button (Button System may replace it with dynamic ID):
+        // 1. By ID (if exists)
+        let btn = document.getElementById('generateAnalysisBtnModal');
+        
+        // 2. By text content (if Button System created it dynamically)
+        if (!btn) {
+          const buttons = formClone.querySelectorAll('button[type="submit"]');
+          btn = Array.from(buttons).find(b => 
+            b.textContent?.includes('צור ניתוח') || 
+            b.textContent?.includes('יוצר ניתוח') ||
+            b.querySelector('span')?.textContent?.includes('צור ניתוח')
+          );
+        }
+        
+        // 3. By data attribute (if Button System added it)
+        if (!btn) {
+          btn = formClone.querySelector('button[data-text*="צור ניתוח"]');
+        }
+        
         if (btn) {
+          // Set ID for future reference if missing
+          if (!btn.id) {
+            btn.id = 'generateAnalysisBtnModal';
+          }
+          
+          // Find or create text and spinner elements
+          let btnText = document.getElementById('generateAnalysisBtnTextModal');
+          let btnSpinner = document.getElementById('generateAnalysisBtnSpinnerModal');
+          
+          if (!btnText) {
+            // Try to find existing text span
+            btnText = btn.querySelector('span.btn-text') || btn.querySelector('span[id*="Text"]');
+            if (btnText && !btnText.id) {
+              btnText.id = 'generateAnalysisBtnTextModal';
+            }
+          }
+          
+          if (!btnSpinner) {
+            // Try to find existing spinner span
+            btnSpinner = btn.querySelector('span.hide') || btn.querySelector('span[id*="Spinner"]');
+            if (btnSpinner && !btnSpinner.id) {
+              btnSpinner.id = 'generateAnalysisBtnSpinnerModal';
+            }
+          }
+          
           // Remove old listener by cloning button
           const btnClone = btn.cloneNode(true);
           btn.parentNode.replaceChild(btnClone, btn);
+          
+          // Update references after clone
+          btn = document.getElementById('generateAnalysisBtnModal');
+          btnText = document.getElementById('generateAnalysisBtnTextModal');
+          btnSpinner = document.getElementById('generateAnalysisBtnSpinnerModal');
           
           btnClone.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -227,6 +275,15 @@
             window.Logger?.info('🖱️ Button click event triggered', { page: 'ai-analysis' });
             await this.handleGenerateAnalysis();
           });
+          
+          window.Logger?.info('✅ Form handler setup complete', { 
+            page: 'ai-analysis',
+            buttonId: btnClone.id,
+            hasText: !!btnText,
+            hasSpinner: !!btnSpinner
+          });
+        } else {
+          window.Logger?.warn('⚠️ Generate analysis button not found in DOM', { page: 'ai-analysis' });
         }
       } else {
         window.Logger?.warn('⚠️ aiAnalysisFormModal not found in DOM', { page: 'ai-analysis' });
@@ -294,9 +351,9 @@
         if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
           window.ModalManagerV2.hideModal('aiTemplateSelectionModal');
         } else if (bootstrap?.Modal) {
-          const templateModal = bootstrap.Modal.getInstance(document.getElementById('aiTemplateSelectionModal'));
-          if (templateModal) {
-            templateModal.hide();
+        const templateModal = bootstrap.Modal.getInstance(document.getElementById('aiTemplateSelectionModal'));
+        if (templateModal) {
+          templateModal.hide();
           }
         }
 
@@ -324,28 +381,86 @@
         // Check if any LLM providers are configured
         await this.checkLLMProvidersConfigured();
 
-        // Render variables form in modal
-        await this.renderVariablesFormModal(this.selectedTemplate);
-
-        // Update provider select
         const manager = window.AIAnalysisManager || this;
-        if (typeof manager.updateProviderSelectModal === 'function') {
-          manager.updateProviderSelectModal();
-        } else if (typeof manager.updateProviderSelect === 'function') {
-          // Fallback to page version
-          manager.updateProviderSelect();
-        }
-        
-        // Setup form handler when modal is opened (to ensure it's connected)
-        if (typeof manager.setupFormHandler === 'function') {
-          manager.setupFormHandler();
-        }
+        const template = this.selectedTemplate;
 
         // Show modal using ModalManagerV2 if available, otherwise Bootstrap
+        // IMPORTANT: Render form AFTER modal is shown to ensure proper data flow through ModalManagerV2
         let modalShown = false;
         if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
           try {
-            await window.ModalManagerV2.showModal('aiVariablesModal', 'view');
+            // Open modal first - ModalManagerV2 will handle nested modal detection and z-index
+            await window.ModalManagerV2.showModal('aiVariablesModal', 'view', null, {
+              template: template // Pass template data through options for later use
+            });
+            
+            // After modal is shown, render the form
+            // Use shown.bs.modal event to ensure modal is fully visible and DOM is ready
+            const modalElement = document.getElementById('aiVariablesModal');
+            if (modalElement) {
+              const renderFormAfterShow = async () => {
+                window.Logger?.info('Modal shown via ModalManagerV2, rendering variables form', { page: 'ai-analysis' });
+                
+                // Render variables form in modal (now that modal is open and DOM is ready)
+                await manager.renderVariablesFormModal(template);
+
+        // Update provider select
+        if (typeof manager.updateProviderSelectModal === 'function') {
+          manager.updateProviderSelectModal();
+        } else if (typeof manager.updateProviderSelect === 'function') {
+          manager.updateProviderSelect();
+        }
+
+                // Populate tickers after form is rendered (if needed)
+                const tickerSelect = document.querySelector('#aiVariablesModal select[data-needs-ticker-population="true"]');
+                if (tickerSelect && window.SelectPopulatorService) {
+                  try {
+                    window.Logger?.info('🔄 Populating tickers after modal shown', { 
+                      page: 'ai-analysis', 
+                      selectId: tickerSelect.id 
+                    });
+                    
+                    await window.SelectPopulatorService.populateTickersSelect(tickerSelect, {
+                      includeEmpty: true,
+                      emptyText: 'בחר טיקר...'
+                    });
+                    
+                    // Add "אחר" option after tickers
+                    const otherOption = document.createElement('option');
+                    otherOption.value = '__other__';
+                    otherOption.textContent = 'אחר';
+                    tickerSelect.appendChild(otherOption);
+                    
+                    tickerSelect.removeAttribute('data-needs-ticker-population');
+                    
+                    window.Logger?.info('✅ Tickers populated after modal shown', { 
+                      page: 'ai-analysis', 
+                      selectId: tickerSelect.id,
+                      optionsCount: tickerSelect.options.length 
+                    });
+                  } catch (error) {
+                    window.Logger?.warn('Error populating tickers after modal shown', error, { page: 'ai-analysis' });
+                  }
+                }
+                
+                // Setup form handler after form is rendered
+                if (typeof manager.setupFormHandler === 'function') {
+                  setTimeout(() => {
+                    manager.setupFormHandler();
+                    window.Logger?.debug('Form handler setup after modal shown', { page: 'ai-analysis' });
+                  }, 100);
+                }
+              };
+              
+              // Listen for modal shown event (Bootstrap event)
+              modalElement.addEventListener('shown.bs.modal', renderFormAfterShow, { once: true });
+              
+              // If modal is already shown, call immediately
+              if (modalElement.classList.contains('show')) {
+                setTimeout(renderFormAfterShow, 50);
+              }
+            }
+            
             modalShown = true;
           } catch (error) {
             window.Logger?.warn('ModalManagerV2.showModal failed, trying Bootstrap fallback', { page: 'ai-analysis', error });
@@ -353,6 +468,53 @@
         }
         
         if (!modalShown) {
+            // Fallback: Render form first, then open modal
+            await manager.renderVariablesFormModal(template);
+
+            // Update provider select
+            if (typeof manager.updateProviderSelectModal === 'function') {
+              manager.updateProviderSelectModal();
+            } else if (typeof manager.updateProviderSelect === 'function') {
+              manager.updateProviderSelect();
+            }
+            
+            // Populate tickers after form is rendered (if needed)
+            const tickerSelect = document.querySelector('#aiVariablesModal select[data-needs-ticker-population="true"]');
+            if (tickerSelect && window.SelectPopulatorService) {
+              try {
+                window.Logger?.info('🔄 Populating tickers (fallback)', { 
+                  page: 'ai-analysis', 
+                  selectId: tickerSelect.id 
+                });
+                
+                await window.SelectPopulatorService.populateTickersSelect(tickerSelect, {
+                  includeEmpty: true,
+                  emptyText: 'בחר טיקר...'
+                });
+                
+                // Add "אחר" option after tickers
+                const otherOption = document.createElement('option');
+                otherOption.value = '__other__';
+                otherOption.textContent = 'אחר';
+                tickerSelect.appendChild(otherOption);
+                
+                tickerSelect.removeAttribute('data-needs-ticker-population');
+                
+                window.Logger?.info('✅ Tickers populated (fallback)', { 
+                  page: 'ai-analysis', 
+                  selectId: tickerSelect.id,
+                  optionsCount: tickerSelect.options.length 
+                });
+              } catch (error) {
+                window.Logger?.warn('Error populating tickers (fallback)', error, { page: 'ai-analysis' });
+              }
+            }
+            
+            // Setup form handler
+            if (typeof manager.setupFormHandler === 'function') {
+              manager.setupFormHandler();
+            }
+
           // Fallback to Bootstrap Modal
           const modalElement = document.getElementById('aiVariablesModal');
           if (!modalElement) {
@@ -364,18 +526,18 @@
             window.Logger?.debug('Opening variables modal via Bootstrap', { page: 'ai-analysis' });
             const modal = new bootstrap.Modal(modalElement, { backdrop: false, keyboard: true });
             modal.show();
+            
+            // Setup form handler again after modal is shown
+            setTimeout(() => {
+              if (typeof manager.setupFormHandler === 'function') {
+                manager.setupFormHandler();
+                window.Logger?.debug('Form handler setup after modal shown', { page: 'ai-analysis' });
+              }
+            }, 200);
           } else {
             throw new Error('Bootstrap Modal not available');
           }
         }
-        
-        // Setup form handler again after modal is shown (to ensure DOM is ready)
-        setTimeout(() => {
-          if (typeof manager.setupFormHandler === 'function') {
-            manager.setupFormHandler();
-            window.Logger?.debug('Form handler setup after modal shown', { page: 'ai-analysis' });
-          }
-        }, 200);
 
         window.Logger?.info('Variables modal opened', { page: 'ai-analysis' });
       } catch (error) {
@@ -539,7 +701,7 @@
           }
           
           const col = document.createElement('div');
-          col.className = 'col-md-6 mb-3';
+          col.className = 'col-md-4 mb-3';
 
           const label = document.createElement('label');
           label.className = 'form-label';
@@ -552,11 +714,17 @@
           select.id = `var_modal_${variable.key}`;
           select.name = variable.key;
           
-          // Add empty option
+          // Add empty option (only if not using tickers - tickers will add their own)
+          const isTickerField = (variable.key === 'ticker_symbol' || variable.key === 'stock_ticker') &&
+                                window.SelectPopulatorService && 
+                                typeof window.SelectPopulatorService.populateTickersSelect === 'function';
+          
+          if (!isTickerField) {
           const emptyOption = document.createElement('option');
           emptyOption.value = '';
           emptyOption.textContent = 'בחר...';
           select.appendChild(emptyOption);
+          }
 
           // Populate options based on variable type and key
           let options = [];
@@ -668,31 +836,85 @@
           container.appendChild(col);
 
           // Populate tickers select if needed (after element is in DOM)
+          // Store reference for later population after modal is shown
           if (select.getAttribute('data-populate-tickers') === 'true') {
-            // Use SelectPopulatorService to populate tickers
-            // Note: populateTickersSelect will add empty option, so we need to remove it first
-            // and add "אחר" after population
-            (async () => {
+            // Mark for population - will be populated after modal is shown
+            select.setAttribute('data-needs-ticker-population', 'true');
+            
+            // Also try immediate population as fallback (in case modal is already shown)
+            setTimeout(async () => {
               try {
-                await window.SelectPopulatorService.populateTickersSelect(select, {
-                  includeEmpty: false, // Don't add empty option - we already have it
+                // Wait for SelectPopulatorService to be available
+                let retries = 0;
+                while (!window.SelectPopulatorService && retries < 10) {
+                  await new Promise(resolve => setTimeout(resolve, 100));
+                  retries++;
+                }
+                
+                if (!window.SelectPopulatorService) {
+                  window.Logger?.warn('SelectPopulatorService not available for immediate ticker population', { page: 'ai-analysis' });
+                  return;
+                }
+                
+                // Check if select still exists and needs population
+                const selectEl = document.getElementById(select.id);
+                if (!selectEl || selectEl.getAttribute('data-needs-ticker-population') !== 'true') {
+                  return; // Already populated or removed
+                }
+                
+                // Populate tickers - includeEmpty: true so it adds "בחר..." option
+                window.Logger?.info('🔄 Starting ticker population (immediate)', { 
+                  page: 'ai-analysis', 
+                  selectId: select.id 
+                });
+                
+                await window.SelectPopulatorService.populateTickersSelect(selectEl, {
+                  includeEmpty: true, // Add empty option "בחר טיקר..."
                   emptyText: 'בחר טיקר...'
                 });
+                
+                // Verify tickers were loaded
+                const tickerOptionsCount = selectEl.options.length;
+                window.Logger?.info('✅ Tickers populated (immediate)', { 
+                  page: 'ai-analysis', 
+                  selectId: selectEl.id,
+                  tickerOptionsCount 
+                });
+                
+                if (tickerOptionsCount > 1) {
+                  // Mark as populated
+                  selectEl.removeAttribute('data-needs-ticker-population');
                 
                 // After tickers are populated, add "אחר" option at the end
                 const otherOption = document.createElement('option');
                 otherOption.value = '__other__';
                 otherOption.textContent = 'אחר';
-                select.appendChild(otherOption);
+                  selectEl.appendChild(otherOption);
+                  
+                  window.Logger?.info('✅ Added "אחר" option after tickers', { 
+                    page: 'ai-analysis', 
+                    selectId: selectEl.id,
+                    totalOptions: selectEl.options.length,
+                    tickerOptionsCount 
+                  });
+                } else {
+                  window.Logger?.warn('⚠️ No tickers loaded - only empty option found', { 
+                    page: 'ai-analysis', 
+                    selectId: selectEl.id 
+                  });
+                }
               } catch (error) {
-                window.Logger?.warn('Error populating tickers', error, { page: 'ai-analysis' });
+                window.Logger?.warn('Error populating tickers (immediate)', error, { page: 'ai-analysis' });
                 // Add "אחר" even if population failed
+                const selectEl = document.getElementById(select.id);
+                if (selectEl) {
                 const otherOption = document.createElement('option');
                 otherOption.value = '__other__';
                 otherOption.textContent = 'אחר';
-                select.appendChild(otherOption);
+                  selectEl.appendChild(otherOption);
               }
-            })();
+              }
+            }, 200); // Small delay to ensure DOM is ready
           }
         }
       } catch (error) {
@@ -811,7 +1033,7 @@
       const container = document.getElementById('variablesContainer');
       if (!container) return;
 
-      container.innerHTML = '';
+      container.textContent = '';
 
       try {
         const variables = template.variables_json?.variables || [];
@@ -965,21 +1187,25 @@
           return;
         }
 
-        // Fallback to direct API call
+        // Fallback to direct API call - use /api/tickers/my
         window.Logger?.warn('SelectPopulatorService not available, using direct API call', { page: 'ai-analysis' });
-        const response = await fetch('/api/tickers/');
+        let response = await fetch('/api/tickers/my');
+        if (!response.ok) {
+          // Fallback to /api/tickers/ if /my fails
+          response = await fetch('/api/tickers/');
+        }
         if (response.ok) {
           const data = await response.json();
-          if (data.status === 'success' && data.data) {
-            data.data.forEach((ticker) => {
-              const optionEl = document.createElement('option');
-              optionEl.value = ticker.symbol || ticker.id;
-              // Display ticker + company name
-              const displayText = ticker.name ? `${ticker.symbol} - ${ticker.name}` : ticker.symbol;
-              optionEl.textContent = displayText || `Ticker #${ticker.id}`;
-              select.appendChild(optionEl);
-            });
-          }
+          const tickers = data.status === 'success' && data.data ? data.data : (Array.isArray(data) ? data : []);
+          tickers.forEach((ticker) => {
+            const optionEl = document.createElement('option');
+            optionEl.value = ticker.symbol || ticker.id;
+            // Display ticker + company name (use custom name if available)
+            const displayName = ticker.name_custom || ticker.name || ticker.symbol;
+            const displayText = displayName ? `${ticker.symbol} - ${displayName}` : ticker.symbol;
+            optionEl.textContent = displayText || `Ticker #${ticker.id}`;
+            select.appendChild(optionEl);
+          });
         }
       } catch (error) {
         window.Logger?.warn('Error loading tickers', error, { page: 'ai-analysis' });
@@ -1042,20 +1268,41 @@
         // Use DataCollectionService for standard field collection
         variables = window.DataCollectionService.collectFormData(fieldMap) || {};
         
-        // Handle "אחר" option - check each select field for "__other__" value
+        // Handle "אחר" option and convert ticker IDs to text - check each select field
         Object.keys(fieldMap).forEach((key) => {
           const fieldConfig = fieldMap[key];
           const selectElement = document.getElementById(fieldConfig.id);
           
-          if (selectElement && selectElement.tagName === 'SELECT' && selectElement.value === '__other__') {
-            // Use value from "אחר" input instead
-            const otherInputId = `${fieldConfig.id}_other`;
-            const otherInput = document.getElementById(otherInputId);
-            if (otherInput && otherInput.value) {
-              variables[key] = otherInput.value;
-            } else {
-              // Remove "__other__" if no value in "אחר" input
-              delete variables[key];
+          if (selectElement && selectElement.tagName === 'SELECT') {
+            if (selectElement.value === '__other__') {
+              // Use value from "אחר" input instead
+              const otherInputId = `${fieldConfig.id}_other`;
+              const otherInput = document.getElementById(otherInputId);
+              if (otherInput && otherInput.value) {
+                variables[key] = otherInput.value;
+              } else {
+                // Remove "__other__" if no value in "אחר" input
+                delete variables[key];
+              }
+            } else if (selectElement.value && (key === 'stock_ticker' || key === 'ticker_symbol')) {
+              // For ticker fields, use the text content of the selected option instead of ID
+              const selectedOption = selectElement.options[selectElement.selectedIndex];
+              if (selectedOption && selectedOption.textContent) {
+                // Extract ticker symbol from text (e.g., "TSLA - Tesla, Inc." -> "TSLA")
+                const optionText = selectedOption.textContent.trim();
+                // If text contains " - ", take the part before it (the ticker symbol)
+                const tickerSymbol = optionText.includes(' - ') 
+                  ? optionText.split(' - ')[0].trim()
+                  : optionText;
+                variables[key] = tickerSymbol;
+                window.Logger?.debug('Converted ticker ID to symbol', {
+                  page: 'ai-analysis',
+                  key,
+                  id: selectElement.value,
+                  symbol: tickerSymbol,
+                  fullText: optionText
+                });
+              }
             }
           }
         });
@@ -1079,7 +1326,27 @@
                 variables[input.name] = otherInput.value;
               }
             } else if (select.value) {
-              variables[input.name] = select.value;
+              // For ticker fields, convert ID to symbol text
+              if ((input.name === 'stock_ticker' || input.name === 'ticker_symbol') && select.selectedIndex >= 0) {
+                const selectedOption = select.options[select.selectedIndex];
+                if (selectedOption && selectedOption.textContent) {
+                  const optionText = selectedOption.textContent.trim();
+                  const tickerSymbol = optionText.includes(' - ') 
+                    ? optionText.split(' - ')[0].trim()
+                    : optionText;
+                  variables[input.name] = tickerSymbol;
+                  window.Logger?.debug('Converted ticker ID to symbol (fallback)', {
+                    page: 'ai-analysis',
+                    name: input.name,
+                    id: select.value,
+                    symbol: tickerSymbol
+                  });
+                } else {
+                  variables[input.name] = select.value;
+                }
+              } else {
+                variables[input.name] = select.value;
+              }
             }
           } else if (input.value) {
             variables[input.name] = input.value;
@@ -1100,17 +1367,28 @@
       });
 
       // Set loading state - check both modal and page
-      const isModal = document.getElementById('generateAnalysisBtnModal');
+      // Check if we're in modal by looking for the modal form
+      const modalForm = document.getElementById('aiAnalysisFormModal');
+      const isModal = !!modalForm;
+      
+      // Set loading state IMMEDIATELY to prevent double clicks (synchronous operation)
       if (isModal) {
         this.setLoadingState(true, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal', 'מתחיל...');
       } else {
         this.setLoadingState(true, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner', 'מתחיל...');
       }
-
-      // Show initial loading notification
-      if (window.NotificationSystem) {
-        window.NotificationSystem.showInfo('🚀 מתחיל תהליך יצירת הניתוח...', 'system', { duration: 3000 });
-      }
+      
+      // Show progress overlay IMMEDIATELY
+      this.showProgressOverlay(1, 'מתחיל תהליך יצירת הניתוח...', 'מאתחל את המערכת ומכין את הנתונים');
+      
+      // Force a small delay to ensure UI updates are visible
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      window.Logger?.info('🚀 Starting analysis generation process', {
+        page: 'ai-analysis',
+        templateId: this.selectedTemplate.id,
+        provider
+      });
 
       // Validate request before generating analysis using Business Logic Layer
       if (window.AIAnalysisData?.validateAnalysisRequest) {
@@ -1122,11 +1400,10 @@
             this.setLoadingState(true, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner', 'מאמת נתונים...');
           }
           
-          window.Logger?.info?.('🔍 Validating analysis request...', { page: 'ai-analysis' });
+          // Update progress overlay to step 2
+          this.showProgressOverlay(2, 'מאמת נתונים...', 'בודק תקינות הנתונים והגדרות');
           
-          if (window.NotificationSystem) {
-            window.NotificationSystem.showInfo('🔍 מאמת נתונים...', 'system', { duration: 2000 });
-          }
+          window.Logger?.info?.('🔍 Validating analysis request...', { page: 'ai-analysis' });
           
           const validationResult = await window.AIAnalysisData.validateAnalysisRequest({
             template_id: this.selectedTemplate.id,
@@ -1135,6 +1412,9 @@
           });
 
           if (!validationResult.is_valid) {
+            // Hide progress overlay on error
+            this.hideProgressOverlay();
+            
             // Reset loading state
             if (isModal) {
               this.setLoadingState(false, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal');
@@ -1167,10 +1447,12 @@
             this.setLoadingState(true, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner', 'יוצר ניתוח...');
           }
           
-          if (window.NotificationSystem) {
-            window.NotificationSystem.showInfo('✅ אימות הצליח - יוצר ניתוח... זה עלול לקחת דקה-שתיים', 'system', { duration: 5000 });
-          }
+          // Update progress overlay to step 3
+          this.showProgressOverlay(3, 'שולח בקשה למנוע AI...', 'מתחבר למנוע ומעביר את הנתונים');
         } catch (validationError) {
+          // Hide progress overlay on error
+          this.hideProgressOverlay();
+          
           // Reset loading state on validation error
           if (isModal) {
             this.setLoadingState(false, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal');
@@ -1208,7 +1490,7 @@
         });
 
         if (window.NotificationSystem) {
-          window.NotificationSystem.showInfo('📤 שולח בקשה לשרת... ממתין לתגובת המנוע', 'system', { duration: 3000 });
+          window.NotificationSystem.showInfo('📤 שולח בקשה לשרת... ממתין לתגובת המנוע', 'system', { duration: 8000 });
         }
 
         // Build API URL
@@ -1223,6 +1505,9 @@
           this.setLoadingState(true, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner', 'ממתין לתגובה...');
         }
         
+        // Update progress overlay to step 4
+        this.showProgressOverlay(4, 'ממתין לתגובת המנוע...', 'המנוע מעבד את הבקשה - זה עלול לקחת 30-60 שניות');
+
         // Make API call directly to use CRUDResponseHandler
         const response = await fetch(apiUrl, {
           method: 'POST',
@@ -1236,41 +1521,42 @@
             provider: provider,
           }),
         });
+        
+        // Update loading state - processing response
+        if (isModal) {
+          this.setLoadingState(true, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal', 'מעבד תגובה...');
+        } else {
+          this.setLoadingState(true, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner', 'מעבד תגובה...');
+        }
+        
+        // Update progress overlay to step 5
+        this.showProgressOverlay(5, 'מעבד תוצאות...', 'מכין את הדוח הסופי ושומר במטמון');
 
-        // Use CRUDResponseHandler for response handling
+        // Read response first to get result data before passing to CRUDResponseHandler
+        // We need to clone the response because CRUDResponseHandler will also read it
+        const responseClone = response.clone();
+        let responseData = null;
         let result = null;
-        if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function') {
-          const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {
-            modalId: 'aiVariablesModal',
-            successMessage: 'ניתוח נוצר בהצלחה!',
-            entityName: 'ניתוח AI',
-            reloadFn: async () => {
-              // Reload history after successful analysis creation
-              this.history = await window.AIAnalysisData?.loadHistory({ force: true }) || [];
-              // Check availability AFTER cache is saved (give it a moment for cache to be fully written)
-              await new Promise(resolve => setTimeout(resolve, 200)); // Delay to ensure cache is saved
-              await this.checkAvailabilityForAll();
-              this.renderHistory();
-              // Update summary stats after availability check
-              if (window.updatePageSummaryStats) {
-                window.updatePageSummaryStats('ai-analysis', this.history);
-              }
-              
-              // Show results after history is updated (if we have a pending result)
-              if (this.pendingResult && this.pendingResult.id) {
-                // Find the updated result from history to get latest availability info
-                const updatedResult = this.history.find(h => h.id === this.pendingResult.id) || this.pendingResult;
-                await this.openResultsModal(updatedResult);
-                this.pendingResult = null; // Clear pending result
-              }
-            },
-            requiresHardReload: false,
-          });
-
-          if (crudResult && crudResult.status === 'success' && crudResult.data) {
-            result = crudResult.data;
+        
+        try {
+          responseData = await response.json();
+          
+          // Extract result from response
+          if (responseData.status === 'success' && responseData.data) {
+            result = responseData.data;
             
-            // Save response_text to cache (not in DB) - only if not already cached
+            // Store result for display after reload - MUST be set BEFORE reloadFn is called
+            this.pendingResult = result;
+            
+            window.Logger?.info('✅ Analysis generated successfully - storing pending result', {
+              page: 'ai-analysis',
+              requestId: result.id,
+              status: result.status,
+              hasResponseText: !!result.response_text,
+              pendingResultSet: !!this.pendingResult
+            });
+            
+            // Save response_text to cache IMMEDIATELY (before reloadFn is called)
             if (result.id && result.response_text) {
               const cacheKey = `ai-analysis-response-${result.id}`;
               if (window.UnifiedCacheManager) {
@@ -1286,7 +1572,7 @@
                     layer: 'indexedDB',
                     compress: true
                   });
-                  window.Logger?.info('✅ Saved AI analysis response to cache', { 
+                  window.Logger?.info('✅ Saved AI analysis response to cache (before reloadFn)', { 
                     page: 'ai-analysis', 
                     requestId: result.id,
                     cacheKey,
@@ -1300,9 +1586,145 @@
                 }
               }
             }
+          }
+        } catch (error) {
+          window.Logger?.error('Error reading response before CRUDResponseHandler', {
+            page: 'ai-analysis',
+            error: error?.message || error
+          });
+        }
+
+        // Use CRUDResponseHandler for response handling
+        if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function') {
+          // Now call CRUDResponseHandler with cloned response
+          const crudResult = await window.CRUDResponseHandler.handleSaveResponse(responseClone, {
+            modalId: 'aiVariablesModal',
+            successMessage: 'ניתוח נוצר בהצלחה!',
+            entityName: 'ניתוח AI',
+            reloadFn: async () => {
+              // Update progress overlay - finalizing
+              this.showProgressOverlay(5, 'מסיים תהליך...', 'מעדכן את הטבלה ומכין את התוצאות');
+              
+              // Update loading state - updating table
+              if (isModal) {
+                this.setLoadingState(true, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal', 'מעדכן טבלה...');
+              } else {
+                this.setLoadingState(true, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner', 'מעדכן טבלה...');
+              }
+              
+              // Reload history after successful analysis creation
+              this.history = await window.AIAnalysisData?.loadHistory({ force: true }) || [];
+              
+              // Check availability AFTER cache is saved (give it a moment for cache to be fully written)
+              await new Promise(resolve => setTimeout(resolve, 200)); // Delay to ensure cache is saved
+              await this.checkAvailabilityForAll();
+              this.renderHistory();
+              // Update summary stats after availability check
+              if (window.updatePageSummaryStats) {
+                window.updatePageSummaryStats('ai-analysis', this.history);
+              }
+              
+              // Show results after history is updated (if we have a pending result)
+              if (this.pendingResult && this.pendingResult.id) {
+                window.Logger?.info('📊 Opening results modal for pending result', {
+                  page: 'ai-analysis',
+                  pendingResultId: this.pendingResult.id,
+                  hasResponseText: !!this.pendingResult.response_text
+                });
+                
+                // Find the updated result from history to get latest availability info
+                const updatedResult = this.history.find(h => h.id === this.pendingResult.id) || this.pendingResult;
+                
+                // Ensure we have response_text from pendingResult if not in updatedResult
+                if (!updatedResult.response_text && this.pendingResult.response_text) {
+                  updatedResult.response_text = this.pendingResult.response_text;
+                }
+                
+                // Hide progress overlay before showing results
+                this.hideProgressOverlay();
+                
+                await this.openResultsModal(updatedResult);
+                this.pendingResult = null; // Clear pending result
+                
+                // Reset loading state after results are shown
+                if (isModal) {
+                  this.setLoadingState(false, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal');
+                } else {
+                  this.setLoadingState(false, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner');
+                }
+              } else {
+                window.Logger?.warn('⚠️ No pending result to display', {
+                  page: 'ai-analysis',
+                  pendingResult: this.pendingResult,
+                  historyLength: this.history.length
+                });
+                
+                // Hide progress overlay
+                this.hideProgressOverlay();
+                
+                // Reset loading state
+                if (isModal) {
+                  this.setLoadingState(false, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal');
+                } else {
+                  this.setLoadingState(false, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner');
+                }
+                
+                // If no pending result but analysis was created, show info
+                if (window.NotificationSystem) {
+                  window.NotificationSystem.showInfo(
+                    '✅ הניתוח נוצר בהצלחה. ניתן לצפות בו מהטבלה.',
+                    'business',
+                    { duration: 5000 }
+                  );
+                }
+              }
+            },
+            requiresHardReload: false,
+          });
+
+          if (crudResult && crudResult.status === 'success' && crudResult.data) {
+            // result already set above, just verify
+            if (!result) {
+              result = crudResult.data;
+              this.pendingResult = result;
+            }
             
-            // Store result for display after reload
-            this.pendingResult = result;
+            // Show success notification immediately
+            if (window.NotificationSystem) {
+              window.NotificationSystem.showSuccess(
+                `✅ הניתוח הושלם בהצלחה! מספר בקשה: ${result.id || 'N/A'}`,
+                'business',
+                { duration: 5000 }
+              );
+            }
+            
+            window.Logger?.info('✅ Analysis generated successfully (CRUD path)', {
+              page: 'ai-analysis',
+              requestId: result.id,
+              status: result.status,
+              hasResponseText: !!result.response_text,
+              pendingResultSet: !!this.pendingResult
+            });
+          } else {
+            // Handle error from CRUDResponseHandler
+            const errorMessage = crudResult?.error?.message || crudResult?.message || 'שגיאה לא ידועה ביצירת הניתוח';
+            
+            // Hide progress overlay on error
+            this.hideProgressOverlay();
+            
+            window.Logger?.error('❌ Analysis generation failed', {
+              page: 'ai-analysis',
+              error: errorMessage,
+              crudResult
+            });
+            
+            if (window.NotificationSystem) {
+              window.NotificationSystem.showError(
+                `❌ הניתוח נכשל: ${errorMessage}`,
+                'system',
+                { duration: 8000 }
+              );
+            }
           }
         } else {
           // Fallback to manual handling
@@ -1323,23 +1745,23 @@
                 // Check if already in cache before saving
                 const existingCache = await window.UnifiedCacheManager.get(cacheKey);
                 if (!existingCache || !existingCache.response_text) {
-                  const saveResult = await window.UnifiedCacheManager.save(cacheKey, {
-                    response_text: result.response_text,
-                    response_json: result.response_json || null,
-                    cached_at: new Date().toISOString()
-                  }, {
-                    ttl: 7200000, // 2 hours
-                    layer: 'indexedDB',
-                    compress: true
+                const saveResult = await window.UnifiedCacheManager.save(cacheKey, {
+                  response_text: result.response_text,
+                  response_json: result.response_json || null,
+                  cached_at: new Date().toISOString()
+                }, {
+                  ttl: 7200000, // 2 hours
+                  layer: 'indexedDB',
+                  compress: true
+                });
+                
+                if (saveResult) {
+                  window.Logger?.info('✅ Saved AI analysis response to cache', { 
+                    page: 'ai-analysis', 
+                    requestId: result.id,
+                    cacheKey,
+                    hasResponseText: !!result.response_text
                   });
-                  
-                  if (saveResult) {
-                    window.Logger?.info('✅ Saved AI analysis response to cache', { 
-                      page: 'ai-analysis', 
-                      requestId: result.id,
-                      cacheKey,
-                      hasResponseText: !!result.response_text
-                    });
                   
                   // Update availability for this specific item immediately
                   if (this.history) {
@@ -1368,25 +1790,39 @@
                 window.Logger?.debug('⏭️ Skipped cache save - already exists (handleGenerateAnalysis fallback)', { 
                   page: 'ai-analysis', 
                   requestId: result.id
-                });
-              }
-            }
-          }
-            
-            // Close variables modal
-            if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
-              window.ModalManagerV2.hideModal('aiVariablesModal');
-            } else if (bootstrap?.Modal) {
-              const variablesModal = bootstrap.Modal.getInstance(document.getElementById('aiVariablesModal'));
-              if (variablesModal) {
-                variablesModal.hide();
+                  });
+                }
               }
             }
             
             // Show success notification
             if (window.NotificationSystem) {
-              window.NotificationSystem.showSuccess('ניתוח נוצר בהצלחה!', 'business');
+              window.NotificationSystem.showSuccess(
+                `✅ הניתוח הושלם בהצלחה! מספר בקשה: ${result.id || 'N/A'}`,
+                'business',
+                { duration: 5000 }
+              );
             }
+            
+            window.Logger?.info('✅ Analysis generated successfully (fallback path)', {
+              page: 'ai-analysis',
+              requestId: result.id,
+              status: result.status,
+              hasResponseText: !!result.response_text
+            });
+            
+            // Close variables modal
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+              window.ModalManagerV2.hideModal('aiVariablesModal');
+            } else if (bootstrap?.Modal) {
+            const variablesModal = bootstrap.Modal.getInstance(document.getElementById('aiVariablesModal'));
+            if (variablesModal) {
+              variablesModal.hide();
+              }
+            }
+            
+            // Update progress overlay - finalizing
+            this.showProgressOverlay(5, 'מסיים תהליך...', 'מעדכן את הטבלה ומכין את התוצאות');
             
             // Reload history
             this.history = await window.AIAnalysisData?.loadHistory({ force: true }) || [];
@@ -1401,9 +1837,24 @@
             
             // Show results modal after history is updated
             if (result && result.id) {
+              // Hide progress overlay before showing results
+              this.hideProgressOverlay();
+              
               // Ensure we have the latest result with cache info
               const updatedResult = this.history.find(h => h.id === result.id) || result;
               await this.openResultsModal(updatedResult);
+            } else {
+              // Hide progress overlay
+              this.hideProgressOverlay();
+              
+              // If no result ID, show info
+              if (window.NotificationSystem) {
+                window.NotificationSystem.showInfo(
+                  '✅ הניתוח נוצר בהצלחה. ניתן לצפות בו מהטבלה.',
+                  'business',
+                  { duration: 5000 }
+                );
+              }
             }
           } else {
             throw new Error(data.message || 'שגיאה ביצירת ניתוח');
@@ -1416,11 +1867,42 @@
           await this.openResultsModal(result);
         }
       } catch (error) {
-        window.Logger?.error('Error generating analysis', error, { page: 'ai-analysis' });
+        // Hide progress overlay on error
+        this.hideProgressOverlay();
+        
+        window.Logger?.error('❌ Error generating analysis', {
+          page: 'ai-analysis',
+          error: error?.message || error,
+          stack: error?.stack
+        });
+        
+        // Show detailed error notification
+        const errorMessage = error?.message || 'שגיאה לא ידועה';
         if (window.NotificationSystem) {
-          window.NotificationSystem.showError('שגיאה ביצירת ניתוח: ' + (error.message || 'שגיאה לא ידועה'), 'system');
+          window.NotificationSystem.showError(
+            `❌ הניתוח נכשל: ${errorMessage}`,
+            'system',
+            { duration: 8000 }
+          );
+        }
+        
+        // Try to show error in results modal if possible
+        if (error?.response || error?.data) {
+          try {
+            const errorResult = {
+              status: 'failed',
+              error_message: errorMessage,
+              id: error?.data?.id || null
+            };
+            await this.openResultsModal(errorResult);
+          } catch (modalError) {
+            window.Logger?.warn('Could not show error in results modal', { page: 'ai-analysis', error: modalError });
+          }
         }
       } finally {
+        // Hide progress overlay in finally (in case it wasn't hidden already)
+        this.hideProgressOverlay();
+        
         // Reset loading state - check both modal and page
         const isModal = document.getElementById('generateAnalysisBtnModal');
         if (isModal) {
@@ -1436,6 +1918,19 @@
      */
     async openResultsModal(analysisResult) {
       try {
+        // Hide progress overlay when opening results
+        this.hideProgressOverlay();
+        
+        // Set currentAnalysis for saveAsNote functionality
+        this.currentAnalysis = analysisResult;
+        
+        window.Logger?.info('Opening results modal', { 
+          page: 'ai-analysis',
+          requestId: analysisResult?.id,
+          hasCurrentAnalysis: !!this.currentAnalysis,
+          hasResponseText: !!analysisResult?.response_text
+        });
+        
         // Render results in modal
         await this.renderResultsModal(analysisResult);
 
@@ -1445,6 +1940,23 @@
           try {
             await window.ModalManagerV2.showModal('aiResultsModal', 'view');
             modalShown = true;
+            
+            // Setup event listeners for action buttons after modal is shown
+            // Wait a bit for Button System to process buttons
+            setTimeout(() => {
+              this.setupResultsModalButtons();
+            }, 300);
+            
+            // Show success notification after modal is shown
+            if (analysisResult && analysisResult.status !== 'failed' && analysisResult.response_text) {
+              if (window.NotificationSystem) {
+                window.NotificationSystem.showSuccess(
+                  `✅ תוצאות הניתוח מוצגות. מספר בקשה: ${analysisResult.id || 'N/A'}`,
+                  'business',
+                  { duration: 5000 }
+                );
+              }
+            }
           } catch (error) {
             window.Logger?.warn('ModalManagerV2.showModal failed, trying Bootstrap fallback', { page: 'ai-analysis', error });
           }
@@ -1462,16 +1974,44 @@
             window.Logger?.debug('Opening results modal via Bootstrap', { page: 'ai-analysis' });
             const modal = new bootstrap.Modal(modalElement, { backdrop: false, keyboard: true });
             modal.show();
+            
+            // Setup event listeners for action buttons after modal is shown
+            // Wait a bit for Button System to process buttons
+            setTimeout(() => {
+              this.setupResultsModalButtons();
+            }, 300);
+            
+            // Show success notification after modal is shown
+            if (analysisResult && analysisResult.status !== 'failed' && analysisResult.response_text) {
+              setTimeout(() => {
+                if (window.NotificationSystem) {
+                  window.NotificationSystem.showSuccess(
+                    `✅ תוצאות הניתוח מוצגות. מספר בקשה: ${analysisResult.id || 'N/A'}`,
+                    'business',
+                    { duration: 5000 }
+                  );
+                }
+              }, 300);
+            }
           } else {
             throw new Error('Bootstrap Modal not available');
           }
         }
 
-        window.Logger?.info('Results modal opened', { page: 'ai-analysis' });
+        window.Logger?.info('Results modal opened', { 
+          page: 'ai-analysis',
+          requestId: analysisResult?.id,
+          status: analysisResult?.status,
+          hasResponseText: !!analysisResult?.response_text
+        });
       } catch (error) {
         window.Logger?.error('Error opening results modal', error, { page: 'ai-analysis' });
         if (window.NotificationSystem) {
-          window.NotificationSystem.showError('שגיאה בפתיחת מודול תוצאות', 'system');
+          window.NotificationSystem.showError(
+            `שגיאה בפתיחת מודול תוצאות: ${error?.message || 'שגיאה לא ידועה'}`,
+            'system',
+            { duration: 8000 }
+          );
         }
       }
     },
@@ -1487,21 +2027,57 @@
       }
 
       if (!analysisResult) {
-        container.innerHTML = '<div class="alert alert-warning">אין תוצאות להצגה</div>';
+        container.textContent = '';
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-warning';
+        alert.textContent = 'אין תוצאות להצגה';
+        container.appendChild(alert);
         return;
       }
 
       // Check if analysis failed or has no response
       if (analysisResult.status === 'failed') {
         const errorMessage = analysisResult.error_message || 'שגיאה לא ידועה ביצירת הניתוח';
-        container.innerHTML = `<div class="alert alert-danger">
-          <h5>❌ הניתוח נכשל</h5>
-          <p>${errorMessage}</p>
-          ${analysisResult.id ? `<small>מספר בקשה: ${analysisResult.id}</small>` : ''}
-        </div>`;
+        container.textContent = '';
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-danger';
+        const h5 = document.createElement('h5');
+        h5.textContent = '❌ הניתוח נכשל';
+        alert.appendChild(h5);
+        const p = document.createElement('p');
+        p.textContent = errorMessage;
+        alert.appendChild(p);
+        if (analysisResult.id) {
+          const small = document.createElement('small');
+          small.textContent = `מספר בקשה: ${analysisResult.id}`;
+          alert.appendChild(small);
+        }
+        container.appendChild(alert);
         return;
       }
 
+      // Show loading message while retrieving response
+      container.textContent = '';
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'text-center p-4';
+      const spinner = document.createElement('div');
+      spinner.className = 'spinner-border text-primary';
+      spinner.setAttribute('role', 'status');
+      const spinnerSpan = document.createElement('span');
+      spinnerSpan.className = 'visually-hidden';
+      spinnerSpan.textContent = 'טוען...';
+      spinner.appendChild(spinnerSpan);
+      loadingDiv.appendChild(spinner);
+      const p = document.createElement('p');
+      p.className = 'mt-2';
+      p.textContent = 'טוען תוצאות הניתוח...';
+      loadingDiv.appendChild(p);
+      container.appendChild(loadingDiv);
+      
+      if (window.NotificationSystem) {
+        window.NotificationSystem.showInfo('🔍 מחפש תוצאות במטמון...', 'system', { duration: 2000 });
+      }
+      
       // Try to get response_text from result first
       let responseText = analysisResult.response_text;
       
@@ -1522,6 +2098,10 @@
             requestId: analysisResult.id,
             responseLength: responseText?.length || 0
           });
+          
+          if (window.NotificationSystem) {
+            window.NotificationSystem.showSuccess('✅ נמצא במטמון! טוען תוצאות...', 'system', { duration: 2000 });
+          }
         } else {
           window.Logger?.warn('⚠️ Analysis response not found in cache', { 
             page: 'ai-analysis', 
@@ -1529,6 +2109,10 @@
             cacheKey,
             cachedDataExists: !!cachedData
           });
+          
+          if (window.NotificationSystem) {
+            window.NotificationSystem.showInfo('🔍 לא נמצא במטמון, מחפש במקורות אחרים...', 'system', { duration: 2000 });
+          }
         }
       }
       
@@ -1550,9 +2134,30 @@
       const isJustCreated = this.pendingResult && this.pendingResult.id === analysisResult.id;
       if (!responseText && !isJustCreated && analysisResult.id && analysisResult.status === 'completed') {
         window.Logger?.info('🔄 Loading analysis response from API...', { 
-          page: 'ai-analysis', 
-          requestId: analysisResult.id
-        });
+            page: 'ai-analysis', 
+            requestId: analysisResult.id 
+          });
+        
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showInfo('📡 טוען תוצאות מהשרת...', 'system', { duration: 3000 });
+        }
+        
+        container.textContent = '';
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'text-center p-4';
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner-border text-primary';
+        spinner.setAttribute('role', 'status');
+        const spinnerSpan = document.createElement('span');
+        spinnerSpan.className = 'visually-hidden';
+        spinnerSpan.textContent = 'טוען...';
+        spinner.appendChild(spinnerSpan);
+        loadingDiv.appendChild(spinner);
+        const p = document.createElement('p');
+        p.className = 'mt-2';
+        p.textContent = 'טוען תוצאות מהשרת...';
+        loadingDiv.appendChild(p);
+        container.appendChild(loadingDiv);
         
         try {
           const response = await fetch(`/api/ai-analysis/history/${analysisResult.id}`, {
@@ -1575,6 +2180,10 @@
                 // Check if already in cache before saving
                 const existingCache = await window.UnifiedCacheManager.get(cacheKey);
                 if (!existingCache || !existingCache.response_text) {
+                  if (window.NotificationSystem) {
+                    window.NotificationSystem.showInfo('💾 שומר במטמון...', 'system', { duration: 2000 });
+                  }
+                  
                   await window.UnifiedCacheManager.save(cacheKey, {
                     response_text: responseText,
                     response_json: data.data.response_json || null,
@@ -1588,6 +2197,10 @@
                     page: 'ai-analysis', 
                     requestId: analysisResult.id
                   });
+                  
+                  if (window.NotificationSystem) {
+                    window.NotificationSystem.showSuccess('✅ נשמר במטמון! מציג תוצאות...', 'system', { duration: 2000 });
+                  }
                 } else {
                   window.Logger?.debug('⏭️ Skipped cache save - already exists', { 
                     page: 'ai-analysis', 
@@ -1620,13 +2233,34 @@
       }
 
       if (!responseText) {
-        container.innerHTML = `<div class="alert alert-warning">
-          <h5>⚠️ אין תוצאות להצגה</h5>
-          <p>הניתוח הושלם אך התוצאות לא זמינות כרגע. התוצאות נשמרות במטמון למשך 2 שעות בלבד.</p>
-          <p>אם שמרת את הניתוח כהערה, תוכל למצוא אותו בעמוד הערות.</p>
-          ${analysisResult.status ? `<p><strong>סטטוס:</strong> ${analysisResult.status}</p>` : ''}
-          ${analysisResult.id ? `<p><small>מספר בקשה: ${analysisResult.id}</small></p>` : ''}
-        </div>`;
+        container.textContent = '';
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-warning';
+        const h5 = document.createElement('h5');
+        h5.textContent = '⚠️ אין תוצאות להצגה';
+        alert.appendChild(h5);
+        const p1 = document.createElement('p');
+        p1.textContent = 'הניתוח הושלם אך התוצאות לא זמינות כרגע. התוצאות נשמרות במטמון למשך 2 שעות בלבד.';
+        alert.appendChild(p1);
+        const p2 = document.createElement('p');
+        p2.textContent = 'אם שמרת את הניתוח כהערה, תוכל למצוא אותו בעמוד הערות.';
+        alert.appendChild(p2);
+        if (analysisResult.status) {
+          const p3 = document.createElement('p');
+          p3.textContent = 'סטטוס: ';
+          const strong = document.createElement('strong');
+          strong.textContent = analysisResult.status;
+          p3.appendChild(strong);
+          alert.appendChild(p3);
+        }
+        if (analysisResult.id) {
+          const p4 = document.createElement('p');
+          const small = document.createElement('small');
+          small.textContent = `מספר בקשה: ${analysisResult.id}`;
+          p4.appendChild(small);
+          alert.appendChild(p4);
+        }
+        container.appendChild(alert);
         return;
       }
 
@@ -1648,13 +2282,24 @@
             .replace(/\n/g, '<br>');
         }
 
-        container.innerHTML = htmlContent;
-        container.className = 'markdown-body';
+        // Render HTML content with proper styling (not github-markdown white-on-black)
+        container.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlContent, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          container.appendChild(node.cloneNode(true));
+        });
+        // Remove github-markdown class to use system styling
+        container.className = 'ai-analysis-results-content';
 
         window.Logger?.info('Results rendered in modal', { page: 'ai-analysis', requestId: analysisResult.id });
       } catch (error) {
         window.Logger?.error('Error rendering results in modal', error, { page: 'ai-analysis' });
-        container.innerHTML = '<div class="alert alert-danger">שגיאה בהצגת תוצאות</div>';
+        container.textContent = '';
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-danger';
+        alert.textContent = 'שגיאה בהצגת תוצאות';
+        container.appendChild(alert);
       }
     },
 
@@ -1678,7 +2323,11 @@
       if (!container) return;
 
       if (!this.history || this.history.length === 0) {
-        container.innerHTML = '<div class="alert alert-info">אין ניתוחים בהיסטוריה</div>';
+        container.textContent = '';
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-info';
+        alert.textContent = 'אין ניתוחים בהיסטוריה';
+        container.appendChild(alert);
         // Register empty table
         this.registerHistoryTable([]);
         return;
@@ -1715,7 +2364,12 @@
         </div>
       `;
 
-      container.innerHTML = tableHTML;
+      container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(tableHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+      });
 
       // Render table rows
       const tbody = document.getElementById('aiAnalysisHistoryTableBody');
@@ -2109,19 +2763,19 @@
         } else {
           // Fallback: CRUDResponseHandler not available, read response manually
           window.Logger?.warn('CRUDResponseHandler not available for rerun, using manual handling', { page: 'ai-analysis' });
-          
-          const result = await response.json();
-          
-          if (result.status === 'success' && result.data) {
+
+        const result = await response.json();
+        
+        if (result.status === 'success' && result.data) {
             // Save response_text to cache (not in DB) - only if not already cached
             if (result.data.id && result.data.response_text) {
-              const cacheKey = `ai-analysis-response-${result.data.id}`;
+            const cacheKey = `ai-analysis-response-${result.data.id}`;
               if (window.UnifiedCacheManager) {
                 // Check if already in cache before saving
                 const existingCache = await window.UnifiedCacheManager.get(cacheKey);
                 if (!existingCache || !existingCache.response_text) {
-                  await window.UnifiedCacheManager.save(cacheKey, {
-                    response_text: result.data.response_text,
+            await window.UnifiedCacheManager.save(cacheKey, {
+              response_text: result.data.response_text,
                     response_json: result.data.response_json || null,
                     cached_at: new Date().toISOString()
                   }, {
@@ -2142,34 +2796,33 @@
                   });
                 }
               }
-            }
           }
 
-            // Show success notification
-            if (window.NotificationSystem) {
-              window.NotificationSystem.showSuccess('הניתוח הושלם בהצלחה!', 'business');
-            }
+          // Show success notification
+          if (window.NotificationSystem) {
+            window.NotificationSystem.showSuccess('הניתוח הושלם בהצלחה!', 'business');
+          }
 
-            // Reload history to show new analysis
-            this.history = await window.AIAnalysisData?.loadHistory({ force: true }) || [];
+          // Reload history to show new analysis
+          this.history = await window.AIAnalysisData?.loadHistory({ force: true }) || [];
             // Check availability AFTER cache is saved (give it a moment for cache to be fully written)
             await new Promise(resolve => setTimeout(resolve, 200)); // Delay to ensure cache is saved
-            await this.checkAvailabilityForAll();
-            this.renderHistory();
-            
+          await this.checkAvailabilityForAll();
+          this.renderHistory();
+          
             // Update summary stats after availability check
-            if (window.updatePageSummaryStats) {
-              window.updatePageSummaryStats('ai-analysis', this.history);
-            }
-            
+          if (window.updatePageSummaryStats) {
+            window.updatePageSummaryStats('ai-analysis', this.history);
+          }
+          
             // Open results modal after history is updated
             if (result.data && result.data.id) {
               // Ensure we have the latest result with cache info
               const updatedResult = this.history.find(h => h.id === result.data.id) || result.data;
               await this.openResultsModal(updatedResult);
             }
-          } else {
-            throw new Error(result.message || 'Failed to generate analysis');
+        } else {
+          throw new Error(result.message || 'Failed to generate analysis');
           }
         }
       } catch (error) {
@@ -2237,25 +2890,37 @@
       providerCell.textContent = item.provider || 'לא זמין';
       row.appendChild(providerCell);
 
-      // Status
+      // Status - use FieldRendererService directly (always available via BASE package)
       const statusCell = document.createElement('td');
       if (window.FieldRendererService) {
         let statusForRender = item.status;
         if (item.status === 'completed') statusForRender = 'completed';
         else if (item.status === 'failed') statusForRender = 'cancelled';
         else statusForRender = 'open';
-        statusCell.innerHTML = window.FieldRendererService.renderStatus(statusForRender, 'ai_analysis');
+        statusCell.textContent = '';
+        const statusHTML = window.FieldRendererService.renderStatus(statusForRender, 'ai_analysis');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(statusHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          statusCell.appendChild(node.cloneNode(true));
+        });
       } else {
         statusCell.textContent = item.status === 'completed' ? 'הושלם' : item.status === 'failed' ? 'נכשל' : 'ממתין';
       }
       row.appendChild(statusCell);
 
-      // Created at - handle DateEnvelope format
+      // Created at - handle DateEnvelope format - use FieldRendererService directly
       const dateCell = document.createElement('td');
       if (window.FieldRendererService) {
         // Check if created_at is already a DateEnvelope or needs conversion
         const dateValue = item.created_at_envelope || item.created_at;
-        dateCell.innerHTML = window.FieldRendererService.renderDate(dateValue, true);
+        const dateHTML = window.FieldRendererService.renderDate(dateValue, true);
+        dateCell.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(dateHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          dateCell.appendChild(node.cloneNode(true));
+        });
       } else {
         // Fallback: try to parse date
         const dateValue = item.created_at_envelope?.display || item.created_at_envelope?.local || item.created_at;
@@ -2368,7 +3033,7 @@
           updateFunction: (tableData) => {
             const tbody = document.getElementById('aiAnalysisHistoryTableBody');
             if (tbody) {
-              tbody.innerHTML = '';
+              tbody.textContent = '';
               const dataToRender = Array.isArray(tableData) ? tableData : effectiveData;
               dataToRender.forEach((item) => {
                 tbody.appendChild(this.renderHistoryRow(item));
@@ -2460,8 +3125,8 @@
               // Check if already in cache before saving
               const existingCache = await window.UnifiedCacheManager.get(cacheKey);
               if (!existingCache || !existingCache.response_text) {
-                await window.UnifiedCacheManager.save(cacheKey, {
-                  response_text: analysisResult.response_text,
+              await window.UnifiedCacheManager.save(cacheKey, {
+                response_text: analysisResult.response_text,
                   response_json: analysisResult.response_json,
                   cached_at: new Date().toISOString()
                 }, { 
@@ -2589,22 +3254,143 @@
     },
 
     /**
+     * Setup event listeners for results modal action buttons
+     * Must be called after modal is shown and Button System has processed buttons
+     */
+    setupResultsModalButtons() {
+      window.Logger?.info('Setting up results modal action buttons', { page: 'ai-analysis' });
+      
+      // Find "Save as Note" button - may have dynamic ID from Button System
+      const saveAsNoteBtn = document.querySelector('#aiResultsModal button[data-onclick*="saveAsNote"], #aiResultsModal button#saveAsNoteBtnModal, #aiResultsModal [id*="saveAsNote"]');
+      
+      if (saveAsNoteBtn) {
+        // Remove old listeners by cloning
+        const newBtn = saveAsNoteBtn.cloneNode(true);
+        saveAsNoteBtn.parentNode.replaceChild(newBtn, saveAsNoteBtn);
+        
+        // Add direct event listener
+        newBtn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          window.Logger?.info('🖱️ Save as Note button clicked', { 
+            page: 'ai-analysis',
+            hasCurrentAnalysis: !!this.currentAnalysis,
+            currentAnalysisId: this.currentAnalysis?.id
+          });
+          await this.saveAsNote();
+          return false;
+        });
+        
+        window.Logger?.info('✅ Save as Note button connected', { 
+          page: 'ai-analysis',
+          buttonId: newBtn.id,
+          buttonText: newBtn.textContent?.trim()
+        });
+      } else {
+        window.Logger?.warn('⚠️ Save as Note button not found in results modal', { page: 'ai-analysis' });
+      }
+    },
+
+    /**
      * Save as note
      */
     async saveAsNote() {
+      window.Logger?.info('📝 saveAsNote called', { 
+        page: 'ai-analysis',
+        hasCurrentAnalysis: !!this.currentAnalysis,
+        currentAnalysisId: this.currentAnalysis?.id,
+        hasResponseText: !!this.currentAnalysis?.response_text
+      });
+      
       if (!this.currentAnalysis) {
+        window.Logger?.warn('⚠️ No current analysis to save', { page: 'ai-analysis' });
         if (window.NotificationSystem) {
           window.NotificationSystem.showError('אין ניתוח לשמירה', 'system');
         }
         return;
       }
 
+      // If no response_text, try to load from cache or API
+      if (!this.currentAnalysis.response_text) {
+        window.Logger?.warn('⚠️ Current analysis has no response_text, attempting to load...', { 
+          page: 'ai-analysis',
+          analysisId: this.currentAnalysis.id,
+          status: this.currentAnalysis.status
+        });
+        
+        // Try to load from cache first
+        if (this.currentAnalysis.id) {
+          const cacheKey = `ai-analysis-response-${this.currentAnalysis.id}`;
+          const cachedData = await window.UnifiedCacheManager?.get(cacheKey);
+          if (cachedData && cachedData.response_text) {
+            this.currentAnalysis.response_text = cachedData.response_text;
+            window.Logger?.info('✅ Loaded response_text from cache', { 
+              page: 'ai-analysis',
+              analysisId: this.currentAnalysis.id
+            });
+          } else {
+            // Try to load from API
+            try {
+              const response = await fetch(`/api/ai-analysis/history/${this.currentAnalysis.id}`);
+              if (response.ok) {
+                const data = await response.json();
+                if (data.status === 'success' && data.data && data.data.response_text) {
+                  this.currentAnalysis.response_text = data.data.response_text;
+                  window.Logger?.info('✅ Loaded response_text from API', { 
+                    page: 'ai-analysis',
+                    analysisId: this.currentAnalysis.id
+                  });
+                }
+              }
+            } catch (error) {
+              window.Logger?.warn('Failed to load response_text from API', { 
+                page: 'ai-analysis',
+                error: error.message
+              });
+            }
+          }
+        }
+        
+        // If still no response_text, show error
+        if (!this.currentAnalysis.response_text) {
+          window.Logger?.warn('⚠️ Current analysis has no response_text after loading attempts', { 
+            page: 'ai-analysis',
+            analysisId: this.currentAnalysis.id,
+            status: this.currentAnalysis.status
+          });
+          if (window.NotificationSystem) {
+            window.NotificationSystem.showError('אין תוצאות לשמירה. נא להריץ ניתוח מחדש.', 'system');
+          }
+          return;
+        }
+      }
+
       if (!window.AINotesIntegration) {
-        window.Logger?.warn('AINotesIntegration not available', { page: 'ai-analysis' });
+        window.Logger?.error('❌ AINotesIntegration not available', { page: 'ai-analysis' });
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showError('מערכת הערות לא זמינה', 'system');
+        }
         return;
       }
 
-      await window.AINotesIntegration.saveAsNote(this.currentAnalysis);
+      try {
+        window.Logger?.info('✅ Calling AINotesIntegration.saveAsNote', { 
+          page: 'ai-analysis',
+          analysisId: this.currentAnalysis.id
+        });
+        await window.AINotesIntegration.saveAsNote(this.currentAnalysis);
+      } catch (error) {
+        window.Logger?.error('❌ Error in saveAsNote', error, { 
+          page: 'ai-analysis',
+          analysisId: this.currentAnalysis?.id,
+          errorMessage: error?.message,
+          errorStack: error?.stack
+        });
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showError('שגיאה בשמירת הערה', 'system');
+        }
+      }
     },
 
     /**
@@ -2670,13 +3456,182 @@
      * @param {string} spinnerId - Spinner element ID
      * @param {string} loadingMessage - Optional custom loading message
      */
+    /**
+     * Show progress overlay with current step
+     */
+    showProgressOverlay(step = 1, stepText = '', description = '') {
+      const overlay = document.getElementById('aiAnalysisProgressOverlay');
+      if (!overlay) {
+        window.Logger?.warn('Progress overlay element not found', { page: 'ai-analysis' });
+        return;
+      }
+      
+      // Calculate z-index using ModalZIndexManager if available
+      let overlayZIndex = 2000; // Default fallback
+      if (window.ModalZIndexManager) {
+        const stack = window.ModalNavigationService?.getStack?.() || [];
+        const stackDepth = stack.length;
+        // Progress overlay should be above all modals
+        // BASE_Z_INDEX (1040) + (max stack depth * 10) + 100 for progress overlay
+        overlayZIndex = window.ModalZIndexManager.BASE_Z_INDEX + (stackDepth * window.ModalZIndexManager.Z_INDEX_INCREMENT) + 100;
+        window.Logger?.debug('Progress overlay z-index calculated', {
+          page: 'ai-analysis',
+          stackDepth,
+          baseZIndex: window.ModalZIndexManager.BASE_Z_INDEX,
+          increment: window.ModalZIndexManager.Z_INDEX_INCREMENT,
+          calculatedZIndex: overlayZIndex
+        });
+      }
+      
+      // Set z-index
+      overlay.style.zIndex = overlayZIndex;
+      
+      // Show overlay
+      overlay.classList.remove('d-none');
+      overlay.style.display = 'flex';
+      
+      // Update all steps
+      const steps = overlay.querySelectorAll('.progress-step');
+      steps.forEach((stepEl, index) => {
+        const stepNum = index + 1;
+        stepEl.classList.remove('active', 'completed');
+        
+        if (stepNum < step) {
+          stepEl.classList.add('completed');
+        } else if (stepNum === step) {
+          stepEl.classList.add('active');
+        }
+      });
+      
+      // Update current step text
+      const currentStepText = overlay.querySelector('#aiAnalysisCurrentStep .current-step-text');
+      if (currentStepText && stepText) {
+        currentStepText.textContent = stepText;
+      }
+      
+      // Update active step description
+      const activeStep = overlay.querySelector(`.progress-step[data-step="${step}"]`);
+      if (activeStep && description) {
+        const descEl = activeStep.querySelector('.step-description');
+        if (descEl) {
+          descEl.textContent = description;
+        }
+      }
+      
+      // Update progress bar
+      const progressBar = overlay.querySelector('#aiAnalysisProgressBar');
+      const progressPercentage = overlay.querySelector('#aiAnalysisProgressPercentage');
+      const percentage = Math.min(100, (step / 5) * 100);
+      
+      if (progressBar) {
+        progressBar.style.width = `${percentage}%`;
+        progressBar.setAttribute('aria-valuenow', percentage);
+      }
+      
+      if (progressPercentage) {
+        progressPercentage.textContent = `${Math.round(percentage)}%`;
+      }
+      
+      window.Logger?.debug('Progress overlay updated', { 
+        page: 'ai-analysis', 
+        step, 
+        stepText, 
+        percentage 
+      });
+    },
+    
+    /**
+     * Hide progress overlay
+     */
+    hideProgressOverlay() {
+      const overlay = document.getElementById('aiAnalysisProgressOverlay');
+      if (overlay) {
+        overlay.classList.add('d-none');
+        overlay.style.display = 'none';
+        
+        // Reset progress
+        const progressBar = overlay.querySelector('#aiAnalysisProgressBar');
+        const progressPercentage = overlay.querySelector('#aiAnalysisProgressPercentage');
+        if (progressBar) {
+          progressBar.style.width = '0%';
+          progressBar.setAttribute('aria-valuenow', 0);
+        }
+        if (progressPercentage) {
+          progressPercentage.textContent = '0%';
+        }
+        
+        // Reset all steps
+        const steps = overlay.querySelectorAll('.progress-step');
+        steps.forEach(stepEl => {
+          stepEl.classList.remove('active', 'completed');
+        });
+        
+        window.Logger?.debug('Progress overlay hidden', { page: 'ai-analysis' });
+      }
+    },
+    
     setLoadingState(loading, btnId, textId, spinnerId, loadingMessage = null) {
-      const btn = document.getElementById(btnId);
+      // Find button dynamically - Button System may change the ID
+      let btn = document.getElementById(btnId);
+      if (!btn && btnId === 'generateAnalysisBtnModal') {
+        // Try to find button in modal form
+        const form = document.getElementById('aiAnalysisFormModal');
+        if (form) {
+          btn = form.querySelector('button[type="submit"]');
+          window.Logger?.debug('Found button dynamically in modal form', { 
+            page: 'ai-analysis', 
+            btnId: btn?.id || 'not found',
+            found: !!btn
+          });
+        }
+      } else if (!btn && btnId === 'generateAnalysisBtn') {
+        // Try to find button in page form
+        const form = document.getElementById('aiAnalysisForm');
+        if (form) {
+          btn = form.querySelector('button[type="submit"]');
+          window.Logger?.debug('Found button dynamically in page form', { 
+            page: 'ai-analysis', 
+            btnId: btn?.id || 'not found',
+            found: !!btn
+          });
+        }
+      }
+      
       const text = document.getElementById(textId);
       const spinner = document.getElementById(spinnerId);
 
       if (btn) {
         btn.disabled = loading;
+        // Also add visual indication
+        if (loading) {
+          btn.setAttribute('aria-busy', 'true');
+          btn.style.cursor = 'not-allowed';
+          btn.style.opacity = '0.6';
+          window.Logger?.debug('Button disabled and visual indication added', { 
+            page: 'ai-analysis', 
+            btnId: btn.id,
+            loading,
+            loadingMessage
+          });
+        } else {
+          btn.removeAttribute('aria-busy');
+          btn.style.cursor = '';
+          btn.style.opacity = '';
+          window.Logger?.debug('Button enabled and visual indication removed', { 
+            page: 'ai-analysis', 
+            btnId: btn.id
+          });
+        }
+      } else {
+        window.Logger?.warn('Button not found for setLoadingState', { 
+          page: 'ai-analysis', 
+          btnId, 
+          textId,
+          spinnerId,
+          found: false,
+          modalFormExists: !!document.getElementById('aiAnalysisFormModal'),
+          pageFormExists: !!document.getElementById('aiAnalysisForm')
+        });
       }
 
       if (text) {
@@ -2696,17 +3651,23 @@
           spinner.classList.add('show');
           spinner.classList.add('btn-spinner');
           // Update spinner text if loadingMessage provided
-          if (loadingMessage && spinner.textContent) {
+          if (loadingMessage && spinner.textContent !== undefined) {
             spinner.textContent = loadingMessage;
           }
         } else {
           spinner.classList.remove('show');
           spinner.classList.remove('btn-spinner');
           // Reset spinner text to default
-          if (spinner.textContent && spinner.id.includes('Modal')) {
+          if (spinner.textContent !== undefined && spinner.id && spinner.id.includes('Modal')) {
             spinner.textContent = '⏳ יוצר ניתוח...';
           }
         }
+      } else if (loading && loadingMessage) {
+        // If spinner element doesn't exist, create a temporary one or show notification
+        window.Logger?.warn('Spinner element not found, showing notification instead', { 
+          page: 'ai-analysis', 
+          spinnerId 
+        });
       }
     },
 
@@ -2732,7 +3693,39 @@
               );
             } else {
               // Fallback: use browser confirm
-              resolve(confirm('האם אתה בטוח שברצונך למחוק את כל רשומות הניתוח? פעולה זו אינה ניתנת לביטול.'));
+              if (window.showDeleteWarning) {
+                window.showDeleteWarning(
+                  'האם אתה בטוח שברצונך למחוק את כל רשומות הניתוח? פעולה זו אינה ניתנת לביטול.',
+                  () => resolve(true),
+                  () => resolve(false)
+                );
+              } else if (window.showConfirmationDialog) {
+                window.showConfirmationDialog(
+                  'מחיקת כל הרשומות',
+                  'האם אתה בטוח שברצונך למחוק את כל רשומות הניתוח? פעולה זו אינה ניתנת לביטול.',
+                  () => resolve(true),
+                  () => resolve(false),
+                  'danger'
+                );
+              } else {
+                if (window.showDeleteWarning) {
+                  window.showDeleteWarning(
+                    'האם אתה בטוח שברצונך למחוק את כל רשומות הניתוח? פעולה זו אינה ניתנת לביטול.',
+                    () => resolve(true),
+                    () => resolve(false)
+                  );
+                } else if (window.showConfirmationDialog) {
+                  window.showConfirmationDialog(
+                    'מחיקת כל הרשומות',
+                    'האם אתה בטוח שברצונך למחוק את כל רשומות הניתוח? פעולה זו אינה ניתנת לביטול.',
+                    () => resolve(true),
+                    () => resolve(false),
+                    'danger'
+                  );
+                } else {
+                  resolve(confirm('האם אתה בטוח שברצונך למחוק את כל רשומות הניתוח? פעולה זו אינה ניתנת לביטול.'));
+                }
+              }
             }
           });
 

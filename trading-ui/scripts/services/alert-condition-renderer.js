@@ -120,7 +120,15 @@ class AlertConditionRenderer {
         const config = this.attributeConfig[attribute];
         if (!config) {
             // fallback לממשק פשוט
-            container.innerHTML = `<input type="number" class="form-control" id="${containerId}Value" value="${currentValue}" step="0.01" required>`;
+            container.textContent = '';
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'form-control';
+            input.id = `${containerId}Value`;
+            input.value = currentValue;
+            input.step = '0.01';
+            input.required = true;
+            container.appendChild(input);
             return;
         }
         
@@ -162,7 +170,12 @@ class AlertConditionRenderer {
             </div>
         `;
         
-        container.innerHTML = inputHtml;
+        container.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(inputHtml, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            container.appendChild(node.cloneNode(true));
+        });
     }
     
     /**

@@ -1098,7 +1098,12 @@ async function showDetailsModal(title, content, options = {}) {
   // Ensure content is properly rendered as HTML
   const detailsContent = modal.querySelector('.details-content');
   if (detailsContent) {
-    detailsContent.innerHTML = content;
+    detailsContent.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        detailsContent.appendChild(node.cloneNode(true));
+    });
   }
   
   // Show modal using ModalManagerV2 (with proper z-index and backdrop management)
@@ -1284,12 +1289,12 @@ function closeAllDetailsModals() {
 
 // Helper function to extract text content from HTML
 function extractTextFromHTML(htmlContent) {
-  // Create temporary div to parse HTML
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = htmlContent;
+  // Parse HTML using DOMParser
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlContent, 'text/html');
   
   // Extract text content
-  let textContent = tempDiv.textContent || tempDiv.innerText || '';
+  let textContent = doc.body.textContent || doc.body.innerText || '';
   
   // Clean up the text
   textContent = textContent

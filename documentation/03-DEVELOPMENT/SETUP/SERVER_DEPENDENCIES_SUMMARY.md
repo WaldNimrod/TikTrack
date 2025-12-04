@@ -22,10 +22,6 @@
 - `SQLAlchemy==2.0.23` - ORM
 - `psycopg2-binary==2.9.9` - PostgreSQL adapter
 
-### Real-time Communications
-- `Flask-SocketIO==5.3.6` - WebSocket support
-- `python-socketio==5.8.0` - Socket.IO client
-- `python-engineio==4.7.1` - Engine.IO client
 
 ### Production Server
 - `gunicorn==21.2.0` - Production WSGI server

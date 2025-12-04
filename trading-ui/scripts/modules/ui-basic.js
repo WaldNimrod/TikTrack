@@ -840,7 +840,12 @@ window.toggleSection = async function (sectionId) {
         // Replace text content with img tag using tempDiv
         icon.textContent = '';
         const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = newIconHTML;
+        tempDiv.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(newIconHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tempDiv.appendChild(node.cloneNode(true));
+        });
         while (tempDiv.firstChild) {
           icon.appendChild(tempDiv.firstChild);
         }
@@ -920,7 +925,12 @@ window.toggleSection = async function (sectionId) {
                     new Promise((_, reject) => setTimeout(() => reject(new Error('IconSystem.renderIcon timeout')), 1000))
                 ]);
                 const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = iconHTML;
+                tempDiv.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(iconHTML, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    tempDiv.appendChild(node.cloneNode(true));
+                });
                 const newIcon = tempDiv.firstElementChild;
                 if (newIcon) {
                     // Apply rotation transform for expanded state
@@ -958,7 +968,17 @@ window.toggleSection = async function (sectionId) {
                 ? window.BUTTON_ICONS.TOGGLE 
                 : '/trading-ui/images/icons/tabler/chevron-down.svg';
             const transformStyle = isCollapsed ? '' : ' style="transform: rotate(180deg);"';
-            iconElement.innerHTML = `<img src="${toggleIconPath}" width="16" height="16" alt="${isCollapsed ? 'הצג' : 'הסתר'}" class="icon"${transformStyle}>`;
+            iconElement.textContent = '';
+            const img = document.createElement('img');
+            img.src = toggleIconPath;
+            img.width = 16;
+            img.height = 16;
+            img.alt = isCollapsed ? 'הצג' : 'הסתר';
+            img.className = 'icon';
+            if (transformStyle) {
+                img.setAttribute('style', transformStyle);
+            }
+            iconElement.appendChild(img);
         }
     }
 
@@ -1169,9 +1189,10 @@ window.restoreAllSectionStates = async function () {
           }
         } else {
           // No saved state - apply default state from page config
-          // Special case: trade-creation section should be closed by default (lazy loading)
-          const shouldBeClosed = sectionId === 'trade-creation';
-          const finalState = shouldBeClosed ? 'closed' : defaultState;
+          // Check sectionDefaultStates first, then fallback to sectionsDefaultState
+          const sectionSpecificDefault = pageConfig?.sectionDefaultStates?.[sectionId];
+          const finalDefaultState = sectionSpecificDefault || defaultState;
+          const finalState = finalDefaultState === 'closed' ? 'closed' : 'open';
           
           if (finalState === 'open') {
             sectionBody.style.display = 'block';
@@ -1186,7 +1207,7 @@ window.restoreAllSectionStates = async function () {
                 console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
               }
             }
-            console.log(`✅ Section "${sectionId}" default state OPEN (no cache)`);
+            console.log(`✅ Section "${sectionId}" default state OPEN (no cache)`, { sectionSpecificDefault, finalDefaultState });
           } else {
             sectionBody.style.display = 'none';
             if (icon) { 
@@ -1200,7 +1221,7 @@ window.restoreAllSectionStates = async function () {
                 console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
               }
             }
-            console.log(`✅ Section "${sectionId}" default state CLOSED (no cache)`);
+            console.log(`✅ Section "${sectionId}" default state CLOSED (no cache)`, { sectionSpecificDefault, finalDefaultState });
           }
         }
       }
@@ -1556,7 +1577,12 @@ function loadTableActionButtons(tableId, entityType, config = {}) {
       return;
     }
     
-    actionsCell.innerHTML = buttonsHtml;
+    actionsCell.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(buttonsHtml, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        actionsCell.appendChild(node.cloneNode(true));
+    });
   });
 
 }

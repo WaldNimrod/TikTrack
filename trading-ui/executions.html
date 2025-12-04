@@ -218,7 +218,25 @@
                     <div id="executionTradeCreationClustersEmpty" class="alert alert-success d-none" role="status">
                         אין כרגע ביצועים זמינים ליצירת טרייד חדש.
                     </div>
-                    <div id="executionTradeCreationClustersContainer" class="d-flex flex-column gap-3"></div>
+                    <div class="table-responsive" id="executionTradeCreationClustersContainer">
+                        <table class="table table-hover" id="executionTradeCreationClustersTable" data-table-type="execution-clusters">
+                            <thead>
+                                <tr>
+                                    <th class="col-ticker">סימבול</th>
+                                    <th class="col-account">חשבון</th>
+                                    <th class="col-side">צד</th>
+                                    <th class="col-count">ביצועים</th>
+                                    <th class="col-quantity">כמות</th>
+                                    <th class="col-value">שווי</th>
+                                    <th class="col-price">מחיר ממוצע</th>
+                                    <th class="col-date">טווח תאריכים</th>
+                                    <th class="col-actions">פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody id="executionTradeCreationClustersTableBody">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -731,6 +749,8 @@
     <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- Default value service -->
     <!-- [34] Load Order: 34 -->
     <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- Preferences data service (API + Cache) -->
+    <!-- [34.1] Load Order: 34.1 -->
+    <script src="scripts/services/executions-data.js?v=1.0.0"></script> <!-- Executions data service (API + Cache + CRUD) -->
     <!-- [35] Load Order: 35 -->
     <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- CRUD response handler -->
     <!-- [36] Load Order: 36 -->
@@ -749,6 +769,12 @@
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
     <!-- [43] Load Order: 43 -->
     <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- Rich text editor service -->
+    <!-- [43.1] Load Order: 43.1 -->
+    <script src="scripts/services/execution-clustering-service.js?v=1.0.0"></script> <!-- Execution clustering service (trade creation clusters) -->
+    <!-- [43.2] Load Order: 43.2 -->
+    <script src="scripts/services/execution-assignment-service.js?v=1.0.0"></script> <!-- Execution assignment service (highlights/suggestions) -->
+    <!-- [43.3] Load Order: 43.3 -->
+    <script src="scripts/services/execution-cluster-helpers.js?v=1.0.0"></script> <!-- Execution cluster helper functions (rendering, actions, calculations) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 3/12: MODULES PACKAGE ===== -->
@@ -965,6 +991,12 @@
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
+    <!-- Load Order: 23 | Description: Page-specific scripts -->
+    <!-- Dependencies: all -->
+    <!-- Critical: YES | Version: 1.0.0 -->
+
+    <!-- [110] Load Order: 110 -->
+    <script src="scripts/executions.js?v=1.0.0"></script> <!-- Page-specific script for executions -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->

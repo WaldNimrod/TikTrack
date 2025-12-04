@@ -199,7 +199,11 @@ async function loadAlertsDataInternal(options = {}) {
       } else if (typeof window.showNotification === 'function') {
         window.showNotification('שגיאה בטעינת נתוני ההתראות', 'error');
       } else {
-        alert('שגיאה בטעינת נתוני ההתראות: ' + error.message);
+        if (window.showErrorNotification) {
+          window.showErrorNotification('שגיאה בטעינת נתוני ההתראות', error.message);
+        } else {
+          alert('שגיאה בטעינת נתוני ההתראות: ' + error.message);
+        }
       }
       throw error;
     } finally {
@@ -2871,7 +2875,48 @@ async function deleteAlertInternal(alertId) {
       );
     } else {
       // fallback אחרון - confirm רגיל (אם מערכת התראות לא זמינה)
-      const confirmed = window.confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
+      let confirmed = false;
+      if (window.showDeleteWarning) {
+        confirmed = await new Promise((resolve) => {
+          window.showDeleteWarning(
+            'האם אתה בטוח שברצונך למחוק התראה זו?',
+            () => resolve(true),
+            () => resolve(false)
+          );
+        });
+      } else if (window.showConfirmationDialog) {
+        confirmed = await new Promise((resolve) => {
+          window.showConfirmationDialog(
+            'מחיקת התראה',
+            'האם אתה בטוח שברצונך למחוק התראה זו?',
+            () => resolve(true),
+            () => resolve(false),
+            'danger'
+          );
+        });
+      } else {
+        if (window.showDeleteWarning) {
+          confirmed = await new Promise((resolve) => {
+            window.showDeleteWarning(
+              'האם אתה בטוח שברצונך למחוק התראה זו?',
+              () => resolve(true),
+              () => resolve(false)
+            );
+          });
+        } else if (window.showConfirmationDialog) {
+          confirmed = await new Promise((resolve) => {
+            window.showConfirmationDialog(
+              'מחיקת התראה',
+              'האם אתה בטוח שברצונך למחוק התראה זו?',
+              () => resolve(true),
+              () => resolve(false),
+              'danger'
+            );
+          });
+        } else {
+          confirmed = window.confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
+        }
+      }
       if (confirmed) {
         await confirmDeleteAlert(alertId);
       }
@@ -3200,7 +3245,33 @@ async function reactivateAlert(alertId) {
     if (!confirmed) {return;}
   } else {
     // Fallback למקרה שמערכת התראות לא זמינה
-    if (!window.confirm('האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?')) {
+    let confirmed = false;
+    if (window.showConfirmationDialog) {
+      confirmed = await new Promise((resolve) => {
+        window.showConfirmationDialog(
+          'הפעלה מחדש',
+          'האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?',
+          () => resolve(true),
+          () => resolve(false),
+          'info'
+        );
+      });
+    } else {
+      if (window.showConfirmationDialog) {
+        confirmed = await new Promise((resolve) => {
+          window.showConfirmationDialog(
+            'הפעלה מחדש',
+            'האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?',
+            () => resolve(true),
+            () => resolve(false),
+            'info'
+          );
+        });
+      } else {
+        confirmed = window.confirm('האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?');
+      }
+    }
+    if (!confirmed) {
       return;
     }
   }
@@ -3597,12 +3668,16 @@ async function generateDetailedLogForAlerts() {
             await navigator.clipboard.writeText(detailedLog);
             if (window.showSuccessNotification) {
                 window.showSuccessNotification('לוג מפורט הועתק ללוח');
+            } else if (window.showInfoNotification) {
+                window.showInfoNotification('לוג מפורט הועתק ללוח!', 'info');
             } else {
                 alert('לוג מפורט הועתק ללוח!');
             }
         } else {
             if (window.showWarningNotification) {
                 window.showWarningNotification('אין לוג להעתקה');
+            } else if (window.showInfoNotification) {
+                window.showInfoNotification('אין לוג להעתקה', 'warning');
             } else {
                 alert('אין לוג להעתקה');
             }
@@ -3611,6 +3686,8 @@ async function generateDetailedLogForAlerts() {
         window.Logger.error('שגיאה בהעתקה:', err, { page: "alerts" });
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בהעתקת הלוג');
+        } else if (window.showInfoNotification) {
+            window.showInfoNotification('שגיאה בהעתקת הלוג', 'error');
         } else {
             alert('שגיאה בהעתקת הלוג');
         }

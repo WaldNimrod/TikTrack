@@ -993,12 +993,13 @@
             ? `<div class="status-detail error">⚠️ שגיאה אחרונה: ${safeText(yahooProvider.last_error)}</div>`
             : ''
         ].join('');
-        // Insert using tempDiv
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = detailsHTML;
-        while (tempDiv.firstChild) {
-          detailsElement.appendChild(tempDiv.firstChild);
-        }
+        // Insert using DOMParser
+        detailsElement.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(detailsHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          detailsElement.appendChild(node.cloneNode(true));
+        });
       }
     }
 
@@ -1042,11 +1043,11 @@
         `<div class="status-detail">🌤️ TTL חמים: ${ttlWarm}</div>`
       ].join('');
       detailsElement.textContent = '';
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = detailsHTML;
-      while (tempDiv.firstChild) {
-        detailsElement.appendChild(tempDiv.firstChild);
-      }
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(detailsHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        detailsElement.appendChild(node.cloneNode(true));
+      });
     }
 
     /**
@@ -1073,11 +1074,19 @@
         return;
       }
 
-      detailsElement.innerHTML = [
-        `<div class="status-detail">🗄️ ספקים: ${formatNumber(providersInfo.total)}</div>`,
-        `<div class="status-detail">✅ פעילים: ${formatNumber(providersInfo.active)}</div>`,
-        `<div class="status-detail">💡 בריאים: ${formatNumber(providersInfo.healthy)}</div>`
-      ].join('');
+      detailsElement.textContent = '';
+      const div1 = document.createElement('div');
+      div1.className = 'status-detail';
+      div1.textContent = `🗄️ ספקים: ${formatNumber(providersInfo.total)}`;
+      detailsElement.appendChild(div1);
+      const div2 = document.createElement('div');
+      div2.className = 'status-detail';
+      div2.textContent = `✅ פעילים: ${formatNumber(providersInfo.active)}`;
+      detailsElement.appendChild(div2);
+      const div3 = document.createElement('div');
+      div3.className = 'status-detail';
+      div3.textContent = `💡 בריאים: ${formatNumber(providersInfo.healthy)}`;
+      detailsElement.appendChild(div3);
     }
 
     /**
@@ -1093,18 +1102,26 @@
         return;
       }
       if (!data) {
-        detailsElement.innerHTML.textContent = '';
+        detailsElement.textContent = '';
         const div = document.createElement('div');
         div.className = 'status-detail';
         div.textContent = 'נתוני API לא זמינים';
-        detailsElement.innerHTML.appendChild(div);
+        detailsElement.appendChild(div);
         return;
       }
-      detailsElement.innerHTML = [
-        `<div class="status-detail">🔌 מצב כללי: ${safeText(data.status)}</div>`,
-        `<div class="status-detail">💠 בריאות כללית: ${data.overall_health === true ? 'טובה' : data.overall_health === false ? 'מושפעת' : NOT_AVAILABLE_TEXT}</div>`,
-        `<div class="status-detail">📊 פעולות בשעה האחרונה: ${formatNumber(data.recent_activity?.last_hour?.refresh_operations ?? 0)}</div>`
-      ].join('');
+      detailsElement.textContent = '';
+      const div1 = document.createElement('div');
+      div1.className = 'status-detail';
+      div1.textContent = `🔌 מצב כללי: ${safeText(data.status)}`;
+      detailsElement.appendChild(div1);
+      const div2 = document.createElement('div');
+      div2.className = 'status-detail';
+      div2.textContent = `💠 בריאות כללית: ${data.overall_health === true ? 'טובה' : data.overall_health === false ? 'מושפעת' : NOT_AVAILABLE_TEXT}`;
+      detailsElement.appendChild(div2);
+      const div3 = document.createElement('div');
+      div3.className = 'status-detail';
+      div3.textContent = `📊 פעולות בשעה האחרונה: ${formatNumber(data.recent_activity?.last_hour?.refresh_operations ?? 0)}`;
+      detailsElement.appendChild(div3);
     }
 
     /**
@@ -1116,7 +1133,12 @@
     writeElementHtml(id, html) {
       const element = getElement(id);
       if (element) {
-        element.innerHTML = html;
+        element.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          element.appendChild(node.cloneNode(true));
+        });
       }
     }
 
@@ -1286,15 +1308,16 @@
       }
 
       if (!this.providers.length) {
-        providersGrid.innerHTML.textContent = '';
+        providersGrid.textContent = '';
         const div = document.createElement('div');
         div.className = 'col-12 text-center text-muted py-4';
         div.textContent = 'לא נמצאו ספקים פעילים';
-        providersGrid.innerHTML.appendChild(div);
+        providersGrid.appendChild(div);
         return;
       }
 
-      providersGrid.innerHTML = this.providers
+      providersGrid.textContent = '';
+      const providersHTML = this.providers
         .map((provider) => {
           const statusBadgeClass = provider.isActive
             ? provider.isHealthy
@@ -1343,6 +1366,11 @@
           `;
         })
         .join('');
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(providersHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        providersGrid.appendChild(node.cloneNode(true));
+      });
     }
 
     /**
@@ -1429,7 +1457,10 @@
       const hitRate = stats.hit_rate || stats.cache_hit_rate || 0;
       const memoryMB = stats.estimated_memory_mb || stats.memory_usage_mb || 0;
 
-      cacheStatsElement.innerHTML = `
+      cacheStatsElement.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
             <div class="cache-stats-grid">
                 <div class="stat-card">
             <div class="stat-value">${formatNumber(totalEntries)}</div>
@@ -1448,7 +1479,12 @@
             <div class="stat-label">שימוש בזיכרון</div>
                 </div>
             </div>
-        `;
+        `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        cacheStatsElement.appendChild(fragment);
 
       // Update current settings from status data (not from cache stats)
       this.updateCurrentSettings().catch(error => {
@@ -1650,22 +1686,40 @@
 
       if (!logs.length) {
       const currentTime = window.formatDate ? window.formatDate(new Date(), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(), { includeTime: true }) : new Date().toLocaleString('he-IL'));
-      logContent.innerHTML = `
-        <div class="no-logs">
-          <div class="no-logs-icon">📋</div>
-          <div class="no-logs-title">אין לוגים להצגה</div>
-          <div class="no-logs-subtitle">המערכת פועלת ללא שגיאות</div>
-          <div class="no-logs-time">נבדק לאחרונה: ${currentTime}</div>
-          <div class="no-logs-info">
-            <p>• לוגים יופיעו כאן כאשר יש פעילות במערכת</p>
-            <p>• רענן את הדף כדי לבדוק עדכונים חדשים</p>
-          </div>
-        </div>
-      `;
+      logContent.textContent = '';
+      const noLogsDiv = document.createElement('div');
+      noLogsDiv.className = 'no-logs';
+      const iconDiv = document.createElement('div');
+      iconDiv.className = 'no-logs-icon';
+      iconDiv.textContent = '📋';
+      noLogsDiv.appendChild(iconDiv);
+      const titleDiv = document.createElement('div');
+      titleDiv.className = 'no-logs-title';
+      titleDiv.textContent = 'אין לוגים להצגה';
+      noLogsDiv.appendChild(titleDiv);
+      const subtitleDiv = document.createElement('div');
+      subtitleDiv.className = 'no-logs-subtitle';
+      subtitleDiv.textContent = 'המערכת פועלת ללא שגיאות';
+      noLogsDiv.appendChild(subtitleDiv);
+      const timeDiv = document.createElement('div');
+      timeDiv.className = 'no-logs-time';
+      timeDiv.textContent = `נבדק לאחרונה: ${currentTime}`;
+      noLogsDiv.appendChild(timeDiv);
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'no-logs-info';
+      const p1 = document.createElement('p');
+      p1.textContent = '• לוגים יופיעו כאן כאשר יש פעילות במערכת';
+      infoDiv.appendChild(p1);
+      const p2 = document.createElement('p');
+      p2.textContent = '• רענן את הדף כדי לבדוק עדכונים חדשים';
+      infoDiv.appendChild(p2);
+      noLogsDiv.appendChild(infoDiv);
+      logContent.appendChild(noLogsDiv);
       return;
     }
 
-      logContent.innerHTML = logs
+      logContent.textContent = '';
+      const logsHTML = logs
         .map((log) => {
           const levelClass = `log-${log.level}`;
           return `
@@ -1721,11 +1775,12 @@
         const div = document.createElement('div');
         div.className = 'text-center text-muted p-4';
         div.textContent = 'אין היסטוריית עדכונים קבוצתיים';
-        container.innerHTML.appendChild(div);
+        container.appendChild(div);
         return;
       }
 
-      container.innerHTML = history
+      container.textContent = '';
+      const historyHTML = history
         .map((entry) => {
           const statusClass = entry.status === 'completed' ? 'completed' : entry.status === 'failed' ? 'failed' : 'started';
           const statusLabel = entry.status === 'completed' ? 'הושלם' : entry.status === 'failed' ? 'נכשל' : 'התחיל';

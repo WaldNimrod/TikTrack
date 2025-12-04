@@ -146,7 +146,12 @@ class SMCacheSection extends SMBaseSection {
 
     try {
       const cacheHtml = await this.createCacheHTML(data);
-      this.container.innerHTML = cacheHtml;
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(cacheHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Cache section rendered successfully');
       
@@ -792,7 +797,11 @@ class SMCacheSection extends SMBaseSection {
     if (cacheSection) {
       const sectionInstance = window.systemManagementMain?.sections?.get('sm-cache');
       if (sectionInstance && sectionInstance.lastData) {
-        alert(`פרטי מטמון:\n${JSON.stringify(sectionInstance.lastData, null, 2)}`);
+        if (window.showInfoNotification) {
+          window.showInfoNotification(`פרטי מטמון:\n${JSON.stringify(sectionInstance.lastData, null, 2)}`, 'info');
+        } else {
+          alert(`פרטי מטמון:\n${JSON.stringify(sectionInstance.lastData, null, 2)}`);
+        }
       }
     }
   }

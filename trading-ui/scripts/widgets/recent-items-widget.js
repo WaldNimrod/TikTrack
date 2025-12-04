@@ -45,7 +45,8 @@
     config: { ...DEFAULT_CONFIG },
     pendingTrades: null,
     pendingTradePlans: null,
-    pendingCurrencySymbol: null
+    pendingCurrencySymbol: null,
+    overlaySetup: {} // Track which lists have overlay setup (same as Unified Pending Actions Widget)
   };
 
   // DOM Elements cache
@@ -175,264 +176,68 @@
     return true;
   }
 
+
   /**
-   * Monitor visibility of all items to understand why some are hidden
-   * Used for debugging visibility issues
+   * Setup overlay hover for a list element
+   * @param {HTMLElement} listElement - The list element to setup overlay for
+   * @param {string} itemSelector - Selector for items
+   * @param {string} detailsSelector - Selector for details container
    */
-  function monitorItemsVisibility(items, tabType) {
-    if (!items || items.length === 0) {
-      window.Logger?.warn?.('⚠️ [RecentItemsWidget] No items to monitor', { tabType, page: 'recent-items-widget' });
+  /**
+   * Setup overlay hover for a list element (only once per list)
+   * Same logic as Unified Pending Actions Widget
+   * @param {HTMLElement} listElement - The list element to setup overlay for
+   * @param {string} listKey - Key for tracking (e.g., 'trades' or 'plans')
+   */
+  function setupOverlayForList(listElement, listKey) {
+    if (!window.WidgetOverlayService || !listElement || state.overlaySetup[listKey]) {
       return;
     }
-
-    window.Logger?.info?.(`🔍 [RecentItemsWidget] Monitoring visibility for ${items.length} items (${tabType})`, {
-      tabType,
-      totalItems: items.length,
-      page: 'recent-items-widget'
-    });
-
-    const itemsInfo = Array.from(items).map((item, index) => {
-      const rect = item.getBoundingClientRect();
-      const computedStyle = window.getComputedStyle(item);
-      const parentRect = item.parentElement?.getBoundingClientRect();
-      const parentComputedStyle = item.parentElement ? window.getComputedStyle(item.parentElement) : null;
-
-      // Check if item is visible
-      const isVisible = rect.width > 0 && rect.height > 0 && 
-                       computedStyle.display !== 'none' &&
-                       computedStyle.visibility !== 'hidden' &&
-                       parseFloat(computedStyle.opacity) > 0;
-
-      // Check parent visibility
-      const parentVisible = !parentComputedStyle || (
-        parentComputedStyle.display !== 'none' &&
-        parentComputedStyle.visibility !== 'hidden' &&
-        parseFloat(parentComputedStyle.opacity) > 0
-      );
-
-      const info = {
-        index,
-        entityId: item.getAttribute('data-entity-id'),
-        entityType: item.getAttribute('data-entity-type'),
-        isVisible,
-        parentVisible,
-        rect: {
-          top: rect.top,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height,
-          bottom: rect.bottom,
-          right: rect.right
-        },
-        computedStyles: {
-          display: computedStyle.display,
-          visibility: computedStyle.visibility,
-          opacity: computedStyle.opacity,
-          position: computedStyle.position,
-          zIndex: computedStyle.zIndex,
-          transform: computedStyle.transform,
-          overflow: computedStyle.overflow,
-          height: computedStyle.height,
-          minHeight: computedStyle.minHeight,
-          maxHeight: computedStyle.maxHeight
-        },
-        inlineStyles: {
-          display: item.style.display || '(none)',
-          visibility: item.style.visibility || '(none)',
-          opacity: item.style.opacity || '(none)',
-          position: item.style.position || '(none)',
-          transform: item.style.transform || '(none)'
-        },
-        parentRect: parentRect ? {
-          top: parentRect.top,
-          left: parentRect.left,
-          width: parentRect.width,
-          height: parentRect.height,
-          bottom: parentRect.bottom,
-          right: parentRect.right
-        } : null,
-        parentComputedStyles: parentComputedStyle ? {
-          display: parentComputedStyle.display,
-          visibility: parentComputedStyle.visibility,
-          opacity: parentComputedStyle.opacity,
-          overflow: parentComputedStyle.overflow,
-          height: parentComputedStyle.height,
-          maxHeight: parentComputedStyle.maxHeight,
-          overflowY: parentComputedStyle.overflowY
-        } : null,
-        textContent: item.textContent?.trim().substring(0, 50) || '(empty)',
-        hasContent: item.textContent?.trim().length > 0,
-        classes: item.className,
-        parentClasses: item.parentElement?.className || '(none)',
-        parentId: item.parentElement?.id || '(none)'
-      };
-
-      return info;
-    });
-
-    // Find hidden items
-    const hiddenItems = itemsInfo.filter(info => !info.isVisible);
-    const visibleItems = itemsInfo.filter(info => info.isVisible);
-
-    // Compare first 2 items with rest
-    const firstTwoItems = itemsInfo.slice(0, 2);
-    const restItems = itemsInfo.slice(2);
-
-    window.Logger?.info?.(`📊 [RecentItemsWidget] Visibility Analysis (${tabType}):`, {
-      tabType,
-      totalItems: itemsInfo.length,
-      visibleItems: visibleItems.length,
-      hiddenItems: hiddenItems.length,
-      firstTwoItems: firstTwoItems.map(item => ({
-        index: item.index,
-        isVisible: item.isVisible,
-        entityId: item.entityId,
-        display: item.computedStyles.display,
-        visibility: item.computedStyles.visibility,
-        opacity: item.computedStyles.opacity,
-        rect: item.rect,
-        hasContent: item.hasContent
-      })),
-      restItems: restItems.map(item => ({
-        index: item.index,
-        isVisible: item.isVisible,
-        entityId: item.entityId,
-        display: item.computedStyles.display,
-        visibility: item.computedStyles.visibility,
-        opacity: item.computedStyles.opacity,
-        rect: item.rect,
-        hasContent: item.hasContent
-      })),
-      page: 'recent-items-widget'
-    });
-
-    // Detailed comparison between first 2 and rest
-    if (firstTwoItems.length > 0 && restItems.length > 0) {
-      const differences = [];
-      
-      // Compare computed styles
-      const firstItem = firstTwoItems[0];
-      const thirdItem = restItems[0];
-      
-      Object.keys(firstItem.computedStyles).forEach(key => {
-        if (firstItem.computedStyles[key] !== thirdItem.computedStyles[key]) {
-          differences.push({
-            property: key,
-            firstItem: firstItem.computedStyles[key],
-            thirdItem: thirdItem.computedStyles[key]
-          });
-        }
-      });
-
-      // Compare parent styles
-      if (firstItem.parentComputedStyles && thirdItem.parentComputedStyles) {
-        Object.keys(firstItem.parentComputedStyles).forEach(key => {
-          if (firstItem.parentComputedStyles[key] !== thirdItem.parentComputedStyles[key]) {
-            differences.push({
-              property: `parent.${key}`,
-              firstItem: firstItem.parentComputedStyles[key],
-              thirdItem: thirdItem.parentComputedStyles[key]
-            });
-          }
-        });
-      }
-
-      // Compare rect positions
-      if (firstItem.rect && thirdItem.rect) {
-        const rectDiff = {
-          topDiff: firstItem.rect.top - thirdItem.rect.top,
-          leftDiff: firstItem.rect.left - thirdItem.rect.left,
-          widthDiff: firstItem.rect.width - thirdItem.rect.width,
-          heightDiff: firstItem.rect.height - thirdItem.rect.height
-        };
-        
-        differences.push({
-          property: 'rect',
-          firstItem: firstItem.rect,
-          thirdItem: thirdItem.rect,
-          differences: rectDiff
-        });
-      }
-
-      window.Logger?.info?.(`🔍 [RecentItemsWidget] Differences between first 2 items and rest (${tabType}):`, {
-        tabType,
-        differences,
-        firstItemFull: firstItem,
-        thirdItemFull: thirdItem,
-        page: 'recent-items-widget'
-      });
-    }
-
-    // Log hidden items details
-    if (hiddenItems.length > 0) {
-      window.Logger?.warn?.(`⚠️ [RecentItemsWidget] Found ${hiddenItems.length} hidden items (${tabType}):`, {
-        tabType,
-        hiddenItems: hiddenItems.map(item => ({
-          index: item.index,
-          entityId: item.entityId,
-          reason: !item.isVisible ? 'Item computed styles indicate hidden' : 'Unknown',
-          computedStyles: item.computedStyles,
-          inlineStyles: item.inlineStyles,
-          parentStyles: item.parentComputedStyles,
-          rect: item.rect,
-          textContent: item.textContent
-        })),
-        page: 'recent-items-widget'
-      });
-    }
-
-    // Log all items for detailed inspection
-    window.Logger?.info?.(`📋 [RecentItemsWidget] Full items details (${tabType}):`, {
-      tabType,
-      allItems: itemsInfo,
-      page: 'recent-items-widget'
-    });
-  }
-
-  /**
-   * Bind events
-   */
-  function bindEvents() {
-    // Event listeners are bound via Bootstrap Tab events
-    // No direct event binding needed here
-  }
-
-  /**
-   * Monitor and log positioning/heights for debugging
-   */
-  function logPositioningInfo(tabName) {
-    const pane = tabName === 'trades' ? elements.tradesPane : elements.plansPane;
-    const list = tabName === 'trades' ? elements.tradesList : elements.plansList;
-    const wrapper = pane?.querySelector('.d-flex');
     
-    if (!pane) {
-      window.Logger?.warn?.('⚠️ [RecentItemsWidget] Pane not found for positioning check', { tabName, page: 'recent-items-widget' });
+    // Destroy existing handlers first to prevent duplicates
+    window.WidgetOverlayService.destroy(listElement);
+    
+    // Use requestAnimationFrame to ensure DOM is ready
+    requestAnimationFrame(() => {
+      window.WidgetOverlayService.setupOverlayHover(
+        listElement,
+        '.recent-items-widget-item',
+        '.recent-items-widget-details-container, [data-overlay="true"]',
+        {
+          hoverClass: 'is-hovered',
+          gap: 8,
+          minWidth: 280,
+          maxWidth: 400,
+          zIndex: 1050
+        }
+      );
+      state.overlaySetup[listKey] = true;
+    });
+  }
+
+  /**
+   * Bind click and keyboard events to items using event delegation
+   * @param {HTMLElement} listElement - The list element to bind events to
+   */
+  function bindItemEvents(listElement) {
+    if (!listElement) {
       return;
     }
-
-    const paneRect = pane.getBoundingClientRect();
-    const listRect = list?.getBoundingClientRect();
-    const wrapperRect = wrapper?.getBoundingClientRect();
-    const computedStyle = window.getComputedStyle(pane);
-
-    window.Logger?.info?.(`📐 [RecentItemsWidget] Positioning info for ${tabName} tab:`, {
-      tabName,
-      paneTop: paneRect.top,
-      paneLeft: paneRect.left,
-      paneHeight: paneRect.height,
-      paneWidth: paneRect.width,
-      listTop: listRect?.top || 'N/A',
-      listHeight: listRect?.height || 'N/A',
-      wrapperTop: wrapperRect?.top || 'N/A',
-      wrapperHeight: wrapperRect?.height || 'N/A',
-      computedPosition: computedStyle.position,
-      computedDisplay: computedStyle.display,
-      computedTop: computedStyle.top,
-      computedLeft: computedStyle.left,
-      computedTransform: computedStyle.transform,
-      hasActiveClass: pane.classList.contains('active'),
-      hasShowClass: pane.classList.contains('show'),
-      page: 'recent-items-widget'
+    
+    // Use event delegation on the list element instead of binding to each item
+    listElement.addEventListener('click', (event) => {
+      const item = event.target.closest('.recent-items-widget-item');
+      if (item) {
+        handleItemClick(event);
+      }
+    });
+    
+    listElement.addEventListener('keydown', (event) => {
+      const item = event.target.closest('.recent-items-widget-item');
+      if (item && (event.key === 'Enter' || event.key === ' ')) {
+        event.preventDefault();
+        handleItemClick(event);
+      }
     });
   }
 
@@ -479,12 +284,6 @@
         // Reset positioning before rendering
         resetTabPanesPositioning();
         
-        window.Logger?.debug?.('RecentItemsWidget: Switched to trades tab, ensuring content is rendered', { page: 'recent-items-widget' });
-        
-        // Log positioning info
-        setTimeout(() => {
-          logPositioningInfo('trades');
-        }, 50);
         
         // Re-render to ensure trades are displayed (they should already be rendered, but this ensures it)
         if (state.initialized) {
@@ -503,249 +302,46 @@
         // Reset positioning before rendering
         resetTabPanesPositioning();
         
-        window.Logger?.info?.('🔍 [RecentItemsWidget] Tab switched to PLANS', {
-          initialized: state.initialized,
-          stateTradesCount: state.trades?.length || 0,
-          stateTradePlansCount: state.tradePlans?.length || 0,
-          plansListExists: !!elements.plansList,
-          plansPaneExists: !!elements.plansPane,
-          page: 'recent-items-widget'
-        });
-        
-        // Log positioning info
-        setTimeout(() => {
-          logPositioningInfo('plans');
-        }, 50);
-        
         // Re-render to ensure trade plans are displayed
         if (state.initialized) {
           const tradesToRender = Array.isArray(state.trades) ? state.trades : [];
           const tradePlansToRender = Array.isArray(state.tradePlans) ? state.tradePlans : [];
           const currencySymbol = state.currencySymbol || '$';
-          window.Logger?.info?.('🔍 [RecentItemsWidget] Re-rendering after tab switch to plans', {
-            tradesToRender: tradesToRender.length,
-            tradePlansToRender: tradePlansToRender.length,
-            currencySymbol,
-            page: 'recent-items-widget'
-          });
           renderTrades(tradesToRender, currencySymbol);
           renderTradePlans(tradePlansToRender, currencySymbol);
         } else {
-          window.Logger?.warn?.('⚠️ [RecentItemsWidget] Widget not initialized, cannot re-render on tab switch', { page: 'recent-items-widget' });
+          window.Logger?.warn?.('RecentItemsWidget: Widget not initialized, cannot re-render on tab switch', { page: 'recent-items-widget' });
         }
       });
     }
-  }
+    
+    // Event delegation for approve/reject buttons (same as Unified Pending Actions Widget)
+    const allLists = [elements.tradesList, elements.plansList].filter(Boolean);
+    allLists.forEach(list => {
+      if (list) {
+        list.addEventListener('click', async (event) => {
+          // Handle APPROVE button
+          const approveBtn = event.target.closest('[data-button-type="APPROVE"]');
+          if (approveBtn) {
+            const item = approveBtn.closest('.recent-items-widget-item');
+            if (item) {
+              await handleApproveAction(item, event);
+            }
+            return;
+          }
 
-  /**
-   * Handle hover on widget items
-   */
-  /**
-   * Calculate and position overlay using fixed positioning to extend beyond container
-   * Note: This function is currently not used - overlay positioning is handled by CSS
-   */
-  function positionOverlay(item, details) {
-    if (!item || !details) {
-      window.Logger?.warn?.('RecentItemsWidget: positionOverlay - Missing item or details', {
-        hasItem: !!item,
-        hasDetails: !!details,
-        page: 'recent-items-widget'
-      });
-      return;
-    }
-
-    const itemRect = item.getBoundingClientRect();
-    const isRTL = document.documentElement.dir === 'rtl' || 
-                  getComputedStyle(document.body).direction === 'rtl';
-    
-    // Show overlay temporarily to get dimensions
-    const originalDisplay = details.style.display || window.getComputedStyle(details).display;
-    const originalVisibility = details.style.visibility || window.getComputedStyle(details).visibility;
-    const originalOpacity = details.style.opacity || window.getComputedStyle(details).opacity;
-    
-    // Force visibility to measure
-    details.style.position = 'fixed';
-    details.style.visibility = 'hidden';
-    details.style.opacity = '0';
-    details.style.display = 'block';
-    details.style.pointerEvents = 'none';
-    
-    // Get dimensions
-    const overlayWidth = Math.max(details.offsetWidth || 300, 280);
-    const overlayHeight = details.offsetHeight || 150;
-    
-    // Position below item
-    let top = itemRect.bottom + 8; // 8px gap (0.5rem)
-    let left = itemRect.left;
-    let right = 'auto';
-    
-    // For RTL, position from right
-    if (isRTL) {
-      left = 'auto';
-      right = window.innerWidth - itemRect.right;
-    }
-    
-    // Check if overlay goes beyond viewport bottom
-    if (top + overlayHeight > window.innerHeight) {
-      // Position above item instead
-      top = itemRect.top - overlayHeight - 8;
-      // If still doesn't fit, position at viewport top
-      if (top < 0) {
-        top = 8;
+          // Handle REJECT/DISMISS button
+          const rejectBtn = event.target.closest('[data-button-type="REJECT"], [data-button-type="DISMISS"]');
+          if (rejectBtn) {
+            const item = rejectBtn.closest('.recent-items-widget-item');
+            if (item) {
+              await handleRejectAction(item, event);
+            }
+            return;
+          }
+        });
       }
-    }
-    
-    // Check horizontal overflow
-    if (!isRTL && left + overlayWidth > window.innerWidth) {
-      left = window.innerWidth - overlayWidth - 8;
-      if (left < 8) left = 8;
-    } else if (isRTL && typeof right === 'number') {
-      const rightNum = Number(right);
-      if (rightNum + overlayWidth > window.innerWidth) {
-        right = window.innerWidth - overlayWidth - 8;
-        if (right < 8) right = 8;
-      }
-    }
-    
-    // Apply fixed positioning
-    details.style.position = 'fixed';
-    details.style.top = `${top}px`;
-    if (isRTL) {
-      const rightValue = typeof right === 'number' ? right : window.innerWidth - itemRect.right;
-      details.style.right = `${rightValue}px`;
-      details.style.left = 'auto';
-    } else {
-      details.style.left = `${left}px`;
-      details.style.right = 'auto';
-    }
-    details.style.width = `${overlayWidth}px`;
-    details.style.maxWidth = '400px';
-    details.style.minWidth = '280px';
-    details.style.zIndex = '9999'; // Very high z-index to appear above everything
-    details.style.display = 'block';
-    details.style.visibility = 'visible';
-    details.style.pointerEvents = 'auto';
-    // Ensure overlay is not clipped
-    details.style.overflow = 'visible';
-    details.style.clip = 'auto';
-    details.style.clipPath = 'none';
-    
-    // Get actual position after setting styles
-    const finalRect = details.getBoundingClientRect();
-    
-    window.Logger?.debug?.('RecentItemsWidget: Overlay positioned', {
-      itemId: item.getAttribute('data-entity-id'),
-      position: details.style.position,
-      top: details.style.top,
-      left: details.style.left,
-      right: details.style.right,
-      width: details.style.width,
-      height: overlayHeight,
-      zIndex: details.style.zIndex,
-      itemRect: { top: itemRect.top, bottom: itemRect.bottom, left: itemRect.left, right: itemRect.right },
-      isRTL,
-      page: 'recent-items-widget'
     });
-  }
-
-  /**
-   * Handle hover on widget items - fixed positioning to escape container boundaries
-   */
-  function handleItemHover(event) {
-    const item = event.target.closest('.recent-items-widget-item');
-    if (!item) {
-      window.Logger?.warn?.('RecentItemsWidget: handleItemHover - No item found', {
-        target: event.target?.className,
-        page: 'recent-items-widget'
-      });
-      return;
-    }
-
-    const details = item.querySelector('.recent-items-widget-details-container');
-    
-    if (event.type === 'mouseenter') {
-      item.classList.add('is-hovered');
-      
-      // Position overlay as fixed to escape all container boundaries
-      if (details) {
-        const itemRect = item.getBoundingClientRect();
-        const isRTL = document.documentElement.dir === 'rtl' || document.documentElement.getAttribute('dir') === 'rtl';
-        
-        // Show overlay temporarily to get dimensions
-        details.style.display = 'block';
-        details.style.visibility = 'hidden';
-        const overlayWidth = Math.max(details.offsetWidth || 300, 280);
-        const overlayHeight = details.offsetHeight || 150;
-        details.style.visibility = '';
-        
-        // Position below item (or above if not enough space)
-        let top = itemRect.bottom + 8;
-        if (top + overlayHeight > window.innerHeight - 20) {
-          // Not enough space below - position above
-          top = itemRect.top - overlayHeight - 8;
-          if (top < 20) {
-            // Not enough space above either - position at top of viewport
-            top = 20;
-          }
-        }
-        
-        // Position horizontally
-        let left = itemRect.left;
-        let right = 'auto';
-        if (isRTL) {
-          right = window.innerWidth - itemRect.right;
-          left = 'auto';
-          // Check if overlay goes beyond viewport
-          if (right + overlayWidth > window.innerWidth - 20) {
-            right = 20;
-          }
-        } else {
-          if (left + overlayWidth > window.innerWidth - 20) {
-            left = window.innerWidth - overlayWidth - 20;
-          }
-          if (left < 20) {
-            left = 20;
-          }
-        }
-        
-        // Set fixed position
-        details.style.position = 'fixed';
-        details.style.top = `${top}px`;
-        if (isRTL) {
-          details.style.right = `${right}px`;
-          details.style.left = 'auto';
-        } else {
-          details.style.left = `${left}px`;
-          details.style.right = 'auto';
-        }
-        details.style.width = `${overlayWidth}px`;
-        details.style.zIndex = '1050';
-      }
-    } else if (event.type === 'mouseleave') {
-      // Check if mouse is moving to overlay
-      const relatedTarget = event.relatedTarget;
-      if (details && relatedTarget && details.contains(relatedTarget)) {
-        // Mouse is moving to overlay, keep it visible
-        return;
-      }
-      
-      item.classList.remove('is-hovered');
-      
-      // Hide overlay after transition
-      if (details) {
-        setTimeout(() => {
-          if (!item.classList.contains('is-hovered')) {
-            details.style.display = 'none';
-            details.style.position = '';
-            details.style.top = '';
-            details.style.left = '';
-            details.style.right = '';
-            details.style.width = '';
-            details.style.zIndex = '';
-          }
-        }, 200);
-      }
-    }
   }
 
   /**
@@ -834,6 +430,7 @@
       <li class="list-group-item recent-items-widget-item" 
           data-entity-type="trade" 
           data-entity-id="${tradeId}"
+          data-widget-overlay="true"
           role="button"
           tabindex="0">
         <!-- Header Section - Always Visible -->
@@ -856,7 +453,7 @@
           </div>
         </div>
         <!-- Details Section - Hidden by default, shown on hover -->
-        <div class="recent-items-widget-details-container">
+        <div class="recent-items-widget-details-container" data-overlay="true">
           <div class="recent-items-widget-details-content">
             ${side ? `
               <div class="recent-items-widget-details-row">
@@ -908,7 +505,10 @@
   function buildTradePlanItem(plan, currencySymbol) {
     const planId = plan?.id;
     const name = plan?.name || plan?.title || (planId ? `תוכנית #${planId}` : 'לא זמין');
-    const symbol = plan?.ticker?.symbol || plan?.symbol || '';
+    // Try multiple ways to get ticker symbol
+    const symbol = plan?.ticker?.symbol || plan?.ticker_symbol || plan?.symbol || 
+                  // Note: getTickerSymbol may return a Promise, so we use ticker symbol from data
+                  '';
     const investmentType = plan?.investment_type || plan?.type || '';
     const amount = plan?.planned_amount || plan?.amount || plan?.total_amount || plan?.investment_amount;
     const date = plan?.created_at || plan?.opened_at || plan?.entry_date;
@@ -952,6 +552,7 @@
       <li class="list-group-item recent-items-widget-item" 
           data-entity-type="trade_plan" 
           data-entity-id="${planId}"
+          data-widget-overlay="true"
           role="button"
           tabindex="0">
         <!-- Header Section - Always Visible -->
@@ -971,7 +572,7 @@
           </div>
         </div>
         <!-- Details Section - Hidden by default, shown on hover -->
-        <div class="recent-items-widget-details-container">
+        <div class="recent-items-widget-details-container" data-overlay="true">
           <div class="recent-items-widget-details-content">
             ${symbol ? `
               <div class="recent-items-widget-details-row">
@@ -1019,16 +620,9 @@
    * Render trades list
    */
   function renderTrades(trades, currencySymbol) {
-    window.Logger?.info?.('🔍 [RecentItemsWidget] renderTrades START', {
-      tradesCount: Array.isArray(trades) ? trades.length : 0,
-      tradesListExists: !!elements.tradesList,
-      currencySymbol,
-      firstTrade: trades?.[0],
-      page: 'recent-items-widget'
-    });
 
     if (!elements.tradesList) {
-      window.Logger?.warn?.('⚠️ [RecentItemsWidget] tradesList element not found', { page: 'recent-items-widget' });
+      window.Logger?.warn?.('RecentItemsWidget: tradesList element not found', { page: 'recent-items-widget' });
       return;
     }
 
@@ -1048,11 +642,7 @@
     // Also clear innerHTML as backup
     elements.tradesList.textContent = '';
     
-    window.Logger?.debug?.('🔍 [RecentItemsWidget] tradesList cleared', {
-      remainingChildren: elements.tradesList.children.length,
-      innerHTMLLength: elements.tradesList.innerHTML.length,
-      page: 'recent-items-widget'
-    });
+    // List cleared
 
     // Hide loading/error states
     if (elements.tradesLoading) {
@@ -1063,12 +653,6 @@
     }
 
     if (!Array.isArray(trades) || trades.length === 0) {
-      window.Logger?.debug?.('🔍 [RecentItemsWidget] No trades to render', { 
-        trades, 
-        isArray: Array.isArray(trades),
-        length: trades?.length,
-        page: 'recent-items-widget' 
-      });
       if (elements.tradesEmpty) {
         elements.tradesEmpty.classList.remove('d-none');
       }
@@ -1083,37 +667,16 @@
     const maxItems = state.config?.maxItems || DEFAULT_MAX_ITEMS;
     const topTrades = sorted.slice(0, maxItems);
 
-    window.Logger?.info?.('🔍 [RecentItemsWidget] Rendering trades', {
-      sortedCount: sorted.length,
-      topTradesCount: topTrades.length,
-      firstTradeData: topTrades[0],
-      page: 'recent-items-widget'
-    });
 
     // elements.tradesList is already a <ul> element - just append <li> items directly
     const fragment = document.createDocumentFragment();
 
     topTrades.forEach((trade, index) => {
       try {
-        window.Logger?.debug?.('🔍 [RecentItemsWidget] Building trade item', {
-          index,
-          tradeId: trade?.id,
-          tradeSymbol: trade?.ticker?.symbol || trade?.symbol,
-          page: 'recent-items-widget'
-        });
-        
         const itemHtml = buildTradeItem(trade, currencySymbol);
-        
-        window.Logger?.debug?.('🔍 [RecentItemsWidget] Trade item HTML generated', {
-          index,
-          htmlLength: itemHtml?.length,
-          htmlPreview: itemHtml?.substring(0, 200),
-          page: 'recent-items-widget'
-        });
-        
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = itemHtml.trim();
-        const item = tempDiv.firstElementChild;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(itemHtml.trim(), 'text/html');
+        const item = doc.body.firstElementChild;
         if (item && item.classList.contains('recent-items-widget-item')) {
           // Ensure item is visible
           item.style.display = '';
@@ -1121,28 +684,17 @@
           item.style.opacity = '1';
           
           fragment.appendChild(item);
-          window.Logger?.debug?.('🔍 [RecentItemsWidget] Trade item appended to fragment', {
-            index,
-            itemExists: !!item,
-            itemClasses: item.className,
-            itemHasContent: item.textContent?.trim().length > 0,
-            page: 'recent-items-widget'
-          });
         } else {
-          window.Logger?.warn?.('⚠️ [RecentItemsWidget] Failed to get valid item from HTML', {
+          window.Logger?.warn?.('RecentItemsWidget: Failed to get valid item from HTML', {
             index,
-            htmlLength: itemHtml?.length,
-            itemExists: !!item,
-            itemType: item?.tagName,
-            itemClasses: item?.className,
-            htmlPreview: itemHtml?.substring(0, 200),
+            tradeId: trade?.id,
             page: 'recent-items-widget'
           });
         }
       } catch (error) {
-        window.Logger?.error?.('❌ [RecentItemsWidget] Error building trade item', {
+        window.Logger?.error?.('RecentItemsWidget: Error building trade item', {
           error: error?.message,
-          trade,
+          tradeId: trade?.id,
           index,
           page: 'recent-items-widget'
         });
@@ -1155,80 +707,37 @@
     // Reset positioning after rendering to ensure proper layout
     resetTabPanesPositioning();
     
-    window.Logger?.info?.('🔍 [RecentItemsWidget] Trades rendered', {
-      itemsInList: elements.tradesList.children.length,
-      listHTMLPreview: elements.tradesList.innerHTML.substring(0, 300),
-      page: 'recent-items-widget'
-    });
-
-    // Bind hover and click events
-    const items = elements.tradesList.querySelectorAll('.recent-items-widget-item');
+    // Dispatch event to trigger height equalization after content update (same as Unified Pending Actions Widget)
+    window.dispatchEvent(new CustomEvent('widgetContentUpdated'));
     
-    window.Logger?.info?.('🔍 [RecentItemsWidget] Binding events', {
-      itemsFound: items.length,
-      listElement: elements.tradesList?.id,
-      listChildren: elements.tradesList?.children?.length,
-      page: 'recent-items-widget'
-    });
-    
-    // Monitor visibility of all items to debug hidden items
-    // Only monitor if the tab pane is active (visible)
-    if (items.length > 0 && elements.tradesPane && (elements.tradesPane.classList.contains('active') || elements.tradesPane.classList.contains('show'))) {
-      monitorItemsVisibility(items, 'trades');
-    }
-    
-    if (items.length === 0) {
-      window.Logger?.warn?.('⚠️ [RecentItemsWidget] No items found to bind events!', {
-        listHTML: elements.tradesList?.innerHTML?.substring(0, 500),
-        listChildren: elements.tradesList?.children?.length,
-        page: 'recent-items-widget'
-      });
-      return;
-    }
-    
-    items.forEach((item) => {
-      item.addEventListener('mouseenter', handleItemHover);
-      item.addEventListener('mouseleave', handleItemHover);
-      item.addEventListener('click', handleItemClick);
-      item.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          handleItemClick(event);
+    // Wait for DOM to update before initializing buttons and overlay (same as Unified Pending Actions Widget)
+    requestAnimationFrame(() => {
+      if (elements.tradesList && elements.tradesList.parentNode && elements.tradesList.innerHTML) {
+        // Initialize buttons only if list has content and is in DOM
+        if (window.ButtonSystem?.initializeButtons) {
+          try {
+            window.ButtonSystem.initializeButtons(elements.tradesList);
+          } catch (error) {
+            window.Logger?.warn?.('Failed to initialize buttons', { error, page: 'recent-items-widget' });
+          }
         }
-      });
-      
-      // Store handlers for potential cleanup
-      item.__recentItemsHandlers = {
-        mouseenter: handleItemHover,
-        mouseleave: handleItemHover
-      };
+        
+        // Setup overlay hover AFTER items are rendered and buttons initialized (same as Unified Pending Actions Widget)
+        setupOverlayForList(elements.tradesList, 'trades');
+      }
     });
     
-    window.Logger?.info?.('RecentItemsWidget: Event listeners added', {
-      itemsCount: items.length,
-      page: 'recent-items-widget'
-    });
+    // Bind events using event delegation
+    bindItemEvents(elements.tradesList);
   }
 
   /**
    * Render trade plans list
    */
   function renderTradePlans(tradePlans, currencySymbol) {
-    window.Logger?.info?.('🔍 [RecentItemsWidget] renderTradePlans START', {
-      tradePlansCount: Array.isArray(tradePlans) ? tradePlans.length : 0,
-      isArray: Array.isArray(tradePlans),
-      plansListExists: !!elements.plansList,
-      plansListId: elements.plansList?.id,
-      plansPaneExists: !!elements.plansPane,
-      plansPaneId: elements.plansPane?.id,
-      currencySymbol,
-      firstPlan: tradePlans?.[0],
-      fullTradePlans: tradePlans,
-      page: 'recent-items-widget'
-    });
     
     if (!elements.plansList) {
-      window.Logger?.warn?.('⚠️ [RecentItemsWidget] plansList element not found', { 
+      window.Logger?.warn?.('RecentItemsWidget: plansList element not found', { 
         containerExists: !!elements.container,
         containerId: elements.container?.id,
         page: 'recent-items-widget' 
@@ -1250,13 +759,9 @@
     }
     
     // Also clear innerHTML as backup
-    elements.plansList.innerHTML = '';
+    elements.plansList.textContent = '';
     
-    window.Logger?.debug?.('🔍 [RecentItemsWidget] plansList cleared', {
-      remainingChildren: elements.plansList.children.length,
-      innerHTMLLength: elements.plansList.innerHTML.length,
-      page: 'recent-items-widget'
-    });
+    // List cleared
 
     // Hide loading/error states
     if (elements.plansLoading) {
@@ -1267,26 +772,13 @@
     }
 
     if (!Array.isArray(tradePlans) || tradePlans.length === 0) {
-      window.Logger?.info?.('🔍 [RecentItemsWidget] No trade plans to render - showing empty state', { 
-        isArray: Array.isArray(tradePlans),
-        length: tradePlans?.length,
-        tradePlans,
-        plansEmptyExists: !!elements.plansEmpty,
-        page: 'recent-items-widget' 
-      });
       if (elements.plansEmpty) {
         elements.plansEmpty.classList.remove('d-none');
-        window.Logger?.info?.('🔍 [RecentItemsWidget] Empty state shown', { page: 'recent-items-widget' });
-      } else {
-        window.Logger?.warn?.('⚠️ [RecentItemsWidget] plansEmpty element not found', { page: 'recent-items-widget' });
       }
       return;
     }
     
-    window.Logger?.debug?.('RecentItemsWidget: Rendering trade plans', {
-      count: tradePlans.length,
-      page: 'recent-items-widget'
-    });
+    // Rendering trade plans
 
     if (elements.plansEmpty) {
       elements.plansEmpty.classList.add('d-none');
@@ -1301,9 +793,9 @@
 
     topPlans.forEach(plan => {
       const itemHtml = buildTradePlanItem(plan, currencySymbol);
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = itemHtml.trim();
-      const item = tempDiv.firstElementChild;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(itemHtml.trim(), 'text/html');
+      const item = doc.body.firstElementChild;
       if (item && item.classList.contains('recent-items-widget-item')) {
         // Ensure item is visible
         item.style.display = '';
@@ -1312,7 +804,7 @@
         
         fragment.appendChild(item);
       } else {
-        window.Logger?.warn?.('⚠️ [RecentItemsWidget] Failed to get valid trade plan item from HTML', {
+        window.Logger?.warn?.('RecentItemsWidget: Failed to get valid trade plan item from HTML', {
           planId: plan?.id,
           itemExists: !!item,
           itemType: item?.tagName,
@@ -1329,54 +821,28 @@
     // Reset positioning after rendering to ensure proper layout
     resetTabPanesPositioning();
     
-    window.Logger?.info?.('🔍 [RecentItemsWidget] Trade plans rendered', {
-      itemsInList: elements.plansList.children.length,
-      listHTMLPreview: elements.plansList.innerHTML.substring(0, 300),
-      page: 'recent-items-widget'
-    });
-
-    // Bind hover and click events
-    const items = elements.plansList.querySelectorAll('.recent-items-widget-item');
+    // Dispatch event to trigger height equalization after content update (same as Unified Pending Actions Widget)
+    window.dispatchEvent(new CustomEvent('widgetContentUpdated'));
     
-    window.Logger?.info?.('RecentItemsWidget: Binding events for plans', {
-      itemsFound: items.length,
-      listElement: elements.plansList?.id,
-      listChildren: elements.plansList?.children?.length,
-      page: 'recent-items-widget'
-    });
-    
-    if (items.length === 0) {
-      window.Logger?.warn?.('RecentItemsWidget: No plan items found to bind events', {
-        listHTML: elements.plansList?.innerHTML?.substring(0, 500),
-        listChildren: elements.plansList?.children?.length,
-        page: 'recent-items-widget'
-      });
-      return;
-    }
-    
-    // Monitor visibility of all items to debug hidden items
-    // Only monitor if the tab pane is active (visible)
-    if (items.length > 0 && elements.plansPane && (elements.plansPane.classList.contains('active') || elements.plansPane.classList.contains('show'))) {
-      monitorItemsVisibility(items, 'tradePlans');
-    }
-    
-    items.forEach((item) => {
-      item.addEventListener('mouseenter', handleItemHover);
-      item.addEventListener('mouseleave', handleItemHover);
-      item.addEventListener('click', handleItemClick);
-      item.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          handleItemClick(event);
+    // Wait for DOM to update before initializing buttons and overlay (same as Unified Pending Actions Widget)
+    requestAnimationFrame(() => {
+      if (elements.plansList && elements.plansList.parentNode && elements.plansList.innerHTML) {
+        // Initialize buttons only if list has content and is in DOM
+        if (window.ButtonSystem?.initializeButtons) {
+          try {
+            window.ButtonSystem.initializeButtons(elements.plansList);
+          } catch (error) {
+            window.Logger?.warn?.('Failed to initialize buttons', { error, page: 'recent-items-widget' });
+          }
         }
-      });
-      
-      // Store handlers for potential cleanup
-      item.__recentItemsHandlers = {
-        mouseenter: handleItemHover,
-        mouseleave: handleItemHover
-      };
+        
+        // Setup overlay hover AFTER items are rendered and buttons initialized (same as Unified Pending Actions Widget)
+        setupOverlayForList(elements.plansList, 'plans');
+      }
     });
+    
+    // Bind events using event delegation
+    bindItemEvents(elements.plansList);
   }
 
   // Public API
@@ -1439,11 +905,6 @@
       
       // Reset positioning after initialization to ensure proper layout
       resetTabPanesPositioning();
-      
-      // Log initial positioning
-      setTimeout(() => {
-        logPositioningInfo(state.activeTab);
-      }, 100);
       
       window.Logger?.info?.('RecentItemsWidget: Initialization complete', { page: 'recent-items-widget' });
     },
@@ -1523,28 +984,11 @@
       
       // Trade Plans: update if provided (undefined means don't update - preserve existing)
       if (data.hasOwnProperty('tradePlans')) {
-        window.Logger?.info?.('🔍 [RecentItemsWidget] Updating tradePlans in state', {
-          hasTradePlans: data.hasOwnProperty('tradePlans'),
-          isArray: Array.isArray(data.tradePlans),
-          incomingCount: Array.isArray(data.tradePlans) ? data.tradePlans.length : 0,
-          currentStateCount: state.tradePlans?.length || 0,
-          page: 'recent-items-widget'
-        });
         if (Array.isArray(data.tradePlans)) {
           // Update trade plans (even if empty array - allows clearing)
           state.tradePlans = data.tradePlans;
-          window.Logger?.info?.('🔍 [RecentItemsWidget] Trade plans state updated', {
-            newCount: state.tradePlans.length,
-            firstPlan: state.tradePlans[0],
-            page: 'recent-items-widget'
-          });
         }
         // If tradePlans is explicitly undefined, preserve existing
-      } else {
-        window.Logger?.debug?.('🔍 [RecentItemsWidget] tradePlans not provided, preserving existing', {
-          currentStateCount: state.tradePlans?.length || 0,
-          page: 'recent-items-widget'
-        });
       }
       
       if (data.hasOwnProperty('currencySymbol')) {
@@ -1555,28 +999,38 @@
       const tradesToRender = Array.isArray(state.trades) ? state.trades : [];
       const tradePlansToRender = Array.isArray(state.tradePlans) ? state.tradePlans : [];
       
-      window.Logger?.info?.('🔍 [RecentItemsWidget] render() - About to render', {
-        tradesCount: tradesToRender.length,
-        tradePlansCount: tradePlansToRender.length,
-        tradesArrayType: Array.isArray(state.trades),
-        tradePlansArrayType: Array.isArray(state.tradePlans),
-        stateTradesLength: state.trades?.length,
-        stateTradePlansLength: state.tradePlans?.length,
-        currencySymbol,
-        page: 'recent-items-widget'
-      });
+      // About to render
       
       renderTrades(tradesToRender, currencySymbol);
       renderTradePlans(tradePlansToRender, currencySymbol);
       
-      window.Logger?.info?.('🔍 [RecentItemsWidget] render() - Completed rendering', {
-        tradesRendered: tradesToRender.length,
-        tradePlansRendered: tradePlansToRender.length,
-        page: 'recent-items-widget'
-      });
+      // Completed rendering
 
       // Dispatch event to trigger height equalization
       window.dispatchEvent(new CustomEvent('widgetContentUpdated'));
+    },
+
+    /**
+     * Refresh widget data and re-render
+     * 
+     * @param {Object} data - Optional new data to render
+     */
+    async refresh(data = null) {
+      if (!state.initialized) {
+        return;
+      }
+
+      // If new data provided, use it; otherwise re-render with existing data
+      if (data) {
+        await RecentItemsWidget.render(data);
+      } else {
+        // Re-render with current state
+        await RecentItemsWidget.render({
+          trades: state.trades,
+          tradePlans: state.tradePlans,
+          currencySymbol: state.currencySymbol || '$'
+        });
+      }
     },
 
     /**
@@ -1593,6 +1047,7 @@
       state.pendingTrades = null;
       state.pendingTradePlans = null;
       state.pendingCurrencySymbol = null;
+      state.overlaySetup = {}; // Reset overlay setup tracking (same as Unified Pending Actions Widget)
       
       // Remove event listeners by cloning elements
       if (elements.tradesTab) {
@@ -1607,19 +1062,18 @@
         elements.plansTab = newTab;
       }
       
-      // Remove event listeners from items
-      const allItems = [
-        ...(elements.tradesList?.querySelectorAll('.recent-items-widget-item') || []),
-        ...(elements.plansList?.querySelectorAll('.recent-items-widget-item') || [])
-      ];
-      
-      allItems.forEach(item => {
-        if (item.__recentItemsHandlers) {
-          item.removeEventListener('mouseenter', item.__recentItemsHandlers.mouseenter);
-          item.removeEventListener('mouseleave', item.__recentItemsHandlers.mouseleave);
-          delete item.__recentItemsHandlers;
+      // Cleanup overlay handlers from WidgetOverlayService
+      if (window.WidgetOverlayService) {
+        if (elements.tradesList) {
+          window.WidgetOverlayService.destroy(elements.tradesList);
         }
-      });
+        if (elements.plansList) {
+          window.WidgetOverlayService.destroy(elements.plansList);
+        }
+      }
+      
+      // Event listeners are cleaned up via event delegation on list elements
+      // No need to manually remove them from individual items
       
       window.Logger?.info?.('RecentItemsWidget: Destroyed and cleaned up', { page: 'recent-items-widget' });
     },
@@ -1642,6 +1096,7 @@
     window.Logger.info('Recent Items Widget loaded successfully', { page: 'recent-items-widget', version: '1.0.0' });
   }
 })();
+
 
 
 

@@ -57,6 +57,10 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- Floating UI (Optional - for smart positioning) -->
+<!-- Note: UnifiedUIPositioningService has fallback if not loaded -->
+<script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js"></script>
+
 <!-- Core System Scripts -->
 <script src="scripts/console-cleanup.js"></script>
 <script src="scripts/translation-utils.js"></script>

@@ -167,7 +167,7 @@ class SMSystemSettingsSection extends SMBaseSection {
       return;
     }
 
-    this.container.innerHTML = `
+    const containerHTML = `
       <div class="system-settings-overview">
         <!-- SMTP Settings Card -->
         <div class="card mb-4">
@@ -199,6 +199,12 @@ class SMSystemSettingsSection extends SMBaseSection {
         ${data.groups && data.groups.length > 0 ? this.renderSettingGroupsCards(data.groups) : ''}
       </div>
     `;
+    this.container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(containerHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      this.container.appendChild(node.cloneNode(true));
+    });
 
     // Setup event listeners after rendering
     this.setupEventListeners();

@@ -133,7 +133,19 @@ class YahooFinanceService {
         if (button) {
           button.disabled = true;
           const originalHtml = button.innerHTML;
-          button.innerHTML = button.innerHTML.replace(/🔄|⏳/, '⏳');
+          if (!button.dataset.originalHtml) {
+              button.dataset.originalHtml = button.innerHTML;
+          }
+          button.textContent = '';
+          const parser = new DOMParser();
+          const originalDoc = parser.parseFromString(button.dataset.originalHtml, 'text/html');
+          originalDoc.body.childNodes.forEach(node => {
+              const cloned = node.cloneNode(true);
+              if (cloned.textContent) {
+                  cloned.textContent = cloned.textContent.replace(/🔄|⏳/, '⏳');
+              }
+              button.appendChild(cloned);
+          });
           button.dataset.originalHtml = originalHtml;
         }
       }
@@ -160,7 +172,12 @@ class YahooFinanceService {
     } finally {
       // החזרת הכפתור למצב רגיל
       if (button && button.dataset.originalHtml) {
-        button.innerHTML = button.dataset.originalHtml;
+        button.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(button.dataset.originalHtml, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            button.appendChild(node.cloneNode(true));
+        });
         button.disabled = false;
         delete button.dataset.originalHtml;
       }

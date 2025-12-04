@@ -368,7 +368,12 @@ class UIManager {
       // Restore original content using tempDiv
       element.textContent = '';
       const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = state.originalContent;
+      tempDiv.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(state.originalContent, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          tempDiv.appendChild(node.cloneNode(true));
+      });
       while (tempDiv.firstChild) {
         element.appendChild(tempDiv.firstChild);
       }
@@ -882,7 +887,7 @@ class PreferencesUI {
     if (!this.profileContext) {
       banner.classList.add('d-none');
       banner.setAttribute('aria-hidden', 'true');
-      banner.innerHTML = '';
+      banner.textContent = '';
       return;
     }
 
@@ -897,7 +902,7 @@ class PreferencesUI {
       banner.classList.add('alert-info');
     }
 
-    banner.innerHTML = '';
+    banner.textContent = '';
 
     const messageEl = document.createElement('div');
     messageEl.className = 'profile-context-message fw-semibold';
@@ -1916,7 +1921,7 @@ window.loadProfilesToDropdown = async function(userId = null) {
     }
 
     // Clear existing options
-    profileSelect.innerHTML = '';
+    profileSelect.textContent = '';
 
     if (profiles && profiles.length > 0) {
       // Add all profiles (including default profile if it exists)
@@ -2216,7 +2221,13 @@ window.disableAllPreferencesInterface = function() {
         // Fallback already set
       }
     }
-    saveButton.innerHTML = lockIcon + ' פרופיל ברירת מחדל - לא ניתן לערוך';
+    saveButton.textContent = '';
+    const parser = new DOMParser();
+    const iconDoc = parser.parseFromString(lockIcon, 'text/html');
+    iconDoc.body.childNodes.forEach(node => {
+        saveButton.appendChild(node.cloneNode(true));
+    });
+    saveButton.appendChild(document.createTextNode(' פרופיל ברירת מחדל - לא ניתן לערוך'));
     saveButton.classList.add('btn-secondary', 'disabled');
     saveButton.classList.remove('btn-success');
     window.Logger.info(`🔒 Disabled save button: ${saveButton.id || 'unnamed'}`, { page: 'preferences-ui' });
@@ -2267,7 +2278,13 @@ window.enableAllPreferencesInterface = function() {
         // Fallback already set
       }
     }
-    saveButton.innerHTML = saveIcon + 'שמור העדפות';
+    saveButton.textContent = '';
+    const parser = new DOMParser();
+    const iconDoc = parser.parseFromString(saveIcon, 'text/html');
+    iconDoc.body.childNodes.forEach(node => {
+        saveButton.appendChild(node.cloneNode(true));
+    });
+    saveButton.appendChild(document.createTextNode('שמור העדפות'));
     saveButton.classList.add('btn-success');
     saveButton.classList.remove('btn-secondary', 'disabled');
     window.Logger.info(`✅ Enabled save button: ${saveButton.id || 'unnamed'}`, { page: 'preferences-ui' });
@@ -2287,13 +2304,19 @@ function showDefaultProfileWarning() {
   const warningDiv = document.createElement('div');
   warningDiv.id = 'defaultProfileWarning';
   warningDiv.className = 'alert alert-warning alert-dismissible fade show';
-  warningDiv.innerHTML = `
+  warningDiv.textContent = '';
+  const warningHTML = `
         <img src="/trading-ui/images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="warning" class="icon me-2">
         <strong>פרופיל ברירת מחדל פעיל!</strong>
         לא ניתן לערוך הגדרות בפרופיל ברירת מחדל. 
         החלף לפרופיל משתמש כדי לערוך הגדרות.
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(warningHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        warningDiv.appendChild(node.cloneNode(true));
+    });
 
   // Insert after the profile management section
   const profileSection = document.getElementById('section1');

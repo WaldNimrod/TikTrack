@@ -251,7 +251,7 @@ import subprocess
 from pathlib import Path
 
 # External Data Integration blueprints
-from routes.external_data.quotes import quotes_bp
+from routes.external_data.quotes import quotes_bp as external_quotes_bp
 from routes.external_data.status import status_bp
 from routes.api.quotes_v1 import quotes_bp
 
@@ -509,7 +509,7 @@ app.register_blueprint(user_data_import_reports_bp, url_prefix='/api/user-data-i
 
 # Register External Data Integration blueprints - DISABLED due to import issues
 # External Data Integration blueprints
-app.register_blueprint(quotes_bp, name='quotes')
+app.register_blueprint(external_quotes_bp, name='external_quotes')
 app.register_blueprint(status_bp)
 # API quotes endpoints (specification compliant)
 

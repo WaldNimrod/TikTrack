@@ -300,3 +300,5 @@ test('XSS prevention in results', () => {
 **גרסה:** 1.0.0
 
 
+
+

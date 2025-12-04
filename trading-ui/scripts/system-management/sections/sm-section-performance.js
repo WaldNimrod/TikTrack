@@ -160,7 +160,12 @@ class SMPerformanceSection extends SMBaseSection {
 
     try {
       const performanceHtml = this.createPerformanceHTML(renderData);
-      this.container.innerHTML = performanceHtml;
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(performanceHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Performance section rendered successfully');
       

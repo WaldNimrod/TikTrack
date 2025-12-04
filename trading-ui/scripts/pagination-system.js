@@ -441,13 +441,13 @@ class PaginationInstance {
             </div>
         `;
         
-        // Insert using tempDiv
+        // Insert using DOMParser
         container.textContent = '';
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        while (tempDiv.firstChild) {
-          container.appendChild(tempDiv.firstChild);
-        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          container.appendChild(node.cloneNode(true));
+        });
         return container;
     }
     
@@ -480,13 +480,13 @@ class PaginationInstance {
             </div>
         `;
         
-        // Insert using tempDiv
+        // Insert using DOMParser
         container.textContent = '';
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        while (tempDiv.firstChild) {
-          container.appendChild(tempDiv.firstChild);
-        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          container.appendChild(node.cloneNode(true));
+        });
         return container;
     }
     

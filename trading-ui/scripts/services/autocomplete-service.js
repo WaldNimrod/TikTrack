@@ -99,19 +99,34 @@
       overlay.style.visibility = '';
     }
     
-    // Position below input
-    let top = inputRect.bottom + 2; // 2px gap
-    let left = inputRect.left;
+    // Position above input by default (for RTL layout, tags widget is at bottom of page)
+    // Check if there's enough space above input
+    const spaceAbove = inputRect.top;
+    const spaceBelow = window.innerHeight - inputRect.bottom;
     
-    // Check if overlay goes beyond viewport bottom
-    if (top + overlayHeight > window.innerHeight) {
-      // Position above input instead
+    let top, left;
+    
+    // If more space above than below, position above
+    // Otherwise position below
+    if (spaceAbove > spaceBelow && spaceAbove >= overlayHeight + 2) {
+      // Position above input
       top = inputRect.top - overlayHeight - 2;
-      // If still doesn't fit, position at viewport top
       if (top < 0) {
         top = 2;
       }
+    } else {
+      // Position below input
+      top = inputRect.bottom + 2;
+      // If overlay goes beyond viewport bottom, position above instead
+      if (top + overlayHeight > window.innerHeight) {
+        top = inputRect.top - overlayHeight - 2;
+        if (top < 0) {
+          top = 2;
+        }
+      }
     }
+    
+    left = inputRect.left;
     
     // Align with input width
     overlay.style.width = `${inputRect.width}px`;
@@ -138,7 +153,11 @@
    */
   function renderSuggestions(overlay, suggestions, config, selectedIndex = -1) {
     if (!suggestions || suggestions.length === 0) {
-      overlay.innerHTML = '<div class="autocomplete-empty">אין הצעות</div>';
+      overlay.textContent = '';
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'autocomplete-empty';
+      emptyDiv.textContent = 'אין הצעות';
+      overlay.appendChild(emptyDiv);
       return;
     }
 
@@ -167,7 +186,12 @@
       `;
     }).join('');
 
-    overlay.innerHTML = itemsHtml;
+    overlay.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(itemsHtml, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        overlay.appendChild(node.cloneNode(true));
+    });
   }
 
   /**
@@ -310,7 +334,11 @@
       
       // Show loading state
       const overlay = getOrCreateOverlay(input);
-      overlay.innerHTML = '<div class="autocomplete-loading">טוען...</div>';
+      overlay.textContent = '';
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'autocomplete-loading';
+      loadingDiv.textContent = 'טוען...';
+      overlay.appendChild(loadingDiv);
       overlay.style.display = 'block';
       calculatePosition(input, overlay);
       
@@ -324,7 +352,11 @@
         if (suggestions && suggestions.length > 0) {
           showOverlay(input, suggestions, config);
         } else {
-          overlay.innerHTML = '<div class="autocomplete-empty">אין הצעות</div>';
+          overlay.textContent = '';
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'autocomplete-empty';
+      emptyDiv.textContent = 'אין הצעות';
+      overlay.appendChild(emptyDiv);
         }
       }
     } catch (error) {
@@ -332,7 +364,11 @@
       window.Logger?.error?.('AutocompleteService: Error fetching suggestions', { error, page: 'autocomplete-service' });
       
       const overlay = getOrCreateOverlay(input);
-      overlay.innerHTML = '<div class="autocomplete-error">שגיאה בטעינת הצעות</div>';
+      overlay.textContent = '';
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'autocomplete-error';
+      errorDiv.textContent = 'שגיאה בטעינת הצעות';
+      overlay.appendChild(errorDiv);
       
       if (window.NotificationSystem) {
         window.NotificationSystem.showError('שגיאה בטעינת הצעות. אנא נסה שוב.');

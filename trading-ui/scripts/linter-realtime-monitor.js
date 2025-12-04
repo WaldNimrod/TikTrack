@@ -1112,11 +1112,11 @@ async function startFileScan() {
             }
         }
         scanButton.textContent = '';
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = loaderIcon;
-        while (tempDiv.firstChild) {
-          scanButton.appendChild(tempDiv.firstChild);
-        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(loaderIcon, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            scanButton.appendChild(node.cloneNode(true));
+        });
         scanButton.appendChild(document.createTextNode(' סורק... 0%'));
     }
     
@@ -1285,11 +1285,11 @@ async function performScan() {
                 }
             }
             scanButton.textContent = '';
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = searchIcon;
-            while (tempDiv.firstChild) {
-              scanButton.appendChild(tempDiv.firstChild);
-            }
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(searchIcon, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                scanButton.appendChild(node.cloneNode(true));
+            });
             scanButton.appendChild(document.createTextNode(' סרוק קבצים'));
         }
         
@@ -1594,7 +1594,13 @@ async function updateRealtimeProgress() {
                     // Fallback already set
                 }
             }
-            scanButton.innerHTML = `${loaderIcon} סורק... ${progress}%`;
+            scanButton.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(loaderIcon, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                scanButton.appendChild(node.cloneNode(true));
+            });
+            scanButton.appendChild(document.createTextNode(` סורק... ${progress}%`));
         }
         
         // Add progress log entry every 10 files or at completion
@@ -1643,7 +1649,11 @@ async function finishScan() {
     const scanButton = document.getElementById('startScan');
     if (scanButton) {
         scanButton.disabled = false;
-        scanButton.innerHTML = '<i class="fas fa-search"></i> סרוק קבצים';
+        scanButton.textContent = '';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-search';
+        scanButton.appendChild(icon);
+        scanButton.appendChild(document.createTextNode(' סרוק קבצים'));
     }
     
     // Update overall status
@@ -2027,7 +2037,8 @@ function updateLogDisplay() {
     const logs = getAllLogEntries();
     const recentLogs = logs.slice(-50); // Show last 50 entries
     
-    logContainer.innerHTML = recentLogs.map(entry => {
+    logContainer.textContent = '';
+    const logsHTML = recentLogs.map(entry => {
         const time = new Date(entry.timestamp).toLocaleTimeString('he-IL');
         const levelClass = entry.level.toLowerCase();
         
@@ -2037,8 +2048,13 @@ function updateLogDisplay() {
                 <span class="log-level">[${entry.level}]</span>
                 <span class="log-message">${entry.message}</span>
         </div>
-    `;
+        `;
     }).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(logsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        logContainer.appendChild(node.cloneNode(true));
+    });
     
     // Scroll to bottom
     logContainer.scrollTop = logContainer.scrollHeight;
@@ -2384,7 +2400,8 @@ function updateFileTypeBreakdown() {
     
     const fileTypes = ['js', 'html', 'css', 'python', 'other'];
     
-    tbody.innerHTML = fileTypes.map(type => {
+    tbody.textContent = '';
+    const rowsHTML = fileTypes.map(type => {
         const discovered = fileScanningState.discovered.byType[type] || 0;
         const selected = fileScanningState.selected.byType[type] || 0;
         const scanned = fileScanningState.scanned.byType[type] || 0;
@@ -2425,6 +2442,11 @@ function updateFileTypeBreakdown() {
             </tr>
         `;
     }).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tbody.appendChild(node.cloneNode(true));
+    });
 }
 
 // ========================================
@@ -2481,7 +2503,8 @@ function updateFixDetailsTable(data = null) {
     
     const displayData = data || fixData.fixDetails;
     
-    tbody.innerHTML = displayData.map(fix => {
+    tbody.textContent = '';
+    const rowsHTML = displayData.map(fix => {
         const statusBadge = getFixStatusBadge(fix.status);
         const duration = fix.endTime ? ((fix.endTime - fix.startTime) / 1000).toFixed(1) + 's' : '-';
         
@@ -2500,6 +2523,11 @@ function updateFixDetailsTable(data = null) {
             </tr>
         `;
     }).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tbody.appendChild(node.cloneNode(true));
+    });
 }
 
 // Update progress details table with paginated data
@@ -2509,7 +2537,8 @@ function updateProgressDetailsTable(data = null) {
     
     const displayData = data || progressData.entries;
     
-    tbody.innerHTML = displayData.map(entry => {
+    tbody.textContent = '';
+    const rowsHTML = displayData.map(entry => {
         const statusIcon = getStatusIcon(entry.status);
         const statusBadge = getStatusBadge(entry.status);
         const duration = entry.endTime ? ((entry.endTime - entry.startTime) / 1000).toFixed(1) + 's' : '-';
@@ -2525,6 +2554,11 @@ function updateProgressDetailsTable(data = null) {
             </tr>
         `;
     }).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tbody.appendChild(node.cloneNode(true));
+    });
 }
 
 // Update problem files table with paginated data
@@ -2534,7 +2568,8 @@ function updateProblemFilesTable(data = null) {
     
     const displayData = data || getProblemFilesData();
     
-    tbody.innerHTML = displayData.map(file => {
+    tbody.textContent = '';
+    const rowsHTML = displayData.map(file => {
         const errorCount = file.errors || 0;
         const warningCount = file.warnings || 0;
         const totalIssues = errorCount + warningCount;
@@ -2558,6 +2593,11 @@ function updateProblemFilesTable(data = null) {
             </tr>
         `;
     }).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tbody.appendChild(node.cloneNode(true));
+    });
 }
 
 // Get problem files data
@@ -2722,7 +2762,8 @@ function updateFixDetailsTablePagination() {
         const tbody = document.getElementById('fixDetailsBody');
         if (!tbody) return;
         
-        tbody.innerHTML = fixData.fixDetails.map(fix => {
+        tbody.textContent = '';
+        const rowsHTML = fixData.fixDetails.map(fix => {
             const statusBadge = getFixStatusBadge(fix.status);
             const duration = fix.endTime ? ((fix.endTime - fix.startTime) / 1000).toFixed(1) + 's' : '-';
             
@@ -2920,7 +2961,8 @@ function updateProgressTimeline() {
     // Sort timeline by timestamp (newest first)
     const sortedTimeline = [...progressData.timeline].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     
-    timelineContainer.innerHTML = sortedTimeline.slice(0, 10).map(entry => {
+    timelineContainer.textContent = '';
+    const timelineHTML = sortedTimeline.slice(0, 10).map(entry => {
         const statusIcon = getStatusIcon(entry.status);
         const statusColor = getStatusColor(entry.status);
         
@@ -2951,7 +2993,8 @@ function updateProgressDetailsTableLegacy() {
     const allEntries = [...progressData.completed, ...progressData.inProgress, ...progressData.open]
         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     
-    tbody.innerHTML = allEntries.map(entry => {
+    tbody.textContent = '';
+    const rowsHTML = allEntries.map(entry => {
         const statusBadge = getStatusBadge(entry.status);
         
         return `
@@ -2968,6 +3011,11 @@ function updateProgressDetailsTableLegacy() {
             </tr>
         `;
     }).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tbody.appendChild(node.cloneNode(true));
+    });
 }
 
 // Helper functions
@@ -3104,7 +3152,13 @@ async function startMonitoring() {
                 // Fallback already set
             }
         }
-        startBtn.innerHTML = `${playIcon} פועל...`;
+        startBtn.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(playIcon, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            startBtn.appendChild(node.cloneNode(true));
+        });
+        startBtn.appendChild(document.createTextNode(' פועל...'));
         startBtn.className = 'btn btn-success btn-sm';
     }
     
@@ -3119,7 +3173,13 @@ async function startMonitoring() {
                 // Fallback already set
             }
         }
-        stopBtn.innerHTML = `${stopIcon} עצור`;
+        stopBtn.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(stopIcon, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            stopBtn.appendChild(node.cloneNode(true));
+        });
+        stopBtn.appendChild(document.createTextNode(' עצור'));
         stopBtn.className = 'btn btn-danger btn-sm';
     }
     
@@ -3148,7 +3208,13 @@ async function stopMonitoring() {
                 // Fallback already set
             }
         }
-        startBtn.innerHTML = `${playIcon} התחל`;
+        startBtn.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(playIcon, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            startBtn.appendChild(node.cloneNode(true));
+        });
+        startBtn.appendChild(document.createTextNode(' התחל'));
         startBtn.className = 'btn btn-success btn-sm';
     }
     
@@ -3163,7 +3229,13 @@ async function stopMonitoring() {
                 // Fallback already set
             }
         }
-        stopBtn.innerHTML = `${stopIcon} עצור`;
+        stopBtn.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(stopIcon, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            stopBtn.appendChild(node.cloneNode(true));
+        });
+        stopBtn.appendChild(document.createTextNode(' עצור'));
         stopBtn.className = 'btn btn-secondary btn-sm';
     }
     
@@ -3266,7 +3338,8 @@ function updateFixProgressDisplay() {
     const percentage = progress.totalIssues > 0 ? Math.round((progress.fixedIssues / progress.totalIssues) * 100) : 0;
     const elapsed = progress.startTime ? Math.round((Date.now() - progress.startTime) / 1000) : 0;
     
-    progressElement.innerHTML = `
+    progressElement.textContent = '';
+    const progressHTML = `
         <div class="fix-progress-container">
             <div class="fix-progress-header">
                 <h4>תיקון אוטומטי - התקדמות</h4>
@@ -3295,6 +3368,11 @@ function updateFixProgressDisplay() {
             </div>
                     </div>
                 `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(progressHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        progressElement.appendChild(node.cloneNode(true));
+    });
 }
 
 // Function to show final results
@@ -3306,7 +3384,8 @@ function showFixResults() {
     const successRate = progress.totalIssues > 0 ? Math.round((progress.fixedIssues / progress.totalIssues) * 100) : 0;
     const elapsed = progress.startTime ? Math.round((Date.now() - progress.startTime) / 1000) : 0;
     
-    progressElement.innerHTML = `
+    progressElement.textContent = '';
+    const resultsHTML = `
         <div class="fix-results-container">
             <div class="fix-results-header">
                 <h4>תיקון הושלם!</h4>
@@ -3332,6 +3411,11 @@ function showFixResults() {
             </div>
                     </div>
                 `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(resultsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        progressElement.appendChild(node.cloneNode(true));
+    });
 }
 
 // Function to reset fix progress

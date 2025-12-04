@@ -85,3 +85,5 @@ console.log('Creations:', window.PendingTradePlanWidget?.state?.creations?.lengt
 הווידג'ט שונה בהצלחה להיות wrapper שמשתמש בקוד הקיים. הקוד מוכן לבדיקה בדפדפן.
 
 
+
+

@@ -256,7 +256,12 @@ function updateTableDisplay(data, tableType) {
   const tbodyHTML = createTableBodyHTML(data, tableMapping, tableType);
 
   // Update table body
-  tbody.innerHTML = tbodyHTML;
+  tbody.textContent = '';
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(tbodyHTML, 'text/html');
+  doc.body.childNodes.forEach(node => {
+      tbody.appendChild(node.cloneNode(true));
+  });
 
   // Apply sorting functionality
   applySortingFunctionality(tableType);
@@ -367,7 +372,14 @@ function showLoadingState() {
       if (tableContainer) {
         const tbody = tableContainer.querySelector('tbody');
         if (tbody) {
-          tbody.innerHTML = '<tr><td colspan="10" class="text-center">טוען נתונים...</td></tr>';
+          tbody.textContent = '';
+          const row = document.createElement('tr');
+          const cell = document.createElement('td');
+          cell.colSpan = 10;
+          cell.className = 'text-center';
+          cell.textContent = 'טוען נתונים...';
+          row.appendChild(cell);
+          tbody.appendChild(row);
         }
       }
     }

@@ -197,7 +197,12 @@
                                 class: 'icon',
                                 style: `color: ${color}`
                             });
-                            flagBtn.innerHTML = iconHTML;
+                            flagBtn.textContent = '';
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(iconHTML, 'text/html');
+                            doc.body.childNodes.forEach(node => {
+                                flagBtn.appendChild(node.cloneNode(true));
+                            });
                         }
                     }
                 }
@@ -235,7 +240,12 @@
                                 alt: 'flag',
                                 class: 'icon text-muted'
                             });
-                            flagBtn.innerHTML = iconHTML;
+                            flagBtn.textContent = '';
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(iconHTML, 'text/html');
+                            doc.body.childNodes.forEach(node => {
+                                flagBtn.appendChild(node.cloneNode(true));
+                            });
                         }
                     }
                 }
@@ -323,6 +333,8 @@
     window.Logger?.info?.('✅ WatchListsUIService loaded successfully', PAGE_LOG_CONTEXT);
 
 })();
+
+
 
 
 

@@ -186,7 +186,12 @@ class ConstraintManager {
     }
 
     const html = this.constraints.map(constraint => this.renderConstraintItem(constraint)).join('');
-    container.innerHTML = html;
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+    });
   }
 
   /**
@@ -199,12 +204,21 @@ class ConstraintManager {
     const container = document.getElementById('constraints-list-container');
 
     if (filteredConstraints.length === 0) {
-      container.innerHTML = '<div class="text-center text-muted">לא נמצאו אילוצים התואמים לחיפוש</div>';
+      container.textContent = '';
+      const div = document.createElement('div');
+      div.className = 'text-center text-muted';
+      div.textContent = 'לא נמצאו אילוצים התואמים לחיפוש';
+      container.appendChild(div);
       return;
     }
 
     const html = filteredConstraints.map(constraint => this.renderConstraintItem(constraint)).join('');
-    container.innerHTML = html;
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+    });
   }
 
   /**
@@ -328,7 +342,8 @@ class ConstraintManager {
             `;
     }
 
-    container.innerHTML = `
+    container.textContent = '';
+    const formHTML = `
             <form id="edit-constraint-form">
                 <div class="form-section">
                     <h5>פרטי האילוץ</h5>
@@ -360,6 +375,11 @@ class ConstraintManager {
                 </div>
             </form>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(formHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            container.appendChild(node.cloneNode(true));
+        });
   }
 
   /**
@@ -409,12 +429,19 @@ class ConstraintManager {
       if (data.status === 'success') {
         this.showMessage('האילוץ נמחק בהצלחה', 'success');
         await this.loadConstraints();
-        document.getElementById('editor-container').innerHTML = `
-                    <div class="text-center text-muted">
-                        <i class="fas fa-mouse-pointer fa-2x mb-3"></i>
-                        <p>בחר אילוץ מהרשימה כדי לערוך אותו</p>
-                    </div>
-                `;
+        const editorContainer = document.getElementById('editor-container');
+        if (editorContainer) {
+            editorContainer.textContent = '';
+            const div = document.createElement('div');
+            div.className = 'text-center text-muted';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-mouse-pointer fa-2x mb-3';
+            div.appendChild(icon);
+            const p = document.createElement('p');
+            p.textContent = 'בחר אילוץ מהרשימה כדי לערוך אותו';
+            div.appendChild(p);
+            editorContainer.appendChild(div);
+        }
       } else {
         this.showMessage('שגיאה במחיקת האילוץ', 'error');
       }
@@ -676,7 +703,8 @@ function showAddConstraintModal() {
     modal = document.createElement('div');
     modal.id = 'add-constraint-modal';
     modal.className = 'modal fade';
-    modal.innerHTML = `
+    modal.textContent = '';
+    const modalHTML = `
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header linkedItems_modal-header-colored">
@@ -761,12 +789,33 @@ window.addEnumValue = function () {
   if (container) {
     const newItem = document.createElement('div');
     newItem.className = 'enum-value-item';
-    newItem.innerHTML = `
-            <input type="text" class="form-control" placeholder="ערך" name="enum-value">
-            <input type="text" class="form-control" placeholder="שם תצוגה" name="enum-display">
-            <input type="number" class="form-control" placeholder="סדר" name="enum-sort" value="1">
-            <button data-button-type="DELETE" data-variant="small" data-onclick="removeEnumValue(this)" data-text="" title="מחק"></button>
-        `;
+    newItem.textContent = '';
+    const input1 = document.createElement('input');
+    input1.type = 'text';
+    input1.className = 'form-control';
+    input1.placeholder = 'ערך';
+    input1.name = 'enum-value';
+    newItem.appendChild(input1);
+    const input2 = document.createElement('input');
+    input2.type = 'text';
+    input2.className = 'form-control';
+    input2.placeholder = 'שם תצוגה';
+    input2.name = 'enum-display';
+    newItem.appendChild(input2);
+    const input3 = document.createElement('input');
+    input3.type = 'number';
+    input3.className = 'form-control';
+    input3.placeholder = 'סדר';
+    input3.name = 'enum-sort';
+    input3.value = '1';
+    newItem.appendChild(input3);
+    const button = document.createElement('button');
+    button.setAttribute('data-button-type', 'DELETE');
+    button.setAttribute('data-variant', 'small');
+    button.setAttribute('data-onclick', 'removeEnumValue(this)');
+    button.setAttribute('data-text', '');
+    button.title = 'מחק';
+    newItem.appendChild(button);
     container.appendChild(newItem);
   }
 };

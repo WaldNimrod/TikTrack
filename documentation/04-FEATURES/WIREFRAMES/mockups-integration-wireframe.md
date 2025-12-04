@@ -254,3 +254,5 @@ function navigateToPortfolioState() {
 - **תמיכה ב-URL Parameters** - Mockups יקראו את הפרמטרים מ-URL
 
 
+
+

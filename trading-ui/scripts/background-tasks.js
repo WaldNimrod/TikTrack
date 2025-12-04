@@ -131,7 +131,12 @@ const utils = {
       }
       element.textContent = '';
       const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = loaderIcon;
+      tempDiv.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(loaderIcon, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        tempDiv.appendChild(node.cloneNode(true));
+      });
       while (tempDiv.firstChild) {
         element.appendChild(tempDiv.firstChild);
       }
@@ -166,7 +171,12 @@ const utils = {
         }
         element.textContent = '';
         const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = stopIcon;
+        tempDiv.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(stopIcon, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          tempDiv.appendChild(node.cloneNode(true));
+        });
         while (tempDiv.firstChild) {
           element.appendChild(tempDiv.firstChild);
         }
@@ -191,7 +201,13 @@ const utils = {
             // Fallback already set
           }
         }
-        element.innerHTML = refreshIcon + ' רענן';
+        element.textContent = '';
+        const parser = new DOMParser();
+        const iconDoc = parser.parseFromString(refreshIcon, 'text/html');
+        iconDoc.body.childNodes.forEach(node => {
+          element.appendChild(node.cloneNode(true));
+        });
+        element.appendChild(document.createTextNode(' רענן'));
       }
     }
   },
@@ -394,11 +410,19 @@ const uiManager = {
     window.Logger?.debug('✅ Found tbody, rendering', tasks?.length || 0, 'tasks');
 
     if (!tasks || tasks.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" class="no-data">אין משימות זמינות</td></tr>';
+      tbody.textContent = '';
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 7;
+      cell.className = 'no-data';
+      cell.textContent = 'אין משימות זמינות';
+      row.appendChild(cell);
+      tbody.appendChild(row);
       return;
     }
 
-    tbody.innerHTML = tasks.map(task => `
+    tbody.textContent = '';
+    const tasksHTML = tasks.map(task => `
             <tr>
                 <td><strong>${task.name}</strong></td>
                 <td>${task.description || 'אין תיאור'}</td>
@@ -486,11 +510,19 @@ const uiManager = {
             </div>
         `).join('');
 
-    chartContainer.innerHTML = `
+    chartContainer.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
             <div class="performance-chart">
                 ${chartHtml}
             </div>
-        `;
+        `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        chartContainer.appendChild(fragment);
   },
 };
 
@@ -523,20 +555,39 @@ const modalManager = {
         // Fallback already set
       }
     }
-    modalDetails.innerHTML = `<div class="loading-message">${loaderIcon} טוען פרטים...</div>`;
+    modalDetails.textContent = '';
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'loading-message';
+    const parser = new DOMParser();
+    const iconDoc = parser.parseFromString(loaderIcon, 'text/html');
+    iconDoc.body.childNodes.forEach(node => {
+      loadingDiv.appendChild(node.cloneNode(true));
+    });
+    loadingDiv.appendChild(document.createTextNode(' טוען פרטים...'));
+    modalDetails.appendChild(loadingDiv);
 
     try {
       // Get task details
       const details = await apiService.getTaskDetails(taskName);
 
       // Render details
-      modalDetails.innerHTML = this.renderTaskDetails(details);
+      modalDetails.textContent = '';
+      const detailsHTML = this.renderTaskDetails(details);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(detailsHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        modalDetails.appendChild(node.cloneNode(true));
+      });
 
       // Show modal
       modal.style.display = 'block';
 
     } catch (error) {
-      modalDetails.innerHTML = `<div class="error-message">שגיאה בטעינת פרטי המשימה: ${error.message}</div>`;
+      modalDetails.textContent = '';
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-message';
+      errorDiv.textContent = `שגיאה בטעינת פרטי המשימה: ${error.message}`;
+      modalDetails.appendChild(errorDiv);
       modal.style.display = 'block';
     }
   },
@@ -1244,7 +1295,6 @@ async function initializeBackgroundTasks() {
     eventHandlers.init();
 
     // Initialize real-time log listener
-    initializeRealtimeLogListener();
 
     // Load initial data
     await Promise.all([
@@ -1509,40 +1559,4 @@ if (document.readyState === 'loading') {
 
 // ===== REAL-TIME LOG LISTENER =====
 
-/**
- * Initialize real-time log listener for background tasks
- */
-function initializeRealtimeLogListener() {
-    try {
-        // Listen for background task log events from server
-        if (window.io && window.io.socket) {
-            window.io.socket.on('background_task_log', async (logData) => {
-                try {
-                    window.Logger?.debug('📥 Received background task log:', logData);
-                    
-                    // Save to IndexedDB using unified cache system
-                    if (window.saveBackgroundTaskLog) {
-                        await window.saveBackgroundTaskLog(logData.task_name, {
-                            status: logData.status,
-                            duration_ms: logData.duration_ms,
-                            result: logData.result,
-                            error: logData.error,
-                            user_id: logData.user_id
-                        });
-                        
-                        // Refresh the log display
-                    }
-                } catch (error) {
-                    window.Logger?.error('❌ Error processing background task log:', error);
-                }
-            });
-            
-            window.Logger?.debug('✅ Real-time background task log listener initialized');
-        } else {
-            window.Logger?.warn('⚠️ Socket.IO not available for real-time log listening');
-        }
-    } catch (error) {
-        window.Logger?.error('❌ Failed to initialize real-time log listener:', error);
-    }
-}
 

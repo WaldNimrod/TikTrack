@@ -1459,8 +1459,37 @@ async function cancelTradeRecord(tradeId) {
       }
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      if (!window.confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`)) {
-        return;
+      if (window.showConfirmationDialog) {
+        const confirmed = await new Promise((resolve) => {
+          window.showConfirmationDialog(
+            'ביטול טרייד',
+            `האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`,
+            () => resolve(true),
+            () => resolve(false),
+            'warning'
+          );
+        });
+        if (!confirmed) {
+          return;
+        }
+      } else {
+        let confirmed = false;
+        if (window.showConfirmationDialog) {
+          confirmed = await new Promise((resolve) => {
+            window.showConfirmationDialog(
+              'ביטול טרייד',
+              `האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`,
+              () => resolve(true),
+              () => resolve(false),
+              'warning'
+            );
+          });
+        } else {
+          confirmed = window.confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`);
+        }
+        if (!confirmed) {
+          return;
+        }
       }
     }
     await executeCancellation();
@@ -1827,29 +1856,27 @@ window.updateTradesTable = updateTradesTable;
 window.updatePageSummaryStats = updatePageSummaryStats;
 
 /**
- * Add trade function - wrapper for showAddTradeModal
- * Maintains backward compatibility with old function name
+ * Add trade function - wrapper for ModalManagerV2
+ * Maintains backward compatibility with HTML onclick handlers
  * 
  * @function addTrade
- * @returns {void}
+ * @returns {Promise<void>}
  */
 async function addTrade() {
-  if (typeof showAddTradeModal === 'function') {
-    // Use ModalManagerV2 directly
-    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-      await window.ModalManagerV2.showModal('tradesModal', 'add');
-      const select = document.getElementById('tradeTags');
-      if (select) {
-        select.setAttribute('data-initial-value', '');
-        if (window.TagUIManager?.refreshSelectOptions) {
-          await window.TagUIManager.refreshSelectOptions(select);
-        }
+  // Use ModalManagerV2 directly
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    await window.ModalManagerV2.showModal('tradesModal', 'add');
+    const select = document.getElementById('tradeTags');
+    if (select) {
+      select.setAttribute('data-initial-value', '');
+      if (window.TagUIManager?.refreshSelectOptions) {
+        await window.TagUIManager.refreshSelectOptions(select);
       }
     }
   } else {
-    window.Logger?.error('showAddTradeModal not available', { page: "trades" });
+    window.Logger?.error('ModalManagerV2 not available', { page: "trades" });
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'לא ניתן לפתוח מודל הוספת טרייד');
+      window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
     }
   }
 }
@@ -2931,7 +2958,47 @@ async function handleTradeConditionSummaryDelete(conditionId) {
     });
   } else {
     // Fallback למקרה שמערכת התראות לא זמינה
-    confirmed = window.confirm('האם למחוק את התנאי הנבחר?');
+    if (window.showDeleteWarning) {
+      confirmed = await new Promise((resolve) => {
+        window.showDeleteWarning(
+          'האם למחוק את התנאי הנבחר?',
+          () => resolve(true),
+          () => resolve(false)
+        );
+      });
+    } else if (window.showConfirmationDialog) {
+      confirmed = await new Promise((resolve) => {
+        window.showConfirmationDialog(
+          'מחיקת תנאי',
+          'האם למחוק את התנאי הנבחר?',
+          () => resolve(true),
+          () => resolve(false),
+          'danger'
+        );
+      });
+    } else {
+      if (window.showDeleteWarning) {
+        confirmed = await new Promise((resolve) => {
+          window.showDeleteWarning(
+            'האם למחוק את התנאי הנבחר?',
+            () => resolve(true),
+            () => resolve(false)
+          );
+        });
+      } else if (window.showConfirmationDialog) {
+        confirmed = await new Promise((resolve) => {
+          window.showConfirmationDialog(
+            'מחיקת תנאי',
+            'האם למחוק את התנאי הנבחר?',
+            () => resolve(true),
+            () => resolve(false),
+            'danger'
+          );
+        });
+      } else {
+        confirmed = window.confirm('האם למחוק את התנאי הנבחר?');
+      }
+    }
   }
   
   if (!confirmed) {
@@ -3661,8 +3728,28 @@ function showTickerChangeConfirmation(originalSymbol, newSymbol) {
         );
       } else {
         // Fallback למקרה שמערכת התראות לא זמינה
-        const confirmed = window.confirm(message);
-        resolve(confirmed);
+        if (window.showConfirmationDialog) {
+          window.showConfirmationDialog(
+            'שינוי טיקר',
+            message,
+            () => resolve(true),
+            () => resolve(false),
+            'warning'
+          );
+        } else {
+          if (window.showConfirmationDialog) {
+            window.showConfirmationDialog(
+              'שינוי טיקר',
+              message,
+              () => resolve(true),
+              () => resolve(false),
+              'warning'
+            );
+          } else {
+            const confirmed = window.confirm(message);
+            resolve(confirmed);
+          }
+        }
       }
     });
   } catch (error) {
@@ -4103,7 +4190,49 @@ function confirmDeleteTrade(tradeId) {
       );
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      if (confirm(confirmMessage)) {
+      let confirmed = false;
+      if (window.showDeleteWarning) {
+        confirmed = await new Promise((resolve) => {
+          window.showDeleteWarning(
+            confirmMessage,
+            () => resolve(true),
+            () => resolve(false)
+          );
+        });
+      } else if (window.showConfirmationDialog) {
+        confirmed = await new Promise((resolve) => {
+          window.showConfirmationDialog(
+            'מחיקת טרייד',
+            confirmMessage,
+            () => resolve(true),
+            () => resolve(false),
+            'danger'
+          );
+        });
+      } else {
+        if (window.showDeleteWarning) {
+          confirmed = await new Promise((resolve) => {
+            window.showDeleteWarning(
+              confirmMessage,
+              () => resolve(true),
+              () => resolve(false)
+            );
+          });
+        } else if (window.showConfirmationDialog) {
+          confirmed = await new Promise((resolve) => {
+            window.showConfirmationDialog(
+              'מחיקת טרייד',
+              confirmMessage,
+              () => resolve(true),
+              () => resolve(false),
+              'danger'
+            );
+          });
+        } else {
+          confirmed = confirm(confirmMessage);
+        }
+      }
+      if (confirmed) {
         deleteTradeRecord(tradeId);
       }
     }
@@ -4710,6 +4839,7 @@ function setupTradeConditionsButton(modalElement) {
 /**
  * Show edit trade modal (wrapper for ModalManagerV2)
  * Maintains backward compatibility with HTML onclick handlers
+ * @deprecated Use window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId) directly
  * @function showEditTradeModal
  * @param {number|string} tradeId - ID of trade to edit
  */

@@ -190,7 +190,8 @@ class SMBaseSection {
   showLoadingState() {
     if (!this.container) return;
     
-    this.container.innerHTML = `
+    this.container.textContent = '';
+    const containerHTML = `
       <div class="sm-loading-state">
         <div class="loading-spinner">
           <div class="spinner-border text-primary" role="status">
@@ -203,6 +204,11 @@ class SMBaseSection {
         </div>
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(containerHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+    });
   }
 
   /**
@@ -212,12 +218,18 @@ class SMBaseSection {
   showEmptyState(message = 'אין נתונים להצגה') {
     if (!this.container) return;
     
-    this.container.innerHTML = `
+    this.container.textContent = '';
+    const containerHTML = `
       <div class="sm-empty-state">
         <i class="fas fa-inbox"></i>
         <p>${message}</p>
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(containerHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+    });
   }
 
   /**

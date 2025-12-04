@@ -183,7 +183,12 @@ class SMDashboardSection extends SMBaseSection {
 
     try {
       const dashboardHtml = this.createDashboardHTML(data);
-      this.container.innerHTML = dashboardHtml;
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(dashboardHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Dashboard rendered successfully');
       

@@ -87,11 +87,19 @@
     }
 
     const timestamp = new Date(state.lastUpdated).toLocaleString('he-IL');
-    container.innerHTML = `
+    container.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
       <div class="info-summary" data-component="research-dashboard">
         <p>נתוני מחקר זמינים (עודכנו ב-${timestamp}).</p>
       </div>
-    `;
+    `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        container.appendChild(fragment);
   }
 
   /**

@@ -741,3 +741,5 @@ const details = await window.entityDetailsAPI?.getEntityDetails(type, id);
 **עודכן:** 29 ינואר 2025
 
 
+
+

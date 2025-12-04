@@ -806,7 +806,14 @@ const PreferenceTypesAudit = (() => {
       return;
     }
 
-    tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">טוען נתונים...</td></tr>';
+    tableBody.textContent = '';
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = 6;
+    cell.className = 'text-center text-muted';
+    cell.textContent = 'טוען נתונים...';
+    row.appendChild(cell);
+    tableBody.appendChild(row);
 
     try {
       window.Logger?.info('📡 [Types Table] Calling PreferencesData.loadPreferenceTypes', {
@@ -877,7 +884,14 @@ const PreferenceTypesAudit = (() => {
           page: 'preferences-page',
           result: result,
         });
-        tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">לא נמצאו סוגי העדפות.</td></tr>';
+        tableBody.textContent = '';
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 6;
+        cell.className = 'text-center text-muted';
+        cell.textContent = 'לא נמצאו סוגי העדפות.';
+        row.appendChild(cell);
+        tableBody.appendChild(row);
         return;
       }
 
@@ -927,7 +941,7 @@ const PreferenceTypesAudit = (() => {
         fragment.appendChild(row);
       });
 
-      tableBody.innerHTML = '';
+      tableBody.textContent = '';
       tableBody.appendChild(fragment);
 
       window.Logger?.info('✅ [Types Table] Preference types audit table rendered successfully', {
@@ -942,7 +956,14 @@ const PreferenceTypesAudit = (() => {
         errorStack: error.stack,
         errorName: error.name,
       });
-      tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת הנתונים: ${error.message}</td></tr>`;
+      tableBody.textContent = '';
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 6;
+      cell.className = 'text-center text-danger';
+      cell.textContent = `שגיאה בטעינת הנתונים: ${error.message}`;
+      row.appendChild(cell);
+      tableBody.appendChild(row);
     }
   };
 

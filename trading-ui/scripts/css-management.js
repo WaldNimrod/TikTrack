@@ -537,7 +537,12 @@ function displaySearchResults(results, searchTerm) {
         // Insert using tempDiv
         container.textContent = '';
         const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
+        tempDiv.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tempDiv.appendChild(node.cloneNode(true));
+        });
         while (tempDiv.firstChild) {
           container.appendChild(tempDiv.firstChild);
         }
@@ -554,7 +559,10 @@ function createSearchResultsContainer() {
         resultsContainer.id = 'searchResults';
         resultsContainer.className = 'search-results-container mt-3';
         
-        resultsContainer.innerHTML = `
+        resultsContainer.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">🔍 תוצאות חיפוש</h5>
@@ -566,7 +574,12 @@ function createSearchResultsContainer() {
                     <!-- תוצאות חיפוש יוצגו כאן -->
                 </div>
             </div>
-        `;
+        `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        resultsContainer.appendChild(fragment);
         
         searchSection.appendChild(resultsContainer);
     }
@@ -1052,7 +1065,12 @@ function displayDuplicateResults(results) {
             `;
         }
         
-        container.innerHTML = html;
+        container.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            container.appendChild(node.cloneNode(true));
+        });
     }
 }
 
@@ -1066,7 +1084,8 @@ function createDuplicateResultsContainer() {
         resultsContainer.id = 'duplicateResults';
         resultsContainer.className = 'duplicate-results-container mt-3';
         
-        resultsContainer.innerHTML = `
+        resultsContainer.textContent = '';
+        const resultsHTML = `
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">🔍 תוצאות כפילויות</h5>
@@ -1079,6 +1098,11 @@ function createDuplicateResultsContainer() {
                 </div>
             </div>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(resultsHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            resultsContainer.appendChild(node.cloneNode(true));
+        });
         
         duplicateSection.appendChild(resultsContainer);
     }
@@ -1723,7 +1747,12 @@ function displayComplianceResults(results) {
             html += `</ul>`;
         }
         
-        container.innerHTML = html;
+        container.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            container.appendChild(node.cloneNode(true));
+        });
     }
 }
 
@@ -1737,7 +1766,8 @@ function createComplianceResultsContainer() {
         resultsContainer.id = 'complianceResults';
         resultsContainer.className = 'compliance-results-container mt-3';
         
-        resultsContainer.innerHTML = `
+        resultsContainer.textContent = '';
+        const resultsHTML = `
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">🏗️ תוצאות תאימות ITCSS</h5>
@@ -1750,6 +1780,11 @@ function createComplianceResultsContainer() {
                 </div>
             </div>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(resultsHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            resultsContainer.appendChild(node.cloneNode(true));
+        });
         
         complianceSection.appendChild(resultsContainer);
     }
@@ -1960,11 +1995,12 @@ function displayCssFilesTable(files) {
     const tbody = document.querySelector('#cssFilesTable tbody');
     if (!tbody) return;
     
-    tbody.innerHTML = '';
+    tbody.textContent = '';
     
     files.forEach(file => {
         const row = document.createElement('tr');
-        row.innerHTML = `
+        row.textContent = '';
+        const rowHTML = `
             <td><code>${file.name}</code></td>
             <td>${file.size}</td>
             <td>${file.rules}</td>
@@ -1978,6 +2014,14 @@ function displayCssFilesTable(files) {
                 </div>
             </td>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+        const tempRow = doc.body.querySelector('tr');
+        if (tempRow) {
+            Array.from(tempRow.children).forEach(cell => {
+                row.appendChild(cell.cloneNode(true));
+            });
+        }
         tbody.appendChild(row);
     });
 }

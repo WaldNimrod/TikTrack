@@ -92,7 +92,12 @@
                 const alertDiv = document.createElement('div');
                 alertDiv.className = 'alert alert-warning';
                 const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = alertIcon;
+                tempDiv.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(alertIcon, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    tempDiv.appendChild(node.cloneNode(true));
+                });
                 while (tempDiv.firstChild) {
                   alertDiv.appendChild(tempDiv.firstChild);
                 }
@@ -121,7 +126,12 @@
                 const alertDiv = document.createElement('div');
                 alertDiv.className = 'alert alert-danger';
                 const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = alertIcon2;
+                tempDiv.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(alertIcon2, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    tempDiv.appendChild(node.cloneNode(true));
+                });
                 while (tempDiv.firstChild) {
                   alertDiv.appendChild(tempDiv.firstChild);
                 }
@@ -136,7 +146,7 @@
 
         // Dates are already sorted, so we just need to check they're valid
         if (validationMessage) {
-            validationMessage.innerHTML = '';
+            validationMessage.textContent = '';
         }
 
         return true;
@@ -350,7 +360,7 @@
         const datesList = document.getElementById('dates-list');
         if (!datesList) return;
 
-        datesList.innerHTML = '';
+        datesList.textContent = '';
 
         if (selectedDates.length === 0) {
             datesList.innerHTML.textContent = '';
@@ -369,13 +379,21 @@
             
             const canRemove = selectedDates.length > 2; // Can only remove if more than 2 dates
             
-            dateItem.innerHTML = `
+            dateItem.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
                 <label class="date-label form-label-small">תאריך ${index + 1} (${formatDate(date)}):</label>
                 <input type="date" class="form-control form-control-sm date-input" id="${dateId}" value="${date}" data-original-date="${date}" data-onchange="handleDateInputChange('${dateId}')">
                 <button type="button" class="remove-date-btn" data-onclick="removeDateInput('${dateId}')" title="${canRemove ? 'הסר תאריך' : 'חייבים להישאר לפחות 2 תאריכים'}" ${!canRemove ? 'disabled' : ''}>
                     <img src="../../images/icons/tabler/x.svg" width="16" height="16" alt="remove">
                 </button>
-            `;
+            `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        dateItem.appendChild(fragment);
             datesList.appendChild(dateItem);
         });
 
@@ -721,7 +739,14 @@
                 window.Logger.warn('Invalid comparison data', { page: 'date-comparison-modal', data });
             }
             const colCount = selectedDates.length + 2; // dates + metric + change
-            tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center text-muted">אין נתונים להצגה</td></tr>`;
+            tbody.textContent = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = colCount;
+            cell.className = 'text-center text-muted';
+            cell.textContent = 'אין נתונים להצגה';
+            row.appendChild(cell);
+            tbody.appendChild(row);
             return;
         }
         
@@ -805,10 +830,25 @@
         }).join('');
 
         if (rows) {
-            tbody.innerHTML = rows;
+            tbody.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(`<table><tbody>${rows}</tbody></table>`, 'text/html');
+            const tempTbody = doc.body.querySelector('tbody');
+            if (tempTbody) {
+                Array.from(tempTbody.children).forEach(row => {
+                    tbody.appendChild(row.cloneNode(true));
+                });
+            }
         } else {
             const colCount = selectedDates.length + 2;
-            tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center text-muted">אין נתונים להצגה</td></tr>`;
+            tbody.textContent = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = colCount;
+            cell.className = 'text-center text-muted';
+            cell.textContent = 'אין נתונים להצגה';
+            row.appendChild(cell);
+            tbody.appendChild(row);
         }
     }
 
@@ -1456,16 +1496,27 @@
         const alerts = calculateAlerts(data);
 
         if (alerts.length === 0) {
-            alertsContainer.innerHTML = '';
+            alertsContainer.textContent = '';
             return;
         }
 
-        alertsContainer.innerHTML = alerts.map(alert => `
-            <div class="alert alert-${alert.type}">
-                <img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">
-                <strong>שינוי משמעותי:</strong> ${alert.message}
-            </div>
-        `).join('');
+        alertsContainer.textContent = '';
+        alerts.forEach(alert => {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${alert.type}`;
+            const icon = document.createElement('img');
+            icon.src = '../../images/icons/tabler/alert-triangle.svg';
+            icon.width = 16;
+            icon.height = 16;
+            icon.alt = 'alert-triangle';
+            icon.className = 'icon';
+            alertDiv.appendChild(icon);
+            const strong = document.createElement('strong');
+            strong.textContent = 'שינוי משמעותי: ';
+            alertDiv.appendChild(strong);
+            alertDiv.appendChild(document.createTextNode(alert.message));
+            alertsContainer.appendChild(alertDiv);
+        });
     }
 
     // ===== SUMMARY FUNCTIONS =====
@@ -1531,7 +1582,12 @@
                 });
                 
                 html += '</div></div>';
-                summaryContainer.innerHTML = html;
+                summaryContainer.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    summaryContainer.appendChild(node.cloneNode(true));
+                });
             }
         } catch (error) {
             if (window.Logger && typeof window.Logger.warn === 'function') {

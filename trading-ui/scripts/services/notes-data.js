@@ -246,9 +246,31 @@
     if (payload !== undefined && payload !== null) {
       if (isFormDataPayload(payload)) {
         requestOptions.body = payload;
+        // Log FormData contents for debugging
+        if (window.Logger && payload.get) {
+          const content = payload.get('content');
+          window.Logger.debug('📤 [buildMutationRequest] FormData payload', {
+            hasContent: !!content,
+            contentLength: content?.length || 0,
+            hasAttachment: !!payload.get('attachment'),
+            ...PAGE_LOG_CONTEXT
+          });
+        }
       } else if (typeof payload === 'object') {
         requestOptions.headers = { ...DEFAULT_HEADERS, ...headers };
         requestOptions.body = JSON.stringify(payload);
+        // Log JSON payload contents for debugging
+        if (window.Logger) {
+          window.Logger.debug('📤 [buildMutationRequest] JSON payload', {
+            hasContent: !!payload.content,
+            contentLength: payload.content?.length || 0,
+            contentType: typeof payload.content,
+            related_type_id: payload.related_type_id,
+            related_id: payload.related_id,
+            payloadKeys: Object.keys(payload),
+            ...PAGE_LOG_CONTEXT
+          });
+        }
       } else {
         requestOptions.body = payload;
       }

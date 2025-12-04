@@ -277,6 +277,9 @@ window.initPositionsPortfolio = async function(autoSelectDefault = false) {
         });
     }
     
+    // Setup section open listeners
+    setupPositionsSectionOpenListener();
+    
     // Load portfolio on init (if no trading account selector dependency)
     await loadPortfolio();
     await loadPortfolioSummary();
@@ -292,6 +295,62 @@ window.initPositionsPortfolio = async function(autoSelectDefault = false) {
         }
     }
 };
+
+/**
+ * Setup event listener for positions-portfolio section opening
+ * Ensures data is loaded when section opens
+ */
+function setupPositionsSectionOpenListener() {
+    const positionsSection = document.querySelector('[data-section="positions-portfolio"]');
+    if (!positionsSection) return;
+    
+    // Use MutationObserver to watch for section body display changes
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                const sectionBody = positionsSection.querySelector('.section-body');
+                if (sectionBody) {
+                    const isVisible = sectionBody.style.display !== 'none' && 
+                                     window.getComputedStyle(sectionBody).display !== 'none';
+                    if (isVisible) {
+                        window.Logger.info('📂 positions-portfolio section opened', { page: "trading_accounts" });
+                        // Check if selector is populated and account is selected
+                        const selector = document.getElementById('positionsAccountSelector');
+                        if (selector && selector.value) {
+                            const accountId = parseInt(selector.value);
+                            if (accountId && !isNaN(accountId)) {
+                                // Ensure positions data is loaded
+                                if (!window.positionsPortfolioState.positionsData || 
+                                    window.positionsPortfolioState.selectedAccountId !== accountId) {
+                                    window.Logger.info(`🔄 Loading positions data on section open for account ${accountId}`, { page: "trading_accounts" });
+                                    loadAccountPositions(accountId).catch(error => {
+                                        window.Logger.error('❌ Error loading positions on section open:', error, { page: "trading_accounts" });
+                                    });
+                                }
+                            }
+                        } else {
+                            // Selector not populated yet - wait a bit and try again
+                            setTimeout(() => {
+                                const selector2 = document.getElementById('positionsAccountSelector');
+                                if (selector2 && selector2.options.length > 1 && !selector2.value) {
+                                    // Auto-select first account if no account selected
+                                    selector2.value = selector2.options[1].value;
+                                    handlePositionsAccountSelection({ target: selector2 });
+                                }
+                            }, 500);
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+    // Observe section body for style changes
+    const sectionBody = positionsSection.querySelector('.section-body');
+    if (sectionBody) {
+        observer.observe(sectionBody, { attributes: true, attributeFilter: ['style'] });
+    }
+}
 
 /**
  * Populate positions trading account selector dropdown
@@ -381,9 +440,12 @@ async function handlePositionsAccountSelection(event) {
     window.positionsPortfolioState.selectedAccountId = accountId;
     
     // Show section body
+    // Show section body to ensure table is visible
     const sectionBody = document.querySelector('[data-section="positions-portfolio"] .section-body');
     if (sectionBody) {
         sectionBody.style.display = 'block';
+        // Remove d-none class if present
+        sectionBody.classList.remove('d-none');
     }
     
     // Load positions for selected trading account
@@ -605,7 +667,14 @@ function renderPositionsTable(positions) {
     
     if (!positions || positions.length === 0) {
         const message = getNoPositionsMessage(window.positionsPortfolioState.positionsDiagnostics, 'account');
-        tableBody.innerHTML = `<tr><td colspan="9" class="empty">${message}</td></tr>`;
+        tableBody.textContent = '';
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 9;
+        cell.className = 'empty';
+        cell.textContent = message;
+        row.appendChild(cell);
+        tableBody.appendChild(row);
         return;
     }
     
@@ -704,7 +773,12 @@ function renderPositionsTable(positions) {
     });
     
     // Update table HTML
-    tableBody.innerHTML = html;
+    tableBody.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tableBody.appendChild(node.cloneNode(true));
+    });
 }
 
 /**
@@ -837,7 +911,14 @@ async function loadPortfolio() {
     try {
         // Show loading state
         if (tableBody) {
-            tableBody.innerHTML = '<tr><td colspan="10" class="loading">טוען פורטפוליו...</td></tr>';
+            tableBody.textContent = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 10;
+            cell.className = 'loading';
+            cell.textContent = 'טוען פורטפוליו...';
+            row.appendChild(cell);
+            tableBody.appendChild(row);
         }
         
         // Get filter values
@@ -924,7 +1005,14 @@ async function loadPortfolio() {
     } catch (error) {
         window.Logger.error('❌ Error loading portfolio:', error, { page: "trading_accounts" });
         if (tableBody) {
-            tableBody.innerHTML = '<tr><td colspan="10" class="error">שגיאה בטעינת פורטפוליו</td></tr>';
+            tableBody.textContent = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 10;
+            cell.className = 'error';
+            cell.textContent = 'שגיאה בטעינת פורטפוליו';
+            row.appendChild(cell);
+            tableBody.appendChild(row);
         }
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה', 'שגיאה בטעינת פורטפוליו. אנא נסה שוב.');
@@ -983,7 +1071,14 @@ function renderPortfolioTable(positions) {
     
     if (!positions || positions.length === 0) {
         const message = getNoPositionsMessage(window.positionsPortfolioState.portfolioDiagnostics, 'portfolio');
-        tableBody.innerHTML = `<tr><td colspan="10" class="empty">${message}</td></tr>`;
+        tableBody.textContent = '';
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 10;
+        cell.className = 'empty';
+        cell.textContent = message;
+        row.appendChild(cell);
+        tableBody.appendChild(row);
         return;
     }
     
@@ -1085,7 +1180,12 @@ function renderPortfolioTable(positions) {
     });
     
     // Update table HTML
-    tableBody.innerHTML = html;
+    tableBody.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tableBody.appendChild(node.cloneNode(true));
+    });
 }
 
 /**
@@ -1118,7 +1218,7 @@ async function updatePortfolioSummaryToggleButton() {
     const iconName = isMinimal ? 'eye' : 'close';
     
     // Clear existing content
-    toggleBtn.innerHTML = '';
+    toggleBtn.textContent = '';
     
     // Render icon using IconSystem - no fallback
     if (!window.IconSystem || !window.IconSystem.initialized) {
@@ -1139,9 +1239,9 @@ async function updatePortfolioSummaryToggleButton() {
         });
         
         // Parse and insert icon HTML
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = iconHTML;
-        const iconElement = tempDiv.firstElementChild;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(iconHTML, 'text/html');
+        const iconElement = doc.body.firstElementChild;
         
         if (iconElement) {
             toggleBtn.appendChild(iconElement);
@@ -1206,7 +1306,10 @@ async function loadPortfolioSummary() {
     if (!summaryElement) return;
     
     try {
-        summaryElement.innerHTML = '<div>טוען סיכום...</div>';
+        summaryElement.textContent = '';
+        const loadingDiv = document.createElement('div');
+        loadingDiv.textContent = 'טוען סיכום...';
+        summaryElement.appendChild(loadingDiv);
         
         const size = window.positionsPortfolioState.summarySize || 'minimal';
         const cacheKey = `portfolio-summary-${size}`;
@@ -1240,7 +1343,11 @@ async function loadPortfolioSummary() {
     } catch (error) {
         window.Logger.error('❌ Error loading portfolio summary:', error, { page: "trading_accounts" });
         if (summaryElement) {
-            summaryElement.innerHTML = '<div class="error">שגיאה בטעינת סיכום</div>';
+            summaryElement.textContent = '';
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = 'שגיאה בטעינת סיכום';
+            summaryElement.appendChild(errorDiv);
         }
     }
 }
@@ -1260,24 +1367,52 @@ function renderPortfolioSummaryFallback(summary, size) {
     const totalPl = summary.total_pl || 0;
     const totalPlPercent = summary.total_pl_percent || 0;
     
+    summaryElement.textContent = '';
     if (size === 'minimal') {
-        summaryElement.innerHTML = `
-            <div>סה"כ פוזיציות: <strong>${totalPositions}</strong></div>
-            <div>שווי שוק כולל: <strong>${formatCurrencyHebrew(totalMarketValue, false, true)}</strong></div>
-            <div>רווח/הפסד כולל: <strong class="${totalPl >= 0 ? 'text-success' : 'text-danger'}">${formatCurrencyHebrew(totalPl, true, true)} (${totalPlPercent.toFixed(2)}%${totalPlPercent >= 0 ? '+' : '-'})</strong></div>
-        `;
+        const div1 = document.createElement('div');
+        div1.textContent = 'סה"כ פוזיציות: ';
+        const strong1 = document.createElement('strong');
+        strong1.textContent = totalPositions;
+        div1.appendChild(strong1);
+        summaryElement.appendChild(div1);
+        
+        const div2 = document.createElement('div');
+        div2.textContent = 'שווי שוק כולל: ';
+        const strong2 = document.createElement('strong');
+        strong2.textContent = formatCurrencyHebrew(totalMarketValue, false, true);
+        div2.appendChild(strong2);
+        summaryElement.appendChild(div2);
+        
+        const div3 = document.createElement('div');
+        div3.textContent = 'רווח/הפסד כולל: ';
+        const strong3 = document.createElement('strong');
+        strong3.className = totalPl >= 0 ? 'text-success' : 'text-danger';
+        strong3.textContent = `${formatCurrencyHebrew(totalPl, true, true)} (${totalPlPercent.toFixed(2)}%${totalPlPercent >= 0 ? '+' : '-'})`;
+        div3.appendChild(strong3);
+        summaryElement.appendChild(div3);
     } else {
-        summaryElement.innerHTML = `
-            <div class="info-summary-full">
-                <div>סה"כ פוזיציות: <strong>${totalPositions}</strong></div>
-                <div>שווי שוק כולל: <strong>${formatCurrencyHebrew(totalMarketValue, false, true)}</strong></div>
-                <div>עלות כוללת: <strong>${formatCurrencyHebrew(totalCost, false, false)}</strong></div>
-                <div>רווח/הפסד מוכר: <strong>${formatCurrencyHebrew(summary.total_realized_pl || 0, true, true)}</strong></div>
-                <div>רווח/הפסד לא מוכר: <strong>${formatCurrencyHebrew(summary.total_unrealized_pl || 0, true, true)}</strong></div>
-                <div>רווח/הפסד כולל: <strong class="${totalPl >= 0 ? 'text-success' : 'text-danger'}">${formatCurrencyHebrew(totalPl, true, true)} (${totalPlPercent.toFixed(2)}%${totalPlPercent >= 0 ? '+' : '-'})</strong></div>
-                <div>סה"כ עמלות: <strong>${formatCurrencyHebrew(summary.total_fees || 0, false, false)}</strong></div>
-            </div>
-        `;
+        const container = document.createElement('div');
+        container.className = 'info-summary-full';
+        
+        const createSummaryRow = (label, value, className = '') => {
+            const div = document.createElement('div');
+            div.textContent = `${label}: `;
+            const strong = document.createElement('strong');
+            if (className) strong.className = className;
+            strong.textContent = value;
+            div.appendChild(strong);
+            return div;
+        };
+        
+        container.appendChild(createSummaryRow('סה"כ פוזיציות', totalPositions));
+        container.appendChild(createSummaryRow('שווי שוק כולל', formatCurrencyHebrew(totalMarketValue, false, true)));
+        container.appendChild(createSummaryRow('עלות כוללת', formatCurrencyHebrew(totalCost, false, false)));
+        container.appendChild(createSummaryRow('רווח/הפסד מוכר', formatCurrencyHebrew(summary.total_realized_pl || 0, true, true)));
+        container.appendChild(createSummaryRow('רווח/הפסד לא מוכר', formatCurrencyHebrew(summary.total_unrealized_pl || 0, true, true)));
+        container.appendChild(createSummaryRow('רווח/הפסד כולל', `${formatCurrencyHebrew(totalPl, true, true)} (${totalPlPercent.toFixed(2)}%${totalPlPercent >= 0 ? '+' : '-'})`, totalPl >= 0 ? 'text-success' : 'text-danger'));
+        container.appendChild(createSummaryRow('סה"כ עמלות', formatCurrencyHebrew(summary.total_fees || 0, false, false)));
+        
+        summaryElement.appendChild(container);
     }
     
     const diagnosticsSource = window.positionsPortfolioState.portfolioDiagnostics || window.positionsPortfolioState.summaryDiagnostics;
@@ -1340,7 +1475,14 @@ window.showPositionDetails = function(accountId, tickerId) {
 function clearPositionsTable() {
     const tableBody = document.querySelector('#positionsTable tbody');
     if (tableBody) {
-        tableBody.innerHTML = '<tr><td colspan="9" class="loading">בחר חשבון מסחר להצגת פוזיציות...</td></tr>';
+        tableBody.textContent = '';
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 9;
+        cell.className = 'loading';
+        cell.textContent = 'בחר חשבון מסחר להצגת פוזיציות...';
+        row.appendChild(cell);
+        tableBody.appendChild(row);
     }
     
     // Reset count and totals display

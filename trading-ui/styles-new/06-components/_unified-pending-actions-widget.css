@@ -24,6 +24,20 @@
   overflow: visible;
 }
 
+.content-section#main .section-body .row > [class*="col-"] {
+  overflow: visible;
+}
+
+/* Ensure section body doesn't clip overlays */
+.content-section#main .section-body {
+  overflow: visible;
+}
+
+/* Ensure row doesn't clip overlays */
+.content-section#main .section-body .row {
+  overflow: visible;
+}
+
 #unifiedPendingActionsWidgetContainer .card-header {
   position: relative;
   padding-bottom: 0;
@@ -154,6 +168,17 @@
   margin-bottom: 0.75rem;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.2s ease, z-index 0s;
+  /* Ensure entire item area is hover-sensitive, including gaps */
+  width: 100%;
+  box-sizing: border-box;
+  /* Ensure header fills entire item area */
+  min-height: 60px;
+}
+
+.unified-pending-list-item .unified-pending-item-header,
+.trade-create-widget-item .trade-create-widget-top {
+  width: 100%;
+  min-height: 100%;
 }
 
 .unified-pending-list-item.is-hovered,
@@ -167,58 +192,30 @@
   margin-bottom: 0;
 }
 
-/* ===== Expandable Details (Fixed Position Overlay) ===== */
+/* ===== Expandable Details (Overlay) ===== */
+/* Base overlay styles are in _widget-overlay.css */
+/* Widget-specific styles below */
+
 .unified-pending-details,
 .trade-create-widget-details {
-  display: none; /* Hidden by default */
-  position: fixed; /* Fixed position to escape all container boundaries */
-  z-index: 1050; /* Above all content including modals */
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 0.375rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  padding: 0.75rem;
-  min-width: 280px;
-  max-width: 400px;
-  /* Position will be set by JavaScript based on item position */
-  /* Allow overlay to extend beyond all containers */
-  overflow: visible;
-  pointer-events: auto;
-}
-
-/* RTL support */
-[dir="rtl"] .unified-pending-details,
-[dir="rtl"] .trade-create-widget-details {
-  /* Position will be set by JavaScript */
-}
-
-.unified-pending-list-item.is-hovered .unified-pending-details,
-.trade-create-widget-item.is-hovered .trade-create-widget-details {
-  display: block;
+  /* Inherits base styles from _widget-overlay.css */
+  /* Widget-specific overrides can be added here if needed */
 }
 
 .unified-pending-details-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  /* Inherits from _widget-overlay.css .widget-item-details-content */
 }
 
 .unified-pending-details-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  padding-block: 0.25rem;
-  font-size: 0.85rem;
+  /* Inherits from _widget-overlay.css .widget-item-details-row */
 }
 
 .unified-pending-details-label {
-  font-weight: 500;
-  color: var(--text-muted, #6c757d);
+  /* Inherits from _widget-overlay.css .widget-item-details-label */
 }
 
 .unified-pending-details-value {
-  text-align: end;
+  /* Inherits from _widget-overlay.css .widget-item-details-value */
 }
 
 .unified-pending-details-suggestions {

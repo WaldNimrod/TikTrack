@@ -179,11 +179,11 @@
             <canvas id="${canvasId}" height="320"></canvas>
         </div>
       `;
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = cardHTML;
-      while (tempDiv.firstChild) {
-        card.appendChild(tempDiv.firstChild);
-      }
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(cardHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        card.appendChild(node.cloneNode(true));
+      });
       this.elements.chartsList.appendChild(card);
 
       const removeBtn = card.querySelector('[data-chart-remove]');

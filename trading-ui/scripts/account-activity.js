@@ -1514,7 +1514,10 @@ function calculateActivityStatistics() {
   };
 
   if (!allMovements || allMovements.length === 0) {
-    window.Logger.info('📊 אין תנועות מחושבות לחישוב סטטיסטיקות', { page: 'trading_accounts' });
+    window.Logger.info('📊 אין תנועות מחושבות לחישוב סטטיסטיקות', { 
+      processedMovementsLength: window.accountActivityState?.processedMovements?.length || 0,
+      page: 'trading_accounts' 
+    });
     return { cashFlows: emptyStats, executions: emptyStats };
   }
 
@@ -1653,11 +1656,25 @@ function calculateActivityStatistics() {
     // - 'deposit' and 'withdrawal' into 'deposits_withdrawals'
     const bySubtype = {};
     movements.forEach(m => {
-      let subtype = (m.subtype || (m.amount >= 0 ? 'other_positive' : 'other_negative')).toLowerCase();
+      // Get subtype from movement - check multiple possible fields
+      let subtype = (m.subtype || m.sub_type || (m.amount >= 0 ? 'other_positive' : 'other_negative')).toLowerCase();
 
       // Merge 'deposit' and 'withdrawal' into 'deposits_withdrawals'
-      if (subtype === 'deposit' || subtype === 'withdrawal') {
+      if (subtype === 'deposit' || subtype === 'withdrawal' || subtype === 'הפקדה' || subtype === 'משיכה') {
         subtype = 'deposits_withdrawals';
+      }
+      
+      // Map other common subtypes
+      if (subtype === 'fee' || subtype === 'עמלה') {
+        subtype = 'fee';
+      } else if (subtype === 'dividend' || subtype === 'דיבידנד') {
+        subtype = 'dividend';
+      } else if (subtype === 'transfer' || subtype === 'transfer_in' || subtype === 'transfer_out' || subtype === 'העברה') {
+        subtype = 'transfer';
+      } else if (subtype === 'interest' || subtype === 'syep_interest' || subtype === 'ריבית') {
+        subtype = subtype === 'syep_interest' ? 'syep_interest' : 'interest';
+      } else if (subtype === 'other' || subtype === 'other_positive' || subtype === 'other_negative' || subtype === 'אחר') {
+        subtype = 'other';
       }
 
       if (!bySubtype[subtype]) {

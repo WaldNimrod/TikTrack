@@ -1968,3 +1968,103 @@ if (window.Logger) {
   window.Logger.info('✅ Header System v7.0.0 loaded successfully!', { page: 'header-system' });
 }
 
+// ===== AUTO-INITIALIZATION FALLBACK =====
+// Ensure header is initialized on all pages (except auth pages) even if UnifiedAppInitializer doesn't run
+// זה מבטיח שה-header יתאחל בכל עמוד (חוץ מ-auth pages) גם אם UnifiedAppInitializer לא רץ
+
+(function() {
+  'use strict';
+  
+  // Skip auto-initialization for auth pages
+  const isAuthPage = window.location.pathname.includes('login.html') ||
+                     window.location.pathname.includes('register.html') ||
+                     window.location.pathname.includes('forgot-password.html') ||
+                     window.location.pathname.includes('reset-password.html');
+  
+  if (isAuthPage) {
+    if (window.Logger?.debug) {
+      window.Logger.debug('Skipping Header System auto-initialization for auth page', { page: 'header-system' });
+    }
+    return;
+  }
+  
+  // Function to initialize header with retry logic
+  const ensureHeaderInitialized = async () => {
+    // Check if header is already initialized
+    if (window.headerSystem && window.headerSystem.isInitialized) {
+      if (window.Logger?.debug) {
+        window.Logger.debug('Header System already initialized, skipping auto-init', { page: 'header-system' });
+      }
+      return;
+    }
+    
+    // Check if UnifiedAppInitializer is handling initialization
+    // Wait a bit to see if UnifiedAppInitializer will initialize it
+    let waitCount = 0;
+    const maxWait = 30; // 3 seconds
+    
+    while (waitCount < maxWait) {
+      if (window.headerSystem && window.headerSystem.isInitialized) {
+        // Header was initialized by UnifiedAppInitializer
+        if (window.Logger?.debug) {
+          window.Logger.debug('Header System initialized by UnifiedAppInitializer', { page: 'header-system' });
+        }
+        return;
+      }
+      
+      // Check if UnifiedAppInitializer is still initializing
+      if (window.globalInitializationState && window.globalInitializationState.unifiedAppInitializing) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        waitCount++;
+        continue;
+      }
+      
+      // UnifiedAppInitializer is done (or not running), initialize header ourselves
+      break;
+    }
+    
+    // Initialize header if not already initialized
+    if (!window.headerSystem || !window.headerSystem.isInitialized) {
+      if (window.Logger?.info) {
+        window.Logger.info('🔄 Auto-initializing Header System (fallback)', {
+          waitCount,
+          unifiedAppInitialized: window.globalInitializationState?.unifiedAppInitialized,
+          unifiedAppInitializing: window.globalInitializationState?.unifiedAppInitializing
+        }, { page: 'header-system' });
+      }
+      
+      try {
+        if (typeof window.initializeHeaderSystem === 'function') {
+          window.initializeHeaderSystem();
+        } else if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+          window.HeaderSystem.initialize();
+        } else {
+          if (window.Logger?.warn) {
+            window.Logger.warn('⚠️ Header System initialization functions not available', {
+              initializeHeaderSystemExists: typeof window.initializeHeaderSystem !== 'undefined',
+              HeaderSystemExists: typeof window.HeaderSystem !== 'undefined'
+            }, { page: 'header-system' });
+          }
+        }
+      } catch (error) {
+        if (window.Logger?.error) {
+          window.Logger.error('❌ Error auto-initializing Header System', {
+            error: error.message,
+            stack: error.stack
+          }, { page: 'header-system' });
+        } else {
+          console.error('❌ Error auto-initializing Header System:', error);
+        }
+      }
+    }
+  };
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ensureHeaderInitialized);
+  } else {
+    // DOM is already loaded, initialize after a short delay to allow other systems to initialize first
+    setTimeout(ensureHeaderInitialized, 200);
+  }
+})();
+

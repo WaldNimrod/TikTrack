@@ -240,29 +240,44 @@
      * @returns {Promise<Object>} Updated ticker data
      */
     async function fetchDataFromProvider(tickerId, tickerSymbol) {
+        const overlayId = `tickerDataFetch-${tickerId}`;
+        
         try {
             if (window.Logger) {
                 window.Logger.info('🔄 Starting data fetch from external provider', { tickerId, tickerSymbol, page: 'ticker-dashboard' });
             }
 
-            // Show progress notification
-            let progressNotification = null;
-            if (window.NotificationSystem) {
-                progressNotification = window.NotificationSystem.showInfo(
-                    'טוען נתונים',
-                    `מתחיל טעינת נתונים עבור ${tickerSymbol}...`,
-                    { duration: 0, persistent: true }
-                );
+            // Initialize progress overlay
+            if (window.unifiedProgressManager) {
+                window.unifiedProgressManager.createOverlay(overlayId, {
+                    title: `טעינת נתונים עבור ${tickerSymbol}`,
+                    totalSteps: 4,
+                    stepLabels: [
+                        'טוען מחיר נוכחי',
+                        'טוען נתונים היסטוריים',
+                        'מעבד ומאמת נתונים',
+                        'מסיים טעינה'
+                    ],
+                    stepDescriptions: [
+                        'מתחבר לספק הנתונים החיצוני...',
+                        'מוריד 150 ימים של נתונים היסטוריים...',
+                        'בודק שכל הנתונים קיימים...',
+                        'מסיים את התהליך...'
+                    ]
+                });
             }
 
             // Step 1: Fetch latest quote
             if (window.Logger) {
                 window.Logger.info('📊 Step 1/4: Fetching latest quote...', { tickerId, page: 'ticker-dashboard' });
             }
-            if (progressNotification && window.NotificationSystem && window.NotificationSystem.updateNotification) {
-                window.NotificationSystem.updateNotification(progressNotification, {
-                    message: `טוען מחיר נוכחי עבור ${tickerSymbol}...`
-                });
+            if (window.unifiedProgressManager) {
+                window.unifiedProgressManager.showProgress(
+                    overlayId,
+                    1,
+                    `טוען מחיר נוכחי עבור ${tickerSymbol}...`,
+                    'מתחבר לספק הנתונים החיצוני...'
+                );
             }
 
             // Use ExternalDataService to fetch quote
@@ -311,10 +326,13 @@
             if (window.Logger) {
                 window.Logger.info('📊 Step 2/4: Triggering historical data fetch...', { tickerId, page: 'ticker-dashboard' });
             }
-            if (progressNotification && window.NotificationSystem && window.NotificationSystem.updateNotification) {
-                window.NotificationSystem.updateNotification(progressNotification, {
-                    message: `טוען נתונים היסטוריים עבור ${tickerSymbol}...`
-                });
+            if (window.unifiedProgressManager) {
+                window.unifiedProgressManager.showProgress(
+                    overlayId,
+                    2,
+                    `טוען נתונים היסטוריים עבור ${tickerSymbol}...`,
+                    'מוריד 150 ימים של נתונים היסטוריים...'
+                );
             }
 
             // Note: Historical data is typically fetched by backend scheduler
@@ -349,10 +367,13 @@
             if (window.Logger) {
                 window.Logger.info('📊 Step 3/4: Waiting for data processing and verification...', { tickerId, page: 'ticker-dashboard' });
             }
-            if (progressNotification && window.NotificationSystem && window.NotificationSystem.updateNotification) {
-                window.NotificationSystem.updateNotification(progressNotification, {
-                    message: `מעבד נתונים עבור ${tickerSymbol}...`
-                });
+            if (window.unifiedProgressManager) {
+                window.unifiedProgressManager.showProgress(
+                    overlayId,
+                    3,
+                    `מעבד ומאמת נתונים עבור ${tickerSymbol}...`,
+                    'בודק שכל הנתונים קיימים...'
+                );
             }
 
             // Wait for backend to process - longer wait for historical data (150 days)
@@ -366,10 +387,13 @@
                 // Wait before checking
                 await new Promise(resolve => setTimeout(resolve, retryDelay));
                 
-                if (progressNotification && window.NotificationSystem && window.NotificationSystem.updateNotification) {
-                    window.NotificationSystem.updateNotification(progressNotification, {
-                        message: `בודק נתונים עבור ${tickerSymbol}... (${retryCount + 1}/${maxRetries})`
-                    });
+                if (window.unifiedProgressManager) {
+                    const progressPercent = Math.min(75, 50 + (retryCount / maxRetries) * 25); // 50-75% during verification
+                    window.unifiedProgressManager.updateProgress(
+                        overlayId,
+                        progressPercent,
+                        `בודק נתונים עבור ${tickerSymbol}... (${retryCount + 1}/${maxRetries})`
+                    );
                 }
 
                 // Invalidate cache before reloading
@@ -422,10 +446,13 @@
             if (window.Logger) {
                 window.Logger.info('📊 Step 4/4: Final data verification...', { tickerId, page: 'ticker-dashboard' });
             }
-            if (progressNotification && window.NotificationSystem && window.NotificationSystem.updateNotification) {
-                window.NotificationSystem.updateNotification(progressNotification, {
-                    message: `מסיים טעינת נתונים עבור ${tickerSymbol}...`
-                });
+            if (window.unifiedProgressManager) {
+                window.unifiedProgressManager.showProgress(
+                    overlayId,
+                    4,
+                    `מסיים טעינת נתונים עבור ${tickerSymbol}...`,
+                    'מסיים את התהליך...'
+                );
             }
 
             // Final check - if still missing data, log warning but continue
@@ -443,18 +470,11 @@
                 }
             }
 
-            // Close progress notification
-            if (progressNotification && window.NotificationSystem && window.NotificationSystem.closeNotification) {
-                window.NotificationSystem.closeNotification(progressNotification);
-            } else if (progressNotification && window.NotificationSystem) {
-                // Fallback: try to remove by ID if closeNotification not available
-                try {
-                    if (progressNotification.remove) {
-                        progressNotification.remove();
-                    }
-                } catch (e) {
-                    // Ignore
-                }
+            // Hide progress overlay
+            if (window.unifiedProgressManager) {
+                // Small delay to show completion
+                await new Promise(resolve => setTimeout(resolve, 500));
+                window.unifiedProgressManager.hideProgress(overlayId);
             }
 
             if (window.Logger) {
@@ -506,6 +526,11 @@
                     stack: error.stack,
                     page: 'ticker-dashboard' 
                 });
+            }
+
+            // Hide progress overlay on error
+            if (window.unifiedProgressManager) {
+                window.unifiedProgressManager.hideProgress(overlayId);
             }
 
             if (window.NotificationSystem) {

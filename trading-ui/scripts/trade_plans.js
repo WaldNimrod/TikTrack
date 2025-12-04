@@ -1914,6 +1914,34 @@ if (typeof window.loadTradePlansDataPage === 'function') {
   };
 }
 
+// Auto-load data when page is ready (fallback if unified initialization doesn't run)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    // Wait a bit for initialization system to load
+    setTimeout(async () => {
+      // Only auto-load if unified initialization didn't run
+      if (!window.globalInitializationState?.unifiedAppInitialized && typeof window.loadTradePlansDataPage === 'function') {
+        try {
+          await window.loadTradePlansDataPage();
+        } catch (error) {
+          window.Logger?.warn('Auto-load of trade plans data failed', { error: error.message, page: 'trade_plans' });
+        }
+      }
+    }, 1000);
+  });
+} else {
+  // DOM already loaded, check if we need to auto-load
+  setTimeout(async () => {
+    if (!window.globalInitializationState?.unifiedAppInitialized && typeof window.loadTradePlansDataPage === 'function') {
+      try {
+        await window.loadTradePlansDataPage();
+      } catch (error) {
+        window.Logger?.warn('Auto-load of trade plans data failed', { error: error.message, page: 'trade_plans' });
+      }
+    }
+  }, 1000);
+}
+
 // REMOVED: updateDesignsTable - alias not used
 /**
  * עדכון טבלת עיצובים (alias ל-updateTradePlansTable)

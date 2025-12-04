@@ -433,8 +433,8 @@
         return;
       }
 
-      // Add delay before closing
-      const closeDelay = config.closeDelay || 150;
+      // Reduced delay for faster response (same as Unified Pending Actions Widget)
+      const closeDelay = config.closeDelay || 100;
 
       // Cancel any existing timeout
       const existingTimeout = overlayConfig.closeTimeouts.get(item);
@@ -450,7 +450,19 @@
         const mouseOverItem = item.matches(':hover');
         const mouseOverOverlay = details.matches(':hover');
         
-        if (!isHovered && !mouseOverItem && !mouseOverOverlay) {
+        // Also check using getBoundingClientRect for more reliable detection
+        const itemRect = item.getBoundingClientRect();
+        const overlayRect = details.getBoundingClientRect();
+        // Get mouse position from last known event (if available)
+        const mouseX = window.lastMouseX || 0;
+        const mouseY = window.lastMouseY || 0;
+        
+        const isMouseInItem = mouseX >= itemRect.left && mouseX <= itemRect.right &&
+                            mouseY >= itemRect.top && mouseY <= itemRect.bottom;
+        const isMouseInOverlay = mouseX >= overlayRect.left && mouseX <= overlayRect.right &&
+                               mouseY >= overlayRect.top && mouseY <= overlayRect.bottom;
+        
+        if (!isHovered && !mouseOverItem && !mouseOverOverlay && !isMouseInItem && !isMouseInOverlay) {
           item.classList.remove(config.hoverClass);
           
           // Hide overlay with animation
@@ -712,43 +724,11 @@
     listElement.addEventListener('mouseenter', handleMouseEnter, true);
     listElement.addEventListener('mouseleave', handleMouseLeave, true);
     
-    // Also listen on document to catch mouse leaving the entire area
+    // Track mouse position for better closing detection
     const handleDocumentMouseMove = (e) => {
-      // Check if mouse is over any item or overlay in this list
-      const target = e.target;
-      const isOverItem = target.closest && target.closest(itemSelector);
-      const isOverOverlay = target.closest && target.closest('[data-overlay="true"]');
-      
-      if (!isOverItem && !isOverOverlay) {
-        // Mouse is outside - check all items and close if needed
-        const allItems = listElement.querySelectorAll(itemSelector);
-        allItems.forEach(closeItem => {
-          if (closeItem.classList.contains(config.hoverClass)) {
-            const closeDetails = closeItem.querySelector(detailsSelector) || 
-                                closeItem.querySelector('[data-overlay="true"]');
-            if (closeDetails && closeDetails.style.display !== 'none') {
-              // Check if mouse is really outside (not just moving between items)
-              const itemRect = closeItem.getBoundingClientRect();
-              const overlayRect = closeDetails.getBoundingClientRect();
-              const mouseX = e.clientX;
-              const mouseY = e.clientY;
-              
-              const isInItem = mouseX >= itemRect.left && mouseX <= itemRect.right &&
-                              mouseY >= itemRect.top && mouseY <= itemRect.bottom;
-              const isInOverlay = mouseX >= overlayRect.left && mouseX <= overlayRect.right &&
-                                 mouseY >= overlayRect.top && mouseY <= overlayRect.bottom;
-              
-              if (!isInItem && !isInOverlay) {
-                // Mouse is really outside - close
-                closeOverlayForItem(closeItem);
-              }
-            }
-          }
-        });
-      }
+      window.lastMouseX = e.clientX;
+      window.lastMouseY = e.clientY;
     };
-    
-    // Store document handler for cleanup
     document.addEventListener('mousemove', handleDocumentMouseMove, { passive: true });
 
     // Store handlers for cleanup

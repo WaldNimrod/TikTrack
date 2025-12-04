@@ -133,6 +133,9 @@
         // Setup form handler
         this.setupFormHandler();
 
+        // Setup Page Visibility API listener to close modals when page returns from sleep/hidden
+        this.setupPageVisibilityListener();
+
         this.initialized = true;
         window.Logger?.info('✅ AI Analysis Manager initialized successfully', { page: 'ai-analysis' });
       } catch (error) {
@@ -2669,6 +2672,51 @@
           provider
         });
 
+        // Validate request before generating analysis using Business Logic Layer
+        if (window.AIAnalysisData?.validateAnalysisRequest) {
+          try {
+            window.Logger?.info?.('🔍 Validating analysis request before rerun...', { page: 'ai-analysis' });
+            
+            const validationResult = await window.AIAnalysisData.validateAnalysisRequest({
+              template_id: templateId,
+              variables: variables,
+              provider: provider
+            });
+
+            if (!validationResult.is_valid) {
+              const errorMessage = validationResult.errors.join(', ');
+              
+              window.Logger?.warn?.('⚠️ Validation failed before rerun', {
+                page: 'ai-analysis',
+                errors: validationResult.errors,
+              });
+              
+              if (window.NotificationSystem) {
+                window.NotificationSystem.showError(
+                  'שגיאת ולידציה: ' + errorMessage,
+                  'system'
+                );
+              }
+              return;
+            }
+            
+            window.Logger?.info?.('✅ Validation passed for rerun', { page: 'ai-analysis' });
+          } catch (validationError) {
+            window.Logger?.error?.('❌ Error during validation for rerun', {
+              page: 'ai-analysis',
+              error: validationError?.message || validationError,
+            });
+            
+            if (window.NotificationSystem) {
+              window.NotificationSystem.showError(
+                'שגיאה בוולידציה: ' + (validationError?.message || 'שגיאה לא ידועה'),
+                'system'
+              );
+            }
+            return;
+          }
+        }
+
         // Show loading notification
         if (window.NotificationSystem) {
           window.NotificationSystem.showInfo('מריץ ניתוח מחדש...', 'system');
@@ -3799,6 +3847,58 @@
         
         throw error;
       }
+    },
+
+    /**
+     * Setup Page Visibility API listener to close modals when page returns from sleep/hidden
+     */
+    setupPageVisibilityListener() {
+      if (typeof document === 'undefined' || !document.addEventListener) {
+        return;
+      }
+
+      document.addEventListener('visibilitychange', () => {
+        // When page becomes visible again after being hidden
+        if (document.visibilityState === 'visible') {
+          // Close any open modals using ModalManagerV2
+          if (window.ModalManagerV2 && window.ModalManagerV2.hideModal) {
+            // Get all currently open modals
+            const openModals = document.querySelectorAll('.modal.show, .modal[style*="display: block"]');
+            
+            openModals.forEach(modal => {
+              const modalId = modal.getAttribute('id');
+              if (modalId) {
+                window.Logger?.info('Closing modal after page visibility change', {
+                  page: 'ai-analysis',
+                  modalId
+                });
+                
+                // Close modal using ModalManagerV2
+                window.ModalManagerV2.hideModal(modalId);
+              }
+            });
+          } else {
+            // Fallback: Use Bootstrap modal API directly
+            const openModals = document.querySelectorAll('.modal.show, .modal[style*="display: block"]');
+            openModals.forEach(modal => {
+              const bsModal = bootstrap?.Modal?.getInstance(modal);
+              if (bsModal) {
+                bsModal.hide();
+              } else {
+                // Direct hide if Bootstrap instance not available
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                  backdrop.remove();
+                }
+              }
+            });
+          }
+        }
+      });
+      
+      window.Logger?.info('Page Visibility API listener setup for modal management', { page: 'ai-analysis' });
     },
   };
 

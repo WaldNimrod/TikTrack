@@ -117,7 +117,9 @@ class ValidationService:
                 logger.error("Failed to validate execution record %s: %s", i, exc)
 
         logger.info("🔍 Starting missing tickers check for %s valid execution records", len(valid_records))
-        missing_tickers = self._check_missing_tickers(valid_records)
+        # Get user_id from import session if available (passed via context)
+        user_id = getattr(self, 'user_id', None)
+        missing_tickers = self._check_missing_tickers(valid_records, user_id=user_id)
         logger.info("📊 Missing tickers result: %s", missing_tickers)
 
         return {
@@ -839,12 +841,16 @@ class ValidationService:
         
         return violations
     
-    def _check_missing_tickers(self, records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _check_missing_tickers(self, records: List[Dict[str, Any]], user_id: Optional[int] = None) -> List[Dict[str, Any]]:
         """
-        Check which tickers are missing from the database.
+        Check which tickers are missing from the user's ticker list (user_tickers).
+        A ticker is considered missing if:
+        1. The ticker doesn't exist in the tickers table, OR
+        2. The ticker exists but the user doesn't have a user_ticker association
         
         Args:
             records: List of valid records to check
+            user_id: Optional user ID for user-specific ticker checking
             
         Returns:
             List[Dict[str, Any]]: List of missing ticker info with symbol and currency
@@ -878,7 +884,7 @@ class ValidationService:
             
             # Load ticker cache if not loaded
             if not hasattr(self, 'ticker_cache') or self.ticker_cache is None:
-                self._load_ticker_cache()
+                self._load_ticker_cache(user_id=user_id)
             
             # Use cache if available
             if hasattr(self, 'ticker_cache') and self.ticker_cache:
@@ -894,7 +900,39 @@ class ValidationService:
                 logger.info(f"✅ Found {len(missing_tickers)} missing tickers: {[t['symbol'] for t in missing_tickers]}")
                 return missing_tickers
             
-            logger.info(f"🔍 Querying database for {len(symbols)} symbols")
+            # If user_id is provided, check user_tickers instead of just tickers
+            if user_id:
+                logger.info(f"🔍 Querying user_tickers for user_id={user_id} with {len(symbols)} symbols")
+                try:
+                    from models.user_ticker import UserTicker
+                    
+                    # Get tickers that exist AND have user_ticker association for this user
+                    existing_user_tickers = self.db_session.query(Ticker.symbol).join(
+                        UserTicker, Ticker.id == UserTicker.ticker_id
+                    ).filter(
+                        UserTicker.user_id == user_id,
+                        Ticker.symbol.in_(symbols)
+                    ).all()
+                    
+                    logger.info(f"📊 Found {len(existing_user_tickers)} existing user_tickers in DB")
+                    
+                    existing_symbols = {ticker.symbol for ticker in existing_user_tickers}
+                    missing_tickers = []
+                    for symbol in symbols:
+                        if symbol not in existing_symbols:
+                            missing_tickers.append({
+                                'symbol': symbol,
+                                'currency': symbol_currency_map[symbol]
+                            })
+                    
+                    logger.info(f"✅ Found {len(missing_tickers)} missing user_tickers: {[t['symbol'] for t in missing_tickers]}")
+                    return missing_tickers
+                except ImportError:
+                    logger.warning("UserTicker model not available - falling back to ticker-only check")
+                    # Fall through to ticker-only check
+            
+            # Fallback: Check only tickers table (for backward compatibility)
+            logger.info(f"🔍 Querying database for {len(symbols)} symbols (ticker-only check)")
             existing_tickers = self.db_session.query(Ticker.symbol).filter(
                 Ticker.symbol.in_(symbols)
             ).all()

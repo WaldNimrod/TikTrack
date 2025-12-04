@@ -276,18 +276,37 @@ class TechnicalIndicatorsCalculator:
                 )
             ).order_by(MarketDataQuote.asof_utc).all()
             
-            if len(quotes) < period:
-                logger.info(f"Insufficient database data for SMA {period} for ticker {ticker_id}: {len(quotes)} quotes, need {period}")
+            # For MA 150, we need 150 trading days, not calendar days
+            # With weekends and holidays, 150 trading days ≈ 210 calendar days
+            # So we check if we have at least 80% of required quotes (120 for MA 150)
+            min_required = period if period <= 20 else int(period * 0.8)
+            
+            if len(quotes) < min_required:
+                logger.info(f"Insufficient database data for SMA {period} for ticker {ticker_id}: {len(quotes)} quotes, need at least {min_required} (80% of {period})")
                 return None
+            
+            # If we have less than period but more than min_required, log warning but continue
+            if len(quotes) < period:
+                logger.warning(f"⚠️ Limited data for SMA {period} for ticker {ticker_id}: {len(quotes)} quotes (need {period}, have {len(quotes)}). Calculating with available data.")
             
             quotes_sorted = sorted(quotes, key=lambda q: q.asof_utc)
             
-            # Get the last 'period' closing prices
-            recent_closes = [q.close_price for q in quotes_sorted[-period:] if q.close_price is not None]
+            # Get the last available closing prices (up to 'period' quotes)
+            # For MA 150, we may have less than 150 quotes due to weekends/holidays
+            # So we use all available quotes if we have at least 80% of required
+            available_quotes = min(len(quotes_sorted), period)
+            recent_closes = [q.close_price for q in quotes_sorted[-available_quotes:] if q.close_price is not None]
             
-            if len(recent_closes) < period:
-                logger.warning(f"Insufficient closing prices for SMA {period}: {len(recent_closes)}, need {period}")
+            # For periods > 20, allow 80% of required quotes (to account for weekends/holidays)
+            min_required_closes = period if period <= 20 else int(period * 0.8)
+            
+            if len(recent_closes) < min_required_closes:
+                logger.warning(f"Insufficient closing prices for SMA {period}: {len(recent_closes)}, need at least {min_required_closes} (80% of {period})")
                 return None
+            
+            # If we have less than period but more than min_required, use what we have
+            if len(recent_closes) < period:
+                logger.info(f"📊 Using {len(recent_closes)} quotes for SMA {period} (have {len(recent_closes)}, ideal is {period} - accounting for weekends/holidays)")
             
             # Calculate SMA: average of last 'period' closing prices
             sma = sum(recent_closes) / len(recent_closes)

@@ -380,12 +380,90 @@ def refresh_ticker_quote(ticker_id):
             
             # Also fetch historical data (150 days for MA 150 calculation)
             # This ensures we have enough data for technical indicators
+            historical_count = 0
             try:
                 historical_count = adapter.fetch_and_save_historical_quotes(ticker, days_back=150)
                 logger.info(f"📊 Fetched {historical_count} historical quotes for {ticker.symbol}")
             except Exception as hist_error:
                 logger.warning(f"Could not fetch historical data for {ticker.symbol}: {hist_error}", exc_info=True)
                 # Continue even if historical fetch fails
+            
+            # Pre-calculate technical indicators after fetching historical data
+            # This ensures calculations are ready when entity_details is called
+            if historical_count > 0:
+                try:
+                    from services.external_data.technical_indicators_calculator import TechnicalIndicatorsCalculator
+                    from services.external_data.week52_calculator import Week52Calculator
+                    from services.advanced_cache_service import advanced_cache_service
+                    
+                    tech_calculator = TechnicalIndicatorsCalculator(db_session)
+                    week52_calculator = Week52Calculator(db_session)
+                    
+                    logger.info(f"📊 Pre-calculating technical indicators for {ticker.symbol} after fetching {historical_count} historical quotes")
+                    
+                    # Pre-calculate Volatility (needs 30+ days)
+                    if historical_count >= 30:
+                        try:
+                            volatility = tech_calculator.calculate_volatility(ticker_id, period=30, db_session=db_session)
+                            if volatility is not None:
+                                volatility_cache_key = f"ticker_{ticker_id}_volatility_30"
+                                advanced_cache_service.set(volatility_cache_key, volatility, ttl=3600)
+                                logger.info(f"✅ Pre-calculated Volatility for {ticker.symbol}: {volatility:.2f}%")
+                            else:
+                                logger.warning(f"⚠️ Volatility calculation returned None for {ticker.symbol} (have {historical_count} quotes)")
+                        except Exception as vol_error:
+                            logger.warning(f"Error pre-calculating volatility for {ticker.symbol}: {vol_error}", exc_info=True)
+                    
+                    # Pre-calculate MA 20 (needs 20+ days)
+                    if historical_count >= 20:
+                        try:
+                            sma_20 = tech_calculator.calculate_sma(ticker_id, period=20, db_session=db_session)
+                            if sma_20 is not None:
+                                ma20_cache_key = f"ticker_{ticker_id}_ma_20"
+                                advanced_cache_service.set(ma20_cache_key, sma_20, ttl=3600)
+                                logger.info(f"✅ Pre-calculated MA 20 for {ticker.symbol}: {sma_20:.2f}")
+                            else:
+                                logger.warning(f"⚠️ MA 20 calculation returned None for {ticker.symbol} (have {historical_count} quotes)")
+                        except Exception as ma20_error:
+                            logger.warning(f"Error pre-calculating MA 20 for {ticker.symbol}: {ma20_error}", exc_info=True)
+                    
+                    # Pre-calculate MA 150 (needs 150 trading days ≈ 120+ quotes due to weekends/holidays)
+                    # With weekends and holidays, 150 trading days ≈ 210 calendar days
+                    # So we check if we have at least 120 quotes (80% of 150)
+                    if historical_count >= 120:
+                        try:
+                            sma_150 = tech_calculator.calculate_sma(ticker_id, period=150, db_session=db_session)
+                            if sma_150 is not None:
+                                ma150_cache_key = f"ticker_{ticker_id}_ma_150"
+                                advanced_cache_service.set(ma150_cache_key, sma_150, ttl=3600)
+                                logger.info(f"✅ Pre-calculated MA 150 for {ticker.symbol}: {sma_150:.2f}")
+                            else:
+                                logger.warning(f"⚠️ MA 150 calculation returned None for {ticker.symbol} (have {historical_count} quotes)")
+                        except Exception as ma150_error:
+                            logger.warning(f"Error pre-calculating MA 150 for {ticker.symbol}: {ma150_error}", exc_info=True)
+                    
+                    # Pre-calculate 52W range (needs 10+ days, but better with more)
+                    if historical_count >= 10:
+                        try:
+                            week52_result = week52_calculator.calculate_52w_range(ticker_id, db_session=db_session)
+                            if week52_result:
+                                week52_cache_key = f"ticker_{ticker_id}_week52"
+                                week52_dict = {
+                                    'high': week52_result.high,
+                                    'low': week52_result.low,
+                                    'warnings': week52_result.warnings if hasattr(week52_result, 'warnings') else []
+                                }
+                                advanced_cache_service.set(week52_cache_key, week52_dict, ttl=3600)
+                                logger.info(f"✅ Pre-calculated 52W range for {ticker.symbol}: high={week52_result.high:.2f}, low={week52_result.low:.2f}")
+                            else:
+                                logger.warning(f"⚠️ 52W range calculation returned None for {ticker.symbol} (have {historical_count} quotes)")
+                        except Exception as week52_error:
+                            logger.warning(f"Error pre-calculating 52W range for {ticker.symbol}: {week52_error}", exc_info=True)
+                    
+                    logger.info(f"✅ Completed pre-calculation of technical indicators for {ticker.symbol}")
+                except Exception as calc_error:
+                    logger.warning(f"Error pre-calculating technical indicators for {ticker.symbol}: {calc_error}", exc_info=True)
+                    # Continue even if pre-calculation fails - calculations will happen on-demand
             
             if quote_data and quote_data.price:
                 # Quote fetched and saved successfully

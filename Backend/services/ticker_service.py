@@ -412,20 +412,22 @@ class TickerService:
         return mapping
     
     @staticmethod
-    def enrich_records_with_ticker_ids(db: Session, records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def enrich_records_with_ticker_ids(db: Session, records: List[Dict[str, Any]], user_id: Optional[int] = None) -> List[Dict[str, Any]]:
         """
-        Enrich records with ticker_id field based on symbol
+        Enrich records with ticker_id field based on symbol.
+        Creates ticker and user_ticker association if needed.
         
         Args:
             db: Session - Database connection
             records: List[Dict[str, Any]] - Records with 'symbol' field
+            user_id: Optional[int] - User ID for creating user_ticker associations
             
         Returns:
             List[Dict[str, Any]] - Records enriched with 'ticker_id' field
             
         Example:
             >>> records = [{"symbol": "AAPL", "action": "buy"}, {"symbol": "GOOGL", "action": "sell"}]
-            >>> enriched = TickerService.enrich_records_with_ticker_ids(db, records)
+            >>> enriched = TickerService.enrich_records_with_ticker_ids(db, records, user_id=1)
             >>> print(enriched)  # [{"symbol": "AAPL", "action": "buy", "ticker_id": 1}, ...]
         """
         if not records:
@@ -454,19 +456,101 @@ class TickerService:
         enriched_records = []
         missing_symbols = []
         
+        # Import UserTicker model for creating associations
+        from models.user_ticker import UserTicker
+        from models.currency import Currency
+        from datetime import datetime, timezone
+        
         for record in records:
             enriched_record = record.copy()
             raw_symbol = record.get('symbol')
             normalized = TickerService._normalize_symbol(raw_symbol)
             
             if normalized and normalized in symbol_to_id:
-                enriched_record['ticker_id'] = symbol_to_id[normalized]
+                # Ticker exists - check if user_ticker association exists
+                ticker_id = symbol_to_id[normalized]
+                
+                if user_id:
+                    # Check if user_ticker association exists
+                    user_ticker = db.query(UserTicker).filter(
+                        UserTicker.user_id == user_id,
+                        UserTicker.ticker_id == ticker_id
+                    ).first()
+                    
+                    if not user_ticker:
+                        # Create user_ticker association
+                        try:
+                            new_user_ticker = UserTicker(
+                                user_id=user_id,
+                                ticker_id=ticker_id,
+                                status='open',
+                                created_at=datetime.now(timezone.utc)
+                            )
+                            db.add(new_user_ticker)
+                            db.flush()  # Flush to get ID, but don't commit yet
+                            logger.info(f"✅ Created user_ticker association: user_id={user_id}, ticker_id={ticker_id}")
+                        except Exception as e:
+                            logger.warning(f"⚠️ Failed to create user_ticker association: {e}")
+                            # Continue anyway - ticker exists, just no association
+                
+                enriched_record['ticker_id'] = ticker_id
                 enriched_record['symbol'] = normalized
                 enriched_records.append(enriched_record)
             else:
-                if raw_symbol is not None:
-                    missing_symbols.append(raw_symbol)
-                logger.warning(f"⚠️ No ticker_id found for symbol: {raw_symbol}")
+                # Ticker doesn't exist - create it if user_id is provided
+                if raw_symbol is not None and user_id:
+                    try:
+                        # Get currency from record or default to USD
+                        currency_code = record.get('currency', 'USD')
+                        currency = db.query(Currency).filter(Currency.symbol == currency_code).first()
+                        
+                        if not currency:
+                            logger.warning(f"⚠️ Currency {currency_code} not found, using USD")
+                            currency = db.query(Currency).filter(Currency.symbol == 'USD').first()
+                        
+                        if currency:
+                            # Create new ticker
+                            ticker_data = {
+                                'symbol': normalized,
+                                'name': normalized,  # Default name to symbol
+                                'type': record.get('type', 'stock'),
+                                'currency_id': currency.id,
+                                'status': 'open'
+                            }
+                            
+                            new_ticker = TickerService.create(db, ticker_data)
+                            db.flush()  # Flush to get ID
+                            
+                            # Create user_ticker association
+                            try:
+                                new_user_ticker = UserTicker(
+                                    user_id=user_id,
+                                    ticker_id=new_ticker.id,
+                                    status='open',
+                                    created_at=datetime.now(timezone.utc)
+                                )
+                                db.add(new_user_ticker)
+                                db.flush()
+                                
+                                enriched_record['ticker_id'] = new_ticker.id
+                                enriched_record['symbol'] = normalized
+                                enriched_records.append(enriched_record)
+                                logger.info(f"✅ Created ticker and user_ticker: symbol={normalized}, ticker_id={new_ticker.id}, user_id={user_id}")
+                            except Exception as e:
+                                logger.error(f"❌ Failed to create user_ticker after creating ticker: {e}")
+                                # Rollback ticker creation
+                                db.delete(new_ticker)
+                                db.flush()
+                                missing_symbols.append(raw_symbol)
+                        else:
+                            missing_symbols.append(raw_symbol)
+                    except Exception as e:
+                        logger.error(f"❌ Failed to create ticker for symbol {raw_symbol}: {e}")
+                        missing_symbols.append(raw_symbol)
+                else:
+                    if raw_symbol is not None:
+                        missing_symbols.append(raw_symbol)
+                    logger.warning(f"⚠️ No ticker_id found for symbol: {raw_symbol}")
         
         if missing_symbols:
             logger.warning(f"⚠️ Missing ticker_ids for symbols: {missing_symbols}")

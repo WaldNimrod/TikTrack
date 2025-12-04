@@ -122,10 +122,11 @@ DEMO_TAG_CATEGORIES = [
 class DemoTagCreator:
     """יוצר תגיות יפות ומרשימות לנתוני הדוגמה"""
     
-    def __init__(self, db_session: Session, dry_run: bool = False, verbose: bool = False):
+    def __init__(self, db_session: Session, dry_run: bool = False, verbose: bool = False, username: Optional[str] = None):
         self.db = db_session
         self.dry_run = dry_run
         self.verbose = verbose
+        self.username = username
         self.tag_service = TagService()
         self.created_count = {
             'categories': 0,
@@ -162,12 +163,22 @@ class DemoTagCreator:
     
     def _get_user_id(self) -> None:
         """מביא את ID המשתמש הפעיל"""
-        result = self.db.execute(text("SELECT id FROM users ORDER BY id LIMIT 1")).fetchone()
-        if not result:
-            raise ValueError("לא נמצא משתמש במערכת")
-        self.user_id = result[0]
-        if self.verbose:
-            print(f"   👤 משתמש: ID {self.user_id}")
+        if self.username:
+            # Search by username
+            result = self.db.execute(text("SELECT id FROM users WHERE username = :username"), {"username": self.username}).fetchone()
+            if not result:
+                raise ValueError(f"משתמש '{self.username}' לא נמצא במערכת")
+            self.user_id = result[0]
+            if self.verbose:
+                print(f"   👤 משתמש: {self.username} (ID: {self.user_id})")
+        else:
+            # Backward compatibility - use first user
+            result = self.db.execute(text("SELECT id FROM users ORDER BY id LIMIT 1")).fetchone()
+            if not result:
+                raise ValueError("לא נמצא משתמש במערכת")
+            self.user_id = result[0]
+            if self.verbose:
+                print(f"   👤 משתמש: ID {self.user_id} - משתמש ראשון שנמצא")
     
     def _create_categories_and_tags(self) -> None:
         """יוצר קטגוריות ותגיות"""
@@ -489,6 +500,11 @@ def main():
         '--verbose',
         action='store_true',
         help='Show detailed progress information'
+    )
+    parser.add_argument(
+        '--username',
+        type=str,
+        help='Username to create tags for (if not provided, uses first user for backward compatibility)'
     )
     
     args = parser.parse_args()

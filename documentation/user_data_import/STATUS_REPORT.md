@@ -44,6 +44,35 @@
 
 ## בעיות ידועות
 
+### ✅ בעיה #0: User Isolation ו-User_Ticker Integration - תוקן
+
+**תיאור**: מערכת הייבוא לא תמכה ב-user isolation ו-user_ticker associations.
+
+**מיקום בקוד**:
+- `Backend/routes/api/user_data_import.py` - לא השתמש ב-`g.user_id`
+- `Backend/services/user_data_import/import_orchestrator.py` - `user_id=1` hardcoded
+- `Backend/services/ticker_service.py` - לא יוצר `user_ticker` associations
+- `Backend/services/user_data_import/validation_service.py` - לא בודק `user_tickers`
+
+**סטטוס**: ✅ תוקן (דצמבר 2025)
+- ✅ כל API routes משתמשים ב-`g.user_id`
+- ✅ `ImportOrchestrator` מקבל ומעביר `user_id`
+- ✅ `enrich_records_with_ticker_ids()` יוצר `user_ticker` associations
+- ✅ `_check_missing_tickers()` בודק `user_tickers` user-specific
+- ✅ `_load_ticker_cache()` תומך ב-user-specific cache
+
+**פעולות שנעשו**:
+1. הוספת `g.user_id` לכל routes ב-`user_data_import.py`
+2. החלפת כל `user_id=1` hardcoded ב-`import_orchestrator.py`
+3. הוספת `user_id` parameter ל-`enrich_records_with_ticker_ids()`
+4. הוספת יצירת `user_ticker` associations אוטומטית
+5. עדכון `_check_missing_tickers()` להיות user-specific
+6. עדכון `_load_ticker_cache()` לתמוך ב-user-specific cache
+
+**קישור לתיעוד**: [USER_TICKER_IMPORT.md](./USER_TICKER_IMPORT.md)
+
+---
+
 ### 🔴 בעיה #1: סינון לפי סוג לא עובד תמיד
 
 **תיאור**: למרות 3 נקודות סינון, לפעמים כל הרשומות מיובאות גם אם נבחר רק סוג אחד.

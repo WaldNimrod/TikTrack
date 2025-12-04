@@ -9,7 +9,7 @@ Version: 1.0
 Last Updated: 2025-01-16
 """
 
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, g
 from werkzeug.utils import secure_filename
 import os
 import logging
@@ -303,7 +303,8 @@ def upload_file():
                     file_content=file_content,
                     connector_type=connector_type,
                     task_type=task_type,
-                    linking_context=linking_context
+                    linking_context=linking_context,
+                    user_id=user_id
                 )
                 logger.info(f"📊 [UPLOAD] Session creation result: {result}")
             except Exception as session_error:

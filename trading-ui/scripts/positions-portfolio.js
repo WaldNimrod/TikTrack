@@ -776,28 +776,15 @@ function renderPositionsTable(positions) {
                 
             case 'ticker_name':
                 cellClass = 'col-ticker';
-                let tickerHtml = `<strong>${position.ticker_symbol || 'N/A'}</strong>`;
+                // Display only ticker name (not symbol, as symbol is already in ticker_symbol column)
+                // If ticker_name is not available, show ticker_symbol as fallback
                 if (position.ticker_name) {
-                    tickerHtml += `<br><small>${position.ticker_name}</small>`;
+                    cellContent = `<strong>${position.ticker_name}</strong>`;
+                } else if (position.ticker_symbol) {
+                    cellContent = `<strong>${position.ticker_symbol}</strong>`;
+                } else {
+                    cellContent = 'N/A';
                 }
-                if (FieldRenderer && FieldRenderer.renderTickerInfo) {
-                    try {
-                        let renderedTicker = FieldRenderer.renderTickerInfo({
-                            symbol: position.ticker_symbol,
-                            name: position.ticker_name,
-                            current_price: position.market_price,
-                            daily_change: null,
-                            daily_change_percent: null
-                        }, 'ticker-info-compact');
-                        if (isIndexPage && typeof renderedTicker === 'string') {
-                            renderedTicker = renderedTicker.replace(/<span class="text-muted small">[\s\S]*?<\/span>/, '');
-                        }
-                        tickerHtml = renderedTicker;
-                    } catch (e) {
-                        window.Logger.warn('Error rendering ticker info:', e, { page: "trading_accounts" });
-                    }
-                }
-                cellContent = tickerHtml;
                 break;
                 
             case 'quantity':
@@ -887,13 +874,16 @@ function renderPositionsTable(positions) {
         page: 'trading_accounts' 
     });
     
-    // Update table HTML
+    // Update table HTML - wrap in table/tbody structure for proper parsing
     tableBody.textContent = '';
     const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    doc.body.childNodes.forEach(node => {
-        tableBody.appendChild(node.cloneNode(true));
-    });
+    const doc = parser.parseFromString(`<table><tbody>${html}</tbody></table>`, 'text/html');
+    const tempTbody = doc.body.querySelector('tbody');
+    if (tempTbody) {
+        Array.from(tempTbody.children).forEach(row => {
+            tableBody.appendChild(row.cloneNode(true));
+        });
+    }
     window.Logger.info('🔵 [renderPositionsTable] Table updated', { 
         finalRowsCount: tableBody.querySelectorAll('tr').length,
         page: 'trading_accounts' 
@@ -1216,31 +1206,12 @@ function renderPortfolioTable(positions) {
         const unrealizedPlPercent = position.unrealized_pl_percent || 0;
         const percentPortfolio = position.percent_of_portfolio || 0;
         
-        // Render ticker info
+        // Render ticker info (don't use async renderTickerInfo in sync context)
         let tickerHtml = `<strong>${position.ticker_symbol || 'N/A'}</strong>`;
         if (position.ticker_name) {
             tickerHtml += `<br><small>${position.ticker_name}</small>`;
         }
-        
-        if (FieldRenderer && FieldRenderer.renderTickerInfo) {
-            try {
-                let renderedTicker = FieldRenderer.renderTickerInfo({
-                    symbol: position.ticker_symbol,
-                    name: position.ticker_name,
-                    current_price: position.market_price,
-                    daily_change: null,
-                    daily_change_percent: null
-                }, 'ticker-info-compact');
-
-                if (isIndexPage && typeof renderedTicker === 'string') {
-                    renderedTicker = renderedTicker.replace(/<span class="text-muted small">[\s\S]*?<\/span>/, '');
-                }
-
-                tickerHtml = renderedTicker;
-            } catch (e) {
-                window.Logger.warn('Error rendering ticker info:', e, { page: "trading_accounts" });
-            }
-        }
+        // Note: renderTickerInfo is async and returns Promise, not usable in sync HTML building
         
         // Render side using FieldRendererService
         let sideHtml = `<span class="badge badge-${side}">${side === 'long' ? 'לונג' : side === 'short' ? 'שורט' : 'סגור'}</span>`;

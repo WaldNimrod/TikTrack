@@ -1060,13 +1060,35 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           }
 
           if (typeof window.initializeHeaderSystem === 'function') {
+            // Mark that planned initialization is being used
+            window.__headerSystemInitMethod = 'planned';
+            
             if (window.Logger?.debug) {
-              window.Logger.debug('Initializing Header System', {
+              window.Logger.debug('Initializing Header System (PLANNED METHOD)', {
                 waitCount,
                 HeaderSystemExists: typeof window.HeaderSystem !== 'undefined',
-                initializeHeaderSystemExists: typeof window.initializeHeaderSystem !== 'undefined'
+                initializeHeaderSystemExists: typeof window.initializeHeaderSystem !== 'undefined',
+                page: window.location.pathname
               }, { page: 'core-systems' });
             }
+            
+            // Also log to console for easy tracking
+            console.log('✅ [HEADER INIT] Using PLANNED method for:', window.location.pathname);
+            
+            // Store in localStorage for tracking
+            try {
+              const initLog = {
+                page: window.location.pathname,
+                method: 'planned',
+                timestamp: new Date().toISOString()
+              };
+              const existingLogs = JSON.parse(localStorage.getItem('__headerInitLogs') || '[]');
+              existingLogs.push(initLog);
+              localStorage.setItem('__headerInitLogs', JSON.stringify(existingLogs));
+            } catch (e) {
+              // Ignore localStorage errors
+            }
+            
             try {
               window.initializeHeaderSystem();
             } catch (error) {

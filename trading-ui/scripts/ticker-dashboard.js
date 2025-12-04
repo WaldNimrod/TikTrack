@@ -158,9 +158,15 @@
         }
 
         // Check MA 150
+        // Note: MA 150 needs 150 trading days, not calendar days
+        // With weekends and holidays, 150 trading days ≈ 210 calendar days
+        // So we check if MA 150 exists, but don't require it for critical data
         if (!tickerData || tickerData.ma_150 === null || tickerData.ma_150 === undefined) {
             missing.hasMA150 = false;
-            missing.missingCalculations.push('ממוצע נע 150 (MA 150)');
+            // Only add to missingCalculations if we have price data (non-critical)
+            if (missing.hasPrice) {
+                missing.missingCalculations.push('ממוצע נע 150 (MA 150)');
+            }
         } else {
             missing.hasMA150 = true;
         }

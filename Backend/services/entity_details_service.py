@@ -821,7 +821,16 @@ class EntityDetailsService:
                                 advanced_cache_service.set(volatility_cache_key, volatility_result, ttl=3600)
                                 logger.info(f"✅ Volatility calculated and cached for ticker {entity_id}: {volatility_result:.2f}%")
                             else:
-                                logger.warning(f"⚠️ Volatility calculation returned None for ticker {entity_id}")
+                                # Check if we have enough historical data
+                                from models.external_data import MarketDataQuote
+                                from datetime import datetime, timedelta
+                                cutoff_date = datetime.utcnow() - timedelta(days=35)
+                                quote_count = db.query(MarketDataQuote).filter(
+                                    MarketDataQuote.ticker_id == entity_id,
+                                    MarketDataQuote.close_price.isnot(None),
+                                    MarketDataQuote.asof_utc >= cutoff_date
+                                ).count()
+                                logger.warning(f"⚠️ Volatility calculation returned None for ticker {entity_id} (have {quote_count} quotes, need 31)")
                         else:
                             logger.info(f"✅ Volatility retrieved from cache for ticker {entity_id}: {volatility_result:.2f}%")
                         
@@ -878,7 +887,16 @@ class EntityDetailsService:
                                 advanced_cache_service.set(ma150_cache_key, sma_150, ttl=3600)
                                 logger.info(f"✅ MA 150 calculated and cached for ticker {entity_id}: {sma_150:.2f}")
                             else:
-                                logger.warning(f"⚠️ MA 150 calculation returned None for ticker {entity_id}")
+                                # Check if we have enough historical data
+                                from models.external_data import MarketDataQuote
+                                from datetime import datetime, timedelta
+                                cutoff_date = datetime.utcnow() - timedelta(days=155)
+                                quote_count = db.query(MarketDataQuote).filter(
+                                    MarketDataQuote.ticker_id == entity_id,
+                                    MarketDataQuote.close_price.isnot(None),
+                                    MarketDataQuote.asof_utc >= cutoff_date
+                                ).count()
+                                logger.warning(f"⚠️ MA 150 calculation returned None for ticker {entity_id} (have {quote_count} quotes, need 150)")
                         else:
                             logger.info(f"✅ MA 150 retrieved from cache for ticker {entity_id}: {sma_150:.2f}")
                         

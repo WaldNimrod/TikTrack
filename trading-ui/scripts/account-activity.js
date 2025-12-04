@@ -660,7 +660,18 @@ function renderMovementRow(movement, runningBalance) {
     // Prefer envelope if available (it's already normalized), otherwise use raw date
     // renderDate returns a string (not HTML), so we set it directly as textContent
     const dateToRender = movementDateEnvelope || movement.date;
-    const dateDisplay = window.FieldRendererService.renderDate(dateToRender, false);
+    let dateDisplay = window.FieldRendererService.renderDate(dateToRender, false);
+    // Check for "Invalid Date" string and handle it
+    if (dateDisplay && typeof dateDisplay === 'string' && dateDisplay.toLowerCase().includes('invalid')) {
+      // Fallback to envelope display property or raw date
+      if (movementDateEnvelope && movementDateEnvelope.display) {
+        dateDisplay = movementDateEnvelope.display;
+      } else if (movement.date && typeof movement.date === 'object' && movement.date.display) {
+        dateDisplay = movement.date.display;
+      } else {
+        dateDisplay = '-';
+      }
+    }
     dateCell.textContent = dateDisplay || '-';
   } else {
     // Fallback: use dateUtils for consistent date formatting

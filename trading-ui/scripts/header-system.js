@@ -1998,39 +1998,87 @@ if (window.Logger) {
       return;
     }
     
-    // Check if UnifiedAppInitializer is handling initialization
-    // Wait a bit to see if UnifiedAppInitializer will initialize it
-    let waitCount = 0;
-    const maxWait = 30; // 3 seconds
+    // Check if UnifiedAppInitializer exists and might initialize the header
+    const hasUnifiedAppInitializer = typeof window.UnifiedAppInitializer !== 'undefined' || 
+                                     typeof window.initializeUnifiedApp !== 'undefined' ||
+                                     (window.globalInitializationState && window.globalInitializationState.unifiedAppInitializing);
     
-    while (waitCount < maxWait) {
-      if (window.headerSystem && window.headerSystem.isInitialized) {
-        // Header was initialized by UnifiedAppInitializer
-        if (window.Logger?.debug) {
-          window.Logger.debug('Header System initialized by UnifiedAppInitializer', { page: 'header-system' });
-        }
-        return;
-      }
+    if (hasUnifiedAppInitializer) {
+      // Wait longer for UnifiedAppInitializer to initialize the header
+      let waitCount = 0;
+      const maxWait = 50; // 5 seconds - give UnifiedAppInitializer enough time
       
-      // Check if UnifiedAppInitializer is still initializing
-      if (window.globalInitializationState && window.globalInitializationState.unifiedAppInitializing) {
+      while (waitCount < maxWait) {
+        // Check if header was initialized
+        if (window.headerSystem && window.headerSystem.isInitialized) {
+          if (window.Logger?.debug) {
+            window.Logger.debug('Header System initialized by UnifiedAppInitializer', { 
+              waitCount,
+              page: 'header-system' 
+            });
+          }
+          return;
+        }
+        
+        // Check if UnifiedAppInitializer is still initializing
+        if (window.globalInitializationState && window.globalInitializationState.unifiedAppInitializing) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          waitCount++;
+          continue;
+        }
+        
+        // Check if UnifiedAppInitializer finished initializing
+        if (window.globalInitializationState && window.globalInitializationState.unifiedAppInitialized) {
+          // UnifiedAppInitializer finished, check one more time if header was initialized
+          await new Promise(resolve => setTimeout(resolve, 200));
+          if (window.headerSystem && window.headerSystem.isInitialized) {
+            if (window.Logger?.debug) {
+              window.Logger.debug('Header System initialized by UnifiedAppInitializer (after completion)', { 
+                waitCount,
+                page: 'header-system' 
+              });
+            }
+            return;
+          }
+          // UnifiedAppInitializer finished but didn't initialize header, break and initialize ourselves
+          break;
+        }
+        
+        // Wait a bit more
         await new Promise(resolve => setTimeout(resolve, 100));
         waitCount++;
-        continue;
       }
-      
-      // UnifiedAppInitializer is done (or not running), initialize header ourselves
-      break;
     }
     
     // Initialize header if not already initialized
     if (!window.headerSystem || !window.headerSystem.isInitialized) {
+      // Mark that fallback initialization is being used
+      window.__headerSystemInitMethod = 'fallback';
+      
       if (window.Logger?.info) {
-        window.Logger.info('🔄 Auto-initializing Header System (fallback)', {
-          waitCount,
+        window.Logger.info('🔄 Auto-initializing Header System (FALLBACK METHOD)', {
+          hasUnifiedAppInitializer,
           unifiedAppInitialized: window.globalInitializationState?.unifiedAppInitialized,
-          unifiedAppInitializing: window.globalInitializationState?.unifiedAppInitializing
+          unifiedAppInitializing: window.globalInitializationState?.unifiedAppInitializing,
+          page: window.location.pathname
         }, { page: 'header-system' });
+      }
+      
+      // Also log to console for easy tracking
+      console.log('🔄 [HEADER INIT] Using FALLBACK method for:', window.location.pathname);
+      
+      // Store in localStorage for tracking
+      try {
+        const initLog = {
+          page: window.location.pathname,
+          method: 'fallback',
+          timestamp: new Date().toISOString()
+        };
+        const existingLogs = JSON.parse(localStorage.getItem('__headerInitLogs') || '[]');
+        existingLogs.push(initLog);
+        localStorage.setItem('__headerInitLogs', JSON.stringify(existingLogs));
+      } catch (e) {
+        // Ignore localStorage errors
       }
       
       try {
@@ -2060,11 +2108,15 @@ if (window.Logger) {
   };
   
   // Initialize when DOM is ready
+  // Use longer delay to ensure UnifiedAppInitializer has time to initialize first
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', ensureHeaderInitialized);
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait 1 second after DOMContentLoaded to allow UnifiedAppInitializer to start
+      setTimeout(ensureHeaderInitialized, 1000);
+    });
   } else {
-    // DOM is already loaded, initialize after a short delay to allow other systems to initialize first
-    setTimeout(ensureHeaderInitialized, 200);
+    // DOM is already loaded, wait longer to allow other systems to initialize first
+    setTimeout(ensureHeaderInitialized, 1500);
   }
 })();
 

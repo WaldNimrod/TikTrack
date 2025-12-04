@@ -54,6 +54,8 @@ class AIAnalysisRequest(BaseModel):
     status = Column(String(20), default='pending', nullable=False,
                    comment="Request status: 'pending', 'completed', 'failed'")
     error_message = Column(Text, nullable=True, comment="Error message if status is 'failed'")
+    retry_count = Column(Integer, default=0, nullable=False,
+                        comment="Number of retry attempts for failed analyses")
     
     # Timestamps
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)

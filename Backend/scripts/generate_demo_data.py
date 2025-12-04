@@ -499,11 +499,12 @@ class DataRelationshipManager:
 class DemoDataGenerator:
     """יוצר נתוני דוגמה מלאים למערכת"""
     
-    def __init__(self, db_session: Session, config: Dict[str, Any], dry_run: bool = False, verbose: bool = False):
+    def __init__(self, db_session: Session, config: Dict[str, Any], dry_run: bool = False, verbose: bool = False, username: Optional[str] = None):
         self.db = db_session
         self.config = config
         self.dry_run = dry_run
         self.verbose = verbose
+        self.username = username
         self.date_gen = DateDistributionGenerator()
         self.relationship_manager = DataRelationshipManager(db_session)
         self.created_count = {
@@ -570,10 +571,20 @@ class DemoDataGenerator:
         for currency in currencies:
             self.currency_cache[currency.symbol] = currency
         
-        # Load user (any user - no full user system yet)
-        self.user_cache = self.db.query(User).first()
-        if not self.user_cache:
-            raise DataGenerationError('users', "לא נמצא משתמש במערכת. יש ליצור משתמש ידנית בבסיס הנתונים")
+        # Load user - by username if provided, otherwise first user (backward compatibility)
+        if self.username:
+            self.user_cache = self.db.query(User).filter_by(username=self.username).first()
+            if not self.user_cache:
+                raise DataGenerationError('users', f"משתמש '{self.username}' לא נמצא במערכת. יש ליצור משתמש זה בבסיס הנתונים")
+            if self.verbose:
+                print(f"   👤 יוצר נתונים עבור משתמש: {self.username} (ID: {self.user_cache.id})")
+        else:
+            # Backward compatibility - use first user
+            self.user_cache = self.db.query(User).first()
+            if not self.user_cache:
+                raise DataGenerationError('users', "לא נמצא משתמש במערכת. יש ליצור משתמש ידנית בבסיס הנתונים")
+            if self.verbose:
+                print(f"   👤 יוצר נתונים עבור משתמש: {self.user_cache.username} (ID: {self.user_cache.id}) - משתמש ראשון שנמצא")
         
         # Load note relation types
         note_types = self.db.query(NoteRelationType).all()
@@ -1759,6 +1770,11 @@ def main():
         action='store_true',
         help='Show detailed progress information'
     )
+    parser.add_argument(
+        '--username',
+        type=str,
+        help='Username to create data for (if not provided, uses first user for backward compatibility)'
+    )
     
     args = parser.parse_args()
     
@@ -1782,7 +1798,7 @@ def main():
             return
         
         # Generate data
-        generator = DemoDataGenerator(db, DEMO_CONFIG, dry_run=args.dry_run, verbose=args.verbose)
+        generator = DemoDataGenerator(db, DEMO_CONFIG, dry_run=args.dry_run, verbose=args.verbose, username=args.username)
         results = generator.generate_all()
         
         print("\n" + "=" * 70)

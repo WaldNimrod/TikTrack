@@ -134,9 +134,13 @@
         }
       );
 
-      // Debug: Log positioning result
-      if (window.Logger?.debug) {
-        window.Logger.debug('Floating UI positioning result', {
+      // Debug: Log positioning result (only if TestWidgetsOverlayLogger is available)
+      if (window.TestWidgetsOverlayLogger?.logPositioningDebug) {
+        window.TestWidgetsOverlayLogger.logPositioningDebug({
+          floatingUI: true,
+          placement,
+          x,
+          y,
           referenceRect: {
             top: refRect.top,
             bottom: refRect.bottom,
@@ -144,12 +148,7 @@
             right: refRect.right,
             width: refRect.width,
             height: refRect.height
-          },
-          computedPosition: { x, y },
-          placement,
-          strategy: config.strategy,
-          gap: config.gap,
-          page: 'unified-ui-positioning-service'
+          }
         });
       }
 
@@ -372,7 +371,7 @@
     const config = {
       hoverClass: options.hoverClass || 'is-hovered',
       transitionDuration: options.transitionDuration || 200,
-      closeDelay: options.closeDelay || 150,
+      closeDelay: options.closeDelay || 100, // Reduced delay for faster response
       gap: options.gap || 8,
       minWidth: options.minWidth || 280,
       maxWidth: options.maxWidth || 400,
@@ -433,8 +432,8 @@
         return;
       }
 
-      // Reduced delay for faster response (same as Unified Pending Actions Widget)
-      const closeDelay = config.closeDelay || 100;
+      // Use delay from config (already set to 100ms default)
+      const closeDelay = config.closeDelay;
 
       // Cancel any existing timeout
       const existingTimeout = overlayConfig.closeTimeouts.get(item);
@@ -547,25 +546,21 @@
       }
 
       // Close all other overlays in this list BEFORE opening new one
-      // Do this synchronously to ensure clean state
+      // Do this synchronously to ensure clean state (no delay, no animation)
       const allItems = listElement.querySelectorAll(itemSelector);
       allItems.forEach(otherItem => {
         if (otherItem !== item) {
-          // Remove hover class
-          otherItem.classList.remove(config.hoverClass);
-          
-          // Find and close its overlay immediately (no animation delay)
           const otherDetails = otherItem.querySelector(detailsSelector) || 
                               otherItem.querySelector('[data-overlay="true"]');
           if (otherDetails && otherDetails.style.display !== 'none') {
-            // Cancel any pending timeout for this item
+            // Cancel any pending timeout
             const otherTimeout = overlayConfig.closeTimeouts.get(otherItem);
             if (otherTimeout) {
               clearTimeout(otherTimeout);
               overlayConfig.closeTimeouts.delete(otherItem);
             }
-            
             // Close immediately (synchronously) - no animation delay
+            otherItem.classList.remove(config.hoverClass);
             if (window.WidgetZIndexManager) {
               window.WidgetZIndexManager.unregisterOverlay(otherDetails);
             }
@@ -610,24 +605,9 @@
       // Position overlay immediately relative to THIS item (not previous item)
       // Use Floating UI directly - it handles positioning correctly
       
-      // Debug: Log item and details info
-      if (window.Logger?.debug) {
-        const itemRect = item.getBoundingClientRect();
-        window.Logger.debug('Positioning overlay', {
-          itemSelector,
-          itemClass: item.className,
-          itemRect: {
-            top: itemRect.top,
-            bottom: itemRect.bottom,
-            left: itemRect.left,
-            right: itemRect.right,
-            width: itemRect.width,
-            height: itemRect.height
-          },
-          detailsClass: details.className,
-          placement,
-          page: 'unified-ui-positioning-service'
-        });
+      // Debug: Log item and details info (only if TestWidgetsOverlayLogger is available)
+      if (window.TestWidgetsOverlayLogger?.logMouseEvent) {
+        window.TestWidgetsOverlayLogger.logMouseEvent('mouseenter', event, item, details);
       }
       
       await positionElement(item, details, {
@@ -662,12 +642,38 @@
       };
       
       const handleOverlayLeave = (e) => {
-        // Check if mouse is moving to the item
         const relatedTarget = e.relatedTarget;
-        if (relatedTarget && item.contains(relatedTarget)) {
+        
+        // If no relatedTarget, mouse left the window - close immediately
+        if (!relatedTarget) {
+          closeOverlayForItem(item);
+          return;
+        }
+
+        // Check if mouse is moving to the item - keep open
+        if (item.contains(relatedTarget) || relatedTarget === item) {
           return; // Moving to item - keep open
         }
-        // Mouse leaving overlay - close
+        
+        // Check if mouse is moving to another item in the same list
+        const otherItem = relatedTarget.closest(itemSelector);
+        if (otherItem && otherItem !== item && listElement.contains(otherItem)) {
+          // Moving to another item - don't close this one yet (let handleMouseEnter handle it)
+          return;
+        }
+        
+        // Check if mouse is moving to another overlay in the same list
+        const otherOverlay = relatedTarget.closest('[data-overlay="true"]');
+        if (otherOverlay) {
+          // Check if this overlay belongs to another item in the same list
+          const otherItemFromOverlay = otherOverlay.closest(itemSelector);
+          if (otherItemFromOverlay && otherItemFromOverlay !== item && listElement.contains(otherItemFromOverlay)) {
+            // Moving to another item's overlay - don't close this one yet
+            return;
+          }
+        }
+        
+        // Mouse leaving overlay to somewhere else - close
         closeOverlayForItem(item);
       };
 
@@ -698,25 +704,32 @@
         return;
       }
 
-      // Check if mouse is moving to the overlay itself (keep open)
-      const overlay = relatedTarget.closest('[data-overlay="true"]');
-      if (overlay) {
-        // Verify this overlay belongs to this item
-        const itemOverlay = item.querySelector('[data-overlay="true"]');
-        if (overlay === itemOverlay) {
-          // Moving to this item's overlay - keep open
+      // Check if mouse is moving to this item's overlay - keep open
+      const itemOverlay = item.querySelector('[data-overlay="true"]');
+      if (itemOverlay && (itemOverlay.contains(relatedTarget) || relatedTarget === itemOverlay)) {
+        // Moving to this item's overlay - keep open
+        return;
+      }
+
+      // Check if mouse is moving to another item in the same list (don't close - let handleMouseEnter handle it)
+      const newItem = relatedTarget.closest(itemSelector);
+      if (newItem && newItem !== item && listElement.contains(newItem)) {
+        // Moving to another item in the same list - don't close, let handleMouseEnter handle it
+        return;
+      }
+
+      // Check if mouse is moving to another overlay in the same list
+      const otherOverlay = relatedTarget.closest('[data-overlay="true"]');
+      if (otherOverlay && otherOverlay !== itemOverlay) {
+        // Check if this overlay belongs to another item in the same list
+        const otherItem = otherOverlay.closest(itemSelector);
+        if (otherItem && otherItem !== item && listElement.contains(otherItem)) {
+          // Moving to another item's overlay - don't close this item yet (let handleOverlayLeave handle it)
           return;
         }
       }
 
-      // Check if mouse is moving to another item in the list (don't close - let handleMouseEnter handle it)
-      const newItem = relatedTarget.closest(itemSelector);
-      if (newItem && newItem !== item) {
-        // Moving to another item - don't close, let handleMouseEnter handle it
-        return;
-      }
-
-      // Mouse is leaving to somewhere else - close this item's overlay
+      // Mouse is leaving to somewhere else (not to item's overlay, not to another item, not to another overlay in list) - close this item's overlay
       closeOverlayForItem(item);
     };
 
@@ -809,4 +822,5 @@
   });
 
 })();
+
 

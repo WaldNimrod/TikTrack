@@ -671,34 +671,40 @@
     };
 
     const handleMouseLeave = function(event) {
-      // Check if mouse is moving to another item or overlay
-      const relatedTarget = event.relatedTarget;
-      if (!relatedTarget) {
-        // Mouse left the window - close immediately
-        closeOverlayForItem(null);
-        return;
-      }
-
-      // Check if mouse is moving to another item in the list
-      const newItem = relatedTarget.closest(itemSelector);
-      if (newItem) {
-        // Moving to another item - don't close, let handleMouseEnter handle it
-        return;
-      }
-
-      // Check if mouse is moving to the overlay itself
-      const overlay = relatedTarget.closest('[data-overlay="true"]');
-      if (overlay) {
-        // Moving to overlay - don't close
-        return;
-      }
-
-      // Mouse is leaving to somewhere else - find the item and close
+      // Find the item that mouse is leaving
       const item = event.target.closest(itemSelector);
       if (!item) {
         return;
       }
 
+      // Check if mouse is moving to another item or overlay
+      const relatedTarget = event.relatedTarget;
+      
+      // If no relatedTarget, mouse left the window - close immediately
+      if (!relatedTarget) {
+        closeOverlayForItem(item);
+        return;
+      }
+
+      // Check if mouse is moving to the overlay itself (keep open)
+      const overlay = relatedTarget.closest('[data-overlay="true"]');
+      if (overlay) {
+        // Verify this overlay belongs to this item
+        const itemOverlay = item.querySelector('[data-overlay="true"]');
+        if (overlay === itemOverlay) {
+          // Moving to this item's overlay - keep open
+          return;
+        }
+      }
+
+      // Check if mouse is moving to another item in the list (don't close - let handleMouseEnter handle it)
+      const newItem = relatedTarget.closest(itemSelector);
+      if (newItem && newItem !== item) {
+        // Moving to another item - don't close, let handleMouseEnter handle it
+        return;
+      }
+
+      // Mouse is leaving to somewhere else - close this item's overlay
       closeOverlayForItem(item);
     };
 

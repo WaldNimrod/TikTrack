@@ -2053,21 +2053,15 @@ function requiresTables(pageName) {
   return tablePages.includes(pageName) || document.querySelectorAll('table').length > 0;
 }
 
-    /**
-     * Check if page requires charts
-     * בדיקה אם העמוד דורש גרפים
-     * 
-     * @method requiresCharts
-     * @description בודק אם העמוד דורש מערכת גרפים
-     * 
-     * @memberof UnifiedAppInitializer
-     * @param {string} pageName - שם העמוד
-     * @returns {boolean} true אם העמוד דורש גרפים
-     * 
-     * @since 1.0.0
-     */
-    requiresCharts(pageName) {
-  return pageName === 'index' || document.querySelectorAll('canvas, .chart-container').length > 0;
+/**
+ * Check if page requires charts (Legacy - moved outside class)
+ */
+function requiresCharts(pageName) {
+  const chartPages = ['index'];
+  return (
+    chartPages.includes(pageName) ||
+    document.querySelectorAll('canvas[id], .chart-container').length > 0
+  );
 }
 
 /**

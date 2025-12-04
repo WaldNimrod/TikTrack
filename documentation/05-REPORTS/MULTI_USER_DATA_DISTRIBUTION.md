@@ -123,32 +123,45 @@ Password: nimw
 
 ### יצירת נתונים למשתמש יחיד
 
-**הסקריפט `generate_demo_data.py` יוצר נתונים למשתמש הפעיל:**
+**הסקריפט `generate_demo_data.py` יוצר נתונים למשתמש ספציפי:**
 
 ```bash
-# יצירת נתוני דוגמה למשתמש הפעיל
+# יצירת נתוני דוגמה למשתמש ספציפי
+python3 Backend/scripts/generate_demo_data.py --username user
+
+# יצירת נתוני דוגמה למשתמש admin
+python3 Backend/scripts/generate_demo_data.py --username admin
+
+# ללא username - משתמש ראשון שנמצא (תאימות לאחור)
 python3 Backend/scripts/generate_demo_data.py
 ```
 
 **הערות:**
-- הסקריפט מזהה את המשתמש הפעיל מהבסיס נתונים
-- כל הנתונים נוצרים למשתמש זה
-- אם יש מספר משתמשים, הנתונים נוצרים למשתמש הראשון שנמצא
+- הסקריפט תומך בפרמטר `--username` ליצירת נתונים למשתמש ספציפי
+- אם לא מסופק `--username`, הסקריפט ישתמש במשתמש הראשון שנמצא (תאימות לאחור)
+- כל הנתונים נוצרים למשתמש שצוין
 
-### יצירת נתונים לשלושה משתמשים
+### יצירת נתונים לכל המשתמשים (מומלץ)
 
 **הסקריפט `generate_multi_user_demo_data.py` יוצר נתונים לכל המשתמשים:**
 
 ```bash
 # יצירת נתוני דוגמה לכל המשתמשים
 python3 Backend/scripts/generate_multi_user_demo_data.py
+
+# Dry run - רק אימות ללא יצירת נתונים
+python3 Backend/scripts/generate_multi_user_demo_data.py --dry-run
+
+# עם הודעות מפורטות
+python3 Backend/scripts/generate_multi_user_demo_data.py --verbose
 ```
 
 **הערות:**
 - הסקריפט יוצר נתונים לפי ההגדרות במסמך זה
-- משתמש (user) - כל הנתונים
-- מנהל (admin) - נתונים מוגבלים
-- נימרוד (nimrod) - ללא נתונים
+- משתמש (user) - כל הנתונים (120 תוכניות, 80 טריידים, 50 טיקרים)
+- מנהל (admin) - נתונים מוגבלים (20 תוכניות, 15 טריידים, 10 טיקרים)
+- נימרוד (nimrod) - ללא נתונים (מדלג)
+- זהו הסקריפט המומלץ ליצירת נתוני דוגמה במערכת multi-user
 
 ---
 

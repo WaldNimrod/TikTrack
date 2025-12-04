@@ -758,6 +758,8 @@ JOIN tickers t ON tps.ticker_id = t.id;
 
 ## 🎨 פייז 2: יצירת נתוני דוגמה (אופציונלי)
 
+**⚠️ עדכון חשוב:** במערכת multi-user, מומלץ להשתמש ב-`generate_multi_user_demo_data.py` ליצירת נתונים לכל המשתמשים לפי `MULTI_USER_DATA_DISTRIBUTION.md`.
+
 ### מטרה
 יצירת בסיס נתונים עם נתוני דוגמה מלאים המאפשרים הדגמה מרשימה של כל יכולות המערכת.
 
@@ -823,8 +825,11 @@ python3 Backend/scripts/cleanup_user_data.py
 # בדיקה: אימות תוצאות שלב 1
 python3 Backend/scripts/verify_cleanup_results.py
 
-# שלב 2: יצירת דוגמה
-python3 Backend/scripts/generate_demo_data.py
+# שלב 2: יצירת דוגמה (מומלץ במערכת multi-user)
+python3 Backend/scripts/generate_multi_user_demo_data.py
+
+# או יצירת נתונים למשתמש יחיד
+python3 Backend/scripts/generate_demo_data.py --username user
 
 # שלב 2.5: טעינת נתוני שוק לכל הטיקרים
 python3 Backend/scripts/load_market_data_for_tickers.py

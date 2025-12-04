@@ -64,27 +64,40 @@
 
 ## 🚀 הוראות הרצה
 
-### שיטה 1: הרצה ישירה (מומלץ)
+### שיטה 1: יצירת נתונים למשתמש יחיד
 
 ```bash
-cd Backend
-python3 scripts/generate_demo_data.py
+# יצירת נתונים למשתמש ספציפי
+python3 Backend/scripts/generate_demo_data.py --username user
+
+# יצירת נתונים למשתמש admin
+python3 Backend/scripts/generate_demo_data.py --username admin
+
+# ללא username - משתמש ראשון שנמצא (תאימות לאחור)
+python3 Backend/scripts/generate_demo_data.py
 ```
 
-### שיטה 2: עם פרמטרים
+### שיטה 2: יצירת נתונים לכל המשתמשים (מומלץ)
+
+```bash
+# יצירת נתונים לכל המשתמשים לפי MULTI_USER_DATA_DISTRIBUTION.md
+python3 Backend/scripts/generate_multi_user_demo_data.py
+
+# Dry run - רק אימות ללא יצירת נתונים
+python3 Backend/scripts/generate_multi_user_demo_data.py --dry-run
+
+# עם הודעות מפורטות
+python3 Backend/scripts/generate_multi_user_demo_data.py --verbose
+```
+
+### שיטה 3: עם פרמטרים נוספים
 
 ```bash
 # Dry run - רק אימות ללא יצירת נתונים
-python3 Backend/scripts/generate_demo_data.py --dry-run
+python3 Backend/scripts/generate_demo_data.py --dry-run --username user
 
 # עם הודעות מפורטות
-python3 Backend/scripts/generate_demo_data.py --verbose
-```
-
-### שיטה 3: מהתיקייה הראשית
-
-```bash
-python3 Backend/scripts/generate_demo_data.py
+python3 Backend/scripts/generate_demo_data.py --verbose --username admin
 ```
 
 ---

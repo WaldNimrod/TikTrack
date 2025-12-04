@@ -520,7 +520,7 @@ def main():
     db = Session()
     
     try:
-        creator = DemoTagCreator(db, dry_run=args.dry_run, verbose=args.verbose)
+        creator = DemoTagCreator(db, dry_run=args.dry_run, verbose=args.verbose, username=args.username)
         results = creator.create_all()
         
         print()

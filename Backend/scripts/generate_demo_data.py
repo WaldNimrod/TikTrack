@@ -524,6 +524,7 @@ class DemoDataGenerator:
         self.currency_cache: Dict[str, Currency] = {}
         self.user_cache: Optional[User] = None
         self.note_relation_types_cache: Dict[str, int] = {}
+        self.created_tickers_in_this_run: List[Ticker] = []  # Track tickers created in this run
     
     def generate_all(self) -> Dict[str, int]:
         """יוצר את כל נתוני הדוגמה"""
@@ -547,7 +548,18 @@ class DemoDataGenerator:
             self._create_cash_flows()
             self._create_alerts()
             self._create_notes()
-            self._create_ai_analysis()  # Create AI analysis requests
+            
+            # Try to create AI analysis - if retry_count column doesn't exist, skip it
+            try:
+                self._create_ai_analysis()  # Create AI analysis requests
+            except Exception as e:
+                if 'retry_count' in str(e) or 'UndefinedColumn' in str(e):
+                    print(f"\n   ⚠️  לא ניתן ליצור ניתוחי AI - שדה retry_count לא קיים בטבלה")
+                    print(f"   💡 הערה: יש לעדכן את הטבלה ai_analysis_requests להוסיף את השדה retry_count")
+                    self.db.rollback()  # Rollback any partial AI analysis creation
+                    self.created_count['ai_analysis'] = 0
+                else:
+                    raise
             
             # Commit all
             self.db.commit()
@@ -636,11 +648,19 @@ class DemoDataGenerator:
                 created += 1
         
         # Fill remaining USD tickers with random data
+        demo_counter = 1
         for i in range(usd_count - created):
-            symbol = f"DEMO{i+1}"
+            # Find a unique symbol
+            while True:
+                symbol = f"DEMO{demo_counter}"
+                if symbol not in existing_symbols:
+                    existing_symbols.add(symbol)  # Add to set to avoid duplicates in same run
+                    break
+                demo_counter += 1
+            
             ticker = Ticker(
                 symbol=symbol,
-                name=f"Demo Stock {i+1}",
+                name=f"Demo Stock {demo_counter}",
                 type=random.choice(['stock', 'etf']),
                 currency_id=usd_currency.id,
                 status='open',
@@ -648,6 +668,7 @@ class DemoDataGenerator:
             )
             self.db.add(ticker)
             created += 1
+            demo_counter += 1
         
         # Create other currency tickers
         other_count = count - usd_count
@@ -670,8 +691,15 @@ class DemoDataGenerator:
             if matching_ticker:
                 symbol, name, ticker_type, _ = matching_ticker
             else:
-                symbol = f"DEMO{currency.symbol}{i+1}"
-                name = f"Demo {currency.symbol} Stock {i+1}"
+                # Find a unique symbol
+                demo_counter = 1
+                while True:
+                    symbol = f"DEMO{currency.symbol}{demo_counter}"
+                    if symbol not in existing_symbols:
+                        existing_symbols.add(symbol)  # Add to set to avoid duplicates in same run
+                        break
+                    demo_counter += 1
+                name = f"Demo {currency.symbol} Stock {demo_counter}"
                 ticker_type = 'stock'
             
             ticker = Ticker(
@@ -687,7 +715,12 @@ class DemoDataGenerator:
         
         self.db.flush()  # Flush to get IDs
         
-        # Reload for relationship manager
+        # Store created tickers for this run
+        self.created_tickers_in_this_run = []
+        for ticker in self.db.query(Ticker).order_by(Ticker.id.desc()).limit(created).all():
+            self.created_tickers_in_this_run.append(ticker)
+        
+        # Reload for relationship manager (all tickers for other uses)
         self.relationship_manager.tickers = self.db.query(Ticker).filter(
             Ticker.symbol != 'SPY'  # Exclude SPY that should already exist
         ).all()
@@ -707,15 +740,27 @@ class DemoDataGenerator:
         if not self.user_cache:
             raise DataGenerationError('user_tickers', "משתמש לא נמצא")
         
-        # Get all tickers (including SPY)
-        all_tickers = self.db.query(Ticker).all()
+        # Get only tickers created in this run for this user
+        # This ensures we only associate tickers created for this specific user
+        tickers_to_associate = self.created_tickers_in_this_run.copy() if self.created_tickers_in_this_run else []
         
-        if not all_tickers:
+        # Add SPY if exists (it's a system ticker, should be available to all users)
+        spy = self.db.query(Ticker).filter(Ticker.symbol == 'SPY').first()
+        if spy:
+            # Check if SPY association already exists
+            existing_spy = self.db.query(UserTicker).filter(
+                UserTicker.user_id == self.user_cache.id,
+                UserTicker.ticker_id == spy.id
+            ).first()
+            if not existing_spy and spy not in tickers_to_associate:
+                tickers_to_associate.append(spy)
+        
+        if not tickers_to_associate:
             print("   ⚠️  אין טיקרים לשיוך")
             return
         
         created = 0
-        for ticker in all_tickers:
+        for ticker in tickers_to_associate:
             try:
                 # Check if association already exists
                 existing = self.db.query(UserTicker).filter(
@@ -1639,6 +1684,21 @@ class DemoDataGenerator:
         # Get AI templates
         try:
             from models.ai_analysis import AIAnalysisRequest, AIPromptTemplate
+            from sqlalchemy.exc import OperationalError
+            from sqlalchemy import inspect as sqlalchemy_inspect
+            
+            # Check if retry_count column exists in the table
+            try:
+                inspector = sqlalchemy_inspect(self.db.bind)
+                columns = [col['name'] for col in inspector.get_columns('ai_analysis_requests')]
+                if 'retry_count' not in columns:
+                    print("   ⚠️  שדה retry_count לא קיים בטבלה - מדלג על יצירת ניתוחי AI")
+                    print("   💡 הערה: יש לעדכן את הטבלה ai_analysis_requests להוסיף את השדה retry_count")
+                    self.created_count['ai_analysis'] = 0
+                    return
+            except Exception as check_error:
+                # If we can't check, try to create anyway and catch the error
+                pass
             
             templates = self.db.query(AIPromptTemplate).filter(
                 AIPromptTemplate.is_active == True
@@ -1705,6 +1765,7 @@ class DemoDataGenerator:
                     self.date_gen.now
                 )
                 
+                # Create AI analysis request (retry_count not in DB yet, so we don't set it)
                 ai_analysis = AIAnalysisRequest(
                     user_id=self.user_cache.id,
                     template_id=template.id,
@@ -1717,10 +1778,13 @@ class DemoDataGenerator:
                     error_message=error_message,
                     created_at=analysis_date
                 )
+                # Note: retry_count is defined in model but not in DB table yet
+                # SQLAlchemy will use default value if column exists, otherwise ignore
                 
                 self.db.add(ai_analysis)
                 created += 1
             
+            # Flush AI analysis
             self.db.flush()
             self.created_count['ai_analysis'] = created
             print(f"   ✅ נוצרו {created} ניתוחי AI")

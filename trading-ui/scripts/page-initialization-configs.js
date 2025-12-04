@@ -222,6 +222,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.RecentItemsWidget',
         'window.UnifiedPendingActionsWidget',
         'window.TagWidget',
+        'window.TickerListWidget', // Ticker List Widget
+        'window.TickerChartWidget', // Ticker Chart Widget
+        'window.WatchListsWidgetService', // Watch Lists Widget Service
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System
         'window.UnifiedAppInitializer', // Unified Init System
@@ -289,6 +292,30 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           if (typeof window.loadDashboardData === 'function') {
             await window.loadDashboardData();
           }
+          }
+
+          // Initialize ticker widgets
+          window.Logger?.info?.('🔵 About to initialize ticker widgets...', { page: 'page-initialization-configs' });
+          if (window.TickerListWidget) {
+            try {
+              window.TickerListWidget.init('tickerListWidgetContainer', {
+                maxItems: 5,
+                defaultTab: 'active'
+              });
+              window.Logger?.info?.('🔵 TickerListWidget initialized', { page: 'page-initialization-configs' });
+            } catch (error) {
+              window.Logger?.warn?.('⚠️ Error initializing TickerListWidget:', error, { page: 'page-initialization-configs' });
+            }
+          }
+          if (window.TickerChartWidget) {
+            try {
+              window.TickerChartWidget.init('tickerChartWidgetContainer', {
+                maxItems: 3
+              });
+              window.Logger?.info?.('🔵 TickerChartWidget initialized', { page: 'page-initialization-configs' });
+            } catch (error) {
+              window.Logger?.warn?.('⚠️ Error initializing TickerChartWidget:', error, { page: 'page-initialization-configs' });
+            }
           }
 
           // Initialize positions & portfolio system
@@ -2933,39 +2960,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       customInitializers: [
         async pageConfig => {
           window.Logger.info('🎯 Initializing TradingView Widgets Showcase...', {
-            page: 'page-initialization-configs',
-          });
-        },
-      ],
-    },
-
-    'test-widgets-overlay': {
-      name: 'Test Widgets Overlay',
-      packages: ['base', 'services', 'dashboard-widgets', 'init-system'],
-      requiredGlobals: [
-        'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
-        'window.PACKAGE_MANIFEST', // Unified Init System
-
-        'NotificationSystem',
-        'window.IconSystem',
-        'window.UnifiedUIPositioning',
-        'window.WidgetOverlayService',
-        'window.RecentItemsWidget',
-        'window.UnifiedPendingActionsWidget',
-        'window.TagWidget',
-      ],
-      description: 'עמוד בדיקה לוויג\'טים עם Floating UI ו-GSAP - overlay positioning ואנימציות',
-      lastModified: '2025-12-03',
-      pageType: 'test',
-      preloadAssets: [],
-      cacheStrategy: 'none',
-      requiresFilters: false,
-      requiresValidation: false,
-      requiresTables: false,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger.info('🧪 Initializing Test Widgets Overlay page...', {
             page: 'page-initialization-configs',
           });
         },

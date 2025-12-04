@@ -859,8 +859,7 @@ const PAGE_TO_ENTITY_MAPPING = {
   'css-management-page': 'development',
   'chart-management-page': 'development',
   'cache-management-page': 'development',
-  'background-tasks-page': 'development',
-  'test-widgets-overlay-page': 'development' // Test widgets overlay page
+  'background-tasks-page': 'development'
 };
 
 async function getEntityColorFromPreferences(entityType, variant = 'primary') {
@@ -1632,14 +1631,44 @@ window.NUMERIC_VALUE_COLORS = NUMERIC_VALUE_COLORS;
 // Color preferences will be loaded as part of the unified preferences initialization
 // This prevents duplicate API calls and ensures single point of entry
 // 
-// If colors need to be updated after preferences load, use the preferences:updated event:
-// window.addEventListener('preferences:updated', (e) => {
-//   loadColorPreferences().then(preferences => {
-//     if (preferences) {
-//       updateCSSVariablesFromPreferences(preferences);
-//     }
-//   });
-// });
+// Listen for preferences:updated event to update colors when preferences change
+window.addEventListener('preferences:updated', async (e) => {
+  try {
+    if (window.Logger?.debug) {
+      window.Logger.debug('🎨 Preferences updated - reloading color preferences', {
+        page: 'color-scheme',
+        source: e.detail?.source,
+        userId: e.detail?.userId,
+        profileId: e.detail?.profileId,
+      });
+    }
+    
+    // Reload color preferences and update CSS variables
+    const preferences = await loadColorPreferences();
+    if (preferences && Object.keys(preferences).length > 0) {
+      updateCSSVariablesFromPreferences(preferences);
+      if (window.Logger?.info) {
+        window.Logger.info('✅ Color scheme updated from preferences', {
+          page: 'color-scheme',
+          preferenceCount: Object.keys(preferences).length,
+        });
+      }
+    } else {
+      if (window.Logger?.warn) {
+        window.Logger.warn('⚠️ No preferences loaded for color scheme update', {
+          page: 'color-scheme',
+        });
+      }
+    }
+  } catch (error) {
+    if (window.Logger?.error) {
+      window.Logger.error('❌ Error updating color scheme from preferences', {
+        page: 'color-scheme',
+        error: error?.message || error,
+      });
+    }
+  }
+});
 
 // Only set current entity color from page (doesn't require preferences)
 if (document.readyState === 'loading') {

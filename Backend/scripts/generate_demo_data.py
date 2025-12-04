@@ -197,8 +197,8 @@ NOTE_RELATED_TYPES = {
     'ticker': 4
 }
 
-# Investment types
-INVESTMENT_TYPES = ['swing', 'investment', 'passive', 'day_trading', 'scalping']
+# Investment types - Valid values per system constraints: swing, investment, passive
+INVESTMENT_TYPES = ['swing', 'investment', 'passive']
 
 # Trade sides
 TRADE_SIDES = ['Long', 'Short']

@@ -10,13 +10,13 @@
     "notes": "Final sm-section-server fix"
   },
   "development": {
-    "version": "1.3.85.0",
+    "version": "1.3.86.0",
     "major": 1,
     "minor": 3,
-    "patch": 85,
+    "patch": 86,
     "build": 0,
-    "commit": "066f23564d91b813945e5e2a0259505aa9b58a01",
-    "updated_at": "2025-12-04T18:28:08+00:00",
-    "notes": "Improve demo data generation and add Docker database sync tools"
+    "commit": "176269d6b53ee7925d79b78202fc41f1d6976d3d",
+    "updated_at": "2025-12-04T20:48:25+00:00",
+    "notes": "Fix investment types and status validation in demo data generation"
   }
 }

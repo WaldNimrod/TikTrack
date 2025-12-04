@@ -85,8 +85,16 @@
 
 **אנימציות:**
 - אנימציות fade in/out חלקות בעת פתיחה/סגירה של overlay
-- משך אנימציה: 200ms (ברירת מחדל)
+- משך אנימציה: 100ms (ברירת מחדל)
 - ראה [UNIFIED_UI_POSITIONING_GUIDE.md](UNIFIED_UI_POSITIONING_GUIDE.md) - פרק GSAP Integration
+
+**התנהגות פשוטה ומינימלית:**
+- **mouseenter** על item → פתיחת overlay (סוגר את כל האחרים)
+- **mouseleave** מ-item → סגירה (אלא אם העכבר עובר לאוברליי של אותו item או עדיין בתוך אותו item)
+- **mouseleave** מ-overlay → סגירה (אלא אם העכבר עובר חזרה לאותו item)
+
+**טיפול ב"חורים" בתוך item:**
+הקוד בודק אם `relatedTarget` עדיין בתוך אותו item - אם כן, ה-overlay נשאר פתוח. זה מונע סגירה לא רצויה כשהעכבר עובר בין אלמנטים בתוך אותו item.
 
 כל פריט מציג:
 - **Header Section** - תמיד גלוי: שם, תאריך, סכום, כפתורי פעולה

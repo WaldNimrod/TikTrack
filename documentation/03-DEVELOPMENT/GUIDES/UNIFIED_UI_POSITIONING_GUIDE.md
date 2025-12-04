@@ -58,29 +58,37 @@ await window.UnifiedUIPositioning.positionElement(
 **Parameters:**
 - `listElement` (HTMLElement) - אלמנט הרשימה
 - `itemSelector` (string) - selector לפריטים (למשל: `'.widget-item'`)
-- `detailsSelector` (string) - selector ל-overlay (למשל: `'.widget-details'`)
+- `detailsSelector` (string) - selector ל-overlay (למשל: `'.widget-details'` או `'[data-overlay="true"]'`)
 - `options` (Object) - אפשרויות:
   - `hoverClass` (string) - class להוספה על hover (default: `'is-hovered'`)
-  - `transitionDuration` (number) - משך transition במילישניות (default: `200`)
-  - `closeDelay` (number) - delay לפני סגירה במילישניות (default: `150`)
+  - `transitionDuration` (number) - משך transition במילישניות (default: `100`)
   - `gap` (number) - רווח בין item ל-overlay (default: `8`)
   - `minWidth` (number) - רוחב מינימלי (default: `280`)
   - `maxWidth` (number) - רוחב מקסימלי (default: `400`)
   - `zIndex` (number) - z-index (default: `1050`)
-  - `placement` (string) - מיקום overlay (default: `'bottom-start'`)
+  - `placement` (string) - מיקום overlay (default: `'bottom-start'`, אוטומטי ל-`'top-start'` לפריטים האחרונים)
   - `useAnimations` (boolean) - האם להשתמש באנימציות GSAP (default: `true`)
+
+**התנהגות פשוטה ומינימלית:**
+- **mouseenter** על item → פתיחת overlay (סוגר את כל האחרים)
+- **mouseleave** מ-item → סגירה (אלא אם העכבר עובר לאוברליי של אותו item או עדיין בתוך אותו item)
+- **mouseleave** מ-overlay → סגירה (אלא אם העכבר עובר חזרה לאותו item)
+
+**טיפול ב"חורים" בתוך item:**
+הקוד בודק אם `relatedTarget` עדיין בתוך אותו item - אם כן, ה-overlay נשאר פתוח. זה מונע סגירה לא רצויה כשהעכבר עובר בין אלמנטים בתוך אותו item (למשל מ-`<span>` ל-`<div>`).
 
 **Example:**
 ```javascript
 window.UnifiedUIPositioning.setupOverlay(
   document.getElementById('widgetList'),
   '.widget-item',
-  '.widget-details',
+  '[data-overlay="true"]',
   {
     gap: 8,
     minWidth: 280,
     maxWidth: 400,
-    closeDelay: 150
+    useAnimations: true,
+    transitionDuration: 100
   }
 );
 ```

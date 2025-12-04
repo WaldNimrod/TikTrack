@@ -69,6 +69,31 @@
 
 ### Hover Overlay
 
+הווידג'ט משתמש ב-**WidgetOverlayService** המרכזי לניהול overlay של פרטים נוספים.
+
+**מבנה HTML נדרש:**
+- `data-widget-overlay="true"` על ה-item (אופציונלי - לא נדרש)
+- `data-overlay="true"` על ה-details container
+
+**תיעוד:**
+- [WIDGET_OVERLAY_SERVICE_GUIDE.md](WIDGET_OVERLAY_SERVICE_GUIDE.md) - Widget Overlay Service
+- [UNIFIED_UI_POSITIONING_GUIDE.md](UNIFIED_UI_POSITIONING_GUIDE.md) - Unified UI Positioning Service (Floating UI)
+
+**הערה:** `WidgetOverlayService` משתמש ב-`Unified UI Positioning Service` למיקום חכם באמצעות Floating UI (עם fallback אוטומטי). האנימציות מבוצעות באמצעות GSAP (אופציונלי) עם fallback ל-CSS transitions.
+
+**אנימציות:**
+- אנימציות fade in/out חלקות בעת פתיחה/סגירה של overlay
+- משך אנימציה: 100ms (ברירת מחדל)
+- ראה [UNIFIED_UI_POSITIONING_GUIDE.md](UNIFIED_UI_POSITIONING_GUIDE.md) - פרק GSAP Integration
+
+**התנהגות פשוטה ומינימלית:**
+- **mouseenter** על item → פתיחת overlay (סוגר את כל האחרים)
+- **mouseleave** מ-item → סגירה (אלא אם העכבר עובר לאוברליי של אותו item או עדיין בתוך אותו item)
+- **mouseleave** מ-overlay → סגירה (אלא אם העכבר עובר חזרה לאותו item)
+
+**טיפול ב"חורים" בתוך item:**
+הקוד בודק אם `relatedTarget` עדיין בתוך אותו item - אם כן, ה-overlay נשאר פתוח. זה מונע סגירה לא רצויה כשהעכבר עובר בין אלמנטים בתוך אותו item.
+
 כל פריט מציג:
 - **Header Section** - תמיד גלוי: שם, תאריך, סכום
 - **Details Section** - מוצג על hover: פרטים נוספים (צד, סטטוס, כמות, וכו')

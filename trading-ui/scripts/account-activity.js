@@ -76,16 +76,8 @@ window.initAccountActivity = function(autoSelectDefault = false) {
       }
     });
 
-    // Listen for filter updates from header system
-    const checkFilterUpdates = () => {
-      const currentDateRange = window.selectedDateRangeForFilter;
-      if (currentDateRange && window.accountActivityState.activityData) {
-        updateActivitySummary(window.accountActivityState.activityData);
-      }
-    };
-
-    // Check periodically for filter updates (when filter system might not dispatch events)
-    setInterval(checkFilterUpdates, 2000);
+    // Listen for filter updates from header system - removed setInterval to prevent infinite loop
+    // Filter updates are handled via event listeners above
   }
 
   // Setup section open listeners after DOM is ready
@@ -109,10 +101,10 @@ function setupSectionOpenListeners() {
     // Use MutationObserver to watch for section body display changes
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+        if (mutation.type === 'attributes' && (mutation.attributeName === 'class' || mutation.attributeName === 'style')) {
           const sectionBody = accountActivitySummarySection.querySelector('.section-body');
           if (sectionBody) {
-            const isVisible = sectionBody.style.display !== 'none' && 
+            const isVisible = !sectionBody.classList.contains('d-none') && 
                              window.getComputedStyle(sectionBody).display !== 'none';
             if (isVisible) {
               window.Logger.info('📂 account-activity-summary section opened', { page: 'trading_accounts' });
@@ -158,10 +150,10 @@ function setupSectionOpenListeners() {
   if (accountActivityTableSection) {
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+        if (mutation.type === 'attributes' && (mutation.attributeName === 'class' || mutation.attributeName === 'style')) {
           const sectionBody = accountActivityTableSection.querySelector('.section-body');
           if (sectionBody) {
-            const isVisible = sectionBody.style.display !== 'none' && 
+            const isVisible = !sectionBody.classList.contains('d-none') && 
                              window.getComputedStyle(sectionBody).display !== 'none';
             if (isVisible) {
               window.Logger.info('📂 account-activity-table section opened', { page: 'trading_accounts' });
@@ -229,43 +221,39 @@ async function populateAccountSelector(autoSelectDefault = false) {
         // Get default account from preferences - use PreferencesCore first, then fallback
         let defaultAccountId = null;
 
-        // Try PreferencesCore first (preferred method)
+        // Get default account from PreferencesCore (single source of truth)
+        // NOTE: Removed fallback to window.getPreference to prevent recursion
+        // window.getPreference just calls PreferencesCore.getPreference again, causing recursion
         if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
           try {
             const prefValue = await window.PreferencesCore.getPreference('default_trading_account');
             if (prefValue) {
-              const parsed = parseInt(prefValue);
-              if (!isNaN(parsed)) {
-                defaultAccountId = parsed;
-                window.Logger.info(`✅ Got default account from PreferencesCore: ${defaultAccountId}`, { page: 'trading_accounts' });
+              // Handle different value types
+              let accountId = null;
+              if (typeof prefValue === 'object' && prefValue !== null) {
+                // If it's an object, try to get id or value property
+                accountId = prefValue.id || prefValue.value || null;
+              } else {
+                // Try to parse as integer ID first
+                const parsed = parseInt(prefValue);
+                if (!isNaN(parsed)) {
+                  accountId = parsed;
+                } else {
+                  // Try to find account by name
+                  const account = window.trading_accountsData?.find(acc => acc.name === prefValue);
+                  if (account) {
+                    accountId = account.id;
+                  }
+                }
+              }
+              
+              if (accountId) {
+                defaultAccountId = accountId;
+                window.Logger.debug(`✅ Got default account from PreferencesCore: ${defaultAccountId}`, { page: 'trading_accounts' });
               }
             }
           } catch (e) {
             window.Logger.warn('⚠️ Error getting default account from PreferencesCore:', e, { page: 'trading_accounts' });
-          }
-        }
-
-        // Fallback to window.getPreference if PreferencesCore didn't work
-        if (!defaultAccountId && typeof window.getPreference === 'function') {
-          try {
-            const prefValue = await window.getPreference('default_trading_account');
-            if (prefValue) {
-              // Try to parse as integer ID first
-              const parsed = parseInt(prefValue);
-              if (!isNaN(parsed)) {
-                defaultAccountId = parsed;
-                window.Logger.info(`✅ Got default account from window.getPreference: ${defaultAccountId}`, { page: 'trading_accounts' });
-              } else {
-                // Try to find account by name
-                const account = window.trading_accountsData.find(acc => acc.name === prefValue);
-                if (account) {
-                  defaultAccountId = account.id;
-                  window.Logger.info(`✅ Found default account by name: ${defaultAccountId}`, { page: 'trading_accounts' });
-                }
-              }
-            }
-          } catch (e) {
-            window.Logger.warn('⚠️ Error getting default account from window.getPreference:', e, { page: 'trading_accounts' });
           }
         }
 
@@ -326,7 +314,6 @@ async function handleAccountSelection(event) {
   // Show section bodies and ensure they're visible
   const summaryBody = document.querySelector('[data-section="account-activity-summary"] .section-body');
   if (summaryBody) {
-    summaryBody.style.display = 'block';
     summaryBody.classList.remove('d-none');
     // Ensure statistics card is visible
     const statsCard = document.getElementById('accountActivityStatisticsCard');
@@ -339,7 +326,6 @@ async function handleAccountSelection(event) {
   }
   const tableBody = document.querySelector('[data-section="account-activity-table"] .section-body');
   if (tableBody) {
-    tableBody.style.display = 'block';
     tableBody.classList.remove('d-none');
   }
 
@@ -771,9 +757,7 @@ function renderMovementRow(movement, runningBalance) {
     const symbol = movement.ticker_symbol.trim();
     if (symbol && window.showEntityDetails && movement.ticker_id) {
       const span = document.createElement('span');
-      span.style.cursor = 'pointer';
-      span.style.color = 'var(--primary-color, #26baac)';
-      span.style.textDecoration = 'underline';
+      span.className = 'ticker-link-clickable';
       span.onclick = function() {
         if (window.showEntityDetails) {
           window.showEntityDetails('ticker', movement.ticker_id);
@@ -859,15 +843,9 @@ function renderMovementRow(movement, runningBalance) {
     actionsCell.appendChild(span);
   } else {
     const button = document.createElement('button');
-    button.className = 'btn btn-sm';
+    button.className = 'btn btn-sm btn-view-details';
     button.onclick = function() { openMovementDetails(movement.id, movement.type); };
     button.title = 'פרטים';
-    button.style.width = '2.5em';
-    button.style.height = '2.5em';
-    button.style.padding = '0';
-    button.style.display = 'inline-flex';
-    button.style.alignItems = 'center';
-    button.style.justifyContent = 'center';
     button.textContent = '👁️';
     actionsCell.appendChild(button);
   }
@@ -1100,12 +1078,8 @@ function updateActivitySummary(data) {
         textContent: dateRangeDisplay,
         page: 'trading_accounts' 
       });
-    } else {
-      window.Logger.warn('⚠️ [updateActivitySummary] summaryDateRange element not found', { 
-        searchedId: 'accountActivitySelectedRange',
-        page: 'trading_accounts' 
-      });
     }
+    // Element might not exist if section is closed - this is OK, no warning needed
   }
 
   // Update table count (always update, even if no data - show 0)
@@ -1251,7 +1225,7 @@ function updateCurrencyBalancesFooter(data) {
     baseTotalCell.innerHTML += ratesText;
   }
 
-  footer.style.display = 'table-row-group';
+  footer.classList.remove('d-none');
 }
 
 /**
@@ -1295,7 +1269,7 @@ function clearActivityTable() {
 
   const footer = document.getElementById('accountActivityFooter');
   if (footer) {
-    footer.style.display = 'none';
+    footer.classList.add('d-none');
   }
 
   const tableCount = document.getElementById('accountActivityCount');
@@ -1365,6 +1339,7 @@ function getSubtypeDisplay(subtype) {
     'dividend': 'דיבידנד',
     'interest': 'ריבית',
     'syep_interest': 'ריבית SYEP',
+    'interest_all': 'ריבית',  // Unified interest (interest + syep_interest)
     'transfer_in': 'העברה פנימה',
     'transfer_out': 'העברה החוצה',
     'currency_exchange_from': 'המרת מט״ח - יציאה',
@@ -1427,9 +1402,11 @@ function normalizeAmountBySubtype(amount, type, subtype) {
     }
 
     // Interest can be positive or negative - keep original sign
+    // Also handle unified 'interest_all' (interest + syep_interest)
     if (
       subTypeValue === 'interest' ||
       subTypeValue === 'syep_interest' ||
+      subTypeValue === 'interest_all' ||
       subTypeValue === 'ריבית' ||
       subTypeValue === 'ריבית syep'
     ) {
@@ -1682,8 +1659,9 @@ function calculateActivityStatistics() {
         subtype = 'dividend';
       } else if (subtype === 'transfer' || subtype === 'transfer_in' || subtype === 'transfer_out' || subtype === 'העברה') {
         subtype = 'transfer';
-      } else if (subtype === 'interest' || subtype === 'syep_interest' || subtype === 'ריבית') {
-        subtype = subtype === 'syep_interest' ? 'syep_interest' : 'interest';
+      } else if (subtype === 'interest' || subtype === 'syep_interest' || subtype === 'ריבית' || subtype === 'ריבית syep') {
+        // Merge 'interest' and 'syep_interest' into 'interest_all' (like deposits_withdrawals)
+        subtype = 'interest_all';
       } else if (subtype === 'other' || subtype === 'other_positive' || subtype === 'other_negative' || subtype === 'אחר') {
         subtype = 'other';
       }
@@ -1841,7 +1819,7 @@ function updateActivityStatistics() {
   });
 
   // Always show card, even if no data (will show "אין נתונים להצגה")
-  statsCard.style.display = 'block';
+  statsCard.classList.remove('d-none');
 
   // Calculate overall statistics (combining cash flows + executions)
   const overallStats = combineStatistics(stats.cashFlows, stats.executions);
@@ -2072,8 +2050,10 @@ function combineStatistics(cashFlowsStats, executionsStats) {
 
 /**
  * Split cash flows statistics by column
- * Column 1: deposits_withdrawals, fee, dividend
- * Column 2: interest/SYEP interest, transfer, other
+ * NEW ORDER (by rows):
+ * Row 3: Col1 = deposits_withdrawals, Col2 = dividend
+ * Row 4: Col1 = fee, Col2 = interest + syep_interest
+ * Row 5: Col1 = transfer, Col2 = other
  * @param {Object} stats - Full cash flows statistics
  * @param {number} column - Column number (1 or 2)
  * @returns {Object} Filtered statistics object for the column
@@ -2085,8 +2065,12 @@ function splitCashFlowsByColumn(stats, column) {
     return stats;
   }
 
-  const column1Subtypes = ['deposits_withdrawals', 'fee', 'dividend'];
-  const column2Subtypes = ['transfer', 'interest', 'syep_interest', 'other'];
+  // NEW ORDER (by rows):
+  // Row 3: Col1 = deposits_withdrawals, Col2 = dividend
+  // Row 4: Col1 = fee, Col2 = interest_all (unified interest + syep_interest)
+  // Row 5: Col1 = transfer, Col2 = other
+  const column1Subtypes = ['deposits_withdrawals', 'fee', 'transfer'];
+  const column2Subtypes = ['dividend', 'interest_all', 'other'];
   window.Logger.info('🔵 [splitCashFlowsByColumn] Available subtypes', { 
     allSubtypes: Object.keys(stats.bySubtype),
     targetSubtypes: column === 1 ? column1Subtypes : column2Subtypes,
@@ -2096,6 +2080,7 @@ function splitCashFlowsByColumn(stats, column) {
   const targetSubtypes = column === 1 ? column1Subtypes : column2Subtypes;
 
   // Filter bySubtype to only include subtypes for this column
+  // IMPORTANT: Always create entries for all target subtypes, even if empty, so cards always display
   const filteredBySubtype = {};
   let totalCount = 0;
   let totalAmount = 0;
@@ -2106,6 +2091,7 @@ function splitCashFlowsByColumn(stats, column) {
 
   targetSubtypes.forEach(subtype => {
     if (stats.bySubtype[subtype]) {
+      // Subtype exists - use actual data
       filteredBySubtype[subtype] = stats.bySubtype[subtype];
       totalCount += stats.bySubtype[subtype].count || 0;
       totalAmount += stats.bySubtype[subtype].totalAmount || 0;
@@ -2114,6 +2100,24 @@ function splitCashFlowsByColumn(stats, column) {
       positiveCount += stats.bySubtype[subtype].positiveCount || 0;
       negativeCount += stats.bySubtype[subtype].negativeCount || 0;
       window.Logger.info('🔵 [splitCashFlowsByColumn] Added subtype', { subtype, count: stats.bySubtype[subtype].count || 0, page: 'trading_accounts' });
+    } else {
+      // Subtype doesn't exist - create empty entry so card always displays
+      filteredBySubtype[subtype] = {
+        count: 0,
+        totalAmount: 0,
+        movements: [],
+        positiveAmount: 0,
+        negativeAmount: 0,
+        positiveCount: 0,
+        negativeCount: 0,
+        firstAmount: 0,
+        lastAmount: 0,
+        percentageChange: 0,
+        amountChange: 0,
+        annualizedChange: 0,
+        daysInRange: 0
+      };
+      window.Logger.info('🔵 [splitCashFlowsByColumn] Created empty subtype entry', { subtype, page: 'trading_accounts' });
     }
   });
   window.Logger.info('🔵 [splitCashFlowsByColumn] RESULT', { 
@@ -2856,26 +2860,30 @@ function renderBreakdownBySubtype(stats, typeName, column) {
     html += '<div class="statistics-breakdown">';
 
     // Sort subtypes in specific order for cash flows:
-    // 1. deposits_withdrawals (הפקדה ומשיכה)
-    // 2. fee (עמלה)
-    // 3. dividend (דיבידנד)
-    // 4. transfer (העברה)
-    // 5. interest (ריבית) + syep_interest
-    // 6. other (אחר)
+    // NEW ORDER (by rows):
+    // Row 3: Col1 = deposits_withdrawals, Col2 = dividend
+    // Row 4: Col1 = fee, Col2 = interest + syep_interest
+    // Row 5: Col1 = transfer, Col2 = other
+    // Column 1 order: deposits_withdrawals, fee, transfer
+    // Column 2 order: dividend, interest, syep_interest, other
     // For executions: keep alphabetical order (buy/sell)
-    const subtypeOrder = [
-        'deposits_withdrawals',
-        'fee',
-        'dividend',
-        'transfer_in',
-        'transfer_out',
-        'currency_exchange_from',
-        'currency_exchange_to',
-        'interest',
-        'syep_interest',
-        'other_positive',
-        'other_negative'
-    ];
+    const subtypeOrder = column === 1 
+      ? [
+          'deposits_withdrawals',  // Row 3, Col 1
+          'fee',                   // Row 4, Col 1
+          'transfer',              // Row 5, Col 1
+          'transfer_in',
+          'transfer_out'
+        ]
+      : [
+          'dividend',              // Row 3, Col 2
+          'interest_all',          // Row 4, Col 2 (unified interest + syep_interest)
+          'other',                 // Row 5, Col 2
+          'other_positive',
+          'other_negative',
+          'currency_exchange_from',
+          'currency_exchange_to'
+        ];
     const subtypes = Object.keys(stats.bySubtype).sort((a, b) => {
       if (isExecution) {
         // For executions: alphabetical order
@@ -2963,11 +2971,12 @@ function renderBreakdownBySubtype(stats, typeName, column) {
       // Card 2: שינוי או ממוצע (unified - all three metrics in one card)
       // For executions: show average per action instead of change
       // For cash flows: show change as before
-      if (isExecution && subtypeStats.count > 0) {
+      // IMPORTANT: Always show Card 2, even if count is 0 (will show 0 values)
+      if (isExecution) {
         // Executions: Show average per action
         html += '<div class="statistics-card-item">';
 
-        const subtypeAveragePerAction = subtypeStats.totalAmount / subtypeStats.count;
+        const subtypeAveragePerAction = subtypeStats.count > 0 ? subtypeStats.totalAmount / subtypeStats.count : 0;
         const subtypeAverageHtml = window.FieldRendererService && window.FieldRendererService.renderAmount
           ? window.FieldRendererService.renderAmount(subtypeAveragePerAction, currencySymbol, 0, true)
           : `<span>${subtypeAveragePerAction >= 0 ? '+' : ''}${subtypeAveragePerAction.toFixed(0)}${currencySymbol}</span>`;
@@ -3029,7 +3038,8 @@ function renderBreakdownBySubtype(stats, typeName, column) {
         html += `<div class="statistics-card-col statistics-card-col-end">שנתי משוער: <strong>${subtypeAnnualAmountChangeHtml}</strong> | <strong class="${subtypeAnnualPctClass}">${subtypeAnnualPercentageDisplay}</strong></div>`;
         html += '</div>';
         html += '</div>';
-      } else if (!isExecution && subtypeStats.count > 0) {
+      } else if (!isExecution) {
+        // Cash flows: Always show Card 2, even if count is 0 (will show 0 values)
         // Cash flows: Show average per action (same as executions)
         html += '<div class="statistics-card-item">';
 
@@ -3178,31 +3188,45 @@ function setupStatisticsFilterHook() {
   const table = document.getElementById('accountActivityTable');
   if (!table) {return;}
 
+  // Track last update to prevent unnecessary calls
+  let lastUpdateTime = 0;
+  const MIN_UPDATE_INTERVAL = 1000; // Minimum 1 second between updates
+
   // Create observer to watch for row visibility changes
   const observer = new MutationObserver(() => {
+    const now = Date.now();
+    // Skip if updated recently to prevent excessive updates
+    if (now - lastUpdateTime < MIN_UPDATE_INTERVAL) {
+      return;
+    }
+
     // Debounce to avoid excessive updates
     clearTimeout(window.accountActivityState.statsUpdateTimeout);
     window.accountActivityState.statsUpdateTimeout = setTimeout(() => {
+      const now2 = Date.now();
+      // Double-check to prevent race conditions
+      if (now2 - lastUpdateTime < MIN_UPDATE_INTERVAL) {
+        return;
+      }
+      lastUpdateTime = now2;
+
       if (window.updateActivityStatistics) {
         window.updateActivityStatistics();
       }
-      // Also update activity summary to refresh date range in title
+      // Only update activity summary if data exists - don't call with null unnecessarily
       if (window.accountActivityState && window.accountActivityState.activityData) {
         updateActivitySummary(window.accountActivityState.activityData);
-      } else {
-        updateActivitySummary(null);
       }
     }, 300);
   });
 
-  // Observe changes in tbody
+  // Observe changes in tbody - only childList to prevent infinite loops from style changes
   const tbody = table.querySelector('tbody');
   if (tbody) {
     observer.observe(tbody, {
       childList: true,
       subtree: true,
-      attributes: true,
-      attributeFilter: ['style', 'data-movement-type'],
+      // Removed attributes: true to prevent infinite loops from style/attribute changes
     });
   }
 
@@ -3232,22 +3256,8 @@ function setupStatisticsFilterHook() {
   }
 }
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-      if (typeof window.initAccountActivity === 'function') {
-        window.initAccountActivity();
-      }
-    }, 1000);
-  });
-} else {
-  setTimeout(() => {
-    if (typeof window.initAccountActivity === 'function') {
-      window.initAccountActivity();
-    }
-  }, 1000);
-}
+// NOTE: initAccountActivity is now called by page-initialization-configs.js
+// Do not auto-initialize here to avoid duplicate calls
 
 // Export functions globally
 window.loadAccountActivity = loadAccountActivity;

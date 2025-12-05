@@ -325,7 +325,7 @@ class DataCollectionService {
     static getValue(fieldId, type = 'text', defaultValue = null) {
         const element = document.getElementById(fieldId);
         if (!element) {
-            console.warn(`⚠️ שדה ${fieldId} לא נמצא`);
+            // Silent return - it's normal for fields to not exist on some pages
             return defaultValue;
         }
         

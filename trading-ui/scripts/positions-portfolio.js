@@ -307,10 +307,10 @@ function setupPositionsSectionOpenListener() {
     // Use MutationObserver to watch for section body display changes
     const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+            if (mutation.type === 'attributes' && (mutation.attributeName === 'class' || mutation.attributeName === 'style')) {
                 const sectionBody = positionsSection.querySelector('.section-body');
                 if (sectionBody) {
-                    const isVisible = sectionBody.style.display !== 'none' && 
+                    const isVisible = !sectionBody.classList.contains('d-none') && 
                                      window.getComputedStyle(sectionBody).display !== 'none';
                     if (isVisible) {
                         window.Logger.info('📂 positions-portfolio section opened', { page: "trading_accounts" });
@@ -384,41 +384,39 @@ async function populatePositionsAccountSelector(autoSelectDefault = false) {
             try {
                 let defaultAccountId = null;
                 
-                // Try PreferencesCore first (preferred method)
+                // Get default account from PreferencesCore (single source of truth)
+                // NOTE: Removed fallback to window.getPreference to prevent recursion
+                // window.getPreference just calls PreferencesCore.getPreference again, causing recursion
                 if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
                     try {
                         const prefValue = await window.PreferencesCore.getPreference('default_trading_account');
                         if (prefValue) {
-                            const parsed = parseInt(prefValue);
-                            if (!isNaN(parsed)) {
-                                defaultAccountId = parsed;
-                                window.Logger.info(`✅ Got default account from PreferencesCore: ${defaultAccountId}`, { page: 'trading_accounts' });
+                            // Handle different value types
+                            let accountId = null;
+                            if (typeof prefValue === 'object' && prefValue !== null) {
+                                // If it's an object, try to get id or value property
+                                accountId = prefValue.id || prefValue.value || null;
+                            } else {
+                                // Try to parse as integer ID first
+                                const parsed = parseInt(prefValue);
+                                if (!isNaN(parsed)) {
+                                    accountId = parsed;
+                                } else {
+                                    // Try to find account by name
+                                    const tradingAccount = window.trading_accountsData?.find(acc => acc.name === prefValue);
+                                    if (tradingAccount) {
+                                        accountId = tradingAccount.id;
+                                    }
+                                }
+                            }
+                            
+                            if (accountId) {
+                                defaultAccountId = accountId;
+                                window.Logger.debug(`✅ Got default account from PreferencesCore: ${defaultAccountId}`, { page: 'trading_accounts' });
                             }
                         }
                     } catch (e) {
                         window.Logger.warn('⚠️ Error getting default account from PreferencesCore:', e, { page: 'trading_accounts' });
-                    }
-                }
-                
-                // Fallback to window.getPreference if PreferencesCore didn't work
-                if (!defaultAccountId && typeof window.getPreference === 'function') {
-                    try {
-                        const prefValue = await window.getPreference('default_trading_account');
-                        if (prefValue) {
-                            const parsed = parseInt(prefValue);
-                            if (!isNaN(parsed)) {
-                                defaultAccountId = parsed;
-                                window.Logger.info(`✅ Got default account from window.getPreference: ${defaultAccountId}`, { page: 'trading_accounts' });
-                            } else {
-                                const tradingAccount = window.trading_accountsData.find(acc => acc.name === prefValue);
-                                if (tradingAccount) {
-                                    defaultAccountId = tradingAccount.id;
-                                    window.Logger.info(`✅ Found default account by name: ${defaultAccountId}`, { page: 'trading_accounts' });
-                                }
-                            }
-                        }
-                    } catch (e) {
-                        window.Logger.warn('⚠️ Error getting default account from window.getPreference:', e, { page: 'trading_accounts' });
                     }
                 }
                 
@@ -476,7 +474,6 @@ async function handlePositionsAccountSelection(event) {
     // Show section body to ensure table is visible
     const sectionBody = document.querySelector('[data-section="positions-portfolio"] .section-body');
     if (sectionBody) {
-        sectionBody.style.display = 'block';
         // Remove d-none class if present
         sectionBody.classList.remove('d-none');
     }
@@ -575,21 +572,21 @@ async function loadAccountPositions(accountId) {
         
         // Show/hide elements based on data availability
         if (positions.length > 0) {
-            if (separatorElement) separatorElement.style.display = 'inline';
-            if (totalValueElement) totalValueElement.style.display = 'inline';
+            if (separatorElement) separatorElement.classList.remove('d-none');
+            if (totalValueElement) totalValueElement.classList.remove('d-none');
             if (totalValueAmountElement) {
                 totalValueAmountElement.textContent = formatCurrencyHebrew(totalPositionsValue, false, true);
             }
-            if (separator2Element) separator2Element.style.display = 'inline';
-            if (accountTotalElement) accountTotalElement.style.display = 'inline';
+            if (separator2Element) separator2Element.classList.remove('d-none');
+            if (accountTotalElement) accountTotalElement.classList.remove('d-none');
             if (accountTotalAmountElement) {
                 accountTotalAmountElement.textContent = formatCurrencyHebrew(accountTotalValue, false, true);
             }
         } else {
-            if (separatorElement) separatorElement.style.display = 'none';
-            if (totalValueElement) totalValueElement.style.display = 'none';
-            if (separator2Element) separator2Element.style.display = 'none';
-            if (accountTotalElement) accountTotalElement.style.display = 'none';
+            if (separatorElement) separatorElement.classList.add('d-none');
+            if (totalValueElement) totalValueElement.classList.add('d-none');
+            if (separator2Element) separator2Element.classList.add('d-none');
+            if (accountTotalElement) accountTotalElement.classList.add('d-none');
         }
         
         // Render table
@@ -1585,10 +1582,10 @@ function clearPositionsTable() {
     if (countTextElement) {
         countTextElement.textContent = 'בחר חשבון מסחר...';
     }
-    if (separatorElement) separatorElement.style.display = 'none';
-    if (totalValueElement) totalValueElement.style.display = 'none';
-    if (separator2Element) separator2Element.style.display = 'none';
-    if (accountTotalElement) accountTotalElement.style.display = 'none';
+    if (separatorElement) separatorElement.classList.add('d-none');
+    if (totalValueElement) totalValueElement.classList.add('d-none');
+    if (separator2Element) separator2Element.classList.add('d-none');
+    if (accountTotalElement) accountTotalElement.classList.add('d-none');
 }
 
 // Export for external use

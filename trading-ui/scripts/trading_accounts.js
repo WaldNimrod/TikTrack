@@ -220,24 +220,8 @@ window.loadTradingAccountsDataForTradingAccountsPage = async function(passedOpti
 
     // Start parallel loading of data for closed sections (non-blocking)
     // This happens in background after main table is displayed
+    // NOTE: initAccountActivity and initPositionsPortfolio are now handled by page-initialization-configs.js
     Promise.all([
-      // Load account selectors in parallel
-      (async () => {
-        try {
-          window.Logger.info('🔄 Starting parallel loading: Account selectors', { page: "trading_accounts" });
-          // Initialize account activity system (populates selector)
-          if (typeof window.initAccountActivity === 'function') {
-            await window.initAccountActivity(true); // true = auto-select default account from preferences
-          }
-          // Initialize positions portfolio system (populates selector)
-          if (typeof window.initPositionsPortfolio === 'function') {
-            await window.initPositionsPortfolio(true); // true = auto-select default account from preferences
-          }
-          window.Logger.info('✅ Parallel loading completed: Account selectors', { page: "trading_accounts" });
-        } catch (error) {
-          window.Logger.error('❌ Error in parallel loading account selectors:', error, { page: "trading_accounts" });
-        }
-      })(),
       // Preload account activity data if default account is selected (non-blocking)
       (async () => {
         try {
@@ -468,7 +452,7 @@ async function generateCurrencyOptions(tradingAccount = null) {
  * @returns {Promise<Array>} Array of trading accounts
  */
 async function loadTradingAccountsFromServer(options = {}) {
-  window.Logger.info('🚀🚀🚀 loadTradingAccountsFromServer התחיל 🚀🚀🚀', { page: "trading_accounts" });
+  window.Logger.debug('📡 Loading trading accounts from server', { page: "trading_accounts" });
   try {
     const allTradingAccounts = await loadTradingAccountsData(options);
     window.Logger.info('📊 כל החשבונות המסחר:', allTradingAccounts.length, 'חשבונות', { page: "trading_accounts" });
@@ -768,7 +752,7 @@ function updateTradingAccountsTable(trading_accounts) {
   isUpdatingTradingAccountsTable = true;
 
   try {
-    window.Logger.info('🚀🚀🚀 updateTradingAccountsTable התחיל עם', trading_accounts ? trading_accounts.length : 0, 'חשבונות 🚀🚀🚀', { page: "trading_accounts" });
+    window.Logger.debug('📊 Updating trading accounts table', { accountsCount: trading_accounts ? trading_accounts.length : 0, page: "trading_accounts" });
 
     if (!Array.isArray(trading_accounts)) {
       window.Logger.error('❌ פרמטר חשבונות לא תקין:', trading_accounts, { page: "trading_accounts" });
@@ -2286,41 +2270,8 @@ function showTradingAccountDetails(tradingAccountId) {
 // ייצוא הפונקציה לגלובל
 window.showTradingAccountDetails = showTradingAccountDetails;
 
-// הוספת timeout לאתחול - אחרי שהפונקציות מיוצאות
-setTimeout(() => {
-  window.Logger.info('⏰ Timeout 2 שניות - מתחיל אתחול', { page: "trading_accounts" });
-  if (window.location.pathname.includes('/trading_accounts')) {
-    window.Logger.info('🎯 נמצאים בדף החשבונות - מתחיל טעינת נתונים', { page: "trading_accounts" });
-    window.Logger.info('🔍 בדיקת זמינות פונקציות:', { page: "trading_accounts" });
-    window.Logger.info('  - loadTradingAccountsDataForTradingAccountsPage:', typeof window.loadTradingAccountsDataForTradingAccountsPage, { page: "trading_accounts" });
-    window.Logger.info('  - apiCall:', typeof window.apiCall, { page: "trading_accounts" });
-    window.Logger.info('  - updateTradingAccountsTable:', typeof window.updateTradingAccountsTable, { page: "trading_accounts" });
-    
-    if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
-      window.Logger.info('📡 קורא ל-loadTradingAccountsDataForTradingAccountsPage', { page: "trading_accounts" });
-      window.loadTradingAccountsDataForTradingAccountsPage();
-    } else {
-      window.Logger.error('❌ loadTradingAccountsDataForTradingAccountsPage לא נמצאה', { page: "trading_accounts" });
-      window.Logger.info('🔍 ניסיון לטעון נתונים ישירות...', { page: "trading_accounts" });
-      
-      loadTradingAccountsData()
-        .then(async data => {
-          window.Logger.info('✅ נתונים נטענו ישירות:', data, { page: "trading_accounts" });
-          if (data && data.length > 0) {
-            window.Logger.info('📊 עדכון טבלה עם', data.length, 'רשומות', { page: "trading_accounts" });
-            if (typeof window.updateTradingAccountsTable === 'function') {
-              window.updateTradingAccountsTable(data);
-            } else {
-              window.Logger.error('❌ updateTradingAccountsTable לא נמצאה', { page: "trading_accounts" });
-            }
-          }
-        })
-        .catch(error => {
-          window.Logger.error('❌ שגיאה בטעינת נתונים ישירה:', error, { page: "trading_accounts" });
-        });
-    }
-  }
-}, 2000);
+// NOTE: Initialization is now handled by page-initialization-configs.js
+// Removed duplicate timeout initialization to avoid double loading
 
 window.Logger.info('✅ trading_accounts.js נטען בהצלחה', { page: "trading_accounts", keepInfo: true });
 

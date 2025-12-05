@@ -675,11 +675,9 @@ async function resetRecordFiltersToDefaults() {
                 }
             } else if (window.currentPreferences?.default_trading_account) {
                 defaultAccountId = parseInt(window.currentPreferences.default_trading_account);
-            } else if (typeof window.getPreference === 'function') {
-                const prefValue = await window.getPreference('default_trading_account');
-                if (prefValue) {
-                    defaultAccountId = parseInt(prefValue);
-                }
+            }
+            // NOTE: Removed fallback to window.getPreference to prevent recursion
+            // window.getPreference just calls PreferencesCore.getPreference again, causing recursion
             }
         } catch (error) {
             if (window.Logger) {
@@ -2839,11 +2837,9 @@ async function loadTradingAccounts() {
                 }
             } else if (window.currentPreferences?.default_trading_account) {
                 defaultAccountId = parseInt(window.currentPreferences.default_trading_account);
-            } else if (typeof window.getPreference === 'function') {
-                const prefValue = await window.getPreference('default_trading_account');
-                if (prefValue) {
-                    defaultAccountId = parseInt(prefValue);
-                }
+            }
+            // NOTE: Removed fallback to window.getPreference to prevent recursion
+            // window.getPreference just calls PreferencesCore.getPreference again, causing recursion
             }
             
             // Select default account if found

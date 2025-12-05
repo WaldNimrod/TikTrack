@@ -178,7 +178,9 @@ CASH_FLOW_TYPES = [
     'dividend',
     'interest',
     'transfer_in',
-    'transfer_out'
+    'transfer_out',
+    'currency_exchange_from',  # המרת מטבע - יציאה (מצמדים)
+    'currency_exchange_to'     # המרת מטבע - כניסה (מצמדים)
 ]
 
 # Alert related types
@@ -604,7 +606,7 @@ class DemoDataGenerator:
             self.note_relation_types_cache[nt.note_relation_type] = nt.id
     
     def _create_tickers(self) -> None:
-        """יוצר טיקרים"""
+        """יוצר טיקרים - רק טיקרים תקינים עם נתונים חיצוניים זמינים"""
         print(f"\n📈 יוצר {self.config['tickers']['count']} טיקרים...")
         
         count = self.config['tickers']['count']
@@ -626,81 +628,94 @@ class DemoDataGenerator:
         # Get existing ticker symbols to avoid duplicates
         existing_symbols = {t.symbol for t in self.db.query(Ticker.symbol).all()}
         
-        # Shuffle sample tickers and filter out existing ones (especially SPY)
-        available_tickers = [t for t in SAMPLE_TICKERS if t[0] not in existing_symbols]
-        random.shuffle(available_tickers)
+        # Filter SAMPLE_TICKERS by currency and exclude existing ones
+        # CRITICAL: Only use tickers from SAMPLE_TICKERS - these have real market data available
+        available_usd_tickers = [t for t in SAMPLE_TICKERS 
+                                 if t[3] == 'USD' and t[0] not in existing_symbols]
+        available_other_tickers = {curr: [t for t in SAMPLE_TICKERS 
+                                          if t[3] == curr and t[0] not in existing_symbols]
+                                  for curr in set(t[3] for t in SAMPLE_TICKERS) if curr != 'USD'}
+        
+        # Shuffle to randomize selection
+        random.shuffle(available_usd_tickers)
+        for curr in available_other_tickers:
+            random.shuffle(available_other_tickers[curr])
+        
+        # Check if we have enough valid tickers
+        max_available_usd = len(available_usd_tickers)
+        max_available_other = sum(len(tickers) for tickers in available_other_tickers.values())
+        max_available_total = max_available_usd + max_available_other
+        
+        if max_available_total < count:
+            print(f"   ⚠️  אזהרה: מבוקשים {count} טיקרים, אבל רק {max_available_total} טיקרים תקינים זמינים")
+            print(f"      יווצרו רק {max_available_total} טיקרים תקינים (לא יווצרו טיקרים 'DEMO' ללא נתונים)")
+            count = max_available_total
+            usd_count = min(usd_count, max_available_usd)
+        
+        if max_available_usd < usd_count:
+            print(f"   ⚠️  אזהרה: מבוקשים {usd_count} טיקרים USD, אבל רק {max_available_usd} זמינים")
+            print(f"      יווצרו רק {max_available_usd} טיקרים USD")
+            usd_count = max_available_usd
         
         created = 0
         
-        # Create USD tickers
-        for i in range(min(usd_count, len(available_tickers))):
-            symbol, name, ticker_type, currency = available_tickers[i]
-            if currency == 'USD':
-                ticker = Ticker(
-                    symbol=symbol,
-                    name=name,
-                    type=ticker_type,
-                    currency_id=usd_currency.id,
-                    status='open',
-                    active_trades=False
-                )
-                self.db.add(ticker)
-                created += 1
-        
-        # Fill remaining USD tickers with random data
-        demo_counter = 1
-        for i in range(usd_count - created):
-            # Find a unique symbol
-            while True:
-                symbol = f"DEMO{demo_counter}"
-                if symbol not in existing_symbols:
-                    existing_symbols.add(symbol)  # Add to set to avoid duplicates in same run
-                    break
-                demo_counter += 1
-            
+        # Create USD tickers - ONLY from SAMPLE_TICKERS
+        for i in range(min(usd_count, len(available_usd_tickers))):
+            symbol, name, ticker_type, currency = available_usd_tickers[i]
             ticker = Ticker(
                 symbol=symbol,
-                name=f"Demo Stock {demo_counter}",
-                type=random.choice(['stock', 'etf']),
+                name=name,
+                type=ticker_type,
                 currency_id=usd_currency.id,
                 status='open',
                 active_trades=False
             )
             self.db.add(ticker)
             created += 1
-            demo_counter += 1
         
-        # Create other currency tickers
+        # Create other currency tickers - ONLY from SAMPLE_TICKERS
         other_count = count - usd_count
         for i in range(other_count):
             if not other_currencies:
-                # Fallback to USD if no other currencies
-                currency = usd_currency
+                # If no other currencies configured, use remaining USD tickers
+                if i < len(available_usd_tickers) - usd_count:
+                    symbol, name, ticker_type, _ = available_usd_tickers[usd_count + i]
+                    currency = usd_currency
+                else:
+                    # No more valid tickers available
+                    break
             else:
+                # Find ticker with matching currency
                 currency_symbol = random.choice(list(other_currencies.keys()))
                 currency = other_currencies[currency_symbol]
-            
-            # Find ticker from samples with matching currency (already filtered for existing)
-            matching_ticker = None
-            for sym, name, typ, curr in available_tickers:
-                if curr == currency.symbol:
-                    matching_ticker = (sym, name, typ, curr)
-                    available_tickers.remove((sym, name, typ, curr))  # Remove to avoid duplicates
-                    break
-            
-            if matching_ticker:
-                symbol, name, ticker_type, _ = matching_ticker
-            else:
-                # Find a unique symbol
-                demo_counter = 1
-                while True:
-                    symbol = f"DEMO{currency.symbol}{demo_counter}"
-                    if symbol not in existing_symbols:
-                        existing_symbols.add(symbol)  # Add to set to avoid duplicates in same run
+                
+                # Get available tickers for this currency
+                currency_tickers = available_other_tickers.get(currency_symbol, [])
+                if not currency_tickers:
+                    # Try other currencies or fallback to USD
+                    other_currency_symbols = [c for c in other_currencies.keys() 
+                                            if c in available_other_tickers and available_other_tickers[c]]
+                    if other_currency_symbols:
+                        currency_symbol = random.choice(other_currency_symbols)
+                        currency = other_currencies[currency_symbol]
+                        currency_tickers = available_other_tickers[currency_symbol]
+                    elif i < len(available_usd_tickers) - usd_count:
+                        # Fallback to USD
+                        symbol, name, ticker_type, _ = available_usd_tickers[usd_count + i]
+                        currency = usd_currency
+                    else:
+                        # No more valid tickers available
                         break
-                    demo_counter += 1
-                name = f"Demo {currency.symbol} Stock {demo_counter}"
-                ticker_type = 'stock'
+                
+                if currency_tickers:
+                    symbol, name, ticker_type, _ = currency_tickers.pop(0)
+                elif i < len(available_usd_tickers) - usd_count:
+                    # Fallback to USD
+                    symbol, name, ticker_type, _ = available_usd_tickers[usd_count + i]
+                    currency = usd_currency
+                else:
+                    # No more valid tickers available
+                    break
             
             ticker = Ticker(
                 symbol=symbol,
@@ -731,7 +746,7 @@ class DemoDataGenerator:
             self.relationship_manager.tickers.append(spy)
         
         self.created_count['tickers'] = created
-        print(f"   ✅ נוצרו {created} טיקרים")
+        print(f"   ✅ נוצרו {created} טיקרים תקינים (רק טיקרים עם נתונים חיצוניים זמינים)")
     
     def _create_user_tickers(self) -> None:
         """יוצר שיוכי טיקרים למשתמש דרך user_tickers"""
@@ -1276,7 +1291,9 @@ class DemoDataGenerator:
             'fee': 0,
             'interest': 0,
             'transfer_in': 0,
-            'transfer_out': 0
+            'transfer_out': 0,
+            'currency_exchange_from': 0,
+            'currency_exchange_to': 0
         }
         
         for account in self.relationship_manager.accounts:
@@ -1423,6 +1440,64 @@ class DemoDataGenerator:
                     self.db.add(transfer_out)
                     created += 1
                     cash_flow_types_created['transfer_out'] += 1
+            
+            # Currency exchange pairs (המרות מטבע - נוצרות מצמדים)
+            # Only create if we have multiple currencies available
+            all_available_currencies = list(self.currency_cache.values())
+            
+            # Create currency exchange pairs if we have at least 2 different currencies
+            if len(all_available_currencies) >= 2:
+                # Create currency exchange pairs - from one currency to another
+                for _ in range(random.randint(1, 3)):
+                    exchange_date = self.date_gen.generate_date('random')
+                    
+                    # Get two different currencies
+                    from_currency = random.choice(all_available_currencies)
+                    to_currency = random.choice([c for c in all_available_currencies if c.id != from_currency.id])
+                    
+                    if from_currency and to_currency:
+                            # Exchange amount in from_currency
+                            from_amount = round(random.uniform(1000, 10000), 2)
+                            # Simple exchange rate (in real system this would come from market data)
+                            exchange_rate = round(random.uniform(0.8, 1.2), 6)
+                            to_amount = round(from_amount * exchange_rate, 2)
+                            fee_amount = round(random.uniform(5, 25), 2)
+                            
+                            # FROM flow: negative amount, represents money leaving in from_currency
+                            exchange_from = CashFlow(
+                                user_id=self.user_cache.id,
+                                trading_account_id=account.id,
+                                type='currency_exchange_from',
+                                amount=-from_amount,  # Negative - money leaving
+                                fee_amount=fee_amount,
+                                date=exchange_date,
+                                currency_id=from_currency.id,
+                                usd_rate=1.0,  # Would be actual rate in real system
+                                source='manual',
+                                description=f"המרת מטבע מ-{from_currency.symbol} ל-{to_currency.symbol}",
+                                external_id=f"EXCHANGE_{exchange_date.strftime('%Y%m%d')}_{account.id}_{from_currency.id}_{to_currency.id}"
+                            )
+                            self.db.add(exchange_from)
+                            created += 1
+                            cash_flow_types_created['currency_exchange_from'] += 1
+                            
+                            # TO flow: positive amount, represents money entering in to_currency
+                            exchange_to = CashFlow(
+                                user_id=self.user_cache.id,
+                                trading_account_id=account.id,
+                                type='currency_exchange_to',
+                                amount=to_amount,  # Positive - money entering
+                                fee_amount=0,  # Fee is stored in FROM flow
+                                date=exchange_date,
+                                currency_id=to_currency.id,
+                                usd_rate=1.0,  # Would be actual rate in real system
+                                source='manual',
+                                description=f"המרת מטבע מ-{from_currency.symbol} ל-{to_currency.symbol}",
+                                external_id=f"EXCHANGE_{exchange_date.strftime('%Y%m%d')}_{account.id}_{from_currency.id}_{to_currency.id}"
+                            )
+                            self.db.add(exchange_to)
+                            created += 1
+                            cash_flow_types_created['currency_exchange_to'] += 1
         
         self.created_count['cash_flows'] = created
         
@@ -1431,6 +1506,41 @@ class DemoDataGenerator:
         print(f"   ✅ נוצרו {created} תזרימי מזומן")
         if self.verbose:
             print(f"      - סוגים: {types_summary}")
+    
+    def _load_external_market_data(self) -> None:
+        """טוען נתוני שוק חיצוניים ראשוניים לכל הטיקרים שנוצרו"""
+        print(f"\n📡 טוען נתוני שוק חיצוניים ראשוניים...")
+        
+        try:
+            from scripts.load_market_data_for_tickers import MarketDataLoader
+            
+            # Get all tickers created in this run (or all tickers if none were created)
+            if self.created_tickers_in_this_run:
+                ticker_symbols = [t.symbol for t in self.created_tickers_in_this_run if t.symbol]
+            else:
+                # If no tickers were created in this run, load for all open tickers
+                ticker_symbols = None
+            
+            if not ticker_symbols:
+                print("   ℹ️  אין טיקרים לטעינת נתונים חיצוניים")
+                return
+            
+            print(f"   טוען נתונים עבור {len(ticker_symbols)} טיקרים...")
+            
+            # Create loader and load data
+            loader = MarketDataLoader(self.db, dry_run=self.dry_run)
+            loader.load_data_for_all_tickers(ticker_symbols)
+            loader.print_summary()
+            
+        except ImportError as e:
+            print(f"   ⚠️  לא ניתן לייבא את MarketDataLoader: {e}")
+            print(f"      ודא שהסקריפט load_market_data_for_tickers.py קיים")
+        except Exception as e:
+            print(f"   ⚠️  שגיאה בטעינת נתונים חיצוניים: {e}")
+            if self.verbose:
+                import traceback
+                traceback.print_exc()
+            # Don't raise - allow data generation to complete even if external data loading fails
     
     def _create_alerts(self) -> None:
         """יוצר התראות מרשימות ומפורטות"""
@@ -1630,6 +1740,48 @@ class DemoDataGenerator:
         self.created_count['alerts'] = created
         active_count = active_alerts_created if active_alerts_created > 0 else 0
         print(f"   ✅ נוצרו {created} התראות (מתוכן {active_count} התראות פעילות)")
+    
+    def _load_external_market_data(self) -> None:
+        """טוען נתוני שוק חיצוניים ראשוניים לכל הטיקרים שנוצרו"""
+        print(f"\n📡 טוען נתוני שוק חיצוניים ראשוניים...")
+        
+        try:
+            # Import here to avoid circular dependencies
+            import sys
+            import os
+            scripts_dir = os.path.dirname(os.path.abspath(__file__))
+            if scripts_dir not in sys.path:
+                sys.path.insert(0, scripts_dir)
+            
+            from load_market_data_for_tickers import MarketDataLoader
+            
+            # Get all tickers created in this run (or all tickers if none were created)
+            if self.created_tickers_in_this_run:
+                ticker_symbols = [t.symbol for t in self.created_tickers_in_this_run if t.symbol]
+            else:
+                # If no tickers were created in this run, load for all open tickers
+                ticker_symbols = None
+            
+            if not ticker_symbols:
+                print("   ℹ️  אין טיקרים לטעינת נתונים חיצוניים")
+                return
+            
+            print(f"   טוען נתונים עבור {len(ticker_symbols)} טיקרים...")
+            
+            # Create loader and load data
+            loader = MarketDataLoader(self.db, dry_run=self.dry_run)
+            loader.load_data_for_all_tickers(ticker_symbols)
+            loader.print_summary()
+            
+        except ImportError as e:
+            print(f"   ⚠️  לא ניתן לייבא את MarketDataLoader: {e}")
+            print(f"      ודא שהסקריפט load_market_data_for_tickers.py קיים")
+        except Exception as e:
+            print(f"   ⚠️  שגיאה בטעינת נתונים חיצוניים: {e}")
+            if self.verbose:
+                import traceback
+                traceback.print_exc()
+            # Don't raise - allow data generation to complete even if external data loading fails
     
     def _create_notes(self) -> None:
         """יוצר הערות מרשימות ומפורטות"""

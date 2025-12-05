@@ -212,6 +212,28 @@ def main():
                 # Continue with next user
                 continue
         
+        # Load external market data for all tickers (after all users)
+        print("\n" + "=" * 70)
+        print("📡 טוען נתוני שוק חיצוניים ראשוניים לכל הטיקרים...")
+        print("=" * 70)
+        
+        try:
+            from scripts.load_market_data_for_tickers import MarketDataLoader
+            
+            loader = MarketDataLoader(db, dry_run=args.dry_run)
+            loader.load_data_for_all_tickers()  # Load for all tickers
+            loader.print_summary()
+            
+        except ImportError as e:
+            print(f"   ⚠️  לא ניתן לייבא את MarketDataLoader: {e}")
+            print(f"      ודא שהסקריפט load_market_data_for_tickers.py קיים")
+        except Exception as e:
+            print(f"   ⚠️  שגיאה בטעינת נתונים חיצוניים: {e}")
+            if args.verbose:
+                import traceback
+                traceback.print_exc()
+            # Don't fail the entire process if external data loading fails
+        
         # Final summary
         print("\n" + "=" * 70)
         print("✅ יצירת נתוני דוגמה לכל המשתמשים הושלמה!")

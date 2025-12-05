@@ -110,9 +110,9 @@
      * @param {Object} [options={}] - Additional options
      * @param {number} [options.duration] - Notification duration
      * @param {string} [options.category] - Notification category
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    detailedError(title, userMessage, developerDetails = [], options = {}) {
+    async detailedError(title, userMessage, developerDetails = [], options = {}) {
       const developerSection = developerDetails.length
         ? `---\nמידע למפתח:\n${developerDetails.join('\n')}`
         : '';
@@ -446,6 +446,121 @@
   }
 
   /**
+   * Helper function to get UnifiedProgressManager instance
+   * @returns {Object|null} UnifiedProgressManager instance or null
+   */
+  function getProgressManager() {
+    if (window.UnifiedProgressManager) {
+      return window.UnifiedProgressManager;
+    }
+    // Fallback: try to get from global scope
+    if (typeof window.UnifiedProgressManager !== 'undefined') {
+      return window.UnifiedProgressManager;
+    }
+    return null;
+  }
+
+  /**
+   * Helper function to show progress overlay
+   * @param {string} overlayId - Overlay ID
+   * @param {number} step - Current step (1-based)
+   * @param {string} stepText - Step text
+   * @param {string} description - Step description
+   * @param {Object} config - Overlay configuration
+   * @param {Object} progressInfo - Additional progress info (timeEstimate, elapsedTime, etc.)
+   */
+  function showProgressOverlay(overlayId, step, stepText, description, config = {}, progressInfo = {}) {
+    const progressManager = getProgressManager();
+    if (progressManager) {
+      // Create overlay if it doesn't exist
+      if (!document.getElementById(overlayId)) {
+        progressManager.createOverlay(overlayId, {
+          title: config.title || 'תהליך בעבודה',
+          totalSteps: config.totalSteps || 4,
+          stepLabels: config.stepLabels || [],
+          stepDescriptions: config.stepDescriptions || [],
+          ...config
+        });
+      }
+      progressManager.showProgress(overlayId, step, stepText, description);
+      
+      // Update time estimate if provided
+      if (progressInfo.timeEstimate || progressInfo.elapsedTime) {
+        const overlay = document.getElementById(overlayId);
+        if (overlay) {
+          let timeInfoEl = overlay.querySelector(`.time-estimate`);
+          if (!timeInfoEl) {
+            // Create time estimate element if it doesn't exist
+            const currentStepEl = overlay.querySelector(`#${overlayId}CurrentStep`);
+            if (currentStepEl) {
+              timeInfoEl = document.createElement('div');
+              timeInfoEl.className = 'time-estimate text-muted small mt-2';
+              currentStepEl.appendChild(timeInfoEl);
+            }
+          }
+          
+          if (timeInfoEl) {
+            const parts = [];
+            if (progressInfo.elapsedTime) {
+              parts.push(`זמן שעבר: ${formatDurationMs(progressInfo.elapsedTime)}`);
+            }
+            if (progressInfo.timeEstimate) {
+              parts.push(`הערכת זמן נותר: ${formatDurationMs(progressInfo.timeEstimate)}`);
+            }
+            if (parts.length > 0) {
+              timeInfoEl.textContent = parts.join(' · ');
+              timeInfoEl.style.display = 'block';
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Helper function to hide progress overlay
+   * @param {string} overlayId - Overlay ID
+   */
+  function hideProgressOverlay(overlayId) {
+    const progressManager = getProgressManager();
+    if (progressManager) {
+      progressManager.hideProgress(overlayId);
+    }
+  }
+
+  /**
+   * Helper function to show final success notification with details
+   * @param {string} title - Success title
+   * @param {string} message - Success message
+   * @param {Object} details - Additional details
+   * @param {string} category - Category
+   */
+  async function showFinalSuccess(title, message, details = {}, category = 'external-data') {
+    if (typeof window.showFinalSuccessNotification === 'function') {
+      await window.showFinalSuccessNotification(title, message, details, category);
+    } else {
+      // Fallback to regular notification
+      notification.success(title, message);
+    }
+  }
+
+  /**
+   * Helper function to show final error notification with details
+   * @param {string} title - Error title
+   * @param {string} message - Error message
+   * @param {Object} details - Additional details
+   * @param {string} category - Category
+   */
+  async function showFinalError(title, message, details = {}, category = 'external-data') {
+    if (typeof window.showCriticalErrorNotification === 'function') {
+      await window.showCriticalErrorNotification(title, message, details, category);
+    } else {
+      // Fallback to regular notification
+      notification.error(title, message);
+    }
+  }
+
+  /**
    * External Data Dashboard class
    * Manages the external data dashboard UI and data loading
    */
@@ -595,12 +710,21 @@
       this.initializePerformanceMonitoring();
 
       try {
+        // Prevent double initialization
+        if (this._loadingInitialData) {
+          logger.debug(`${MODULE_NAME}:init:already-loading`);
+          return;
+        }
+        
+        this._loadingInitialData = true;
         await this.loadInitialData();
         this.startAutoRefresh();
         this.isInitialized = true;
         logger.info(`${MODULE_NAME}:init:completed`);
-    } catch (error) {
+      } catch (error) {
         this.handleError('שגיאה באתחול דשבורד הנתונים החיצוניים', error, 'init');
+      } finally {
+        this._loadingInitialData = false;
       }
     }
 
@@ -609,13 +733,35 @@
      * @returns {void}
      */
     initializeHeader() {
-      if (window.headerSystem && typeof window.headerSystem.init === 'function') {
+      // Skip if header is already initialized (prevent double initialization)
+      if (window.headerSystem && window.headerSystem.isInitialized) {
+        logger.debug(`${MODULE_NAME}:header-init:already-initialized`);
+        document.title = 'דשבורד נתונים חיצוניים - TikTrack';
+        return;
+      }
+
+      // Ensure HeaderSystem is initialized first
+      if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+        if (!window.headerSystem || !window.headerSystem.isInitialized) {
+          try {
+            window.HeaderSystem.initialize();
+          } catch (error) {
+            logger.error(`${MODULE_NAME}:header-init:initialize-error`, { error });
+            this.handleError('שגיאה באתחול מערכת התפריט', error, 'header-init');
+          }
+        }
+      }
+      
+      // Then call init() if headerSystem exists and not already initialized
+      if (window.headerSystem && typeof window.headerSystem.init === 'function' && !window.headerSystem.isInitialized) {
         try {
           window.headerSystem.init();
-    } catch (error) {
+        } catch (error) {
+          logger.error(`${MODULE_NAME}:header-init:init-error`, { error });
           this.handleError('שגיאה בהפעלת מערכת התפריט', error, 'header-init');
         }
       }
+      
       document.title = 'דשבורד נתונים חיצוניים - TikTrack';
     }
 
@@ -726,9 +872,36 @@
      */
     async refreshAllExternalData() {
       const startTime = performance.now();
+      const overlayId = 'external-data-refresh-all';
+      
       try {
-        notification.info('רענון נתונים חיצוניים', 'התהליך החל, נעדכן בסיום');
+        // Show progress overlay
+        showProgressOverlay(overlayId, 1, 'מתחיל רענון', 'מכין בקשה לרענון כל הנתונים', {
+          title: 'רענון כל הנתונים החיצוניים',
+          totalSteps: 4,
+          stepLabels: ['הכנה', 'שליחת בקשה', 'עיבוד נתונים', 'עדכון דשבורד'],
+          stepDescriptions: ['מכין בקשה לשרת', 'שולח בקשה לרענון', 'מעבד את התגובה', 'מעדכן את הדשבורד']
+        });
+        
+        const elapsedTime = performance.now() - startTime;
+        showProgressOverlay(overlayId, 2, 'שולח בקשה', 'שולח בקשה לרענון כל הנתונים לשרת', {}, {
+          elapsedTime
+        });
+        
+        const requestStartTime = performance.now();
         const response = await fetch('/api/external-data/refresh/all', { method: 'POST' });
+        const requestDuration = performance.now() - requestStartTime;
+        
+        const totalElapsed = performance.now() - startTime;
+        // Estimate remaining time based on current progress (assuming 50% done after request)
+        const estimatedTotal = totalElapsed * 2;
+        const timeEstimate = Math.max(0, estimatedTotal - totalElapsed);
+        
+        showProgressOverlay(overlayId, 3, 'מעבד נתונים', 'מעבד את התגובה מהשרת', {}, {
+          elapsedTime: totalElapsed,
+          timeEstimate
+        });
+        
         const rawText = await response.text();
         let payload = {};
         if (rawText) {
@@ -748,26 +921,32 @@
 
         const duration = performance.now() - startTime;
         const result = payload?.data || {};
-        const requested = Number.isFinite(Number(result.requested)) ? Number(result.requested) : 0;
-        // Handle case where fetched might be an object (due to middleware timestamp conversion bug)
-        // The DateNormalizationService incorrectly converts "fetched" (a count) to a timestamp
-        let fetched = 0;
-        if (typeof result.fetched === 'number') {
-          fetched = Number.isFinite(result.fetched) ? result.fetched : 0;
-        } else if (typeof result.fetched === 'object' && result.fetched !== null) {
-          // If middleware incorrectly converted count to timestamp object, we can't reliably recover it
-          // The epochMs value represents milliseconds since epoch, not the original count
-          // e.g., fetched=1 might become epochMs=1000 (1 second), not 1000 items
-          // With the Backend fix, this should no longer happen, but handle it gracefully
-          fetched = 0; // Can't reliably determine, treat as unknown/error
-          logger.warn(`${MODULE_NAME}:refresh-all:fetched-converted-to-timestamp`, {
-            fetched_object: result.fetched,
-            requested,
-            message: 'fetched was incorrectly converted to timestamp by middleware - treating as 0'
-          });
+        
+        // Validate response structure
+        if (!result || typeof result !== 'object') {
+          logger.error(`${MODULE_NAME}:refresh-all:invalid-response`, { payload, result });
+          throw new Error('תגובה לא תקינה מהשרת - מבנה נתונים לא תקין');
         }
+        
+        const requested = Number.isFinite(Number(result.requested)) ? Number(result.requested) : 0;
+        const fetched = Number.isFinite(Number(result.fetched)) ? Number(result.fetched) : 0;
         const failedSymbols = Array.isArray(result.failed_symbols) ? result.failed_symbols : [];
         const skippedEntries = Array.isArray(result.skipped) ? result.skipped : [];
+        const tickerErrors = Array.isArray(result.ticker_errors) ? result.ticker_errors : [];
+        const historicalLoaded = Number.isFinite(Number(result.historical_loaded)) ? Number(result.historical_loaded) : 0;
+        const indicatorsCalculated = Number.isFinite(Number(result.indicators_calculated)) ? Number(result.indicators_calculated) : 0;
+        const durationSeconds = Number.isFinite(Number(result.duration_seconds)) ? Number(result.duration_seconds) : null;
+        
+        logger.info(`${MODULE_NAME}:refresh-all:response-parsed`, {
+          requested,
+          fetched,
+          failed: failedSymbols.length,
+          skipped: skippedEntries.length,
+          tickerErrors: tickerErrors.length,
+          historicalLoaded,
+          indicatorsCalculated,
+          durationSeconds
+        });
 
         const summaryParts = [
           `עודכנו ${formatNumber(fetched)} מתוך ${formatNumber(requested)} טיקרים`,
@@ -785,8 +964,11 @@
           `• טיקרים שעודכנו: ${formatNumber(fetched)}`,
           `• טיקרים שנכשלו: ${formatNumber(failedSymbols.length)}`,
           `• טיקרים שדולגו (חסר סימול): ${formatNumber(skippedEntries.length)}`,
+          `• טיקרים עם נתונים היסטוריים: ${formatNumber(historicalLoaded)}`,
+          `• חישובים טכניים שבוצעו: ${formatNumber(indicatorsCalculated)}`,
+          `• שגיאות בטיקרים: ${formatNumber(tickerErrors.length)}`,
           `• חותמת בקשה: ${formatTimePayloadForDeveloper(payload.timestamp)}`,
-          `• משך כולל: ${formatDurationMs(duration)}`
+          `• משך כולל: ${formatDurationMs(duration)}${durationSeconds ? ` (שרת: ${durationSeconds.toFixed(2)}s)` : ''}`
         ];
 
         if (safeText(payload.requestId, null)) {
@@ -847,7 +1029,6 @@
             skipped: skippedEntries.length
           });
         } else {
-          notification.success('רענון נתונים חיצוניים', summaryMessage);
           logger.info(`${MODULE_NAME}:refresh-all:success`, {
             requested,
             fetched,
@@ -855,17 +1036,84 @@
           });
         }
 
+        const processingElapsed = performance.now() - startTime;
+        showProgressOverlay(overlayId, 4, 'מעדכן דשבורד', 'מעדכן את הדשבורד עם הנתונים החדשים', {}, {
+          elapsedTime: processingElapsed
+        });
+
         await Promise.allSettled([
           this.refreshCoreData(),
           this.loadGroupRefreshHistory(),
           this.loadLogs()
         ]);
 
+        // Hide progress overlay
+        hideProgressOverlay(overlayId);
+
+        // Show final success/error notification with detailed information
+        const resultDetails = {
+          requested,
+          fetched,
+          failed: failedSymbols.length,
+          skipped: skippedEntries.length,
+          historicalLoaded,
+          indicatorsCalculated,
+          tickerErrors: tickerErrors.length,
+          duration: formatDurationMs(duration),
+          durationSeconds: durationSeconds,
+          timestamp: new Date().toISOString(),
+          failedSymbols: failedSymbols.slice(0, 10), // First 10 for details
+          skippedEntries: skippedEntries.slice(0, 5), // First 5 for details
+          tickerErrorsDetails: tickerErrors.slice(0, 5) // First 5 for details
+        };
+
+        if (!requested) {
+          await showFinalError(
+            'רענון נתונים חיצוניים נכשל',
+            'לא נמצאו טיקרים פעילים עם סימול תקף ולכן הרענון לא בוצע',
+            { ...resultDetails, developerDetails },
+            'external-data'
+          );
+        } else if (!isFullSuccess) {
+          await showFinalError(
+            'רענון נתונים חיצוניים נכשל (חלקי)',
+            'הרענון נעצר לפני שהושלם. חלק מהטיקרים נכשלו או דולגו',
+            { ...resultDetails, developerDetails },
+            'external-data'
+          );
+        } else {
+          await showFinalSuccess(
+            'רענון נתונים חיצוניים הושלם בהצלחה',
+            summaryMessage,
+            { ...resultDetails, developerDetails },
+            'external-data'
+          );
+        }
+
         return payload;
       } catch (error) {
         const duration = performance.now() - startTime;
         logger.error(`${MODULE_NAME}:refresh-all:error`, { error, duration });
-        this.handleError('שגיאה ברענון כל הטיקרים', error, 'refresh-all');
+        
+        // Hide progress overlay
+        hideProgressOverlay(overlayId);
+        
+        // Show final error notification with detailed information
+        const errorDetails = {
+          errorMessage: error.message,
+          errorStack: error.stack,
+          duration: formatDurationMs(duration),
+          timestamp: new Date().toISOString(),
+          context: 'refresh-all'
+        };
+
+        await showFinalError(
+          'שגיאה ברענון כל הטיקרים',
+          `רענון הנתונים נכשל: ${safeText(error.message)}`,
+          errorDetails,
+          'external-data'
+        );
+        
         throw error;
       }
     }
@@ -880,16 +1128,29 @@
       const buttonId = 'action-refresh-full-data';
       const button = document.getElementById(buttonId);
       const originalText = button?.textContent || 'טעינת נתונים מלאה';
+      const overlayId = 'external-data-refresh-full';
       
       try {
+        // Show progress overlay
+        showProgressOverlay(overlayId, 1, 'מתחיל טעינה מלאה', 'מכין בקשה לטעינת נתונים מלאה', {
+          title: 'טעינת נתונים מלאה',
+          totalSteps: 5,
+          stepLabels: ['הכנה', 'טעינת quotes נוכחיים', 'טעינת נתונים היסטוריים', 'חישובים טכניים', 'עדכון דשבורד'],
+          stepDescriptions: ['מכין בקשה לשרת', 'טוען quotes נוכחיים', 'טוען נתונים היסטוריים (150 ימים)', 'מחשב אינדיקטורים טכניים', 'מעדכן את הדשבורד']
+        });
+        
         // Show loading indicator
         if (button) {
           button.disabled = true;
           button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>טוען...';
         }
         
-        notification.info('טעינת נתונים מלאה', 'התהליך החל, זה עשוי לקחת מספר דקות...');
+        const step2Elapsed = window.performance.now() - startTime;
+        showProgressOverlay(overlayId, 2, 'טוען quotes נוכחיים', 'שולח בקשה לטעינת quotes נוכחיים', {}, {
+          elapsedTime: step2Elapsed
+        });
         
+        const requestStartTime = performance.now();
         const response = await fetch('/api/external-data/refresh/full', { method: 'POST' });
         const rawText = await response.text();
         let payload = {};
@@ -908,15 +1169,52 @@
           throw new Error(errorMessage);
         }
 
+        const requestDuration = performance.now() - requestStartTime;
+        const totalElapsed = performance.now() - startTime;
+        // Estimate remaining time (assuming 60% done after request, 40% for processing)
+        const estimatedTotal = totalElapsed / 0.6;
+        const timeEstimate = Math.max(0, estimatedTotal - totalElapsed);
+        
+        showProgressOverlay(overlayId, 3, 'טוען נתונים היסטוריים', 'מעבד נתונים היסטוריים (150 ימים)', {}, {
+          elapsedTime: totalElapsed,
+          timeEstimate
+        });
+        
         const duration = performance.now() - startTime;
         const result = payload?.data || {};
+        
+        // Validate response structure
+        if (!result || typeof result !== 'object') {
+          logger.error(`${MODULE_NAME}:refresh-full:invalid-response`, { payload, result });
+          throw new Error('תגובה לא תקינה מהשרת - מבנה נתונים לא תקין');
+        }
+        
         const requested = Number.isFinite(Number(result.requested)) ? Number(result.requested) : 0;
         const currentQuotesLoaded = Number.isFinite(Number(result.current_quotes_loaded)) ? Number(result.current_quotes_loaded) : 0;
         const failedSymbols = Array.isArray(result.failed_symbols) ? result.failed_symbols : [];
         const skippedEntries = Array.isArray(result.skipped) ? result.skipped : [];
+        const tickerErrors = Array.isArray(result.ticker_errors) ? result.ticker_errors : [];
         const historicalData = result.historical_data || {};
         const technicalIndicators = result.technical_indicators || {};
-        const performance = result.performance || {};
+        const serverPerformance = result.performance || {}; // Renamed to avoid shadowing window.performance
+        
+        logger.info(`${MODULE_NAME}:refresh-full:response-parsed`, {
+          requested,
+          currentQuotesLoaded,
+          failed: failedSymbols.length,
+          skipped: skippedEntries.length,
+          tickerErrors: tickerErrors.length,
+          historicalData,
+          technicalIndicators,
+          performance: serverPerformance
+        });
+        
+        const step3Elapsed = window.performance.now() - startTime;
+        const step3Estimate = Math.max(0, (estimatedTotal - step3Elapsed) * 0.5); // 50% of remaining
+        showProgressOverlay(overlayId, 4, 'מחשב אינדיקטורים', 'מחשב אינדיקטורים טכניים', {}, {
+          elapsedTime: step3Elapsed,
+          timeEstimate: step3Estimate
+        });
 
         // Build summary message
         const summaryParts = [
@@ -936,9 +1234,10 @@
           `• טיקרים עם חישובים טכניים: ${formatNumber(technicalIndicators.tickers_with_indicators || 0)}`,
           `• טיקרים שנכשלו: ${formatNumber(failedSymbols.length)}`,
           `• טיקרים שדולגו: ${formatNumber(skippedEntries.length)}`,
-          `• משך כולל: ${formatDurationMs(duration)}`,
-          `• זמן התחלה: ${performance.start_time ? new Date(performance.start_time).toLocaleString('he-IL') : 'לא זמין'}`,
-          `• זמן סיום: ${performance.end_time ? new Date(performance.end_time).toLocaleString('he-IL') : 'לא זמין'}`
+          `• שגיאות בטיקרים: ${formatNumber(tickerErrors.length)}`,
+          `• משך כולל: ${formatDurationMs(duration)}${serverPerformance.duration_seconds ? ` (שרת: ${serverPerformance.duration_seconds.toFixed(2)}s)` : ''}`,
+          `• זמן התחלה: ${serverPerformance.start_time ? new Date(serverPerformance.start_time).toLocaleString('he-IL') : 'לא זמין'}`,
+          `• זמן סיום: ${serverPerformance.end_time ? new Date(serverPerformance.end_time).toLocaleString('he-IL') : 'לא זמין'}`
         ];
 
         if (failedSymbols.length > 0) {
@@ -973,9 +1272,12 @@
             userMessage,
             developerDetails
           );
-        } else {
-          notification.success('טעינת נתונים מלאה הושלמה', summaryMessage);
         }
+
+        const step4Elapsed = performance.now() - startTime;
+        showProgressOverlay(overlayId, 5, 'מעדכן דשבורד', 'מעדכן את הדשבורד עם הנתונים החדשים', {}, {
+          elapsedTime: step4Elapsed
+        });
 
         // Refresh all dashboard data
         await Promise.allSettled([
@@ -987,11 +1289,85 @@
           this.loadSchedulerStatus()
         ]);
 
+        // Hide progress overlay
+        hideProgressOverlay(overlayId);
+
+        // Show final success/error notification with detailed information
+        const resultDetails = {
+          requested,
+          currentQuotesLoaded,
+          historicalData: {
+            tickersWithHistorical: historicalData.tickers_with_historical || 0,
+            totalHistoricalQuotes: historicalData.total_historical_quotes || 0,
+            averageQuotesPerTicker: historicalData.average_quotes_per_ticker || 0
+          },
+          technicalIndicators: {
+            totalCalculated: technicalIndicators.total_calculated || 0,
+            tickersWithIndicators: technicalIndicators.tickers_with_indicators || 0
+          },
+          failed: failedSymbols.length,
+          skipped: skippedEntries.length,
+          tickerErrors: tickerErrors.length,
+          duration: formatDurationMs(duration),
+          durationSeconds: serverPerformance.duration_seconds,
+          timestamp: new Date().toISOString(),
+          performance: {
+            startTime: serverPerformance.start_time,
+            endTime: serverPerformance.end_time,
+            durationSeconds: serverPerformance.duration_seconds
+          },
+          failedSymbols: failedSymbols.slice(0, 10), // First 10 for details
+          skippedEntries: skippedEntries.slice(0, 5), // First 5 for details
+          tickerErrorsDetails: tickerErrors.slice(0, 5) // First 5 for details
+        };
+
+        if (!requested) {
+          await showFinalError(
+            'טעינת נתונים מלאה נכשלה',
+            'לא נמצאו טיקרים פעילים עם סימול תקף ולכן הטעינה המלאה לא בוצעה',
+            { ...resultDetails, developerDetails },
+            'external-data'
+          );
+        } else if (!isFullSuccess) {
+          await showFinalError(
+            'טעינת נתונים מלאה הושלמה (חלקי)',
+            'הטעינה המלאה הושלמה עם חלק מהטיקרים שנכשלו או דולגו',
+            { ...resultDetails, developerDetails },
+            'external-data'
+          );
+        } else {
+          await showFinalSuccess(
+            'טעינת נתונים מלאה הושלמה בהצלחה',
+            summaryMessage,
+            { ...resultDetails, developerDetails },
+            'external-data'
+          );
+        }
+
         return payload;
       } catch (error) {
         const duration = performance.now() - startTime;
         logger.error(`${MODULE_NAME}:refresh-full:error`, { error, duration });
-        this.handleError('שגיאה בטעינת נתונים מלאה', error, 'refresh-full');
+        
+        // Hide progress overlay
+        hideProgressOverlay(overlayId);
+        
+        // Show final error notification with detailed information
+        const errorDetails = {
+          errorMessage: error.message,
+          errorStack: error.stack,
+          duration: formatDurationMs(duration),
+          timestamp: new Date().toISOString(),
+          context: 'refresh-full'
+        };
+
+        await showFinalError(
+          'שגיאה בטעינת נתונים מלאה',
+          `טעינת הנתונים נכשלה: ${safeText(error.message)}`,
+          errorDetails,
+          'external-data'
+        );
+        
         throw error;
       } finally {
         // Restore button state
@@ -1053,26 +1429,35 @@
      * @returns {Promise<Object>} Refresh result payload
      * @throws {Error} If refresh fails
      */
-    async refreshTickerData() {
-      const startTime = performance.now();
+    async refreshTickerData(tickerIdParam = null) {
+      const startTime = window.performance.now();
       const select = getElement('ticker-select');
       const button = getElement('action-refresh-ticker-data');
       const statsContainer = getElement('ticker-load-stats');
+      const overlayId = 'external-data-refresh-ticker';
       
-      if (!select || !select.value) {
-        notification.warning('בחירת טיקר', 'אנא בחר טיקר מהרשימה');
-        return;
+      // Allow passing tickerId directly (for table buttons) or from select dropdown
+      let tickerId = tickerIdParam;
+      if (!tickerId && select && select.value) {
+        tickerId = parseInt(select.value, 10);
       }
       
-      const tickerId = parseInt(select.value, 10);
       if (!tickerId) {
-        notification.warning('בחירת טיקר', 'טיקר לא תקין');
+        notification.warning('בחירת טיקר', 'אנא בחר טיקר מהרשימה');
         return;
       }
       
       const originalButtonText = button?.textContent || 'טען נתונים מלאים';
       
       try {
+        // Show progress overlay
+        showProgressOverlay(overlayId, 1, 'מתחיל רענון טיקר', 'מכין בקשה לשרת', {
+          title: 'רענון נתוני טיקר',
+          totalSteps: 4,
+          stepLabels: ['הכנה', 'שליחת בקשה', 'עיבוד נתונים', 'עדכון דשבורד'],
+          stepDescriptions: ['מכין בקשה לשרת', 'שולח בקשה לרענון נתונים', 'מעבד את התגובה', 'מעדכן את הדשבורד']
+        });
+        
         // Show loading indicator
         if (button) {
           button.disabled = true;
@@ -1083,8 +1468,18 @@
           statsContainer.innerHTML = '<div class="text-muted">טוען נתונים...</div>';
         }
         
-        notification.info('רענון טיקר', 'התהליך החל, נעדכן בסיום');
+        const step2Elapsed = window.performance.now() - startTime;
+        showProgressOverlay(overlayId, 2, 'שולח בקשה', 'שולח בקשה לרענון נתונים לשרת', {}, {
+          elapsedTime: step2Elapsed
+        });
         
+        logger.info(`${MODULE_NAME}:refresh-ticker:request`, { 
+          tickerId, 
+          url: `/api/external-data/quotes/${tickerId}/refresh`,
+          timestamp: new Date().toISOString()
+        });
+        
+        const requestStartTime = window.performance.now();
         const response = await fetch(`/api/external-data/quotes/${tickerId}/refresh`, { 
           method: 'POST',
           headers: {
@@ -1092,12 +1487,38 @@
           },
           body: JSON.stringify({})
         });
+        const requestDuration = window.performance.now() - requestStartTime;
+        
+        logger.info(`${MODULE_NAME}:refresh-ticker:response`, { 
+          tickerId, 
+          status: response.status, 
+          ok: response.ok,
+          statusText: response.statusText,
+          requestDuration: formatDurationMs(requestDuration),
+          timestamp: new Date().toISOString()
+        });
+        
+        const totalElapsed = window.performance.now() - startTime;
+        // Estimate remaining time (assuming 70% done after request)
+        const estimatedTotal = totalElapsed / 0.7;
+        const timeEstimate = Math.max(0, estimatedTotal - totalElapsed);
+        
+        showProgressOverlay(overlayId, 3, 'מעבד נתונים', 'מעבד את התגובה מהשרת', {}, {
+          elapsedTime: totalElapsed,
+          timeEstimate
+        });
+        
         const rawText = await response.text();
         let payload = {};
         if (rawText) {
           try {
             payload = JSON.parse(rawText);
           } catch (parseError) {
+            logger.error(`${MODULE_NAME}:refresh-ticker:parse-error`, { 
+              tickerId, 
+              parseError: parseError.message,
+              rawText: rawText.substring(0, 200) // First 200 chars for debugging
+            });
             payload = { message: rawText };
           }
         }
@@ -1106,12 +1527,86 @@
           const errorMessage = safeText(
             payload?.error || payload?.message || 'רענון הטיקר נכשל'
           );
+          logger.error(`${MODULE_NAME}:refresh-ticker:http-error`, { 
+            tickerId, 
+            status: response.status,
+            errorMessage,
+            payload
+          });
           throw new Error(errorMessage);
         }
 
-        const duration = performance.now() - startTime;
-        const result = payload?.data || {};
-        const tickerSymbol = result.ticker_symbol || 'לא זמין';
+        // Validate response data
+        if (!payload || !payload.data) {
+          logger.error(`${MODULE_NAME}:refresh-ticker:no-data`, { 
+            tickerId, 
+            payload,
+            hasPayload: !!payload,
+            hasData: !!payload?.data
+          });
+          throw new Error('התגובה מהשרת לא הכילה נתונים');
+        }
+
+        const duration = window.performance.now() - startTime;
+        const result = payload.data;
+        
+        // Validate that the data is for the correct ticker
+        const resultTickerId = result.ticker_id || result.id;
+        if (resultTickerId && parseInt(resultTickerId, 10) !== parseInt(tickerId, 10)) {
+          logger.error(`${MODULE_NAME}:refresh-ticker:ticker-mismatch`, { 
+            requestedTickerId: tickerId,
+            receivedTickerId: resultTickerId,
+            result
+          });
+          throw new Error(`הנתונים שהתקבלו הם עבור טיקר אחר (${resultTickerId} במקום ${tickerId})`);
+        }
+        
+        const tickerSymbol = result.ticker_symbol || result.symbol || 'לא זמין';
+        
+        // Validate that data is fresh (fetched_at should be recent, within last 5 minutes)
+        if (result.fetched_at) {
+          const fetchedAtDate = new Date(result.fetched_at);
+          const now = new Date();
+          const ageMinutes = (now - fetchedAtDate) / (1000 * 60);
+          
+          if (ageMinutes > 5) {
+            logger.warn(`${MODULE_NAME}:refresh-ticker:stale-data`, { 
+              tickerId, 
+              tickerSymbol,
+              fetchedAt: result.fetched_at,
+              ageMinutes: ageMinutes.toFixed(2),
+              warning: 'Data appears to be stale (older than 5 minutes)'
+            });
+          }
+        }
+        
+        // Validate historical quotes count
+        const historicalQuotesCount = Number.isFinite(Number(result.historical_quotes_count)) ? Number(result.historical_quotes_count) : 0;
+        const indicatorsCalculated = Array.isArray(result.indicators_calculated) ? result.indicators_calculated : [];
+        const serverPerformance = result.performance || {}; // Renamed to avoid shadowing window.performance
+        
+        if (historicalQuotesCount > 0 && historicalQuotesCount < 120) {
+          logger.warn(`${MODULE_NAME}:refresh-ticker:insufficient-historical`, { 
+            tickerId, 
+            tickerSymbol,
+            historicalQuotesCount,
+            expected: 150,
+            warning: 'Only partial historical data loaded (less than 120 quotes for MA 150)'
+          });
+        }
+        
+        logger.info(`${MODULE_NAME}:refresh-ticker:success`, { 
+          tickerId, 
+          tickerSymbol,
+          hasPrice: !!result.price,
+          hasVolume: !!result.volume,
+          fetchedAt: result.fetched_at,
+          historicalQuotesCount,
+          indicatorsCalculated: indicatorsCalculated.length,
+          duration: formatDurationMs(duration),
+          resultKeys: Object.keys(result)
+        });
+        
         const price = result.price ? formatNumber(result.price) : NOT_AVAILABLE_TEXT;
         const changePercent = result.change_percent !== null && result.change_percent !== undefined 
           ? `${result.change_percent >= 0 ? '+' : ''}${formatNumber(result.change_percent)}%`
@@ -1121,8 +1616,25 @@
           ? (window.formatDate ? window.formatDate(result.fetched_at, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(result.fetched_at, { includeTime: true }) : new Date(result.fetched_at).toLocaleString('he-IL')))
           : NOT_AVAILABLE_TEXT;
 
+        const step3Elapsed = window.performance.now() - startTime;
+        showProgressOverlay(overlayId, 4, 'מעדכן דשבורד', 'מעדכן את הדשבורד עם הנתונים החדשים', {}, {
+          elapsedTime: step3Elapsed
+        });
+
         // Display statistics
         if (statsContainer) {
+          const historicalInfo = historicalQuotesCount > 0 
+            ? `<div class="stat-item mb-2">
+                <strong>נתונים היסטוריים:</strong> ${formatNumber(historicalQuotesCount)} quotes${historicalQuotesCount < 120 ? ' ⚠️ (חסר נתונים)' : ''}
+              </div>`
+            : '<div class="stat-item mb-2 text-warning"><strong>נתונים היסטוריים:</strong> לא נטענו</div>';
+          
+          const indicatorsInfo = indicatorsCalculated.length > 0
+            ? `<div class="stat-item mb-2">
+                <strong>חישובים טכניים:</strong> ${indicatorsCalculated.join(', ')}
+              </div>`
+            : '<div class="stat-item mb-2 text-warning"><strong>חישובים טכניים:</strong> לא בוצעו</div>';
+          
           statsContainer.innerHTML = `
             <div class="ticker-stats">
               <div class="stat-item mb-2">
@@ -1137,17 +1649,17 @@
               <div class="stat-item mb-2">
                 <strong>נפח:</strong> ${volume}
               </div>
+              ${historicalInfo}
+              ${indicatorsInfo}
               <div class="stat-item mb-2">
                 <strong>נטען ב:</strong> ${fetchedAt}
               </div>
               <div class="stat-item">
-                <strong>משך:</strong> ${formatDurationMs(duration)}
+                <strong>משך:</strong> ${formatDurationMs(duration)}${serverPerformance.duration_seconds ? ` (שרת: ${serverPerformance.duration_seconds.toFixed(2)}s)` : ''}
               </div>
             </div>
           `;
         }
-
-        notification.success('רענון טיקר הושלם', `הנתונים עבור ${tickerSymbol} עודכנו בהצלחה`);
 
         // Refresh dashboard data
         await Promise.allSettled([
@@ -1155,16 +1667,70 @@
           this.loadCacheStats()
         ]);
 
+        // Hide progress overlay
+        hideProgressOverlay(overlayId);
+
+        // Show final success notification with detailed information
+        const successDetails = {
+          tickerId,
+          tickerSymbol,
+          price,
+          changePercent,
+          volume,
+          fetchedAt,
+          historicalQuotesCount,
+          indicatorsCalculated,
+          duration: formatDurationMs(duration),
+          durationSeconds: serverPerformance.duration_seconds,
+          timestamp: new Date().toISOString(),
+          responseStatus: response.status,
+          dataReceived: !!result,
+          performance: {
+            startTime: serverPerformance.start_time,
+            endTime: serverPerformance.end_time,
+            durationSeconds: serverPerformance.duration_seconds
+          }
+        };
+
+        await showFinalSuccess(
+          'רענון טיקר הושלם בהצלחה',
+          `הנתונים עבור ${tickerSymbol} עודכנו בהצלחה`,
+          successDetails,
+          'external-data'
+        );
+
         return payload;
       } catch (error) {
-        const duration = performance.now() - startTime;
+        const duration = window.performance.now() - startTime;
         logger.error(`${MODULE_NAME}:refresh-ticker:error`, { error, duration, tickerId });
+        
+        // Hide progress overlay
+        hideProgressOverlay(overlayId);
         
         if (statsContainer) {
           statsContainer.innerHTML = `<div class="text-danger">שגיאה: ${safeText(error.message)}</div>`;
         }
         
-        this.handleError('שגיאה ברענון טיקר', error, 'refresh-ticker');
+        // Show final error notification with detailed information
+        const errorDetails = {
+          tickerId,
+          errorMessage: error.message,
+          stack: error.stack, // Use 'stack' instead of 'errorStack' for showCriticalErrorNotification
+          errorStack: error.stack, // Keep for backward compatibility
+          duration: formatDurationMs(duration),
+          timestamp: new Date().toISOString(),
+          context: 'refresh-ticker',
+          source: 'external-data-dashboard',
+          function: 'refreshTickerData'
+        };
+
+        await showFinalError(
+          'שגיאה ברענון טיקר',
+          `רענון הטיקר נכשל: ${safeText(error.message)}`,
+          errorDetails,
+          'external-data'
+        );
+        
         throw error;
       } finally {
         // Restore button state
@@ -1341,22 +1907,78 @@
      * @returns {Promise<void>}
      */
     async loadMissingDataTickers(showNotification = false) {
+      const startTime = performance.now();
+      const overlayId = 'external-data-load-missing';
+      
       try {
+        if (showNotification) {
+          showProgressOverlay(overlayId, 1, 'טוען רשימת טיקרים', 'מכין בקשה לזיהוי טיקרים עם נתונים חסרים', {
+            title: 'טעינת רשימת טיקרים עם נתונים חסרים',
+            totalSteps: 3,
+            stepLabels: ['הכנה', 'טעינה', 'עדכון'],
+            stepDescriptions: ['מכין בקשה לשרת', 'טוען נתונים מהשרת', 'מעדכן את הדשבורד']
+          });
+        }
+        
+        showProgressOverlay(overlayId, 2, 'טוען נתונים', 'שולח בקשה לזיהוי טיקרים עם נתונים חסרים');
+        
         const response = await fetch('/api/external-data/status/tickers/missing-data');
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
         }
+        
         const data = await response.json();
         this.missingDataTickers = data?.data || null;
+        
+        showProgressOverlay(overlayId, 3, 'מעדכן דשבורד', 'מעדכן את הדשבורד');
         this.renderMissingDataTickers(this.missingDataTickers);
+        
+        const duration = performance.now() - startTime;
+        const summary = this.missingDataTickers?.summary || {};
+        
         if (showNotification) {
-          notification.success('רשימת טיקרים עודכנה', 'נתוני הטיקרים עם נתונים חסרים נטענו בהצלחה');
+          hideProgressOverlay(overlayId);
+          
+          await showFinalSuccess(
+            'רשימת טיקרים עודכנה בהצלחה',
+            'נתוני הטיקרים עם נתונים חסרים נטענו בהצלחה',
+            {
+              totalOpenTickers: summary.total_open_tickers || 0,
+              missingCurrent: summary.missing_current_count || 0,
+              missingHistorical: summary.missing_historical_count || 0,
+              missingIndicators: summary.missing_indicators_count || 0,
+              duration: formatDurationMs(duration),
+              timestamp: new Date().toISOString()
+            },
+            'external-data'
+          );
         }
       } catch (error) {
+        const duration = performance.now() - startTime;
         this.missingDataTickers = null;
         this.renderMissingDataTickers(null);
-        this.handleError('שגיאה בטעינת טיקרים עם נתונים חסרים', error, 'load-missing-data-tickers');
+        
+        if (showNotification) {
+          hideProgressOverlay(overlayId);
+          
+          const errorDetails = {
+            errorMessage: error.message,
+            errorStack: error.stack,
+            duration: formatDurationMs(duration),
+            timestamp: new Date().toISOString(),
+            context: 'load-missing-data-tickers'
+          };
+
+          await showFinalError(
+            'שגיאה בטעינת טיקרים עם נתונים חסרים',
+            `טעינת הרשימה נכשלה: ${safeText(error.message)}`,
+            errorDetails,
+            'external-data'
+          );
+        } else {
+          this.handleError('שגיאה בטעינת טיקרים עם נתונים חסרים', error, 'load-missing-data-tickers');
+        }
       }
     }
 
@@ -1604,9 +2226,7 @@
       this.updateCurrentSettings().catch(error => {
         logger.error(`${MODULE_NAME}:update-current-settings:failed`, { error });
       });
-      this.updateChartsFromStatus(data).catch((error) => {
-        logger.error(`${MODULE_NAME}:update-charts-failed`, { error });
-      });
+      // Charts removed - not relevant for this dashboard
     }
 
     /**
@@ -1934,13 +2554,19 @@
      */
     async updateChartsFromStatus(data) {
       if (!data) {
+        logger.debug(`${MODULE_NAME}:updateChartsFromStatus:no-data`);
         return;
       }
 
       // Check if charts section is visible before creating charts
       const chartsSection = document.getElementById('charts-section');
-      const isChartsSectionVisible = chartsSection && 
-        chartsSection.querySelector('.section-body')?.style.display !== 'none';
+      if (!chartsSection) {
+        logger.debug(`${MODULE_NAME}:updateChartsFromStatus:charts-section-not-found`);
+        return;
+      }
+
+      const sectionBody = chartsSection.querySelector('.section-body');
+      const isChartsSectionVisible = sectionBody && sectionBody.style.display !== 'none';
 
       // Only create charts if section is visible
       if (!isChartsSectionVisible) {
@@ -1949,6 +2575,32 @@
       }
 
       // Ensure Chart.js is loaded and defaults are configured
+      if (window.Chart) {
+        // Set default font configuration if not already set
+        if (!window.Chart.defaults) {
+          window.Chart.defaults = {};
+        }
+        if (!window.Chart.defaults.font) {
+          window.Chart.defaults.font = {
+            family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+            size: 12,
+            style: 'normal',
+            weight: 'normal',
+            lineHeight: 1.2
+          };
+        }
+        // Also ensure plugins.title has font configured
+        if (!window.Chart.defaults.plugins) {
+          window.Chart.defaults.plugins = {};
+        }
+        if (!window.Chart.defaults.plugins.title) {
+          window.Chart.defaults.plugins.title = {};
+        }
+        if (!window.Chart.defaults.plugins.title.font) {
+          window.Chart.defaults.plugins.title.font = window.Chart.defaults.font;
+        }
+      }
+
       if (window.Chart && window.ChartLoader) {
         try {
           await window.ChartLoader.load();
@@ -1960,7 +2612,8 @@
         }
       }
 
-      await Promise.all([
+      // Use Promise.allSettled to continue even if one chart fails
+      await Promise.allSettled([
         this.updateResponseTimeChart(),
         this.updateDataQualityChart(data),
         this.updateProviderComparisonChart(data),
@@ -2327,9 +2980,25 @@
      * @returns {Promise<void>}
      */
     async loadLogs(showNotification = false) {
+      const startTime = performance.now();
+      const overlayId = 'external-data-load-logs';
+      
       try {
+        if (showNotification) {
+          showProgressOverlay(overlayId, 1, 'טוען לוגים', 'מכין בקשה לטעינת לוגים', {
+            title: 'טעינת לוגים',
+            totalSteps: 3,
+            stepLabels: ['הכנה', 'טעינה', 'עדכון'],
+            stepDescriptions: ['מכין בקשה לשרת', 'טוען לוגים מהשרת', 'מעדכן את הדשבורד']
+          });
+        }
+        
         const logManager = window.UnifiedLogManager;
         if (logManager && typeof logManager.getLogData === 'function') {
+          if (showNotification) {
+            showProgressOverlay(overlayId, 2, 'טוען נתונים', 'טוען לוגים מ-UnifiedLogManager');
+          }
+          
           if (!logManager.initialized && typeof logManager.initialize === 'function') {
             await logManager.initialize();
           }
@@ -2339,6 +3008,10 @@
           });
           this.logs = Array.isArray(result?.data) ? result.data : [];
         } else {
+          if (showNotification) {
+            showProgressOverlay(overlayId, 2, 'טוען נתונים', 'טוען לוגים מהשרת (fallback)');
+          }
+          
           const response = await fetch('/api/external-data/status/logs');
           if (!response.ok) {
             const errorText = await response.text();
@@ -2347,14 +3020,54 @@
           const fallbackData = await response.json();
           this.logs = Array.isArray(fallbackData.logs) ? fallbackData.logs : [];
         }
-        this.applyLogFilters();
+        
         if (showNotification) {
-          notification.success('לוגים נטענו', 'נמשכו רשומות מהשרת');
+          showProgressOverlay(overlayId, 3, 'מעדכן דשבורד', 'מעדכן את הדשבורד');
+        }
+        
+        this.applyLogFilters();
+        
+        const duration = performance.now() - startTime;
+        
+        if (showNotification) {
+          hideProgressOverlay(overlayId);
+          
+          await showFinalSuccess(
+            'לוגים נטענו בהצלחה',
+            `נמשכו ${this.logs.length} רשומות מהשרת`,
+            {
+              logCount: this.logs.length,
+              duration: formatDurationMs(duration),
+              timestamp: new Date().toISOString()
+            },
+            'external-data'
+          );
         }
     } catch (error) {
+        const duration = performance.now() - startTime;
         this.logs = [];
         this.applyLogFilters();
-        this.handleError('שגיאה בטעינת לוגים', error, 'load-logs');
+        
+        if (showNotification) {
+          hideProgressOverlay(overlayId);
+          
+          const errorDetails = {
+            errorMessage: error.message,
+            errorStack: error.stack,
+            duration: formatDurationMs(duration),
+            timestamp: new Date().toISOString(),
+            context: 'load-logs'
+          };
+
+          await showFinalError(
+            'שגיאה בטעינת לוגים',
+            `טעינת הלוגים נכשלה: ${safeText(error.message)}`,
+            errorDetails,
+            'external-data'
+          );
+        } else {
+          this.handleError('שגיאה בטעינת לוגים', error, 'load-logs');
+        }
       }
     }
 
@@ -2449,25 +3162,84 @@
      * @returns {Promise<void>}
      */
     async loadGroupRefreshHistory(showNotification = false) {
+      const startTime = performance.now();
+      const overlayId = 'external-data-load-history';
+      
       try {
+        if (showNotification) {
+          showProgressOverlay(overlayId, 1, 'טוען היסטוריה', 'מכין בקשה לטעינת היסטוריית רענונים', {
+            title: 'טעינת היסטוריית רענונים',
+            totalSteps: 3,
+            stepLabels: ['הכנה', 'טעינה', 'עדכון'],
+            stepDescriptions: ['מכין בקשה לשרת', 'טוען נתונים מהשרת', 'מעדכן את הדשבורד']
+          });
+        }
+        
         const limitSelect = getElement('group-limit');
         const limit = limitSelect ? limitSelect.value : 20;
+        
+        if (showNotification) {
+          showProgressOverlay(overlayId, 2, 'טוען נתונים', 'שולח בקשה לטעינת היסטוריית רענונים');
+        }
+        
         const response = await fetch(`/api/external-data/status/group-refresh-history?limit=${limit}`);
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
         }
+        
         const data = await response.json();
         const history = data.group_refresh_history || [];
         this.groupRefreshHistory = history; // Store for detailed log
-        this.renderGroupRefreshHistory(history);
+        
         if (showNotification) {
-          notification.success('היסטוריה עודכנה', `נטענו ${history.length} רשומות היסטוריה`);
+          showProgressOverlay(overlayId, 3, 'מעדכן דשבורד', 'מעדכן את הדשבורד');
+        }
+        
+        this.renderGroupRefreshHistory(history);
+        
+        const duration = performance.now() - startTime;
+        
+        if (showNotification) {
+          hideProgressOverlay(overlayId);
+          
+          await showFinalSuccess(
+            'היסטוריה עודכנה בהצלחה',
+            `נטענו ${history.length} רשומות היסטוריה`,
+            {
+              historyCount: history.length,
+              limit,
+              duration: formatDurationMs(duration),
+              timestamp: new Date().toISOString()
+            },
+            'external-data'
+          );
         }
       } catch (error) {
+        const duration = performance.now() - startTime;
         this.groupRefreshHistory = []; // Store empty array for detailed log
         this.renderGroupRefreshHistory([]);
-        this.handleError('שגיאה בטעינת היסטוריית רענון', error, 'load-group-refresh-history');
+        
+        if (showNotification) {
+          hideProgressOverlay(overlayId);
+          
+          const errorDetails = {
+            errorMessage: error.message,
+            errorStack: error.stack,
+            duration: formatDurationMs(duration),
+            timestamp: new Date().toISOString(),
+            context: 'load-group-refresh-history'
+          };
+
+          await showFinalError(
+            'שגיאה בטעינת היסטוריית רענון',
+            `טעינת ההיסטוריה נכשלה: ${safeText(error.message)}`,
+            errorDetails,
+            'external-data'
+          );
+        } else {
+          this.handleError('שגיאה בטעינת היסטוריית רענון', error, 'load-group-refresh-history');
+        }
       }
     }
 
@@ -2535,25 +3307,85 @@
     /**
      * Load scheduler status
      * @param {boolean} [showNotification=false] - Whether to show notification
+     * @param {number} [retryCount=0] - Internal retry counter
      * @returns {Promise<void>}
      */
-    async loadSchedulerStatus(showNotification = false) {
+    async loadSchedulerStatus(showNotification = false, retryCount = 0) {
+      // Prevent duplicate calls
+      if (this._loadingSchedulerStatus) {
+        logger.debug(`${MODULE_NAME}:load-scheduler-status:already-loading`);
+        return;
+      }
+      
+      this._loadingSchedulerStatus = true;
+      
       try {
         const response = await fetch('/api/external-data/scheduler/status');
+        
+        // Handle rate limiting with retry
+        if (response.status === 429) {
+          const errorData = await response.json().catch(() => ({}));
+          const resetTime = errorData?.details?.reset_time?.epochMs || Date.now() + 60000; // Default 1 minute
+          const waitTime = Math.max(1000, resetTime - Date.now() + 1000); // Add 1 second buffer
+          
+          if (retryCount < 2) {
+            logger.warn(`${MODULE_NAME}:load-scheduler-status:rate-limited`, { 
+              retryCount, 
+              waitTime: Math.round(waitTime / 1000) + 's',
+              resetTime: new Date(resetTime).toISOString()
+            });
+            
+            this._loadingSchedulerStatus = false;
+            
+            // Wait and retry
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            return this.loadSchedulerStatus(showNotification, retryCount + 1);
+          } else {
+            // Max retries reached, show cached data if available
+            logger.warn(`${MODULE_NAME}:load-scheduler-status:max-retries-reached`, { 
+              hasCachedData: !!this.schedulerStatusData 
+            });
+            
+            if (this.schedulerStatusData) {
+              // Use cached data
+              this.renderSchedulerStatus(this.schedulerStatusData);
+              if (showNotification) {
+                notification.warning('מצב מתזמן', 'נתונים מהמטמון (rate limit)');
+              }
+            } else {
+              this.schedulerStatusData = null;
+              this.renderSchedulerStatus(null);
+              this.handleError('שגיאה בטעינת מצב מתזמן', new Error('Rate limit exceeded - נסה שוב בעוד דקה'), 'load-scheduler-status');
+            }
+            return;
+          }
+        }
+        
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
         }
+        
         const data = await response.json();
         this.schedulerStatusData = data?.data || null;
         this.renderSchedulerStatus(this.schedulerStatusData);
+        
         if (showNotification) {
           notification.success('מצב מתזמן עודכן', 'נתוני המתזמן נטענו בהצלחה');
         }
       } catch (error) {
-        this.schedulerStatusData = null;
-        this.renderSchedulerStatus(null);
-        this.handleError('שגיאה בטעינת מצב מתזמן', error, 'load-scheduler-status');
+        // Only show error if we have no cached data
+        if (!this.schedulerStatusData) {
+          this.schedulerStatusData = null;
+          this.renderSchedulerStatus(null);
+          this.handleError('שגיאה בטעינת מצב מתזמן', error, 'load-scheduler-status');
+        } else {
+          // Use cached data silently
+          logger.warn(`${MODULE_NAME}:load-scheduler-status:using-cached-data`, { error: error.message });
+          this.renderSchedulerStatus(this.schedulerStatusData);
+        }
+      } finally {
+        this._loadingSchedulerStatus = false;
       }
     }
 
@@ -2731,21 +3563,68 @@
    * @returns {Promise<void>}
    */
   async clearLogs() {
+    const startTime = performance.now();
+    const overlayId = 'external-data-clear-logs';
+    
     try {
+      showProgressOverlay(overlayId, 1, 'מתחיל ניקוי לוגים', 'מכין בקשה לניקוי לוגים', {
+        title: 'ניקוי לוגים',
+        totalSteps: 3,
+        stepLabels: ['הכנה', 'ניקוי', 'עדכון'],
+        stepDescriptions: ['מכין בקשה לשרת', 'מנקה את הלוגים', 'מעדכן את הדשבורד']
+      });
+      
+      showProgressOverlay(overlayId, 2, 'מנקה לוגים', 'שולח בקשה לניקוי לוגים לשרת');
+      
       const response = await fetch('/api/external-data/status/logs/clear', { method: 'POST' });
-        if (!response.ok) {
-          if (response.status === 501) {
-            const data = await response.json();
-            notification.warning('הפעולה אינה זמינה', safeText(data.message, 'ניקוי הלוגים טרם יושם'));
-            return;
-          }
-          const errorText = await response.text();
-          throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
+      
+      if (!response.ok) {
+        if (response.status === 501) {
+          const data = await response.json();
+          hideProgressOverlay(overlayId);
+          await showFinalError(
+            'הפעולה אינה זמינה',
+            safeText(data.message, 'ניקוי הלוגים טרם יושם'),
+            { status: response.status, timestamp: new Date().toISOString() },
+            'external-data'
+          );
+          return;
         }
-        notification.success('לוגים נוקו', 'הלוגים נוקו בהצלחה');
-        await this.loadLogs();
+        const errorText = await response.text();
+        throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
+      }
+      
+      showProgressOverlay(overlayId, 3, 'מעדכן דשבורד', 'מעדכן את הדשבורד');
+      
+      await this.loadLogs();
+      
+      const duration = performance.now() - startTime;
+      hideProgressOverlay(overlayId);
+      
+      await showFinalSuccess(
+        'לוגים נוקו בהצלחה',
+        'הלוגים נוקו בהצלחה',
+        { duration: formatDurationMs(duration), timestamp: new Date().toISOString() },
+        'external-data'
+      );
     } catch (error) {
-        this.handleError('שגיאה בניקוי הלוגים', error, 'clear-logs');
+      const duration = performance.now() - startTime;
+      hideProgressOverlay(overlayId);
+      
+      const errorDetails = {
+        errorMessage: error.message,
+        errorStack: error.stack,
+        duration: formatDurationMs(duration),
+        timestamp: new Date().toISOString(),
+        context: 'clear-logs'
+      };
+
+      await showFinalError(
+        'שגיאה בניקוי הלוגים',
+        `ניקוי הלוגים נכשל: ${safeText(error.message)}`,
+        errorDetails,
+        'external-data'
+      );
     }
   }
 
@@ -2754,19 +3633,64 @@
    * @returns {Promise<void>}
    */
   async clearCache() {
+    const startTime = performance.now();
+    const overlayId = 'external-data-clear-cache';
+    
     try {
+      showProgressOverlay(overlayId, 1, 'מתחיל ניקוי מטמון', 'מכין בקשה לניקוי מטמון', {
+        title: 'ניקוי מטמון',
+        totalSteps: 5,
+        stepLabels: ['הכנה', 'ניקוי מטמון', 'עדכון סטטוס', 'עדכון ספקים', 'עדכון היסטוריה'],
+        stepDescriptions: ['מכין בקשה לשרת', 'מנקה את המטמון', 'מעדכן סטטוס מערכת', 'מעדכן רשימת ספקים', 'מעדכן היסטוריית רענונים']
+      });
+      
+      showProgressOverlay(overlayId, 2, 'מנקה מטמון', 'שולח בקשה לניקוי מטמון לשרת');
+      
       const response = await fetch('/api/external-data/status/cache/clear', { method: 'POST' });
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
-        }
-        notification.success('מטמון נוקה', 'מטמון הנתונים החיצוניים נוקה בהצלחה');
-        await this.loadCacheStats();
-        await this.loadSystemStatus();
-        await this.loadProviders();
-        await this.loadGroupRefreshHistory();
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
+      }
+      
+      showProgressOverlay(overlayId, 3, 'מעדכן סטטוס', 'מעדכן סטטוס מערכת');
+      await this.loadSystemStatus();
+      
+      showProgressOverlay(overlayId, 4, 'מעדכן ספקים', 'מעדכן רשימת ספקים');
+      await this.loadProviders();
+      
+      showProgressOverlay(overlayId, 5, 'מעדכן היסטוריה', 'מעדכן היסטוריית רענונים');
+      await this.loadGroupRefreshHistory();
+      
+      await this.loadCacheStats();
+      
+      const duration = performance.now() - startTime;
+      hideProgressOverlay(overlayId);
+      
+      await showFinalSuccess(
+        'מטמון נוקה בהצלחה',
+        'מטמון הנתונים החיצוניים נוקה בהצלחה',
+        { duration: formatDurationMs(duration), timestamp: new Date().toISOString() },
+        'external-data'
+      );
     } catch (error) {
-        this.handleError('שגיאה בניקוי המטמון', error, 'clear-cache');
+      const duration = performance.now() - startTime;
+      hideProgressOverlay(overlayId);
+      
+      const errorDetails = {
+        errorMessage: error.message,
+        errorStack: error.stack,
+        duration: formatDurationMs(duration),
+        timestamp: new Date().toISOString(),
+        context: 'clear-cache'
+      };
+
+      await showFinalError(
+        'שגיאה בניקוי המטמון',
+        `ניקוי המטמון נכשל: ${safeText(error.message)}`,
+        errorDetails,
+        'external-data'
+      );
     }
   }
 
@@ -2775,12 +3699,52 @@
    * @returns {Promise<void>}
    */
   async resetExternalSystem() {
+    const startTime = performance.now();
+    const overlayId = 'external-data-reset-system';
+    
     try {
+      showProgressOverlay(overlayId, 1, 'מתחיל איפוס מערכת', 'מכין לאיפוס מערכת', {
+        title: 'איפוס מערכת נתונים חיצוניים',
+        totalSteps: 3,
+        stepLabels: ['ניקוי מטמון', 'ניקוי לוגים', 'עדכון דשבורד'],
+        stepDescriptions: ['מנקה את המטמון', 'מנקה את הלוגים', 'מעדכן את הדשבורד']
+      });
+      
+      showProgressOverlay(overlayId, 1, 'מנקה מטמון', 'מנקה את המטמון');
       await this.clearCache();
+      
+      showProgressOverlay(overlayId, 2, 'מנקה לוגים', 'מנקה את הלוגים');
       await this.clearLogs();
-      notification.success('המערכת אופסה', 'כל הנתונים ההיסטוריים והלוגים נוקו בהצלחה');
+      
+      showProgressOverlay(overlayId, 3, 'מעדכן דשבורד', 'מעדכן את הדשבורד');
+      
+      const duration = performance.now() - startTime;
+      hideProgressOverlay(overlayId);
+      
+      await showFinalSuccess(
+        'המערכת אופסה בהצלחה',
+        'כל הנתונים ההיסטוריים והלוגים נוקו בהצלחה',
+        { duration: formatDurationMs(duration), timestamp: new Date().toISOString() },
+        'external-data'
+      );
     } catch (error) {
-      this.handleError('שגיאה באיפוס מערכת הנתונים החיצוניים', error, 'reset-system');
+      const duration = performance.now() - startTime;
+      hideProgressOverlay(overlayId);
+      
+      const errorDetails = {
+        errorMessage: error.message,
+        errorStack: error.stack,
+        duration: formatDurationMs(duration),
+        timestamp: new Date().toISOString(),
+        context: 'reset-system'
+      };
+
+      await showFinalError(
+        'שגיאה באיפוס מערכת הנתונים החיצוניים',
+        `איפוס המערכת נכשל: ${safeText(error.message)}`,
+        errorDetails,
+        'external-data'
+      );
     }
   }
 
@@ -2789,74 +3753,68 @@
    * @returns {Promise<void>}
    */
   async optimizeCache() {
+    const startTime = performance.now();
+    const overlayId = 'external-data-optimize-cache';
+    
     try {
+      showProgressOverlay(overlayId, 1, 'מתחיל אופטימיזציה', 'מכין בקשה לאופטימיזציית מטמון', {
+        title: 'אופטימיזציית מטמון',
+        totalSteps: 3,
+        stepLabels: ['הכנה', 'אופטימיזציה', 'עדכון'],
+        stepDescriptions: ['מכין בקשה לשרת', 'מבצע אופטימיזציה של המטמון', 'מעדכן את הדשבורד']
+      });
+      
+      showProgressOverlay(overlayId, 2, 'מבצע אופטימיזציה', 'שולח בקשה לאופטימיזציה לשרת');
+      
       const response = await fetch('/api/external-data/status/cache/optimize', { method: 'POST' });
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
-        }
-        const result = await response.json();
-        notification.success(
-          'אופטימיזציית מטמון',
-          `אופטימיזציית המטמון הושלמה (${formatNumber(result.optimized_size_bytes || 0)} בייטים שוחררו)`
-        );
-        await this.loadCacheStats();
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
+      }
+      
+      const result = await response.json();
+      const optimizedBytes = result.optimized_size_bytes || 0;
+      
+      showProgressOverlay(overlayId, 3, 'מעדכן דשבורד', 'מעדכן את הדשבורד');
+      await this.loadCacheStats();
+      
+      const duration = performance.now() - startTime;
+      hideProgressOverlay(overlayId);
+      
+      await showFinalSuccess(
+        'אופטימיזציית מטמון הושלמה',
+        `אופטימיזציית המטמון הושלמה (${formatNumber(optimizedBytes)} בייטים שוחררו)`,
+        {
+          optimizedBytes,
+          optimizedBytesFormatted: formatNumber(optimizedBytes),
+          duration: formatDurationMs(duration),
+          timestamp: new Date().toISOString()
+        },
+        'external-data'
+      );
     } catch (error) {
-        this.handleError('שגיאה באופטימיזציית המטמון', error, 'optimize-cache');
+      const duration = performance.now() - startTime;
+      hideProgressOverlay(overlayId);
+      
+      const errorDetails = {
+        errorMessage: error.message,
+        errorStack: error.stack,
+        duration: formatDurationMs(duration),
+        timestamp: new Date().toISOString(),
+        context: 'optimize-cache'
+      };
+
+      await showFinalError(
+        'שגיאה באופטימיזציית המטמון',
+        `אופטימיזציית המטמון נכשלה: ${safeText(error.message)}`,
+        errorDetails,
+        'external-data'
+      );
     }
   }
 
   /**
-   * Test all providers
-   * @returns {Promise<Array>} Array of test results
-   */
-  async testAllProviders() {
-    try {
-        const startTime = performance.now();
-        const response = await fetch('/api/external-data/status/providers');
-        const duration = performance.now() - startTime;
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
-        }
-        const data = await response.json();
-        const providers = data.providers || [];
-
-        const results = providers.map((provider) => ({
-          name: provider.display_name || provider.name,
-          status: provider.is_healthy ? 'active' : 'inactive',
-          lastUpdate: extractTimestampIso(provider.last_successful_request),
-          error: provider.last_error,
-          successRate: provider.recent_activity?.success_rate
-            ? formatPercent(provider.recent_activity.success_rate * 100)
-            : NOT_AVAILABLE_TEXT
-        }));
-
-        const healthyCount = results.filter((provider) => provider.status === 'active').length;
-        notification.info(
-          'בדיקת ספקים',
-          `${healthyCount}/${results.length} ספקים בריאים (זמן תגובה ${formatDurationMs(duration)})`
-        );
-
-        this.renderProviderTestModal(results, duration);
-        return results;
-      } catch (error) {
-        this.handleError('שגיאה בבדיקת ספקים', error, 'test-all-providers');
-        return [];
-      }
-    }
-
-    /**
-     * Render provider test modal
-     * @param {Array} results - Array of test results
-     * @param {number} durationMs - Test duration in milliseconds
-     * @returns {void}
-     */
-    renderProviderTestModal(results, durationMs) {
-      if (typeof window.showDetailsModal !== 'function') {
-        return;
-      }
       const rows = results
         .map((provider) => {
           const statusBadge =
@@ -3516,8 +4474,7 @@
         if (this.performanceSamples.length > 50) {
           this.performanceSamples.shift();
         }
-        await this.updateResponseTimeChart();
-        await this.updateErrorAnalysisChart();
+        // Charts removed - not relevant for this dashboard
       } catch (error) {
         const sample = {
           timestamp: new Date().toISOString(),
@@ -3529,23 +4486,11 @@
         if (this.performanceSamples.length > 50) {
           this.performanceSamples.shift();
         }
-        await this.updateErrorAnalysisChart();
+        // Charts removed - not relevant for this dashboard
       }
     }
 
-    /**
-     * Refresh performance charts
-     * @returns {Promise<void>}
-     */
-    async refreshPerformanceCharts() {
-      await Promise.all([
-        this.updateResponseTimeChart(),
-        this.updateDataQualityChart(this.statusData),
-        this.updateProviderComparisonChart(this.statusData),
-        this.updateErrorAnalysisChart()
-      ]);
-      notification.success('גרפי ביצועים', 'הגרפים עודכנו על סמך נתונים אחרונים');
-    }
+    // refreshPerformanceCharts removed - charts are not relevant for this dashboard
 
     /**
      * Update response time chart
@@ -3631,6 +4576,7 @@
     async updateDataQualityChart(data) {
       const chartSystem = this.getChartSystem();
       if (!chartSystem) {
+        logger.debug(`${MODULE_NAME}:updateDataQualityChart:no-chart-system`);
         return;
       }
 
@@ -3638,13 +4584,52 @@
       const selector = '#dataQualityChart';
       const canvas = document.querySelector(selector);
 
-      // Check if canvas is visible in DOM
-      if (!canvas || !canvas.offsetParent || !data?.cache) {
+      // Check if canvas exists and is visible in DOM
+      if (!canvas) {
+        logger.debug(`${MODULE_NAME}:updateDataQualityChart:canvas-not-found`, { selector });
+        return;
+      }
+
+      // Check if section is visible
+      const chartsSection = document.getElementById('charts-section');
+      const isChartsSectionVisible = chartsSection && 
+        chartsSection.querySelector('.section-body')?.style.display !== 'none';
+      
+      if (!isChartsSectionVisible || !canvas.offsetParent) {
         if (canvas && !canvas.offsetParent) {
           // Canvas exists but is hidden (section is collapsed)
           this.destroyChart(chartId, 'dataQualityChart');
         }
+        logger.debug(`${MODULE_NAME}:updateDataQualityChart:section-hidden`);
         return;
+      }
+
+      if (!data?.cache) {
+        logger.debug(`${MODULE_NAME}:updateDataQualityChart:no-cache-data`);
+        return;
+      }
+
+      // Ensure Chart.js defaults are configured BEFORE creating chart
+      if (window.Chart) {
+        // Set font defaults if not already set
+        if (!window.Chart.defaults) {
+          window.Chart.defaults = {};
+        }
+        if (!window.Chart.defaults.font) {
+          window.Chart.defaults.font = {
+            family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+            size: 12,
+            style: 'normal',
+            weight: 'normal',
+            lineHeight: 1.2
+          };
+        }
+        // Also ensure plugins.title has font configured
+        if (window.Chart.defaults.plugins && window.Chart.defaults.plugins.title) {
+          if (!window.Chart.defaults.plugins.title.font) {
+            window.Chart.defaults.plugins.title.font = window.Chart.defaults.font;
+          }
+        }
       }
 
       const totalQuotes = data.cache.total_quotes || 0;
@@ -3699,6 +4684,7 @@
     async updateProviderComparisonChart(data) {
       const chartSystem = this.getChartSystem();
       if (!chartSystem) {
+        logger.debug(`${MODULE_NAME}:updateProviderComparisonChart:no-chart-system`);
         return;
       }
 
@@ -3706,13 +4692,52 @@
       const selector = '#providerComparisonChart';
       const canvas = document.querySelector(selector);
 
-      // Check if canvas is visible in DOM
-      if (!canvas || !canvas.offsetParent || !data?.providers?.details?.length) {
+      // Check if canvas exists
+      if (!canvas) {
+        logger.debug(`${MODULE_NAME}:updateProviderComparisonChart:canvas-not-found`, { selector });
+        return;
+      }
+
+      // Check if section is visible
+      const chartsSection = document.getElementById('charts-section');
+      const isChartsSectionVisible = chartsSection && 
+        chartsSection.querySelector('.section-body')?.style.display !== 'none';
+      
+      if (!isChartsSectionVisible || !canvas.offsetParent) {
         if (canvas && !canvas.offsetParent) {
           // Canvas exists but is hidden (section is collapsed)
           this.destroyChart(chartId, 'providerComparisonChart');
         }
+        logger.debug(`${MODULE_NAME}:updateProviderComparisonChart:section-hidden`);
         return;
+      }
+
+      if (!data?.providers?.details?.length) {
+        logger.debug(`${MODULE_NAME}:updateProviderComparisonChart:no-providers-data`);
+        return;
+      }
+
+      // Ensure Chart.js defaults are configured BEFORE creating chart
+      if (window.Chart) {
+        // Set font defaults if not already set
+        if (!window.Chart.defaults) {
+          window.Chart.defaults = {};
+        }
+        if (!window.Chart.defaults.font) {
+          window.Chart.defaults.font = {
+            family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+            size: 12,
+            style: 'normal',
+            weight: 'normal',
+            lineHeight: 1.2
+          };
+        }
+        // Also ensure plugins.title has font configured
+        if (window.Chart.defaults.plugins && window.Chart.defaults.plugins.title) {
+          if (!window.Chart.defaults.plugins.title.font) {
+            window.Chart.defaults.plugins.title.font = window.Chart.defaults.font;
+          }
+        }
       }
 
       const providers = data.providers.details;
@@ -3778,6 +4803,7 @@
     async updateErrorAnalysisChart() {
       const chartSystem = this.getChartSystem();
       if (!chartSystem) {
+        logger.debug(`${MODULE_NAME}:updateErrorAnalysisChart:no-chart-system`);
         return;
       }
 
@@ -3785,13 +4811,47 @@
       const selector = '#errorAnalysisChart';
       const canvas = document.querySelector(selector);
 
-      // Check if canvas is visible in DOM
-      if (!canvas || !canvas.offsetParent) {
+      // Check if canvas exists
+      if (!canvas) {
+        logger.debug(`${MODULE_NAME}:updateErrorAnalysisChart:canvas-not-found`, { selector });
+        return;
+      }
+
+      // Check if section is visible
+      const chartsSection = document.getElementById('charts-section');
+      const isChartsSectionVisible = chartsSection && 
+        chartsSection.querySelector('.section-body')?.style.display !== 'none';
+      
+      if (!isChartsSectionVisible || !canvas.offsetParent) {
         if (canvas && !canvas.offsetParent) {
           // Canvas exists but is hidden (section is collapsed)
           this.destroyChart(chartId, 'errorAnalysisChart');
         }
+        logger.debug(`${MODULE_NAME}:updateErrorAnalysisChart:section-hidden`);
         return;
+      }
+
+      // Ensure Chart.js defaults are configured BEFORE creating chart
+      if (window.Chart) {
+        // Set font defaults if not already set
+        if (!window.Chart.defaults) {
+          window.Chart.defaults = {};
+        }
+        if (!window.Chart.defaults.font) {
+          window.Chart.defaults.font = {
+            family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+            size: 12,
+            style: 'normal',
+            weight: 'normal',
+            lineHeight: 1.2
+          };
+        }
+        // Also ensure plugins.title has font configured
+        if (window.Chart.defaults.plugins && window.Chart.defaults.plugins.title) {
+          if (!window.Chart.defaults.plugins.title.font) {
+            window.Chart.defaults.plugins.title.font = window.Chart.defaults.font;
+          }
+        }
       }
 
       const errorCounts = this.performanceSamples.reduce(
@@ -4376,19 +5436,56 @@ window.ExternalDataDashboard = ExternalDataDashboard;
      * @returns {Promise<Object>}
      */
     refreshTickerById(tickerId) {
+      // Validate tickerId
+      const parsedTickerId = parseInt(tickerId, 10);
+      if (!tickerId || !Number.isFinite(parsedTickerId) || parsedTickerId <= 0) {
+        logger.error(`${MODULE_NAME}:actions:refresh-ticker-by-id:invalid-id`, { tickerId, parsedTickerId });
+        notification.warning('בחירת טיקר', `טיקר לא תקין: ${tickerId}`);
+        return Promise.reject(new Error(`Invalid ticker ID: ${tickerId}`));
+      }
+      
+      logger.info(`${MODULE_NAME}:actions:refresh-ticker-by-id:start`, { tickerId: parsedTickerId });
+      
       return ensureExternalDashboardInstance()
         .then((dashboard) => {
-          // Set the ticker in the select dropdown
-          const select = getElement('ticker-select');
-          if (select) {
-            select.value = tickerId;
-            select.dispatchEvent(new Event('change'));
-          }
-          return dashboard.refreshTickerData();
+          // Pass tickerId directly to refreshTickerData (no need to set select dropdown)
+          logger.debug(`${MODULE_NAME}:actions:refresh-ticker-by-id:calling-refresh`, { tickerId: parsedTickerId });
+          return dashboard.refreshTickerData(parsedTickerId);
+        })
+        .then((result) => {
+          logger.info(`${MODULE_NAME}:actions:refresh-ticker-by-id:success`, { tickerId: parsedTickerId, result });
+          return result;
         })
         .catch((error) => {
-          logger.error(`${MODULE_NAME}:actions:refresh-ticker-by-id`, { error, tickerId });
-          notification.error('שגיאה ברענון טיקר', error.message || 'רענון הטיקר נכשל');
+          logger.error(`${MODULE_NAME}:actions:refresh-ticker-by-id:error`, { error, tickerId: parsedTickerId, errorMessage: error.message, errorStack: error.stack });
+          
+          // Show detailed error notification using showFinalError
+          const errorDetails = {
+            tickerId: parsedTickerId,
+            errorMessage: error.message,
+            errorStack: error.stack,
+            timestamp: new Date().toISOString(),
+            context: 'refresh-ticker-by-id'
+          };
+          
+          // Use showFinalError helper which calls showCriticalErrorNotification
+          if (typeof window.showCriticalErrorNotification === 'function') {
+            window.showCriticalErrorNotification(
+              'שגיאה ברענון טיקר',
+              `רענון הטיקר נכשל: ${error.message || 'רענון הטיקר נכשל'}`,
+              errorDetails,
+              'external-data'
+            ).catch((notifError) => {
+              // Fallback to regular notification if detailed notification fails
+              logger.error(`${MODULE_NAME}:actions:refresh-ticker-by-id:notification-error`, { notifError });
+              notification.error('שגיאה ברענון טיקר', error.message || 'רענון הטיקר נכשל');
+            });
+          } else {
+            // Fallback to regular notification
+            notification.error('שגיאה ברענון טיקר', error.message || 'רענון הטיקר נכשל');
+          }
+          
+          throw error;
         });
     },
     /**
@@ -4467,15 +5564,6 @@ window.ExternalDataDashboard = ExternalDataDashboard;
     generateTestReport(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.generateTestReport();
-    },
-    /**
-     * Test all providers
-     * @param {Event} [event] - Event object
-     * @returns {Promise<Array>}
-     */
-    testAllProviders(event) {
-      if (event) event.preventDefault();
-      return window.externalDataDashboard?.testAllProviders();
     },
     /**
      * Analyze dashboard data
@@ -4576,15 +5664,7 @@ window.ExternalDataDashboard = ExternalDataDashboard;
       if (event) event.preventDefault();
       return window.externalDataDashboard?.loadGroupRefreshHistory(true);
     },
-    /**
-     * Refresh performance charts
-     * @param {Event} [event] - Event object
-     * @returns {Promise<void>}
-     */
-    refreshPerformanceCharts(event) {
-      if (event) event.preventDefault();
-      return window.externalDataDashboard?.refreshPerformanceCharts();
-    }
+    // refreshPerformanceCharts removed - charts are not relevant for this dashboard
   };
 })();
 

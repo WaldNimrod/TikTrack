@@ -1350,6 +1350,8 @@ function getSubtypeDisplay(subtype) {
     // Execution subtypes
     'buy': 'קנייה',
     'sell': 'מכירה',
+    'short': 'קנייה בחסר',
+    'cover': 'כיסוי',
   };
 
   return translations[subtype] || subtype || '-';
@@ -1642,28 +1644,48 @@ function calculateActivityStatistics() {
     // Group by subtype
     // IMPORTANT: Merge related subtypes into single groups:
     // - 'deposit' and 'withdrawal' into 'deposits_withdrawals'
+    // - For executions: use 'action' field (buy/sell/short/cover) as subtype
     const bySubtype = {};
     movements.forEach(m => {
       // Get subtype from movement - check multiple possible fields
-      let subtype = (m.subtype || m.sub_type || (m.amount >= 0 ? 'other_positive' : 'other_negative')).toLowerCase();
-
-      // Merge 'deposit' and 'withdrawal' into 'deposits_withdrawals'
-      if (subtype === 'deposit' || subtype === 'withdrawal' || subtype === 'הפקדה' || subtype === 'משיכה') {
-        subtype = 'deposits_withdrawals';
-      }
+      // CRITICAL: For executions, use 'action' field (buy/sell/short/cover)
+      // For cash flows, use 'subtype' or 'sub_type'
+      let subtype = null;
       
-      // Map other common subtypes
-      if (subtype === 'fee' || subtype === 'עמלה') {
-        subtype = 'fee';
-      } else if (subtype === 'dividend' || subtype === 'דיבידנד') {
-        subtype = 'dividend';
-      } else if (subtype === 'transfer' || subtype === 'transfer_in' || subtype === 'transfer_out' || subtype === 'העברה') {
-        subtype = 'transfer';
-      } else if (subtype === 'interest' || subtype === 'syep_interest' || subtype === 'ריבית' || subtype === 'ריבית syep') {
-        // Merge 'interest' and 'syep_interest' into 'interest_all' (like deposits_withdrawals)
-        subtype = 'interest_all';
-      } else if (subtype === 'other' || subtype === 'other_positive' || subtype === 'other_negative' || subtype === 'אחר') {
-        subtype = 'other';
+      if (m.type === 'execution') {
+        // For executions, use 'action' field (buy/sell/short/cover)
+        subtype = (m.action || m.subtype || m.sub_type || (m.amount >= 0 ? 'sell' : 'buy')).toLowerCase();
+        
+        // Normalize execution actions:
+        // - 'sell', 'short', 'cover' should all be grouped as 'sell' for statistics
+        // - 'buy' stays as 'buy'
+        if (subtype === 'sell' || subtype === 'short' || subtype === 'cover' || subtype === 'מכירה') {
+          subtype = 'sell';
+        } else if (subtype === 'buy' || subtype === 'קנייה') {
+          subtype = 'buy';
+        }
+      } else {
+        // For cash flows, use subtype/sub_type
+        subtype = (m.subtype || m.sub_type || (m.amount >= 0 ? 'other_positive' : 'other_negative')).toLowerCase();
+
+        // Merge 'deposit' and 'withdrawal' into 'deposits_withdrawals'
+        if (subtype === 'deposit' || subtype === 'withdrawal' || subtype === 'הפקדה' || subtype === 'משיכה') {
+          subtype = 'deposits_withdrawals';
+        }
+        
+        // Map other common subtypes
+        if (subtype === 'fee' || subtype === 'עמלה') {
+          subtype = 'fee';
+        } else if (subtype === 'dividend' || subtype === 'דיבידנד') {
+          subtype = 'dividend';
+        } else if (subtype === 'transfer' || subtype === 'transfer_in' || subtype === 'transfer_out' || subtype === 'העברה') {
+          subtype = 'transfer';
+        } else if (subtype === 'interest' || subtype === 'syep_interest' || subtype === 'ריבית' || subtype === 'ריבית syep') {
+          // Merge 'interest' and 'syep_interest' into 'interest_all' (like deposits_withdrawals)
+          subtype = 'interest_all';
+        } else if (subtype === 'other' || subtype === 'other_positive' || subtype === 'other_negative' || subtype === 'אחר') {
+          subtype = 'other';
+        }
       }
 
       if (!bySubtype[subtype]) {
@@ -1966,6 +1988,32 @@ function updateActivityStatistics() {
     });
   }
 
+  // Render executions breakdown for short positions
+  const executionsBreakdown3 = document.getElementById('executionsBreakdownContent3');
+  if (executionsBreakdown3) {
+    const executionsShort = splitExecutionsByAction(stats.executions, 'short');
+    const html11 = renderBreakdownBySubtype(executionsShort, 'ביצועים', 'short');
+    const parser11 = new DOMParser();
+    const doc11 = parser11.parseFromString(html11, 'text/html');
+    executionsBreakdown3.textContent = '';
+    doc11.body.childNodes.forEach(node => {
+      executionsBreakdown3.appendChild(node.cloneNode(true));
+    });
+  }
+
+  // Render executions breakdown for cover positions
+  const executionsBreakdown4 = document.getElementById('executionsBreakdownContent4');
+  if (executionsBreakdown4) {
+    const executionsCover = splitExecutionsByAction(stats.executions, 'cover');
+    const html12 = renderBreakdownBySubtype(executionsCover, 'ביצועים', 'cover');
+    const parser12 = new DOMParser();
+    const doc12 = parser12.parseFromString(html12, 'text/html');
+    executionsBreakdown4.textContent = '';
+    doc12.body.childNodes.forEach(node => {
+      executionsBreakdown4.appendChild(node.cloneNode(true));
+    });
+  }
+
   // Update activity summary header (with date range)
   // Always update summary even if data hasn't changed, to refresh date range display
   if (window.accountActivityState && window.accountActivityState.activityData) {
@@ -2150,13 +2198,23 @@ function splitExecutionsByAction(stats, action) {
     return stats;
   }
 
+  // Normalize action: 'sell', 'short', 'cover' should all map to 'sell' for statistics grouping
+  // BUT: preserve the original action name for display purposes
+  const normalizedAction = (action || '').toLowerCase();
+  const targetAction = (normalizedAction === 'sell' || normalizedAction === 'short' || normalizedAction === 'cover' || normalizedAction === 'מכירה') 
+    ? 'sell' 
+    : (normalizedAction === 'buy' || normalizedAction === 'קנייה' ? 'buy' : normalizedAction);
+
   // Filter bySubtype to only include the requested action
+  // For short/cover: use 'sell' to get the data, but rename the key to the original action for display
   const filteredBySubtype = {};
-  if (stats.bySubtype[action]) {
-    filteredBySubtype[action] = stats.bySubtype[action];
+  if (stats.bySubtype[targetAction]) {
+    // If requesting 'short' or 'cover', rename the key to preserve the action name for display
+    const displayKey = (normalizedAction === 'short' || normalizedAction === 'cover') ? normalizedAction : targetAction;
+    filteredBySubtype[displayKey] = stats.bySubtype[targetAction];
   }
 
-  const subtypeStats = stats.bySubtype[action];
+  const subtypeStats = stats.bySubtype[targetAction];
   if (!subtypeStats) {
     // Return empty stats structure
     return {

@@ -412,17 +412,59 @@ const cashFlowModalConfig = {
     onSaveExchange: 'saveCurrencyExchange' // Function to call when saving exchange
 };
 
-// יצירת המודל כאשר הקובץ נטען
-document.addEventListener('DOMContentLoaded', () => {
-    if (window.ModalManagerV2) {
+// ייצוא הקונפיגורציה למרחב הגלובלי - חייב להיות לפני יצירת המודל
+window.cashFlowModalConfig = cashFlowModalConfig;
+
+// יצירת המודל - נסה מיד ואם ModalManagerV2 לא זמין, נסה שוב
+(function createCashFlowModal() {
+    // נסה ליצור את המודל מיד אם ModalManagerV2 זמין
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
         try {
             window.ModalManagerV2.createCRUDModal(cashFlowModalConfig);
-            console.log('Cash Flow Modal created successfully');
+            if (window.Logger) {
+                window.Logger.info('✅ Cash Flow Modal created successfully', { page: 'cash-flows-config' });
+            } else {
+                console.log('✅ Cash Flow Modal created successfully');
+            }
+            return; // הצלחנו, אין צורך לנסות שוב
         } catch (error) {
-            console.error('Error creating Cash Flow Modal:', error);
+            if (window.Logger) {
+                window.Logger.error('❌ Error creating Cash Flow Modal:', error, { page: 'cash-flows-config' });
+            } else {
+                console.error('❌ Error creating Cash Flow Modal:', error);
+            }
         }
     }
-});
-
-// ייצוא הקונפיגורציה למרחב הגלובלי
-window.cashFlowModalConfig = cashFlowModalConfig;
+    
+    // אם ModalManagerV2 לא זמין, נסה שוב אחרי זמן קצר (עד 5 שניות)
+    let attempts = 0;
+    const maxAttempts = 50; // 50 ניסיונות * 100ms = 5 שניות
+    const retryInterval = setInterval(() => {
+        attempts++;
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
+            try {
+                window.ModalManagerV2.createCRUDModal(cashFlowModalConfig);
+                if (window.Logger) {
+                    window.Logger.info('✅ Cash Flow Modal created successfully (retry)', { page: 'cash-flows-config', attempts });
+                } else {
+                    console.log(`✅ Cash Flow Modal created successfully (after ${attempts} attempts)`);
+                }
+                clearInterval(retryInterval);
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('❌ Error creating Cash Flow Modal (retry):', error, { page: 'cash-flows-config', attempts });
+                } else {
+                    console.error(`❌ Error creating Cash Flow Modal (attempt ${attempts}):`, error);
+                }
+            }
+        } else if (attempts >= maxAttempts) {
+            // הגענו למקסימום ניסיונות
+            clearInterval(retryInterval);
+            if (window.Logger) {
+                window.Logger.warn('⚠️ Cash Flow Modal not created - ModalManagerV2 not available after retries', { page: 'cash-flows-config', attempts: maxAttempts });
+            } else {
+                console.warn(`⚠️ Cash Flow Modal not created - ModalManagerV2 not available after ${maxAttempts} attempts`);
+            }
+        }
+    }, 100);
+})();

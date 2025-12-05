@@ -814,7 +814,7 @@ const PACKAGE_MANIFEST = {
         file: 'modal-configs/cash-flows-config.js',
         globalCheck: 'window.cashFlowModalConfig',
         description: 'Cash flows modal configuration',
-        required: false,
+        required: true, // Required for cash_flows page
         loadOrder: 21
       },
       {
@@ -2051,6 +2051,27 @@ const PACKAGE_MANIFEST = {
         description: 'Unified tag widget (cloud + search)',
         required: true,
         loadOrder: 5
+      },
+      {
+        file: 'widgets/ticker-list-widget.js',
+        globalCheck: 'window.TickerListWidget',
+        description: 'Ticker list widget with KPI cards',
+        required: true,
+        loadOrder: 6
+      },
+      {
+        file: 'widgets/ticker-chart-widget.js',
+        globalCheck: 'window.TickerChartWidget',
+        description: 'Ticker chart widget with mini charts',
+        required: true,
+        loadOrder: 7
+      },
+      {
+        file: 'services/watch-lists-widget-service.js',
+        globalCheck: 'window.WatchListsWidgetService',
+        description: 'Watch lists widget service (mockup)',
+        required: false,
+        loadOrder: 5.5
       },
       {
         file: 'active-alerts-component.js',

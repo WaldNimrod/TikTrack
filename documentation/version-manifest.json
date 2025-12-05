@@ -10,13 +10,13 @@
     "notes": "Final sm-section-server fix"
   },
   "development": {
-    "version": "1.3.86.0",
+    "version": "1.3.87.0",
     "major": 1,
     "minor": 3,
-    "patch": 86,
+    "patch": 87,
     "build": 0,
-    "commit": "176269d6b53ee7925d79b78202fc41f1d6976d3d",
-    "updated_at": "2025-12-04T20:48:25+00:00",
-    "notes": "Fix investment types and status validation in demo data generation"
+    "commit": "591ff219ec00ca45430562360d8e02bf4488e14f",
+    "updated_at": "2025-12-05T17:37:46+00:00",
+    "notes": "Fix account activity calculations and add short/cover execution cards"
   }
 }

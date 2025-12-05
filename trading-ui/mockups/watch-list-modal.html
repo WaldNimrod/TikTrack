@@ -15,8 +15,91 @@
     <!-- Notification container -->
     <div class="notification-container" id="notificationContainer"></div>
     
+    <!-- Mockups Navigation -->
+    <div class="mockups-navigation">
+        <div class="mockups-navigation-content">
+            <span class="mockups-navigation-label">📋 ניווט מוקאפים:</span>
+            <a href="watch-lists-page.html" class="mockups-navigation-link">רשימות צפייה</a>
+            <a href="watch-list-modal.html" class="mockups-navigation-link active">מודל רשימה</a>
+            <a href="add-ticker-modal.html" class="mockups-navigation-link">הוספת טיקר</a>
+            <a href="flag-quick-action.html" class="mockups-navigation-link">דגלים</a>
+        </div>
+    </div>
 
-    
+    <!-- Add/Edit Watch List Modal -->
+    <div class="modal fade show" id="watchListModal" tabindex="-1" style="display: block;" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="watchListModalTitle">רשימה חדשה</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="watchListForm">
+                        <div class="mb-3">
+                            <label for="watchListName" class="form-label">שם הרשימה *</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="watchListName" 
+                                   required 
+                                   maxlength="100"
+                                   placeholder="לדוגמה: מניות טכנולוגיה">
+                        </div>
+                        <div class="mb-3">
+                            <label for="watchListIcon" class="form-label">איקון</label>
+                            <select class="form-select" id="watchListIcon">
+                                <option value="">ללא איקון</option>
+                                <option value="chart-line">גרף</option>
+                                <option value="flame">אש</option>
+                                <option value="coins">מטבעות</option>
+                                <option value="eye">עין</option>
+                                <option value="star">כוכב</option>
+                                <option value="heart">לב</option>
+                            </select>
+                            <small class="form-text text-muted">איקון שיוצג בכרטיס הרשימה</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="watchListColor" class="form-label">צבע</label>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <input type="color" 
+                                           class="form-control form-control-color" 
+                                           id="watchListColor" 
+                                           value="#26baac"
+                                           title="בחר צבע">
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="watchListColorHex" 
+                                           value="#26baac"
+                                           placeholder="#26baac"
+                                           pattern="^#[0-9A-Fa-f]{6}$">
+                                    <small class="form-text text-muted">Hex color code</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="watchListViewMode" class="form-label">תצוגה ברירת מחדל</label>
+                            <select class="form-select" id="watchListViewMode">
+                                <option value="table">טבלה</option>
+                                <option value="cards">כרטיסים</option>
+                                <option value="compact">קומפקטי</option>
+                            </select>
+                            <small class="form-text text-muted">תצוגה שתוצג בעת פתיחת הרשימה</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" 
+                            class="btn btn-primary" 
+                            data-onclick="window.WatchListModal?.saveWatchList()">
+                        שמור
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Bootstrap JS -->
@@ -30,8 +113,22 @@
     <script src="../scripts/init-system/package-manifest.js?v=1.0.0"></script>
     <script src="../scripts/page-initialization-configs.js?v=1.0.0"></script>
 
-    <!-- Unified Initialization System -->
-    <script src="../scripts/unified-app-initializer.js?v=1.0.0"></script>
+    <!-- Cache System -->
+    <script src="../scripts/unified-cache-manager.js?v=1.0.0"></script>
+
+    <!-- Icon System -->
+    <script src="../scripts/icon-mappings.js?v=1.0.0"></script>
+    <script src="../scripts/icon-system.js?v=1.0.0"></script>
+
+    <!-- Notification System -->
+    <script src="../scripts/notification-system.js?v=1.0.0"></script>
+
+    <!-- Watch Lists Services -->
+    <script src="../scripts/services/watch-lists-data.js?v=1.0.0"></script>
+    <script src="../scripts/services/watch-lists-ui-service.js?v=1.0.0"></script>
+
+    <!-- Modal Manager (required for modals) -->
+    <script src="../scripts/modal-manager-v2.js?v=1.0.0"></script>
 
     <!-- Page-specific script -->
     <script src="../scripts/watch-list-modal.js?v=1.0.0" defer></script>

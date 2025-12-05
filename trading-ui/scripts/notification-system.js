@@ -423,14 +423,20 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
       if (cached && cached.notification_mode !== undefined) {
         notificationMode = cached.notification_mode;
       } else {
-        // אם לא במטמון, קרא מהשרת ועדכן מטמון
-        notificationMode = await window.getPreference('notification_mode', 1, null);
+        // CRITICAL: Prevent infinite recursion - if getPreference is currently being called, use default
+        if (!window.__GET_PREFERENCE_IN_PROGRESS__) {
+          // אם לא במטמון, קרא מהשרת ועדכן מטמון
+          notificationMode = await window.getPreference('notification_mode', 1, null);
+        } else {
+          notificationMode = 'work'; // Default during preferences loading
+        }
       }
       
       const mode = notificationMode || 'work'; // ברירת מחדל: מצב עבודה
       
+      // CRITICAL: Do NOT use Logger here to prevent infinite recursion
       if (window.DEBUG_MODE) {
-        window.Logger.info(`🔍 Notification mode: ${mode}, category: ${category}, type: ${type}, userInitiated: ${userInitiated}`, { page: "notification-system" });
+        console.log(`🔍 Notification mode: ${mode}, category: ${category}, type: ${type}, userInitiated: ${userInitiated}`);
       }
       
       // בדוק אם ההודעה צריכה להיות מוצגת במצב הנוכחי
@@ -438,7 +444,7 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
       
       if (!shouldShow) {
         if (window.DEBUG_MODE) {
-          // window.Logger.info(`🔍 Notification filtered out by mode ${mode}: category=${category}, type=${type}, userInitiated=${userInitiated}`, { page: "notification-system" });
+          console.log(`🔍 Notification filtered out by mode ${mode}: category=${category}, type=${type}, userInitiated=${userInitiated}`);
         }
         return false;
       }
@@ -446,16 +452,23 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
     
     // בדוק את ההגדרות הישנות (תאימות לאחור)
     const preferenceName = `notifications_${category}_enabled`;
-    // window.Logger.info(`🔍 Checking preference: ${preferenceName}`, { page: "notification-system" });
+    
+    // CRITICAL: Prevent infinite recursion - if getPreference is currently being called, return default
+    if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+      return true; // Default: show notification during preferences loading
+    }
     
     if (typeof window.getPreference !== 'function') {
-      window.Logger.warn('getPreference function not available, showing notification by default', { page: "notification-system" });
+      // CRITICAL: Do NOT use Logger here to prevent infinite recursion
+      if (window.DEBUG_MODE) {
+        console.warn('getPreference function not available, showing notification by default');
+      }
       return true;
     }
     
     const isEnabled = await window.getPreference(preferenceName);
     if (window.DEBUG_MODE) {
-      // window.Logger.info(`🔍 Preference ${preferenceName} value:`, isEnabled, typeof isEnabled, { page: "notification-system" });
+      console.log(`🔍 Preference ${preferenceName} value:`, isEnabled, typeof isEnabled);
     }
     
     // If preference is not found (null), show notifications by default for critical categories
@@ -463,30 +476,32 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
     if (isEnabled === null) {
       // For import-user-data category, always show errors and warnings
       if (category === 'import-user-data') {
-        window.Logger?.info?.(`⚠️ Preference ${preferenceName} not found - showing notification by default for import-user-data`, { page: "notification-system" });
+        if (window.DEBUG_MODE) {
+          console.log(`⚠️ Preference ${preferenceName} not found - showing notification by default for import-user-data`);
+        }
         return true;
       }
-      // window.Logger.info(`⚠️ Preference ${preferenceName} not found - notification disabled`, { page: "notification-system" });
+      if (window.DEBUG_MODE) {
+        console.log(`⚠️ Preference ${preferenceName} not found - notification disabled`);
+      }
       return false;
     }
     
     const result = isEnabled === 'true' || isEnabled === true;
     if (window.DEBUG_MODE) {
-      // window.Logger.info(`🔍 Should show notification for ${category}:`, result, { page: "notification-system" });
+      console.log(`🔍 Should show notification for ${category}:`, result);
     }
     return result;
   } catch (error) {
+    // CRITICAL: Do NOT use Logger here to prevent infinite recursion
     if (window.DEBUG_MODE) {
-      window.Logger.warn('Failed to check notification preference, showing by default:', error, { page: "notification-system" });
+      console.warn('Failed to check notification preference, showing by default:', error);
     }
     // For general category, map to system category; for others, show by default
     if (error && error.isAuthError) {
       __NOTIFICATION_PREFS_AUTH_FAILED__ = true;
       if (window.DEBUG_MODE) {
-        window.Logger?.warn?.('⚠️ Notification preferences disabled due to authentication error; falling back to defaults', {
-          page: 'notification-system',
-          error: error?.message,
-        });
+        console.warn('⚠️ Notification preferences disabled due to authentication error; falling back to defaults', error?.message);
       }
       // When auth is missing, do not spam errors; just allow notifications to show.
       return true;
@@ -508,11 +523,19 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
  */
 async function shouldLogToConsole(category) {
   try {
+    // CRITICAL: Prevent infinite recursion - if getPreference is currently being called, return default
+    if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+      return true; // Default: write to console during preferences loading
+    }
+    
     const preferenceName = `console_logs_${category}_enabled`;
     const isEnabled = await window.getPreference(preferenceName);
     return isEnabled === 'true' || isEnabled === true;
   } catch (error) {
-    window.Logger.warn('Failed to check console log preference, logging by default:', error, { page: "notification-system" });
+    // CRITICAL: Do NOT use Logger here to prevent infinite recursion
+    if (window.DEBUG_MODE) {
+      console.warn('Failed to check console log preference, logging by default:', error);
+    }
     return true; // Default: write to console
   }
 }
@@ -562,8 +585,20 @@ function getLogEmoji(level) {
  * @param {string} category - Category of notification (development, system, business, performance, ui)
  */
 async function showNotification(message, type = 'info', title = 'מערכת', duration = 5000, category = null, options = {}) {
-  // Auto-detect category if not provided
-  if (!category && typeof window.detectNotificationCategory === 'function') {
+  // CRITICAL: Prevent infinite recursion - if showNotification is already running, skip
+  if (window.__SHOW_NOTIFICATION_IN_PROGRESS__) {
+    if (window.DEBUG_MODE) {
+      console.warn('⚠️ showNotification called while already in progress - preventing recursion');
+    }
+    return;
+  }
+  
+  // Set flag to prevent recursion
+  window.__SHOW_NOTIFICATION_IN_PROGRESS__ = true;
+  
+  try {
+    // Auto-detect category if not provided
+    if (!category && typeof window.detectNotificationCategory === 'function') {
     try {
       const context = {
         fileName: window.location.pathname,
@@ -600,7 +635,10 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
   }
   
   // Check if notification should be shown based on category preferences and notification mode
-  window.Logger.info(`🔔 showNotification called: "${message}", type: ${type}, category: ${category}, options:`, options, { page: "notification-system" });
+  // CRITICAL: Do NOT use Logger here to prevent infinite recursion (Logger calls getPreference which may call showNotification)
+  if (window.DEBUG_MODE) {
+    console.log(`🔔 showNotification called: "${message}", type: ${type}, category: ${category}`, options);
+  }
   
   if (category) {
     try {
@@ -613,18 +651,25 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
         options.functionName || 'showNotification'
       );
       if (window.DEBUG_MODE) {
-        window.Logger.info(`🔍 Category ${category} enabled:`, shouldShow, { page: "notification-system" });
+        console.log(`🔍 Category ${category} enabled:`, shouldShow);
       }
       if (!shouldShow) {
-        window.Logger.info(`❌ Notification blocked for category: ${category}`, { page: "notification-system" });
+        if (window.DEBUG_MODE) {
+          console.log(`❌ Notification blocked for category: ${category}`);
+        }
         return; // Don't show notification if category is disabled
       }
     } catch (error) {
-      window.Logger.warn('Failed to check notification category, showing anyway:', error, { page: "notification-system" });
+      // CRITICAL: Do NOT use Logger here to prevent infinite recursion
+      if (window.DEBUG_MODE) {
+        console.warn('Failed to check notification category, showing anyway:', error);
+      }
       // Continue to show notification if category check fails
     }
   } else {
-    window.Logger.info(`✅ Showing notification (category: ${category}, { page: "notification-system" })`);
+    if (window.DEBUG_MODE) {
+      console.log(`✅ Showing notification (category: ${category})`);
+    }
   }
   
   const notificationColor = getNotificationColor(type);
@@ -653,7 +698,14 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
   contentDiv.appendChild(titleDiv);
   const messageDiv = document.createElement('div');
   messageDiv.className = 'notification-message';
-  messageDiv.textContent = message;
+  messageDiv.textContent = message || '';
+  // Check if message is in English - if so, apply LTR direction
+  const messageStr = (message || '').toString();
+  const isEnglish = messageStr && (/^[a-zA-Z]/.test(messageStr.trim()) || /[a-zA-Z]{3,}/.test(messageStr));
+  if (isEnglish) {
+    messageDiv.style.direction = 'ltr';
+    messageDiv.style.textAlign = 'left';
+  }
   contentDiv.appendChild(messageDiv);
   notification.appendChild(contentDiv);
   const closeBtn = document.createElement('button');
@@ -859,11 +911,20 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
 
   // Save to global history
   saveNotificationToGlobalHistory(type, title, message, category).catch(error => {
-    window.Logger.warn('Failed to save notification to global history:', error, { page: "notification-system" });
+    // CRITICAL: Do NOT use Logger here to prevent infinite recursion
+    if (window.DEBUG_MODE) {
+      console.warn('Failed to save notification to global history:', error);
+    }
   });
 
-  // Console log for debugging
-  window.Logger.info(`🔔 ${type.toUpperCase()}: ${title} - ${message}`, { page: "notification-system" });
+  // Console log for debugging (only in DEBUG_MODE to prevent recursion)
+  if (window.DEBUG_MODE) {
+    console.log(`🔔 ${type.toUpperCase()}: ${title} - ${message}`);
+  }
+  } finally {
+    // CRITICAL: Always clear the flag to allow future notifications
+    window.__SHOW_NOTIFICATION_IN_PROGRESS__ = false;
+  }
 }
 
 /**
@@ -1405,7 +1466,7 @@ async function saveNotificationToGlobalHistory(type, title, message, category = 
       }
     } else {
       // מערכת מטמון לא מאותחלת - מדלג על שמירה
-      window.Logger.info('⚠️ Cache system not initialized - skipping notification history save', { page: "notification-system" });
+      window.Logger?.debug?.('ℹ️ Cache system not initialized - skipping notification history save', { page: "notification-system" });
     }
 
     // Fallback ל-localStorage במקרה של בעיה
@@ -1455,7 +1516,7 @@ async function updateGlobalNotificationStats() {
       }
     } else {
       // מערכת מטמון לא מאותחלת - מדלג על טעינה
-      window.Logger.info('⚠️ Cache system not initialized - skipping notification history load', { page: "notification-system" });
+      window.Logger?.debug?.('ℹ️ Cache system not initialized - skipping notification history load', { page: "notification-system" });
       history = [];
     }
     
@@ -1498,7 +1559,7 @@ async function updateGlobalNotificationStats() {
       }
     } else {
       // מערכת מטמון לא מאותחלת - מדלג על שמירת סטטיסטיקות
-      window.Logger.info('⚠️ Cache system not initialized - skipping notification stats save', { page: "notification-system" });
+      window.Logger?.debug?.('ℹ️ Cache system not initialized - skipping notification stats save', { page: "notification-system" });
     }
 
     // Fallback ל-localStorage

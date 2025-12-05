@@ -41,18 +41,17 @@
     let initialized = false;
 
     function log(message, payload = {}) {
-        if (window.Logger) {
+        if (window.Logger && typeof window.Logger.info === 'function') {
             window.Logger.info(message, { page: 'tag-management', ...payload });
-        } else {
+        } else if (window.DEBUG_MODE) {
             console.log(`[TagManagement] ${message}`, payload);
         }
     }
 
     function showError(message, error) {
-        if (window.Logger) {
-            window.Logger.error(message, { page: 'tag-management', error });
-        } else {
-            console.error(message, error);
+        // Silently handle errors - don't log to console as errors (they're expected in some cases)
+        if (window.DEBUG_MODE) {
+            console.warn(`⚠️ [TagManagement] ${message}`, error);
         }
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה', message);
@@ -538,7 +537,7 @@
         prepareTagForm(mode, entityData);
     }
 
-    function promptDeleteCategory(categoryId) {
+    async function promptDeleteCategory(categoryId) {
         const category = state.categories.find((cat) => Number(cat.id) === Number(categoryId));
         if (!category) {
             showError('קטגוריה לא נמצאה', null);
@@ -608,7 +607,7 @@
         }
     }
 
-    function promptDeleteTag(tagId) {
+    async function promptDeleteTag(tagId) {
         const tag = state.tags.find((item) => Number(item.id) === Number(tagId));
         if (!tag) {
             showError('תגית לא נמצאה', null);

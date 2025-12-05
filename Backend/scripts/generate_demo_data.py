@@ -1245,18 +1245,34 @@ class DemoDataGenerator:
                 
                 intermediate_quantity = round(trade.planned_quantity * random.uniform(0.3, 0.7), 2)
                 
+                # For intermediate executions:
+                # - Long: can be buy (scale in) or sell (partial close/scale out)
+                # - Short: can be short (scale in) or cover (partial close/scale out)
+                if random.random() > 0.5:
+                    # Scale in - add more to position (same as open_action)
+                    intermediate_action = open_action
+                    intermediate_notes = f"ביצוע ביניים (scale in) לטרייד {trade.id}"
+                else:
+                    # Scale out - partial close (opposite of open_action)
+                    if trade.side == 'Long':
+                        intermediate_action = 'sell'  # Partial sell for long
+                    else:  # Short
+                        intermediate_action = 'cover'  # Partial cover for short
+                    intermediate_quantity = round(trade.planned_quantity * random.uniform(0.2, 0.5), 2)  # Smaller quantity for partial close
+                    intermediate_notes = f"ביצוע ביניים (scale out - סגירה חלקית) לטרייד {trade.id}"
+                
                 intermediate_execution = Execution(
                     user_id=self.user_cache.id,
                     ticker_id=trade.ticker_id,
                     trading_account_id=trade.trading_account_id,
                     trade_id=trade.id,
-                    action=open_action,  # Additional buy/short (scale in)
+                    action=intermediate_action,
                     date=intermediate_date,
                     quantity=intermediate_quantity,
                     price=round(trade.entry_price * random.uniform(0.97, 1.03), 2),
                     fee=round(random.uniform(0, 30), 2),
                     source='manual',
-                    notes=f"ביצוע ביניים (scale in) לטרייד {trade.id}"
+                    notes=intermediate_notes
                 )
                 self.db.add(intermediate_execution)
                 created += 1

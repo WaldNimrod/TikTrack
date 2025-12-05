@@ -40,11 +40,22 @@ async function checkPage(browser, pageName, baseUrl = 'http://localhost:8080') {
   const page = await browser.newPage();
   
   try {
-    // Listen to console messages
+    // Listen to console messages and capture HEADER INIT logs
     const consoleMessages = [];
+    let headerInitMethod = null;
+    
     page.on('console', msg => {
       const text = msg.text();
       consoleMessages.push(text);
+      
+      // Check for HEADER INIT messages
+      if (text.includes('[HEADER INIT]')) {
+        if (text.includes('PLANNED')) {
+          headerInitMethod = 'planned';
+        } else if (text.includes('FALLBACK')) {
+          headerInitMethod = 'fallback';
+        }
+      }
     });
     
     // Navigate to page
@@ -53,39 +64,57 @@ async function checkPage(browser, pageName, baseUrl = 'http://localhost:8080') {
     
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
     
-    // Wait longer for initialization (8 seconds to ensure everything loads)
-    await new Promise(resolve => setTimeout(resolve, 8000));
+    // Wait longer for initialization (10 seconds to ensure everything loads and logs are written)
+    await new Promise(resolve => setTimeout(resolve, 10000));
     
     // Check window.__headerSystemInitMethod first (most reliable)
-    let method = null;
-    try {
-      method = await page.evaluate(() => {
-        return window.__headerSystemInitMethod || null;
-      });
-    } catch (e) {
-      // Ignore
-    }
+    let method = headerInitMethod; // Use value captured from console listener
     
-    // Check localStorage for init logs
     if (!method) {
       try {
-        const initLogs = await page.evaluate(() => {
-          return localStorage.getItem('__headerInitLogs');
+        const debugInfo = await page.evaluate(() => {
+          return {
+            headerSystemInitMethod: window.__headerSystemInitMethod || null,
+            headerSystemExists: typeof window.headerSystem !== 'undefined',
+            headerSystemInitialized: !!(window.headerSystem && window.headerSystem.isInitialized),
+            unifiedAppExists: typeof window.UnifiedAppInitializer !== 'undefined',
+            unifiedAppInitialized: window.globalInitializationState?.unifiedAppInitialized || false,
+            localStorageLogs: localStorage.getItem('__headerInitLogs')
+          };
         });
         
-        if (initLogs) {
-          const logs = JSON.parse(initLogs);
-          const pageLog = logs.find(log => log.page && log.page.endsWith(pageName));
-          if (pageLog) {
-            method = pageLog.method;
+        method = debugInfo.headerSystemInitMethod;
+        
+        // If method not set but header is initialized, infer from context
+        if (!method && debugInfo.headerSystemInitialized) {
+          if (debugInfo.unifiedAppExists && debugInfo.unifiedAppInitialized) {
+            method = 'planned';
+          } else if (debugInfo.headerSystemInitialized) {
+            method = 'fallback';
+          }
+        }
+        
+        // Check localStorage as backup
+        if (!method && debugInfo.localStorageLogs) {
+          try {
+            const logs = JSON.parse(debugInfo.localStorageLogs);
+            const pageLog = logs.find(log => {
+              const logPage = log.page || '';
+              return logPage.endsWith(pageName) || logPage.includes(pageName);
+            });
+            if (pageLog && pageLog.method) {
+              method = pageLog.method;
+            }
+          } catch (e) {
+            // Ignore parse errors
           }
         }
       } catch (e) {
-        // Ignore
+        // Ignore evaluation errors
       }
     }
     
-    // Check console messages for HEADER INIT
+    // Last resort: check console messages we captured
     if (!method) {
       for (const msg of consoleMessages) {
         if (msg.includes('[HEADER INIT]')) {

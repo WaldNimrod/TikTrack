@@ -119,8 +119,6 @@
 | **background-tasks.html** | משימות רקע | `http://localhost:5000/background-tasks.html` | `/api/background/*` |
 | **server-monitor.html** | ניטור שרת | `http://localhost:5000/server-monitor.html` | `/api/monitor/*` |
 | **system-management.html** | ניהול מערכת | `http://localhost:5000/system-management.html` | `/api/system/*` |
-| **cache-test.html** | בדיקת מטמון | `http://localhost:5000/cache-test.html` | `/api/cache/*` |
-| **linter-realtime-monitor.html** | ניטור לינטר | `http://localhost:5000/linter-realtime-monitor.html` | `/api/linter/*` |
 | **notifications-center.html** | מרכז התראות | `http://localhost:5000/notifications-center.html` | `/api/notifications/*` |
 | **css-management.html** | ניהול CSS | `http://localhost:5000/css-management.html` | `/api/css/*` |
 | **tradingview-test-page.html** | בדיקת TradingView Lightweight Charts | `http://localhost:8080/mockups/daily-snapshots/tradingview-test-page.html` | - |
@@ -158,7 +156,6 @@
 | **button-color-mapping.html** | מיפוי צבעי כפתורים | `http://localhost:8080/button-color-mapping.html` |
 | **button-color-mapping-simple.html** | מיפוי צבעי כפתורים - פשוט | `http://localhost:8080/button-color-mapping-simple.html` |
 | **conditions-modals.html** | מודלים של תנאים | `http://localhost:8080/conditions-modals.html` |
-| **tooltip-editor.html** | עורך טולטיפים | `http://localhost:8080/tooltip-editor.html` |
 | **preferences-groups-management.html** | ניהול קבוצות העדפות | `http://localhost:8080/preferences-groups-management.html` |
 | **tag-management.html** | ניהול תגיות | `http://localhost:8080/tag-management.html` |
 | **cache-management.html** | ניהול מטמון | `http://localhost:8080/cache-management.html` |
@@ -169,7 +166,7 @@
 ### עמודי רשימות מעקב
 | עמוד | תיאור | גישה |
 |------|--------|------|
-| **watch-lists-page.html** | ניהול רשימות צפייה | `http://localhost:8080/watch-lists-page.html` |
+| **watch-lists-page.html** | ניהול רשימות צפייה (מוקאפ) | `http://localhost:8080/mockups/watch-lists-page.html` |
 | **watch-list-modal.html** | מודל רשימת צפייה | `http://localhost:8080/watch-list-modal.html` |
 | **add-ticker-modal.html** | מודל הוספת טיקר | `http://localhost:8080/add-ticker-modal.html` |
 | **flag-quick-action.html** | פעולה מהירה - דגל | `http://localhost:8080/flag-quick-action.html` |

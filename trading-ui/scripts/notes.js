@@ -1804,19 +1804,34 @@ async function saveNote() {
       });
     }
 
-    const crudOptions = {
-      modalId: 'notesModal',
-      successMessage: noteId ? 'הערה עודכנה בהצלחה!' : 'הערה נשמרה בהצלחה!',
-      entityName: 'הערה',
-      reloadFn,
-      requiresHardReload: false
-    };
-
+    // Use UnifiedCRUDService for consistent CRUD operations
     let crudResult = null;
-    if (noteId) {
-      crudResult = await CRUDResponseHandler.handleUpdateResponse(response, crudOptions);
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+      if (noteId) {
+        payload.id = noteId;
+      }
+      crudResult = await window.UnifiedCRUDService.saveEntity('note', payload, {
+        modalId: 'notesModal',
+        successMessage: noteId ? 'הערה עודכנה בהצלחה!' : 'הערה נשמרה בהצלחה!',
+        entityName: 'הערה',
+        reloadFn,
+        requiresHardReload: false
+      });
     } else {
-      crudResult = await CRUDResponseHandler.handleSaveResponse(response, crudOptions);
+      // Fallback to direct API call with CRUDResponseHandler
+      const crudOptions = {
+        modalId: 'notesModal',
+        successMessage: noteId ? 'הערה עודכנה בהצלחה!' : 'הערה נשמרה בהצלחה!',
+        entityName: 'הערה',
+        reloadFn,
+        requiresHardReload: false
+      };
+
+      if (noteId) {
+        crudResult = await CRUDResponseHandler.handleUpdateResponse(response, crudOptions);
+      } else {
+        crudResult = await CRUDResponseHandler.handleSaveResponse(response, crudOptions);
+      }
     }
 
     // Cache invalidation after CRUDResponseHandler processes the response
@@ -2032,20 +2047,32 @@ async function deleteNoteFromServer(noteId) {
 
   while (retryCount < maxRetries) {
     try {
-      const useService = typeof window.NotesData?.deleteNote === 'function';
-      const response = useService
-        ? await window.NotesData.deleteNote(noteId)
-        : await fetch(`/api/notes/${noteId}`, { method: 'DELETE' });
+      // Use UnifiedCRUDService for consistent CRUD operations
+      if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.deleteEntity === 'function') {
+        await window.UnifiedCRUDService.deleteEntity('note', noteId, {
+          successMessage: 'הערה נמחקה בהצלחה!',
+          entityName: 'הערה',
+          reloadFn: () => window.loadNotesData({ force: true }),
+          requiresHardReload: false
+        });
+        return; // יציאה מוצלחת
+      } else {
+        // Fallback to direct API call with CRUDResponseHandler
+        const useService = typeof window.NotesData?.deleteNote === 'function';
+        const response = useService
+          ? await window.NotesData.deleteNote(noteId)
+          : await fetch(`/api/notes/${noteId}`, { method: 'DELETE' });
 
-      // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-      await CRUDResponseHandler.handleDeleteResponse(response, {
-        successMessage: 'הערה נמחקה בהצלחה!',
-        apiUrl: '/api/notes/',
-        entityName: 'הערה',
-        reloadFn: () => window.loadNotesData({ force: true }),
-        requiresHardReload: false
-      });
-      return; // יציאה מוצלחת
+        // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+        await CRUDResponseHandler.handleDeleteResponse(response, {
+          successMessage: 'הערה נמחקה בהצלחה!',
+          apiUrl: '/api/notes/',
+          entityName: 'הערה',
+          reloadFn: () => window.loadNotesData({ force: true }),
+          requiresHardReload: false
+        });
+        return; // יציאה מוצלחת
+      }
     } catch (error) {
       retryCount++;
 

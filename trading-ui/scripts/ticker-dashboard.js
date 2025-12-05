@@ -12,6 +12,7 @@
 
     let tickerId = null;
     let tickerData = null;
+    let dataUpdateApproved = false; // Flag to prevent infinite update loop
 
     /**
      * Resolve ticker symbol to ID
@@ -186,11 +187,39 @@
      */
     async function showMissingDataConfirmation(missingData, tickerSymbol) {
         return new Promise((resolve) => {
-            // Build detailed message
+            // Calculate totals for progress tracking
+            const totalFields = 1; // Only critical field: latest quote (נתוני מחיר נוכחי)
+            
+            // Total calculations depend on whether we have price data
+            // If we have price data: 5 calculations (ATR, 52W, Volatility, MA20, MA150)
+            // If we don't have price data: 6 calculations (price data + the 5 above)
+            // But since "price data" is included in missingCalculations when no quote,
+            // we can calculate dynamically based on what's actually checked
+            const totalCalculations = missingData.hasPrice ? 5 : 6; // 5 if we have price, 6 if we don't (includes price data calculation)
+            
+            const missingFieldsCount = missingData.missingFields.length;
+            const missingCalculationsCount = missingData.missingCalculations.length;
+            const availableFieldsCount = totalFields - missingFieldsCount;
+            const availableCalculationsCount = totalCalculations - missingCalculationsCount;
+            
+            // Build detailed message with progress information
             let message = `חסרים נתונים לטיקר ${tickerSymbol}:\n\n`;
             
+            // Add summary with counts
+            message += `📊 סיכום:\n`;
+            message += `  • שדות: ${availableFieldsCount}/${totalFields} זמינים`;
+            if (missingFieldsCount > 0) {
+                message += ` (${missingFieldsCount} חסרים)`;
+            }
+            message += `\n`;
+            message += `  • חישובים: ${availableCalculationsCount}/${totalCalculations} זמינים`;
+            if (missingCalculationsCount > 0) {
+                message += ` (${missingCalculationsCount} חסרים)`;
+            }
+            message += `\n\n`;
+            
             if (missingData.missingFields.length > 0) {
-                message += `שדות חסרים:\n`;
+                message += `שדות חסרים (${missingFieldsCount}/${totalFields}):\n`;
                 missingData.missingFields.forEach(field => {
                     message += `  • ${field}\n`;
                 });
@@ -198,7 +227,7 @@
             }
 
             if (missingData.missingCalculations.length > 0) {
-                message += `חישובים חסרים:\n`;
+                message += `חישובים חסרים (${missingCalculationsCount}/${totalCalculations}):\n`;
                 missingData.missingCalculations.forEach(calc => {
                     message += `  • ${calc}\n`;
                 });
@@ -210,11 +239,24 @@
 
             // Use showConfirmationDialog from warning-system.js if available
             if (typeof window.showConfirmationDialog === 'function') {
+                // Ensure modal z-index is set correctly before showing
+                // The modal will be shown via ModalManagerV2 which handles z-index
                 window.showConfirmationDialog(
                     'נתונים חסרים',
                     message,
                     () => {
-                        resolve(true);
+                        // After user confirms, ensure progress overlay will be above modal
+                        // by closing modal first, then resolving
+                        const modal = document.getElementById('confirmationModal');
+                        if (modal && window.ModalManagerV2) {
+                            window.ModalManagerV2.closeModal('confirmationModal').then(() => {
+                                resolve(true);
+                            }).catch(() => {
+                                resolve(true); // Resolve anyway if close fails
+                            });
+                        } else {
+                            resolve(true);
+                        }
                     },
                     () => {
                         resolve(false);
@@ -257,126 +299,73 @@
             if (window.unifiedProgressManager) {
                 window.unifiedProgressManager.createOverlay(overlayId, {
                     title: `טעינת נתונים עבור ${tickerSymbol}`,
-                    totalSteps: 4,
+                    totalSteps: 3,
                     stepLabels: [
-                        'טוען מחיר נוכחי',
-                        'טוען נתונים היסטוריים',
+                        'טוען נתונים מהספק החיצוני',
                         'מעבד ומאמת נתונים',
                         'מסיים טעינה'
                     ],
                     stepDescriptions: [
-                        'מתחבר לספק הנתונים החיצוני...',
-                        'מוריד 150 ימים של נתונים היסטוריים...',
+                        'מתחבר לספק הנתונים החיצוני, טוען מחיר נוכחי ונתונים היסטוריים...',
                         'בודק שכל הנתונים קיימים...',
                         'מסיים את התהליך...'
                     ]
                 });
             }
 
-            // Step 1: Fetch latest quote
+            // Step 1-2: Use ExternalDataService to refresh ticker data (quote + historical + indicators)
             if (window.Logger) {
-                window.Logger.info('📊 Step 1/4: Fetching latest quote...', { tickerId, page: 'ticker-dashboard' });
+                window.Logger.info('📊 Step 1-2/4: Refreshing ticker data using ExternalDataService...', { tickerId, page: 'ticker-dashboard' });
             }
             if (window.unifiedProgressManager) {
                 window.unifiedProgressManager.showProgress(
                     overlayId,
                     1,
-                    `טוען מחיר נוכחי עבור ${tickerSymbol}...`,
+                    `טוען נתונים עבור ${tickerSymbol}...`,
                     'מתחבר לספק הנתונים החיצוני...'
                 );
             }
 
-            // Use ExternalDataService to fetch quote
-            let quoteData = null;
-            if (window.ExternalDataService && typeof window.ExternalDataService.getQuote === 'function') {
+            // Use ExternalDataService.refreshTickerData() - unified system
+            // This handles: quote refresh, historical data (150 days), and technical indicators
+            let refreshResult = null;
+            if (window.ExternalDataService && typeof window.ExternalDataService.refreshTickerData === 'function') {
                 try {
-                    quoteData = await window.ExternalDataService.getQuote(tickerSymbol, { forceRefresh: true });
-                    if (window.Logger) {
-                        window.Logger.info('✅ Quote fetched successfully', { tickerId, hasPrice: !!quoteData?.price, page: 'ticker-dashboard' });
-                    }
-                } catch (quoteError) {
-                    if (window.Logger) {
-                        window.Logger.warn('⚠️ Error fetching quote, trying API endpoint', { error: quoteError.message, page: 'ticker-dashboard' });
-                    }
-                }
-            }
-
-            // Fallback: Try API endpoint directly
-            if (!quoteData) {
-                try {
-                    const response = await fetch(`/api/external-data/yahoo/quote/${tickerSymbol}`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        }
+                    refreshResult = await window.ExternalDataService.refreshTickerData(tickerId, {
+                        forceRefresh: true,
+                        includeHistorical: true,
+                        daysBack: 150
                     });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.status === 'success' && data.data) {
-                            quoteData = data.data;
-                            if (window.Logger) {
-                                window.Logger.info('✅ Quote fetched via API endpoint', { tickerId, page: 'ticker-dashboard' });
-                            }
-                        }
-                    }
-                } catch (apiError) {
                     if (window.Logger) {
-                        window.Logger.error('❌ Error fetching quote via API', { error: apiError.message, page: 'ticker-dashboard' });
+                        window.Logger.info('✅ Ticker data refreshed successfully via ExternalDataService', { 
+                            tickerId, 
+                            hasPrice: !!refreshResult?.price,
+                            hasHistorical: !!refreshResult?.historical_quotes_count,
+                            page: 'ticker-dashboard' 
+                        });
                     }
+                } catch (refreshError) {
+                    if (window.Logger) {
+                        window.Logger.error('❌ Error refreshing ticker data via ExternalDataService', { 
+                            error: refreshError.message, 
+                            tickerId,
+                            page: 'ticker-dashboard' 
+                        });
+                    }
+                    throw refreshError; // Re-throw to be handled by outer try-catch
                 }
+            } else {
+                throw new Error('ExternalDataService.refreshTickerData is not available');
             }
 
-            // Step 2: Trigger historical data fetch (for MA, Volatility, 52W calculations)
+            // Step 2: Wait for backend to process and verify all data is available
             if (window.Logger) {
-                window.Logger.info('📊 Step 2/4: Triggering historical data fetch...', { tickerId, page: 'ticker-dashboard' });
+                window.Logger.info('📊 Step 2/3: Waiting for data processing and verification...', { tickerId, page: 'ticker-dashboard' });
             }
             if (window.unifiedProgressManager) {
                 window.unifiedProgressManager.showProgress(
                     overlayId,
                     2,
-                    `טוען נתונים היסטוריים עבור ${tickerSymbol}...`,
-                    'מוריד 150 ימים של נתונים היסטוריים...'
-                );
-            }
-
-            // Note: Historical data is typically fetched by backend scheduler
-            // We can trigger a refresh endpoint if available
-            try {
-                const refreshResponse = await fetch(`/api/external-data/quotes/${tickerId}/refresh`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ force_refresh: true })
-                });
-
-                if (refreshResponse.ok) {
-                    if (window.Logger) {
-                        window.Logger.info('✅ Historical data refresh triggered', { tickerId, page: 'ticker-dashboard' });
-                    }
-                } else if (refreshResponse.status === 501) {
-                    // Feature not implemented - this is expected
-                    if (window.Logger) {
-                        window.Logger.info('ℹ️ Historical data refresh not implemented, will use existing data', { tickerId, page: 'ticker-dashboard' });
-                    }
-                }
-            } catch (refreshError) {
-                if (window.Logger) {
-                    window.Logger.warn('⚠️ Could not trigger historical data refresh', { error: refreshError.message, page: 'ticker-dashboard' });
-                }
-            }
-
-            // Step 3: Wait for backend to process and verify all data is available
-            if (window.Logger) {
-                window.Logger.info('📊 Step 3/4: Waiting for data processing and verification...', { tickerId, page: 'ticker-dashboard' });
-            }
-            if (window.unifiedProgressManager) {
-                window.unifiedProgressManager.showProgress(
-                    overlayId,
-                    3,
                     `מעבד ומאמת נתונים עבור ${tickerSymbol}...`,
                     'בודק שכל הנתונים קיימים...'
                 );
@@ -384,14 +373,24 @@
 
             // Wait for backend to process - longer wait for historical data (150 days)
             // Check data availability with retries
+            // If user already approved, reduce retries to avoid infinite loops
             let updatedData = null;
             let retryCount = 0;
-            const maxRetries = 10; // Try up to 10 times (50 seconds total)
+            const maxRetries = dataUpdateApproved ? 3 : 10; // Fewer retries if already approved
             const retryDelay = 5000; // 5 seconds between retries
+            const initialWait = 10000; // Wait 10 seconds before first check (allow backend to process)
+            
+            // Initial wait to allow backend to process and save data
+            if (window.Logger) {
+                window.Logger.info('⏳ Waiting for backend to process data before checking...', { tickerId, waitSeconds: initialWait / 1000, page: 'ticker-dashboard' });
+            }
+            await new Promise(resolve => setTimeout(resolve, initialWait));
             
             while (retryCount < maxRetries) {
-                // Wait before checking
-                await new Promise(resolve => setTimeout(resolve, retryDelay));
+                // Wait before checking (except first iteration which already waited)
+                if (retryCount > 0) {
+                    await new Promise(resolve => setTimeout(resolve, retryDelay));
+                }
                 
                 if (window.unifiedProgressManager) {
                     const progressPercent = Math.min(75, 50 + (retryCount / maxRetries) * 25); // 50-75% during verification
@@ -412,10 +411,20 @@
 
                 // Reload data with force refresh
                 if (window.TickerDashboardData) {
+                    const previousData = updatedData;
                     updatedData = await window.TickerDashboardData.loadTickerDashboardData(tickerId, { forceRefresh: true });
                     
                     // Check if all required data is now available
                     const missingData = checkMissingData(updatedData);
+                    
+                    // Check if data has improved (more calculations available than before)
+                    const previousMissingData = previousData ? checkMissingData(previousData) : null;
+                    const hasImproved = previousMissingData ? (
+                        (missingData.missingCalculations.length < previousMissingData.missingCalculations.length) ||
+                        ((!previousData?.atr || previousData?.atr === null) && updatedData?.atr) ||
+                        ((!previousData?.volatility || previousData?.volatility === null) && updatedData?.volatility) ||
+                        ((!previousData?.ma_20 || previousData?.ma_20 === null) && updatedData?.ma_20)
+                    ) : true; // First iteration - assume improvement
                     
                     if (window.Logger) {
                         window.Logger.info(`📊 Data check attempt ${retryCount + 1}/${maxRetries}`, { 
@@ -429,6 +438,7 @@
                             hasMA150: !!updatedData?.ma_150,
                             missingCalculations: missingData.missingCalculations,
                             hasAnyMissing: missingData.hasAnyMissing,
+                            hasImproved: hasImproved,
                             page: 'ticker-dashboard' 
                         });
                     }
@@ -441,6 +451,34 @@
                         break;
                     }
                     
+                    // If data hasn't improved after 3 attempts, stop trying
+                    // This means the backend either can't calculate the data or it's not available
+                    if (retryCount >= 3 && !hasImproved && previousData) {
+                        if (window.Logger) {
+                            window.Logger.info('ℹ️ Data not improving after multiple attempts, stopping retries', { 
+                                tickerId, 
+                                retryCount,
+                                missingCalculations: missingData.missingCalculations,
+                                page: 'ticker-dashboard' 
+                            });
+                        }
+                        break;
+                    }
+                    
+                    // If user already approved and we've tried a few times, stop early
+                    // This prevents infinite loops when data can't be fetched
+                    if (dataUpdateApproved && retryCount >= 2) {
+                        if (window.Logger) {
+                            window.Logger.info('ℹ️ User already approved update, stopping retries early to prevent infinite loop', { 
+                                tickerId, 
+                                retryCount,
+                                missingCalculations: missingData.missingCalculations,
+                                page: 'ticker-dashboard' 
+                            });
+                        }
+                        break;
+                    }
+                    
                     // If we still have missing calculations, continue waiting
                     retryCount++;
                 } else {
@@ -448,14 +486,14 @@
                 }
             }
 
-            // Step 4: Final verification and return
+            // Step 3: Final verification and return
             if (window.Logger) {
-                window.Logger.info('📊 Step 4/4: Final data verification...', { tickerId, page: 'ticker-dashboard' });
+                window.Logger.info('📊 Step 3/3: Final data verification...', { tickerId, page: 'ticker-dashboard' });
             }
             if (window.unifiedProgressManager) {
                 window.unifiedProgressManager.showProgress(
                     overlayId,
-                    4,
+                    3,
                     `מסיים טעינת נתונים עבור ${tickerSymbol}...`,
                     'מסיים את התהליך...'
                 );
@@ -615,22 +653,53 @@
                 });
             }
 
-            // Show confirmation
-            const approved = await showMissingDataConfirmation(missingData, tickerSymbol);
-            
-            if (approved) {
-                // Fetch data from provider
-                try {
-                    const updatedData = await fetchDataFromProvider(tickerId, tickerSymbol);
-                    if (updatedData) {
-                        tickerData = updatedData;
-                        return true;
+            // Only show confirmation if user hasn't already approved an update
+            // This prevents infinite update loops
+            if (!dataUpdateApproved) {
+                // Show confirmation
+                const approved = await showMissingDataConfirmation(missingData, tickerSymbol);
+                
+                if (approved) {
+                    dataUpdateApproved = true; // Mark as approved to prevent re-prompting
+                    
+                    // Fetch data from provider
+                    try {
+                        const updatedData = await fetchDataFromProvider(tickerId, tickerSymbol);
+                        if (updatedData) {
+                            tickerData = updatedData;
+                            
+                            // Re-check if data is still missing after update
+                            const updatedMissingData = checkMissingData(updatedData);
+                            if (updatedMissingData.missingCalculations.length > 0) {
+                                // Data still missing after update - log but proceed
+                                if (window.Logger) {
+                                    window.Logger.warn('⚠️ Some calculations still missing after update', { 
+                                        tickerId, 
+                                        tickerSymbol,
+                                        missingCalculations: updatedMissingData.missingCalculations,
+                                        page: 'ticker-dashboard' 
+                                    });
+                                }
+                            }
+                            
+                            return true;
+                        }
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.error('❌ Failed to fetch data from provider', { error: error.message, page: 'ticker-dashboard' });
+                        }
+                        // Continue anyway with existing data
                     }
-                } catch (error) {
-                    if (window.Logger) {
-                        window.Logger.error('❌ Failed to fetch data from provider', { error: error.message, page: 'ticker-dashboard' });
-                    }
-                    // Continue anyway with existing data
+                }
+            } else {
+                // User already approved, but data is still missing - log and proceed
+                if (window.Logger) {
+                    window.Logger.info('ℹ️ Data update already attempted, proceeding with available data', { 
+                        tickerId, 
+                        tickerSymbol,
+                        missingCalculations: missingData.missingCalculations,
+                        page: 'ticker-dashboard' 
+                    });
                 }
             }
         }
@@ -648,20 +717,55 @@
         const id = urlParams.get('tickerId');
         const symbol = urlParams.get('tickerSymbol');
         
+        if (window.Logger) {
+            window.Logger.debug('🔍 Parsing ticker ID from URL', { 
+                fullUrl: window.location.href,
+                searchParams: window.location.search,
+                tickerId: id,
+                tickerSymbol: symbol,
+                allParams: Object.fromEntries(urlParams.entries()),
+                page: 'ticker-dashboard' 
+            });
+        }
+        
         if (id) {
-            return parseInt(id, 10);
+            const parsedId = parseInt(id, 10);
+            if (isNaN(parsedId) || parsedId <= 0) {
+                if (window.Logger) {
+                    window.Logger.error('❌ Invalid ticker ID in URL', { id, parsedId, page: 'ticker-dashboard' });
+                }
+                return null;
+            }
+            if (window.Logger) {
+                window.Logger.debug('✅ Parsed ticker ID from URL', { id, parsedId, page: 'ticker-dashboard' });
+            }
+            return parsedId;
         }
         
         // If symbol provided, resolve to ID
         if (symbol) {
+            if (window.Logger) {
+                window.Logger.debug('🔍 Resolving ticker symbol to ID', { symbol, page: 'ticker-dashboard' });
+            }
             const resolvedId = await resolveTickerSymbolToId(symbol);
             if (resolvedId) {
+                if (window.Logger) {
+                    window.Logger.debug('✅ Resolved ticker symbol to ID', { symbol, resolvedId, page: 'ticker-dashboard' });
+                }
                 return resolvedId;
             } else {
                 if (window.Logger) {
-                    window.Logger.warn('Ticker symbol provided but could not resolve to ID', { symbol, page: 'ticker-dashboard' });
+                    window.Logger.warn('⚠️ Ticker symbol provided but could not resolve to ID', { symbol, page: 'ticker-dashboard' });
                 }
             }
+        }
+        
+        if (window.Logger) {
+            window.Logger.warn('⚠️ No ticker ID or symbol found in URL', { 
+                url: window.location.href,
+                search: window.location.search,
+                page: 'ticker-dashboard' 
+            });
         }
         
         return null;
@@ -731,6 +835,9 @@
                 window.Logger.info('🚀 initTickerDashboard START', { page: 'ticker-dashboard' });
             }
             
+            // Reset data update approval flag for new initialization
+            dataUpdateApproved = false;
+            
             if (typeof window.showLoadingState === 'function') {
                 window.showLoadingState('ticker-dashboard-top');
             }
@@ -744,6 +851,15 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const id = urlParams.get('tickerId');
                 const symbol = urlParams.get('tickerSymbol');
+                if (window.Logger) {
+                    window.Logger.error('❌ No ticker ID found in URL', { 
+                        urlParams: Object.fromEntries(urlParams.entries()),
+                        id,
+                        symbol,
+                        fullUrl: window.location.href,
+                        page: 'ticker-dashboard' 
+                    });
+                }
                 if (symbol) {
                     throw new Error(`לא ניתן למצוא טיקר עם סימול: ${symbol}`);
                 } else {
@@ -751,27 +867,67 @@
                 }
             }
             
+            // Validate ticker ID is a valid number
+            if (isNaN(tickerId) || tickerId <= 0) {
+                const errorMsg = `מזהה טיקר לא תקין: ${tickerId}`;
+                if (window.Logger) {
+                    window.Logger.error('❌ Invalid ticker ID', { tickerId, page: 'ticker-dashboard' });
+                }
+                throw new Error(errorMsg);
+            }
+            
             // Load ticker data
             if (window.TickerDashboardData) {
                 if (window.Logger) {
                     window.Logger.info('📊 Loading ticker dashboard data...', { tickerId, page: 'ticker-dashboard' });
                 }
-                tickerData = await window.TickerDashboardData.loadTickerDashboardData(tickerId);
-                if (window.Logger) {
-                    window.Logger.info('✅ Ticker data loaded', { 
-                        tickerId, 
-                        hasData: !!tickerData, 
-                        symbol: tickerData?.symbol,
-                        price: tickerData?.current_price || tickerData?.price,
-                        atr: tickerData?.atr,
-                        week52_high: tickerData?.week52_high,
-                        week52_low: tickerData?.week52_low,
-                        volatility: tickerData?.volatility,
-                        ma_20: tickerData?.ma_20,
-                        ma_150: tickerData?.ma_150,
-                        allKeys: tickerData ? Object.keys(tickerData).filter(k => k.includes('atr') || k.includes('week') || k.includes('volatility') || k.includes('52') || k.includes('ma')) : [],
-                        page: 'ticker-dashboard' 
-                    });
+                try {
+                    tickerData = await window.TickerDashboardData.loadTickerDashboardData(tickerId);
+                    if (window.Logger) {
+                        window.Logger.info('✅ Ticker data loaded', { 
+                            tickerId, 
+                            hasData: !!tickerData, 
+                            symbol: tickerData?.symbol,
+                            price: tickerData?.current_price || tickerData?.price,
+                            atr: tickerData?.atr,
+                            week52_high: tickerData?.week52_high,
+                            week52_low: tickerData?.week52_low,
+                            volatility: tickerData?.volatility,
+                            ma_20: tickerData?.ma_20,
+                            ma_150: tickerData?.ma_150,
+                            allKeys: tickerData ? Object.keys(tickerData).filter(k => k.includes('atr') || k.includes('week') || k.includes('volatility') || k.includes('52') || k.includes('ma')) : [],
+                            page: 'ticker-dashboard' 
+                        });
+                    }
+                } catch (error) {
+                    // Handle 404 errors (ticker not found) gracefully
+                    if (error.status === 404 || error?.message?.includes('לא נמצא')) {
+                        const errorMessage = error.userMessage || error.message || `טיקר עם מזהה ${tickerId} לא נמצא במערכת`;
+                        if (window.Logger) {
+                            window.Logger.error('❌ Ticker not found', { tickerId, error: errorMessage, page: 'ticker-dashboard' });
+                        }
+                        if (window.NotificationSystem) {
+                            window.NotificationSystem.showError('טיקר לא נמצא', errorMessage);
+                        }
+                        // Show error in the dashboard container
+                        const dashboardContainer = document.getElementById('ticker-dashboard-top');
+                        if (dashboardContainer) {
+                            dashboardContainer.innerHTML = `
+                                <div class="alert alert-danger" role="alert">
+                                    <h4 class="alert-heading">טיקר לא נמצא</h4>
+                                    <p>${errorMessage}</p>
+                                    <hr>
+                                    <p class="mb-0">אנא ודא שהמזהה נכון או חזור לדף הקודם.</p>
+                                </div>
+                            `;
+                        }
+                        if (typeof window.hideLoadingState === 'function') {
+                            window.hideLoadingState('ticker-dashboard-top');
+                        }
+                        return; // Stop initialization
+                    }
+                    // Re-throw other errors
+                    throw error;
                 }
             } else {
                 throw new Error('TickerDashboardData service not available');
@@ -1591,7 +1747,9 @@
                 "hide_top_toolbar": false,
                 "hide_legend": false,
                 "save_image": false,
-                "container_id": "tradingview_widget",
+                // Note: container_id is NOT part of TradingView widget config
+                // It's only used internally by TradingViewWidgetsFactory
+                // Do NOT include it here - it causes "cannot_get_metainfo" errors
                 "width": "100%", // Width is 100% of container
                 // Do NOT set height when using autosize: true - it will fill the container
                 "studies": [
@@ -1618,7 +1776,7 @@
                             color: "#800020" // Burgundy for MA 150
                         }]
                     }
-                ],
+                ].filter(Boolean), // Remove any null/undefined studies
                 "show_popup_button": true,
                 "popup_width": "1000",
                 "popup_height": "650",

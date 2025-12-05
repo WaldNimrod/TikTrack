@@ -1790,8 +1790,9 @@ class FieldRendererService {
         
         const colorClass = quantity > 0 ? 'numeric-value-positive' : 'numeric-value-negative';
         
-        // RTL: ערך קודם (ימין), אחר כך סימן מטבע (שמאל), ואז יחידות בסוגריים
-        return `<span class="position-display ${colorClass}">${formattedValue}${currencySymbol}(${formattedQuantity}#)</span>`;
+        // Format: (quantity#)$amount - quantity with # first, then $amount, no space
+        // white-space: nowrap prevents line break
+        return `<span class="position-display ${colorClass}" dir="ltr" style="white-space: nowrap;">(${formattedQuantity}#)${currencySymbol}${formattedValue}</span>`;
     }
 
     /**

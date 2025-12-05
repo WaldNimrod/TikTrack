@@ -92,14 +92,22 @@
 
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeIcons);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait for IconSystem to be ready
+            setTimeout(initializeIcons, 100);
+        });
     } else {
-        // DOM already loaded, initialize immediately
-        initializeIcons();
+        // DOM already loaded, wait a bit for IconSystem
+        setTimeout(initializeIcons, 100);
     }
 
-    // Also initialize after a short delay to catch dynamically added icons
+    // Also initialize after delays to catch dynamically added icons
     setTimeout(initializeIcons, 500);
+    setTimeout(initializeIcons, 1000);
+    setTimeout(initializeIcons, 2000);
+
+    // Export function for manual initialization
+    window.initializeIcons = initializeIcons;
 })();
 
 

@@ -262,6 +262,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 11
       },
       {
+        file: 'quick-quality-check.js',
+        globalCheck: 'window.runQuickQualityCheck',
+        description: 'Quick quality check for header button',
+        required: false,
+        loadOrder: 11.5
+      },
+      {
         file: 'page-state-manager.js',
         globalCheck: 'window.PageStateManager',
         description: 'Unified page state manager',
@@ -684,53 +691,46 @@ const PACKAGE_MANIFEST = {
         loadOrder: 1.9
       },
       {
-        file: 'modal-manager-v2.js',
-        globalCheck: 'window.ModalManagerV2',
-        description: 'Modal manager V2',
-        required: true,
-        loadOrder: 2
-      },
-      {
         file: 'tag-ui-manager.js',
         globalCheck: 'window.TagUIManager',
         description: 'Tag selection management in modals',
         required: true,
-        loadOrder: 3
+        loadOrder: 2
       },
       {
         file: 'tag-events.js',
         globalCheck: 'window.TagEvents',
         description: 'Global tag events system',
         required: true,
-        loadOrder: 4
+        loadOrder: 3
       },
       {
         file: 'modules/data-basic.js',
         globalCheck: 'window.DataBasic',
         description: 'Basic data',
         required: true,
-        loadOrder: 6
+        loadOrder: 4
       },
       {
         file: 'modules/ui-basic.js',
         globalCheck: 'window.UIBasic',
         description: 'Basic interface',
         required: true,
-        loadOrder: 7
+        loadOrder: 5
       },
       {
         file: 'modules/data-advanced.js',
         globalCheck: 'window.DataAdvanced',
         description: 'Advanced data',
         required: true,
-        loadOrder: 8
+        loadOrder: 6
       },
       {
         file: 'modules/ui-advanced.js',
         globalCheck: 'window.UIAdvanced',
         description: 'Advanced interface',
         required: true,
-        loadOrder: 9,
+        loadOrder: 7,
         exports: ['window.loadUserPreferences'] // Explicitly document that this script exports loadUserPreferences
       },
       {
@@ -738,105 +738,132 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.CommunicationModule',
         description: 'Communication module',
         required: true,
-        loadOrder: 10
+        loadOrder: 8
       },
       {
         file: 'modules/business-module.js',
         globalCheck: 'window.BusinessModule',
         description: 'Business module',
         required: true,
-        loadOrder: 11
+        loadOrder: 9
       },
       {
         file: 'modules/localstorage-sync.js',
         globalCheck: 'window.LocalStorageSync',
         description: 'localStorage synchronization',
         required: true,
-        loadOrder: 12
+        loadOrder: 10
       },
       {
         file: 'modules/dynamic-loader-config.js',
         globalCheck: 'window.DynamicLoaderConfig',
         description: 'Dynamic loader configuration',
         required: true,
-        loadOrder: 13
+        loadOrder: 11
       },
       {
         file: 'import-user-data.js',
         globalCheck: 'window.openImportUserDataModal',
         description: 'Execution data import modal',
         required: true,
-        loadOrder: 14
+        loadOrder: 12
       },
+      // ⚠️ CRITICAL: All modal configs MUST load BEFORE modal-manager-v2.js
+      // ModalManagerV2 needs these configs to be available when it initializes
       {
         file: 'modal-configs/trading-accounts-config.js',
         globalCheck: 'window.tradingAccountsModalConfig',
         description: 'Trading accounts modal configuration',
         required: false,
-        loadOrder: 15
+        loadOrder: 13
       },
       {
         file: 'modal-configs/alerts-config.js',
         globalCheck: 'window.alertsModalConfig',
         description: 'Alerts modal configuration',
         required: false,
-        loadOrder: 16
+        loadOrder: 14
       },
       {
         file: 'modal-configs/trades-config.js',
         globalCheck: 'window.tradesModalConfig',
         description: 'Trades modal configuration',
         required: true,
-        loadOrder: 17
+        loadOrder: 15
       },
       {
         file: 'modal-configs/executions-config.js',
         globalCheck: 'window.executionsModalConfig',
         description: 'Executions modal configuration (specific to executions page)',
         required: false,
-        loadOrder: 18
+        loadOrder: 16
       },
       {
         file: 'modal-configs/trade-plans-config.js',
         globalCheck: 'window.tradePlansModalConfig',
         description: 'Trade plans modal configuration',
         required: true,
-        loadOrder: 19
+        loadOrder: 17
       },
       {
         file: 'modal-configs/tickers-config.js',
         globalCheck: 'window.tickersModalConfig',
         description: 'Tickers modal configuration',
         required: false,
-        loadOrder: 20
+        loadOrder: 18
       },
       {
         file: 'modal-configs/cash-flows-config.js',
         globalCheck: 'window.cashFlowModalConfig',
         description: 'Cash flows modal configuration',
         required: true, // Required for cash_flows page
-        loadOrder: 21
+        loadOrder: 19
       },
       {
         file: 'modal-configs/notes-config.js',
         globalCheck: 'window.notesModalConfig',
         description: 'Notes modal configuration',
         required: false, // Not required for tag-management page. Required for ai-analysis page (loaded via ai-analysis package)
-        loadOrder: 22
+        loadOrder: 20
       },
       {
         file: 'modal-configs/tag-management-config.js',
         globalCheck: 'window.tagModalConfig',
         description: 'Tag system modal configuration',
         required: true,
-        loadOrder: 23
+        loadOrder: 21
       },
       {
         file: 'trade-selector-modal.js',
         globalCheck: 'window.tradeSelectorModal',
         description: 'Trade selector modal',
         required: false,
+        loadOrder: 22
+      },
+      // ⚠️ CRITICAL: Additional modal configs from other packages
+      // These must load before modal-manager-v2.js
+      {
+        file: 'modal-configs/conditions-config.js',
+        globalCheck: 'window.conditionsModalConfig',
+        description: 'Condition modal configuration (from conditions package)',
+        required: false, // Only required for pages with conditions package
+        loadOrder: 23
+      },
+      {
+        file: 'modal-configs/tag-search-config.js',
+        globalCheck: 'window.tagSearchDrawerConfig',
+        description: 'Tag search drawer configuration (from dashboard package)',
+        required: false, // Only required for pages with dashboard package
         loadOrder: 24
+      },
+      // ⚠️ CRITICAL: modal-manager-v2.js MUST load AFTER all modal configs
+      // It needs all configs to be available when it initializes
+      {
+        file: 'modal-manager-v2.js',
+        globalCheck: 'window.ModalManagerV2',
+        description: 'Modal manager V2 - MUST load after all modal configs',
+        required: true,
+        loadOrder: 25
       }
     ],
     estimatedSize: '~250KB',
@@ -1094,13 +1121,8 @@ const PACKAGE_MANIFEST = {
         required: true,
         loadOrder: 5
       },
-      {
-        file: 'modal-configs/conditions-config.js',
-        globalCheck: 'window.conditionsModalConfig',
-        description: 'Condition modal configuration',
-        required: true,
-        loadOrder: 6
-      },
+      // ⚠️ NOTE: conditions-config.js moved to modules package (loadOrder: 23)
+      // It must load before modal-manager-v2.js which is in modules package
       {
         file: 'conditions/conditions-ui-manager.js',
         globalCheck: 'window.ConditionsUIManager',
@@ -1906,14 +1928,9 @@ const PACKAGE_MANIFEST = {
         description: 'AI analysis export service',
         required: true,
         loadOrder: 5
-      },
-      {
-        file: 'modal-configs/notes-config.js',
-        globalCheck: 'window.notesModalConfig',
-        description: 'Notes modal configuration (required for Save as Note feature)',
-        required: true,
-        loadOrder: 6
       }
+      // ⚠️ NOTE: notes-config.js is already in modules package (loadOrder: 20)
+      // It must load before modal-manager-v2.js which is in modules package
     ],
     estimatedSize: '~80KB',
     initTime: '~50ms'
@@ -2080,13 +2097,8 @@ const PACKAGE_MANIFEST = {
         required: true,
         loadOrder: 5
       },
-      {
-        file: 'modal-configs/tag-search-config.js',
-        globalCheck: 'window.tagSearchDrawerConfig',
-        description: 'Tag search drawer configuration (for TagWidget)',
-        required: true,
-        loadOrder: 6
-      },
+      // ⚠️ NOTE: tag-search-config.js moved to modules package (loadOrder: 24)
+      // It must load before modal-manager-v2.js which is in modules package
       {
         file: 'index.js',
         globalCheck: 'window.initializeIndexPage',

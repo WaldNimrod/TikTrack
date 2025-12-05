@@ -147,6 +147,7 @@
                                         <button data-button-type="REFRESH" data-text="רענון ספקים" data-onclick="ExternalDataDashboardActions.refreshProviders(event)" data-size="small" data-id="action-refresh-providers"></button>
                                         <button data-button-type="REFRESH" data-text="רענון נתוני מטמון" data-onclick="ExternalDataDashboardActions.refreshCacheStats(event)" data-size="small" data-id="action-refresh-cache-stats"></button>
                                         <button data-button-type="PLAY" data-text="רענון כל הטיקרים" data-onclick="ExternalDataDashboardActions.refreshAllExternalData(event)" data-size="small" data-id="action-refresh-all-data"></button>
+                                        <button data-button-type="PLAY" data-text="טעינת נתונים מלאה" data-onclick="ExternalDataDashboardActions.refreshFullExternalData(event)" data-size="small" data-id="action-refresh-full-data" title="טוען נתונים נוכחיים, היסטוריים (150 ימים) ומחשב חישובים טכניים"></button>
                                     </div>
                                 </div>
                             </div>
@@ -197,6 +198,106 @@
                     </div>
                 </div>
                 <!-- UI Content Section 1 End-->
+
+                <!-- UI Content Section 1.5 Start - Scheduler Status -->
+                <div class="content-section" id="scheduler-section" data-section="scheduler-section">
+                    <div class="section-header">
+                        <h2>מצב מתזמן רענון נתונים</h2>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('scheduler-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div id="scheduler-status-content" class="scheduler-status-content">
+                            <div class="text-muted">טוען נתונים...</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 1.5 End-->
+
+                <!-- UI Content Section 1.55 Start - Scheduler Monitoring -->
+                <div class="content-section" id="scheduler-monitoring-section" data-section="scheduler-monitoring-section">
+                    <div class="section-header">
+                        <h2>ניטור מתזמן רענון נתונים</h2>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('scheduler-monitoring-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div id="scheduler-monitoring-content" class="scheduler-monitoring-content">
+                            <div class="text-muted">טוען נתונים...</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 1.55 End-->
+
+                <!-- UI Content Section 1.6 Start - Ticker Specific Data Load -->
+                <div class="content-section" id="ticker-load-section" data-section="ticker-load-section">
+                    <div class="section-header">
+                        <h2>טעינת נתונים לטיקר ספציפי</h2>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('ticker-load-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">בחירת טיקר</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="ticker-select" class="form-label">בחר טיקר:</label>
+                                            <select id="ticker-select" class="form-select">
+                                                <option value="">טוען רשימת טיקרים...</option>
+                                            </select>
+                                        </div>
+                                        <button data-button-type="PLAY" data-text="טען נתונים מלאים" data-onclick="ExternalDataDashboardActions.refreshTickerData(event)" data-size="small" data-id="action-refresh-ticker-data" class="w-100" disabled>
+                                            טען נתונים מלאים
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">סטטיסטיקות טעינה</h6>
+                                    </div>
+                                    <div class="card-body" id="ticker-load-stats">
+                                        <div class="text-muted">לא בוצעה טעינה</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 1.6 End-->
+
+                <!-- UI Content Section 1.7 Start - Missing Data Tickers -->
+                <div class="content-section" id="missing-data-section" data-section="missing-data-section">
+                    <div class="section-header">
+                        <h2>טיקרים עם נתונים חסרים</h2>
+                        <div class="table-actions">
+                            <button data-button-type="REFRESH" data-text="רענון רשימה" data-onclick="ExternalDataDashboardActions.refreshMissingData(event)" data-size="small" data-id="action-refresh-missing-data"></button>
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('missing-data-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div id="missing-data-content" class="missing-data-content">
+                            <div class="text-muted">טוען נתונים...</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 1.7 End-->
 
                 <!-- UI Content Section 2 Start-->
                 <div class="content-section" id="providers-section" data-section="providers-section">
@@ -414,11 +515,13 @@
         <!-- =============================================================== -->
         <!-- =============================================================== -->
         <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
     <!-- =============================================================== -->
     <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
     <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
-    <!-- 🎯 Page: external-data-dashboard | Generated: 2025-12-01T14:37:21.380Z -->
+    <!-- 🎯 Page: external-data-dashboard | Generated: 2025-12-05T18:13:41.261Z -->
     <!-- 📦 Packages: base, services, ui-advanced, modules, crud, conditions, dashboard-widgets, external-data, charts, logs, info-summary, init-system -->
 
     <!-- =============================================================== -->
@@ -478,8 +581,6 @@
     <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- Button system -->
     <!-- [25] Load Order: 25 -->
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- Dynamic color system -->
-    <!-- [26] Load Order: 26 -->
-     <!-- Unified initialization system - single entry point (required for all pages) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/12: SERVICES PACKAGE ===== -->
@@ -488,39 +589,39 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [27] Load Order: 27 -->
+    <!-- [26] Load Order: 26 -->
     <script src="scripts/services/data-collection-service.js?v=1.0.0"></script> <!-- Data collection service -->
-    <!-- [28] Load Order: 28 -->
+    <!-- [27] Load Order: 27 -->
     <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script> <!-- Field rendering service -->
-    <!-- [29] Load Order: 29 -->
+    <!-- [28] Load Order: 28 -->
     <script src="scripts/services/select-populator-service.js?v=1.0.0"></script> <!-- Select box population service -->
-    <!-- [30] Load Order: 30 -->
+    <!-- [29] Load Order: 29 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> <!-- jsPDF library (for AI analysis PDF export) -->
-    <!-- [31] Load Order: 31 -->
+    <!-- [30] Load Order: 30 -->
     <script src="scripts/services/ai-analysis-data.js?v=1.0.0"></script> <!-- AI Analysis data service -->
-    <!-- [32] Load Order: 32 -->
+    <!-- [31] Load Order: 31 -->
     <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- Statistics calculator -->
-    <!-- [33] Load Order: 33 -->
+    <!-- [32] Load Order: 32 -->
     <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- Default value service -->
-    <!-- [34] Load Order: 34 -->
+    <!-- [33] Load Order: 33 -->
     <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- Preferences data service (API + Cache) -->
-    <!-- [35] Load Order: 35 -->
+    <!-- [34] Load Order: 34 -->
     <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- CRUD response handler -->
-    <!-- [36] Load Order: 36 -->
+    <!-- [35] Load Order: 35 -->
     <script src="scripts/services/unified-crud-service.js?v=1.0.0"></script> <!-- Unified CRUD service for all entities -->
-    <!-- [37] Load Order: 37 -->
+    <!-- [36] Load Order: 36 -->
     <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- Investment form amount ↔ quantity calculations -->
-    <!-- [38] Load Order: 38 -->
+    <!-- [37] Load Order: 37 -->
     <script src="scripts/services/tag-service.js?v=1.0.0"></script> <!-- Central tag service (tag management and retrieval) -->
-    <!-- [39] Load Order: 39 -->
+    <!-- [38] Load Order: 38 -->
     <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
-    <!-- [40] Load Order: 40 -->
+    <!-- [39] Load Order: 39 -->
     <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- Unified linter status service (API reading and data conversion) -->
-    <!-- [41] Load Order: 41 -->
+    <!-- [40] Load Order: 40 -->
     <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
-    <!-- [42] Load Order: 42 -->
+    <!-- [41] Load Order: 41 -->
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
-    <!-- [43] Load Order: 43 -->
+    <!-- [42] Load Order: 42 -->
     <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- Rich text editor service -->
 
     <!-- =============================================================== -->
@@ -530,40 +631,42 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [44] Load Order: 44 -->
+    <!-- [43] Load Order: 43 -->
     <script src="scripts/modal-navigation-manager.js?v=1.0.0"></script> <!-- Nested modal navigation system -->
-    <!-- [45] Load Order: 45 -->
+    <!-- [44] Load Order: 44 -->
     <script src="scripts/modal-z-index-manager.js?v=1.0.0"></script> <!-- Dynamic z-index management for nested modals -->
-    <!-- [46] Load Order: 46 -->
-    <script src="scripts/modal-manager-v2.js?v=1.0.0"></script> <!-- Modal manager V2 -->
-    <!-- [47] Load Order: 47 -->
+    <!-- [45] Load Order: 45 -->
     <script src="scripts/tag-ui-manager.js?v=1.0.0"></script> <!-- Tag selection management in modals -->
-    <!-- [48] Load Order: 48 -->
+    <!-- [46] Load Order: 46 -->
     <script src="scripts/tag-events.js?v=1.0.0"></script> <!-- Global tag events system -->
-    <!-- [49] Load Order: 49 -->
+    <!-- [47] Load Order: 47 -->
     <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- Basic data -->
-    <!-- [50] Load Order: 50 -->
+    <!-- [48] Load Order: 48 -->
     <script src="scripts/modules/ui-basic.js?v=1.0.0"></script> <!-- Basic interface -->
-    <!-- [51] Load Order: 51 -->
+    <!-- [49] Load Order: 49 -->
     <script src="scripts/modules/data-advanced.js?v=1.0.0"></script> <!-- Advanced data -->
-    <!-- [52] Load Order: 52 -->
+    <!-- [50] Load Order: 50 -->
     <script src="scripts/modules/ui-advanced.js?v=1.0.0"></script> <!-- Advanced interface -->
-    <!-- [53] Load Order: 53 -->
+    <!-- [51] Load Order: 51 -->
     <script src="scripts/modules/communication-module.js?v=1.0.0"></script> <!-- Communication module -->
-    <!-- [54] Load Order: 54 -->
+    <!-- [52] Load Order: 52 -->
     <script src="scripts/modules/business-module.js?v=1.0.0"></script> <!-- Business module -->
-    <!-- [55] Load Order: 55 -->
+    <!-- [53] Load Order: 53 -->
     <script src="scripts/modules/localstorage-sync.js?v=1.0.0"></script> <!-- localStorage synchronization -->
-    <!-- [56] Load Order: 56 -->
+    <!-- [54] Load Order: 54 -->
     <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script> <!-- Dynamic loader configuration -->
-    <!-- [57] Load Order: 57 -->
+    <!-- [55] Load Order: 55 -->
     <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- Execution data import modal -->
-    <!-- [58] Load Order: 58 -->
+    <!-- [56] Load Order: 56 -->
     <script src="scripts/modal-configs/trades-config.js?v=1.0.0"></script> <!-- Trades modal configuration -->
-    <!-- [59] Load Order: 59 -->
+    <!-- [57] Load Order: 57 -->
     <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script> <!-- Trade plans modal configuration -->
-    <!-- [60] Load Order: 60 -->
+    <!-- [58] Load Order: 58 -->
+    <script src="scripts/modal-configs/cash-flows-config.js?v=1.0.0"></script> <!-- Cash flows modal configuration -->
+    <!-- [59] Load Order: 59 -->
     <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script> <!-- Tag system modal configuration -->
+    <!-- [60] Load Order: 60 -->
+    <script src="scripts/modal-manager-v2.js?v=1.0.0"></script> <!-- Modal manager V2 - MUST load after all modal configs -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 4/12: UI ADVANCED PACKAGE ===== -->
@@ -615,10 +718,8 @@
     <!-- [73] Load Order: 73 -->
     <script src="scripts/conditions/conditions-initializer.js?v=1.0.0"></script> <!-- Condition initializer -->
     <!-- [74] Load Order: 74 -->
-    <script src="scripts/modal-configs/conditions-config.js?v=1.0.0"></script> <!-- Condition modal configuration -->
-    <!-- [75] Load Order: 75 -->
     <script src="scripts/conditions/conditions-ui-manager.js?v=1.0.0"></script> <!-- Condition UI manager -->
-    <!-- [76] Load Order: 76 -->
+    <!-- [75] Load Order: 75 -->
     <script src="scripts/conditions/conditions-modal-controller.js?v=1.0.0"></script> <!-- Condition modal controller -->
 
     <!-- =============================================================== -->
@@ -628,12 +729,14 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [77] Load Order: 77 -->
+    <!-- [76] Load Order: 76 -->
     <script src="scripts/yahoo-finance-service.js?v=1.0.0"></script> <!-- Yahoo Finance service -->
-    <!-- [78] Load Order: 78 -->
+    <!-- [77] Load Order: 77 -->
     <script src="scripts/external-data-service.js?v=1.0.0"></script> <!-- External data service -->
-    <!-- [79] Load Order: 79 -->
+    <!-- [78] Load Order: 78 -->
     <script src="scripts/external-data-settings-service.js?v=1.0.0"></script> <!-- External data settings -->
+    <!-- [79] Load Order: 79 -->
+    <script src="scripts/external-data-dashboard.js?v=1.0.0"></script> <!-- External Data Dashboard - Main controller -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 8/12: CHARTS PACKAGE ===== -->
@@ -642,19 +745,19 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [80] Load Order: 80 -->
+    <!-- [79] Load Order: 79 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script> <!-- Chart.js library (CDN) -->
-    <!-- [81] Load Order: 81 -->
+    <!-- [80] Load Order: 80 -->
     <script src="scripts/charts/chart-theme.js?v=1.0.0"></script> <!-- Chart theme -->
-    <!-- [82] Load Order: 82 -->
+    <!-- [81] Load Order: 81 -->
     <script src="scripts/charts/chart-system.js?v=1.0.0"></script> <!-- Chart system -->
-    <!-- [83] Load Order: 83 -->
+    <!-- [82] Load Order: 82 -->
     <script src="scripts/charts/chart-loader.js?v=1.0.0"></script> <!-- Chart loader -->
-    <!-- [84] Load Order: 84 -->
+    <!-- [83] Load Order: 83 -->
     <script src="scripts/charts/chart-export.js?v=1.0.0"></script> <!-- Chart export -->
-    <!-- [85] Load Order: 85 -->
+    <!-- [84] Load Order: 84 -->
     <script src="scripts/charts/adapters/performance-adapter.js?v=1.0.0"></script> <!-- Performance adapter -->
-    <!-- [86] Load Order: 86 -->
+    <!-- [85] Load Order: 85 -->
     <script src="scripts/charts/adapters/trades-adapter.js?v=1.0.0"></script> <!-- Trades adapter -->
 
     <!-- =============================================================== -->
@@ -664,11 +767,11 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [87] Load Order: 87 -->
+    <!-- [86] Load Order: 86 -->
     <script src="scripts/unified-log-api.js?v=1.0.0"></script> <!-- Unified log API -->
-    <!-- [88] Load Order: 88 -->
+    <!-- [87] Load Order: 87 -->
     <script src="scripts/unified-log-manager.js?v=1.0.0"></script> <!-- Unified log manager -->
-    <!-- [89] Load Order: 89 -->
+    <!-- [88] Load Order: 88 -->
     <script src="scripts/unified-log-display.js?v=1.0.0"></script> <!-- Unified log display -->
 
     <!-- =============================================================== -->
@@ -678,9 +781,9 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [90] Load Order: 90 -->
+    <!-- [89] Load Order: 89 -->
     <script src="scripts/info-summary-system.js?v=1.0.0"></script> <!-- Core data summary system -->
-    <!-- [91] Load Order: 91 -->
+    <!-- [90] Load Order: 90 -->
     <script src="scripts/info-summary-configs.js?v=1.0.0"></script> <!-- Page configurations for data summary -->
 
     <!-- =============================================================== -->
@@ -690,18 +793,20 @@
     <!-- Dependencies: base, services, ui-advanced, entity-services, modules, entity-details -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [92] Load Order: 92 -->
+    <!-- [91] Load Order: 91 -->
     <script src="scripts/services/dashboard-data.js?v=1.0.0"></script> <!-- Unified dashboard data service -->
+    <!-- [92] Load Order: 92 -->
+    <script src="scripts/widgets/unified-pending-actions-widget.js?v=1.0.0"></script> <!-- undefined -->
     <!-- [93] Load Order: 93 -->
     <script src="scripts/widgets/recent-items-widget.js?v=1.0.0"></script> <!-- Unified recent trades and trade plans widget -->
     <!-- [94] Load Order: 94 -->
-    <script src="scripts/widgets/unified-pending-actions-widget.js?v=1.0.0"></script> <!-- Unified widget for pending assignments and creations -->
-    <!-- [95] Load Order: 95 -->
     <script src="scripts/widgets/tag-widget.js?v=1.0.0"></script> <!-- Unified tag widget (cloud + search) -->
-    <!-- [96] Load Order: 96 -->
+    <!-- [95] Load Order: 95 -->
     <script src="scripts/active-alerts-component.js?v=1.0.0"></script> <!-- Active alerts component -->
+    <!-- [96] Load Order: 96 -->
+    <script src="scripts/widgets/ticker-list-widget.js?v=1.0.0"></script> <!-- Ticker list widget with KPI cards -->
     <!-- [97] Load Order: 97 -->
-    <script src="scripts/modal-configs/tag-search-config.js?v=1.0.0"></script> <!-- Tag search drawer configuration (for TagWidget) -->
+    <script src="scripts/widgets/ticker-chart-widget.js?v=1.0.0"></script> <!-- Ticker chart widget with mini charts -->
     <!-- [98] Load Order: 98 -->
     <script src="scripts/index.js?v=1.0.0"></script> <!-- Dashboard page logic -->
 
@@ -709,7 +814,7 @@
     <!-- ===== PACKAGE 12/12: INITIALIZATION PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
-    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary, dashboard-widgets, tradingview-widgets, tradingview-charts, watch-lists, ai-analysis -->
+    <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
     <!-- [99] Load Order: 99 -->
@@ -720,15 +825,20 @@
     <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- Initialization system check -->
     <!-- [102] Load Order: 102 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- Page monitoring functions -->
+    <!-- [103] Load Order: 103 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- Unified initialization system - single entry point (required for all pages) -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
+    
+    <!-- External Data Dashboard - Main controller (must load after external-data package) -->
+    <script src="scripts/external-data-dashboard.js?v=1.0.0"></script> <!-- External Data Dashboard controller and actions -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 102 | Unique Scripts Loaded: 102 -->
+    <!-- 📊 Total Scripts Processed: 103 | Unique Scripts Loaded: 103 -->
     <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
 </body>
 </html>

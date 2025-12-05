@@ -2882,6 +2882,7 @@ class ImportOrchestrator:
                 import_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
                 unique_execution_id = f"{filename}_{import_timestamp}_{record.get('external_id', 'exec')}"
                 execution = Execution(
+                    user_id=user_id,  # Set user_id from parameter
                     ticker_id=record.get('ticker_id'),
                     trading_account_id=import_session.trading_account_id,
                     trade_id=None,

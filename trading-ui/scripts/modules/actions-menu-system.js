@@ -269,6 +269,8 @@ class ActionsMenuSystem {
                     case 'ADD': icon = '➕'; break;
                     case 'MENU': icon = '⚙️'; break;
                     case 'DASHBOARD': icon = '📊'; break;
+                    case 'REFRESH': icon = '🔄'; break;
+                    case 'RERUN': icon = '🔄'; break;
                     default: icon = '⚙️'; break;
                 }
             }

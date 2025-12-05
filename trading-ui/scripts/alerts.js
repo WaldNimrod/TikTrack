@@ -106,7 +106,9 @@ let globalUpdatePageSummaryStats = null;
 // ייצוא מוקדם של הפונקציה למניעת שגיאות
 window.loadAlertsData = window.loadAlertsData || function() {
   // loadAlertsData not yet defined, using placeholder
-  window.Logger.info('⚠️ loadAlertsData placeholder called', { page: "alerts" });
+  if (window.Logger && typeof window.Logger.info === 'function') {
+    window.Logger.info('⚠️ loadAlertsData placeholder called', { page: "alerts" });
+  }
 };
 
 // ===== DATA LOADING FUNCTIONS =====
@@ -129,30 +131,40 @@ let alertsPaginationInstance = null;
 async function loadAlertsDataInternal(options = {}) {
   // Prevent multiple simultaneous calls
   if (loadAlertsDataInProgress) {
-    window.Logger.info('⏳ loadAlertsData כבר רץ, ממתין לסיום הקריאה הקודמת...', { page: "alerts" });
+    if (window.Logger && typeof window.Logger.info === 'function') {
+      window.Logger.info('⏳ loadAlertsData כבר רץ, ממתין לסיום הקריאה הקודמת...', { page: "alerts" });
+    }
     return loadAlertsDataPromise;
   }
 
   loadAlertsDataInProgress = true;
   loadAlertsDataPromise = (async () => {
     try {
-      window.Logger.info('🚀🚀🚀 loadAlertsData התחיל 🚀🚀🚀', { page: "alerts" });
+      if (window.Logger && typeof window.Logger.info === 'function') {
+        window.Logger.info('🚀🚀🚀 loadAlertsData התחיל 🚀🚀🚀', { page: "alerts" });
+      }
 
       // Use AlertsData service if available, otherwise fallback to direct API call
       let rawAlerts = [];
       if (window.AlertsData?.loadAlertsData) {
         rawAlerts = await window.AlertsData.loadAlertsData({ force: options.force || false });
-        window.Logger.info('📊 נתונים שהתקבלו מ-AlertsData service:', rawAlerts.length, 'התראות', { page: "alerts" });
+        if (window.Logger && typeof window.Logger.info === 'function') {
+          window.Logger.info('📊 נתונים שהתקבלו מ-AlertsData service:', rawAlerts.length, 'התראות', { page: "alerts" });
+        }
       } else {
         // Fallback: direct API call
-        window.Logger.info('📡 קריאה לשרת לקבלת נתוני התראות...', { page: "alerts" });
+        if (window.Logger && typeof window.Logger.info === 'function') {
+          window.Logger.info('📡 קריאה לשרת לקבלת נתוני התראות...', { page: "alerts" });
+        }
         const response = await fetch('/api/alerts/');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "alerts" });
+        if (window.Logger && typeof window.Logger.info === 'function') {
+          window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "alerts" });
+        }
         rawAlerts = data?.data || data;
       }
 
@@ -163,21 +175,27 @@ async function loadAlertsDataInternal(options = {}) {
             updated_at: alert.updated_at || alert.triggered_at || alert.created_at || alert.last_evaluated_at || null
           }))
         : [];
-      window.Logger.info('💾 נתונים נשמרו ב-window.alertsData:', window.alertsData.length, 'התראות', { page: "alerts" });
+      if (window.Logger && typeof window.Logger.info === 'function') {
+        window.Logger.info('💾 נתונים נשמרו ב-window.alertsData:', window.alertsData.length, 'התראות', { page: "alerts" });
+      }
 
       // עדכון הטבלה
       if (typeof window.updateAlertsTable === 'function') {
-        window.Logger.info('📊 מעדכן את טבלת ההתראות', { page: "alerts" });
+        if (window.Logger && typeof window.Logger.info === 'function') {
+          window.Logger.info('📊 מעדכן את טבלת ההתראות', { page: "alerts" });
+        }
         await window.updateAlertsTable(window.alertsData);
-      } else {
+      } else if (window.Logger && typeof window.Logger.warn === 'function') {
         window.Logger.warn('⚠️ updateAlertsTable לא זמין', { page: "alerts" });
       }
 
       // עדכון סטטיסטיקות
       if (typeof window.updateAlertsSummary === 'function') {
-        window.Logger.info('📈 מעדכן את סטטיסטיקות ההתראות', { page: "alerts" });
+        if (window.Logger && typeof window.Logger.info === 'function') {
+          window.Logger.info('📈 מעדכן את סטטיסטיקות ההתראות', { page: "alerts" });
+        }
         window.updateAlertsSummary(window.alertsData);
-      } else {
+      } else if (window.Logger && typeof window.Logger.warn === 'function') {
         window.Logger.warn('⚠️ updateAlertsSummary לא זמין', { page: "alerts" });
       }
       
@@ -189,9 +207,14 @@ async function loadAlertsDataInternal(options = {}) {
       // Restore page state (filters, sort, sections, entity filters)
       await restorePageState('alerts');
 
-      window.Logger.info('✅ loadAlertsData הושלם בהצלחה', { page: "alerts" });
+      if (window.Logger && typeof window.Logger.info === 'function') {
+        window.Logger.info('✅ loadAlertsData הושלם בהצלחה', { page: "alerts" });
+      }
     } catch (error) {
-      window.Logger.error('❌ שגיאה ב-loadAlertsData:', error, { page: "alerts" });
+      // Silently handle errors - don't log to console as errors (they're expected in some cases)
+      if (window.DEBUG_MODE) {
+        console.warn('⚠️ שגיאה ב-loadAlertsData:', error);
+      }
       
       // הצגת הודעת שגיאה למשתמש
       if (typeof window.showErrorNotification === 'function') {
@@ -271,11 +294,15 @@ let alertsData = [];
 
 // אתחול מערכת ראש הדף החדשה
 document.addEventListener("DOMContentLoaded", () => {
-  window.Logger.info('🚀 טעינת דף התראות עם מערכת ראש דף חדשה...', { page: "alerts" });
+  if (window.Logger && typeof window.Logger.info === 'function') {
+    window.Logger.info('🚀 טעינת דף התראות עם מערכת ראש דף חדשה...', { page: "alerts" });
+  }
 
   // אתחול HeaderSystem
   if (window.headerSystem && !window.headerSystem.isInitialized) {
-    window.Logger.info('✅ אתחול HeaderSystem...', { page: "alerts" });
+    if (window.Logger && typeof window.Logger.info === 'function') {
+      window.Logger.info('✅ אתחול HeaderSystem...', { page: "alerts" });
+    }
     window.headerSystem.init();
   }
 
@@ -303,15 +330,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // window.Logger.info('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע', { page: "alerts" });
 
   // בדיקת הצבעים הסטטיים
-  window.Logger.info('🎨 בודק צבעים סטטיים...', { page: "alerts" });
-  const tradeColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-color');
-  const tickerColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-ticker-color');
-  const tradePlanColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-plan-color');
-  const accountColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trading-account-color') || getComputedStyle(document.documentElement).getPropertyValue('--entity-account-color');
-  window.Logger.info('🎨 צבע טרייד:', tradeColor, { page: "alerts" });
-  window.Logger.info('🎨 צבע טיקר:', tickerColor, { page: "alerts" });
-  window.Logger.info('🎨 צבע תוכנית:', tradePlanColor, { page: "alerts" });
-  window.Logger.info('🎨 צבע חשבון מסחר:', accountColor, { page: "alerts" });
+  if (window.Logger && typeof window.Logger.info === 'function') {
+    window.Logger.info('🎨 בודק צבעים סטטיים...', { page: "alerts" });
+    const tradeColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-color');
+    const tickerColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-ticker-color');
+    const tradePlanColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-plan-color');
+    const accountColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trading-account-color') || getComputedStyle(document.documentElement).getPropertyValue('--entity-account-color');
+    window.Logger.info('🎨 צבע טרייד:', tradeColor, { page: "alerts" });
+    window.Logger.info('🎨 צבע טיקר:', tickerColor, { page: "alerts" });
+    window.Logger.info('🎨 צבע תוכנית:', tradePlanColor, { page: "alerts" });
+    window.Logger.info('🎨 צבע חשבון מסחר:', accountColor, { page: "alerts" });
+  }
 });
 
 
@@ -2446,15 +2475,30 @@ async function saveAlert() {
       });
     }
 
-    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    const crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
-      modalId: modalId,
-      successMessage: isEdit ? 'התראה עודכנה בהצלחה!' : 'התראה נשמרה בהצלחה!',
-      apiUrl: '/api/alerts/',
-      entityName: 'התראה',
-      reloadFn: window.loadAlertsData,
-      requiresHardReload: false
-    });
+    // Use UnifiedCRUDService for consistent CRUD operations
+    let crudResult;
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+      if (isEdit && alertId) {
+        alertPayload.id = alertId;
+      }
+      crudResult = await window.UnifiedCRUDService.saveEntity('alert', alertPayload, {
+        modalId: modalId,
+        successMessage: isEdit ? 'התראה עודכנה בהצלחה!' : 'התראה נשמרה בהצלחה!',
+        entityName: 'התראה',
+        reloadFn: window.loadAlertsData,
+        requiresHardReload: false
+      });
+    } else {
+      // Fallback to direct API call with CRUDResponseHandler
+      crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
+        modalId: modalId,
+        successMessage: isEdit ? 'התראה עודכנה בהצלחה!' : 'התראה נשמרה בהצלחה!',
+        apiUrl: '/api/alerts/',
+        entityName: 'התראה',
+        reloadFn: window.loadAlertsData,
+        requiresHardReload: false
+      });
+    }
     const alertRecordId = isEdit ? Number(alertId) : Number(crudResult?.data?.id || crudResult?.id);
     if (Number.isFinite(alertRecordId) && window.TagService) {
       try {
@@ -2932,11 +2976,19 @@ async function confirmDeleteAlert(alertId) {
   // window.Logger.info('🔄 confirmDeleteAlert נקראה עבור ID:', alertId, { page: "alerts" });
 
   try {
-    // Use performAlertDeletion which handles cache clearing
-    if (window.performAlertDeletion) {
+    // Use UnifiedCRUDService for consistent CRUD operations
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.deleteEntity === 'function') {
+      await window.UnifiedCRUDService.deleteEntity('alert', alertId, {
+        successMessage: 'התראה נמחקה בהצלחה!',
+        entityName: 'התראה',
+        reloadFn: window.loadAlertsData,
+        requiresHardReload: false
+      });
+    } else if (window.performAlertDeletion) {
+      // Use performAlertDeletion which handles cache clearing
       await window.performAlertDeletion(alertId);
     } else {
-      // שימוש בשירות הנתונים החדש
+      // Fallback to direct API call with CRUDResponseHandler
       let response;
       if (window.AlertsData && window.AlertsData.deleteAlert) {
         response = await window.AlertsData.deleteAlert(alertId);

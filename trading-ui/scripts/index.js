@@ -1756,17 +1756,41 @@ window.debugZIndexStatus = debugZIndexStatus;
  * Sets all widgets in the same row to the height of the tallest widget in that row
  * @returns {void}
  */
-function equalizeWidgetHeights() {
-    try {
-        // Find all rows with widgets in the dashboard section
-        const dashboardSection = document.querySelector('#main .section-body');
-        if (!dashboardSection) {
-            window.Logger?.warn?.('⚠️ Dashboard section not found', { page: 'index' });
-            return;
-        }
+// CRITICAL: Add debouncing to prevent infinite loops
+let equalizeWidgetHeightsTimeout = null;
+let equalizeWidgetHeightsInProgress = false;
 
-        // Find all rows with class "row" that contain widgets
-        const rows = dashboardSection.querySelectorAll('.row.g-3');
+function equalizeWidgetHeights() {
+    // CRITICAL: Prevent infinite loops - if already in progress, skip silently
+    if (equalizeWidgetHeightsInProgress) {
+        return;
+    }
+    
+    // Clear any pending timeout
+    if (equalizeWidgetHeightsTimeout) {
+        clearTimeout(equalizeWidgetHeightsTimeout);
+    }
+    
+    // Debounce: wait 200ms before executing (increased from 100ms to reduce calls)
+    equalizeWidgetHeightsTimeout = setTimeout(() => {
+        equalizeWidgetHeightsInProgress = true;
+        
+        try {
+            // Find all rows with widgets in the dashboard section
+            const dashboardSection = document.querySelector('#main .section-body');
+            if (!dashboardSection) {
+                window.Logger?.warn?.('⚠️ Dashboard section not found', { page: 'index' });
+                equalizeWidgetHeightsInProgress = false;
+                return;
+            }
+
+            // Find all rows with class "row" that contain widgets
+            const rows = dashboardSection.querySelectorAll('.row.g-3');
+            
+            if (rows.length === 0) {
+                equalizeWidgetHeightsInProgress = false;
+                return;
+            }
         
         rows.forEach((row, rowIndex) => {
             // Find all card widgets in this row
@@ -1832,13 +1856,19 @@ function equalizeWidgetHeights() {
             }
         });
 
-        window.Logger?.info?.('✅ Widget heights equalized', { 
-            rowsProcessed: rows.length,
-            page: 'index' 
-        });
-    } catch (error) {
-        window.Logger?.error?.('❌ Error equalizing widget heights:', error, { page: 'index' });
-    }
+            // Only log if there were actual rows processed (reduce log spam)
+            if (rows.length > 0) {
+                window.Logger?.debug?.('✅ Widget heights equalized', { 
+                    rowsProcessed: rows.length,
+                    page: 'index' 
+                });
+            }
+        } catch (error) {
+            window.Logger?.error?.('❌ Error equalizing widget heights:', error, { page: 'index' });
+        } finally {
+            equalizeWidgetHeightsInProgress = false;
+        }
+    }, 200);
 }
 
 // Export to global scope
@@ -1870,10 +1900,18 @@ window.addEventListener('resize', () => {
 
 // Re-equalize heights after widget content updates
 // This will be called by widgets after they render content
+// CRITICAL: Debounce to prevent infinite loops
+let widgetContentUpdatedTimeout = null;
 window.addEventListener('widgetContentUpdated', () => {
-    setTimeout(() => {
+    // Clear any pending timeout
+    if (widgetContentUpdatedTimeout) {
+        clearTimeout(widgetContentUpdatedTimeout);
+    }
+    
+    // Debounce: wait 300ms before executing (longer than equalizeWidgetHeights debounce to prevent loops)
+    widgetContentUpdatedTimeout = setTimeout(() => {
         equalizeWidgetHeights();
-    }, 100);
+    }, 300);
 });
 
 window.Logger.info('✅ Index page ready', { page: "index" });

@@ -543,16 +543,104 @@ class DataRefreshScheduler:
             logger.error(f"Error logging group refresh failure: {e}")
 
     def get_scheduler_status(self) -> Dict[str, Any]:
-        """Get current scheduler status."""
+        """Get current scheduler status with detailed information."""
         current_ny_time = datetime.now(self.ny_timezone)
+        session = None
         
-        return {
-            'scheduler_running': self.running,
-            'current_ny_time': current_ny_time.isoformat(),
-            'is_trading_time': self._is_trading_time(current_ny_time),
-            'refresh_policy': self.refresh_policy,
-            'config': self.config
-        }
+        try:
+            from models.external_data import DataRefreshLog
+            
+            session = self.session_factory()
+            
+            # Get last refresh time
+            last_refresh_log = session.query(DataRefreshLog).filter(
+                DataRefreshLog.operation_type == 'group_refresh',
+                DataRefreshLog.status.in_(['success', 'partial_success', 'completed'])
+            ).order_by(DataRefreshLog.end_time.desc()).first()
+            
+            last_refresh = None
+            if last_refresh_log and last_refresh_log.end_time:
+                last_refresh = last_refresh_log.end_time.isoformat()
+            
+            # Get refresh statistics
+            total_refreshes = session.query(DataRefreshLog).filter(
+                DataRefreshLog.operation_type == 'group_refresh'
+            ).count()
+            
+            successful_refreshes = session.query(DataRefreshLog).filter(
+                DataRefreshLog.operation_type == 'group_refresh',
+                DataRefreshLog.status.in_(['success', 'partial_success', 'completed'])
+            ).count()
+            
+            failed_refreshes = session.query(DataRefreshLog).filter(
+                DataRefreshLog.operation_type == 'group_refresh',
+                DataRefreshLog.status == 'failed'
+            ).count()
+            
+            # Calculate next refresh time based on policy
+            next_refresh = None
+            if self.running and last_refresh_log:
+                # Calculate next refresh based on category and time period
+                if last_refresh_log.category == 'active_trades':
+                    if last_refresh_log.time_period == 'in_hours':
+                        # 5 minutes for active trades in hours
+                        next_refresh_time = last_refresh_log.end_time + timedelta(minutes=5)
+                    else:  # off_hours
+                        # 60 minutes for active trades off hours
+                        next_refresh_time = last_refresh_log.end_time + timedelta(minutes=60)
+                elif last_refresh_log.category == 'no_active_trades':
+                    # 60 minutes for no active trades
+                    next_refresh_time = last_refresh_log.end_time + timedelta(minutes=60)
+                else:
+                    # Default to 60 minutes
+                    next_refresh_time = last_refresh_log.end_time + timedelta(minutes=60)
+                
+                if next_refresh_time:
+                    next_refresh = next_refresh_time.isoformat()
+            
+            # Get when scheduler started (if running)
+            started_at = None
+            if self.running and self.scheduler_thread and self.scheduler_thread.is_alive():
+                # Try to get the first log entry after scheduler started
+                first_log = session.query(DataRefreshLog).filter(
+                    DataRefreshLog.operation_type == 'group_refresh'
+                ).order_by(DataRefreshLog.start_time.asc()).first()
+                if first_log:
+                    started_at = first_log.start_time.isoformat()
+            
+            return {
+                'scheduler_running': self.running,
+                'current_ny_time': current_ny_time.isoformat(),
+                'is_trading_time': self._is_trading_time(current_ny_time),
+                'refresh_policy': self.refresh_policy,
+                'config': self.config,
+                'last_refresh': last_refresh,
+                'next_refresh': next_refresh,
+                'total_refreshes': total_refreshes,
+                'successful_refreshes': successful_refreshes,
+                'failed_refreshes': failed_refreshes,
+                'started_at': started_at
+            }
+        except Exception as e:
+            logger.error(f"Error getting detailed scheduler status: {e}")
+            # Return basic status if error
+            return {
+                'scheduler_running': self.running,
+                'current_ny_time': current_ny_time.isoformat(),
+                'is_trading_time': self._is_trading_time(current_ny_time),
+                'refresh_policy': self.refresh_policy,
+                'config': self.config,
+                'last_refresh': None,
+                'next_refresh': None,
+                'total_refreshes': 0,
+                'successful_refreshes': 0,
+                'failed_refreshes': 0,
+                'started_at': None,
+                'error': str(e)
+            }
+        finally:
+            if session:
+                session.close()
     
     def get_group_refresh_history(self, limit: int = 50) -> List[Dict]:
         """Get recent group refresh history."""

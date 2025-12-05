@@ -1,0 +1,307 @@
+{
+  "timestamp": "2025-12-05T20:55:11.847450",
+  "summary": {
+    "total": 24,
+    "passed": 11,
+    "failed": 13
+  },
+  "results": [
+    {
+      "page": "טריידים",
+      "url": "/trades.html",
+      "modal_id": "tradesModal",
+      "tests": {
+        "page_load": {
+          "status": "PASSED"
+        },
+        "modal_open": {
+          "status": "PASSED"
+        },
+        "modal_close": {
+          "status": "PASSED"
+        }
+      }
+    },
+    {
+      "page": "טריידים",
+      "url": "/trades.html",
+      "modal_id": "tradesModal",
+      "tests": {
+        "form_fields": {
+          "status": "PASSED",
+          "field_count": 19,
+          "error": null
+        }
+      }
+    },
+    {
+      "page": "טריידים",
+      "url": "/trades.html",
+      "modal_id": "tradesModal",
+      "tests": {
+        "no_data": {
+          "status": "SKIPPED",
+          "error": "No data rows found"
+        }
+      }
+    },
+    {
+      "page": "תכניות מסחר",
+      "url": "/trade_plans.html",
+      "modal_id": "tradePlansModal",
+      "tests": {
+        "page_load": {
+          "status": "PASSED"
+        },
+        "modal_open": {
+          "status": "PASSED"
+        },
+        "modal_close": {
+          "status": "PASSED"
+        }
+      }
+    },
+    {
+      "page": "תכניות מסחר",
+      "url": "/trade_plans.html",
+      "modal_id": "tradePlansModal",
+      "tests": {
+        "form_fields": {
+          "status": "PASSED",
+          "field_count": 19,
+          "error": null
+        }
+      }
+    },
+    {
+      "page": "תכניות מסחר",
+      "url": "/trade_plans.html",
+      "modal_id": "tradePlansModal",
+      "tests": {
+        "no_data": {
+          "status": "SKIPPED",
+          "error": "No data rows found"
+        }
+      }
+    },
+    {
+      "page": "התראות",
+      "url": "/alerts.html",
+      "modal_id": "alertsModal",
+      "tests": {
+        "page_load": {
+          "status": "PASSED"
+        },
+        "modal_open": {
+          "status": "FAILED",
+          "error": "Modal element not found or not visible after 20 seconds. Console errors: 16"
+        }
+      }
+    },
+    {
+      "page": "התראות",
+      "url": "/alerts.html",
+      "modal_id": "alertsModal",
+      "tests": {
+        "error": {
+          "status": "FAILED",
+          "error": "Modal element not found in DOM after 15 seconds"
+        }
+      }
+    },
+    {
+      "page": "התראות",
+      "url": "/alerts.html",
+      "modal_id": "alertsModal",
+      "tests": {
+        "no_data": {
+          "status": "SKIPPED",
+          "error": "No data rows found"
+        }
+      }
+    },
+    {
+      "page": "ביצועים",
+      "url": "/executions.html",
+      "modal_id": "executionsModal",
+      "tests": {
+        "page_load": {
+          "status": "PASSED"
+        },
+        "modal_open": {
+          "status": "FAILED",
+          "error": "Modal element not found or not visible after 20 seconds. Console errors: 13"
+        }
+      }
+    },
+    {
+      "page": "ביצועים",
+      "url": "/executions.html",
+      "modal_id": "executionsModal",
+      "tests": {
+        "error": {
+          "status": "FAILED",
+          "error": "Modal element not found in DOM after 15 seconds"
+        }
+      }
+    },
+    {
+      "page": "ביצועים",
+      "url": "/executions.html",
+      "modal_id": "executionsModal",
+      "tests": {
+        "no_data": {
+          "status": "SKIPPED",
+          "error": "No data rows found"
+        }
+      }
+    },
+    {
+      "page": "חשבונות מסחר",
+      "url": "/trading_accounts.html",
+      "modal_id": "tradingAccountsModal",
+      "tests": {
+        "page_load": {
+          "status": "PASSED"
+        },
+        "modal_open": {
+          "status": "FAILED",
+          "error": "Modal element not found or not visible after 20 seconds. Console errors: 13"
+        }
+      }
+    },
+    {
+      "page": "חשבונות מסחר",
+      "url": "/trading_accounts.html",
+      "modal_id": "tradingAccountsModal",
+      "tests": {
+        "error": {
+          "status": "FAILED",
+          "error": "Modal element not found in DOM after 15 seconds"
+        }
+      }
+    },
+    {
+      "page": "חשבונות מסחר",
+      "url": "/trading_accounts.html",
+      "modal_id": "tradingAccountsModal",
+      "tests": {
+        "no_data": {
+          "status": "SKIPPED",
+          "error": "No data rows found"
+        }
+      }
+    },
+    {
+      "page": "טיקרים",
+      "url": "/tickers.html",
+      "modal_id": "tickersModal",
+      "tests": {
+        "page_load": {
+          "status": "PASSED"
+        },
+        "modal_open": {
+          "status": "FAILED",
+          "error": "Modal element not found or not visible after 20 seconds. Console errors: 13"
+        }
+      }
+    },
+    {
+      "page": "טיקרים",
+      "url": "/tickers.html",
+      "modal_id": "tickersModal",
+      "tests": {
+        "error": {
+          "status": "FAILED",
+          "error": "Modal element not found in DOM after 15 seconds"
+        }
+      }
+    },
+    {
+      "page": "טיקרים",
+      "url": "/tickers.html",
+      "modal_id": "tickersModal",
+      "tests": {
+        "no_data": {
+          "status": "SKIPPED",
+          "error": "No data rows found"
+        }
+      }
+    },
+    {
+      "page": "תזרימי מזומנים",
+      "url": "/cash_flows.html",
+      "modal_id": "cashFlowModal",
+      "tests": {
+        "page_load": {
+          "status": "PASSED"
+        },
+        "modal_open": {
+          "status": "PASSED"
+        },
+        "modal_close": {
+          "status": "PASSED"
+        }
+      }
+    },
+    {
+      "page": "תזרימי מזומנים",
+      "url": "/cash_flows.html",
+      "modal_id": "cashFlowModal",
+      "tests": {
+        "form_fields": {
+          "status": "PASSED",
+          "field_count": 25,
+          "error": null
+        }
+      }
+    },
+    {
+      "page": "תזרימי מזומנים",
+      "url": "/cash_flows.html",
+      "modal_id": "cashFlowModal",
+      "tests": {
+        "no_data": {
+          "status": "SKIPPED",
+          "error": "No data rows found"
+        }
+      }
+    },
+    {
+      "page": "הערות",
+      "url": "/notes.html",
+      "modal_id": "notesModal",
+      "tests": {
+        "page_load": {
+          "status": "PASSED"
+        },
+        "modal_open": {
+          "status": "FAILED",
+          "error": "Modal element not found or not visible after 20 seconds. Console errors: 16"
+        }
+      }
+    },
+    {
+      "page": "הערות",
+      "url": "/notes.html",
+      "modal_id": "notesModal",
+      "tests": {
+        "error": {
+          "status": "FAILED",
+          "error": "Modal element not found in DOM after 15 seconds"
+        }
+      }
+    },
+    {
+      "page": "הערות",
+      "url": "/notes.html",
+      "modal_id": "notesModal",
+      "tests": {
+        "no_data": {
+          "status": "SKIPPED",
+          "error": "No data rows found"
+        }
+      }
+    }
+  ]
+}

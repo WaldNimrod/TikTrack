@@ -35,6 +35,7 @@ class RateLimiter:
     def __init__(self):
         self.rate_limits: Dict[str, deque] = defaultdict(deque)
         self.endpoint_limits: Dict[str, Dict[str, int]] = {
+            'static': {'requests': 100000, 'window': 60},  # 100000 requests per minute for static files (effectively unlimited)
             'default': {'requests': 5000, 'window': 60},  # 5000 requests per minute (increased for development)
             'api': {'requests': 5000, 'window': 60},      # 5000 requests per minute (increased for development)
             'auth': {'requests': 500, 'window': 60},      # 500 requests per minute (increased for development)
@@ -69,7 +70,10 @@ class RateLimiter:
         Returns:
             str: Endpoint type
         """
-        if endpoint.startswith('/api/auth'):
+        # Static files (JS, CSS, images, etc.) - no rate limiting or very high limit
+        if any(endpoint.endswith(ext) for ext in ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.woff', '.woff2', '.ttf', '.eot']):
+            return 'static'
+        elif endpoint.startswith('/api/auth'):
             return 'auth'
         elif endpoint.startswith('/api/admin'):
             return 'admin'

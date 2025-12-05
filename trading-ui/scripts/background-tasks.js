@@ -148,7 +148,7 @@ const utils = {
       element.disabled = false;
       // Restore original content based on element type
       if (elementId.includes('start-scheduler')) {
-        element.innerHTML.textContent = ';
+        element.textContent = 'התחל';
       } else if (elementId.includes('stop-scheduler')) {
         // Use IconSystem to render stop icon
         // Use IconSystem if available
@@ -376,13 +376,13 @@ const uiManager = {
         // Scheduler is running - show only stop button
         startBtn.style.setProperty('display', 'none', 'important');
         stopBtn.style.setProperty('display', 'inline-block', 'important');
-        stopBtn.innerHTML.textContent = ';
+        stopBtn.textContent = 'עצור';
         stopBtn.disabled = false;
       } else {
         // Scheduler is stopped - show only start button
         startBtn.style.setProperty('display', 'inline-block', 'important');
         stopBtn.style.setProperty('display', 'none', 'important');
-        startBtn.innerHTML.textContent = ';
+        startBtn.textContent = 'הפעל';
         startBtn.disabled = false;
       }
     }

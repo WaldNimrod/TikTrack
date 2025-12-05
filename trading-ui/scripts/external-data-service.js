@@ -9,8 +9,8 @@
  * - documentation/02-ARCHITECTURE/FRONTEND/EXTERNAL_DATA_SERVICE_SYSTEM.md
  * 
  * Author: TikTrack Development Team
- * Version: 1.0
- * Last Updated: 2025-01-27
+ * Version: 2.0.0
+ * Last Updated: 2025-12-05
  */
 
 /**
@@ -688,6 +688,54 @@ class ExternalDataService {
     } catch (error) {
       this.log(`Silent external data refresh failed: ${error.message}`, 'warn');
       return null;
+    }
+  }
+
+  /**
+   * Refresh single ticker data with historical data and technical indicators
+   * @function refreshTickerData
+   * @async
+   * @param {number} tickerId - Ticker ID
+   * @param {Object} options - Options
+   * @param {boolean} [options.forceRefresh=true] - Force refresh even if data is recent
+   * @param {boolean} [options.includeHistorical=true] - Include historical data (150 days)
+   * @param {number} [options.daysBack=150] - Number of days for historical data
+   * @returns {Promise<Object>} Updated ticker data with quote, historical data, and indicators
+   */
+  async refreshTickerData(tickerId, options = {}) {
+    try {
+      const {
+        forceRefresh = true,
+        includeHistorical = true,
+        daysBack = 150
+      } = options;
+
+      this.log(`Refreshing ticker data for ticker ID ${tickerId} (historical: ${includeHistorical}, days: ${daysBack})`);
+
+      // Use backend endpoint that handles:
+      // - Quote refresh
+      // - Historical data (150 days)
+      // - Technical indicators pre-calculation
+      const url = `${this.baseUrl}/quotes/${tickerId}/refresh`;
+      const response = await this.makeRequest(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          force_refresh: forceRefresh,
+          include_historical: includeHistorical,
+          days_back: daysBack
+        })
+      });
+
+      if (response.status === 'success' && response.data) {
+        this.log(`Successfully refreshed ticker data for ticker ID ${tickerId}`);
+        return response.data;
+      } else {
+        throw new Error(response.message || 'Failed to refresh ticker data');
+      }
+
+    } catch (error) {
+      this.log(`Error refreshing ticker data for ticker ID ${tickerId}: ${error.message}`, 'error');
+      throw error;
     }
   }
 

@@ -131,7 +131,6 @@ http://localhost:8080/my-new-page
 - `/designs` → `designs.html`
 - `/constraints` → `constraints.html`
 - `/external-data-dashboard` → `external-data-dashboard.html`
-- `/linter-realtime-monitor` → `linter-realtime-monitor.html`
 - `/chart-management` → `chart-management.html`
 
 ### עמודים נוספים
@@ -218,6 +217,7 @@ def ai_analysis() -> Any:
 ---
 
 **עודכן:** 28 בינואר 2025
+
 
 
 

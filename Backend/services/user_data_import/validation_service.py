@@ -956,11 +956,15 @@ class ValidationService:
             logger.error(f"📋 Traceback: {traceback.format_exc()}")
             return []
     
-    def _load_ticker_cache(self):
+    def _load_ticker_cache(self, user_id: Optional[int] = None):
         """
         Load ticker cache from database.
         
         This method loads all tickers into memory for faster validation.
+        If user_id is provided, loads only user-specific tickers via user_tickers.
+        
+        Args:
+            user_id: Optional user ID for user-specific ticker loading
         """
         try:
             if not self.db_session or not Ticker:
@@ -968,8 +972,19 @@ class ValidationService:
                 self.ticker_cache = None
                 return
             
-            logger.info("🔄 Loading ticker cache from database...")
-            tickers = self.db_session.query(Ticker).all()
+            if user_id:
+                logger.info(f"🔄 Loading user-specific ticker cache for user {user_id}...")
+                from models.user_ticker import UserTicker
+                user_tickers = self.db_session.query(UserTicker).filter(
+                    UserTicker.user_id == user_id
+                ).all()
+                ticker_ids = [ut.ticker_id for ut in user_tickers]
+                tickers = self.db_session.query(Ticker).filter(
+                    Ticker.id.in_(ticker_ids)
+                ).all() if ticker_ids else []
+            else:
+                logger.info("🔄 Loading ticker cache from database...")
+                tickers = self.db_session.query(Ticker).all()
             
             # Create cache as dict with symbol as key
             self.ticker_cache = {ticker.symbol: ticker for ticker in tickers}

@@ -2348,8 +2348,27 @@ window.addEventListener('error', event => {
     console.error('❌ Global Error:', details);
   }
 
-  if (event.error && typeof window.showNotification === 'function') {
-    window.showNotification('❌ System error occurred', 'error');
+  // CRITICAL: Prevent infinite recursion - don't call showNotification if error is in notification system
+  // Check if error is related to notification system to prevent recursion
+  const isNotificationError = event.filename && (
+    event.filename.includes('notification-system') ||
+    event.filename.includes('notification') ||
+    event.message?.includes('notification') ||
+    event.message?.includes('showNotification') ||
+    event.message?.includes('shouldShowNotification')
+  );
+
+  // Also check if showNotification is currently being called (prevent recursion)
+  if (!isNotificationError && !window.__SHOW_NOTIFICATION_IN_PROGRESS__ && event.error && typeof window.showNotification === 'function') {
+    try {
+      window.showNotification('❌ System error occurred', 'error', 'מערכת', 5000, 'system', { userInitiated: false });
+    } catch (notificationError) {
+      // If showing notification fails, just log to console to prevent further recursion
+      console.error('❌ Failed to show error notification:', notificationError);
+    }
+  } else if (isNotificationError) {
+    // If error is in notification system, just log to console
+    console.error('❌ Error in notification system (preventing recursion):', details);
   }
 });
 
@@ -2622,6 +2641,11 @@ function getNotificationIcon(type) {
  */
 async function shouldShowNotification(category) {
   try {
+    // CRITICAL: Prevent infinite recursion - if getPreference is currently being called, return default
+    if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+      return true; // Default: show notification during preferences loading
+    }
+    
     const preferenceName = `notifications_${category}_enabled`;
     // Preference check - debug only
 
@@ -2674,6 +2698,11 @@ async function shouldShowNotification(category) {
  */
 async function shouldLogToConsole(category) {
   try {
+    // CRITICAL: Prevent infinite recursion - if getPreference is currently being called, return default
+    if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+      return true; // Default: write to console during preferences loading
+    }
+    
     const preferenceName = `console_logs_${category}_enabled`;
     const isEnabled = await window.getPreference(preferenceName);
     return isEnabled === 'true' || isEnabled === true;

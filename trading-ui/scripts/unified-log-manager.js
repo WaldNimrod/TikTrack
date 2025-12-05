@@ -517,7 +517,10 @@ class UnifiedLogManager {
                 timestamp: new Date().toISOString()
             };
         } catch (error) {
-            console.error(`❌ Failed to get log data for ${logType}:`, error);
+            // Silently handle errors - don't log to console as errors (they're expected in some cases)
+            if (window.DEBUG_MODE) {
+                console.warn(`⚠️ Failed to get log data for ${logType}:`, error);
+            }
             // Return empty data instead of throwing error
             return {
                 data: [],

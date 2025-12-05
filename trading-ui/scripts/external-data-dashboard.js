@@ -638,6 +638,14 @@
       if (groupLimitSelect) {
         groupLimitSelect.addEventListener('change', () => this.loadGroupRefreshHistory(true));
       }
+
+      const tickerSelect = getElement('ticker-select');
+      const tickerRefreshButton = getElement('action-refresh-ticker-data');
+      if (tickerSelect && tickerRefreshButton) {
+        tickerSelect.addEventListener('change', () => {
+          tickerRefreshButton.disabled = !tickerSelect.value;
+        });
+      }
     }
 
     /**
@@ -646,6 +654,15 @@
      */
     startAutoRefresh() {
       this.stopAutoRefresh();
+      // Refresh scheduler status every 30 seconds
+      this.schedulerRefreshHandle = window.setInterval(() => {
+        this.loadSchedulerStatus();
+      }, 30000);
+      // Refresh scheduler monitoring every 60 seconds
+      this.schedulerMonitoringHandle = window.setInterval(() => {
+        this.loadSchedulerMonitoring();
+      }, 60000);
+      // Refresh core data at normal interval
       this.autoRefreshHandle = window.setInterval(() => {
         this.refreshCoreData();
       }, AUTO_REFRESH_INTERVAL_MS);
@@ -660,6 +677,14 @@
         window.clearInterval(this.autoRefreshHandle);
         this.autoRefreshHandle = null;
       }
+      if (this.schedulerRefreshHandle) {
+        window.clearInterval(this.schedulerRefreshHandle);
+        this.schedulerRefreshHandle = null;
+      }
+      if (this.schedulerMonitoringHandle) {
+        window.clearInterval(this.schedulerMonitoringHandle);
+        this.schedulerMonitoringHandle = null;
+      }
     }
 
     /**
@@ -672,7 +697,11 @@
         this.loadProviders(),
         this.loadCacheStats(),
         this.loadLogs(),
-        this.loadGroupRefreshHistory()
+        this.loadGroupRefreshHistory(),
+        this.loadSchedulerStatus(),
+        this.loadSchedulerMonitoring(),
+        this.loadTickersList(),
+        this.loadMissingDataTickers()
       ]);
     }
 
@@ -685,7 +714,8 @@
       await Promise.allSettled([
         this.loadSystemStatus(showNotifications),
         this.loadProviders(showNotifications),
-        this.loadCacheStats(showNotifications)
+        this.loadCacheStats(showNotifications),
+        this.loadSchedulerStatus(showNotifications)
       ]);
     }
 
@@ -838,6 +868,686 @@
         this.handleError('שגיאה ברענון כל הטיקרים', error, 'refresh-all');
         throw error;
       }
+    }
+
+    /**
+     * Full external data refresh - loads current quotes, historical data (150 days), and pre-calculates technical indicators
+     * @returns {Promise<Object>} Refresh result payload
+     * @throws {Error} If refresh fails
+     */
+    async refreshFullExternalData() {
+      const startTime = performance.now();
+      const buttonId = 'action-refresh-full-data';
+      const button = document.getElementById(buttonId);
+      const originalText = button?.textContent || 'טעינת נתונים מלאה';
+      
+      try {
+        // Show loading indicator
+        if (button) {
+          button.disabled = true;
+          button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>טוען...';
+        }
+        
+        notification.info('טעינת נתונים מלאה', 'התהליך החל, זה עשוי לקחת מספר דקות...');
+        
+        const response = await fetch('/api/external-data/refresh/full', { method: 'POST' });
+        const rawText = await response.text();
+        let payload = {};
+        if (rawText) {
+          try {
+            payload = JSON.parse(rawText);
+          } catch (parseError) {
+            payload = { message: rawText };
+          }
+        }
+
+        if (!response.ok) {
+          const errorMessage = safeText(
+            payload?.error || payload?.message || 'טעינת הנתונים המלאה נכשלה'
+          );
+          throw new Error(errorMessage);
+        }
+
+        const duration = performance.now() - startTime;
+        const result = payload?.data || {};
+        const requested = Number.isFinite(Number(result.requested)) ? Number(result.requested) : 0;
+        const currentQuotesLoaded = Number.isFinite(Number(result.current_quotes_loaded)) ? Number(result.current_quotes_loaded) : 0;
+        const failedSymbols = Array.isArray(result.failed_symbols) ? result.failed_symbols : [];
+        const skippedEntries = Array.isArray(result.skipped) ? result.skipped : [];
+        const historicalData = result.historical_data || {};
+        const technicalIndicators = result.technical_indicators || {};
+        const performance = result.performance || {};
+
+        // Build summary message
+        const summaryParts = [
+          `נטענו ${formatNumber(currentQuotesLoaded)} מתוך ${formatNumber(requested)} טיקרים`,
+          `${formatNumber(historicalData.tickers_with_historical || 0)} טיקרים עם נתונים היסטוריים`,
+          `${formatNumber(technicalIndicators.total_calculated || 0)} חישובים טכניים`,
+          `משך ${formatDurationMs(duration)}`
+        ];
+
+        const developerDetails = [
+          `• טיקרים שהתבקשו: ${formatNumber(requested)}`,
+          `• quotes נוכחיים שנטענו: ${formatNumber(currentQuotesLoaded)}`,
+          `• טיקרים עם נתונים היסטוריים: ${formatNumber(historicalData.tickers_with_historical || 0)}`,
+          `• סה"כ quotes היסטוריים: ${formatNumber(historicalData.total_historical_quotes || 0)}`,
+          `• ממוצע quotes לטיקר: ${formatNumber(historicalData.average_quotes_per_ticker || 0)}`,
+          `• חישובים טכניים שבוצעו: ${formatNumber(technicalIndicators.total_calculated || 0)}`,
+          `• טיקרים עם חישובים טכניים: ${formatNumber(technicalIndicators.tickers_with_indicators || 0)}`,
+          `• טיקרים שנכשלו: ${formatNumber(failedSymbols.length)}`,
+          `• טיקרים שדולגו: ${formatNumber(skippedEntries.length)}`,
+          `• משך כולל: ${formatDurationMs(duration)}`,
+          `• זמן התחלה: ${performance.start_time ? new Date(performance.start_time).toLocaleString('he-IL') : 'לא זמין'}`,
+          `• זמן סיום: ${performance.end_time ? new Date(performance.end_time).toLocaleString('he-IL') : 'לא זמין'}`
+        ];
+
+        if (failedSymbols.length > 0) {
+          const truncatedFailed = failedSymbols.slice(0, 10).join(', ');
+          const hasMoreFailures = failedSymbols.length > 10 ? ' (קיימים נוספים…) ' : '';
+          developerDetails.push(`• סימבולים שנכשלו: ${truncatedFailed}${hasMoreFailures}`);
+        }
+
+        if (skippedEntries.length) {
+          const truncatedSkipped = skippedEntries
+            .slice(0, 5)
+            .map((entry) => `ID:${entry.id} (${safeText(entry.reason, 'לא צויין')})`)
+            .join(', ');
+          const hasMoreSkipped = skippedEntries.length > 5 ? ' (קיימים נוספים…) ' : '';
+          developerDetails.push(`• פרטי טיקרים שדולגו: ${truncatedSkipped}${hasMoreSkipped}`);
+        }
+
+        const summaryMessage = summaryParts.join(' · ');
+        const isFullSuccess = requested > 0 && currentQuotesLoaded === requested && failedSymbols.length === 0 && skippedEntries.length === 0;
+
+        if (!requested) {
+          const userMessage = 'לא נמצאו טיקרים פעילים עם סימול תקף ולכן הטעינה המלאה לא בוצעה.';
+          notification.detailedError(
+            'טעינת נתונים מלאה נכשלה',
+            userMessage,
+            developerDetails
+          );
+        } else if (!isFullSuccess) {
+          const userMessage = 'הטעינה המלאה הושלמה עם חלק מהטיקרים שנכשלו או דולגו.';
+          notification.detailedError(
+            'טעינת נתונים מלאה הושלמה (חלקי)',
+            userMessage,
+            developerDetails
+          );
+        } else {
+          notification.success('טעינת נתונים מלאה הושלמה', summaryMessage);
+        }
+
+        // Refresh all dashboard data
+        await Promise.allSettled([
+          this.refreshCoreData(),
+          this.loadGroupRefreshHistory(),
+          this.loadLogs(),
+          this.loadSystemStatus(),
+          this.loadCacheStats(),
+          this.loadSchedulerStatus()
+        ]);
+
+        return payload;
+      } catch (error) {
+        const duration = performance.now() - startTime;
+        logger.error(`${MODULE_NAME}:refresh-full:error`, { error, duration });
+        this.handleError('שגיאה בטעינת נתונים מלאה', error, 'refresh-full');
+        throw error;
+      } finally {
+        // Restore button state
+        if (button) {
+          button.disabled = false;
+          button.textContent = originalText;
+        }
+      }
+    }
+
+    /**
+     * Load tickers list for dropdown
+     * @returns {Promise<void>}
+     */
+    async loadTickersList() {
+      try {
+        const response = await fetch('/api/tickers?status=open');
+        if (!response.ok) {
+          throw new Error(`Failed to load tickers: ${response.status}`);
+        }
+        const data = await response.json();
+        const tickers = data?.data || [];
+        const select = getElement('ticker-select');
+        if (!select) {
+          return;
+        }
+        
+        // Clear existing options except the first one
+        select.innerHTML = '<option value="">בחר טיקר...</option>';
+        
+        // Add tickers to dropdown
+        tickers.forEach(ticker => {
+          const option = document.createElement('option');
+          option.value = ticker.id;
+          option.textContent = `${ticker.symbol || 'N/A'} - ${ticker.name || 'ללא שם'}`;
+          select.appendChild(option);
+        });
+        
+        // Enable refresh button if tickers are available
+        const refreshButton = getElement('action-refresh-ticker-data');
+        if (refreshButton) {
+          refreshButton.disabled = tickers.length === 0;
+        }
+        
+        // Enable select if tickers are available
+        select.disabled = tickers.length === 0;
+      } catch (error) {
+        logger.error(`${MODULE_NAME}:load-tickers-list:error`, { error });
+        const select = getElement('ticker-select');
+        if (select) {
+          select.innerHTML = '<option value="">שגיאה בטעינת רשימת טיקרים</option>';
+          select.disabled = true;
+        }
+      }
+    }
+
+    /**
+     * Refresh ticker-specific data
+     * @returns {Promise<Object>} Refresh result payload
+     * @throws {Error} If refresh fails
+     */
+    async refreshTickerData() {
+      const startTime = performance.now();
+      const select = getElement('ticker-select');
+      const button = getElement('action-refresh-ticker-data');
+      const statsContainer = getElement('ticker-load-stats');
+      
+      if (!select || !select.value) {
+        notification.warning('בחירת טיקר', 'אנא בחר טיקר מהרשימה');
+        return;
+      }
+      
+      const tickerId = parseInt(select.value, 10);
+      if (!tickerId) {
+        notification.warning('בחירת טיקר', 'טיקר לא תקין');
+        return;
+      }
+      
+      const originalButtonText = button?.textContent || 'טען נתונים מלאים';
+      
+      try {
+        // Show loading indicator
+        if (button) {
+          button.disabled = true;
+          button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>טוען...';
+        }
+        
+        if (statsContainer) {
+          statsContainer.innerHTML = '<div class="text-muted">טוען נתונים...</div>';
+        }
+        
+        notification.info('רענון טיקר', 'התהליך החל, נעדכן בסיום');
+        
+        const response = await fetch(`/api/external-data/quotes/${tickerId}/refresh`, { 
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        });
+        const rawText = await response.text();
+        let payload = {};
+        if (rawText) {
+          try {
+            payload = JSON.parse(rawText);
+          } catch (parseError) {
+            payload = { message: rawText };
+          }
+        }
+
+        if (!response.ok) {
+          const errorMessage = safeText(
+            payload?.error || payload?.message || 'רענון הטיקר נכשל'
+          );
+          throw new Error(errorMessage);
+        }
+
+        const duration = performance.now() - startTime;
+        const result = payload?.data || {};
+        const tickerSymbol = result.ticker_symbol || 'לא זמין';
+        const price = result.price ? formatNumber(result.price) : NOT_AVAILABLE_TEXT;
+        const changePercent = result.change_percent !== null && result.change_percent !== undefined 
+          ? `${result.change_percent >= 0 ? '+' : ''}${formatNumber(result.change_percent)}%`
+          : NOT_AVAILABLE_TEXT;
+        const volume = result.volume ? formatNumber(result.volume) : NOT_AVAILABLE_TEXT;
+        const fetchedAt = result.fetched_at 
+          ? (window.formatDate ? window.formatDate(result.fetched_at, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(result.fetched_at, { includeTime: true }) : new Date(result.fetched_at).toLocaleString('he-IL')))
+          : NOT_AVAILABLE_TEXT;
+
+        // Display statistics
+        if (statsContainer) {
+          statsContainer.innerHTML = `
+            <div class="ticker-stats">
+              <div class="stat-item mb-2">
+                <strong>טיקר:</strong> ${safeText(tickerSymbol)}
+              </div>
+              <div class="stat-item mb-2">
+                <strong>מחיר:</strong> ${price}
+              </div>
+              <div class="stat-item mb-2">
+                <strong>שינוי יומי:</strong> ${changePercent}
+              </div>
+              <div class="stat-item mb-2">
+                <strong>נפח:</strong> ${volume}
+              </div>
+              <div class="stat-item mb-2">
+                <strong>נטען ב:</strong> ${fetchedAt}
+              </div>
+              <div class="stat-item">
+                <strong>משך:</strong> ${formatDurationMs(duration)}
+              </div>
+            </div>
+          `;
+        }
+
+        notification.success('רענון טיקר הושלם', `הנתונים עבור ${tickerSymbol} עודכנו בהצלחה`);
+
+        // Refresh dashboard data
+        await Promise.allSettled([
+          this.loadSystemStatus(),
+          this.loadCacheStats()
+        ]);
+
+        return payload;
+      } catch (error) {
+        const duration = performance.now() - startTime;
+        logger.error(`${MODULE_NAME}:refresh-ticker:error`, { error, duration, tickerId });
+        
+        if (statsContainer) {
+          statsContainer.innerHTML = `<div class="text-danger">שגיאה: ${safeText(error.message)}</div>`;
+        }
+        
+        this.handleError('שגיאה ברענון טיקר', error, 'refresh-ticker');
+        throw error;
+      } finally {
+        // Restore button state
+        if (button) {
+          button.disabled = false;
+          button.textContent = originalButtonText;
+        }
+      }
+    }
+
+    /**
+     * Load scheduler monitoring data
+     * @param {boolean} [showNotification=false] - Whether to show notification
+     * @returns {Promise<void>}
+     */
+    async loadSchedulerMonitoring(showNotification = false) {
+      try {
+        const response = await fetch('/api/external-data/status/scheduler/monitoring');
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
+        }
+        const data = await response.json();
+        this.schedulerMonitoringData = data?.data || null;
+        this.renderSchedulerMonitoring(this.schedulerMonitoringData);
+        if (showNotification) {
+          notification.success('ניטור מתזמן עודכן', 'נתוני הניטור נטענו בהצלחה');
+        }
+      } catch (error) {
+        this.schedulerMonitoringData = null;
+        this.renderSchedulerMonitoring(null);
+        this.handleError('שגיאה בטעינת ניטור מתזמן', error, 'load-scheduler-monitoring');
+      }
+    }
+
+    /**
+     * Render scheduler monitoring data
+     * @param {Object|null} data - Monitoring data or null
+     * @returns {void}
+     */
+    renderSchedulerMonitoring(data) {
+      const container = getElement('scheduler-monitoring-content');
+      if (!container) {
+        return;
+      }
+
+      if (!data) {
+        container.innerHTML = '<div class="text-muted text-center p-4">לא ניתן לטעון את נתוני הניטור</div>';
+        return;
+      }
+
+      const schedulerStatus = data.scheduler_status || {};
+      const refreshHistory = data.refresh_history || [];
+      const performanceMetrics = data.performance_metrics || {};
+      const alerts = data.alerts || [];
+
+      // Render alerts
+      const alertsHTML = alerts.length > 0
+        ? alerts.map(alert => {
+            const alertClass = alert.level === 'error' ? 'danger' : alert.level === 'warning' ? 'warning' : 'info';
+            return `
+              <div class="alert alert-${alertClass} alert-dismissible fade show" role="alert">
+                <strong>${alert.type === 'scheduler_stopped' ? '⚠️' : alert.level === 'error' ? '❌' : '⚠️'}</strong>
+                ${safeText(alert.message)}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            `;
+          }).join('')
+        : '<div class="alert alert-success">אין התראות - הכל תקין</div>';
+
+      // Render refresh history
+      const historyHTML = refreshHistory.length > 0
+        ? refreshHistory.map(entry => {
+            const statusClass = entry.status === 'completed' || entry.status === 'success' ? 'success' 
+              : entry.status === 'failed' ? 'danger' 
+              : 'warning';
+            const statusText = entry.status === 'completed' || entry.status === 'success' ? 'הושלם'
+              : entry.status === 'failed' ? 'נכשל'
+              : 'בתהליך';
+            const startedAt = entry.started_at 
+              ? (window.formatDate ? window.formatDate(entry.started_at, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(entry.started_at, { includeTime: true }) : new Date(entry.started_at).toLocaleString('he-IL')))
+              : NOT_AVAILABLE_TEXT;
+            const duration = entry.duration_ms ? formatDurationMs(entry.duration_ms) : NOT_AVAILABLE_TEXT;
+            
+            return `
+              <tr>
+                <td>${safeText(this.getCategoryLabel(entry.category))}</td>
+                <td>${safeText(entry.time_period)}</td>
+                <td>${formatNumber(entry.ticker_count || 0)}</td>
+                <td><span class="badge bg-${statusClass}">${statusText}</span></td>
+                <td>${formatNumber(entry.successful_count || 0)}</td>
+                <td>${formatNumber(entry.failed_count || 0)}</td>
+                <td>${duration}</td>
+                <td>${startedAt}</td>
+              </tr>
+            `;
+          }).join('')
+        : '<tr><td colspan="8" class="text-center text-muted">אין היסטוריית רענונים</td></tr>';
+
+      container.innerHTML = `
+        <div class="row g-3">
+          <div class="col-12">
+            <h5>התראות</h5>
+            ${alertsHTML}
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h6 class="mb-0">סטטיסטיקות ביצועים</h6>
+              </div>
+              <div class="card-body">
+                <div class="performance-metrics">
+                  <div class="metric-item mb-3">
+                    <div class="metric-label">סה"כ רענונים</div>
+                    <div class="metric-value">${formatNumber(performanceMetrics.total_refreshes || 0)}</div>
+                  </div>
+                  <div class="metric-item mb-3">
+                    <div class="metric-label">רענונים מוצלחים</div>
+                    <div class="metric-value text-success">${formatNumber(performanceMetrics.successful_refreshes || 0)}</div>
+                  </div>
+                  <div class="metric-item mb-3">
+                    <div class="metric-label">רענונים שנכשלו</div>
+                    <div class="metric-value text-danger">${formatNumber(performanceMetrics.failed_refreshes || 0)}</div>
+                  </div>
+                  <div class="metric-item mb-3">
+                    <div class="metric-label">שיעור הצלחה</div>
+                    <div class="metric-value ${performanceMetrics.success_rate >= 90 ? 'text-success' : performanceMetrics.success_rate >= 80 ? 'text-warning' : 'text-danger'}">
+                      ${formatNumber(performanceMetrics.success_rate || 0)}%
+                    </div>
+                  </div>
+                  <div class="metric-item">
+                    <div class="metric-label">משך ממוצע</div>
+                    <div class="metric-value">${performanceMetrics.average_duration_ms ? formatDurationMs(performanceMetrics.average_duration_ms) : NOT_AVAILABLE_TEXT}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h6 class="mb-0">היסטוריית רענונים (10 האחרונים)</h6>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-sm table-striped">
+                    <thead>
+                      <tr>
+                        <th>קטגוריה</th>
+                        <th>תקופה</th>
+                        <th>טיקרים</th>
+                        <th>סטטוס</th>
+                        <th>הצליחו</th>
+                        <th>נכשלו</th>
+                        <th>משך</th>
+                        <th>התחיל</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${historyHTML}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * Load missing data tickers
+     * @param {boolean} [showNotification=false] - Whether to show notification
+     * @returns {Promise<void>}
+     */
+    async loadMissingDataTickers(showNotification = false) {
+      try {
+        const response = await fetch('/api/external-data/status/tickers/missing-data');
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
+        }
+        const data = await response.json();
+        this.missingDataTickers = data?.data || null;
+        this.renderMissingDataTickers(this.missingDataTickers);
+        if (showNotification) {
+          notification.success('רשימת טיקרים עודכנה', 'נתוני הטיקרים עם נתונים חסרים נטענו בהצלחה');
+        }
+      } catch (error) {
+        this.missingDataTickers = null;
+        this.renderMissingDataTickers(null);
+        this.handleError('שגיאה בטעינת טיקרים עם נתונים חסרים', error, 'load-missing-data-tickers');
+      }
+    }
+
+    /**
+     * Render missing data tickers
+     * @param {Object|null} data - Missing data tickers or null
+     * @returns {void}
+     */
+    renderMissingDataTickers(data) {
+      const container = getElement('missing-data-content');
+      if (!container) {
+        return;
+      }
+
+      if (!data) {
+        container.innerHTML = '<div class="text-muted text-center p-4">לא ניתן לטעון את נתוני הטיקרים</div>';
+        return;
+      }
+
+      const summary = data.summary || {};
+      const missingCurrent = data.tickers_missing_current || [];
+      const missingHistorical = data.tickers_missing_historical || [];
+      const missingIndicators = data.tickers_missing_indicators || [];
+      const recommendations = data.recommendations || [];
+
+      // Summary cards
+      const summaryHTML = `
+        <div class="row g-3 mb-4">
+          <div class="col-md-3">
+            <div class="card text-center">
+              <div class="card-body">
+                <h5 class="card-title">${formatNumber(summary.total_open_tickers || 0)}</h5>
+                <p class="card-text text-muted mb-0">טיקרים פתוחים</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card text-center border-danger">
+              <div class="card-body">
+                <h5 class="card-title text-danger">${formatNumber(summary.missing_current_count || 0)}</h5>
+                <p class="card-text text-muted mb-0">חסר quote נוכחי</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card text-center border-warning">
+              <div class="card-body">
+                <h5 class="card-title text-warning">${formatNumber(summary.missing_historical_count || 0)}</h5>
+                <p class="card-text text-muted mb-0">נתונים היסטוריים לא מספיקים</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card text-center border-info">
+              <div class="card-body">
+                <h5 class="card-title text-info">${formatNumber(summary.missing_indicators_count || 0)}</h5>
+                <p class="card-text text-muted mb-0">חסרים חישובים טכניים</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Recommendations table
+      const recommendationsHTML = recommendations.length > 0
+        ? recommendations.map(rec => {
+            const priorityClass = rec.priority === 'high' ? 'danger' : rec.priority === 'medium' ? 'warning' : 'info';
+            return `
+              <tr>
+                <td>${safeText(rec.symbol)}</td>
+                <td><span class="badge bg-${priorityClass}">${rec.priority === 'high' ? 'גבוה' : rec.priority === 'medium' ? 'בינוני' : 'נמוך'}</span></td>
+                <td>${safeText(rec.message)}</td>
+                <td>
+                  <button data-button-type="PLAY" data-text="רענון" data-onclick="ExternalDataDashboardActions.refreshTickerById(${rec.ticker_id})" data-size="small" class="btn-sm">
+                    רענון
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join('')
+        : '<tr><td colspan="4" class="text-center text-muted">אין המלצות - כל הטיקרים מעודכנים</td></tr>';
+
+      // Missing current quotes table
+      const missingCurrentHTML = missingCurrent.length > 0
+        ? missingCurrent.map(ticker => `
+            <tr>
+              <td>${safeText(ticker.symbol)}</td>
+              <td>${safeText(ticker.name || 'ללא שם')}</td>
+              <td>
+                <button data-button-type="PLAY" data-text="רענון" data-onclick="ExternalDataDashboardActions.refreshTickerById(${ticker.id})" data-size="small" class="btn-sm">
+                  רענון
+                </button>
+              </td>
+            </tr>
+          `).join('')
+        : '<tr><td colspan="3" class="text-center text-success">כל הטיקרים בעלי quotes נוכחיים</td></tr>';
+
+      // Missing historical data table
+      const missingHistoricalHTML = missingHistorical.length > 0
+        ? missingHistorical.map(ticker => `
+            <tr>
+              <td>${safeText(ticker.symbol)}</td>
+              <td>${safeText(ticker.name || 'ללא שם')}</td>
+              <td>${formatNumber(ticker.current_count || 0)} / ${formatNumber(ticker.required_count || 150)}</td>
+              <td>${formatNumber(ticker.missing_count || 0)}</td>
+              <td>
+                <button data-button-type="PLAY" data-text="רענון" data-onclick="ExternalDataDashboardActions.refreshTickerById(${ticker.id})" data-size="small" class="btn-sm">
+                  רענון
+                </button>
+              </td>
+            </tr>
+          `).join('')
+        : '<tr><td colspan="5" class="text-center text-success">כל הטיקרים בעלי נתונים היסטוריים מספיקים</td></tr>';
+
+      container.innerHTML = `
+        ${summaryHTML}
+        <div class="row g-3">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h6 class="mb-0">המלצות רענון</h6>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-sm table-striped">
+                    <thead>
+                      <tr>
+                        <th>טיקר</th>
+                        <th>עדיפות</th>
+                        <th>סיבה</th>
+                        <th>פעולה</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${recommendationsHTML}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h6 class="mb-0">טיקרים ללא quote נוכחי</h6>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-sm table-striped">
+                    <thead>
+                      <tr>
+                        <th>סימול</th>
+                        <th>שם</th>
+                        <th>פעולה</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${missingCurrentHTML}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h6 class="mb-0">טיקרים עם נתונים היסטוריים לא מספיקים</h6>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-sm table-striped">
+                    <thead>
+                      <tr>
+                        <th>סימול</th>
+                        <th>שם</th>
+                        <th>נוכחי / נדרש</th>
+                        <th>חסר</th>
+                        <th>פעולה</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${missingHistoricalHTML}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     /**
@@ -1066,11 +1776,11 @@
       }
 
       if (!hasData) {
-        detailsElement.innerHTML.textContent = '';
+        detailsElement.textContent = '';
         const div = document.createElement('div');
         div.className = 'status-detail';
         div.textContent = 'נתוני ספקים לא זמינים';
-        detailsElement.innerHTML.appendChild(div);
+        detailsElement.appendChild(div);
         return;
       }
 
@@ -1443,11 +2153,11 @@
       }
 
       if (!stats) {
-        cacheStatsElement.innerHTML.textContent = '';
+        cacheStatsElement.textContent = '';
         const div = document.createElement('div');
         div.className = 'text-muted text-center p-3';
         div.textContent = 'נתוני מטמון לא זמינים';
-        cacheStatsElement.innerHTML.appendChild(div);
+        cacheStatsElement.appendChild(div);
         return;
       }
 
@@ -1749,11 +2459,13 @@
         }
         const data = await response.json();
         const history = data.group_refresh_history || [];
+        this.groupRefreshHistory = history; // Store for detailed log
         this.renderGroupRefreshHistory(history);
         if (showNotification) {
           notification.success('היסטוריה עודכנה', `נטענו ${history.length} רשומות היסטוריה`);
         }
       } catch (error) {
+        this.groupRefreshHistory = []; // Store empty array for detailed log
         this.renderGroupRefreshHistory([]);
         this.handleError('שגיאה בטעינת היסטוריית רענון', error, 'load-group-refresh-history');
       }
@@ -1802,6 +2514,7 @@
           `;
         })
         .join('');
+      container.innerHTML = historyHTML;
     }
 
     /**
@@ -1817,6 +2530,117 @@
         unknown: 'לא ידוע'
       };
       return labels[category] || category || NOT_AVAILABLE_TEXT;
+    }
+
+    /**
+     * Load scheduler status
+     * @param {boolean} [showNotification=false] - Whether to show notification
+     * @returns {Promise<void>}
+     */
+    async loadSchedulerStatus(showNotification = false) {
+      try {
+        const response = await fetch('/api/external-data/scheduler/status');
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
+        }
+        const data = await response.json();
+        this.schedulerStatusData = data?.data || null;
+        this.renderSchedulerStatus(this.schedulerStatusData);
+        if (showNotification) {
+          notification.success('מצב מתזמן עודכן', 'נתוני המתזמן נטענו בהצלחה');
+        }
+      } catch (error) {
+        this.schedulerStatusData = null;
+        this.renderSchedulerStatus(null);
+        this.handleError('שגיאה בטעינת מצב מתזמן', error, 'load-scheduler-status');
+      }
+    }
+
+    /**
+     * Render scheduler status
+     * @param {Object|null} data - Scheduler status data or null
+     * @returns {void}
+     */
+    renderSchedulerStatus(data) {
+      const container = getElement('scheduler-status-content');
+      if (!container) {
+        return;
+      }
+
+      if (!data) {
+        container.innerHTML = '<div class="text-muted text-center p-4">לא ניתן לטעון את מצב המתזמן</div>';
+        return;
+      }
+
+      const isRunning = data.scheduler_running === true;
+      const statusClass = isRunning ? 'success' : 'secondary';
+      const statusText = isRunning ? 'רץ' : 'עצור';
+      const statusIcon = isRunning ? 'fa-play-circle' : 'fa-stop-circle';
+
+      const lastRefresh = data.last_refresh ? (window.formatDate ? window.formatDate(data.last_refresh, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(data.last_refresh, { includeTime: true }) : new Date(data.last_refresh).toLocaleString('he-IL'))) : NOT_AVAILABLE_TEXT;
+      const nextRefresh = data.next_refresh ? (window.formatDate ? window.formatDate(data.next_refresh, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(data.next_refresh, { includeTime: true }) : new Date(data.next_refresh).toLocaleString('he-IL'))) : NOT_AVAILABLE_TEXT;
+      const startedAt = data.started_at ? (window.formatDate ? window.formatDate(data.started_at, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(data.started_at, { includeTime: true }) : new Date(data.started_at).toLocaleString('he-IL'))) : NOT_AVAILABLE_TEXT;
+
+      container.innerHTML = `
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header">
+                <h6 class="mb-0">סטטוס מתזמן</h6>
+              </div>
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="status-indicator status-${statusClass} me-3">
+                    <i class="fas ${statusIcon} fa-2x"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">${statusText}</h5>
+                    <small class="text-muted">מצב נוכחי</small>
+                  </div>
+                </div>
+                <div class="scheduler-details">
+                  <div class="detail-item mb-2">
+                    <span class="detail-label">התחיל לרוץ:</span>
+                    <span class="detail-value">${startedAt}</span>
+                  </div>
+                  <div class="detail-item mb-2">
+                    <span class="detail-label">רענון אחרון:</span>
+                    <span class="detail-value">${lastRefresh}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">רענון הבא:</span>
+                    <span class="detail-value">${nextRefresh}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header">
+                <h6 class="mb-0">סטטיסטיקות רענונים</h6>
+              </div>
+              <div class="card-body">
+                <div class="scheduler-stats">
+                  <div class="stat-item mb-3">
+                    <div class="stat-label">סה"כ רענונים</div>
+                    <div class="stat-value">${formatNumber(data.total_refreshes || 0)}</div>
+                  </div>
+                  <div class="stat-item mb-3">
+                    <div class="stat-label">רענונים מוצלחים</div>
+                    <div class="stat-value text-success">${formatNumber(data.successful_refreshes || 0)}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">רענונים שנכשלו</div>
+                    <div class="stat-value text-danger">${formatNumber(data.failed_refreshes || 0)}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
   /**
@@ -3284,8 +4108,127 @@
       } else {
         lines.push('אין לוגים זמינים');
       }
-
       lines.push('');
+
+      // Add scheduler status data
+      lines.push('--- מצב מתזמן רענון נתונים ---');
+      if (this.schedulerStatusData) {
+        lines.push(`מתזמן רץ: ${this.schedulerStatusData.scheduler_running ? 'כן' : 'לא'}`);
+        lines.push(`רענון אחרון: ${this.schedulerStatusData.last_refresh ? safeText(this.schedulerStatusData.last_refresh) : NOT_AVAILABLE_TEXT}`);
+        lines.push(`רענון הבא: ${this.schedulerStatusData.next_refresh ? safeText(this.schedulerStatusData.next_refresh) : NOT_AVAILABLE_TEXT}`);
+        lines.push(`רענונים מוצלחים: ${formatNumber(this.schedulerStatusData.successful_refreshes ?? 0)}`);
+        lines.push(`רענונים נכשלו: ${formatNumber(this.schedulerStatusData.failed_refreshes ?? 0)}`);
+        lines.push(`סה"כ רענונים: ${formatNumber(this.schedulerStatusData.total_refreshes ?? 0)}`);
+      } else {
+        lines.push('נתוני מתזמן לא נטענו');
+      }
+      lines.push('');
+
+      // Add scheduler monitoring data
+      lines.push('--- ניטור מתזמן רענון נתונים ---');
+      if (this.schedulerMonitoringData) {
+        const monitoring = this.schedulerMonitoringData;
+        const schedulerStatus = monitoring.scheduler_status || {};
+        const performanceMetrics = monitoring.performance_metrics || {};
+        const alerts = monitoring.alerts || [];
+        
+        lines.push(`מתזמן רץ: ${schedulerStatus.scheduler_running ? 'כן' : 'לא'}`);
+        lines.push(`רענון אחרון: ${schedulerStatus.last_refresh ? safeText(schedulerStatus.last_refresh) : NOT_AVAILABLE_TEXT}`);
+        lines.push(`רענון הבא: ${schedulerStatus.next_refresh ? safeText(schedulerStatus.next_refresh) : NOT_AVAILABLE_TEXT}`);
+        
+        if (Object.keys(performanceMetrics).length > 0) {
+          lines.push('מדדי ביצועים:');
+          Object.entries(performanceMetrics).forEach(([key, value]) => {
+            lines.push(`  ${key}: ${typeof value === 'number' ? formatNumber(value) : safeText(value)}`);
+          });
+        }
+        
+        if (alerts.length > 0) {
+          lines.push(`התראות: ${alerts.length}`);
+          alerts.slice(0, 5).forEach(alert => {
+            lines.push(`  [${alert.level}] ${safeText(alert.message)}`);
+          });
+        } else {
+          lines.push('אין התראות');
+        }
+      } else {
+        lines.push('נתוני ניטור לא נטענו');
+      }
+      lines.push('');
+
+      // Add missing data tickers
+      lines.push('--- טיקרים עם נתונים חסרים ---');
+      if (this.missingDataTickers) {
+        const missing = this.missingDataTickers;
+        const summary = missing.summary || {};
+        lines.push(`סה"כ טיקרים פתוחים: ${formatNumber(summary.total_open_tickers || 0)}`);
+        lines.push(`חסר quote נוכחי: ${formatNumber(summary.missing_current_count || 0)}`);
+        lines.push(`נתונים היסטוריים לא מספיקים: ${formatNumber(summary.missing_historical_count || 0)}`);
+        lines.push(`חסרים חישובים טכניים: ${formatNumber(summary.missing_indicators_count || 0)}`);
+        
+        const missingCurrent = missing.tickers_missing_current || [];
+        if (missingCurrent.length > 0) {
+          lines.push(`טיקרים ללא quote נוכחי (${missingCurrent.length}):`);
+          missingCurrent.slice(0, 10).forEach(ticker => {
+            lines.push(`  - ${safeText(ticker.symbol || ticker.name || `טיקר #${ticker.id}`)}`);
+          });
+        }
+        
+        const recommendations = missing.recommendations || [];
+        if (recommendations.length > 0) {
+          lines.push(`המלצות (${recommendations.length}):`);
+          recommendations.slice(0, 5).forEach(rec => {
+            lines.push(`  - ${safeText(rec.message || rec)}`);
+          });
+        }
+      } else {
+        lines.push('נתוני טיקרים עם נתונים חסרים לא נטענו');
+      }
+      lines.push('');
+
+      // Add group refresh history
+      lines.push('--- היסטוריית רענונים קבוצתיים ---');
+      if (this.groupRefreshHistory && Array.isArray(this.groupRefreshHistory) && this.groupRefreshHistory.length > 0) {
+        lines.push(`סה"כ רענונים: ${formatNumber(this.groupRefreshHistory.length)}`);
+        this.groupRefreshHistory.slice(0, 5).forEach((entry, index) => {
+          lines.push(`רענון ${index + 1}:`);
+          lines.push(`  זמן: ${entry.timestamp ? safeText(entry.timestamp) : NOT_AVAILABLE_TEXT}`);
+          lines.push(`  טיקרים: ${formatNumber(entry.tickers_count || 0)}`);
+          lines.push(`  מוצלח: ${entry.success ? 'כן' : 'לא'}`);
+          if (entry.duration) {
+            lines.push(`  משך: ${formatNumber(entry.duration)}ms`);
+          }
+        });
+      } else {
+        lines.push('אין היסטוריית רענונים זמינה');
+      }
+      lines.push('');
+
+      // Add UI elements state
+      lines.push('--- מצב אלמנטים בממשק ---');
+      const uiElements = {
+        'scheduler-status-content': 'מצב מתזמן',
+        'scheduler-monitoring-content': 'ניטור מתזמן',
+        'missing-data-content': 'טיקרים עם נתונים חסרים',
+        'ticker-load-stats': 'סטטיסטיקות טעינת טיקר',
+        'providers-grid': 'רשת ספקים',
+        'cache-stats': 'סטטיסטיקות מטמון',
+        'log-content': 'תוכן לוגים',
+        'group-refresh-content': 'תוכן רענונים קבוצתיים'
+      };
+      
+      Object.entries(uiElements).forEach(([elementId, description]) => {
+        const element = getElement(elementId);
+        if (element) {
+          const isVisible = element.offsetParent !== null;
+          const hasContent = element.textContent.trim().length > 0 || element.innerHTML.trim().length > 0;
+          lines.push(`${description} (${elementId}): ${isVisible ? 'נראה' : 'מוסתר'}, ${hasContent ? 'יש תוכן' : 'ריק'}`);
+        } else {
+          lines.push(`${description} (${elementId}): אלמנט לא נמצא`);
+        }
+      });
+      lines.push('');
+
       lines.push('=== סוף הלוג ===');
       return lines.join('\n');
     }
@@ -3397,6 +4340,69 @@ window.ExternalDataDashboard = ExternalDataDashboard;
         .catch((error) => {
           logger.error(`${MODULE_NAME}:actions:refresh-all`, { error });
           notification.error('שגיאה ברענון כל הטיקרים', error.message || 'רענון הטיקרים נכשל');
+        });
+    },
+    /**
+     * Full external data refresh - loads current quotes, historical data (150 days), and pre-calculates technical indicators
+     * @param {Event} [event] - Event object
+     * @returns {Promise<Object>}
+     */
+    refreshFullExternalData(event) {
+      if (event) event.preventDefault();
+      return ensureExternalDashboardInstance()
+        .then((dashboard) => dashboard.refreshFullExternalData())
+        .catch((error) => {
+          logger.error(`${MODULE_NAME}:actions:refresh-full`, { error });
+          notification.error('שגיאה בטעינת נתונים מלאה', error.message || 'טעינת הנתונים המלאה נכשלה');
+        });
+    },
+    /**
+     * Refresh ticker-specific data
+     * @param {Event} [event] - Event object
+     * @returns {Promise<Object>}
+     */
+    refreshTickerData(event) {
+      if (event) event.preventDefault();
+      return ensureExternalDashboardInstance()
+        .then((dashboard) => dashboard.refreshTickerData())
+        .catch((error) => {
+          logger.error(`${MODULE_NAME}:actions:refresh-ticker`, { error });
+          notification.error('שגיאה ברענון טיקר', error.message || 'רענון הטיקר נכשל');
+        });
+    },
+    /**
+     * Refresh ticker by ID
+     * @param {number} tickerId - Ticker ID
+     * @returns {Promise<Object>}
+     */
+    refreshTickerById(tickerId) {
+      return ensureExternalDashboardInstance()
+        .then((dashboard) => {
+          // Set the ticker in the select dropdown
+          const select = getElement('ticker-select');
+          if (select) {
+            select.value = tickerId;
+            select.dispatchEvent(new Event('change'));
+          }
+          return dashboard.refreshTickerData();
+        })
+        .catch((error) => {
+          logger.error(`${MODULE_NAME}:actions:refresh-ticker-by-id`, { error, tickerId });
+          notification.error('שגיאה ברענון טיקר', error.message || 'רענון הטיקר נכשל');
+        });
+    },
+    /**
+     * Refresh missing data list
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
+    refreshMissingData(event) {
+      if (event) event.preventDefault();
+      return ensureExternalDashboardInstance()
+        .then((dashboard) => dashboard.loadMissingDataTickers(true))
+        .catch((error) => {
+          logger.error(`${MODULE_NAME}:actions:refresh-missing-data`, { error });
+          notification.error('שגיאה ברענון רשימת טיקרים', error.message || 'רענון הרשימה נכשל');
         });
     },
     /**

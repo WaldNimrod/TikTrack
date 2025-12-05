@@ -16,7 +16,12 @@
  * @lastUpdated 15 אוקטובר 2025
  */
 
-Logger.info('⚙️ Cache Management Page - JavaScript loaded');
+// Logger initialization check - use console if Logger not available
+if (window.Logger && typeof window.Logger.info === 'function') {
+    window.Logger.info('⚙️ Cache Management Page - JavaScript loaded');
+} else if (window.DEBUG_MODE) {
+    console.log('⚙️ Cache Management Page - JavaScript loaded');
+}
 
 // Cache Management Page Class
 class CacheManagementPage {
@@ -40,11 +45,19 @@ class CacheManagementPage {
      */
     async init() {
         if (this.isInitialized) {
-            Logger.info('⚠️ Cache Management Page already initialized');
+            if (window.Logger && typeof window.Logger.info === 'function') {
+                window.Logger.info('⚠️ Cache Management Page already initialized');
+            } else if (window.DEBUG_MODE) {
+                console.log('⚠️ Cache Management Page already initialized');
+            }
             return;
         }
 
-        Logger.info('🚀 Cache Management Page - Initializing...');
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info('🚀 Cache Management Page - Initializing...');
+        } else if (window.DEBUG_MODE) {
+            console.log('🚀 Cache Management Page - Initializing...');
+        }
 
         try {
             // Initialize cache systems
@@ -69,10 +82,17 @@ class CacheManagementPage {
             this.checkForValidationResults();
             
             this.isInitialized = true;
-            Logger.info('✅ Cache Test Page Refactored - Initialized successfully');
-            
+            if (window.Logger && typeof window.Logger.info === 'function') {
+                window.Logger.info('✅ Cache Test Page Refactored - Initialized successfully');
+            } else if (window.DEBUG_MODE) {
+                console.log('✅ Cache Test Page Refactored - Initialized successfully');
+            }
         } catch (error) {
-            Logger.error('❌ Failed to initialize Cache Test Page:', error);
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('❌ Failed to initialize Cache Test Page:', error);
+            } else if (window.DEBUG_MODE) {
+                console.error('❌ Failed to initialize Cache Test Page:', error);
+            }
             this.handleActionError('שגיאה באתחול העמוד', error.message);
         }
     }
@@ -82,7 +102,11 @@ class CacheManagementPage {
      * אתחול מערכות המטמון
      */
     async initializeCacheSystem() {
-        Logger.info('🔄 Initializing cache systems...');
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info('🔄 Initializing cache systems...');
+        } else if (window.DEBUG_MODE) {
+            console.log('🔄 Initializing cache systems...');
+        }
         
         if (!window.UnifiedCacheManager) {
             throw new Error('UnifiedCacheManager not available');
@@ -90,7 +114,11 @@ class CacheManagementPage {
         
         if (!window.UnifiedCacheManager.initialized) {
             await window.UnifiedCacheManager.initialize();
-            Logger.info('✅ UnifiedCacheManager initialized');
+            if (window.Logger && typeof window.Logger.info === 'function') {
+                window.Logger.info('✅ UnifiedCacheManager initialized');
+            } else if (window.DEBUG_MODE) {
+                console.log('✅ UnifiedCacheManager initialized');
+            }
         }
         
         // Log initialization
@@ -107,7 +135,11 @@ class CacheManagementPage {
      * אתחול תצוגת לוגים
      */
     async initializeLogDisplay() {
-        Logger.info('🔄 Initializing unified log display...');
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info('🔄 Initializing unified log display...');
+        } else if (window.DEBUG_MODE) {
+            console.log('🔄 Initializing unified log display...');
+        }
         
         const logContainer = document.getElementById('unifiedLogDisplay');
         if (!logContainer) {
@@ -128,10 +160,17 @@ class CacheManagementPage {
                 });
                 
                 await logDisplay.initialize();
-                Logger.info('✅ Unified log display initialized');
-                
+                if (window.Logger && typeof window.Logger.info === 'function') {
+                    window.Logger.info('✅ Unified log display initialized');
+                } else if (window.DEBUG_MODE) {
+                    console.log('✅ Unified log display initialized');
+                }
             } catch (error) {
-                Logger.error('❌ Failed to initialize log display:', error);
+                if (window.Logger && typeof window.Logger.error === 'function') {
+                    window.Logger.error('❌ Failed to initialize log display:', error);
+                } else if (window.DEBUG_MODE) {
+                    console.error('❌ Failed to initialize log display:', error);
+                }
                 // Fallback: show basic log info
                 logContainer.textContent = '';
                 const p = document.createElement('p');
@@ -172,7 +211,11 @@ class CacheManagementPage {
                 modules: ['cache', 'notifications', 'logs'],
                 cleanup: () => this.cleanup()
             };
-            Logger.info('✅ Registered with PAGE_CONFIGS');
+            if (window.Logger && typeof window.Logger.info === 'function') {
+                window.Logger.info('✅ Registered with PAGE_CONFIGS');
+            } else if (window.DEBUG_MODE) {
+                console.log('✅ Registered with PAGE_CONFIGS');
+            }
         }
     }
 
@@ -186,7 +229,11 @@ class CacheManagementPage {
             const storedResults = sessionStorage.getItem(validationKey);
             
             if (storedResults) {
-                Logger.info('🔍 Found validation results from previous session');
+                if (window.Logger && typeof window.Logger.info === 'function') {
+                    window.Logger.info('🔍 Found validation results from previous session');
+                } else if (window.DEBUG_MODE) {
+                    console.log('🔍 Found validation results from previous session');
+                }
                 
                 const validationData = JSON.parse(storedResults);
                 const feedback = document.getElementById('clearingFeedback');
@@ -200,7 +247,11 @@ class CacheManagementPage {
                 }
             }
         } catch (error) {
-            Logger.error('❌ Error checking validation results:', error);
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('❌ Error checking validation results:', error);
+            } else if (window.DEBUG_MODE) {
+                console.error('❌ Error checking validation results:', error);
+            }
         }
     }
 
@@ -259,7 +310,11 @@ class CacheManagementPage {
         if (this.isLoading) return;
         
         this.isLoading = true;
-        Logger.info('📊 Refreshing cache statistics...');
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info('📊 Refreshing cache statistics...');
+        } else if (window.DEBUG_MODE) {
+            console.log('📊 Refreshing cache statistics...');
+        }
 
         try {
             await Promise.all([
@@ -272,10 +327,18 @@ class CacheManagementPage {
             // Update last update time
             this.updateElement('lastUpdate', new Date().toLocaleTimeString('he-IL'));
             
-            Logger.info('✅ Cache statistics refreshed');
+            if (window.Logger && typeof window.Logger.info === 'function') {
+                window.Logger.info('✅ Cache statistics refreshed');
+            } else if (window.DEBUG_MODE) {
+                console.log('✅ Cache statistics refreshed');
+            }
             
         } catch (error) {
-            Logger.error('❌ Error refreshing cache stats:', error);
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('❌ Error refreshing cache stats:', error);
+            } else if (window.DEBUG_MODE) {
+                console.error('❌ Error refreshing cache stats:', error);
+            }
             this.handleActionError('שגיאה ברענון סטטיסטיקות', error.message);
         } finally {
             this.isLoading = false;
@@ -288,7 +351,11 @@ class CacheManagementPage {
      */
     async updateMonitoringStats() {
         if (!window.UnifiedCacheManager) {
-            Logger.warn('UnifiedCacheManager not available for updateMonitoringStats');
+            if (window.Logger && typeof window.Logger.warn === 'function') {
+                window.Logger.warn('UnifiedCacheManager not available for updateMonitoringStats');
+            } else if (window.DEBUG_MODE) {
+                console.warn('UnifiedCacheManager not available for updateMonitoringStats');
+            }
             return;
         }
 
@@ -313,7 +380,11 @@ class CacheManagementPage {
             this.updateElement('backendChange', 'עדכני');
             
         } catch (error) {
-            Logger.error('❌ Error updating monitoring stats:', error);
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('❌ Error updating monitoring stats:', error);
+            } else if (window.DEBUG_MODE) {
+                console.error('❌ Error updating monitoring stats:', error);
+            }
         }
     }
 
@@ -341,7 +412,10 @@ class CacheManagementPage {
                 const row = this.createLayerTableRow(layer, layerStats, layerNames[layer]);
                 tbody.appendChild(row);
             } catch (error) {
-                Logger.error(`Error getting stats for layer ${layer}:`, error);
+                // Silently handle errors - don't log to console as errors (they're expected in some cases)
+                if (window.DEBUG_MODE) {
+                    console.warn(`⚠️ Error getting stats for layer ${layer}:`, error);
+                }
                 const row = this.createLayerTableRow(layer, {}, layerNames[layer], true);
                 tbody.appendChild(row);
             }
@@ -413,7 +487,11 @@ class CacheManagementPage {
                 this.updateElement('totalCacheSize', this.formatBytes(totalSize));
             }
         } catch (error) {
-            Logger.error('Error updating performance metrics:', error);
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('Error updating performance metrics:', error);
+            } else if (window.DEBUG_MODE) {
+                console.error('Error updating performance metrics:', error);
+            }
         }
     }
 
@@ -428,7 +506,11 @@ class CacheManagementPage {
             this.updateElement('systemHealth', isHealthy ? 'טוב' : 'בעיה');
             
         } catch (error) {
-            Logger.error('Error updating system health:', error);
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('Error updating system health:', error);
+            } else if (window.DEBUG_MODE) {
+                console.error('Error updating system health:', error);
+            }
             this.updateElement('systemHealth', 'שגיאה');
         }
     }
@@ -440,7 +522,11 @@ class CacheManagementPage {
      * ביצוע ניקוי מטמון עם ולידציה
      */
     async executeCacheClearing(level) {
-        Logger.info(`🧹 Executing cache clearing: ${level}`);
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info(`🧹 Executing cache clearing: ${level}`);
+        } else if (window.DEBUG_MODE) {
+            console.log(`🧹 Executing cache clearing: ${level}`);
+        }
         
         const validateAfter = document.getElementById('enableValidation')?.checked || false;
         const feedback = document.getElementById('clearingFeedback');
@@ -466,7 +552,11 @@ class CacheManagementPage {
             }
             
         } catch (error) {
-            Logger.error('Cache clearing error:', error);
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('Cache clearing error:', error);
+            } else if (window.DEBUG_MODE) {
+                console.error('Cache clearing error:', error);
+            }
             this.handleActionError('שגיאה בניקוי מטמון', error.message);
             this.showFeedback(feedback, `שגיאה: ${error.message}`, 'error');
         }
@@ -477,7 +567,11 @@ class CacheManagementPage {
      * ביצוע אופטימיזציה
      */
     async executeOptimization(type) {
-        Logger.info(`⚡ Executing optimization: ${type}`);
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info(`⚡ Executing optimization: ${type}`);
+        } else if (window.DEBUG_MODE) {
+            console.log(`⚡ Executing optimization: ${type}`);
+        }
         
         const feedback = document.getElementById('optimizationFeedback');
         
@@ -492,7 +586,11 @@ class CacheManagementPage {
             this.showFeedback(feedback, `אופטימיזציה ${type} הושלמה`, 'success');
             
         } catch (error) {
-            Logger.error('Optimization error:', error);
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('Optimization error:', error);
+            } else if (window.DEBUG_MODE) {
+                console.error('Optimization error:', error);
+            }
             this.handleActionError('שגיאה באופטימיזציה', error.message);
             this.showFeedback(feedback, `שגיאה: ${error.message}`, 'error');
         }
@@ -503,7 +601,11 @@ class CacheManagementPage {
      * ביצוע סינכרון
      */
     async executeSynchronization(type) {
-        Logger.info(`🔄 Executing synchronization: ${type}`);
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info(`🔄 Executing synchronization: ${type}`);
+        } else if (window.DEBUG_MODE) {
+            console.log(`🔄 Executing synchronization: ${type}`);
+        }
         
         const feedback = document.getElementById('syncFeedback');
         
@@ -518,7 +620,11 @@ class CacheManagementPage {
             this.showFeedback(feedback, `סינכרון ${type} הושלם`, 'success');
             
         } catch (error) {
-            Logger.error('Synchronization error:', error);
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('Synchronization error:', error);
+            } else if (window.DEBUG_MODE) {
+                console.error('Synchronization error:', error);
+            }
             this.handleActionError('שגיאה בסינכרון', error.message);
             this.showFeedback(feedback, `שגיאה: ${error.message}`, 'error');
         }
@@ -529,7 +635,11 @@ class CacheManagementPage {
      * ביצוע תחזוקה
      */
     async executeMaintenance(action) {
-        Logger.info(`🔧 Executing maintenance: ${action}`);
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info(`🔧 Executing maintenance: ${action}`);
+        } else if (window.DEBUG_MODE) {
+            console.log(`🔧 Executing maintenance: ${action}`);
+        }
         
         const feedback = document.getElementById('maintenanceFeedback');
         
@@ -544,7 +654,11 @@ class CacheManagementPage {
             this.showFeedback(feedback, `תחזוקה ${action} הושלמה`, 'success');
             
         } catch (error) {
-            Logger.error('Maintenance error:', error);
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('Maintenance error:', error);
+            } else if (window.DEBUG_MODE) {
+                console.error('Maintenance error:', error);
+            }
             this.handleActionError('שגיאה בתחזוקה', error.message);
             this.showFeedback(feedback, `שגיאה: ${error.message}`, 'error');
         }
@@ -557,7 +671,9 @@ class CacheManagementPage {
      * הרצת כל הבדיקות
      */
     async runAllTests() {
-        Logger.info('🧪 Running all cache tests...');
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info('🧪 Running all cache tests...');
+        }
         
         try {
             const results = {
@@ -576,7 +692,11 @@ class CacheManagementPage {
             }
             
         } catch (error) {
-            Logger.error('Tests execution error:', error);
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('Tests execution error:', error);
+            } else if (window.DEBUG_MODE) {
+                console.error('Tests execution error:', error);
+            }
             this.handleActionError('שגיאה בהרצת בדיקות', error.message);
         }
     }
@@ -721,7 +841,11 @@ class CacheManagementPage {
      * פתיחת דפדפן מטמון
      */
     openCacheBrowser() {
-        Logger.info('🔍 Opening cache browser...');
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info('🔍 Opening cache browser...');
+        } else if (window.DEBUG_MODE) {
+            console.log('🔍 Opening cache browser...');
+        }
         // Implementation for cache browser
         this.handleActionSuccess('פתיחת דפדפן מטמון', 'Browser opened');
     }
@@ -731,7 +855,9 @@ class CacheManagementPage {
      * ייצוא נתוני מטמון
      */
     async exportCacheData() {
-        Logger.info('📤 Exporting cache data...');
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info('📤 Exporting cache data...');
+        }
         
         try {
             if (window.UnifiedCacheManager) {
@@ -751,7 +877,11 @@ class CacheManagementPage {
                 this.handleActionSuccess('נתוני מטמון יוצאו בהצלחה');
             }
         } catch (error) {
-            Logger.error('Export error:', error);
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('Export error:', error);
+            } else if (window.DEBUG_MODE) {
+                console.error('Export error:', error);
+            }
             this.handleActionError('שגיאה בייצוא נתונים', error.message);
         }
     }
@@ -761,7 +891,11 @@ class CacheManagementPage {
      * ייבוא נתוני מטמון
      */
     importCacheData() {
-        Logger.info('📥 Import cache data - Not implemented yet');
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info('📥 Import cache data - Not implemented yet');
+        } else if (window.DEBUG_MODE) {
+            console.log('📥 Import cache data - Not implemented yet');
+        }
         this.handleActionError('ייבוא נתונים', 'פונקציה עדיין לא מומשה');
     }
 
@@ -772,7 +906,11 @@ class CacheManagementPage {
      * סינון לוגים
      */
     filterLogs(level) {
-        Logger.info(`📋 Filtering logs by level: ${level}`);
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info(`📋 Filtering logs by level: ${level}`);
+        } else if (window.DEBUG_MODE) {
+            console.log(`📋 Filtering logs by level: ${level}`);
+        }
         
         if (window.UnifiedLogDisplay) {
             // Filter through UnifiedLogDisplay
@@ -824,7 +962,11 @@ class CacheManagementPage {
             btn.appendChild(document.createTextNode(' ' + (this.autoRefresh ? 'עצור רענון אוטומטי' : 'רענון אוטומטי')));
         }
         
-        Logger.info(`Auto-refresh ${this.autoRefresh ? 'enabled' : 'disabled'}`);
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info(`Auto-refresh ${this.autoRefresh ? 'enabled' : 'disabled'}`);
+        } else if (window.DEBUG_MODE) {
+            console.log(`Auto-refresh ${this.autoRefresh ? 'enabled' : 'disabled'}`);
+        }
     }
 
     /**
@@ -848,7 +990,9 @@ class CacheManagementPage {
      * טיפול בהצלחת פעולה עם מערכת הודעות
      */
     handleActionSuccess(message, details = null) {
-        Logger.info('✅ Action Success:', message, details);
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info('✅ Action Success:', message, details);
+        }
         
         // Use unified notification system
         if (typeof window.showFinalSuccessNotification === 'function') {
@@ -865,7 +1009,11 @@ class CacheManagementPage {
         } else if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification(message, details);
         } else {
-            Logger.info('Success:', message);
+            if (window.Logger && typeof window.Logger.info === 'function') {
+                window.Logger.info('Success:', message);
+            } else if (window.DEBUG_MODE) {
+                console.log('Success:', message);
+            }
         }
         
         // Log to unified system
@@ -877,13 +1025,21 @@ class CacheManagementPage {
      * טיפול בשגיאת פעולה עם מערכת הודעות
      */
     handleActionError(message, details = null) {
-        Logger.error('❌ Action Error:', message, details);
+        if (window.Logger && typeof window.Logger.error === 'function') {
+            window.Logger.error('❌ Action Error:', message, details);
+        } else if (window.DEBUG_MODE) {
+            console.error('❌ Action Error:', message, details);
+        }
         
         // Use unified notification system
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification(message, details);
         } else {
-            Logger.error('Error:', message);
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('Error:', message);
+            } else if (window.DEBUG_MODE) {
+                console.error('Error:', message);
+            }
         }
         
         // Log to unified system
@@ -904,7 +1060,10 @@ class CacheManagementPage {
                 });
             }
         } catch (error) {
-            // Silently fail - logging is not critical
+            // Silently handle errors - don't log to console as errors (they're expected in some cases)
+            if (window.DEBUG_MODE) {
+                console.warn('⚠️ Failed to log to unified system:', error);
+            }
         }
     }
 
@@ -1158,26 +1317,28 @@ class CacheManagementPage {
             clearInterval(this.statsInterval);
         }
         this.isInitialized = false;
-        Logger.info('🧹 Cache Management Page cleaned up');
+        if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info('🧹 Cache Management Page cleaned up');
+        }
     }
 }
 
 // Global functions for HTML onclick handlers
-window.refreshCacheStats = () => window.cacheManagementPage?.refreshCacheStats();
-window.toggleAutoRefresh = () => window.cacheManagementPage?.toggleAutoRefresh();
-window.executeCacheClearing = (level) => window.cacheManagementPage?.executeCacheClearing(level);
-window.executeOptimization = (type) => window.cacheManagementPage?.executeOptimization(type);
-window.executeSynchronization = (type) => window.cacheManagementPage?.executeSynchronization(type);
-window.executeMaintenance = (action) => window.cacheManagementPage?.executeMaintenance(action);
-window.runAllTests = () => window.cacheManagementPage?.runAllTests();
-window.runHealthChecks = () => window.cacheManagementPage?.runHealthChecks();
-window.runPerformanceTests = () => window.cacheManagementPage?.runPerformanceTests();
-window.runIntegrationTests = () => window.cacheManagementPage?.runIntegrationTests();
-window.runValidationTests = () => window.cacheManagementPage?.runValidationTests();
-window.openCacheBrowser = () => window.cacheManagementPage?.openCacheBrowser();
-window.exportCacheData = () => window.cacheManagementPage?.exportCacheData();
-window.importCacheData = () => window.cacheManagementPage?.importCacheData();
-window.filterLogs = (level) => window.cacheManagementPage?.filterLogs(level);
+window.refreshCacheStats = () => window.cacheManagementPage && window.cacheManagementPage.refreshCacheStats();
+window.toggleAutoRefresh = () => window.cacheManagementPage && window.cacheManagementPage.toggleAutoRefresh();
+window.executeCacheClearing = (level) => window.cacheManagementPage && window.cacheManagementPage.executeCacheClearing(level);
+window.executeOptimization = (type) => window.cacheManagementPage && window.cacheManagementPage.executeOptimization(type);
+window.executeSynchronization = (type) => window.cacheManagementPage && window.cacheManagementPage.executeSynchronization(type);
+window.executeMaintenance = (action) => window.cacheManagementPage && window.cacheManagementPage.executeMaintenance(action);
+window.runAllTests = () => window.cacheManagementPage && window.cacheManagementPage.runAllTests();
+window.runHealthChecks = () => window.cacheManagementPage && window.cacheManagementPage.runHealthChecks();
+window.runPerformanceTests = () => window.cacheManagementPage && window.cacheManagementPage.runPerformanceTests();
+window.runIntegrationTests = () => window.cacheManagementPage && window.cacheManagementPage.runIntegrationTests();
+window.runValidationTests = () => window.cacheManagementPage && window.cacheManagementPage.runValidationTests();
+window.openCacheBrowser = () => window.cacheManagementPage && window.cacheManagementPage.openCacheBrowser();
+window.exportCacheData = () => window.cacheManagementPage && window.cacheManagementPage.exportCacheData();
+window.importCacheData = () => window.cacheManagementPage && window.cacheManagementPage.importCacheData();
+window.filterLogs = (level) => window.cacheManagementPage && window.cacheManagementPage.filterLogs(level);
 
 // ===== Detailed Log Functions =====
 
@@ -1522,7 +1683,11 @@ async function copyDetailedLog() {
             }
         }
     } catch (error) {
-        Logger.error('שגיאה בהעתקת הלוג המפורט:', error);
+        if (window.Logger && typeof window.Logger.error === 'function') {
+            window.Logger.error('שגיאה בהעתקת הלוג המפורט:', error);
+        } else if (window.DEBUG_MODE) {
+            console.error('שגיאה בהעתקת הלוג המפורט:', error);
+        }
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה בהעתקת הלוג', error.message);
         } else if (window.showInfoNotification) {
@@ -1559,4 +1724,9 @@ if (document.readyState === 'loading') {
     }
 }
 
-Logger.info('⚙️ Cache Management Page - JavaScript ready');
+// Logger initialization check - use console if Logger not available
+if (window.Logger && typeof window.Logger.info === 'function') {
+    window.Logger.info('⚙️ Cache Management Page - JavaScript ready');
+} else if (window.DEBUG_MODE) {
+    console.log('⚙️ Cache Management Page - JavaScript ready');
+}

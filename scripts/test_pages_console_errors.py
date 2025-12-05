@@ -1,0 +1,519 @@
+#!/usr/bin/env python3
+"""
+Comprehensive script to test console errors on ALL pages
+This script uses Selenium to check JavaScript console errors
+"""
+
+import json
+import time
+from datetime import datetime
+from pathlib import Path
+from collections import deque
+from typing import Optional
+
+try:
+    from selenium import webdriver
+    from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.common.exceptions import TimeoutException, WebDriverException
+    from webdriver_manager.chrome import ChromeDriverManager
+except ImportError:
+    print("❌ Error: selenium or webdriver-manager not installed.")
+    print("   Install with: pip install selenium webdriver-manager")
+    exit(1)
+
+BASE_URL = "http://localhost:8080"
+
+# Rate limiting configuration
+# Server limits: 5000 requests/minute = ~83 requests/second
+# Additional limit in app.py: 10 requests/second
+# We'll be conservative and use 5 requests/second to avoid hitting limits
+RATE_LIMIT_CONFIG = {
+    'max_requests_per_second': 5,  # Conservative limit
+    'window_seconds': 1,  # 1 second window
+    'min_delay_between_pages': 2.0,  # Minimum delay between page loads
+    'max_delay_between_pages': 5.0,  # Maximum delay if rate limited
+    'retry_max_attempts': 3,  # Max retries for 429 errors
+    'retry_base_delay': 2.0,  # Base delay for exponential backoff
+    'adaptive_delay': True,  # Enable adaptive delay adjustment
+}
+
+# All pages from test_all_pages_comprehensive.py
+ALL_PAGES = [
+    # עמודים מרכזיים (Main Pages)
+    {"name": "דף הבית", "url": "/", "category": "main", "priority": "high"},
+    {"name": "טריידים", "url": "/trades.html", "category": "main", "priority": "high"},
+    {"name": "תכניות מסחר", "url": "/trade_plans.html", "category": "main", "priority": "high"},
+    {"name": "התראות", "url": "/alerts.html", "category": "main", "priority": "high"},
+    {"name": "טיקרים", "url": "/tickers.html", "category": "main", "priority": "high"},
+    {"name": "דשבורד טיקר", "url": "/ticker-dashboard.html", "category": "main", "priority": "medium"},
+    {"name": "חשבונות מסחר", "url": "/trading_accounts.html", "category": "main", "priority": "high"},
+    {"name": "ביצועים", "url": "/executions.html", "category": "main", "priority": "high"},
+    {"name": "ייבוא נתונים", "url": "/data_import.html", "category": "main", "priority": "medium"},
+    {"name": "תזרימי מזומן", "url": "/cash_flows.html", "category": "main", "priority": "high"},
+    {"name": "הערות", "url": "/notes.html", "category": "main", "priority": "high"},
+    {"name": "מחקר", "url": "/research.html", "category": "main", "priority": "medium"},
+    {"name": "ניתוח AI", "url": "/ai-analysis.html", "category": "main", "priority": "medium"},
+    {"name": "העדפות", "url": "/preferences.html", "category": "main", "priority": "high"},
+    {"name": "פרופיל משתמש", "url": "/user-profile.html", "category": "main", "priority": "medium"},
+    
+    # עמודים טכניים (Technical Pages)
+    {"name": "תצוגת בסיס נתונים", "url": "/db_display.html", "category": "technical", "priority": "low"},
+    {"name": "נתונים נוספים", "url": "/db_extradata.html", "category": "technical", "priority": "low"},
+    {"name": "אילוצי מערכת", "url": "/constraints.html", "category": "technical", "priority": "low"},
+    {"name": "משימות רקע", "url": "/background-tasks.html", "category": "technical", "priority": "low"},
+    {"name": "ניטור שרת", "url": "/server-monitor.html", "category": "technical", "priority": "low"},
+    {"name": "ניהול מערכת", "url": "/system-management.html", "category": "technical", "priority": "low"},
+    {"name": "מרכז התראות", "url": "/notifications-center.html", "category": "technical", "priority": "low"},
+    {"name": "ניהול CSS", "url": "/css-management.html", "category": "technical", "priority": "low"},
+    {"name": "תצוגת צבעים", "url": "/dynamic-colors-display.html", "category": "technical", "priority": "low"},
+    {"name": "עיצובים", "url": "/designs.html", "category": "technical", "priority": "low"},
+    
+    # עמודים משניים (Secondary Pages)
+    {"name": "דשבורד נתונים חיצוניים", "url": "/external-data-dashboard.html", "category": "secondary", "priority": "low"},
+    {"name": "ניהול גרפים", "url": "/chart-management.html", "category": "secondary", "priority": "low"},
+    {"name": "דשבורד בדיקות CRUD", "url": "/crud-testing-dashboard.html", "category": "secondary", "priority": "low"},
+    
+    # עמודי אימות (Auth Pages)
+    {"name": "כניסה למערכת", "url": "/login.html", "category": "auth", "priority": "high"},
+    {"name": "הרשמה למערכת", "url": "/register.html", "category": "auth", "priority": "medium"},
+    {"name": "שחזור סיסמה", "url": "/forgot-password.html", "category": "auth", "priority": "medium"},
+    {"name": "איפוס סיסמה", "url": "/reset-password.html", "category": "auth", "priority": "medium"},
+    
+    # עמודי כלים לפיתוח (Dev Tools)
+    {"name": "מיפוי צבעי כפתורים", "url": "/button-color-mapping.html", "category": "dev", "priority": "low"},
+    {"name": "מיפוי צבעי כפתורים - פשוט", "url": "/button-color-mapping-simple.html", "category": "dev", "priority": "low"},
+    {"name": "מודלים של תנאים", "url": "/conditions-modals.html", "category": "dev", "priority": "low"},
+    {"name": "ניהול קבוצות העדפות", "url": "/preferences-groups-management.html", "category": "dev", "priority": "low"},
+    {"name": "ניהול תגיות", "url": "/tag-management.html", "category": "dev", "priority": "low"},
+    {"name": "ניהול מטמון", "url": "/cache-management.html", "category": "dev", "priority": "low"},
+    {"name": "דשבורד איכות קוד", "url": "/code-quality-dashboard.html", "category": "dev", "priority": "low"},
+    {"name": "ניהול מערכת אתחול", "url": "/init-system-management.html", "category": "dev", "priority": "low"},
+    {"name": "בדיקת תנאים", "url": "/conditions-test.html", "category": "dev", "priority": "low"},
+    
+    # עמודי רשימות מעקב (Watch Lists)
+    {"name": "ניהול רשימות צפייה", "url": "/mockups/watch-lists-page.html", "category": "watchlists", "priority": "medium"},
+    {"name": "מודל רשימת צפייה", "url": "/mockups/watch-list-modal.html", "category": "watchlists", "priority": "medium"},
+    {"name": "מודל הוספת טיקר", "url": "/mockups/add-ticker-modal.html", "category": "watchlists", "priority": "medium"},
+    {"name": "פעולה מהירה דגלים", "url": "/mockups/flag-quick-action.html", "category": "watchlists", "priority": "medium"},
+    
+    # עמודים נוספים
+    {"name": "תצוגת ווידג'טים TradingView", "url": "/tradingview-widgets-showcase.html", "category": "additional", "priority": "low"},
+    {"name": "טריידים מעוצבים", "url": "/trades_formatted.html", "category": "additional", "priority": "low"},
+]
+
+class RateLimitTracker:
+    """Track requests to avoid hitting rate limits"""
+    
+    def __init__(self, max_requests_per_second: int = 5, window_seconds: int = 1):
+        self.max_requests_per_second = max_requests_per_second
+        self.window_seconds = window_seconds
+        self.request_times = deque()
+        self.rate_limit_hits = 0
+        self.last_rate_limit_time = None
+        self.adaptive_delay = 2.0  # Start with base delay
+    
+    def record_request(self):
+        """Record a request timestamp"""
+        current_time = time.time()
+        self.request_times.append(current_time)
+        
+        # Remove old requests outside the window
+        cutoff_time = current_time - self.window_seconds
+        while self.request_times and self.request_times[0] < cutoff_time:
+            self.request_times.popleft()
+    
+    def should_wait(self) -> bool:
+        """Check if we should wait before making another request"""
+        return len(self.request_times) >= self.max_requests_per_second
+    
+    def get_wait_time(self) -> float:
+        """Calculate how long to wait before next request"""
+        if not self.request_times:
+            return 0.0
+        
+        # Calculate time until oldest request expires
+        oldest_request = self.request_times[0]
+        wait_time = (oldest_request + self.window_seconds) - time.time()
+        return max(0.0, wait_time)
+    
+    def record_rate_limit_hit(self):
+        """Record that we hit a rate limit"""
+        self.rate_limit_hits += 1
+        self.last_rate_limit_time = time.time()
+        # Increase adaptive delay
+        self.adaptive_delay = min(
+            self.adaptive_delay * 1.5,
+            RATE_LIMIT_CONFIG['max_delay_between_pages']
+        )
+    
+    def record_success(self):
+        """Record successful request - gradually decrease delay"""
+        if self.rate_limit_hits == 0:
+            # Only decrease if we haven't hit rate limits recently
+            self.adaptive_delay = max(
+                self.adaptive_delay * 0.95,
+                RATE_LIMIT_CONFIG['min_delay_between_pages']
+            )
+    
+    def get_adaptive_delay(self) -> float:
+        """Get adaptive delay based on rate limit history"""
+        return self.adaptive_delay
+    
+    def get_stats(self) -> dict:
+        """Get rate limiting statistics"""
+        return {
+            'rate_limit_hits': self.rate_limit_hits,
+            'current_requests_in_window': len(self.request_times),
+            'adaptive_delay': self.adaptive_delay,
+            'last_rate_limit_time': self.last_rate_limit_time
+        }
+
+# Global rate limit tracker
+rate_tracker = RateLimitTracker(
+    max_requests_per_second=RATE_LIMIT_CONFIG['max_requests_per_second'],
+    window_seconds=RATE_LIMIT_CONFIG['window_seconds']
+)
+
+def setup_driver():
+    """Setup Chrome WebDriver with automatic ChromeDriver management"""
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--window-size=1920,1080')
+    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    
+    # Enable logging
+    chrome_options.set_capability('goog:loggingPrefs', {'browser': 'ALL', 'performance': 'ALL'})
+    
+    try:
+        # Use webdriver-manager to automatically download and manage ChromeDriver
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        return driver
+    except Exception as e:
+        print(f"❌ Error setting up Chrome driver: {e}")
+        print("💡 Make sure Chrome browser is installed")
+        return None
+
+def test_page_console(driver, page_info, retry_count: int = 0):
+    """Test a single page for console errors with rate limiting and retry logic"""
+    url = BASE_URL + page_info["url"]
+    result = {
+        "page": page_info["name"],
+        "url": page_info["url"],
+        "category": page_info["category"],
+        "priority": page_info["priority"],
+        "success": False,
+        "load_time": None,
+        "console_errors": [],
+        "console_warnings": [],
+        "page_errors": [],
+        "has_header": False,
+        "has_core_systems": False,
+        "initialization_status": {},
+        "rate_limit_retries": retry_count,
+        "timestamp": datetime.now().isoformat()
+    }
+    
+    try:
+        # Wait if we're hitting rate limits
+        if rate_tracker.should_wait():
+            wait_time = rate_tracker.get_wait_time()
+            if wait_time > 0:
+                print(f"  ⏳ Rate limit: waiting {wait_time:.2f}s...")
+                time.sleep(wait_time)
+        
+        # Record request
+        rate_tracker.record_request()
+        
+        # Clear previous logs
+        driver.get_log('browser')
+        
+        # Navigate to page
+        start_time = time.time()
+        driver.get(url)
+        
+        # Wait for page to load
+        try:
+            WebDriverWait(driver, 10).until(
+                lambda d: d.execute_script('return document.readyState') == 'complete'
+            )
+        except TimeoutException:
+            result["page_errors"].append("Page load timeout")
+        
+        result["load_time"] = time.time() - start_time
+        
+        # Wait additional time for JavaScript to execute
+        time.sleep(2)
+        
+        # Get console logs
+        logs = driver.get_log('browser')
+        for log in logs:
+            level = log.get('level', '').upper()
+            message = log.get('message', '')
+            
+            # Filter out non-critical messages
+            if 'favicon' in message.lower() or 'chrome-extension' in message.lower():
+                continue
+            
+            # Filter out expected auth errors (401) - these are normal when not logged in
+            if '401 (UNAUTHORIZED)' in message and '/api/auth/me' in message:
+                continue
+            
+            # Filter out network errors for missing optional resources
+            if 'Failed to load resource' in message:
+                # Check for 429 rate limit errors
+                if '429' in message or 'Too Many Requests' in message:
+                    rate_tracker.record_rate_limit_hit()
+                    # Retry with exponential backoff
+                    if retry_count < RATE_LIMIT_CONFIG['retry_max_attempts']:
+                        retry_delay = RATE_LIMIT_CONFIG['retry_base_delay'] * (2 ** retry_count)
+                        print(f"  ⚠️  Rate limit hit (429), retrying in {retry_delay:.1f}s (attempt {retry_count + 1}/{RATE_LIMIT_CONFIG['retry_max_attempts']})...")
+                        time.sleep(retry_delay)
+                        return test_page_console(driver, page_info, retry_count + 1)
+                    else:
+                        result["console_errors"].append({
+                            "level": level,
+                            "message": f"Rate limit exceeded after {retry_count} retries: {message}",
+                            "timestamp": log.get('timestamp', 0)
+                        })
+                        continue
+                
+                # Only count as error if it's a critical resource
+                if any(critical in message.lower() for critical in ['core-systems', 'unified-app-initializer', 'preferences-core']):
+                    result["console_errors"].append({
+                        "level": level,
+                        "message": message,
+                        "timestamp": log.get('timestamp', 0)
+                    })
+                # Otherwise, it's a warning
+                elif level == 'SEVERE':
+                    result["console_warnings"].append({
+                        "level": "WARNING",
+                        "message": message,
+                        "timestamp": log.get('timestamp', 0)
+                    })
+                continue
+            
+            if level == 'SEVERE' or 'error' in message.lower():
+                result["console_errors"].append({
+                    "level": level,
+                    "message": message,
+                    "timestamp": log.get('timestamp', 0)
+                })
+            elif level == 'WARNING' or 'warning' in message.lower():
+                result["console_warnings"].append({
+                    "level": level,
+                    "message": message,
+                    "timestamp": log.get('timestamp', 0)
+                })
+        
+        # Check for page errors using JavaScript
+        page_status = driver.execute_script("""
+            return {
+                hasHeader: !!(document.querySelector('unified-header') || 
+                             document.querySelector('app-header') || 
+                             document.querySelector('.header-container') ||
+                             document.querySelector('header')),
+                hasCoreSystems: !!(window.initializeUnifiedApp || 
+                                  document.querySelector('script[src*="core-systems.js"]')),
+                recursionFlags: {
+                    getPreferenceInProgress: !!(window.__GET_PREFERENCE_IN_PROGRESS__),
+                    showNotificationInProgress: !!(window.__SHOW_NOTIFICATION_IN_PROGRESS__),
+                    loadActiveAlertsInProgress: !!(window.__LOAD_ACTIVE_ALERTS_CALL_STACK__)
+                },
+                globalErrors: window.__LAST_GLOBAL_ERROR || null,
+                documentReadyState: document.readyState
+            };
+        """)
+        
+        result["has_header"] = page_status.get("hasHeader", False)
+        result["has_core_systems"] = page_status.get("hasCoreSystems", False)
+        result["initialization_status"] = page_status.get("recursionFlags", {})
+        
+        if page_status.get("globalErrors"):
+            result["page_errors"].append(page_status["globalErrors"])
+        
+        # Check for critical errors
+        critical_errors = [
+            "Maximum call stack size exceeded",
+            "Uncaught",
+            "ReferenceError",
+            "TypeError",
+            "SyntaxError"
+        ]
+        
+        for error in result["console_errors"]:
+            message = error.get("message", "").lower()
+            if any(critical in message for critical in critical_errors):
+                result["page_errors"].append(error["message"])
+        
+        # Success if no errors
+        result["success"] = len(result["console_errors"]) == 0 and len(result["page_errors"]) == 0
+        
+        # Record success for adaptive delay
+        if result["success"]:
+            rate_tracker.record_success()
+        
+    except WebDriverException as e:
+        error_msg = str(e)
+        result["page_errors"].append(f"WebDriver error: {error_msg}")
+        
+        # Check if it's a rate limit error
+        if '429' in error_msg or 'Too Many Requests' in error_msg:
+            rate_tracker.record_rate_limit_hit()
+            if retry_count < RATE_LIMIT_CONFIG['retry_max_attempts']:
+                retry_delay = RATE_LIMIT_CONFIG['retry_base_delay'] * (2 ** retry_count)
+                print(f"  ⚠️  Rate limit error, retrying in {retry_delay:.1f}s...")
+                time.sleep(retry_delay)
+                return test_page_console(driver, page_info, retry_count + 1)
+    except Exception as e:
+        result["page_errors"].append(f"Exception: {str(e)}")
+    
+    # Adaptive delay based on rate limit history
+    if RATE_LIMIT_CONFIG['adaptive_delay']:
+        delay = rate_tracker.get_adaptive_delay()
+    else:
+        delay = RATE_LIMIT_CONFIG['min_delay_between_pages']
+    
+    # Ensure minimum delay
+    delay = max(delay, RATE_LIMIT_CONFIG['min_delay_between_pages'])
+    
+    # Additional wait if we're hitting rate limits
+    if rate_tracker.should_wait():
+        additional_wait = rate_tracker.get_wait_time()
+        delay = max(delay, additional_wait)
+    
+    time.sleep(delay)
+    
+    return result
+
+def main():
+    """Main test function"""
+    print("=" * 80)
+    print("🔍 בדיקת שגיאות קונסול בכל העמודים")
+    print("=" * 80)
+    print(f"Base URL: {BASE_URL}")
+    print(f"Total pages to test: {len(ALL_PAGES)}")
+    print(f"Start time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("=" * 80)
+    print()
+    
+    driver = setup_driver()
+    if not driver:
+        print("❌ Failed to setup WebDriver. Exiting.")
+        return
+    
+    results = []
+    
+    try:
+        for i, page in enumerate(ALL_PAGES, 1):
+            print(f"[{i}/{len(ALL_PAGES)}] Testing: {page['name']} ({page['url']}) [{page['category']}]")
+            
+            # Show rate limit stats if we've hit limits
+            if rate_tracker.rate_limit_hits > 0:
+                stats = rate_tracker.get_stats()
+                if stats['adaptive_delay'] > RATE_LIMIT_CONFIG['min_delay_between_pages']:
+                    print(f"  📊 Rate limit stats: {stats['rate_limit_hits']} hits, delay: {stats['adaptive_delay']:.2f}s")
+            
+            result = test_page_console(driver, page)
+            results.append(result)
+            
+            status_icon = "✅" if result["success"] else "❌"
+            errors_count = len(result["console_errors"]) + len(result["page_errors"])
+            warnings_count = len(result["console_warnings"])
+            
+            print(f"  {status_icon} Status: {'SUCCESS' if result['success'] else 'ERRORS FOUND'}")
+            print(f"  ⏱️  Load time: {result['load_time']:.2f}s")
+            if result.get("rate_limit_retries", 0) > 0:
+                print(f"  🔄 Retries: {result['rate_limit_retries']}")
+            if errors_count > 0:
+                print(f"  ❌ Errors: {errors_count}")
+            if warnings_count > 0:
+                print(f"  ⚠️  Warnings: {warnings_count}")
+            if result["has_header"]:
+                print(f"  📄 Header: ✅")
+            if result["has_core_systems"]:
+                print(f"  ⚙️  Core Systems: ✅")
+            print()
+    
+    finally:
+        driver.quit()
+    
+    # Summary
+    print("=" * 80)
+    print("📊 סיכום תוצאות")
+    print("=" * 80)
+    
+    successful = [r for r in results if r["success"]]
+    failed = [r for r in results if not r["success"]]
+    with_errors = [r for r in results if r["console_errors"] or r["page_errors"]]
+    with_warnings = [r for r in results if r["console_warnings"]]
+    with_header = [r for r in results if r["has_header"]]
+    with_core_systems = [r for r in results if r["has_core_systems"]]
+    
+    print(f"✅ עמודים ללא שגיאות: {len(successful)}/{len(results)} ({len(successful)/len(results)*100:.1f}%)")
+    print(f"❌ עמודים עם שגיאות: {len(failed)}/{len(results)} ({len(failed)/len(results)*100:.1f}%)")
+    print(f"⚠️  עמודים עם אזהרות: {len(with_warnings)}/{len(results)}")
+    print(f"📄 עמודים עם Header: {len(with_header)}/{len(results)} ({len(with_header)/len(results)*100:.1f}%)")
+    print(f"⚙️  עמודים עם Core Systems: {len(with_core_systems)}/{len(results)} ({len(with_core_systems)/len(results)*100:.1f}%)")
+    
+    # Rate limiting statistics
+    rate_stats = rate_tracker.get_stats()
+    if rate_stats['rate_limit_hits'] > 0:
+        print(f"📊 Rate Limiting: {rate_stats['rate_limit_hits']} rate limit hits detected")
+        print(f"   Final adaptive delay: {rate_stats['adaptive_delay']:.2f}s")
+    print()
+    
+    if failed:
+        print("❌ עמודים עם שגיאות:")
+        for r in failed:
+            error_count = len(r["console_errors"]) + len(r["page_errors"])
+            print(f"  - {r['page']} ({r['url']}) [{r['category']}]: {error_count} errors")
+            if r["console_errors"]:
+                for error in r["console_errors"][:3]:  # Show first 3 errors
+                    print(f"    • {error['message'][:100]}")
+            if r["page_errors"]:
+                for error in r["page_errors"][:3]:  # Show first 3 errors
+                    print(f"    • {str(error)[:100]}")
+        print()
+    
+    # Save results to file
+    output_file = Path(__file__).parent.parent / "console_errors_report.json"
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump({
+            "timestamp": datetime.now().isoformat(),
+            "base_url": BASE_URL,
+            "total_pages": len(results),
+            "successful": len(successful),
+            "failed": len(failed),
+            "with_errors": len(with_errors),
+            "with_warnings": len(with_warnings),
+            "with_header": len(with_header),
+            "with_core_systems": len(with_core_systems),
+            "rate_limiting_stats": rate_tracker.get_stats(),
+            "summary_by_category": {
+                cat: {
+                    "total": len([r for r in results if r["category"] == cat]),
+                    "successful": len([r for r in results if r["category"] == cat and r["success"]])
+                }
+                for cat in set(r["category"] for r in results)
+            },
+            "results": results
+        }, f, ensure_ascii=False, indent=2)
+    
+    print(f"💾 תוצאות נשמרו ל: {output_file}")
+    print()
+    print("=" * 80)
+    print(f"✅ בדיקה הושלמה: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("=" * 80)
+
+if __name__ == "__main__":
+    main()
+

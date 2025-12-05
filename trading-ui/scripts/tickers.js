@@ -1018,29 +1018,42 @@ async function saveTicker() {
       tickerPayload.provider_symbols = providerSymbols;
     }
 
-    // שימוש בשירות הנתונים החדש
-    let response;
-    if (window.TickersData && window.TickersData.createTicker) {
-      response = await window.TickersData.createTicker(tickerPayload);
+    // Use UnifiedCRUDService for consistent CRUD operations
+    let crudResult;
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+      crudResult = await window.UnifiedCRUDService.saveEntity('ticker', tickerPayload, {
+        modalId: 'tickersModal',
+        successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
+        entityName: 'טיקר',
+        reloadFn: window.loadTickersData,
+        requiresHardReload: false
+      });
     } else {
-      // Fallback ל-direct fetch אם השירות לא זמין
-      response = await fetch('/api/tickers', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(tickerPayload),
+      // Fallback to direct API call with CRUDResponseHandler
+      let response;
+      if (window.TickersData && window.TickersData.createTicker) {
+        response = await window.TickersData.createTicker(tickerPayload);
+      } else {
+        // Fallback ל-direct fetch אם השירות לא זמין
+        response = await fetch('/api/tickers', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(tickerPayload),
+        });
+      }
+
+      // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+      crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
+        modalId: 'tickersModal',
+        successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
+        entityName: 'טיקר',
+        reloadFn: window.loadTickersData,
+        requiresHardReload: false
       });
     }
-
-    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    const crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
-      modalId: 'tickersModal',
-      successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
-      entityName: 'טיקר',
-      reloadFn: window.loadTickersData,
-      requiresHardReload: false
-    });
+    
     const newTickerId = Number(crudResult?.data?.id || crudResult?.id);
     if (Number.isFinite(newTickerId) && window.TagService) {
       try {
@@ -1235,6 +1248,7 @@ async function updateTicker() {
 
   try {
     const tickerPayload = {
+      id: parseInt(id),
       symbol,
       name,
       type,
@@ -1248,30 +1262,43 @@ async function updateTicker() {
       tickerPayload.provider_symbols = providerSymbols;
     }
 
-    // שימוש בשירות הנתונים החדש
-    let response;
-    if (window.TickersData && window.TickersData.updateTicker) {
-      response = await window.TickersData.updateTicker(parseInt(id), tickerPayload);
+    // Use UnifiedCRUDService for consistent CRUD operations
+    let updateResult;
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+      updateResult = await window.UnifiedCRUDService.saveEntity('ticker', tickerPayload, {
+        modalId: 'tickersModal',
+        successMessage: `טיקר ${symbol} עודכן בהצלחה!`,
+        entityName: 'טיקר',
+        reloadFn: window.loadTickersData,
+        requiresHardReload: false
+      });
     } else {
-      // Fallback ל-direct fetch אם השירות לא זמין
-      response = await fetch(`/api/tickers/${parseInt(id)}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(tickerPayload),
+      // Fallback to direct API call with CRUDResponseHandler
+      let response;
+      if (window.TickersData && window.TickersData.updateTicker) {
+        response = await window.TickersData.updateTicker(parseInt(id), tickerPayload);
+      } else {
+        // Fallback ל-direct fetch אם השירות לא זמין
+        response = await fetch(`/api/tickers/${parseInt(id)}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(tickerPayload),
+        });
+      }
+
+      // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+      updateResult = await CRUDResponseHandler.handleUpdateResponse(response, {
+        modalId: 'tickersModal',
+        successMessage: `טיקר ${symbol} עודכן בהצלחה!`,
+        apiUrl: '/api/tickers/',
+        entityName: 'טיקר',
+        reloadFn: window.loadTickersData,
+        requiresHardReload: false
       });
     }
-
-    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    const updateResult = await CRUDResponseHandler.handleUpdateResponse(response, {
-      modalId: 'tickersModal',
-      successMessage: `טיקר ${symbol} עודכן בהצלחה!`,
-      apiUrl: '/api/tickers/',
-      entityName: 'טיקר',
-      reloadFn: window.loadTickersData,
-      requiresHardReload: false
-    });
+    
     if (updateResult !== null && window.TagService) {
       try {
         await window.TagService.replaceEntityTags('ticker', Number.parseInt(id, 10), tagIds);
@@ -1737,34 +1764,54 @@ async function checkLinkedItemsAndDeleteTicker(tickerId) {
  */
 async function performTickerDeletion(tickerId) {
   try {
-    // Send delete request using TickersData service if available
-    let response;
-    if (typeof window.TickersData?.deleteTicker === 'function') {
-      response = await window.TickersData.deleteTicker(tickerId);
+    // Use UnifiedCRUDService for consistent CRUD operations
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.deleteEntity === 'function') {
+      await window.UnifiedCRUDService.deleteEntity('ticker', tickerId, {
+        successMessage: 'טיקר נמחק בהצלחה',
+        entityName: 'טיקר',
+        reloadFn: () => {
+          window.loadTickersData({ force: true });
+          // Update active trades field if function exists
+          if (typeof window.updateActiveTradesField === 'function') {
+            window.updateActiveTradesField();
+          }
+          // Call onTickerDeleted callback if exists
+          if (typeof window.onTickerDeleted === 'function') {
+            window.onTickerDeleted(tickerId);
+          }
+        },
+        requiresHardReload: false
+      });
     } else {
-      // Fallback to direct fetch
-      response = await fetch(`/api/tickers/${tickerId}`, {
-        method: 'DELETE',
+      // Fallback to direct API call with CRUDResponseHandler
+      let response;
+      if (typeof window.TickersData?.deleteTicker === 'function') {
+        response = await window.TickersData.deleteTicker(tickerId);
+      } else {
+        // Fallback to direct fetch
+        response = await fetch(`/api/tickers/${tickerId}`, {
+          method: 'DELETE',
+        });
+      }
+
+      // Use CRUDResponseHandler for consistent response handling
+      await CRUDResponseHandler.handleDeleteResponse(response, {
+        successMessage: 'טיקר נמחק בהצלחה',
+        entityName: 'טיקר',
+        reloadFn: () => {
+          window.loadTickersData({ force: true });
+          // Update active trades field if function exists
+          if (typeof window.updateActiveTradesField === 'function') {
+            window.updateActiveTradesField();
+          }
+          // Call onTickerDeleted callback if exists
+          if (typeof window.onTickerDeleted === 'function') {
+            window.onTickerDeleted(tickerId);
+          }
+        },
+        requiresHardReload: false
       });
     }
-
-    // Use CRUDResponseHandler for consistent response handling
-    await CRUDResponseHandler.handleDeleteResponse(response, {
-      successMessage: 'טיקר נמחק בהצלחה',
-      entityName: 'טיקר',
-      reloadFn: () => {
-        window.loadTickersData({ force: true });
-        // Update active trades field if function exists
-        if (typeof window.updateActiveTradesField === 'function') {
-          window.updateActiveTradesField();
-        }
-        // Call onTickerDeleted callback if exists
-        if (typeof window.onTickerDeleted === 'function') {
-          window.onTickerDeleted(tickerId);
-        }
-      },
-      requiresHardReload: false
-    });
 
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'מחיקת טיקר');
@@ -1928,20 +1975,70 @@ async function loadTickersDataInternal(options = {}) {
 
       const data = await response.json();
       rawTickers = data?.data || data;
+      
+      // Log volume data for debugging
+      if (window.Logger && rawTickers && rawTickers.length > 0) {
+        const firstTicker = rawTickers[0];
+        window.Logger.info('📊 First ticker from API:', {
+          symbol: firstTicker.symbol,
+          volume: firstTicker.volume,
+          volumeType: typeof firstTicker.volume,
+          hasVolume: 'volume' in firstTicker,
+          change_percent: firstTicker.change_percent,
+          change_percentType: typeof firstTicker.change_percent,
+          hasChangePercent: 'change_percent' in firstTicker,
+          current_price: firstTicker.current_price,
+          change_amount: firstTicker.change_amount,
+          allKeys: Object.keys(firstTicker).filter(k => k.toLowerCase().includes('volume') || k.toLowerCase().includes('change'))
+        }, { page: 'tickers' });
+      }
     }
 
     // שמירת הנתונים
+    // IMPORTANT: yahoo_updated_at is the timestamp when external market data (price) was last updated
     tickersData = Array.isArray(rawTickers)
-      ? rawTickers.map(ticker => ({
-          ...ticker,
-          updated_at: ticker.updated_at
-            || ticker.yahoo_updated_at
-            || ticker.fetched_at
-            || ticker.last_updated_at
-            || null
-        }))
+      ? rawTickers.map(ticker => {
+          // Log volume for each ticker
+          if (window.Logger && ticker.volume !== undefined && ticker.volume !== null) {
+            window.Logger.debug('📊 Ticker volume data:', {
+              symbol: ticker.symbol,
+              volume: ticker.volume,
+              volumeType: typeof ticker.volume
+            }, { page: 'tickers' });
+          }
+          
+          return {
+            ...ticker,
+            // Preserve volume explicitly to ensure it's not lost
+            volume: ticker.volume !== undefined ? ticker.volume : null,
+            // Preserve yahoo_updated_at as primary source for "last price update" display
+            yahoo_updated_at: ticker.yahoo_updated_at || null,
+            updated_at: ticker.updated_at
+              || ticker.yahoo_updated_at
+              || ticker.fetched_at
+              || ticker.last_updated_at
+              || ticker.created_at
+              || null
+          };
+        })
       : [];
     window.tickersData = tickersData;
+    
+    // Log final tickersData volume
+    if (window.Logger && tickersData.length > 0) {
+      const firstTicker = tickersData[0];
+      window.Logger.info('📊 First ticker in tickersData after processing:', {
+        symbol: firstTicker.symbol,
+        volume: firstTicker.volume,
+        volumeType: typeof firstTicker.volume,
+        hasVolume: 'volume' in firstTicker,
+        change_percent: firstTicker.change_percent,
+        change_percentType: typeof firstTicker.change_percent,
+        hasChangePercent: 'change_percent' in firstTicker,
+        current_price: firstTicker.current_price,
+        change_amount: firstTicker.change_amount
+      }, { page: 'tickers' });
+    }
 
     // עדכון שדה active_trades
     await updateActiveTradesField();
@@ -2073,12 +2170,41 @@ function renderTickersTableRows(tickers) {
     
     // יצירת שורות עם עיצוב משופר - שימוש ב-createElement במקום DOMParser
     tickers.forEach(ticker => {
-      // קבלת סמל מטבע
-      const currencySymbol = getCurrencySymbol(ticker.currency_id);
+      // קבלת סמל מטבע - נירמול לפי אותו לוגיקה של FieldRendererService._normalizeCurrencySymbol
+      const rawCurrencySymbol = getCurrencySymbol(ticker.currency_id);
       const priceValue = toFiniteNumber(ticker.current_price);
       const changePercentValue = toFiniteNumber(ticker.change_percent);
       const volumeValue = toFiniteNumber(ticker.volume);
+      
+      // Log volume for debugging
+      if (window.Logger) {
+        window.Logger.info('📊 Rendering ticker volume:', {
+          symbol: ticker.symbol,
+          rawVolume: ticker.volume,
+          volumeType: typeof ticker.volume,
+          volumeValue: volumeValue,
+          volumeIsNull: volumeValue === null,
+          volumeIsUndefined: volumeValue === undefined,
+          volumeIsNaN: isNaN(volumeValue),
+          volumeIsFinite: Number.isFinite(volumeValue),
+          volumeIsPositive: volumeValue > 0,
+          changePercentValue: changePercentValue,
+          changePercentIsNull: changePercentValue === null,
+          changePercentIsFinite: Number.isFinite(changePercentValue)
+        }, { page: 'tickers' });
+      }
 
+      // נירמול מטבע - אותו לוגיקה כמו FieldRendererService._normalizeCurrencySymbol
+      let currencySymbol = rawCurrencySymbol || '$';
+      if (currencySymbol && currencySymbol.length > 1 && /^[A-Za-z]+$/.test(currencySymbol)) {
+        const symbolMap = {
+          'USD': '$', 'ILS': '₪', 'EUR': '€', 'GBP': '£', 'JPY': '¥',
+          'AUD': 'A$', 'CAD': 'C$', 'CHF': 'CHF', 'CNY': '¥', 'HKD': 'HK$', 'INR': '₹'
+        };
+        currencySymbol = symbolMap[currencySymbol.toUpperCase()] || currencySymbol;
+      }
+
+      // מחיר - שימוש ב-FieldRendererService
       const priceHtml = (typeof window.renderAmount === 'function' && priceValue !== null)
         ? window.renderAmount(priceValue, currencySymbol, 2, false)
         : (priceValue !== null ? `${currencySymbol || ''}${priceValue.toFixed(2)}` : 'N/A');
@@ -2087,11 +2213,42 @@ function renderTickersTableRows(tickers) {
       const changeFromOpenValue = toFiniteNumber(ticker.change_from_open);
       const changeFromOpenPercentValue = toFiniteNumber(ticker.change_from_open_percent);
       
-      const changePercentHtml = (typeof window.renderNumericValue === 'function' && changePercentValue !== null)
-        ? window.renderNumericValue(changePercentValue, '%', true)
-        : (changePercentValue !== null
-            ? `${changePercentValue >= 0 ? '+' : ''}${changePercentValue.toFixed(2)}%`
-            : 'N/A');
+      // Calculate change amount from percentage if not provided directly
+      let changeAmountValue = toFiniteNumber(ticker.change_amount || ticker.daily_change);
+      if ((changeAmountValue === null || changeAmountValue === undefined || isNaN(changeAmountValue)) && priceValue !== null && changePercentValue !== null) {
+        // Calculate: changeAmount = price * (changePercent / 100)
+        changeAmountValue = priceValue * (changePercentValue / 100);
+      }
+      
+      // Render change using FieldRendererService - extract values and format according to requirements
+      // Requirements: sign left of symbol, no + for positive, percentage bold, amount in parentheses not bold, no line break
+      let changeHtml = '';
+      if (changePercentValue !== null && changePercentValue !== undefined && !isNaN(changePercentValue) && Number.isFinite(changePercentValue)) {
+        const changeColor = changePercentValue >= 0 ? 'text-success' : 'text-danger';
+        
+        // Format percentage: sign left of number, % symbol after number, no + for positive
+        const percentSign = changePercentValue < 0 ? '-' : '';
+        const percentValue = Math.abs(changePercentValue).toFixed(2);
+        const percentText = `${percentSign}${percentValue}%`;
+        
+        // Format amount: sign left of currency symbol, no + for positive
+        let amountText = '';
+        if (changeAmountValue !== null && changeAmountValue !== undefined && !isNaN(changeAmountValue) && Number.isFinite(changeAmountValue)) {
+          const amountSign = changeAmountValue < 0 ? '-' : '';
+          const amountValue = Math.abs(changeAmountValue).toFixed(2);
+          amountText = `${amountSign}${currencySymbol}${amountValue}`;
+        }
+        
+        // Combine: amount in parentheses not bold first, then percentage bold (appears on right in RTL)
+        // In RTL: what's written last appears first (on the right), so we write percentage last to appear first
+        if (amountText) {
+          changeHtml = `<span class="${changeColor}" dir="ltr" style="white-space: nowrap;"><span class="fw-normal">(${amountText})</span><span class="fw-bold">${percentText}</span></span>`;
+        } else {
+          changeHtml = `<span class="${changeColor} fw-bold" dir="ltr">${percentText}</span>`;
+        }
+      } else {
+        changeHtml = 'N/A';
+      }
       
       // Build change from open HTML if available
       let changeFromOpenHtml = '';
@@ -2117,7 +2274,9 @@ function renderTickersTableRows(tickers) {
            </span>`;
 
       // Build updated cell HTML
-      const rawDate = ticker.updated_at || ticker.yahoo_updated_at || ticker.fetched_at || ticker.last_updated_at || null;
+      // Priority: yahoo_updated_at (market data - last price update) > updated_at > fetched_at > created_at (fallback)
+      // IMPORTANT: yahoo_updated_at is the timestamp when external market data (price) was last updated
+      const rawDate = ticker.yahoo_updated_at || ticker.updated_at || ticker.fetched_at || ticker.last_updated_at || ticker.created_at || null;
       let dateDisplay = '';
       let epoch = null;
       
@@ -2207,11 +2366,13 @@ function renderTickersTableRows(tickers) {
         <td class="table-cell-center numeric-ltr" title="${priceValue !== null ? `מחיר נוכחי: ${currencySymbol || ''}${priceValue.toFixed(2)}` : 'אין נתוני מחיר'}" dir="ltr">
           ${priceHtml}
         </td>
-        <td class="table-cell-center numeric-ltr" title="${changePercentValue !== null ? `שינוי יומי: ${changePercentValue.toFixed(2)}%` : 'אין נתוני שינוי'}${changeFromOpenValue !== null ? ` | שינוי מפתיחה: ${changeFromOpenValue.toFixed(2)} (${changeFromOpenPercentValue.toFixed(2)}%)` : ''}" dir="ltr">
-          ${changePercentHtml}${changeFromOpenHtml}
+        <td class="table-cell-center numeric-ltr" title="${changePercentValue !== null ? `שינוי יומי: ${changePercentValue.toFixed(2)}%${changeAmountValue !== null && !isNaN(changeAmountValue) ? ` (${changeAmountValue >= 0 ? '+' : ''}${currencySymbol}${Math.abs(changeAmountValue).toFixed(2)})` : ''}` : 'אין נתוני שינוי'}${changeFromOpenValue !== null ? ` | שינוי מפתיחה: ${changeFromOpenValue.toFixed(2)} (${changeFromOpenPercentValue.toFixed(2)}%)` : ''}" dir="ltr">
+          ${changeHtml}${changeFromOpenHtml}
         </td>
-        <td class="table-cell-center numeric-ltr" title="${volumeValue !== null ? `נפח: ${volumeValue.toLocaleString('he-IL')}` : 'אין נתוני נפח'}" dir="ltr">
-          ${window.renderVolume ? window.renderVolume(volumeValue, true) : (volumeValue !== null ? volumeValue.toLocaleString('he-IL') : 'N/A')}
+        <td class="table-cell-center numeric-ltr" title="${volumeValue !== null && volumeValue !== undefined && !isNaN(volumeValue) && Number.isFinite(volumeValue) && volumeValue > 0 ? `נפח: ${volumeValue.toLocaleString('he-IL')}` : 'אין נתוני נפח'}" dir="ltr">
+          ${(typeof window.renderVolume === 'function' && volumeValue !== null && volumeValue !== undefined && !isNaN(volumeValue) && Number.isFinite(volumeValue) && volumeValue > 0)
+            ? window.renderVolume(volumeValue, true)
+            : (volumeValue !== null && volumeValue !== undefined && !isNaN(volumeValue) && Number.isFinite(volumeValue) && volumeValue > 0 ? volumeValue.toLocaleString('he-IL') : 'N/A')}
         </td>
         <td class="status-cell" data-status="${ticker.user_ticker_status || ticker.status || ''}" title="${statusLabel}">
           ${statusHtml}

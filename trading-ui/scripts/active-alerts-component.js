@@ -440,7 +440,48 @@ class ActiveAlertsComponent extends HTMLElement {
 
   async loadActiveAlerts(options = {}) {
     const { force = false } = options;
+    
+    // CRITICAL: Track call stack to detect recursion
+    if (!window.__LOAD_ACTIVE_ALERTS_CALL_STACK__) {
+      window.__LOAD_ACTIVE_ALERTS_CALL_STACK__ = [];
+    }
+    
+    const callInfo = {
+      timestamp: Date.now(),
+      stack: new Error().stack,
+      force
+    };
+    
+    // Check for recursion - if called again within 100ms
+    const recentCall = window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.find(c => 
+      Date.now() - c.timestamp < 100
+    );
+    
+    if (recentCall && this.isLoading) {
+      console.error('🚨 RECURSION DETECTED in loadActiveAlerts:', {
+        callStack: window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.map(c => ({
+          timestamp: c.timestamp,
+          force: c.force
+        })),
+        recentCall: recentCall.stack
+      });
+      return; // Break recursion
+    }
+    
+    window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.push(callInfo);
+    // Keep only last 10 calls
+    if (window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.length > 10) {
+      window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.shift();
+    }
+    
     if (this.isLoading) {
+      // Remove from call stack if already loading
+      const index = window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.findIndex(c => 
+        Math.abs(c.timestamp - callInfo.timestamp) < 10
+      );
+      if (index !== -1) {
+        window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.splice(index, 1);
+      }
       return;
     }
 
@@ -451,10 +492,20 @@ class ActiveAlertsComponent extends HTMLElement {
     const cacheEnabled = !force && this.shouldUseCache();
 
     const finalize = async (alerts, source) => {
-      const normalizedAlerts = Array.isArray(alerts) ? alerts : [];
-      await this.ensureRelatedData();
-      await this.applyAlertsState(normalizedAlerts);
-      this.log('info', 'Active alerts loaded', { source, count: this.alerts.length });
+      try {
+        const normalizedAlerts = Array.isArray(alerts) ? alerts : [];
+        await this.ensureRelatedData();
+        await this.applyAlertsState(normalizedAlerts);
+        this.log('info', 'Active alerts loaded', { source, count: this.alerts.length });
+      } finally {
+        // Remove from call stack
+        const index = window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.findIndex(c => 
+          Math.abs(c.timestamp - callInfo.timestamp) < 10
+        );
+        if (index !== -1) {
+          window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.splice(index, 1);
+        }
+      }
     };
 
     try {
@@ -511,6 +562,14 @@ class ActiveAlertsComponent extends HTMLElement {
       this.isLoading = false;
       this.setLoadingState(false);
       this.updateHeaderState();
+      
+      // Remove from call stack
+      const index = window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.findIndex(c => 
+        Math.abs(c.timestamp - callInfo.timestamp) < 10
+      );
+      if (index !== -1) {
+        window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.splice(index, 1);
+      }
     }
   }
 
@@ -1014,7 +1073,9 @@ class ActiveAlertsComponent extends HTMLElement {
         window.showSuccessNotification('התראה עודכנה', 'התראה סומנה כנקראה');
       }
 
-      await this.loadActiveAlerts({ force: true });
+      // CRITICAL: Prevent infinite recursion - don't reload if already loading
+      // The state is already updated above, so we don't need to reload
+      // await this.loadActiveAlerts({ force: true });
       this.log('info', 'Alert marked as read', { alertId });
     } catch (error) {
       this.log('error', 'Failed to mark alert as read', { alertId, error: error?.message });
@@ -1479,15 +1540,53 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   handleLoadError(error) {
+    // CRITICAL: Prevent recursion - don't use Logger or showNotification if loadActiveAlerts is in progress
+    // or if getPreference is in progress (to avoid Logger -> getPreference -> Logger loop)
+    if (this.isLoading || window.__GET_PREFERENCE_IN_PROGRESS__) {
+      // Use console directly during loading to avoid recursion
+      if (window.DEBUG_MODE) {
+        console.error('[ActiveAlertsComponent] Failed to load active alerts', { error: error?.message });
+      }
+      return;
+    }
+    
     this.log('error', 'Failed to load active alerts', { error: error?.message });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בטעינת התראות פעילות', error?.message || 'אירעה שגיאה בעת טעינת ההתראות');
+    
+    // CRITICAL: Only show notification if not currently loading preferences to avoid recursion
+    if (!window.__GET_PREFERENCE_IN_PROGRESS__ && typeof window.showErrorNotification === 'function') {
+      try {
+        window.showErrorNotification('שגיאה בטעינת התראות פעילות', error?.message || 'אירעה שגיאה בעת טעינת ההתראות');
+      } catch (notifError) {
+        // Fallback to console if notification fails
+        if (window.DEBUG_MODE) {
+          console.error('[ActiveAlertsComponent] Failed to show error notification', notifError);
+        }
+      }
     }
   }
 
   log(level, message, extra = {}) {
+    // CRITICAL: Prevent recursion - don't use Logger if loadActiveAlerts is in progress
+    // or if getPreference is in progress (to avoid Logger -> getPreference -> Logger loop)
+    if (this.isLoading || window.__GET_PREFERENCE_IN_PROGRESS__) {
+      // Use console directly during loading to avoid recursion
+      if (window.DEBUG_MODE) {
+        const consoleMethod = level === 'error' ? console.error : level === 'warn' ? console.warn : console.log;
+        consoleMethod(`[ActiveAlertsComponent] ${message}`, extra);
+      }
+      return;
+    }
+    
     if (window.Logger && typeof window.Logger[level] === 'function') {
-      window.Logger[level](message, { component: 'ActiveAlertsComponent', ...extra });
+      try {
+        window.Logger[level](message, { component: 'ActiveAlertsComponent', ...extra });
+      } catch (error) {
+        // Fallback to console if Logger fails
+        if (window.DEBUG_MODE) {
+          const consoleMethod = level === 'error' ? console.error : level === 'warn' ? console.warn : console.log;
+          consoleMethod(`[ActiveAlertsComponent] ${message}`, extra);
+        }
+      }
     }
   }
 

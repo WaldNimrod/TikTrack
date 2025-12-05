@@ -32,6 +32,8 @@
 | **Pending Trade Plan Widget** | `trading-ui/scripts/pending-trade-plan-widget.js` | [PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md) | ⚠️ Deprecated | הוחלף ב-Unified Pending Actions Widget |
 | **Active Alerts Component** | `trading-ui/scripts/active-alerts-component.js` | [ACTIVE_ALERTS_COMPONENT.md](ACTIVE_ALERTS_COMPONENT.md) | ✅ פעיל | קומפוננטת התראות פעילות (Web Component) |
 | **Tag Widget (מאוחד)** | `trading-ui/scripts/widgets/tag-widget.js`<br>`trading-ui/styles-new/06-components/_tag-widget.css` | [TAG_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TAG_WIDGET_DEVELOPER_GUIDE.md) | ✅ פעיל | ענן תגיות + חיפוש מהיר עם Bootstrap Tabs |
+| **Ticker List Widget** | `trading-ui/scripts/widgets/ticker-list-widget.js`<br>`trading-ui/styles-new/06-components/_ticker-list-widget.css` | [TICKER_LIST_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TICKER_LIST_WIDGET_DEVELOPER_GUIDE.md) | ✅ פעיל | רשימת טיקרים עם KPI Cards (3 טאבים: פעילים, רשימת צפיה, כל הטיקרים) |
+| **Ticker Chart Widget** | `trading-ui/scripts/widgets/ticker-chart-widget.js`<br>`trading-ui/styles-new/06-components/_ticker-chart-widget.css` | [TICKER_CHART_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TICKER_CHART_WIDGET_DEVELOPER_GUIDE.md) | ✅ פעיל | גרפים מהירים עם TradingView Mini Charts |
 
 ### תלויות Dashboard Widgets
 
@@ -99,6 +101,8 @@
 - **Tag Widget:** [TAG_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TAG_WIDGET_DEVELOPER_GUIDE.md)
 - **Recent Items Widget:** [RECENT_ITEMS_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/RECENT_ITEMS_WIDGET_DEVELOPER_GUIDE.md)
 - **Unified Pending Actions Widget:** [UNIFIED_PENDING_ACTIONS_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/UNIFIED_PENDING_ACTIONS_WIDGET_DEVELOPER_GUIDE.md)
+- **Ticker List Widget:** [TICKER_LIST_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TICKER_LIST_WIDGET_DEVELOPER_GUIDE.md)
+- **Ticker Chart Widget:** [TICKER_CHART_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TICKER_CHART_WIDGET_DEVELOPER_GUIDE.md)
 - **Pending Trade Plan Widget:** [PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md)
 - **History Widget:** [HISTORY_WIDGET_DEVELOPER_GUIDE.md](HISTORY_WIDGET_DEVELOPER_GUIDE.md)
 - **Emotional Tracking Widget:** [EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md](EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md)

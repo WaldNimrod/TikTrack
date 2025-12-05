@@ -47,6 +47,8 @@ class TradingAccount(BaseModel):
     total_value = Column(Float, default=0)
     total_pl = Column(Float, default=0)  # Not updated - shows "בפיתוח" in UI
     notes = Column(String(5000))
+    external_account_number = Column(String(100), nullable=True, unique=True,
+                                     comment="External broker account number for account linking during imports")
     
     # Relationships with other entities
     # Currency relationship

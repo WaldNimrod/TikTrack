@@ -516,7 +516,15 @@ function cashFlowMatchesType(item, normalizedType) {
     if (!item) {
       return false;
     }
-    // Exchange rows מזוהים רק אם יש exchange_group_id או external_id בפורמט exchange_
+    // Exchange rows מזוהים לפי:
+    // 1. type הוא currency_exchange_from או currency_exchange_to
+    // 2. exchange_group_id קיים
+    // 3. external_id מתחיל ב-exchange_
+    // 4. isCurrencyExchange מחזיר true
+    const itemType = (item?.type || '').toString().toLowerCase();
+    if (itemType === 'currency_exchange_from' || itemType === 'currency_exchange_to') {
+      return true;
+    }
     return Boolean(item.exchange_group_id || isCurrencyExchange(item));
   }
   const candidate = (item?.type || '').toString().toLowerCase();
@@ -531,9 +539,6 @@ function cashFlowMatchesType(item, normalizedType) {
  * @returns {Promise<void>}
  */
 async function filterCashFlowsByType(flowType, options = {}) {
-  // Export to window for global access (needed for data-onchange)
-  window.filterCashFlowsByType = filterCashFlowsByType;
-  
   window.Logger?.debug('🔍 [filterCashFlowsByType] Called with:', { flowType, options });
   window.Logger?.info('🔍 filterCashFlowsByType called', { 
     flowType, 
@@ -621,6 +626,23 @@ async function filterCashFlowsByType(flowType, options = {}) {
       if (currentPageData.length > 0 || filteredData.length === 0) {
         window.Logger?.debug('🔄 [filterCashFlowsByType] Force calling updateCashFlowsTable');
         await updateCashFlowsTable(currentPageData, { skipDataUpdate: true, skipSummary: true });
+      }
+      
+      // Always update unified forex exchanges table with ALL exchange data (independent of filter)
+      try {
+        const allData = Array.isArray(window.allCashFlowsData) && window.allCashFlowsData.length > 0
+          ? window.allCashFlowsData
+          : (Array.isArray(window.cashFlowsData) && window.cashFlowsData.length > 0
+              ? window.cashFlowsData
+              : []);
+        // Filter only exchange-related cash flows for the unified table
+        const exchangeData = allData.filter(item => {
+          const itemType = (item?.type || '').toString().toLowerCase();
+          return itemType === 'currency_exchange_from' || itemType === 'currency_exchange_to' || isCurrencyExchange(item);
+        });
+        renderUnifiedForexExchangesTable(exchangeData);
+      } catch (e) {
+        window.Logger?.warn('renderUnifiedForexExchangesTable failed in filterCashFlowsByType', { error: e?.message, page: 'cash_flows' });
       }
     }, 100);
     
@@ -1056,22 +1078,33 @@ async function deleteCashFlow(id) {
  */
 async function performCashFlowDeletion(id) {
   try {
-    let response;
-    if (typeof window.CashFlowsData?.deleteCashFlow === 'function') {
-      response = await window.CashFlowsData.deleteCashFlow(id);
+    // Use UnifiedCRUDService for consistent CRUD operations
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.deleteEntity === 'function') {
+      await window.UnifiedCRUDService.deleteEntity('cash_flow', id, {
+        successMessage: 'תזרים המזומנים נמחק בהצלחה!',
+        entityName: 'תזרים מזומנים',
+        reloadFn: () => window.loadCashFlowsData({ force: true }),
+        requiresHardReload: false
+      });
     } else {
-      response = await fetch(`/api/cash-flows/${id}`, {
-        method: 'DELETE',
+      // Fallback to direct API call with CRUDResponseHandler
+      let response;
+      if (typeof window.CashFlowsData?.deleteCashFlow === 'function') {
+        response = await window.CashFlowsData.deleteCashFlow(id);
+      } else {
+        response = await fetch(`/api/cash-flows/${id}`, {
+          method: 'DELETE',
+        });
+      }
+
+      // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+      await CRUDResponseHandler.handleDeleteResponse(response, {
+        successMessage: 'תזרים המזומנים נמחק בהצלחה!',
+        entityName: 'תזרים מזומנים',
+        reloadFn: () => window.loadCashFlowsData({ force: true }),
+        requiresHardReload: false
       });
     }
-
-    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleDeleteResponse(response, {
-      successMessage: 'תזרים המזומנים נמחק בהצלחה!',
-      entityName: 'תזרים מזומנים',
-      reloadFn: () => window.loadCashFlowsData({ force: true }),
-      requiresHardReload: false
-    });
   } catch (error) {
     window.Logger.error('performCashFlowDeletion: Error occurred', { page: 'cash_flows', error: error?.message || error });
     CRUDResponseHandler.handleError(error, 'מחיקת תזרים מזומנים');
@@ -1547,7 +1580,23 @@ async function renderCashFlowsTable() {
   setupExchangeRowInteractions();
 
   // Render unified forex exchanges table
-  renderUnifiedForexExchangesTable(dataToRender);
+  // IMPORTANT: Always render with ALL exchange data, independent of main table filter
+  // The unified forex table should show all exchanges regardless of the filter applied to the main table
+  try {
+    const allData = Array.isArray(window.allCashFlowsData) && window.allCashFlowsData.length > 0
+      ? window.allCashFlowsData
+      : (Array.isArray(window.cashFlowsData) && window.cashFlowsData.length > 0
+          ? window.cashFlowsData
+          : []);
+    // Filter only exchange-related cash flows for the unified table
+    const exchangeData = allData.filter(item => {
+      const itemType = (item?.type || '').toString().toLowerCase();
+      return itemType === 'currency_exchange_from' || itemType === 'currency_exchange_to' || isCurrencyExchange(item);
+    });
+    renderUnifiedForexExchangesTable(exchangeData);
+  } catch (e) {
+    window.Logger?.warn('renderUnifiedForexExchangesTable failed in renderCashFlowsTable', { error: e?.message, page: 'cash_flows' });
+  }
 
   // עדכון מספר הפריטים - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
   if (window.updateTableCount) {
@@ -1915,9 +1964,9 @@ function renderUnifiedForexExchangesTable(sourceRows) {
     const toCell = document.createElement('td');
     toCell.setAttribute('dir', 'ltr');
     toCell.textContent = '';
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(fmtAmt(toAmt, toSym), 'text/html');
-    doc.body.childNodes.forEach(node => {
+    const toParser = new DOMParser();
+    const toDoc = toParser.parseFromString(fmtAmt(toAmt, toSym), 'text/html');
+    toDoc.body.childNodes.forEach(node => {
         toCell.appendChild(node.cloneNode(true));
     });
     row.appendChild(toCell);
@@ -2908,54 +2957,69 @@ async function saveCashFlow() {
         const cashFlowId = form.dataset.cashFlowId;
         window.Logger.debug('saveCashFlow resolved mode', { page: 'cash_flows', isEdit, cashFlowId });
         
-        let response;
-        if (isEdit && typeof window.CashFlowsData?.updateCashFlow === 'function') {
-            response = await window.CashFlowsData.updateCashFlow(cashFlowId, dataToSend);
-        } else if (!isEdit && typeof window.CashFlowsData?.createCashFlow === 'function') {
-            response = await window.CashFlowsData.createCashFlow(dataToSend);
-        } else {
-            const url = isEdit ? `/api/cash-flows/${cashFlowId}` : '/api/cash-flows';
-            response = await fetch(url, {
-                method: isEdit ? 'PUT' : 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(dataToSend)
-            });
-        }
-        
-        let responseToHandle = response;
-        if (!response.ok) {
-            const responseClone = response.clone();
-            const errorText = await responseClone.text();
-            window.Logger.error('saveCashFlow error response', {
-                page: 'cash_flows',
-                status: response.status,
-                body: errorText,
-            });
-        }
-        
-        // CRUDResponseHandler handles ALL response processing including errors
-        // No need to pre-check or call response.json() here
+        // Use UnifiedCRUDService for consistent CRUD operations
         let crudResult = null;
-        if (isEdit) {
-            window.Logger.debug('saveCashFlow - Calling handleUpdateResponse', { page: 'cash_flows', cashFlowId });
-            crudResult = await CRUDResponseHandler.handleUpdateResponse(responseToHandle, {
+        if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+            if (isEdit && cashFlowId) {
+                dataToSend.id = parseInt(cashFlowId);
+            }
+            crudResult = await window.UnifiedCRUDService.saveEntity('cash_flow', dataToSend, {
                 modalId: 'cashFlowModal',
-                successMessage: 'תזרים מזומן עודכן בהצלחה',
+                successMessage: isEdit ? 'תזרים מזומן עודכן בהצלחה' : 'תזרים מזומן נוסף בהצלחה',
                 entityName: 'תזרים מזומן',
                 reloadFn: () => window.loadCashFlowsData({ force: true }),
                 requiresHardReload: false  // Prevent reload confirmation dialog
             });
         } else {
-            window.Logger.debug('saveCashFlow - Calling handleSaveResponse', { page: 'cash_flows' });
-            crudResult = await CRUDResponseHandler.handleSaveResponse(responseToHandle, {
-                modalId: 'cashFlowModal',
-                successMessage: 'תזרים מזומן נוסף בהצלחה',
-                entityName: 'תזרים מזומן',
-                reloadFn: () => window.loadCashFlowsData({ force: true }),
-                requiresHardReload: false  // Prevent reload confirmation dialog
-            });
+            // Fallback to direct API call with CRUDResponseHandler
+            let response;
+            if (isEdit && typeof window.CashFlowsData?.updateCashFlow === 'function') {
+                response = await window.CashFlowsData.updateCashFlow(cashFlowId, dataToSend);
+            } else if (!isEdit && typeof window.CashFlowsData?.createCashFlow === 'function') {
+                response = await window.CashFlowsData.createCashFlow(dataToSend);
+            } else {
+                const url = isEdit ? `/api/cash-flows/${cashFlowId}` : '/api/cash-flows';
+                response = await fetch(url, {
+                    method: isEdit ? 'PUT' : 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(dataToSend)
+                });
+            }
+            
+            let responseToHandle = response;
+            if (!response.ok) {
+                const responseClone = response.clone();
+                const errorText = await responseClone.text();
+                window.Logger.error('saveCashFlow error response', {
+                    page: 'cash_flows',
+                    status: response.status,
+                    body: errorText,
+                });
+            }
+            
+            // CRUDResponseHandler handles ALL response processing including errors
+            // No need to pre-check or call response.json() here
+            if (isEdit) {
+                window.Logger.debug('saveCashFlow - Calling handleUpdateResponse', { page: 'cash_flows', cashFlowId });
+                crudResult = await CRUDResponseHandler.handleUpdateResponse(responseToHandle, {
+                    modalId: 'cashFlowModal',
+                    successMessage: 'תזרים מזומן עודכן בהצלחה',
+                    entityName: 'תזרים מזומן',
+                    reloadFn: () => window.loadCashFlowsData({ force: true }),
+                    requiresHardReload: false  // Prevent reload confirmation dialog
+                });
+            } else {
+                window.Logger.debug('saveCashFlow - Calling handleSaveResponse', { page: 'cash_flows' });
+                crudResult = await CRUDResponseHandler.handleSaveResponse(responseToHandle, {
+                    modalId: 'cashFlowModal',
+                    successMessage: 'תזרים מזומן נוסף בהצלחה',
+                    entityName: 'תזרים מזומן',
+                    reloadFn: () => window.loadCashFlowsData({ force: true }),
+                    requiresHardReload: false  // Prevent reload confirmation dialog
+                });
+            }
         }
         
         const resolvedCashFlowId = isEdit
@@ -3786,6 +3850,8 @@ async function editCashFlow(id) {
 window.manageExternalIdField = manageExternalIdField;
 window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
+// Export filterCashFlowsByType to window EARLY for data-onchange handler
+// This must be defined before the page loads so EventHandlerManager can find it
 window.filterCashFlowsByType = filterCashFlowsByType;
 window.reapplyCashFlowTypeFilter = reapplyCashFlowTypeFilter;
 window.deleteCashFlow = deleteCashFlow;

@@ -201,6 +201,42 @@ Authorization: Bearer <token>
 
 ---
 
+### DELETE /api/ai-analysis/history/{request_id}
+
+מחיקת ניתוח ספציפי לפי ID.
+
+**Response (Success):**
+```json
+{
+  "status": "success",
+  "message": "Analysis deleted successfully",
+  "data": {
+    "deleted_id": 123
+  }
+}
+```
+
+**Response (Error):**
+```json
+{
+  "status": "error",
+  "message": "Analysis not found or not authorized"
+}
+```
+
+**Status Codes:**
+- `200` - Success
+- `404` - Not Found or Not Authorized
+- `401` - Unauthorized
+- `500` - Server Error
+
+**הערות:**
+- רק המשתמש שיצר את הניתוח יכול למחוק אותו
+- המחיקה היא סופית ולא ניתנת לביטול
+- המטמון של הניתוח ינוקה אוטומטית
+
+---
+
 ### POST /api/ai-analysis/llm-provider
 
 עדכון הגדרות LLM Provider (API keys).

@@ -10,6 +10,7 @@ import logging
 from models.ticker import Ticker
 from models.external_data import MarketDataQuote, ExternalDataProvider
 from config.database import get_db
+from routes.api.base_entity_decorators import require_authentication
 
 logger = logging.getLogger(__name__)
 
@@ -322,11 +323,14 @@ def get_quote_history(ticker_id):
 
 
 @quotes_bp.route('/<int:ticker_id>/refresh', methods=['POST'])
+@require_authentication()
 def refresh_ticker_quote(ticker_id):
     """Manually refresh quote for a ticker"""
     try:
         data = request.get_json() or {}
         force_refresh = data.get('force_refresh', False)
+        include_historical = data.get('include_historical', True)  # Default to True
+        days_back = data.get('days_back', 150)  # Default to 150 for MA 150 calculation
         
         # Get database session
         db_session = next(get_db())
@@ -376,17 +380,23 @@ def refresh_ticker_quote(ticker_id):
                 db_session.rollback()
             
             # Fetch current quote (will fetch fresh from API since cache is cleared)
-            quote_data = adapter.get_quote(ticker.symbol, ticker=ticker)
+            quote_data = None
+            try:
+                quote_data = adapter.get_quote(ticker.symbol, ticker=ticker)
+            except Exception as quote_error:
+                logger.error(f"Error fetching quote for {ticker.symbol}: {quote_error}", exc_info=True)
+                # Continue - we'll check if we have existing data in database
             
-            # Also fetch historical data (150 days for MA 150 calculation)
+            # Also fetch historical data (days_back days for MA 150 calculation)
             # This ensures we have enough data for technical indicators
             historical_count = 0
-            try:
-                historical_count = adapter.fetch_and_save_historical_quotes(ticker, days_back=150)
-                logger.info(f"📊 Fetched {historical_count} historical quotes for {ticker.symbol}")
-            except Exception as hist_error:
-                logger.warning(f"Could not fetch historical data for {ticker.symbol}: {hist_error}", exc_info=True)
-                # Continue even if historical fetch fails
+            if include_historical:
+                try:
+                    historical_count = adapter.fetch_and_save_historical_quotes(ticker, days_back=days_back)
+                    logger.info(f"📊 Fetched {historical_count} historical quotes for {ticker.symbol} (requested {days_back} days)")
+                except Exception as hist_error:
+                    logger.warning(f"Could not fetch historical data for {ticker.symbol}: {hist_error}", exc_info=True)
+                    # Continue even if historical fetch fails
             
             # Pre-calculate technical indicators after fetching historical data
             # This ensures calculations are ready when entity_details is called
@@ -465,6 +475,7 @@ def refresh_ticker_quote(ticker_id):
                     logger.warning(f"Error pre-calculating technical indicators for {ticker.symbol}: {calc_error}", exc_info=True)
                     # Continue even if pre-calculation fails - calculations will happen on-demand
             
+            # Check if we got quote data or if we have existing data in database
             if quote_data and quote_data.price:
                 # Quote fetched and saved successfully
                 # Invalidate backend cache for entity details and all technical indicators
@@ -480,14 +491,10 @@ def refresh_ticker_quote(ticker_id):
                     # Also use the service's own invalidation method
                     EntityDetailsService.invalidate_entity_cache('ticker', ticker_id)
                     
-                    # Invalidate technical indicators cache to force recalculation
-                    # These are calculated on-demand and cached, so we need to clear them
-                    advanced_cache_service.invalidate(f"ticker_{ticker_id}_week52")
-                    advanced_cache_service.invalidate(f"ticker_{ticker_id}_volatility_30")
-                    advanced_cache_service.invalidate(f"ticker_{ticker_id}_ma_20")
-                    advanced_cache_service.invalidate(f"ticker_{ticker_id}_ma_150")
-                    
-                    logger.info(f"✅ Invalidated cache for ticker {ticker_id} (including technical indicators)")
+                    # Don't delete technical indicators cache - they were just calculated and saved
+                    # Only invalidate entity details cache to force reload with new data
+                    # The technical indicators are already in cache from pre-calculation above
+                    logger.info(f"✅ Invalidated entity details cache for ticker {ticker_id} (technical indicators remain in cache)")
                 except Exception as cache_error:
                     logger.warning(f"Could not invalidate cache: {cache_error}", exc_info=True)
                 
@@ -498,18 +505,42 @@ def refresh_ticker_quote(ticker_id):
                         'ticker_id': ticker_id,
                         'ticker_symbol': ticker.symbol,
                         'price': quote_data.price,
-                        'change_percent': quote_data.change_percent or quote_data.change_pct_day,
+                        'change_percent': quote_data.change_pct_day or quote_data.change_pct,
                         'volume': quote_data.volume,
                         'fetched_at': quote_data.asof_utc.isoformat() if quote_data.asof_utc else None
                     }
                 })
             else:
-                return jsonify({
-                    'status': 'error',
-                    'message': f'Failed to fetch quote for {ticker.symbol}',
-                    'error_code': 'QUOTE_FETCH_FAILED',
-                    'ticker_symbol': ticker.symbol
-                }), 500
+                # Check if we have existing quote data in database (might be fresh enough)
+                existing_quote = db_session.query(MarketDataQuote).filter(
+                    MarketDataQuote.ticker_id == ticker_id
+                ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                
+                if existing_quote:
+                    # We have existing data - refresh might have failed but we have data
+                    logger.info(f"⚠️ Quote refresh failed for {ticker.symbol}, but existing data found in database")
+                    return jsonify({
+                        'status': 'success',
+                        'message': f'Quote refresh attempted for {ticker.symbol}. Using existing data.',
+                        'data': {
+                            'ticker_id': ticker_id,
+                            'ticker_symbol': ticker.symbol,
+                            'price': existing_quote.price,
+                            'change_percent': existing_quote.change_pct_day,
+                            'volume': existing_quote.volume,
+                            'fetched_at': existing_quote.fetched_at.isoformat() if existing_quote.fetched_at else None,
+                            'note': 'Using existing data - refresh may have failed'
+                        }
+                    }), 200
+                else:
+                    # No quote data at all - this is a real error
+                    logger.error(f"❌ Failed to fetch quote for {ticker.symbol} and no existing data found")
+                    return jsonify({
+                        'status': 'error',
+                        'message': f'Failed to fetch quote for {ticker.symbol} and no existing data available',
+                        'error_code': 'QUOTE_FETCH_FAILED',
+                        'ticker_symbol': ticker.symbol
+                    }), 500
             
         finally:
             db_session.close()

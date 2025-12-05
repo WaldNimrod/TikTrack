@@ -22,6 +22,7 @@ const BUTTON_ICONS = {
   SAVE: '/trading-ui/images/icons/tabler/device-floppy.svg',
   CLOSE: '/trading-ui/images/icons/tabler/x.svg',
   REFRESH: '/trading-ui/images/icons/tabler/refresh.svg',
+  RERUN: '/trading-ui/images/icons/tabler/refresh.svg', // Re-run action - uses refresh icon
   EXPORT: '/trading-ui/images/icons/tabler/download.svg',
   IMPORT: '/trading-ui/images/icons/tabler/upload.svg',
   WARNING: '/trading-ui/images/icons/tabler/alert-triangle.svg',
@@ -56,6 +57,7 @@ const BUTTON_TEXTS = {
   SAVE: 'שמור',
   CLOSE: 'סגור',
   REFRESH: 'רענן',
+  RERUN: 'הרץ מחדש',
   EXPORT: 'ייצא',
   IMPORT: 'ייבא',
   WARNING: 'אזהרה',
@@ -96,6 +98,7 @@ function getButtonClass(type) {
     SAVE: 'btn',
     CLOSE: 'btn',
     REFRESH: 'btn',
+    RERUN: 'btn',
     EXPORT: 'btn',
     IMPORT: 'btn',
     SEARCH: 'btn',

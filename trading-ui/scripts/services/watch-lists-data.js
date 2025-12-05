@@ -96,6 +96,36 @@
     }
 
     /**
+     * Get ticker IDs from a watch list (mockup)
+     * @param {number} listId - Watch list ID
+     * @returns {Promise<Array<number>>} Array of ticker IDs
+     */
+    async function getWatchListTickers(listId) {
+        try {
+            if (window.Logger) {
+                window.Logger.info('Getting ticker IDs from watch list (mockup)', { listId, page: PAGE_LOG_CONTEXT.page });
+            }
+            
+            // Mockup: return ticker IDs from mockup data
+            const mockupItems = getMockupWatchListItems(listId);
+            const tickerIds = mockupItems
+                .filter(item => item.ticker_id)
+                .map(item => item.ticker_id);
+            
+            if (window.Logger) {
+                window.Logger.info('Retrieved ticker IDs from watch list (mockup)', { listId, count: tickerIds.length, page: PAGE_LOG_CONTEXT.page });
+            }
+            
+            return tickerIds;
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error getting ticker IDs from watch list', { listId, error: error.message, page: PAGE_LOG_CONTEXT.page });
+            }
+            return [];
+        }
+    }
+
+    /**
      * Get mockup watch list items
      * @param {number} listId - Watch list ID
      * @returns {Array} Array of watch list items
@@ -534,6 +564,7 @@
         getMockupWatchLists,
         getMockupWatchListItems,
         getMockupFlaggedTickers,
+        getWatchListTickers, // Get ticker IDs from watch list
 
         // Cache management
         saveWatchListsCache,
@@ -557,6 +588,7 @@
     window.getMockupWatchLists = getMockupWatchLists;
     window.getMockupWatchListItems = getMockupWatchListItems;
     window.getMockupFlaggedTickers = getMockupFlaggedTickers;
+    window.getWatchListTickers = getWatchListTickers; // Get ticker IDs from watch list
     window.loadWatchListsData = loadWatchListsData;
     window.loadWatchListItemsData = loadWatchListItemsData;
     window.createWatchList = createWatchList;

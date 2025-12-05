@@ -16,9 +16,18 @@ from services.external_data import YahooFinanceAdapter, CacheManager
 from services.advanced_cache_service import advanced_cache_service
 from models.external_data import ExternalDataProvider, DataRefreshLog, MarketDataQuote, IntradayDataSlot
 from config.database import get_db
+from routes.api.base_entity_decorators import require_authentication
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+# External data refresh scheduler instance will be set from app.py
+data_refresh_scheduler = None
+
+def set_data_refresh_scheduler(scheduler):
+    """Set the data refresh scheduler instance from app.py"""
+    global data_refresh_scheduler
+    data_refresh_scheduler = scheduler
 
 # Create Blueprint
 status_bp = Blueprint('external_data_status', __name__, url_prefix='/api/external-data/status')
@@ -617,6 +626,7 @@ def get_detailed_cache_stats():
         }), 500
 
 @status_bp.route('/cache/clear', methods=['POST'])
+@require_authentication()  # TODO: Add admin role check when roles are implemented
 def clear_cache_endpoint():
     """
     Clear the cache
@@ -666,6 +676,7 @@ def clear_cache_endpoint():
         }), 500
 
 @status_bp.route('/cache/optimize', methods=['POST'])
+@require_authentication()  # TODO: Add admin role check when roles are implemented
 def optimize_cache_endpoint():
     """
     Optimize the cache
@@ -699,6 +710,7 @@ def optimize_cache_endpoint():
             'message': str(e)
         }), 500
 
+@status_bp.route('/scheduler/history', methods=['GET'])
 @status_bp.route('/group-refresh-history', methods=['GET'])
 def get_group_refresh_history():
     """
@@ -708,8 +720,6 @@ def get_group_refresh_history():
     - JSON response with group refresh history
     """
     try:
-        from services.data_refresh_scheduler import data_refresh_scheduler
-        
         # Get limit from query parameters
         limit = request.args.get('limit', 50, type=int)
         
@@ -861,6 +871,7 @@ def get_data_logs():
         }), 500
 
 @status_bp.route('/logs/clear', methods=['POST'])
+@require_authentication()  # TODO: Add admin role check when roles are implemented
 def clear_data_logs():
     """
     Clear data refresh logs
@@ -911,6 +922,7 @@ def clear_data_logs():
         }), 500
 
 @status_bp.route('/providers/test-all', methods=['POST'])
+@require_authentication()  # TODO: Add admin role check when roles are implemented
 def test_all_providers_endpoint():
     """
     Test all external data providers
@@ -989,6 +1001,7 @@ def test_all_providers_endpoint():
         }), 500
 
 @status_bp.route('/settings', methods=['POST'])
+@require_authentication()  # TODO: Add admin role check when roles are implemented
 def update_external_data_settings():
     """
     Update external data system settings
@@ -1044,6 +1057,421 @@ def update_external_data_settings():
         return jsonify({
             'error': 'Internal server error',
             'message': str(e)
+        }), 500
+
+@status_bp.route('/scheduler/monitoring', methods=['GET'])
+def get_scheduler_monitoring():
+    """
+    Get comprehensive scheduler monitoring information
+    
+    Returns:
+    - JSON response with scheduler status, history, performance metrics, and alerts
+    """
+    try:
+        from models.external_data import DataRefreshLog
+        from config.database import SessionLocal
+        
+        db_session = SessionLocal()
+        
+        try:
+            # Get scheduler status
+            scheduler_status = None
+            if data_refresh_scheduler:
+                scheduler_status = data_refresh_scheduler.get_scheduler_status()
+            else:
+                scheduler_status = {
+                    'scheduler_running': False,
+                    'message': 'Scheduler not available',
+                    'current_ny_time': datetime.now(timezone.utc).isoformat(),
+                    'is_trading_time': False,
+                    'refresh_policy': None,
+                    'config': None,
+                    'last_refresh': None,
+                    'next_refresh': None,
+                    'total_refreshes': 0,
+                    'successful_refreshes': 0,
+                    'failed_refreshes': 0,
+                    'started_at': None
+                }
+            
+            # Get recent refresh history (last 10)
+            recent_refreshes = db_session.query(DataRefreshLog).filter(
+                DataRefreshLog.operation_type == 'group_refresh'
+            ).order_by(
+                DataRefreshLog.start_time.desc()
+            ).limit(10).all()
+            
+            refresh_history = [
+                {
+                    'id': log.id,
+                    'category': log.category,
+                    'time_period': log.time_period,
+                    'ticker_count': log.ticker_count,
+                    'status': log.status,
+                    'started_at': log.start_time.isoformat() if log.start_time else None,
+                    'completed_at': log.end_time.isoformat() if log.end_time else None,
+                    'duration_ms': log.total_duration_ms,
+                    'successful_count': log.successful_count,
+                    'failed_count': log.failed_count,
+                    'message': log.message
+                }
+                for log in recent_refreshes
+            ]
+            
+            # Calculate performance metrics
+            total_refreshes = scheduler_status.get('total_refreshes', 0)
+            successful_refreshes = scheduler_status.get('successful_refreshes', 0)
+            failed_refreshes = scheduler_status.get('failed_refreshes', 0)
+            
+            success_rate = (successful_refreshes / total_refreshes * 100) if total_refreshes > 0 else 0
+            
+            # Calculate average duration from recent refreshes
+            completed_refreshes = [r for r in refresh_history if r['completed_at'] and r['duration_ms']]
+            avg_duration_ms = sum(r['duration_ms'] for r in completed_refreshes) / len(completed_refreshes) if completed_refreshes else None
+            
+            performance_metrics = {
+                'total_refreshes': total_refreshes,
+                'successful_refreshes': successful_refreshes,
+                'failed_refreshes': failed_refreshes,
+                'success_rate': round(success_rate, 2),
+                'average_duration_ms': round(avg_duration_ms, 2) if avg_duration_ms else None,
+                'recent_refreshes_count': len(refresh_history)
+            }
+            
+            # Generate alerts
+            alerts = []
+            
+            # Check if scheduler is not running
+            if not scheduler_status.get('scheduler_running', False):
+                alerts.append({
+                    'level': 'warning',
+                    'message': 'Scheduler is not running',
+                    'type': 'scheduler_stopped'
+                })
+            
+            # Check success rate
+            if total_refreshes > 10 and success_rate < 80:
+                alerts.append({
+                    'level': 'error',
+                    'message': f'Low success rate: {success_rate:.1f}%',
+                    'type': 'low_success_rate',
+                    'value': success_rate
+                })
+            elif total_refreshes > 10 and success_rate < 90:
+                alerts.append({
+                    'level': 'warning',
+                    'message': f'Moderate success rate: {success_rate:.1f}%',
+                    'type': 'moderate_success_rate',
+                    'value': success_rate
+                })
+            
+            # Check for recent failures
+            recent_failures = [r for r in refresh_history[:5] if r['status'] == 'failed']
+            if recent_failures:
+                alerts.append({
+                    'level': 'warning',
+                    'message': f'{len(recent_failures)} recent refresh(es) failed',
+                    'type': 'recent_failures',
+                    'count': len(recent_failures)
+                })
+            
+            # Check if last refresh is too old (more than 2 hours)
+            last_refresh_str = scheduler_status.get('last_refresh')
+            if last_refresh_str:
+                try:
+                    last_refresh_time = datetime.fromisoformat(last_refresh_str.replace('Z', '+00:00'))
+                    time_since_last = (datetime.now(timezone.utc) - last_refresh_time).total_seconds()
+                    if time_since_last > 7200:  # 2 hours
+                        alerts.append({
+                            'level': 'warning',
+                            'message': f'Last refresh was {int(time_since_last / 3600)} hours ago',
+                            'type': 'stale_refresh',
+                            'hours_ago': round(time_since_last / 3600, 1)
+                        })
+                except Exception:
+                    pass
+            
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'scheduler_status': scheduler_status,
+                    'refresh_history': refresh_history,
+                    'performance_metrics': performance_metrics,
+                    'alerts': alerts
+                },
+                'timestamp': datetime.now(timezone.utc).isoformat()
+            }), 200
+            
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error in get_scheduler_monitoring: {e}", exc_info=True)
+        return jsonify({
+            'status': 'error',
+            'error': 'Internal server error',
+            'message': str(e),
+            'timestamp': datetime.now(timezone.utc).isoformat()
+        }), 500
+
+@status_bp.route('/scheduler/start', methods=['POST'])
+@require_authentication()  # TODO: Add admin role check when roles are implemented
+def start_scheduler():
+    """
+    Manually start the external data refresh scheduler
+    
+    Returns:
+    - JSON response with scheduler start result
+    """
+    try:
+        if not data_refresh_scheduler:
+            return jsonify({
+                'success': False,
+                'error': 'Scheduler not available',
+                'message': 'External data refresh scheduler is not initialized',
+                'timestamp': datetime.now(timezone.utc).isoformat()
+            }), 503
+        
+        # Check if scheduler is already running
+        if hasattr(data_refresh_scheduler, 'running') and data_refresh_scheduler.running:
+            return jsonify({
+                'success': True,
+                'message': 'Scheduler is already running',
+                'status': 'running',
+                'timestamp': datetime.now(timezone.utc).isoformat()
+            }), 200
+        
+        # Start the scheduler
+        try:
+            data_refresh_scheduler.start()
+            
+            # Verify scheduler is running
+            if hasattr(data_refresh_scheduler, 'running') and data_refresh_scheduler.running:
+                logger.info("✅ External data refresh scheduler started manually via API")
+                return jsonify({
+                    'success': True,
+                    'message': 'External data refresh scheduler started successfully',
+                    'status': 'started',
+                    'timestamp': datetime.now(timezone.utc).isoformat()
+                }), 200
+            else:
+                logger.warning("⚠️ Scheduler start() called but scheduler.running is False")
+                return jsonify({
+                    'success': False,
+                    'error': 'Scheduler start failed',
+                    'message': 'Scheduler start() was called but scheduler is not running',
+                    'timestamp': datetime.now(timezone.utc).isoformat()
+                }), 500
+                
+        except Exception as start_error:
+            logger.error(f"❌ Failed to start scheduler: {start_error}", exc_info=True)
+            return jsonify({
+                'success': False,
+                'error': 'Failed to start scheduler',
+                'message': str(start_error),
+                'timestamp': datetime.now(timezone.utc).isoformat()
+            }), 500
+            
+    except Exception as e:
+        logger.error(f"Error in start_scheduler: {e}", exc_info=True)
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e),
+            'timestamp': datetime.now(timezone.utc).isoformat()
+        }), 500
+
+@status_bp.route('/scheduler/stop', methods=['POST'])
+@require_authentication()  # TODO: Add admin role check when roles are implemented
+def stop_scheduler():
+    """
+    Manually stop the external data refresh scheduler
+    
+    Returns:
+    - JSON response with scheduler stop result
+    """
+    try:
+        if not data_refresh_scheduler:
+            return jsonify({
+                'success': False,
+                'error': 'Scheduler not available',
+                'message': 'External data refresh scheduler is not initialized',
+                'timestamp': datetime.now(timezone.utc).isoformat()
+            }), 503
+        
+        # Check if scheduler is already stopped
+        if not (hasattr(data_refresh_scheduler, 'running') and data_refresh_scheduler.running):
+            return jsonify({
+                'success': True,
+                'message': 'Scheduler is already stopped',
+                'status': 'stopped',
+                'timestamp': datetime.now(timezone.utc).isoformat()
+            }), 200
+        
+        # Stop the scheduler
+        try:
+            data_refresh_scheduler.stop()
+            logger.info("⏸️ External data refresh scheduler stopped manually via API")
+            return jsonify({
+                'success': True,
+                'message': 'External data refresh scheduler stopped successfully',
+                'status': 'stopped',
+                'timestamp': datetime.now(timezone.utc).isoformat()
+            }), 200
+                
+        except Exception as stop_error:
+            logger.error(f"❌ Failed to stop scheduler: {stop_error}", exc_info=True)
+            return jsonify({
+                'success': False,
+                'error': 'Failed to stop scheduler',
+                'message': str(stop_error),
+                'timestamp': datetime.now(timezone.utc).isoformat()
+            }), 500
+            
+    except Exception as e:
+        logger.error(f"Error in stop_scheduler: {e}", exc_info=True)
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e),
+            'timestamp': datetime.now(timezone.utc).isoformat()
+        }), 500
+
+@status_bp.route('/tickers/missing-data', methods=['GET'])
+def get_tickers_missing_data():
+    """
+    Get list of tickers with missing data
+    
+    Returns:
+    - JSON response with tickers missing current quotes, historical data, or technical indicators
+    """
+    try:
+        from models.ticker import Ticker
+        from models.external_data import MarketDataQuote
+        from services.advanced_cache_service import advanced_cache_service
+        from config.database import SessionLocal
+        
+        db_session = SessionLocal()
+        
+        try:
+            # Get all open tickers
+            open_tickers = db_session.query(Ticker).filter(Ticker.status == 'open').all()
+            
+            tickers_missing_current = []
+            tickers_missing_historical = []
+            tickers_missing_indicators = []
+            recommendations = []
+            
+            for ticker in open_tickers:
+                if not ticker.symbol:
+                    continue
+                
+                ticker_info = {
+                    'id': ticker.id,
+                    'symbol': ticker.symbol,
+                    'name': ticker.name
+                }
+                
+                # Check for current quote
+                current_quote = db_session.query(MarketDataQuote).filter(
+                    MarketDataQuote.ticker_id == ticker.id
+                ).order_by(MarketDataQuote.asof_utc.desc()).first()
+                
+                if not current_quote:
+                    tickers_missing_current.append(ticker_info)
+                    recommendations.append({
+                        'ticker_id': ticker.id,
+                        'symbol': ticker.symbol,
+                        'priority': 'high',
+                        'reason': 'missing_current_quote',
+                        'message': f'{ticker.symbol} - חסר quote נוכחי'
+                    })
+                    continue
+                
+                # Check for historical data (need at least 150 quotes)
+                historical_count = db_session.query(MarketDataQuote).filter(
+                    MarketDataQuote.ticker_id == ticker.id
+                ).count()
+                
+                if historical_count < 150:
+                    tickers_missing_historical.append({
+                        **ticker_info,
+                        'current_count': historical_count,
+                        'required_count': 150,
+                        'missing_count': 150 - historical_count
+                    })
+                    recommendations.append({
+                        'ticker_id': ticker.id,
+                        'symbol': ticker.symbol,
+                        'priority': 'medium' if historical_count >= 50 else 'high',
+                        'reason': 'insufficient_historical_data',
+                        'message': f'{ticker.symbol} - יש רק {historical_count} quotes היסטוריים (נדרש 150)'
+                    })
+                
+                # Check for technical indicators in cache
+                volatility_key = f"ticker_{ticker.id}_volatility_30"
+                ma20_key = f"ticker_{ticker.id}_ma_20"
+                ma150_key = f"ticker_{ticker.id}_ma_150"
+                week52_key = f"ticker_{ticker.id}_week52"
+                
+                missing_indicators = []
+                if historical_count >= 30:
+                    if not advanced_cache_service.get(volatility_key):
+                        missing_indicators.append('volatility_30')
+                if historical_count >= 20:
+                    if not advanced_cache_service.get(ma20_key):
+                        missing_indicators.append('ma_20')
+                if historical_count >= 120:
+                    if not advanced_cache_service.get(ma150_key):
+                        missing_indicators.append('ma_150')
+                if historical_count >= 10:
+                    if not advanced_cache_service.get(week52_key):
+                        missing_indicators.append('week52')
+                
+                if missing_indicators:
+                    tickers_missing_indicators.append({
+                        **ticker_info,
+                        'missing_indicators': missing_indicators,
+                        'historical_count': historical_count
+                    })
+                    recommendations.append({
+                        'ticker_id': ticker.id,
+                        'symbol': ticker.symbol,
+                        'priority': 'low',
+                        'reason': 'missing_technical_indicators',
+                        'message': f'{ticker.symbol} - חסרים חישובים טכניים: {", ".join(missing_indicators)}'
+                    })
+            
+            # Sort recommendations by priority
+            priority_order = {'high': 0, 'medium': 1, 'low': 2}
+            recommendations.sort(key=lambda x: priority_order.get(x['priority'], 3))
+            
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'tickers_missing_current': tickers_missing_current,
+                    'tickers_missing_historical': tickers_missing_historical,
+                    'tickers_missing_indicators': tickers_missing_indicators,
+                    'recommendations': recommendations,
+                    'summary': {
+                        'total_open_tickers': len(open_tickers),
+                        'missing_current_count': len(tickers_missing_current),
+                        'missing_historical_count': len(tickers_missing_historical),
+                        'missing_indicators_count': len(tickers_missing_indicators),
+                        'total_recommendations': len(recommendations)
+                    }
+                },
+                'timestamp': datetime.now(timezone.utc).isoformat()
+            }), 200
+            
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error in get_tickers_missing_data: {e}", exc_info=True)
+        return jsonify({
+            'status': 'error',
+            'error': 'Internal server error',
+            'message': str(e),
+            'timestamp': datetime.now(timezone.utc).isoformat()
         }), 500
 
 @status_bp.route('/groups/status', methods=['GET'])

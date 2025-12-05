@@ -7,12 +7,16 @@ from sqlalchemy.orm import Session, joinedload
 from typing import Dict, Any, List, Optional, cast
 import logging
 import json
+import time
 from datetime import datetime
 
 from models.ai_analysis import AIPromptTemplate, AIAnalysisRequest, UserLLMProvider
 from services.llm_providers.llm_provider_manager import LLMProviderManager
 from services.api_key_encryption_service import APIKeyEncryptionService
 from services.business_logic.ai_analysis_business_service import AIAnalysisBusinessService
+from services.ai_analysis_error_codes import (
+    AIAnalysisErrorCodes, categorize_error, format_error_response, get_error_message
+)
 
 logger = logging.getLogger(__name__)
 
@@ -334,14 +338,24 @@ class AIAnalysisService:
             # Check for errors in response
             if response.get('error'):
                 # Provider returned an error response
+                error_msg = response.get('error', 'Unknown error from LLM provider')
+                error_code = response.get('error_code') or categorize_error(Exception(error_msg), error_msg)
+                user_message, _ = get_error_message(error_code, 'he')
+                
                 setattr(request, 'status', 'failed')
-                setattr(request, 'error_message', response.get('error', 'Unknown error from LLM provider'))
-                logger.error(f"LLM provider returned error: {request.error_message}")
+                setattr(request, 'error_message', user_message)  # User-friendly message
+                # Store error code in error_message with format: "ERROR_CODE: user_message"
+                # This allows frontend to extract error code if needed
+                setattr(request, 'error_message', f"{error_code}: {user_message}")
+                logger.error(f"LLM provider returned error [{error_code}]: {error_msg}")
             elif not response.get('text'):
                 # No text in response
+                error_code = AIAnalysisErrorCodes.PROVIDER_NO_RESPONSE
+                user_message, _ = get_error_message(error_code, 'he')
+                
                 setattr(request, 'status', 'failed')
-                setattr(request, 'error_message', 'No response text received from LLM provider')
-                logger.error("No response text received from LLM provider")
+                setattr(request, 'error_message', f"{error_code}: {user_message}")
+                logger.error(f"No response text received from LLM provider [{error_code}]")
             else:
                 # Success - Save response_text to DB
                 request.response_text = response.get('text')  # Save to DB
@@ -351,8 +365,11 @@ class AIAnalysisService:
             
         except Exception as e:
             logger.error(f"Error generating analysis: {e}", exc_info=True)
+            error_code = categorize_error(e, str(e))
+            user_message, _ = get_error_message(error_code, 'he')
+            
             setattr(request, 'status', 'failed')
-            setattr(request, 'error_message', str(e))
+            setattr(request, 'error_message', f"{error_code}: {user_message}")
         
         db.commit()
         return request
@@ -437,6 +454,46 @@ class AIAnalysisService:
             AIAnalysisRequest.id == request_id,
             AIAnalysisRequest.user_id == user_id
         ).first()
+    
+    def delete_analysis(
+        self,
+        db: Session,
+        request_id: int,
+        user_id: int
+    ) -> bool:
+        """
+        Delete analysis by ID (with user authorization check)
+        
+        Args:
+            db: Database session
+            request_id: Request ID
+            user_id: User ID (required - must be authenticated, for authorization)
+            
+        Returns:
+            True if deleted, False if not found or not authorized
+        """
+        if not user_id:
+            logger.error(f"❌ delete_analysis: user_id is None or invalid - authentication required for request_id={request_id}")
+            return False
+        
+        logger.debug(f"🗑️ delete_analysis: user_id={user_id}, request_id={request_id}")
+        
+        # Get analysis and verify ownership
+        request_obj = db.query(AIAnalysisRequest).filter(
+            AIAnalysisRequest.id == request_id,
+            AIAnalysisRequest.user_id == user_id
+        ).first()
+        
+        if not request_obj:
+            logger.warning(f"⚠️ delete_analysis: Analysis {request_id} not found or not authorized for user {user_id}")
+            return False
+        
+        # Delete the analysis
+        db.delete(request_obj)
+        db.commit()
+        
+        logger.info(f"✅ Deleted analysis {request_id} for user {user_id}")
+        return True
     
     def update_llm_provider_settings(
         self,
@@ -531,4 +588,182 @@ class AIAnalysisService:
         return db.query(UserLLMProvider).filter(
             UserLLMProvider.user_id == user_id
         ).first()
+    
+    def retry_failed_analysis(
+        self,
+        db: Session,
+        request_id: int,
+        user_id: int,
+        max_retries: int = 3,
+        use_fallback_provider: bool = True
+    ) -> AIAnalysisRequest:
+        """
+        Retry a failed analysis with exponential backoff
+        
+        Args:
+            db: Database session
+            request_id: ID of failed analysis request
+            user_id: User ID (required - must be authenticated)
+            max_retries: Maximum number of retry attempts (default: 3)
+            use_fallback_provider: Whether to try fallback provider on failure (default: True)
+            
+        Returns:
+            AIAnalysisRequest object with updated status
+            
+        Raises:
+            ValueError: If request not found, not failed, or user_id is None
+        """
+        if not user_id:
+            logger.error("❌ retry_failed_analysis: user_id is None or invalid - authentication required")
+            raise ValueError("User ID is required for retrying analysis")
+        
+        logger.debug(f"🔍 retry_failed_analysis: user_id={user_id}, request_id={request_id}")
+        
+        # Get the failed analysis request
+        request = self.get_analysis_by_id(db, request_id, user_id)
+        if not request:
+            raise ValueError(f"Analysis request {request_id} not found")
+        
+        if request.status != 'failed':
+            raise ValueError(f"Analysis request {request_id} is not in 'failed' status (current: {request.status})")
+        
+        # Check retry count
+        current_retry_count = getattr(request, 'retry_count', 0) or 0
+        if current_retry_count >= max_retries:
+            logger.warning(f"⚠️ Analysis {request_id} has already been retried {current_retry_count} times (max: {max_retries})")
+            raise ValueError(f"Maximum retry attempts ({max_retries}) already reached for analysis {request_id}")
+        
+        # Increment retry count
+        request.retry_count = current_retry_count + 1
+        request.status = 'pending'
+        request.error_message = None
+        db.flush()
+        
+        logger.info(f"🔄 Retrying analysis {request_id} (attempt {request.retry_count}/{max_retries})")
+        
+        # Get original variables and provider
+        try:
+            variables = json.loads(request.variables_json) if request.variables_json else {}
+        except json.JSONDecodeError:
+            logger.error(f"❌ Failed to parse variables_json for request {request_id}")
+            request.status = 'failed'
+            request.error_message = 'Invalid variables data'
+            db.commit()
+            return request
+        
+        provider = request.provider
+        
+        # Get user's provider settings
+        user_provider = db.query(UserLLMProvider).filter(
+            UserLLMProvider.user_id == user_id
+        ).first()
+        
+        if not user_provider:
+            request.status = 'failed'
+            request.error_message = "User LLM provider settings not found. Please configure API keys first."
+            db.commit()
+            return request
+        
+        # Determine providers to try (original + fallback if enabled)
+        providers_to_try = [provider]
+        if use_fallback_provider:
+            fallback_provider = 'perplexity' if provider == 'gemini' else 'gemini'
+            providers_to_try.append(fallback_provider)
+        
+        last_error = None
+        used_fallback = False
+        
+        # Single retry attempt (we already incremented retry_count)
+        # Apply exponential backoff delay if not first retry
+        if request.retry_count > 1:
+            delay = min(2 ** (request.retry_count - 1), 30)
+            logger.info(f"⏳ Waiting {delay} seconds before retry attempt {request.retry_count}...")
+            time.sleep(delay)
+        
+        # Try each provider in order
+        for try_provider in providers_to_try:
+            # Skip fallback provider if we already tried it
+            if try_provider != provider and used_fallback:
+                continue
+            
+            try:
+                # Get API key for provider
+                api_key = None
+                if try_provider == 'gemini':
+                    gemini_key: Optional[str] = getattr(user_provider, 'gemini_api_key', None)
+                    if not gemini_key or (isinstance(gemini_key, str) and gemini_key.strip() == ""):
+                        logger.warning(f"⚠️ Gemini API key not configured, skipping provider")
+                        continue
+                    gemini_encrypted: bool = bool(getattr(user_provider, 'gemini_api_key_encrypted', False))
+                    if gemini_encrypted:
+                        api_key = self.encryption_service.decrypt_api_key(str(gemini_key))
+                    else:
+                        api_key = str(gemini_key)
+                elif try_provider == 'perplexity':
+                    perplexity_key: Optional[str] = getattr(user_provider, 'perplexity_api_key', None)
+                    if not perplexity_key or (isinstance(perplexity_key, str) and perplexity_key.strip() == ""):
+                        logger.warning(f"⚠️ Perplexity API key not configured, skipping provider")
+                        continue
+                    perplexity_encrypted: bool = bool(getattr(user_provider, 'perplexity_api_key_encrypted', False))
+                    if perplexity_encrypted:
+                        api_key = self.encryption_service.decrypt_api_key(str(perplexity_key))
+                    else:
+                        api_key = str(perplexity_key)
+                else:
+                    continue
+                
+                # Get template
+                template = PromptTemplateService.get_template(db, request.template_id)
+                if not template:
+                    raise ValueError(f"Template {request.template_id} not found")
+                
+                # Build prompt
+                prompt = PromptTemplateService.build_prompt(template, variables)
+                
+                # Update request with new provider if using fallback
+                if try_provider != provider:
+                    request.provider = try_provider
+                    used_fallback = True
+                    logger.info(f"🔄 Trying fallback provider: {try_provider}")
+                
+                # Send to LLM
+                logger.info(f"📤 Sending request to {try_provider} (retry attempt {request.retry_count})")
+                response = self.provider_manager.send_prompt(try_provider, prompt, api_key)
+                
+                # Check for errors in response
+                if response.get('error'):
+                    last_error = response.get('error', 'Unknown error from LLM provider')
+                    logger.warning(f"⚠️ Provider {try_provider} returned error: {last_error}")
+                    continue  # Try next provider
+                
+                if not response.get('text'):
+                    last_error = 'No response text received from LLM provider'
+                    logger.warning(f"⚠️ Provider {try_provider} returned no text")
+                    continue  # Try next provider
+                
+                # Success!
+                request.response_text = response.get('text')
+                if response.get('json'):
+                    request.response_json = json.dumps(response['json'])
+                request.status = 'completed'
+                request.error_message = None
+                
+                logger.info(f"✅ Analysis {request_id} retry successful with provider {try_provider}")
+                db.commit()
+                return request
+                
+            except Exception as e:
+                last_error = str(e)
+                logger.warning(f"⚠️ Retry attempt {request.retry_count} with provider {try_provider} failed: {e}")
+                continue  # Try next provider
+        
+        # All providers failed
+        error_code = categorize_error(Exception(last_error or 'Unknown error'), str(last_error or 'Unknown error'))
+        user_message, _ = get_error_message(error_code, 'he')
+        
+        request.status = 'failed'
+        request.error_message = f"{error_code}: {user_message}"
+        logger.error(f"❌ Retry attempt {request.retry_count} failed for analysis {request_id} with all providers [{error_code}]")
+        db.commit()
+        return request
 

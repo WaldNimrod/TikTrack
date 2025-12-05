@@ -83,6 +83,16 @@ class AIAnalysisRequest(BaseModel):
         else:
             result['template_name'] = 'ניתוח'
         
+        # Extract error_code from error_message if present (format: "ERROR_CODE: message")
+        if self.error_message:
+            error_parts = self.error_message.split(':', 1)
+            if len(error_parts) == 2 and error_parts[0].startswith('AI_'):
+                result['error_code'] = error_parts[0].strip()
+                result['error_message'] = error_parts[1].strip()  # User-friendly message only
+            else:
+                result['error_message'] = self.error_message
+                result['error_code'] = None
+        
         # Include response_text only if explicitly requested
         # response_text is saved to DB and can also be saved to frontend cache
         if include_response:

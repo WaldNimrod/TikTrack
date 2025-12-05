@@ -166,10 +166,6 @@ const PAGE_REQUIREMENTS = {
         modules: ['core-systems', 'cache-module', 'ui-basic'],
         description: 'ניהול מטמון - דורש מערכת מטמון'
     },
-    'linter-realtime-monitor': {
-        modules: ['core-systems', 'ui-basic', 'data-advanced', 'communication-module'],
-        description: 'ניטור Linter - דורש מערכות תקשורת ונתונים מתקדמות'
-    },
     'chart-management': {
         modules: ['core-systems', 'ui-basic', 'ui-advanced', 'data-basic'],
         description: 'ניהול גרפים - דורש מערכות UI מתקדמות'

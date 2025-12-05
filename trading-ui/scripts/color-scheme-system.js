@@ -1632,43 +1632,50 @@ window.NUMERIC_VALUE_COLORS = NUMERIC_VALUE_COLORS;
 // This prevents duplicate API calls and ensures single point of entry
 // 
 // Listen for preferences:updated event to update colors when preferences change
-window.addEventListener('preferences:updated', async (e) => {
-  try {
-    if (window.Logger?.debug) {
-      window.Logger.debug('🎨 Preferences updated - reloading color preferences', {
-        page: 'color-scheme',
-        source: e.detail?.source,
-        userId: e.detail?.userId,
-        profileId: e.detail?.profileId,
-      });
-    }
-    
-    // Reload color preferences and update CSS variables
-    const preferences = await loadColorPreferences();
-    if (preferences && Object.keys(preferences).length > 0) {
-      updateCSSVariablesFromPreferences(preferences);
-      if (window.Logger?.info) {
-        window.Logger.info('✅ Color scheme updated from preferences', {
-          page: 'color-scheme',
-          preferenceCount: Object.keys(preferences).length,
-        });
+// Only register listener after functions are available
+// CRITICAL: Prevent infinite loop - if preferences are already loaded, just update CSS variables
+if (typeof loadColorPreferences === 'function' && typeof updateCSSVariablesFromPreferences === 'function') {
+  window.addEventListener('preferences:updated', async (e) => {
+    try {
+      // CRITICAL: Prevent infinite loop - if loadUserPreferences is in progress, don't reload
+      // This prevents: loadUserPreferences() → preferences:updated → loadColorPreferences() → loadUserPreferences() → ...
+      if (window.__loadUserPreferencesInflight && window.__loadUserPreferencesInflight.size > 0) {
+        // Preferences are being loaded - just update CSS from currentPreferences
+        if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+          updateCSSVariablesFromPreferences(window.currentPreferences);
+        }
+        return;
       }
-    } else {
-      if (window.Logger?.warn) {
-        window.Logger.warn('⚠️ No preferences loaded for color scheme update', {
-          page: 'color-scheme',
-        });
+      
+      // CRITICAL: Prevent infinite loop - if getPreference is in progress, don't reload
+      if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+        // Preferences are being loaded - just update CSS from currentPreferences
+        if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+          updateCSSVariablesFromPreferences(window.currentPreferences);
+        }
+        return;
+      }
+      
+      // Only reload if preferences are not already loaded
+      // Use currentPreferences if available to avoid unnecessary API calls
+      if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+        // Preferences already loaded - just update CSS variables
+        updateCSSVariablesFromPreferences(window.currentPreferences);
+      } else {
+        // Preferences not loaded - reload them
+        const preferences = await loadColorPreferences();
+        if (preferences && Object.keys(preferences).length > 0) {
+          updateCSSVariablesFromPreferences(preferences);
+        }
+      }
+    } catch (error) {
+      // CRITICAL: Do NOT use Logger here to prevent infinite recursion
+      if (window.DEBUG_MODE) {
+        console.error('❌ Error updating color scheme from preferences:', error);
       }
     }
-  } catch (error) {
-    if (window.Logger?.error) {
-      window.Logger.error('❌ Error updating color scheme from preferences', {
-        page: 'color-scheme',
-        error: error?.message || error,
-      });
-    }
-  }
-});
+  });
+}
 
 // Only set current entity color from page (doesn't require preferences)
 if (document.readyState === 'loading') {

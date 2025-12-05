@@ -15,8 +15,37 @@
     <!-- Notification container -->
     <div class="notification-container" id="notificationContainer"></div>
     
+    <!-- Mockups Navigation -->
+    <div class="mockups-navigation">
+        <div class="mockups-navigation-content">
+            <span class="mockups-navigation-label">📋 ניווט מוקאפים:</span>
+            <a href="watch-lists-page.html" class="mockups-navigation-link">רשימות צפייה</a>
+            <a href="watch-list-modal.html" class="mockups-navigation-link">מודל רשימה</a>
+            <a href="add-ticker-modal.html" class="mockups-navigation-link active">הוספת טיקר</a>
+            <a href="flag-quick-action.html" class="mockups-navigation-link">דגלים</a>
+        </div>
+    </div>
 
-    
+    <!-- Add Ticker Modal -->
+    <div class="modal fade show" id="addTickerModal" tabindex="-1" style="display: block;" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">הוסף טיקר לרשימה</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addTickerForm">
+                        <!-- System Ticker Search -->
+                        <div class="mb-3">
+                            <label for="tickerSearch" class="form-label fw-bold">חיפוש טיקר מהמערכת</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="tickerSearch" 
+                                   placeholder="הקלד symbol או שם...">
+                            <div id="tickerSearchResults" class="mt-2">
+                                <!-- Search results will appear here -->
+                            </div>
                         </div>
 
                         <hr>
@@ -101,8 +130,22 @@
     <script src="../scripts/init-system/package-manifest.js?v=1.0.0"></script>
     <script src="../scripts/page-initialization-configs.js?v=1.0.0"></script>
 
-    <!-- Unified Initialization System -->
-    <script src="../scripts/unified-app-initializer.js?v=1.0.0"></script>
+    <!-- Cache System -->
+    <script src="../scripts/unified-cache-manager.js?v=1.0.0"></script>
+
+    <!-- Icon System -->
+    <script src="../scripts/icon-mappings.js?v=1.0.0"></script>
+    <script src="../scripts/icon-system.js?v=1.0.0"></script>
+
+    <!-- Notification System -->
+    <script src="../scripts/notification-system.js?v=1.0.0"></script>
+
+    <!-- Watch Lists Services -->
+    <script src="../scripts/services/watch-lists-data.js?v=1.0.0"></script>
+    <script src="../scripts/services/watch-lists-ui-service.js?v=1.0.0"></script>
+
+    <!-- Modal Manager (required for modals) -->
+    <script src="../scripts/modal-manager-v2.js?v=1.0.0"></script>
 
     <!-- Page-specific script -->
     <script src="../scripts/add-ticker-modal.js?v=1.0.0" defer></script>

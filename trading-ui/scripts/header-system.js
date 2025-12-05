@@ -1193,10 +1193,14 @@ class HeaderSystem {
                         <span class="nav-text">מעקב</span>
                       </a>
                     </li>
-                    <li class="tiktrack-nav-item">
-                      <a href="/research" class="tiktrack-nav-link" data-page="research">
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="/research" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="research">
                         <span class="nav-text">מחקר</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
+                      <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="/ai-analysis">אנליזת AI</a></li>
+                      </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
                       <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="data">

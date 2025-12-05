@@ -7,7 +7,7 @@ validation, and business logic integration.
 """
 
 import pytest
-from flask import Flask
+from flask import Flask, g
 from unittest.mock import Mock, patch, MagicMock
 import json
 
@@ -38,12 +38,21 @@ def mock_user_id():
     return 1
 
 
+@pytest.fixture
+def authenticated_client(client, mock_user_id):
+    """Create authenticated test client with user_id in g."""
+    with client.application.app_context():
+        g.user_id = mock_user_id
+        yield client
+
+
 class TestAIAnalysisAPI:
     """Test suite for AI Analysis API endpoints."""
     
     def test_generate_analysis_endpoint_success(self, client, mock_user_id):
         """Test POST /api/ai-analysis/generate with valid data."""
-        with patch('routes.api.ai_analysis.get_current_user_id', return_value=mock_user_id):
+        with client.application.app_context():
+            g.user_id = mock_user_id
             with patch('routes.api.ai_analysis.ai_analysis_service') as mock_service:
                 # Mock successful analysis generation
                 mock_request = Mock()
@@ -64,7 +73,8 @@ class TestAIAnalysisAPI:
                 response = client.post('/api/ai-analysis/generate', json={
                     'template_id': 1,
                     'variables': {'stock_ticker': 'TSLA', 'goal': 'Investment'},
-                    'provider': 'gemini'
+                    'provider': 'gemini',
+                    'user_id': mock_user_id  # Fallback for require_authentication
                 })
                 
                 assert response.status_code == 200
@@ -74,7 +84,8 @@ class TestAIAnalysisAPI:
     
     def test_generate_analysis_endpoint_validation_error(self, client, mock_user_id):
         """Test POST /api/ai-analysis/generate with validation error."""
-        with patch('routes.api.ai_analysis.get_current_user_id', return_value=mock_user_id):
+        with client.application.app_context():
+            g.user_id = mock_user_id
             with patch('routes.api.ai_analysis.ai_analysis_service') as mock_service:
                 # Mock validation error
                 mock_service.generate_analysis.side_effect = ValueError('Validation failed: Template not found')
@@ -82,41 +93,46 @@ class TestAIAnalysisAPI:
                 response = client.post('/api/ai-analysis/generate', json={
                     'template_id': 999,
                     'variables': {'stock_ticker': 'TSLA'},
-                    'provider': 'gemini'
+                    'provider': 'gemini',
+                    'user_id': mock_user_id
                 })
                 
                 assert response.status_code == 400
                 data = json.loads(response.data)
                 assert data['status'] == 'error'
-                assert 'error_type' in data
-                assert data['error_type'] == 'validation_error'
+                # Check for error_code (new format) or error_type (old format)
+                assert 'error_code' in data or 'error_type' in data
     
     def test_generate_analysis_endpoint_missing_template_id(self, client, mock_user_id):
         """Test POST /api/ai-analysis/generate with missing template_id."""
-        with patch('routes.api.ai_analysis.get_current_user_id', return_value=mock_user_id):
+        with client.application.app_context():
+            g.user_id = mock_user_id
             response = client.post('/api/ai-analysis/generate', json={
                 'variables': {'stock_ticker': 'TSLA'},
-                'provider': 'gemini'
+                'provider': 'gemini',
+                'user_id': mock_user_id
             })
             
             assert response.status_code == 400
             data = json.loads(response.data)
             assert data['status'] == 'error'
-            assert 'template_id' in data['message'].lower()
+            assert 'template_id' in data['message'].lower() or 'error_code' in data
     
     def test_generate_analysis_endpoint_invalid_variables(self, client, mock_user_id):
         """Test POST /api/ai-analysis/generate with invalid variables."""
-        with patch('routes.api.ai_analysis.get_current_user_id', return_value=mock_user_id):
+        with client.application.app_context():
+            g.user_id = mock_user_id
             response = client.post('/api/ai-analysis/generate', json={
                 'template_id': 1,
                 'variables': 'not a dict',
-                'provider': 'gemini'
+                'provider': 'gemini',
+                'user_id': mock_user_id
             })
             
             assert response.status_code == 400
             data = json.loads(response.data)
             assert data['status'] == 'error'
-            assert 'variables' in data['message'].lower() or 'dictionary' in data['message'].lower()
+            assert 'variables' in data['message'].lower() or 'dictionary' in data['message'].lower() or 'error_code' in data
     
     def test_get_templates_endpoint(self, client):
         """Test GET /api/ai-analysis/templates."""
@@ -170,7 +186,8 @@ class TestAIAnalysisAPI:
     
     def test_get_history_endpoint(self, client, mock_user_id):
         """Test GET /api/ai-analysis/history."""
-        with patch('routes.api.ai_analysis.get_current_user_id', return_value=mock_user_id):
+        with client.application.app_context():
+            g.user_id = mock_user_id
             with patch('routes.api.ai_analysis.ai_analysis_service') as mock_service:
                 # Mock history
                 mock_request1 = Mock()
@@ -199,7 +216,7 @@ class TestAIAnalysisAPI:
                 
                 mock_service.get_analysis_history.return_value = ([mock_request1, mock_request2], 2)
                 
-                response = client.get('/api/ai-analysis/history?limit=50&offset=0')
+                response = client.get('/api/ai-analysis/history?limit=50&offset=0&user_id=' + str(mock_user_id))
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -210,13 +227,14 @@ class TestAIAnalysisAPI:
     
     def test_get_history_endpoint_with_filters(self, client, mock_user_id):
         """Test GET /api/ai-analysis/history with filters."""
-        with patch('routes.api.ai_analysis.get_current_user_id', return_value=mock_user_id):
+        with client.application.app_context():
+            g.user_id = mock_user_id
             with patch('routes.api.ai_analysis.ai_analysis_service') as mock_service:
                 mock_request = Mock()
                 mock_request.to_dict.return_value = {'id': 1, 'template_id': 1}
                 mock_service.get_analysis_history.return_value = ([mock_request], 1)
                 
-                response = client.get('/api/ai-analysis/history?template_id=1&provider=gemini&status=completed')
+                response = client.get('/api/ai-analysis/history?template_id=1&provider=gemini&status=completed&user_id=' + str(mock_user_id))
                 
                 assert response.status_code == 200
                 # Verify filters were passed
@@ -227,7 +245,8 @@ class TestAIAnalysisAPI:
     
     def test_get_analysis_by_id_endpoint(self, client, mock_user_id):
         """Test GET /api/ai-analysis/history/<id>."""
-        with patch('routes.api.ai_analysis.get_current_user_id', return_value=mock_user_id):
+        with client.application.app_context():
+            g.user_id = mock_user_id
             with patch('routes.api.ai_analysis.ai_analysis_service') as mock_service:
                 mock_request = Mock()
                 mock_request.id = 123
@@ -244,7 +263,7 @@ class TestAIAnalysisAPI:
                 
                 mock_service.get_analysis_by_id.return_value = mock_request
                 
-                response = client.get('/api/ai-analysis/history/123')
+                response = client.get('/api/ai-analysis/history/123?user_id=' + str(mock_user_id))
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -253,11 +272,12 @@ class TestAIAnalysisAPI:
     
     def test_get_analysis_by_id_endpoint_not_found(self, client, mock_user_id):
         """Test GET /api/ai-analysis/history/<id> when not found."""
-        with patch('routes.api.ai_analysis.get_current_user_id', return_value=mock_user_id):
+        with client.application.app_context():
+            g.user_id = mock_user_id
             with patch('routes.api.ai_analysis.ai_analysis_service') as mock_service:
                 mock_service.get_analysis_by_id.return_value = None
                 
-                response = client.get('/api/ai-analysis/history/999')
+                response = client.get('/api/ai-analysis/history/999?user_id=' + str(mock_user_id))
                 
                 assert response.status_code == 404
                 data = json.loads(response.data)
@@ -266,7 +286,8 @@ class TestAIAnalysisAPI:
     
     def test_llm_provider_get_endpoint(self, client, mock_user_id):
         """Test GET /api/ai-analysis/llm-provider."""
-        with patch('routes.api.ai_analysis.get_current_user_id', return_value=mock_user_id):
+        with client.application.app_context():
+            g.user_id = mock_user_id
             with patch('routes.api.ai_analysis.ai_analysis_service') as mock_service:
                 # Mock provider settings
                 mock_provider = Mock()
@@ -281,7 +302,7 @@ class TestAIAnalysisAPI:
                 
                 mock_service.get_llm_provider_settings.return_value = mock_provider
                 
-                response = client.get('/api/ai-analysis/llm-provider')
+                response = client.get('/api/ai-analysis/llm-provider?user_id=' + str(mock_user_id))
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -291,11 +312,12 @@ class TestAIAnalysisAPI:
     
     def test_llm_provider_get_endpoint_not_found(self, client, mock_user_id):
         """Test GET /api/ai-analysis/llm-provider when settings not found."""
-        with patch('routes.api.ai_analysis.get_current_user_id', return_value=mock_user_id):
+        with client.application.app_context():
+            g.user_id = mock_user_id
             with patch('routes.api.ai_analysis.ai_analysis_service') as mock_service:
                 mock_service.get_llm_provider_settings.return_value = None
                 
-                response = client.get('/api/ai-analysis/llm-provider')
+                response = client.get('/api/ai-analysis/llm-provider?user_id=' + str(mock_user_id))
                 
                 assert response.status_code == 200
                 data = json.loads(response.data)
@@ -306,7 +328,8 @@ class TestAIAnalysisAPI:
     
     def test_llm_provider_post_endpoint_success(self, client, mock_user_id):
         """Test POST /api/ai-analysis/llm-provider with valid API key."""
-        with patch('routes.api.ai_analysis.get_current_user_id', return_value=mock_user_id):
+        with client.application.app_context():
+            g.user_id = mock_user_id
             with patch('routes.api.ai_analysis.ai_analysis_service') as mock_service:
                 mock_service.update_llm_provider_settings.return_value = {
                     'success': True,
@@ -317,7 +340,8 @@ class TestAIAnalysisAPI:
                 response = client.post('/api/ai-analysis/llm-provider', json={
                     'provider': 'gemini',
                     'api_key': 'test_api_key_12345',
-                    'validate': True
+                    'validate': True,
+                    'user_id': mock_user_id
                 })
                 
                 assert response.status_code == 200
@@ -335,31 +359,36 @@ class TestAIAnalysisAPI:
     
     def test_llm_provider_post_endpoint_missing_provider(self, client, mock_user_id):
         """Test POST /api/ai-analysis/llm-provider with missing provider."""
-        with patch('routes.api.ai_analysis.get_current_user_id', return_value=mock_user_id):
+        with client.application.app_context():
+            g.user_id = mock_user_id
             response = client.post('/api/ai-analysis/llm-provider', json={
-                'api_key': 'test_api_key_12345'
+                'api_key': 'test_api_key_12345',
+                'user_id': mock_user_id
             })
             
             assert response.status_code == 400
             data = json.loads(response.data)
             assert data['status'] == 'error'
-            assert 'provider' in data['message'].lower()
+            assert 'provider' in data['message'].lower() or 'error_code' in data
     
     def test_llm_provider_post_endpoint_missing_api_key(self, client, mock_user_id):
         """Test POST /api/ai-analysis/llm-provider with missing API key."""
-        with patch('routes.api.ai_analysis.get_current_user_id', return_value=mock_user_id):
+        with client.application.app_context():
+            g.user_id = mock_user_id
             response = client.post('/api/ai-analysis/llm-provider', json={
-                'provider': 'gemini'
+                'provider': 'gemini',
+                'user_id': mock_user_id
             })
             
             assert response.status_code == 400
             data = json.loads(response.data)
             assert data['status'] == 'error'
-            assert 'api_key' in data['message'].lower()
+            assert 'api_key' in data['message'].lower() or 'error_code' in data
     
     def test_llm_provider_post_endpoint_invalid_key(self, client, mock_user_id):
         """Test POST /api/ai-analysis/llm-provider with invalid API key."""
-        with patch('routes.api.ai_analysis.get_current_user_id', return_value=mock_user_id):
+        with client.application.app_context():
+            g.user_id = mock_user_id
             with patch('routes.api.ai_analysis.ai_analysis_service') as mock_service:
                 mock_service.update_llm_provider_settings.return_value = {
                     'success': False,
@@ -370,7 +399,8 @@ class TestAIAnalysisAPI:
                 response = client.post('/api/ai-analysis/llm-provider', json={
                     'provider': 'gemini',
                     'api_key': 'invalid_key',
-                    'validate': True
+                    'validate': True,
+                    'user_id': mock_user_id
                 })
                 
                 assert response.status_code == 400

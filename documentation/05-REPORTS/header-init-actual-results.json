@@ -1,5 +1,7 @@
 {
-  "planned": [],
+  "planned": [
+    "conditions-modals.html"
+  ],
   "fallback": [],
   "unknown": [
     "ai-analysis.html",
@@ -11,7 +13,6 @@
     "cash_flows.html",
     "chart-management.html",
     "code-quality-dashboard.html",
-    "conditions-modals.html",
     "conditions-test.html",
     "constraints.html",
     "crud-testing-dashboard.html",
@@ -31,12 +32,10 @@
     "preferences.html",
     "research.html",
     "server-monitor.html",
-    "smart-init-testing.html",
     "system-management.html",
     "tag-management.html",
     "ticker-dashboard.html",
     "tickers.html",
-    "tooltip-editor.html",
     "trade_plans.html",
     "trades.html",
     "trades_formatted.html",

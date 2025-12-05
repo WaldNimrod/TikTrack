@@ -4105,38 +4105,51 @@ async function saveTradePlan() {
             tradePlanData.status = 'open';
         }
         
-        // Prepare API call
-        const url = isEdit && Number.isFinite(tradePlanId) ? `/api/trade-plans/${tradePlanId}` : '/api/trade-plans';
-        const method = isEdit ? 'PUT' : 'POST';
-        
-        // Send to API
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(tradePlanData)
-        });
-        
-        // Use CRUDResponseHandler for consistent response handling
+        // Use UnifiedCRUDService for consistent CRUD operations
         let result;
-
-        if (isEdit) {
-            result = await CRUDResponseHandler.handleUpdateResponse(response, {
+        if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+            if (isEdit && Number.isFinite(tradePlanId)) {
+                tradePlanData.id = tradePlanId;
+            }
+            result = await window.UnifiedCRUDService.saveEntity('trade_plan', tradePlanData, {
                 modalId: 'tradePlansModal',
-                successMessage: 'תוכנית מסחר עודכנה בהצלחה',
+                successMessage: isEdit ? 'תוכנית מסחר עודכנה בהצלחה' : 'תוכנית מסחר נוספה בהצלחה',
                 entityName: 'תוכנית מסחר',
                 reloadFn: window.loadTradePlansData,
                 requiresHardReload: false
             });
         } else {
-            result = await CRUDResponseHandler.handleSaveResponse(response, {
-                modalId: 'tradePlansModal',
-                successMessage: 'תוכנית מסחר נוספה בהצלחה',
-                entityName: 'תוכנית מסחר',
-                reloadFn: window.loadTradePlansData,
-                requiresHardReload: false
+            // Fallback to direct API call with CRUDResponseHandler
+            const url = isEdit && Number.isFinite(tradePlanId) ? `/api/trade-plans/${tradePlanId}` : '/api/trade-plans';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            // Send to API
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(tradePlanData)
             });
+            
+            // Use CRUDResponseHandler for consistent response handling
+            if (isEdit) {
+                result = await CRUDResponseHandler.handleUpdateResponse(response, {
+                    modalId: 'tradePlansModal',
+                    successMessage: 'תוכנית מסחר עודכנה בהצלחה',
+                    entityName: 'תוכנית מסחר',
+                    reloadFn: window.loadTradePlansData,
+                    requiresHardReload: false
+                });
+            } else {
+                result = await CRUDResponseHandler.handleSaveResponse(response, {
+                    modalId: 'tradePlansModal',
+                    successMessage: 'תוכנית מסחר נוספה בהצלחה',
+                    entityName: 'תוכנית מסחר',
+                    reloadFn: window.loadTradePlansData,
+                    requiresHardReload: false
+                });
+            }
         }
 
         const planId = isEdit ? Number(tradePlanId) : Number(result?.data?.id || result?.id);

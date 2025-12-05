@@ -118,19 +118,8 @@
     -->
     <!-- LOCK: DO NOT MODIFY - Page Structure -->
     <div class="container-fluid page-container">
-        <header class="row g-0">
-            <div class="col-12">
-                </div>
-        </header>
-
-        
-            </div>
-        </div>
-
-        <main class="row g-0">
-            <div class="col-12">
-                    <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
-<div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+        <div class="background-wrapper">
         <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
         <div id="unified-header"></div>
 
@@ -818,8 +807,26 @@
     <script src="../scripts/init-system/package-manifest.js?v=1.0.0"></script>
     <script src="../scripts/page-initialization-configs.js?v=1.0.0"></script>
 
+    <!-- Cache System (MUST load first) -->
+    <script src="../scripts/unified-cache-manager.js?v=1.0.0"></script>
+
+    <!-- Icon System -->
+    <script src="../scripts/icon-mappings.js?v=1.0.0"></script>
+    <script src="../scripts/icon-system.js?v=1.0.0"></script>
+
+    <!-- Notification System -->
+    <script src="../scripts/notification-system.js?v=1.0.0"></script>
+
+    <!-- Watch Lists Services (MUST load before page script) -->
+    <script src="../scripts/services/watch-lists-data.js?v=1.0.0"></script>
+    <script src="../scripts/services/watch-lists-ui-service.js?v=1.0.0"></script>
+
+    <!-- Icon Initializer (MUST load after page content is ready) -->
+    <script src="../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
+
     <!-- Unified Initialization System -->
-    <script src="../scripts/unified-app-initializer.js?v=1.0.0"></script>
+    <!-- Note: unified-app-initializer.js is loaded via package-manifest.js in production -->
+    <!-- For mockup, we skip this as it's not critical for the mockup display -->
 
     <!-- Page-specific script -->
     <script src="../scripts/watch-lists-page.js?v=1.0.0" defer></script>

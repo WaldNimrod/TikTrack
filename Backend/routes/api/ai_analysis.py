@@ -11,6 +11,9 @@ from services.llm_providers.llm_provider_manager import LLMProviderManager
 from routes.api.base_entity_utils import BaseEntityUtils
 from routes.api.base_entity_decorators import require_authentication
 from services.date_normalization_service import DateNormalizationService
+from services.ai_analysis_error_codes import (
+    AIAnalysisErrorCodes, categorize_error, format_error_response, get_error_message
+)
 import logging
 from typing import Dict, Any
 
@@ -46,15 +49,23 @@ def generate_analysis():
         
         # Validation
         if not template_id:
+            error_response = format_error_response(
+                AIAnalysisErrorCodes.VALIDATION_MISSING_TEMPLATE_ID,
+                'template_id is required'
+            )
             return jsonify({
                 'status': 'error',
-                'message': 'template_id is required'
+                **error_response
             }), 400
         
         if not isinstance(variables, dict):
+            error_response = format_error_response(
+                AIAnalysisErrorCodes.VALIDATION_MISSING_VARIABLES,
+                'variables must be a dictionary'
+            )
             return jsonify({
                 'status': 'error',
-                'message': 'variables must be a dictionary'
+                **error_response
             }), 400
         
         # Generate analysis
@@ -73,27 +84,26 @@ def generate_analysis():
         
     except ValueError as e:
         logger.warning(f"Invalid request: {e}")
+        error_code = categorize_error(e, str(e))
+        error_response = format_error_response(error_code, str(e))
         return jsonify({
             'status': 'error',
-            'message': str(e),
-            'error_type': 'validation_error'
+            **error_response
         }), 400
     except Exception as e:
         logger.error(f"Error generating analysis: {e}", exc_info=True)
-        # In development, include error details
-        error_message = 'Internal server error'
-        error_type = 'internal_error'
-        if hasattr(e, '__class__'):
-            error_type = e.__class__.__name__
-        # In development mode, include more details
+        error_code = categorize_error(e, str(e))
+        error_response = format_error_response(error_code, str(e))
+        
+        # In development mode, include original error details
         import os
         if os.getenv('FLASK_ENV') == 'development':
-            error_message = str(e)
+            error_response['original_error'] = str(e)
+            error_response['error_type'] = type(e).__name__
         
         return jsonify({
             'status': 'error',
-            'message': error_message,
-            'error_type': error_type
+            **error_response
         }), 500
     finally:
         db.close()
@@ -227,6 +237,55 @@ def get_analysis_by_id(request_id: int):
         db.close()
 
 
+@ai_analysis_bp.route('/history/<int:request_id>', methods=['DELETE'])
+@require_authentication()
+def delete_analysis(request_id: int):
+    """Delete specific analysis by ID"""
+    db: Session = next(get_db())
+    normalizer = None
+    
+    try:
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
+        normalizer = BaseEntityUtils.get_request_normalizer(request, fallback_user_id=user_id)
+        
+        # Delete the analysis
+        deleted = ai_analysis_service.delete_analysis(
+            db=db,
+            request_id=request_id,
+            user_id=user_id
+        )
+        
+        if not deleted:
+            return jsonify({
+                'status': 'error',
+                'message': 'Analysis not found or not authorized'
+            }), 404
+        
+        # Return success response
+        return jsonify({
+            'status': 'success',
+            'message': 'Analysis deleted successfully',
+            'data': {
+                'deleted_id': request_id
+            }
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error deleting analysis: {e}", exc_info=True)
+        return jsonify({
+            'status': 'error',
+            'message': 'Internal server error'
+        }), 500
+    finally:
+        db.close()
+
+
 @ai_analysis_bp.route('/history/<int:request_id>/availability', methods=['GET'])
 @require_authentication()
 def check_analysis_availability(request_id: int):
@@ -290,9 +349,13 @@ def check_analysis_availability(request_id: int):
                 note_exists = False
                 note_id = None
         
+        # Check if response_text exists in DB
+        has_db = bool(request_obj.response_text and request_obj.status == 'completed')
+        
         result = {
             'analysis_id': request_id,
             'has_cache': False,  # Frontend will check cache
+            'has_db': has_db,  # Check if response_text exists in DB
             'has_note': note_exists,
             'note_id': note_id if note_exists else None
         }
@@ -451,9 +514,13 @@ def check_analysis_availability_batch():
                     note_exists = False
                     note_id = None
             
+            # Check if response_text exists in DB
+            has_db = bool(analysis.response_text and analysis.status == 'completed')
+            
             result_map[analysis.id] = {
                 'analysis_id': analysis.id,
                 'has_cache': False,  # Frontend will check cache
+                'has_db': has_db,  # Check if response_text exists in DB
                 'has_note': note_exists,
                 'note_id': note_id if note_exists else None
             }
@@ -464,6 +531,7 @@ def check_analysis_availability_batch():
                 result_map[analysis_id] = {
                     'analysis_id': analysis_id,
                     'has_cache': False,
+                    'has_db': False,
                     'has_note': False,
                     'note_id': None
                 }
@@ -646,6 +714,75 @@ def manage_llm_provider():
         return jsonify({
             'status': 'error',
             'message': 'Internal server error'
+        }), 500
+    finally:
+        db.close()
+
+
+@ai_analysis_bp.route('/history/<int:request_id>/retry', methods=['POST'])
+@require_authentication()
+def retry_failed_analysis(request_id: int):
+    """Retry a failed analysis with exponential backoff"""
+    db: Session = next(get_db())
+    normalizer = None
+    
+    try:
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
+        
+        normalizer = BaseEntityUtils.get_request_normalizer(request, fallback_user_id=user_id)
+        data = request.get_json() or {}
+        
+        # Get optional parameters
+        max_retries = data.get('max_retries', 3)
+        use_fallback_provider = data.get('use_fallback_provider', True)
+        
+        # Retry the failed analysis
+        request_obj = ai_analysis_service.retry_failed_analysis(
+            db=db,
+            request_id=request_id,
+            user_id=user_id,
+            max_retries=max_retries,
+            use_fallback_provider=use_fallback_provider
+        )
+        
+        # Normalize dates in response
+        result_data = request_obj.to_dict(include_response=True)
+        normalized_data = BaseEntityUtils.normalize_output(normalizer, result_data) if normalizer else result_data
+        
+        return jsonify({
+            'status': 'success',
+            'data': normalized_data,
+            'message': f"Analysis retry completed. Status: {request_obj.status}"
+        }), 200
+        
+    except ValueError as e:
+        logger.warning(f"Invalid retry request: {e}")
+        error_code = categorize_error(e, str(e))
+        error_response = format_error_response(error_code, str(e))
+        return jsonify({
+            'status': 'error',
+            **error_response
+        }), 400
+    except Exception as e:
+        logger.error(f"Error retrying analysis: {e}", exc_info=True)
+        error_code = categorize_error(e, str(e))
+        error_response = format_error_response(error_code, str(e))
+        
+        # In development mode, include original error details
+        import os
+        if os.getenv('FLASK_ENV') == 'development':
+            error_response['original_error'] = str(e)
+            error_response['error_type'] = type(e).__name__
+        
+        return jsonify({
+            'status': 'error',
+            **error_response
         }), 500
     finally:
         db.close()

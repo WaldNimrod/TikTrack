@@ -295,27 +295,39 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
 
           // Initialize ticker widgets
-          window.Logger?.info?.('🔵 About to initialize ticker widgets...', { page: 'page-initialization-configs' });
+          window.Logger?.info?.('🔵 About to initialize ticker widgets...', { 
+            hasTickerListWidget: typeof window.TickerListWidget !== 'undefined',
+            hasTickerChartWidget: typeof window.TickerChartWidget !== 'undefined',
+            page: 'page-initialization-configs' 
+          });
+          
           if (window.TickerListWidget) {
             try {
+              window.Logger?.info?.('🔵 Initializing TickerListWidget...', { page: 'page-initialization-configs' });
               window.TickerListWidget.init('tickerListWidgetContainer', {
                 maxItems: 5,
                 defaultTab: 'active'
               });
-              window.Logger?.info?.('🔵 TickerListWidget initialized', { page: 'page-initialization-configs' });
+              window.Logger?.info?.('✅ TickerListWidget initialized successfully', { page: 'page-initialization-configs' });
             } catch (error) {
-              window.Logger?.warn?.('⚠️ Error initializing TickerListWidget:', error, { page: 'page-initialization-configs' });
+              window.Logger?.error?.('❌ Error initializing TickerListWidget', { error: error.message, stack: error.stack, page: 'page-initialization-configs' });
             }
+          } else {
+            window.Logger?.warn?.('⚠️ TickerListWidget not available', { page: 'page-initialization-configs' });
           }
+          
           if (window.TickerChartWidget) {
             try {
+              window.Logger?.info?.('🔵 Initializing TickerChartWidget...', { page: 'page-initialization-configs' });
               window.TickerChartWidget.init('tickerChartWidgetContainer', {
                 maxItems: 3
               });
-              window.Logger?.info?.('🔵 TickerChartWidget initialized', { page: 'page-initialization-configs' });
+              window.Logger?.info?.('✅ TickerChartWidget initialized successfully', { page: 'page-initialization-configs' });
             } catch (error) {
-              window.Logger?.warn?.('⚠️ Error initializing TickerChartWidget:', error, { page: 'page-initialization-configs' });
+              window.Logger?.error?.('❌ Error initializing TickerChartWidget', { error: error.message, stack: error.stack, page: 'page-initialization-configs' });
             }
+          } else {
+            window.Logger?.warn?.('⚠️ TickerChartWidget not available', { page: 'page-initialization-configs' });
           }
 
           // Initialize positions & portfolio system
@@ -2418,7 +2430,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.codeQualityDashboard',
         'window.LintStatusService',
       ],
-      pageSpecificScripts: ['scripts/linter-realtime-monitor.js'],
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: true,
@@ -3125,21 +3136,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: false,
     },
 
-    'tooltip-editor': {
-      name: 'Tooltip Editor',
-      packages: ['base', 'services', 'ui-advanced', 'init-system'],
-      requiredGlobals: [
-        'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
-        'window.PACKAGE_MANIFEST', // Unified Init System
-'NotificationSystem', 'window.IconSystem',
-      ],
-      description: 'עורך טולטיפים',
-      pageType: 'dev-tools',
-      requiresFilters: false,
-      requiresValidation: false,
-      requiresTables: false,
-    },
 
     'preferences-groups-management': {
       name: 'Preferences Groups Management',
@@ -3553,59 +3549,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
 
-    'cache-test': {
-      name: 'Cache Test',
-      description: 'בדיקת מטמון מערכת',
-      lastModified: '2025-02-02',
-      pageType: 'development',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'modules',
-        'crud',
-        'conditions',
-        'dashboard-widgets',
-        'info-summary',
-        'entity-details',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'window.UnifiedAppInitializer', // Unified Init System
-        'window.PAGE_CONFIGS', // Unified Init System
-        'window.PACKAGE_MANIFEST', // Unified Init System
-
-        'NotificationSystem',
-        'window.IconSystem',
-        'window.SelectPopulatorService',
-        'window.DataCollectionService',
-        'window.DefaultValueSetter',
-        'window.TableSortValueAdapter',
-        'window.LinkedItemsService',
-        'window.CRUDResponseHandler',
-        'window.createActionsMenu',
-        'window.ModalNavigationManager',
-        'window.ModalManagerV2',
-        'window.conditionsInitializer',
-        'window.ConditionsUIManager',
-        'window.PendingTradePlanWidget',
-        'window.InfoSummarySystem',
-        'window.PaginationSystem',
-        'window.showEntityDetails',
-      ],
-      preloadAssets: ['cache-test'],
-      cacheStrategy: 'standard',
-      requiresFilters: false,
-      requiresValidation: false,
-      requiresTables: false,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('💾 Initializing Cache Test...', {
-            page: 'page-initialization-configs',
-          });
-        },
-      ],
-    },
 
     'tradingview-test-page': {
       name: 'TradingView Test Page',

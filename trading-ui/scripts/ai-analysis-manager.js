@@ -1559,34 +1559,26 @@
               pendingResultSet: !!this.pendingResult
             });
             
-            // Save response_text to cache IMMEDIATELY (before reloadFn is called)
+            // Save response_text to cache IMMEDIATELY (before reloadFn is called) - ALWAYS save
             if (result.id && result.response_text) {
               const cacheKey = `ai-analysis-response-${result.id}`;
               if (window.UnifiedCacheManager) {
-                // Check if already in cache before saving
-                const existingCache = await window.UnifiedCacheManager.get(cacheKey);
-                if (!existingCache || !existingCache.response_text) {
-                  await window.UnifiedCacheManager.save(cacheKey, {
-                    response_text: result.response_text,
-                    response_json: result.response_json || null,
-                    cached_at: new Date().toISOString()
-                  }, {
-                    ttl: 7200000, // 2 hours
-                    layer: 'indexedDB',
-                    compress: true
-                  });
-                  window.Logger?.info('✅ Saved AI analysis response to cache (before reloadFn)', { 
-                    page: 'ai-analysis', 
-                    requestId: result.id,
-                    cacheKey,
-                    hasResponseText: !!result.response_text
-                  });
-                } else {
-                  window.Logger?.debug('⏭️ Skipped cache save - already exists (handleGenerateAnalysis CRUD)', { 
-                    page: 'ai-analysis', 
-                    requestId: result.id
-                  });
-                }
+                // Always save to cache (even if exists) to ensure data is up to date
+                await window.UnifiedCacheManager.save(cacheKey, {
+                  response_text: result.response_text,
+                  response_json: result.response_json || null,
+                  cached_at: new Date().toISOString()
+                }, {
+                  ttl: 7200000, // 2 hours
+                  layer: 'indexedDB',
+                  compress: true
+                });
+                window.Logger?.info('✅ Saved AI analysis response to cache (before reloadFn)', { 
+                  page: 'ai-analysis', 
+                  requestId: result.id,
+                  cacheKey,
+                  hasResponseText: !!result.response_text
+                });
               }
             }
           }
@@ -1741,13 +1733,11 @@
           if (data.status === 'success' && data.data) {
             result = data.data;
             
-            // Save response_text to cache (not in DB) - only if not already cached
+            // Save response_text to cache - ALWAYS save, even if exists (to update timestamp)
             if (result.id && result.response_text) {
               const cacheKey = `ai-analysis-response-${result.id}`;
               if (window.UnifiedCacheManager) {
-                // Check if already in cache before saving
-                const existingCache = await window.UnifiedCacheManager.get(cacheKey);
-                if (!existingCache || !existingCache.response_text) {
+                // Always save to cache (even if exists) to ensure data is up to date
                 const saveResult = await window.UnifiedCacheManager.save(cacheKey, {
                   response_text: result.response_text,
                   response_json: result.response_json || null,
@@ -1787,12 +1777,6 @@
                     page: 'ai-analysis', 
                     requestId: result.id,
                     cacheKey
-                  });
-                }
-              } else {
-                window.Logger?.debug('⏭️ Skipped cache save - already exists (handleGenerateAnalysis fallback)', { 
-                  page: 'ai-analysis', 
-                  requestId: result.id
                   });
                 }
               }
@@ -1879,11 +1863,40 @@
           stack: error?.stack
         });
         
-        // Show detailed error notification
-        const errorMessage = error?.message || 'שגיאה לא ידועה';
+        // Extract error message and code
+        let errorMessage = error?.message || 'שגיאה לא ידועה';
+        const errorCode = error?.errorCode || null;
+        const errorAction = error?.errorAction || null;
+        
+        // If error has errorCode, use the message from error (already user-friendly)
+        // Otherwise, try to extract from error response
+        if (error?.response) {
+          try {
+            const errorData = await error.response.json().catch(() => ({}));
+            if (errorData.message) {
+              errorMessage = errorData.message;
+            }
+            if (errorData.error_code && !errorCode) {
+              error.errorCode = errorData.error_code;
+            }
+            if (errorData.action && !errorAction) {
+              error.errorAction = errorData.action;
+            }
+          } catch (e) {
+            // Ignore JSON parse errors
+          }
+        }
+        
+        // Show detailed error notification with error code if available
+        let notificationMessage = `❌ הניתוח נכשל: ${errorMessage}`;
+        if (errorCode) {
+          window.Logger?.info?.('Error code detected', { page: 'ai-analysis', errorCode, errorAction });
+          // Error message is already user-friendly, just show it
+        }
+        
         if (window.NotificationSystem) {
           window.NotificationSystem.showError(
-            `❌ הניתוח נכשל: ${errorMessage}`,
+            notificationMessage,
             'system',
             { duration: 8000 }
           );
@@ -1895,6 +1908,8 @@
             const errorResult = {
               status: 'failed',
               error_message: errorMessage,
+              error_code: errorCode,
+              error_action: errorAction,
               id: error?.data?.id || null
             };
             await this.openResultsModal(errorResult);
@@ -2041,6 +2056,9 @@
       // Check if analysis failed or has no response
       if (analysisResult.status === 'failed') {
         const errorMessage = analysisResult.error_message || 'שגיאה לא ידועה ביצירת הניתוח';
+        // Check if error message is in English - if so, apply LTR direction
+        const isEnglish = /^[a-zA-Z]/.test(errorMessage.trim()) || /[a-zA-Z]{3,}/.test(errorMessage);
+        
         container.textContent = '';
         const alert = document.createElement('div');
         alert.className = 'alert alert-danger';
@@ -2049,6 +2067,11 @@
         alert.appendChild(h5);
         const p = document.createElement('p');
         p.textContent = errorMessage;
+        // Apply LTR direction for English messages
+        if (isEnglish) {
+          p.style.direction = 'ltr';
+          p.style.textAlign = 'left';
+        }
         alert.appendChild(p);
         if (analysisResult.id) {
           const small = document.createElement('small');
@@ -2180,35 +2203,27 @@
               // Save to cache for future use (only if not already cached)
               if (window.UnifiedCacheManager && analysisResult.id) {
                 const cacheKey = `ai-analysis-response-${analysisResult.id}`;
-                // Check if already in cache before saving
-                const existingCache = await window.UnifiedCacheManager.get(cacheKey);
-                if (!existingCache || !existingCache.response_text) {
-                  if (window.NotificationSystem) {
-                    window.NotificationSystem.showInfo('💾 שומר במטמון...', 'system', { duration: 2000 });
-                  }
-                  
-                  await window.UnifiedCacheManager.save(cacheKey, {
-                    response_text: responseText,
-                    response_json: data.data.response_json || null,
-                    cached_at: new Date().toISOString()
-                  }, {
-                    ttl: 7200000, // 2 hours
-                    layer: 'indexedDB',
-                    compress: true
-                  });
-                  window.Logger?.info('💾 Saved analysis response to cache', { 
-                    page: 'ai-analysis', 
-                    requestId: analysisResult.id
-                  });
-                  
-                  if (window.NotificationSystem) {
-                    window.NotificationSystem.showSuccess('✅ נשמר במטמון! מציג תוצאות...', 'system', { duration: 2000 });
-                  }
-                } else {
-                  window.Logger?.debug('⏭️ Skipped cache save - already exists', { 
-                    page: 'ai-analysis', 
-                    requestId: analysisResult.id
-                  });
+                // Always save to cache (even if exists) to ensure data is up to date
+                if (window.NotificationSystem) {
+                  window.NotificationSystem.showInfo('💾 שומר במטמון...', 'system', { duration: 2000 });
+                }
+                
+                await window.UnifiedCacheManager.save(cacheKey, {
+                  response_text: responseText,
+                  response_json: data.data.response_json || null,
+                  cached_at: new Date().toISOString()
+                }, {
+                  ttl: 7200000, // 2 hours
+                  layer: 'indexedDB',
+                  compress: true
+                });
+                window.Logger?.info('💾 Saved analysis response to cache', { 
+                  page: 'ai-analysis', 
+                  requestId: analysisResult.id
+                });
+                
+                if (window.NotificationSystem) {
+                  window.NotificationSystem.showSuccess('✅ נשמר במטמון! מציג תוצאות...', 'system', { duration: 2000 });
                 }
               }
             } else {
@@ -2349,14 +2364,18 @@
                   <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תבנית" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 1)"></button>
                 </th>
                 <th>
-                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="מנוע" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 2)"></button>
+                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="טיקר" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 2)"></button>
                 </th>
                 <th>
-                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="סטטוס" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 3)"></button>
+                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="מנוע" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 3)"></button>
                 </th>
                 <th>
-                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="נוצר ב" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 4)"></button>
+                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="סטטוס" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 4)"></button>
                 </th>
+                <th>
+                  <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="נוצר ב" data-classes="btn-link sortable-header" data-onclick="window.sortTable('ai_analysis_history', 5)"></button>
+                </th>
+                <th>אובייקט משתמש</th>
                 <th>פעולות</th>
               </tr>
             </thead>
@@ -2430,23 +2449,10 @@
           const cachePromises = analysisIds.map(async (id) => {
             const cacheKey = `ai-analysis-response-${id}`;
             try {
-              // Try to get from indexedDB layer first (where we save it)
-              let cachedData = await window.UnifiedCacheManager.get(cacheKey, 'indexedDB');
-              
-              // If not found, try memory layer
-              if (!cachedData) {
-                cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
-              }
-              
-              // If still not found, try localStorage
-              if (!cachedData) {
-                cachedData = await window.UnifiedCacheManager.get(cacheKey, 'localStorage');
-              }
-              
-              // If still not found, try without layer (default search)
-              if (!cachedData) {
-                cachedData = await window.UnifiedCacheManager.get(cacheKey);
-              }
+              // UnifiedCacheManager.get() searches all layers automatically in order:
+              // memory -> localStorage -> indexedDB -> backend
+              // No need to specify layer - it will search all layers automatically
+              const cachedData = await window.UnifiedCacheManager.get(cacheKey);
               
               const hasCache = !!(cachedData && (
                 cachedData.response_text || 
@@ -2472,6 +2478,7 @@
               return {
                 id,
                 has_cache: hasCache,
+                has_db: false,  // Will be updated from API response
                 has_note: false,
                 note_id: null
               };
@@ -2485,6 +2492,7 @@
               return {
                 id,
                 has_cache: false,
+                has_db: false,  // Will be updated from API response
                 has_note: false,
                 note_id: null
               };
@@ -2495,6 +2503,7 @@
           cacheResults.forEach(result => {
             cacheChecks[result.id] = {
               has_cache: result.has_cache,
+              has_db: result.has_db || false,  // Will be updated from API response
               has_note: result.has_note,
               note_id: result.note_id
             };
@@ -2527,15 +2536,17 @@
           if (response.ok) {
             const data = await response.json();
             if (data.status === 'success' && data.data) {
-              // Merge cache and note availability
+              // Merge cache, note, and DB availability
               for (const id of analysisIds) {
                 const apiData = data.data[id] || {};
                 if (cacheChecks[id]) {
                   cacheChecks[id].has_note = apiData.has_note || false;
                   cacheChecks[id].note_id = apiData.note_id || null;
+                  cacheChecks[id].has_db = apiData.has_db || false;
                 } else {
                   cacheChecks[id] = {
                     has_cache: false,
+                    has_db: apiData.has_db || false,
                     has_note: apiData.has_note || false,
                     note_id: apiData.note_id || null
                   };
@@ -2574,13 +2585,15 @@
             if (cacheChecks[item.id].has_note) {
               noteFoundCount++;
             }
-            if (cacheChecks[item.id].has_cache || cacheChecks[item.id].has_note) {
+            if (cacheChecks[item.id].has_cache || cacheChecks[item.id].has_db || cacheChecks[item.id].has_note) {
               availableCount++;
             }
           } else if (item.status === 'completed') {
             // For completed items, initialize availability even if not checked
+            // Default to has_db: true for completed items (will be verified when viewing)
             item._availability = {
               has_cache: false,
+              has_db: true,  // Completed analyses should have response_text in DB
               has_note: false,
               note_id: null
             };
@@ -2740,18 +2753,88 @@
           })
         });
 
+        // Read response and save pendingResult BEFORE calling CRUDResponseHandler (same as handleGenerateAnalysis)
+        const responseClone = response.clone();
+        let responseData = null;
+        let result = null;
+        
+        try {
+          responseData = await response.json();
+          
+          // Extract result from response
+          if (responseData.status === 'success' && responseData.data) {
+            result = responseData.data;
+            
+            // Store result for display after reload - MUST be set BEFORE reloadFn is called
+            this.pendingResult = result;
+            
+            window.Logger?.info('✅ Analysis rerun successfully - storing pending result', {
+              page: 'ai-analysis',
+              requestId: result.id,
+              status: result.status,
+              hasResponseText: !!result.response_text,
+              pendingResultSet: !!this.pendingResult
+            });
+            
+            // Save response_text to cache IMMEDIATELY (before reloadFn is called) - ALWAYS save
+            if (result.id && result.response_text) {
+              const cacheKey = `ai-analysis-response-${result.id}`;
+              if (window.UnifiedCacheManager) {
+                // Always save to cache (even if exists) to ensure data is up to date
+                await window.UnifiedCacheManager.save(cacheKey, {
+                  response_text: result.response_text,
+                  response_json: result.response_json || null,
+                  cached_at: new Date().toISOString()
+                }, {
+                  ttl: 7200000, // 2 hours
+                  layer: 'indexedDB',
+                  compress: true
+                });
+                window.Logger?.info('✅ Saved AI analysis response to cache (before reloadFn)', { 
+                  page: 'ai-analysis', 
+                  requestId: result.id,
+                  cacheKey,
+                  hasResponseText: !!result.response_text
+                });
+              }
+            }
+          }
+        } catch (error) {
+          window.Logger?.error('Error reading response before CRUDResponseHandler', {
+            page: 'ai-analysis',
+            error: error?.message || error
+          });
+        }
+
         // Use CRUDResponseHandler if available (same flow as handleGenerateAnalysis)
-        // CRUDResponseHandler will handle error responses too, so don't read response here
         if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function') {
-          const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {
+          // Now call CRUDResponseHandler with cloned response
+          const crudResult = await window.CRUDResponseHandler.handleSaveResponse(responseClone, {
               modalId: null, // No modal to close for rerun
               successMessage: 'ניתוח נוצר מחדש בהצלחה!',
               entityName: 'ניתוח AI',
               reloadFn: async () => {
                 // Reload history after successful analysis creation
                 this.history = await window.AIAnalysisData?.loadHistory({ force: true }) || [];
+                
+                // Update availability for pending result immediately in history (before full check)
+                if (this.pendingResult && this.pendingResult.id) {
+                  const historyItem = this.history.find(h => h.id === this.pendingResult.id);
+                  if (historyItem) {
+                    historyItem._availability = {
+                      has_cache: true,
+                      has_note: false,
+                      note_id: null
+                    };
+                    // Ensure response_text is available from pendingResult
+                    if (this.pendingResult.response_text && !historyItem.response_text) {
+                      historyItem.response_text = this.pendingResult.response_text;
+                    }
+                  }
+                }
+                
                 // Check availability AFTER cache is saved (give it a moment for cache to be fully written)
-                await new Promise(resolve => setTimeout(resolve, 200)); // Delay to ensure cache is saved
+                await new Promise(resolve => setTimeout(resolve, 500)); // Increased delay to ensure cache is saved
                 await this.checkAvailabilityForAll();
                 this.renderHistory();
                 // Update summary stats after availability check
@@ -2763,50 +2846,31 @@
                 if (this.pendingResult && this.pendingResult.id) {
                   // Find the updated result from history to get latest availability info
                   const updatedResult = this.history.find(h => h.id === this.pendingResult.id) || this.pendingResult;
+                  
+                  // Ensure we have response_text from pendingResult if not in updatedResult
+                  if (!updatedResult.response_text && this.pendingResult.response_text) {
+                    updatedResult.response_text = this.pendingResult.response_text;
+                  }
+                  
                   await this.openResultsModal(updatedResult);
                   this.pendingResult = null; // Clear pending result
+                } else {
+                  window.Logger?.warn('⚠️ No pending result to display after rerun', {
+                    page: 'ai-analysis',
+                    pendingResult: this.pendingResult,
+                    historyLength: this.history.length
+                  });
                 }
               },
               requiresHardReload: false,
             });
 
-            // Use result from CRUDResponseHandler instead of reading response ourselves
+            // Verify result from CRUDResponseHandler matches what we read
             if (crudResult && crudResult.status === 'success' && crudResult.data) {
-              const analysisResult = crudResult.data;
-              
-              // Save response_text to cache (not in DB) - only if not already cached
-              if (analysisResult.id && analysisResult.response_text) {
-                const cacheKey = `ai-analysis-response-${analysisResult.id}`;
-                if (window.UnifiedCacheManager) {
-                  // Check if already in cache before saving
-                  const existingCache = await window.UnifiedCacheManager.get(cacheKey);
-                  if (!existingCache || !existingCache.response_text) {
-                    await window.UnifiedCacheManager.save(cacheKey, {
-                      response_text: analysisResult.response_text,
-                      response_json: analysisResult.response_json || null,
-                      cached_at: new Date().toISOString()
-                    }, {
-                      ttl: 7200000, // 2 hours
-                      layer: 'indexedDB',
-                      compress: true
-                    });
-                    window.Logger?.info('✅ Saved AI analysis response to cache (rerun)', { 
-                      page: 'ai-analysis', 
-                      requestId: analysisResult.id,
-                      cacheKey,
-                      hasResponseText: !!analysisResult.response_text
-                    });
-                  } else {
-                    window.Logger?.debug('⏭️ Skipped cache save - already exists (rerun CRUD)', { 
-                      page: 'ai-analysis', 
-                      requestId: analysisResult.id
-                    });
-                  }
-                }
+              if (!result) {
+                result = crudResult.data;
+                this.pendingResult = result;
               }
-              
-              // Store result for display after reload
-              this.pendingResult = analysisResult;
             }
         } else {
           // Fallback: CRUDResponseHandler not available, read response manually
@@ -2819,30 +2883,22 @@
             if (result.data.id && result.data.response_text) {
             const cacheKey = `ai-analysis-response-${result.data.id}`;
               if (window.UnifiedCacheManager) {
-                // Check if already in cache before saving
-                const existingCache = await window.UnifiedCacheManager.get(cacheKey);
-                if (!existingCache || !existingCache.response_text) {
-            await window.UnifiedCacheManager.save(cacheKey, {
-              response_text: result.data.response_text,
-                    response_json: result.data.response_json || null,
-                    cached_at: new Date().toISOString()
-                  }, {
-                    ttl: 7200000, // 2 hours
-                    layer: 'indexedDB',
-                    compress: true
-                  });
-                  window.Logger?.info('✅ Saved AI analysis response to cache (rerun, manual)', { 
-                    page: 'ai-analysis', 
-                    requestId: result.data.id,
-                    cacheKey,
-                    hasResponseText: !!result.data.response_text
-                  });
-                } else {
-                  window.Logger?.debug('⏭️ Skipped cache save - already exists (rerun manual)', { 
-                    page: 'ai-analysis', 
-                    requestId: result.data.id
-                  });
-                }
+                // Always save to cache (even if exists) to ensure data is up to date
+                await window.UnifiedCacheManager.save(cacheKey, {
+                  response_text: result.data.response_text,
+                  response_json: result.data.response_json || null,
+                  cached_at: new Date().toISOString()
+                }, {
+                  ttl: 7200000, // 2 hours
+                  layer: 'indexedDB',
+                  compress: true
+                });
+                window.Logger?.info('✅ Saved AI analysis response to cache (rerun, manual)', { 
+                  page: 'ai-analysis', 
+                  requestId: result.data.id,
+                  cacheKey,
+                  hasResponseText: !!result.data.response_text
+                });
               }
           }
 
@@ -2933,6 +2989,37 @@
       templateCell.textContent = item.template_name || 'ניתוח';
       row.appendChild(templateCell);
 
+      // Ticker - Extract from variables_json (stored as simple key-value dictionary)
+      const tickerCell = document.createElement('td');
+      let tickerSymbol = '-';
+      try {
+        if (item.variables_json) {
+          let variables = item.variables_json;
+          
+          // Parse if it's a string
+          if (typeof variables === 'string') {
+            variables = JSON.parse(variables);
+          }
+          
+          // Variables are stored as simple dictionary: { "stock_ticker": "TSLA", ... }
+          // Try to find ticker in variables (can be stock_ticker, ticker_symbol, etc.)
+          if (variables && typeof variables === 'object') {
+            tickerSymbol = variables.stock_ticker || 
+                          variables.ticker_symbol || 
+                          '-';
+            
+            // Clean up ticker symbol if it contains " - " (e.g., "TSLA - Tesla, Inc." -> "TSLA")
+            if (tickerSymbol && tickerSymbol !== '-' && typeof tickerSymbol === 'string' && tickerSymbol.includes(' - ')) {
+              tickerSymbol = tickerSymbol.split(' - ')[0].trim();
+            }
+          }
+        }
+      } catch (error) {
+        window.Logger?.warn('Error extracting ticker from variables_json', { page: 'ai-analysis', error, itemId: item.id });
+      }
+      tickerCell.textContent = tickerSymbol || '-';
+      row.appendChild(tickerCell);
+
       // Provider
       const providerCell = document.createElement('td');
       providerCell.textContent = item.provider || 'לא זמין';
@@ -2976,69 +3063,91 @@
       }
       row.appendChild(dateCell);
 
-      // Actions
+      // User Object (Note) - Show link if saved as note
+      const userObjectCell = document.createElement('td');
+      userObjectCell.className = 'col-user-object';
+      const availability = item._availability || { has_cache: false, has_note: false, note_id: null };
+      
+      if (availability.has_note && availability.note_id) {
+        // Create link to note
+        const noteLink = document.createElement('a');
+        noteLink.href = '#';
+        noteLink.className = 'entity-link';
+        noteLink.textContent = `📝 הערה #${availability.note_id}`;
+        noteLink.setAttribute('title', 'צפה בהערה');
+        noteLink.onclick = (e) => {
+          e.preventDefault();
+          if (typeof window.showEntityDetails === 'function') {
+            window.showEntityDetails('note', availability.note_id, { mode: 'view' });
+          } else if (typeof viewNote === 'function') {
+            viewNote(availability.note_id);
+          }
+        };
+        userObjectCell.appendChild(noteLink);
+      } else {
+        userObjectCell.textContent = '-';
+      }
+      row.appendChild(userObjectCell);
+
+      // Actions - Use createActionsMenu like other pages
       const actionsCell = document.createElement('td');
+      actionsCell.className = 'actions-cell';
       
-      // Always add "Re-run" button for all records
-      const rerunBtn = document.createElement('button');
-      rerunBtn.className = 'btn btn-sm btn-outline-secondary';
-      rerunBtn.setAttribute('data-button-type', 'SECONDARY');
-      rerunBtn.setAttribute('data-variant', 'small');
-      rerunBtn.setAttribute('data-text', 'הרצה חוזרת');
-      rerunBtn.setAttribute('data-onclick', `window.AIAnalysisManager.rerunAnalysis(${item.id})`);
-      rerunBtn.setAttribute('title', 'הרצה חוזרת של הניתוח לקבלת משוב עדכני מהמנוע');
-      actionsCell.appendChild(rerunBtn);
+      // Build actions menu items
+      const actionsMenuItems = [];
       
-      // Show "View Results" button only if data is available (cache or note)
+      // Always add "Re-run" action
+      actionsMenuItems.push({
+        type: 'RERUN',
+        onclick: `window.AIAnalysisManager.rerunAnalysis(${item.id})`,
+        title: 'הרצה חוזרת של הניתוח לקבלת משוב עדכני מהמנוע'
+      });
+      
+      // Add "View Results" for completed analyses
       if (item.status === 'completed') {
-        const availability = item._availability || { has_cache: false, has_note: false, note_id: null };
-        
-        // Only show "View Results" if we have data available
-        if (availability.has_cache || availability.has_note) {
-          const viewBtn = document.createElement('button');
-          viewBtn.className = 'btn btn-sm btn-primary ms-2';
-          viewBtn.setAttribute('data-button-type', 'PRIMARY');
-          viewBtn.setAttribute('data-variant', 'small');
-          viewBtn.setAttribute('data-text', 'צפה בתוצאות');
-          viewBtn.setAttribute('data-onclick', `window.AIAnalysisManager.viewHistoryItem(${item.id})`);
-          
-          // Build tooltip based on availability
-          let tooltip = '';
-          if (availability.has_note && availability.note_id) {
-            tooltip = `נשמר כהערה (מזהה: ${availability.note_id})`;
-          } else if (availability.has_cache) {
-            tooltip = 'התוצאות זמינות זמנית במטמון (2 שעות)';
-          }
-          viewBtn.title = tooltip;
-          
-          actionsCell.appendChild(viewBtn);
-          
-          // Show note indicator if saved as note
-          if (availability.has_note && availability.note_id) {
-            const noteBadge = document.createElement('span');
-            noteBadge.className = 'badge bg-success ms-2';
-            noteBadge.textContent = `📝 הערה #${availability.note_id}`;
-            noteBadge.setAttribute('title', 'הניתוח נשמר כהערה');
-            actionsCell.appendChild(noteBadge);
-          }
-        } else {
-          // No data available - show message
-          const msgSpan = document.createElement('span');
-          msgSpan.className = 'text-muted small ms-2';
-          msgSpan.textContent = 'תוצאות לא זמינות';
-          msgSpan.setAttribute('title', 'התוצאות לא זמינות במטמון או כהערה. לחץ על "הרצה חוזרת" ליצירת ניתוח חדש.');
-          actionsCell.appendChild(msgSpan);
+        let viewTooltip = 'התוצאות יטענו מבסיס הנתונים (תמיד זמינות)';
+        if (availability.has_note && availability.note_id) {
+          viewTooltip = `נשמר כהערה (מזהה: ${availability.note_id})`;
+        } else if (availability.has_cache) {
+          viewTooltip = 'התוצאות זמינות במטמון';
         }
-      } else if (item.status === 'failed') {
-        const msgSpan = document.createElement('span');
-        msgSpan.className = 'text-danger small ms-2';
-        msgSpan.textContent = 'נכשל';
-        actionsCell.appendChild(msgSpan);
-      } else if (item.status === 'pending') {
-        const msgSpan = document.createElement('span');
-        msgSpan.className = 'text-muted small ms-2';
-        msgSpan.textContent = 'ממתין...';
-        actionsCell.appendChild(msgSpan);
+        
+        actionsMenuItems.push({
+          type: 'VIEW',
+          onclick: `window.AIAnalysisManager.viewHistoryItem(${item.id})`,
+          title: viewTooltip
+        });
+      }
+      
+      // Always add "Delete" action
+      actionsMenuItems.push({
+        type: 'DELETE',
+        onclick: `window.AIAnalysisManager.deleteAnalysis(${item.id})`,
+        title: 'מחק ניתוח זה'
+      });
+      
+      // Use createActionsMenu if available, otherwise fallback to simple buttons
+      if (window.createActionsMenu && typeof window.createActionsMenu === 'function') {
+        const actionsMenuHTML = window.createActionsMenu(actionsMenuItems);
+        actionsCell.innerHTML = actionsMenuHTML;
+      } else {
+        // Fallback: create simple buttons
+        actionsMenuItems.forEach(menuItem => {
+          const btn = document.createElement('button');
+          btn.className = 'btn btn-sm ms-2';
+          btn.setAttribute('data-button-type', menuItem.type);
+          btn.setAttribute('data-variant', 'small');
+          btn.setAttribute('data-onclick', menuItem.onclick);
+          btn.setAttribute('title', menuItem.title);
+          if (menuItem.type === 'VIEW') {
+            btn.textContent = '👁️';
+          } else if (menuItem.type === 'DELETE') {
+            btn.textContent = '🗑️';
+          } else {
+            btn.textContent = '🔄';
+          }
+          actionsCell.appendChild(btn);
+        });
       }
       
       row.appendChild(actionsCell);
@@ -3167,31 +3276,23 @@
           if (data.status === 'success' && data.data) {
             analysisResult = data.data;
             
-            // If API returned response_text, save to cache (only if not already cached)
+            // If API returned response_text, save to cache (always save to ensure data is up to date)
             if (analysisResult.response_text && window.UnifiedCacheManager && item.id) {
               const cacheKey = `ai-analysis-response-${item.id}`;
-              // Check if already in cache before saving
-              const existingCache = await window.UnifiedCacheManager.get(cacheKey);
-              if (!existingCache || !existingCache.response_text) {
+              // Always save to cache (even if exists) to ensure data is up to date
               await window.UnifiedCacheManager.save(cacheKey, {
                 response_text: analysisResult.response_text,
-                  response_json: analysisResult.response_json,
-                  cached_at: new Date().toISOString()
-                }, { 
-                  ttl: 7200000, // 2 hours
-                  layer: 'indexedDB',
-                  compress: true
-                });
-                window.Logger?.debug('💾 Saved analysis response to cache (viewHistoryItem)', { 
-                  page: 'ai-analysis', 
-                  requestId: item.id
-                });
-              } else {
-                window.Logger?.debug('⏭️ Skipped cache save - already exists (viewHistoryItem)', { 
-                  page: 'ai-analysis', 
-                  requestId: item.id
-                });
-              }
+                response_json: analysisResult.response_json,
+                cached_at: new Date().toISOString()
+              }, { 
+                ttl: 7200000, // 2 hours
+                layer: 'indexedDB',
+                compress: true
+              });
+              window.Logger?.debug('💾 Saved analysis response to cache (viewHistoryItem)', { 
+                page: 'ai-analysis', 
+                requestId: item.id
+              });
             }
           }
         }
@@ -3845,6 +3946,139 @@
           );
         }
         
+        throw error;
+      }
+    },
+
+    /**
+     * Delete single analysis by ID
+     * Includes linked items check and confirmation
+     * @param {number} analysisId - Analysis ID to delete
+     * @returns {Promise<void>}
+     */
+    async deleteAnalysis(analysisId) {
+      window.Logger?.info('🗑️ deleteAnalysis called', {
+        page: 'ai-analysis',
+        analysisId
+      });
+
+      try {
+        if (!analysisId) {
+          throw new Error('Analysis ID is required');
+        }
+
+        // Get analysis details for confirmation message
+        const analysis = this.history.find(a => a.id === analysisId || a.id === parseInt(analysisId));
+        let analysisDetails = `ניתוח #${analysisId}`;
+        if (analysis) {
+          const templateName = analysis.template_name || 'לא מוגדר';
+          const statusText = analysis.status === 'completed' ? 'הושלם' :
+                            analysis.status === 'failed' ? 'נכשל' :
+                            analysis.status === 'pending' ? 'ממתין' : analysis.status || 'לא מוגדר';
+          analysisDetails = `ניתוח #${analysisId} - ${templateName}, סטטוס: ${statusText}`;
+        }
+
+        // Check linked items first (Notes)
+        // Note: AI Analysis might be linked to Notes - check if linked items system supports it
+        // For now, we'll skip linked items check as AI Analysis is not yet fully integrated
+        // with the linked items system, but we'll leave the structure for future integration
+        window.Logger?.debug('🔍 Checking for linked items before deletion', {
+          page: 'ai-analysis',
+          analysisId
+        });
+
+        // Optional: Check linked items if system supports it
+        // if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+        //   const hasLinkedItems = await window.checkLinkedItemsBeforeAction('ai_analysis', analysisId, 'delete');
+        //   if (hasLinkedItems) {
+        //     window.Logger?.info('🚫 Analysis has linked items, deletion cancelled', {
+        //       page: 'ai-analysis',
+        //       analysisId
+        //     });
+        //     return;
+        //   }
+        // }
+
+        // Confirm deletion
+        const confirmed = await new Promise((resolve) => {
+          if (window.showDeleteWarning) {
+            window.showDeleteWarning(
+              `האם אתה בטוח שברצונך למחוק את הניתוח?\n\n${analysisDetails}\n\nפעולה זו אינה ניתנת לביטול.`,
+              () => resolve(true),
+              () => resolve(false)
+            );
+          } else if (window.showConfirmationDialog) {
+            window.showConfirmationDialog(
+              'מחיקת ניתוח',
+              `האם אתה בטוח שברצונך למחוק את הניתוח?\n\n${analysisDetails}\n\nפעולה זו אינה ניתנת לביטול.`,
+              () => resolve(true),
+              () => resolve(false),
+              'danger'
+            );
+          } else {
+            resolve(confirm(`האם אתה בטוח שברצונך למחוק את הניתוח?\n\n${analysisDetails}\n\nפעולה זו אינה ניתנת לביטול.`));
+          }
+        });
+
+        if (!confirmed) {
+          window.Logger?.info('🗑️ Delete cancelled by user', {
+            page: 'ai-analysis',
+            analysisId
+          });
+          return;
+        }
+
+        // Show loading
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showInfo('מוחק את הניתוח...', 'system');
+        }
+
+        // Delete analysis
+        if (!window.AIAnalysisData || !window.AIAnalysisData.deleteAnalysis) {
+          throw new Error('AIAnalysisData.deleteAnalysis not available');
+        }
+
+        const deleted = await window.AIAnalysisData.deleteAnalysis(analysisId);
+
+        if (!deleted) {
+          throw new Error('Failed to delete analysis');
+        }
+
+        // Remove from history and re-render
+        this.history = this.history.filter(a => a.id !== analysisId && a.id !== parseInt(analysisId));
+        this.renderHistory();
+
+        // Update summary stats
+        if (window.updatePageSummaryStats) {
+          window.updatePageSummaryStats('ai-analysis', this.history);
+        }
+
+        // Show success
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showSuccess(
+            'הניתוח נמחק בהצלחה',
+            'business'
+          );
+        }
+
+        window.Logger?.info('✅ Analysis deleted successfully', {
+          page: 'ai-analysis',
+          analysisId
+        });
+
+      } catch (error) {
+        window.Logger?.error('❌ Error deleting analysis', error, {
+          page: 'ai-analysis',
+          analysisId
+        });
+
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showError(
+            `שגיאה במחיקת הניתוח: ${error.message || 'שגיאה לא ידועה'}`,
+            'system'
+          );
+        }
+
         throw error;
       }
     },

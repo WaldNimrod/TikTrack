@@ -23,7 +23,7 @@ const BASE_DIR = '.';
 
 // Filter out non-existent files
 function shouldTestPage(pagePath) {
-  const nonExistent = ["trading-ui/cache-test.html","trading-ui/linter-realtime-monitor.html","trading-ui/tradingview-test-page.html","trading-ui/test_external_data.html","trading-ui/test_models.html"];
+  const nonExistent = ["trading-ui/tradingview-test-page.html","trading-ui/test_external_data.html","trading-ui/test_models.html"];
   return !nonExistent.some(nonEx => pagePath.includes(nonEx));
 }
 

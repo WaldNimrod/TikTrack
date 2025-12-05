@@ -464,9 +464,39 @@ class YahooFinanceAdapter:
         
         return None
     
+    def _get_fallback_symbols(self, symbol: str) -> List[str]:
+        """
+        Get fallback symbol variations for European/unsupported tickers
+        
+        Args:
+            symbol: Original symbol
+            
+        Returns:
+            List of fallback symbols to try
+        """
+        fallbacks = []
+        symbol_upper = symbol.upper()
+        
+        # Common European exchanges
+        if not '.' in symbol_upper:
+            # Try German exchange (.DE)
+            fallbacks.append(f"{symbol_upper}.DE")
+            # Try Frankfurt exchange (.F)
+            fallbacks.append(f"{symbol_upper}.F")
+            # Try XETR exchange (.XETR)
+            fallbacks.append(f"{symbol_upper}.XETR")
+            # Try London exchange (.L)
+            fallbacks.append(f"{symbol_upper}.L")
+            # Try Paris exchange (.PA)
+            fallbacks.append(f"{symbol_upper}.PA")
+            # Try Amsterdam exchange (.AS)
+            fallbacks.append(f"{symbol_upper}.AS")
+        
+        return fallbacks
+    
     def get_quote(self, symbol: str, ticker: Optional[Ticker] = None) -> Optional[QuoteData]:
         """
-        Get single quote for a symbol
+        Get single quote for a symbol with retry and fallback symbols
         
         Args:
             symbol: Ticker symbol (internal symbol)
@@ -500,32 +530,85 @@ class YahooFinanceAdapter:
                 logger.debug(f"Cache hit for {provider_symbol}")
                 return cached_quote
             
-            # Fetch from API using provider symbol
-            url = f"{self.base_url}/v8/finance/chart/{provider_symbol}"
-            params = {
-                'interval': '1d',
-                'range': '1d',
-                'includePrePost': 'false'
-            }
+            # Try primary symbol first
+            symbols_to_try = [provider_symbol]
             
-            data = self._make_request(url, params)
-            if not data:
-                return None
+            # Add fallback symbols if primary symbol fails (only for symbols without exchange suffix)
+            if not '.' in provider_symbol:
+                fallback_symbols = self._get_fallback_symbols(provider_symbol)
+                symbols_to_try.extend(fallback_symbols)
             
-            # Parse response - use internal symbol for the quote object
-            internal_symbol = ticker.symbol if ticker else provider_symbol
-            quote = self._parse_quote_response(internal_symbol, data)
-            if quote:
-                # Cache the result
-                if ticker:
-                    self._cache_quote_by_ticker(quote, ticker)
-                else:
-                    self._cache_quote(quote)
-                
-            return quote
+            # Try each symbol until one works
+            last_error = None
+            for attempt_symbol in symbols_to_try:
+                try:
+                    # Fetch from API using provider symbol
+                    url = f"{self.base_url}/v8/finance/chart/{attempt_symbol}"
+                    params = {
+                        'interval': '1d',
+                        'range': '1d',
+                        'includePrePost': 'false'
+                    }
+                    
+                    data = self._make_request(url, params)
+                    if not data:
+                        if attempt_symbol != symbols_to_try[-1]:  # Not the last attempt
+                            logger.debug(f"Symbol {attempt_symbol} not found, trying next fallback...")
+                            continue
+                        else:
+                            logger.warning(f"All symbol variations failed for {symbol} (tried: {', '.join(symbols_to_try)})")
+                            return None
+                    
+                    # Parse response - use internal symbol for the quote object
+                    internal_symbol = ticker.symbol if ticker else symbol
+                    quote = self._parse_quote_response(internal_symbol, data)
+                    if quote:
+                        # If we used a fallback symbol, log it and optionally save the mapping
+                        if attempt_symbol != provider_symbol:
+                            logger.info(f"✅ Successfully fetched quote for {symbol} using fallback symbol '{attempt_symbol}'")
+                            # Optionally save the mapping for future use
+                            if ticker:
+                                try:
+                                    from services.ticker_symbol_mapping_service import TickerSymbolMappingService
+                                    TickerSymbolMappingService.set_provider_symbol(
+                                        self.db_session,
+                                        ticker.id,
+                                        self.provider_id,
+                                        attempt_symbol,
+                                        is_primary=True
+                                    )
+                                    self.db_session.commit()
+                                    logger.info(f"💾 Saved provider symbol mapping: {ticker.symbol} -> {attempt_symbol}")
+                                except Exception as mapping_error:
+                                    logger.warning(f"Could not save provider symbol mapping: {mapping_error}")
+                        
+                        # Cache the result
+                        if ticker:
+                            self._cache_quote_by_ticker(quote, ticker)
+                        else:
+                            self._cache_quote(quote)
+                        
+                        return quote
+                    else:
+                        if attempt_symbol != symbols_to_try[-1]:  # Not the last attempt
+                            logger.debug(f"Could not parse response for {attempt_symbol}, trying next fallback...")
+                            continue
+                        
+                except Exception as e:
+                    last_error = e
+                    if attempt_symbol != symbols_to_try[-1]:  # Not the last attempt
+                        logger.debug(f"Error fetching {attempt_symbol}: {e}, trying next fallback...")
+                        continue
+                    else:
+                        logger.error(f"Error getting quote for {symbol} (tried: {', '.join(symbols_to_try)}): {e}")
+            
+            # If all attempts failed, log the last error
+            if last_error:
+                logger.error(f"All symbol variations failed for {symbol}: {last_error}")
+            return None
             
         except Exception as e:
-            logger.error(f"Error getting quote for {symbol}: {e}")
+            logger.error(f"Error getting quote for {symbol}: {e}", exc_info=True)
             return None
     
     def get_quotes_batch(self, symbols: List[str]) -> List[QuoteData]:
@@ -1445,7 +1528,13 @@ class YahooFinanceAdapter:
             from datetime import date, timedelta
             
             end_date = date.today()
-            start_date = end_date - timedelta(days=days_back + 5)  # Get more data for reliability
+            # Calculate buffer: need to account for weekends and holidays
+            # For 150 trading days, we need ~210 calendar days (150 * 1.4 ratio)
+            # But to be safe, we use 1.5 ratio to ensure we get enough trading days
+            # For 150 trading days: 150 * 1.5 = 225 calendar days minimum
+            # So buffer should be approximately 75 days for 150 trading days
+            buffer_days = max(75, int(days_back * 0.5))  # 50% buffer for trading days vs calendar days (safer)
+            start_date = end_date - timedelta(days=days_back + buffer_days)  # Get more data for reliability
             
             url = f"{self.base_url}/v8/finance/chart/{symbol}"
             params = {
@@ -1515,6 +1604,12 @@ class YahooFinanceAdapter:
             if not historical_data:
                 logger.warning(f"⚠️ No historical data fetched for {ticker.symbol}")
                 return 0
+            
+            logger.info(f"📊 Fetched {len(historical_data)} historical data points for {ticker.symbol} (requested {days_back} trading days)")
+            
+            # Check if we have enough data
+            if len(historical_data) < days_back:
+                logger.warning(f"⚠️ Only {len(historical_data)} quotes fetched for {ticker.symbol}, expected at least {days_back} trading days")
             
             saved_count = 0
             skipped_count = 0

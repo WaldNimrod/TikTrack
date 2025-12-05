@@ -82,6 +82,22 @@
         try {
             window.Logger?.info?.('🔧 Initializing Watch Lists Page...', PAGE_LOG_CONTEXT);
 
+            // Wait for Cache Manager to initialize
+            if (window.UnifiedCacheManager && !window.UnifiedCacheManager.initialized) {
+                await new Promise(resolve => {
+                    const checkInterval = setInterval(() => {
+                        if (window.UnifiedCacheManager?.initialized) {
+                            clearInterval(checkInterval);
+                            resolve();
+                        }
+                    }, 100);
+                    setTimeout(() => {
+                        clearInterval(checkInterval);
+                        resolve(); // Continue even if not initialized
+                    }, 3000);
+                });
+            }
+
             // Wait for required systems
             if (!window.WatchListsDataService) {
                 window.Logger?.warn?.('⚠️ WatchListsDataService not available, waiting...', PAGE_LOG_CONTEXT);
@@ -99,7 +115,7 @@
                 });
             }
 
-            // Register tables
+            // Register tables (optional - UnifiedTableSystem may not be available in mockups)
             registerWatchListsTables();
 
             // Load mockup data
@@ -121,6 +137,11 @@
                 window.restoreAllSectionStates();
             }
 
+            // Trigger icon initialization after page is fully loaded
+            if (typeof window.initializeIcons === 'function') {
+                setTimeout(() => window.initializeIcons(), 100);
+            }
+
             window.Logger?.info?.('✅ Watch Lists Page initialized successfully', PAGE_LOG_CONTEXT);
         } catch (error) {
             const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
@@ -138,7 +159,8 @@
      */
     function registerWatchListsTables() {
         if (!window.UnifiedTableSystem) {
-            window.Logger?.warn?.('⚠️ UnifiedTableSystem not available for registration', PAGE_LOG_CONTEXT);
+            // UnifiedTableSystem is optional for mockups - no warning needed
+            window.Logger?.debug?.('ℹ️ UnifiedTableSystem not available (optional for mockups)', PAGE_LOG_CONTEXT);
             return;
         }
 

@@ -454,45 +454,63 @@ async function saveExecution() {
         const isEdit = form.dataset.mode === 'edit';
         const executionId = form.dataset.executionId;
         
-        // Prepare API call
-        const url = isEdit ? `/api/executions/${executionId}` : '/api/executions';
-        const method = isEdit ? 'PUT' : 'POST';
-        
-        // Send to API using ExecutionsData service if available
-        let response;
-        if (isEdit && typeof window.ExecutionsData?.updateExecution === 'function') {
-            response = await window.ExecutionsData.updateExecution(executionId, executionData);
-        } else if (!isEdit && typeof window.ExecutionsData?.createExecution === 'function') {
-            response = await window.ExecutionsData.createExecution(executionData);
-        } else {
-            // Fallback to direct fetch
-            response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(executionData)
-            });
-        }
-        
-        // Use CRUDResponseHandler for consistent response handling
+        // Use UnifiedCRUDService for consistent CRUD operations
         let crudResult;
-        if (isEdit) {
-            crudResult = await CRUDResponseHandler.handleUpdateResponse(response, {
+        if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+            // Set entity ID for update
+            if (isEdit && executionId) {
+                executionData.id = parseInt(executionId);
+            }
+            
+            crudResult = await window.UnifiedCRUDService.saveEntity('execution', executionData, {
                 modalId: 'executionsModal',
-                successMessage: 'ביצוע עודכן בהצלחה',
+                successMessage: isEdit ? 'ביצוע עודכן בהצלחה' : 'ביצוע נוסף בהצלחה',
                 entityName: 'ביצוע',
                 reloadFn: window.loadExecutionsData,
-                requiresHardReload: false
+                requiresHardReload: false,
+                isEdit: isEdit,
+                entityId: isEdit ? executionId : null
             });
         } else {
-            crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
-                modalId: 'executionsModal',
-                successMessage: 'ביצוע נוסף בהצלחה',
-                entityName: 'ביצוע',
-                reloadFn: window.loadExecutionsData,
-                requiresHardReload: false
-            });
+            // Fallback to direct API call with CRUDResponseHandler
+            const url = isEdit ? `/api/executions/${executionId}` : '/api/executions';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            // Send to API using ExecutionsData service if available
+            let response;
+            if (isEdit && typeof window.ExecutionsData?.updateExecution === 'function') {
+                response = await window.ExecutionsData.updateExecution(executionId, executionData);
+            } else if (!isEdit && typeof window.ExecutionsData?.createExecution === 'function') {
+                response = await window.ExecutionsData.createExecution(executionData);
+            } else {
+                // Fallback to direct fetch
+                response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(executionData)
+                });
+            }
+            
+            // Use CRUDResponseHandler for consistent response handling
+            if (isEdit) {
+                crudResult = await CRUDResponseHandler.handleUpdateResponse(response, {
+                    modalId: 'executionsModal',
+                    successMessage: 'ביצוע עודכן בהצלחה',
+                    entityName: 'ביצוע',
+                    reloadFn: window.loadExecutionsData,
+                    requiresHardReload: false
+                });
+            } else {
+                crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
+                    modalId: 'executionsModal',
+                    successMessage: 'ביצוע נוסף בהצלחה',
+                    entityName: 'ביצוע',
+                    reloadFn: window.loadExecutionsData,
+                    requiresHardReload: false
+                });
+            }
         }
 
         const executionRecordId = isEdit ? Number(executionId) : Number(crudResult?.data?.id || crudResult?.id);
@@ -4748,33 +4766,44 @@ async function deleteExecution(executionId) {
 
 async function performExecutionDeletion(executionId) {
     try {
-        // Clear cache before deletion to ensure fresh data after reload
-        if (window.unifiedCacheManager) {
-            await window.unifiedCacheManager.clearByPattern('executions-data');
-            await window.unifiedCacheManager.clearByPattern('dashboard-data');
-            await window.unifiedCacheManager.clearByPattern('account-activity-data');
-            await window.unifiedCacheManager.clearByPattern('account-activity-*');
-            await window.unifiedCacheManager.clearByPattern('account-balance-*');
-        }
-        
-        // Send delete request using ExecutionsData service if available
-        let response;
-        if (typeof window.ExecutionsData?.deleteExecution === 'function') {
-            response = await window.ExecutionsData.deleteExecution(executionId);
+        // Use UnifiedCRUDService for consistent CRUD operations
+        if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.deleteEntity === 'function') {
+            await window.UnifiedCRUDService.deleteEntity('execution', executionId, {
+                successMessage: 'ביצוע נמחק בהצלחה',
+                entityName: 'ביצוע',
+                reloadFn: window.loadExecutionsData,
+                requiresHardReload: false
+            });
         } else {
-            // Fallback to direct fetch
-            response = await fetch(`/api/executions/${executionId}`, {
-                method: 'DELETE'
+            // Fallback to direct API call with CRUDResponseHandler
+            // Clear cache before deletion to ensure fresh data after reload
+            if (window.unifiedCacheManager) {
+                await window.unifiedCacheManager.clearByPattern('executions-data');
+                await window.unifiedCacheManager.clearByPattern('dashboard-data');
+                await window.unifiedCacheManager.clearByPattern('account-activity-data');
+                await window.unifiedCacheManager.clearByPattern('account-activity-*');
+                await window.unifiedCacheManager.clearByPattern('account-balance-*');
+            }
+            
+            // Send delete request using ExecutionsData service if available
+            let response;
+            if (typeof window.ExecutionsData?.deleteExecution === 'function') {
+                response = await window.ExecutionsData.deleteExecution(executionId);
+            } else {
+                // Fallback to direct fetch
+                response = await fetch(`/api/executions/${executionId}`, {
+                    method: 'DELETE'
+                });
+            }
+            
+            // Use CRUDResponseHandler for consistent response handling
+            await CRUDResponseHandler.handleDeleteResponse(response, {
+                successMessage: 'ביצוע נמחק בהצלחה',
+                entityName: 'ביצוע',
+                reloadFn: window.loadExecutionsData,
+                requiresHardReload: false
             });
         }
-        
-        // Use CRUDResponseHandler for consistent response handling
-        await CRUDResponseHandler.handleDeleteResponse(response, {
-            successMessage: 'ביצוע נמחק בהצלחה',
-            entityName: 'ביצוע',
-            reloadFn: window.loadExecutionsData,
-            requiresHardReload: false
-        });
         
     } catch (error) {
         CRUDResponseHandler.handleError(error, 'מחיקת ביצוע');

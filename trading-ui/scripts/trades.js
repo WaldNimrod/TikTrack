@@ -945,7 +945,7 @@ async function updateTradesTable(trades) {
     const typeForFilter = trade.investment_type || '';
 
     // שימוש ב-FieldRendererService לרינדור שדות
-    const tickerDisplay = trade.ticker_symbol || getTickerSymbol(trade.ticker_id) || 'טיקר לא ידוע';
+    const tickerDisplay = trade.ticker_symbol || getTickerSymbol(trade.ticker_id) || 'n/a';
 
     return `
     <tr>
@@ -963,7 +963,7 @@ async function updateTradesTable(trades) {
         const tickerData = tickerDataMap[trade.ticker_id];
         const dailyChange = tickerData?.daily_change ?? trade.daily_change;
         if (dailyChange === null || dailyChange === undefined) {
-          return '<span class="numeric-value-zero">לא זמין</span>';
+          return '<span class="numeric-value-zero">n/a</span>';
         }
         
         return window.FieldRendererService ? window.FieldRendererService.renderNumericValue(dailyChange, '%', true) : formatDailyChange(dailyChange);
@@ -975,7 +975,23 @@ async function updateTradesTable(trades) {
           }
           const qty = trade.position.quantity;
           const avgPrice = trade.position.average_price || 0;
-          return window.FieldRendererService ? window.FieldRendererService.renderPosition(qty, avgPrice, '$') : `<span class="numeric-value-positive">${Math.abs(qty).toFixed(0)}</span>`;
+          // Use FieldRendererService.renderPosition for consistent rendering
+          // Format: (quantity#)$amount - quantity with # first, then $amount, no space
+          if (window.FieldRendererService && typeof window.FieldRendererService.renderPosition === 'function') {
+            return window.FieldRendererService.renderPosition(qty, avgPrice, '$');
+          } else {
+            // Fallback if FieldRendererService not available
+            if (avgPrice > 0) {
+              const totalValue = Math.abs(qty) * avgPrice;
+              const formattedValue = totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+              const formattedQty = Math.abs(qty).toLocaleString('en-US', { maximumFractionDigits: 0 });
+              const colorClass = qty > 0 ? 'numeric-value-positive' : 'numeric-value-negative';
+              return `<span class="${colorClass}" dir="ltr" style="white-space: nowrap;">(${formattedQty}#)$${formattedValue}</span>`;
+            } else {
+              const formattedQty = Math.abs(qty).toLocaleString('en-US', { maximumFractionDigits: 0 });
+              return `<span class="numeric-value-positive">${formattedQty}#</span>`;
+            }
+          }
         })()}
       </td>
       <td class="position-pl-percent-cell">
@@ -1006,7 +1022,7 @@ async function updateTradesTable(trades) {
           const qty = trade.position.quantity;
           
           if (currentPrice === 0 || avgPrice === 0) {
-            return '<span class="numeric-value-zero entity-badge-medium">חסר מחיר</span>';
+            return '<span class="numeric-value-zero entity-badge-medium">n/a</span>';
           }
           
           const plValue = (currentPrice - avgPrice) * qty;
@@ -1020,11 +1036,11 @@ async function updateTradesTable(trades) {
       <td class="side-cell" data-side="${trade.side || 'Long'}">
         ${window.FieldRendererService?.renderSide ? window.FieldRendererService.renderSide(trade.side) : '<span class="badge badge-secondary">-</span>'}
       </td>
-      <td>${trade.account_name || trade.trading_account_id || 'חשבון מסחר לא ידוע'}</td>
+      <td>${trade.account_name || trade.trading_account_id || 'n/a'}</td>
       <td data-date="${createdMs || ''}">
         ${(() => {
           if (!createdEnvelope) {
-            return '<span class="date-text">לא מוגדר</span>';
+            return '<span class="date-text">n/a</span>';
           }
           if (window.FieldRendererService?.renderDate) {
             return `<span class="date-text">${window.FieldRendererService.renderDate(createdEnvelope, false)}</span>`;
@@ -1041,7 +1057,7 @@ async function updateTradesTable(trades) {
           } catch (error) {
             window.Logger?.warn('⚠️ trades created_at fallback failed', { error, tradeId: trade?.id }, { page: 'trades' });
           }
-          return '<span class="date-text">לא מוגדר</span>';
+          return '<span class="date-text">n/a</span>';
         })()}
       </td>
       <td data-date="${closedMs || ''}">
@@ -1072,7 +1088,7 @@ async function updateTradesTable(trades) {
         const rawDate = trade.updated_at || trade.closed_at || trade.cancelled_at || trade.created_at || null;
         
         if (!rawDate) {
-          return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+          return `<td class="col-updated"><span class="updated-value-empty">n/a</span></td>`;
         }
 
         // Use FieldRendererService.renderDate for proper date formatting
@@ -1180,24 +1196,45 @@ async function updateTradesTable(trades) {
   }).join('');
 
   tbody.textContent = '';
-  // Render rows directly using createElement + innerHTML (like notes.js and cash_flows.js)
+  // Render rows using DOMParser (more reliable than regex parsing)
   if (tableHTML && tableHTML.trim()) {
-    // Split by </tr> to get individual rows
-    const rowMatches = tableHTML.match(/<tr[^>]*>[\s\S]*?<\/tr>/g);
-    if (rowMatches) {
-      rowMatches.forEach(rowHTML => {
-        const row = document.createElement('tr');
-        // Extract content between <tr> and </tr>
-        const match = rowHTML.match(/<tr[^>]*>(.*?)<\/tr>/s);
-        if (match && match[1]) {
-          row.innerHTML = match[1];
-        } else {
-          // Fallback: try to parse as full row
-          row.innerHTML = rowHTML.replace(/^<tr[^>]*>|<\/tr>$/g, '');
-        }
-        tbody.appendChild(row);
-      });
+    window.Logger?.debug('🔍 Generated tableHTML length:', tableHTML.length, { page: "trades" });
+    try {
+      // Use DOMParser to parse the HTML
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(`<table>${tableHTML}</table>`, 'text/html');
+      const rows = doc.querySelectorAll('tr');
+      
+      if (rows && rows.length > 0) {
+        window.Logger?.debug('✅ Found', rows.length, 'rows to render', { page: "trades" });
+        rows.forEach((row) => {
+          tbody.appendChild(row.cloneNode(true));
+        });
+        window.Logger?.info('✅ Rendered', rows.length, 'rows to tbody', { page: "trades" });
+      } else {
+        window.Logger?.warn('⚠️ No rows found in parsed HTML', { 
+          tableHTMLLength: tableHTML.length,
+          tableHTMLPreview: tableHTML.substring(0, 200),
+          page: "trades" 
+        });
+      }
+    } catch (error) {
+      window.Logger?.error('❌ Error parsing tableHTML:', error, { page: "trades" });
+      // Fallback: try direct innerHTML assignment
+      try {
+        tbody.innerHTML = tableHTML;
+        window.Logger?.info('✅ Used fallback: direct innerHTML assignment', { page: "trades" });
+      } catch (fallbackError) {
+        window.Logger?.error('❌ Fallback also failed:', fallbackError, { page: "trades" });
+      }
     }
+  } else {
+    window.Logger?.warn('⚠️ tableHTML is empty or invalid', { 
+      tableHTMLExists: !!tableHTML,
+      tableHTMLType: typeof tableHTML,
+      tradesLength: trades.length,
+      page: "trades" 
+    });
   }
 
   // עדכון ספירת רשומות - רק בדף תכנון
@@ -1683,7 +1720,18 @@ async function deleteTradeRecord(tradeId) {
  */
 async function performTradeDeletion(tradeId) {
   try {
-    // Send delete request
+    // Use UnifiedCRUDService for consistent CRUD operations
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.deleteEntity === 'function') {
+      await window.UnifiedCRUDService.deleteEntity('trade', tradeId, {
+        successMessage: 'טרייד נמחק בהצלחה',
+        entityName: 'טרייד',
+        reloadFn: window.loadTradesData,
+        requiresHardReload: false
+      });
+      return;
+    }
+    
+    // Fallback to direct API call with CRUDResponseHandler
     // Cache will be invalidated after successful delete via CacheSyncManager
     // No need to clear cache before mutation - CacheSyncManager handles dependencies automatically
     const response = await fetch(`/api/trades/${tradeId}`, {
@@ -4159,7 +4207,7 @@ async function updateTrade(tradeId, tradeData) {
  * מציג חלון אישור לפני מחיקת טרייד
  * @param {number} tradeId - מזהה הטרייד למחיקה
  */
-function confirmDeleteTrade(tradeId) {
+async function confirmDeleteTrade(tradeId) {
   try {
     window.Logger.info('🗑️ מאשר מחיקת טרייד:', tradeId, { page: "trades" });
     
@@ -4656,36 +4704,15 @@ window.saveTrade = async function saveTrade() {
         
         const tradeId = form.dataset.tradeId;
         
-        // Prepare API call
-        const url = isEdit ? `/api/trades/${tradeId}` : '/api/trades';
-        const method = isEdit ? 'PUT' : 'POST';
-        
-        // Cache will be invalidated after successful save via CacheSyncManager in CRUDResponseHandler
-        // No need to clear cache before mutation - CacheSyncManager handles dependencies automatically
-
-        // Send to API
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload)
-        });
-        
-        // Use CRUDResponseHandler for consistent response handling
+        // Use UnifiedCRUDService for consistent CRUD operations
         let crudResult = null;
-        if (isEdit) {
-            crudResult = await CRUDResponseHandler.handleUpdateResponse(response, {
+        if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+            if (isEdit && tradeId) {
+                payload.id = parseInt(tradeId);
+            }
+            crudResult = await window.UnifiedCRUDService.saveEntity('trade', payload, {
                 modalId: 'tradesModal',
-                successMessage: 'טרייד עודכן בהצלחה',
-                entityName: 'טרייד',
-                reloadFn: window.loadTradesData,
-                requiresHardReload: false
-            });
-        } else {
-            crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
-                modalId: 'tradesModal',
-                successMessage: 'טרייד נוסף בהצלחה',
+                successMessage: isEdit ? 'טרייד עודכן בהצלחה' : 'טרייד נוסף בהצלחה',
                 entityName: 'טרייד',
                 reloadFn: window.loadTradesData,
                 requiresHardReload: false
@@ -4695,11 +4722,58 @@ window.saveTrade = async function saveTrade() {
             // Note: This is now handled by ExecutionClusterHelpers.handleTradeCreated
             // which is called from the widget's openTradeModalFromCluster context
             const isFromExecutionCluster = form.dataset.tradeCreationSource === 'execution-cluster';
-            if (isFromExecutionCluster && crudResult && window.ExecutionClusterHelpers?.handleTradeCreated) {
+            if (!isEdit && isFromExecutionCluster && crudResult && window.ExecutionClusterHelpers?.handleTradeCreated) {
                 const clusterId = form.dataset.clusterId;
                 const selectedExecutionIds = form.dataset.selectedExecutionIds?.split(',').map(id => Number(id)).filter(Number.isFinite) || [];
                 if (clusterId && selectedExecutionIds.length > 0) {
                     await window.ExecutionClusterHelpers.handleTradeCreated(crudResult, clusterId, selectedExecutionIds);
+                }
+            }
+        } else {
+            // Fallback to direct API call with CRUDResponseHandler
+            const url = isEdit ? `/api/trades/${tradeId}` : '/api/trades';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            // Cache will be invalidated after successful save via CacheSyncManager in CRUDResponseHandler
+            // No need to clear cache before mutation - CacheSyncManager handles dependencies automatically
+
+            // Send to API
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            // Use CRUDResponseHandler for consistent response handling
+            if (isEdit) {
+                crudResult = await CRUDResponseHandler.handleUpdateResponse(response, {
+                    modalId: 'tradesModal',
+                    successMessage: 'טרייד עודכן בהצלחה',
+                    entityName: 'טרייד',
+                    reloadFn: window.loadTradesData,
+                    requiresHardReload: false
+                });
+            } else {
+                crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
+                    modalId: 'tradesModal',
+                    successMessage: 'טרייד נוסף בהצלחה',
+                    entityName: 'טרייד',
+                    reloadFn: window.loadTradesData,
+                    requiresHardReload: false
+                });
+
+                // רק אם הטרייד נוצר מאשקול ביצועים - קישור אוטומטי של ביצועים לטרייד
+                // Note: This is now handled by ExecutionClusterHelpers.handleTradeCreated
+                // which is called from the widget's openTradeModalFromCluster context
+                const isFromExecutionCluster = form.dataset.tradeCreationSource === 'execution-cluster';
+                if (isFromExecutionCluster && crudResult && window.ExecutionClusterHelpers?.handleTradeCreated) {
+                    const clusterId = form.dataset.clusterId;
+                    const selectedExecutionIds = form.dataset.selectedExecutionIds?.split(',').map(id => Number(id)).filter(Number.isFinite) || [];
+                    if (clusterId && selectedExecutionIds.length > 0) {
+                        await window.ExecutionClusterHelpers.handleTradeCreated(crudResult, clusterId, selectedExecutionIds);
+                    }
                 }
             }
         }

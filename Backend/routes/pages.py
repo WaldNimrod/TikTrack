@@ -135,11 +135,6 @@ def test_header_only() -> Any:
     """Test header only page"""
     return send_from_directory(UI_DIR, "test-header-only.html")
 
-@pages_bp.route('/linter-realtime-monitor')
-def linter_realtime_monitor() -> Any:
-    """Linter realtime monitor page"""
-    return send_from_directory(UI_DIR, "linter-realtime-monitor.html")
-
 @pages_bp.route('/chart-management')
 def chart_management() -> Any:
     """Chart management page"""

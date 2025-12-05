@@ -1,15 +1,16 @@
 # Header Initialization Method - Actual Results
 
-**Generated:** 2025-12-04T17:26:51.763Z
+**Generated:** 2025-12-04T18:24:14.038Z
 
 ## Summary
 
-- **Planned Method:** 0 pages
+- **Planned Method:** 1 pages
 - **Fallback Method:** 0 pages
-- **Unknown:** 41 pages
+- **Unknown:** 38 pages
 
 ## Pages with Planned Method
 
+- `conditions-modals.html`
 
 ## Pages with Unknown Method
 
@@ -22,7 +23,6 @@
 - `cash_flows.html`
 - `chart-management.html`
 - `code-quality-dashboard.html`
-- `conditions-modals.html`
 - `conditions-test.html`
 - `constraints.html`
 - `crud-testing-dashboard.html`
@@ -42,12 +42,10 @@
 - `preferences.html`
 - `research.html`
 - `server-monitor.html`
-- `smart-init-testing.html`
 - `system-management.html`
 - `tag-management.html`
 - `ticker-dashboard.html`
 - `tickers.html`
-- `tooltip-editor.html`
 - `trade_plans.html`
 - `trades.html`
 - `trades_formatted.html`

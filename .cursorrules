@@ -257,3 +257,50 @@ When providing coding assistance:
   - When explicitly requested
 
 **These optimization rules are fundamental and should be applied in ALL future interactions.**
+
+## Selenium Testing Rule - CRITICAL
+**לפני כל סיום תוכנית או בקשת בדיקות ידניות מהמשתמש - חובה להריץ בדיקות Selenium מלאות.**
+
+### Requirements:
+1. **MUST RUN BEFORE COMPLETION**: Before asking user to manually test, ALWAYS run Selenium tests first
+2. **Script Location**: `scripts/test_pages_console_errors.py`
+3. **Installation**: Requires `pip install selenium webdriver-manager` (one-time setup)
+4. **Automatic ChromeDriver**: Uses `webdriver-manager` for automatic ChromeDriver installation
+5. **Full Coverage**: Tests all pages for JavaScript runtime errors, console messages, and system initialization
+
+### When to Run:
+- ✅ **Before completion of any plan** - Run full Selenium test suite
+- ✅ **After major changes** - Core systems, initialization, JavaScript files
+- ✅ **Before production deployment** - Full verification
+- ✅ **After fixing bugs** - Verify fixes don't break other pages
+
+### What It Tests:
+- JavaScript runtime errors (not visible in HTML)
+- Console errors and warnings
+- System initialization (Header, Core Systems, Preferences)
+- Page load times
+- Critical errors (Maximum call stack, Uncaught errors, SyntaxError)
+
+### Output:
+- **JSON Report**: `console_errors_report.json` - Full detailed results
+- **Console Summary**: Summary of all pages with error counts
+- **Filtered Results**: Automatically filters non-critical errors (401 auth, optional resources)
+
+### Documentation:
+- **Guide**: `documentation/03-DEVELOPMENT/TESTING/SELENIUM_TESTING_GUIDE.md`
+- **Script**: `scripts/test_pages_console_errors.py`
+
+### Example Workflow:
+```bash
+# 1. Run Selenium tests
+python3 scripts/test_pages_console_errors.py
+
+# 2. Review results
+# - Check console_errors_report.json
+# - Fix critical errors
+# - Re-run if needed
+
+# 3. Only then ask user for manual testing (if needed)
+```
+
+**This is a fundamental rule that ALL future chats must follow.**

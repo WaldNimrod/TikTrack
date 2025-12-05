@@ -131,11 +131,24 @@
             const config = overlayData.config;
 
             // Calculate z-index using ModalZIndexManager if available
+            // Progress overlay should ALWAYS be above modals
             let overlayZIndex = config.zIndex || this.defaultConfig.zIndex;
             if (window.ModalZIndexManager) {
                 const stack = window.ModalNavigationService?.getStack?.() || [];
                 const stackDepth = stack.length;
-                overlayZIndex = window.ModalZIndexManager.BASE_Z_INDEX + (stackDepth * window.ModalZIndexManager.Z_INDEX_INCREMENT) + 100;
+                // Progress overlay should be above all modals
+                // BASE_Z_INDEX (1040) + (max stack depth * 10) + 200 for progress overlay (higher than modals)
+                overlayZIndex = window.ModalZIndexManager.BASE_Z_INDEX + (stackDepth * window.ModalZIndexManager.Z_INDEX_INCREMENT) + 200;
+                
+                if (window.Logger) {
+                    window.Logger.debug('Progress overlay z-index calculated', {
+                        page: 'unified-progress-manager',
+                        stackDepth,
+                        baseZIndex: window.ModalZIndexManager.BASE_Z_INDEX,
+                        increment: window.ModalZIndexManager.Z_INDEX_INCREMENT,
+                        calculatedZIndex: overlayZIndex
+                    });
+                }
             }
             overlay.style.zIndex = overlayZIndex;
 

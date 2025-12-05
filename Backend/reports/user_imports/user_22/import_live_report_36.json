@@ -1,0 +1,42 @@
+{
+  "session_info": {
+    "session_id": 36,
+    "user_id": 22,
+    "created_at": {
+      "utc": "2025-12-04T17:44:13.729309Z",
+      "epochMs": 1764870253729,
+      "local": "2025-12-04T17:44:13.729309+00:00",
+      "timezone": "UTC",
+      "display": "04.12.2025 17:44"
+    },
+    "report_version": "1.0"
+  },
+  "steps": {
+    "file_upload": {
+      "timestamp": {
+        "utc": "2025-12-04T17:44:13.729347Z",
+        "epochMs": 1764870253729,
+        "local": "2025-12-04T17:44:13.729347+00:00",
+        "timezone": "UTC",
+        "display": "04.12.2025 17:44"
+      },
+      "data": {
+        "file_name": "ibkr_sample.csv",
+        "provider": "IBKR",
+        "connector_info": {
+          "provider_name": "IBKR",
+          "source_value": "ibkr_import",
+          "class_name": "IBKRConnector",
+          "supports_external_id": true,
+          "supports_validation": true
+        },
+        "task_type": "executions"
+      }
+    }
+  },
+  "summary": {
+    "current_step": "file_upload",
+    "total_steps": 6,
+    "progress_percentage": 16.666666666666664
+  }
+}

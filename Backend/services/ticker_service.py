@@ -500,53 +500,111 @@ class TickerService:
                 # Ticker doesn't exist - create it if user_id is provided
                 if raw_symbol is not None and user_id:
                     try:
-                        # Get currency from record or default to USD
-                        currency_code = record.get('currency', 'USD')
-                        currency = db.query(Currency).filter(Currency.symbol == currency_code).first()
+                        # Double-check if ticker exists (might have been created by another process)
+                        existing_ticker = db.query(Ticker).filter(Ticker.symbol == normalized).first()
                         
-                        if not currency:
-                            logger.warning(f"⚠️ Currency {currency_code} not found, using USD")
-                            currency = db.query(Currency).filter(Currency.symbol == 'USD').first()
-                        
-                        if currency:
-                            # Create new ticker
-                            ticker_data = {
-                                'symbol': normalized,
-                                'name': normalized,  # Default name to symbol
-                                'type': record.get('type', 'stock'),
-                                'currency_id': currency.id,
-                                'status': 'open'
-                            }
+                        if existing_ticker:
+                            # Ticker exists - just create user_ticker association
+                            ticker_id = existing_ticker.id
+                            user_ticker = db.query(UserTicker).filter(
+                                UserTicker.user_id == user_id,
+                                UserTicker.ticker_id == ticker_id
+                            ).first()
                             
-                            new_ticker = TickerService.create(db, ticker_data)
-                            db.flush()  # Flush to get ID
+                            if not user_ticker:
+                                try:
+                                    new_user_ticker = UserTicker(
+                                        user_id=user_id,
+                                        ticker_id=ticker_id,
+                                        status='open',
+                                        created_at=datetime.now(timezone.utc)
+                                    )
+                                    db.add(new_user_ticker)
+                                    db.flush()
+                                    logger.info(f"✅ Created user_ticker association for existing ticker: symbol={normalized}, ticker_id={ticker_id}, user_id={user_id}")
+                                except Exception as e:
+                                    logger.warning(f"⚠️ Failed to create user_ticker association: {e}")
                             
-                            # Create user_ticker association
-                            try:
-                                new_user_ticker = UserTicker(
-                                    user_id=user_id,
-                                    ticker_id=new_ticker.id,
-                                    status='open',
-                                    created_at=datetime.now(timezone.utc)
-                                )
-                                db.add(new_user_ticker)
-                                db.flush()
+                            enriched_record['ticker_id'] = ticker_id
+                            enriched_record['symbol'] = normalized
+                            enriched_records.append(enriched_record)
+                        else:
+                            # Ticker doesn't exist - create it
+                            # Get currency from record or default to USD
+                            currency_code = record.get('currency', 'USD')
+                            currency = db.query(Currency).filter(Currency.symbol == currency_code).first()
+                            
+                            if not currency:
+                                logger.warning(f"⚠️ Currency {currency_code} not found, using USD")
+                                currency = db.query(Currency).filter(Currency.symbol == 'USD').first()
+                            
+                            if currency:
+                                # Create new ticker
+                                ticker_data = {
+                                    'symbol': normalized,
+                                    'name': normalized,  # Default name to symbol
+                                    'type': record.get('type', 'stock'),
+                                    'currency_id': currency.id,
+                                    'status': 'open'
+                                }
                                 
-                                enriched_record['ticker_id'] = new_ticker.id
+                                new_ticker = TickerService.create(db, ticker_data)
+                                db.flush()  # Flush to get ID
+                                
+                                # Create user_ticker association
+                                try:
+                                    new_user_ticker = UserTicker(
+                                        user_id=user_id,
+                                        ticker_id=new_ticker.id,
+                                        status='open',
+                                        created_at=datetime.now(timezone.utc)
+                                    )
+                                    db.add(new_user_ticker)
+                                    db.flush()
+                                    
+                                    enriched_record['ticker_id'] = new_ticker.id
+                                    enriched_record['symbol'] = normalized
+                                    enriched_records.append(enriched_record)
+                                    logger.info(f"✅ Created ticker and user_ticker: symbol={normalized}, ticker_id={new_ticker.id}, user_id={user_id}")
+                                except Exception as e:
+                                    logger.error(f"❌ Failed to create user_ticker after creating ticker: {e}")
+                                    # Rollback ticker creation
+                                    db.delete(new_ticker)
+                                    db.flush()
+                                    missing_symbols.append(raw_symbol)
+                            else:
+                                missing_symbols.append(raw_symbol)
+                    except Exception as e:
+                        logger.error(f"❌ Failed to create ticker for symbol {raw_symbol}: {e}")
+                        # Check if ticker was created by another process
+                        existing_ticker = db.query(Ticker).filter(Ticker.symbol == normalized).first()
+                        if existing_ticker:
+                            # Ticker exists - try to create user_ticker association
+                            try:
+                                user_ticker = db.query(UserTicker).filter(
+                                    UserTicker.user_id == user_id,
+                                    UserTicker.ticker_id == existing_ticker.id
+                                ).first()
+                                
+                                if not user_ticker:
+                                    new_user_ticker = UserTicker(
+                                        user_id=user_id,
+                                        ticker_id=existing_ticker.id,
+                                        status='open',
+                                        created_at=datetime.now(timezone.utc)
+                                    )
+                                    db.add(new_user_ticker)
+                                    db.flush()
+                                
+                                enriched_record['ticker_id'] = existing_ticker.id
                                 enriched_record['symbol'] = normalized
                                 enriched_records.append(enriched_record)
-                                logger.info(f"✅ Created ticker and user_ticker: symbol={normalized}, ticker_id={new_ticker.id}, user_id={user_id}")
-                            except Exception as e:
-                                logger.error(f"❌ Failed to create user_ticker after creating ticker: {e}")
-                                # Rollback ticker creation
-                                db.delete(new_ticker)
-                                db.flush()
+                                logger.info(f"✅ Recovered from error - using existing ticker: symbol={normalized}, ticker_id={existing_ticker.id}, user_id={user_id}")
+                            except Exception as e2:
+                                logger.error(f"❌ Failed to recover from error: {e2}")
                                 missing_symbols.append(raw_symbol)
                         else:
                             missing_symbols.append(raw_symbol)
-                    except Exception as e:
-                        logger.error(f"❌ Failed to create ticker for symbol {raw_symbol}: {e}")
-                        missing_symbols.append(raw_symbol)
                 else:
                     if raw_symbol is not None:
                         missing_symbols.append(raw_symbol)
@@ -1241,6 +1299,7 @@ class TickerService:
         """
         Get all tickers for a specific user (through user_tickers junction table)
         Includes custom fields (name_custom, type_custom, status) from user_tickers
+        AND market data (current_price, change_percent, etc.) from MarketDataQuote
         
         Optimized to avoid N+1 queries by loading associations in a single query.
         
@@ -1249,7 +1308,7 @@ class TickerService:
             user_id: User ID
             
         Returns:
-            List[Ticker]: List of tickers for the user with custom fields attached
+            List[Ticker]: List of tickers for the user with custom fields and market data attached
         """
         from models.user_ticker import UserTicker
         from sqlalchemy.orm import joinedload
@@ -1261,7 +1320,7 @@ class TickerService:
             joinedload(UserTicker.ticker)
         ).all()
         
-        # Extract tickers and attach custom fields
+        # Extract tickers and attach custom fields + market data
         tickers = []
         for user_ticker in user_tickers:
             if user_ticker.ticker:
@@ -1270,6 +1329,43 @@ class TickerService:
                 ticker.name_custom = user_ticker.name_custom
                 ticker.type_custom = user_ticker.type_custom
                 ticker.user_ticker_status = user_ticker.status
+                
+                # Add market data from MarketDataQuote (same logic as get_all)
+                try:
+                    latest_quote = db.query(MarketDataQuote).filter(
+                        MarketDataQuote.ticker_id == ticker.id
+                    ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                    
+                    if latest_quote:
+                        # Add market data fields to ticker object
+                        ticker.current_price = latest_quote.price
+                        ticker.change_percent = latest_quote.change_pct_day
+                        ticker.change_amount = latest_quote.change_amount_day
+                        ticker.volume = latest_quote.volume
+                        ticker.yahoo_updated_at = latest_quote.fetched_at
+                        ticker.data_source = latest_quote.source
+                        # Open price data
+                        ticker.open_price = latest_quote.open_price
+                        ticker.change_from_open = latest_quote.change_amount_from_open
+                        ticker.change_from_open_percent = latest_quote.change_pct_from_open
+                        logger.debug(f"Added market data to {ticker.symbol}: price={latest_quote.price}, change_from_open={latest_quote.change_pct_from_open}%")
+                    else:
+                        logger.debug(f"No market data found for {ticker.symbol}")
+                except DatabaseError as db_error:
+                    logger.error(
+                        "Failed to load market data quote for ticker %s due to database error: %s",
+                        getattr(ticker, "symbol", ticker.id),
+                        db_error
+                    )
+                    # Important: rollback the failing transaction so the session remains usable
+                    db.rollback()
+                except Exception as unexpected_error:
+                    logger.warning(
+                        "Unexpected error while loading market data for ticker %s: %s",
+                        getattr(ticker, "symbol", ticker.id),
+                        unexpected_error
+                    )
+                
                 tickers.append(ticker)
         
         return tickers

@@ -5,7 +5,7 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 11
+ * Total Functions: 12
  * 
  * DATA LOADING (3)
  * - loadTemplates() - Load AI analysis templates from API with cache support
@@ -454,8 +454,22 @@
       window.Logger?.error?.('❌ Error generating analysis', {
         ...PAGE_LOG_CONTEXT,
         error: error?.message || error,
+        errorCode: error?.errorCode,
+        errorAction: error?.errorAction,
       });
-      window.showErrorNotification?.('שגיאה', error.message || 'שגיאה ביצירת ניתוח');
+      
+      // Show user-friendly error message
+      const errorMessage = error?.message || 'שגיאה ביצירת ניתוח';
+      if (window.NotificationSystem) {
+        window.NotificationSystem.showError(
+          `❌ הניתוח נכשל: ${errorMessage}`,
+          'system',
+          { duration: 8000 }
+        );
+      } else {
+        window.showErrorNotification?.('שגיאה', errorMessage);
+      }
+      
       throw error;
     }
   }
@@ -833,6 +847,86 @@
   }
 
   /**
+   * Delete specific AI analysis by ID
+   * @param {number} analysisId - Analysis ID to delete
+   * @returns {Promise<boolean>} - True if deleted successfully, false otherwise
+   */
+  async function deleteAnalysis(analysisId) {
+    if (!analysisId) {
+      throw new Error('Analysis ID is required');
+    }
+
+    try {
+      const url = buildUrl(`/api/ai-analysis/history/${analysisId}`);
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || errorData.error?.message || `Failed to delete analysis: ${response.status} ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+      
+      if (result.status === 'success') {
+        // Clear cache for this specific analysis
+        if (window.UnifiedCacheManager) {
+          try {
+            const cacheKey = `ai-analysis-response-${analysisId}`;
+            await window.UnifiedCacheManager.delete(cacheKey);
+            window.Logger?.debug?.('✅ Cleared cache for deleted analysis', {
+              ...PAGE_LOG_CONTEXT,
+              analysisId,
+              cacheKey
+            });
+          } catch (cacheError) {
+            window.Logger?.warn?.('⚠️ Error clearing cache for deleted analysis', {
+              ...PAGE_LOG_CONTEXT,
+              analysisId,
+              error: cacheError?.message || cacheError
+            });
+          }
+        }
+
+        // Invalidate history cache to refresh the list
+        if (window.UnifiedCacheManager) {
+          try {
+            await window.UnifiedCacheManager.delete(HISTORY_CACHE_KEY);
+            window.Logger?.debug?.('✅ Cleared history cache after deletion', PAGE_LOG_CONTEXT);
+          } catch (cacheError) {
+            window.Logger?.warn?.('⚠️ Error clearing history cache', {
+              ...PAGE_LOG_CONTEXT,
+              error: cacheError?.message || cacheError
+            });
+          }
+        }
+
+        window.Logger?.info?.('✅ Analysis deleted successfully', {
+          ...PAGE_LOG_CONTEXT,
+          analysisId
+        });
+
+        return true;
+      } else {
+        throw new Error(result.message || 'Failed to delete analysis');
+      }
+    } catch (error) {
+      window.Logger?.error?.('❌ Error deleting analysis', {
+        ...PAGE_LOG_CONTEXT,
+        analysisId,
+        error: error?.message || error,
+      });
+      throw error;
+    }
+  }
+
+  /**
    * Delete all AI analysis records
    * @returns {Promise<Object>} - Result with deleted_count
    */
@@ -916,6 +1010,7 @@
     exportToHTML,
     validateAnalysisRequest,
     validateVariables,
+    deleteAnalysis,
     deleteAllAnalyses,
   };
 

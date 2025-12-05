@@ -25,6 +25,7 @@ from services.advanced_cache_service import cache_for, invalidate_cache
 from services.tag_service import TagService
 from services.date_normalization_service import DateNormalizationService
 from services.preferences_service import PreferencesService
+from services.user_service import UserService
 import logging
 from typing import Dict, Any, Optional
 
@@ -42,6 +43,24 @@ base_api = BaseEntityAPI('tickers', TickerService, 'tickers')
 
 # Initialize preferences service for date normalization
 preferences_service = PreferencesService()
+user_service = UserService()
+
+def _resolve_user_id() -> int:
+    """Return active user id from Flask context (set by auth middleware).
+    Falls back to default user if not authenticated (for backward compatibility)."""
+    # Primary: Get from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    if user_id is not None:
+        return user_id
+    
+    # Fallback: Check query parameter
+    user_id = request.args.get('user_id', type=int)
+    if user_id is not None:
+        return user_id
+    
+    # Fallback: Default user (for backward compatibility and tools)
+    default_user = user_service.get_default_user()
+    return default_user["id"] if default_user else 1
 
 def _get_tickers_normalizer() -> DateNormalizationService:
     """Resolve timezone and create a DateNormalizationService for tickers endpoints."""
@@ -58,19 +77,16 @@ def _get_tickers_normalizer() -> DateNormalizationService:
 @tickers_bp.route('/', methods=['GET'])
 @handle_database_session()
 def get_tickers():
-    """Get tickers for the current user - enhanced with market data"""
+    """Get all tickers or tickers for a specific user if user_id is provided"""
     db: Session = g.db
     user_id = getattr(g, 'user_id', None) or request.args.get('user_id', type=int)
     
-    if not user_id:
-        return jsonify({
-            "status": "error",
-            "error": {"message": "User ID required"},
-            "version": "1.0"
-        }), 400
-    
     try:
-        tickers = TickerService.get_user_tickers(db, user_id)
+        if user_id:
+            tickers = TickerService.get_user_tickers(db, user_id)
+        else:
+            # If no user_id, fetch all tickers (e.g., shared/public tickers)
+            tickers = TickerService.get_all(db)
         
         # Convert tickers to dict with market data
         tickers_data = []
@@ -125,9 +141,9 @@ def get_tickers():
         return jsonify({
             "status": "success",
             "data": tickers_data,
-            "message": "Tickers retrieved successfully",
+            "count": len(tickers_data),
             "version": "1.0"
-        })
+        }), 200
     except Exception as e:
         import traceback
         error_trace = traceback.format_exc()
@@ -212,6 +228,119 @@ def get_my_tickers():
         return jsonify({
             "status": "error",
             "error": {"message": f"Failed to retrieve user tickers: {str(e)}"},
+            "version": "1.0"
+        }), 500
+
+@tickers_bp.route('/with-initial-data', methods=['GET'])
+@handle_database_session()
+@api_endpoint(cache_ttl=300, rate_limit=60)
+def get_tickers_with_initial_data():
+    """Get user tickers that have initial market data (latest_quote) - optimized for widgets"""
+    db: Session = g.db
+    user_id = _resolve_user_id()
+    
+    try:
+        from models.user_ticker import UserTicker
+        from models.external_data import MarketDataQuote
+        from models.ticker import Ticker
+        from sqlalchemy import func, and_
+        from sqlalchemy.orm import joinedload
+        
+        # Get user tickers with latest_quote efficiently using subquery
+        # First, get all ticker_ids that have market data
+        ticker_ids_with_data = db.query(MarketDataQuote.ticker_id).distinct().subquery()
+        
+        # Get user tickers that have market data in a single optimized query
+        tickers_with_data = db.query(Ticker).join(
+            UserTicker, Ticker.id == UserTicker.ticker_id
+        ).join(
+            ticker_ids_with_data, Ticker.id == ticker_ids_with_data.c.ticker_id
+        ).filter(
+            UserTicker.user_id == user_id,
+            UserTicker.status == 'open'
+        ).options(
+            joinedload(Ticker.user_tickers)
+        ).all()
+        
+        if not tickers_with_data:
+            return jsonify({
+                "status": "success",
+                "data": [],
+                "message": "No tickers with initial data found",
+                "version": "1.0"
+            })
+        
+        # Get latest quotes for all tickers in a single query (batch)
+        ticker_ids = [t.id for t in tickers_with_data]
+        
+        # Use window function or subquery to get latest quote per ticker efficiently
+        from sqlalchemy import desc
+        
+        # Get latest quote for each ticker using a more efficient approach
+        latest_quotes_subq = db.query(
+            MarketDataQuote.ticker_id,
+            func.max(MarketDataQuote.fetched_at).label('max_fetched_at')
+        ).filter(
+            MarketDataQuote.ticker_id.in_(ticker_ids)
+        ).group_by(MarketDataQuote.ticker_id).subquery()
+        
+        latest_quotes = db.query(MarketDataQuote).join(
+            latest_quotes_subq,
+            and_(
+                MarketDataQuote.ticker_id == latest_quotes_subq.c.ticker_id,
+                MarketDataQuote.fetched_at == latest_quotes_subq.c.max_fetched_at
+            )
+        ).all()
+        
+        # Create a map of ticker_id -> latest_quote for quick lookup
+        quotes_map = {q.ticker_id: q for q in latest_quotes}
+        
+        # Build response with market data
+        result = []
+        for ticker in tickers_with_data:
+            quote = quotes_map.get(ticker.id)
+            if quote:
+                # Get custom fields from user_ticker association
+                name_custom = None
+                type_custom = None
+                if hasattr(ticker, 'user_tickers') and ticker.user_tickers:
+                    for ut in ticker.user_tickers:
+                        if ut.user_id == user_id:
+                            name_custom = ut.name_custom
+                            type_custom = ut.type_custom
+                            break
+                
+                result.append({
+                    'id': ticker.id,
+                    'symbol': ticker.symbol,
+                    'name': ticker.name,
+                    'name_custom': name_custom,
+                    'type_custom': type_custom,
+                    'current_price': float(quote.price) if quote.price else None,
+                    'change_percent': float(quote.change_pct_day) if quote.change_pct_day is not None else None,
+                    'change_amount': float(quote.change_amount_day) if quote.change_amount_day is not None else None,
+                    'volume': int(quote.volume) if quote.volume else None,
+                    'has_data': True,
+                    'fetched_at': quote.fetched_at.isoformat() if quote.fetched_at else None,
+                    'asof_utc': quote.asof_utc.isoformat() if quote.asof_utc else None
+                })
+        
+        # Sort by symbol for consistent ordering
+        result.sort(key=lambda x: x['symbol'] or '')
+        
+        return jsonify({
+            "status": "success",
+            "data": result,
+            "message": f"Found {len(result)} tickers with initial data",
+            "version": "1.0"
+        })
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error getting tickers with initial data: {str(e)}\nTraceback:\n{error_trace}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to retrieve tickers with initial data: {str(e)}"},
             "version": "1.0"
         }), 500
 

@@ -1,0 +1,268 @@
+{
+  "timestamp": "2025-12-05T20:42:53.329456",
+  "base_url": "http://localhost:8080",
+  "api_tests": [
+    {
+      "endpoint": "מצב מערכת",
+      "url": "/api/external-data/status",
+      "method": "GET",
+      "category": "status",
+      "success": true,
+      "status_code": 200,
+      "response_time": 0.1311337947845459,
+      "error": null,
+      "data_keys": [
+        "cache",
+        "overall_health",
+        "providers",
+        "recent_activity",
+        "service",
+        "status",
+        "success",
+        "timestamp",
+        "version"
+      ],
+      "timestamp": "2025-12-05T20:42:53.329460"
+    },
+    {
+      "endpoint": "ניטור Scheduler",
+      "url": "/api/external-data/status/scheduler/monitoring",
+      "method": "GET",
+      "category": "scheduler",
+      "success": true,
+      "status_code": 200,
+      "response_time": 0.03082585334777832,
+      "error": null,
+      "data_keys": [
+        "data",
+        "status",
+        "timestamp",
+        "version"
+      ],
+      "timestamp": "2025-12-05T20:42:53.460712"
+    },
+    {
+      "endpoint": "טיקרים עם נתונים חסרים",
+      "url": "/api/external-data/status/tickers/missing-data",
+      "method": "GET",
+      "category": "status",
+      "success": true,
+      "status_code": 200,
+      "response_time": 0.2671830654144287,
+      "error": null,
+      "data_keys": [
+        "data",
+        "status",
+        "timestamp",
+        "version"
+      ],
+      "timestamp": "2025-12-05T20:42:53.491643"
+    },
+    {
+      "endpoint": "היסטוריית רענונים",
+      "url": "/api/external-data/status/group-refresh-history",
+      "method": "GET",
+      "category": "scheduler",
+      "success": true,
+      "status_code": 200,
+      "response_time": 0.02266073226928711,
+      "error": null,
+      "data_keys": [
+        "group_refresh_history",
+        "source",
+        "success",
+        "timestamp",
+        "total_entries",
+        "version"
+      ],
+      "timestamp": "2025-12-05T20:42:53.759191"
+    }
+  ],
+  "ui_tests": [
+    {
+      "page": "דשבורד נתונים חיצוניים",
+      "url": "/external-data-dashboard.html",
+      "category": "external_data",
+      "priority": "high",
+      "success": true,
+      "load_time": 2.103508949279785,
+      "console_errors": [],
+      "console_warnings": [
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\""
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/charts/chart-system.js?v=1.0.0 56:24 \"⚠️ ChartLoader not available\""
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:42:58 PM] WARN: [ConditionsModalController] Modal element not found\" Object"
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\""
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:42:58 PM] WARN: [ConditionsModalController] Modal element not found\" Object"
+        }
+      ],
+      "ui_elements": {
+        "scheduler_section": false,
+        "scheduler_monitoring_section": false,
+        "missing_data_section": false,
+        "ticker_load_section": false,
+        "refresh_full_button": false,
+        "actions_section": false,
+        "scheduler_status_content": false,
+        "scheduler_monitoring_content": false,
+        "total_buttons": 10,
+        "refresh_status_button": false,
+        "refresh_providers_button": false
+      },
+      "buttons_working": [],
+      "buttons_broken": [],
+      "api_calls": [],
+      "timestamp": "2025-12-05T20:42:56.510912"
+    },
+    {
+      "page": "דשבורד טיקר",
+      "url": "/ticker-dashboard.html",
+      "category": "external_data",
+      "priority": "high",
+      "success": true,
+      "load_time": 0.9123108386993408,
+      "console_errors": [],
+      "console_warnings": [
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\""
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\""
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:43:02 PM] WARN: [ConditionsModalController] Modal element not found\" Object"
+        }
+      ],
+      "ui_elements": {
+        "current_price": false,
+        "technical_indicators": false,
+        "chart": false
+      },
+      "buttons_working": [],
+      "buttons_broken": [],
+      "api_calls": [],
+      "timestamp": "2025-12-05T20:43:01.677124"
+    },
+    {
+      "page": "ניהול מערכת - נתונים חיצוניים",
+      "url": "/system-management.html",
+      "category": "external_data",
+      "priority": "medium",
+      "success": true,
+      "load_time": 0.5144720077514648,
+      "console_errors": [],
+      "console_warnings": [
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\""
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/auth-guard.js?v=1.0.0 76:12 \"Auth guard: checkAuthentication function not found. Loading auth.js...\""
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:43:06 PM] WARN: [ConditionsModalController] Modal element not found\" Object"
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\""
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:43:06 PM] WARN: [ConditionsModalController] Modal element not found\" Object"
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o"
+        }
+      ],
+      "ui_elements": {},
+      "buttons_working": [],
+      "buttons_broken": [],
+      "api_calls": [],
+      "timestamp": "2025-12-05T20:43:05.602973"
+    }
+  ],
+  "process_tests": [
+    {
+      "test_name": "תהליך טעינת נתונים מלאה",
+      "success": false,
+      "steps": [
+        {
+          "step": "1. טעינת עמוד ניהול",
+          "success": true
+        },
+        {
+          "step": "2. בדיקת תצוגת מצב Scheduler",
+          "success": false,
+          "scheduler_section_found": false,
+          "scheduler_content_found": false,
+          "scheduler_monitoring_found": false,
+          "scheduler_any_found": false,
+          "has_dashboard": false
+        },
+        {
+          "step": "3. בדיקת תצוגת טיקרים עם נתונים חסרים",
+          "success": true,
+          "elements_found": 0,
+          "api_works": true
+        },
+        {
+          "step": "4. קריאת API לזיהוי טיקרים עם נתונים חסרים",
+          "success": true,
+          "status_code": 200
+        }
+      ],
+      "errors": [],
+      "timestamp": "2025-12-05T20:43:09.131600"
+    },
+    {
+      "test_name": "בדיקת בקרות Scheduler",
+      "success": false,
+      "steps": [
+        {
+          "step": "1. בדיקת תצוגת Scheduler וניטור",
+          "success": false,
+          "scheduler_section_found": false,
+          "scheduler_monitoring_found": false,
+          "scheduler_status_content_found": false,
+          "scheduler_monitoring_content_found": false,
+          "scheduler_any_found": false,
+          "action_buttons_found": 0
+        },
+        {
+          "step": "2. בדיקת API להפעלת Scheduler",
+          "success": true,
+          "status_code": 200
+        }
+      ],
+      "errors": [],
+      "timestamp": "2025-12-05T20:43:18.587443"
+    }
+  ],
+  "summary": {
+    "api_successful": 4,
+    "api_total": 4,
+    "ui_successful": 3,
+    "ui_total": 3,
+    "process_successful": 0,
+    "process_total": 2
+  }
+}

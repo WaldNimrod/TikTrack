@@ -69,9 +69,17 @@ class EntityDetailsAPI {
             // הוספה לאובייקט הגלובלי
             window.entityDetailsAPI = this;
             
-            window.Logger.info('EntityDetailsAPI initialized successfully', { page: "entity-details-api" });
+            if (window.Logger && typeof window.Logger.info === 'function') {
+                window.Logger.info('EntityDetailsAPI initialized successfully', { page: "entity-details-api" });
+            } else if (window.DEBUG_MODE) {
+                console.log('EntityDetailsAPI initialized successfully');
+            }
         } catch (error) {
-            window.Logger.error('Error initializing EntityDetailsAPI:', error, { page: "entity-details-api" });
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('Error initializing EntityDetailsAPI:', error, { page: "entity-details-api" });
+            } else if (window.DEBUG_MODE) {
+                console.error('Error initializing EntityDetailsAPI:', error);
+            }
         }
     }
 

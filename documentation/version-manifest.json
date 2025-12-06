@@ -10,13 +10,13 @@
     "notes": "Final sm-section-server fix"
   },
   "development": {
-    "version": "1.3.91.0",
+    "version": "1.3.92.0",
     "major": 1,
     "minor": 3,
-    "patch": 91,
+    "patch": 92,
     "build": 0,
-    "commit": "815776016857f0342073693c066a92cadeeafd7b",
-    "updated_at": "2025-12-06T23:23:27+00:00",
-    "notes": "Complete bundles environment-aware setup and development environment fixes"
+    "commit": "b703d5d01f7467fb911a0cfdd6efe0d81d847b50",
+    "updated_at": "2025-12-06T23:23:45+00:00",
+    "notes": "Add backup file patterns to .gitignore"
   }
 }

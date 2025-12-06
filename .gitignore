@@ -90,3 +90,8 @@ __pycache__/
 
 # Temporary test files
 /tmp/test_*_results.txt
+
+# HTML backup files
+*.html.backup*
+*.html.backup-*
+*.backup-*

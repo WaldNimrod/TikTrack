@@ -1499,6 +1499,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'entity-services',
         'entity-details',
         'info-summary',
+        'helper', // Required for notes.js (loadNotesData)
         'init-system',
       ],
       // ← NEW: בדיקות תקינות
@@ -1530,6 +1531,15 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         async pageConfig => {
           console.log('📝 [page-initialization-configs] Notes customInitializer started');
 
+          // Wait for loadNotesData to be available (for bundle support)
+          let waitCount = 0;
+          const maxWait = 50; // 5 seconds max (50 * 100ms)
+          
+          while (typeof window.loadNotesData !== 'function' && waitCount < maxWait) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            waitCount++;
+          }
+
           // Use direct function call for notes page
           if (typeof window.loadNotesData === 'function') {
             window.Logger.info('📝 [page-initialization-configs] Initializing Notes via loadNotesData...', { page: 'page-initialization-configs' });
@@ -1537,11 +1547,12 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
               await window.loadNotesData();
               window.Logger.info('✅ [page-initialization-configs] Notes data loaded successfully', { page: 'page-initialization-configs' });
             } catch (error) {
-              window.Logger.error('❌ [page-initialization-configs] Error in loadNotesData', { error: error?.message, stack: error?.stack, page: 'page-initialization-configs' });
+              window.Logger.warn('⚠️ [page-initialization-configs] Error in loadNotesData (will continue without notes)', { error: error?.message, stack: error?.stack, page: 'page-initialization-configs' });
             }
           } else {
-            window.Logger.error('❌ [page-initialization-configs] loadNotesData function not available', { 
+            window.Logger.warn('⚠️ [page-initialization-configs] loadNotesData function not available (may load later or page may work without it)', { 
               loadNotesDataType: typeof window.loadNotesData,
+              waitTime: waitCount * 100,
               page: 'page-initialization-configs' 
             });
           }

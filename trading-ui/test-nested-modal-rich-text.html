@@ -77,8 +77,9 @@
                 <div class="modal-body">
                     <form id="notesModalForm">
                         <div class="mb-3">
-                            <label for="noteContent" class="form-label">תוכן הערה</label>
-                            <div id="noteContent" style="min-height: 200px;"></div>
+                            <label for="noteContentTextarea" class="form-label">תוכן הערה</label>
+                            <div id="noteContent" style="min-height: 200px;" role="textbox" aria-labelledby="noteContentLabel"></div>
+                            <textarea id="noteContentTextarea" class="visually-hidden" aria-hidden="true"></textarea>
                         </div>
                         <button type="button" class="btn btn-primary" onclick="saveNote()">שמור</button>
                     </form>

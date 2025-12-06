@@ -118,10 +118,27 @@ function generateScriptLoadingCode(pageName, mode = 'development', useBundles = 
       html += scriptTag;
       scriptCounter++;
       
-      // Mark all scripts in this package as loaded
+      // Mark local scripts as loaded, but external scripts (CDN) need to be loaded separately
       sortedScripts.forEach(script => {
         if (!(script.file.startsWith('http://') || script.file.startsWith('https://'))) {
           loadedScripts.add(script.file);
+        }
+      });
+      
+      // Load external scripts (CDN) separately - they're not bundled
+      sortedScripts.forEach((script) => {
+        if (script.file.startsWith('http://') || script.file.startsWith('https://')) {
+          const scriptLoadingStrategy = pkg.loadingStrategy || 'defer';
+          html += `    <!-- [${scriptCounter}] External Script: ${script.file} | Strategy: ${scriptLoadingStrategy} -->\n`;
+          
+          let externalScriptTag;
+          if (scriptLoadingStrategy === 'sync') {
+            externalScriptTag = `    <script src="${script.file}"></script> <!-- ${script.description} -->\n`;
+          } else {
+            externalScriptTag = `    <script src="${script.file}" ${scriptLoadingStrategy}></script> <!-- ${script.description} -->\n`;
+          }
+          html += externalScriptTag;
+          scriptCounter++;
         }
       });
     } else {

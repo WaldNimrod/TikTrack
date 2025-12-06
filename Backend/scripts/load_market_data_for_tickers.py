@@ -187,7 +187,21 @@ class MarketDataLoader:
                 
                 if quote:
                     self.stats['loaded'] += 1
-                    print(f"      ✅ {symbol}: נטען")
+                    print(f"      ✅ {symbol}: quote נוכחי נטען")
+                    
+                    # Load historical data (150 days for MA 150 calculation)
+                    try:
+                        historical_count = self.yahoo_adapter.fetch_and_save_historical_quotes(
+                            ticker, 
+                            days_back=150
+                        )
+                        if historical_count > 0:
+                            print(f"         📊 {historical_count} quotes היסטוריים נטענו")
+                        else:
+                            print(f"         ⚠️  לא נטענו quotes היסטוריים")
+                    except Exception as hist_error:
+                        logger.warning(f"Error loading historical data for {symbol}: {hist_error}")
+                        print(f"         ⚠️  שגיאה בטעינת נתונים היסטוריים")
                 else:
                     self.stats['failed'] += 1
                     print(f"      ❌ {symbol}: נכשל (לא נמצא נתון)")

@@ -2,6 +2,19 @@
  * Runtime Validator
  * מערכת ולידציה בזמן ריצה
  */
+
+// List of optional systems that may not be available on all pages
+// These systems are nice to have but not critical for page functionality
+const OPTIONAL_SYSTEMS = [
+  // Add systems here that are optional and should not trigger errors
+  // Example: 'window.SomeOptionalSystem',
+  // The list can be expanded based on actual usage patterns
+];
+
+/**
+ * Runtime Validator
+ * מערכת ולידציה בזמן ריצה
+ */
 class RuntimeValidator {
   constructor() {
     this.results = {
@@ -75,7 +88,16 @@ class RuntimeValidator {
     });
     
     if (this.results.missing.length > 0) {
-      console.error('🔴 מערכות חסרות:', this.results.missing);
+      // Separate required systems from optional ones
+      const required = this.results.missing.filter(g => !OPTIONAL_SYSTEMS.includes(g));
+      const optional = this.results.missing.filter(g => OPTIONAL_SYSTEMS.includes(g));
+      
+      if (required.length > 0) {
+        console.error('🔴 מערכות נדרשות חסרות:', required);
+      }
+      if (optional.length > 0) {
+        console.debug('ℹ️ מערכות אופציונליות חסרות (זה תקין):', optional);
+      }
     } else {
       console.log('✅ כל המערכות הנדרשות נטענו');
     }

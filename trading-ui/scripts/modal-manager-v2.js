@@ -861,6 +861,41 @@ class ModalManagerV2 {
                         <div class="invalid-feedback"></div>
                     </div>
                 `;
+            
+            case 'date-range':
+                // Use DateRangePickerService for date range picker
+                if (!window.DateRangePickerService) {
+                    console.error('DateRangePickerService not loaded. Please include date-range-picker-service.js');
+                    return `
+                        <div class="mb-3">
+                            <label class="form-label">${field.label} ${requiredStar}</label>
+                            <div class="alert alert-warning">Date range picker service not available</div>
+                        </div>
+                    `;
+                }
+                
+                const rangeConfig = {
+                    id: field.id || `dateRange_${Date.now()}`,
+                    label: field.label || 'טווח תאריכים',
+                    fromFieldId: field.fromFieldId || `${field.id}_from`,
+                    toFieldId: field.toFieldId || `${field.id}_to`,
+                    presetFieldId: field.presetFieldId || `${field.id}_preset`,
+                    required: field.required || false,
+                    defaultValue: field.defaultValue || '',
+                    availablePresets: field.availablePresets || null,
+                    containerClass: field.containerClass || ''
+                };
+                
+                // Store config for initialization
+                if (!window._dateRangePickerConfigs) {
+                    window._dateRangePickerConfigs = {};
+                }
+                window._dateRangePickerConfigs[rangeConfig.id] = {
+                    config: rangeConfig,
+                    onChange: field.onChange || null
+                };
+                
+                return window.DateRangePickerService.render(rangeConfig);
                 
             case 'select':
                 // Check if this is a tag multi-select field
@@ -3614,6 +3649,33 @@ class ModalManagerV2 {
                             valueKeys: actualValue && typeof actualValue === 'object' ? Object.keys(actualValue) : null
                         });
                     }
+                } else if (field.type === 'date-range' && actualValue && window.DateRangePickerService) {
+                    // Date range type - use DateRangePickerService to set value
+                    // Value can be preset name or "YYYY-MM-DD - YYYY-MM-DD" string
+                    let dateRangeValue = '';
+                    
+                    if (typeof actualValue === 'string') {
+                        dateRangeValue = actualValue;
+                    } else if (actualValue && typeof actualValue === 'object') {
+                        // Handle object with from/to dates
+                        if (actualValue.from && actualValue.to) {
+                            dateRangeValue = `${actualValue.from} - ${actualValue.to}`;
+                        } else if (actualValue.start && actualValue.end) {
+                            // Handle Date objects
+                            const from = actualValue.start instanceof Date 
+                                ? actualValue.start.toISOString().split('T')[0]
+                                : actualValue.start;
+                            const to = actualValue.end instanceof Date
+                                ? actualValue.end.toISOString().split('T')[0]
+                                : actualValue.end;
+                            dateRangeValue = `${from} - ${to}`;
+                        }
+                    }
+                    
+                    if (dateRangeValue) {
+                        window.DateRangePickerService.setValue(field.id, dateRangeValue);
+                        console.log(`📝 Set date-range field ${field.id} to: ${dateRangeValue}`);
+                    }
                 } else if (field.type === 'datetime-local' && actualValue) {
                     // Convert date value to datetime-local format (YYYY-MM-DDTHH:MM)
                     // CRITICAL: Server returns DateEnvelope objects, not strings!
@@ -4745,6 +4807,51 @@ class ModalManagerV2 {
         }
         
         return false;
+    }
+
+    /**
+     * Initialize date range pickers - אתחול date range pickers
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @param {Object} config - קונפיגורציה של המודל
+     * @private
+     */
+    initializeDateRangePickers(modalElement, config) {
+        if (!window.DateRangePickerService) {
+            return; // Service not loaded
+        }
+
+        // Get all field configs
+        const allFieldConfigs = [];
+        if (config?.fields && Array.isArray(config.fields)) {
+            allFieldConfigs.push(...config.fields);
+        }
+        if (config?.tabs && Array.isArray(config.tabs)) {
+            config.tabs.forEach(tab => {
+                if (tab.fields && Array.isArray(tab.fields)) {
+                    allFieldConfigs.push(...tab.fields);
+                }
+            });
+        }
+
+        // Initialize date range pickers
+        allFieldConfigs.forEach(field => {
+            if (field.type === 'date-range') {
+                const pickerId = field.id || `dateRange_${Date.now()}`;
+                
+                // Wait a bit for DOM to be ready
+                setTimeout(() => {
+                    if (window._dateRangePickerConfigs && window._dateRangePickerConfigs[pickerId]) {
+                        const { config: rangeConfig, onChange } = window._dateRangePickerConfigs[pickerId];
+                        window.DateRangePickerService.initialize(pickerId, onChange);
+                        delete window._dateRangePickerConfigs[pickerId]; // Clean up
+                    } else {
+                        // Fallback initialization
+                        window.DateRangePickerService.initialize(pickerId, field.onChange || null);
+                    }
+                }, 100);
+            }
+        });
     }
 
     /**
@@ -6787,6 +6894,9 @@ class ModalManagerV2 {
      * @private
      */
     initializeModalSystems(modalElement, config) {
+        // Initialize date range pickers first (must be before other systems that may depend on them)
+        this.initializeDateRangePickers(modalElement, config);
+        
         // אתחול מערכת הכפתורים
         this.initializeButtons(modalElement);
         

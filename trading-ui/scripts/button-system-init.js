@@ -511,13 +511,15 @@ class AdvancedButtonSystem {
      * @returns {Promise<boolean>} True if Bootstrap is available, false if timeout
      */
     async waitForBootstrap() {
-        const maxWaitTime = 5000; // 5 seconds max
+        const maxWaitTime = 10000; // 10 seconds max (increased from 5)
         const checkInterval = 100; // Check every 100ms
         let elapsed = 0;
         
         while (elapsed < maxWaitTime) {
             // Check if Bootstrap is available (either from CDN or fallback)
-            if (typeof bootstrap !== 'undefined' && bootstrap && bootstrap.Tooltip) {
+            // Only check window.bootstrap to avoid TDZ (Temporal Dead Zone) errors
+            const bootstrap = window.bootstrap;
+            if (bootstrap && bootstrap.Tooltip) {
                 this.logger.debug('Bootstrap loaded successfully');
                 return true;
             }
@@ -572,11 +574,26 @@ class AdvancedButtonSystem {
             return;
         }
 
+        // Check if element is attached to DOM - if not, schedule retry
         if (!element.parentNode) {
-            this.logger.warn('Skipping button without parent node', {
-                elementId: element.id || `anonymous-${index}`,
-                buttonType
-            });
+            // Element is not yet attached to DOM - schedule retry after a short delay
+            // This handles cases where buttons are created but not yet inserted into DOM
+            setTimeout(() => {
+                // Check again if element is now in DOM and not yet processed
+                if (element.parentNode && !element.hasAttribute('data-button-processed')) {
+                    this.logger.debug('Retrying button processing after DOM attachment', {
+                        elementId: element.id || `anonymous-${index}`,
+                        buttonType
+                    });
+                    this.processButtonElement(element, index);
+                } else if (!element.parentNode) {
+                    // Still not in DOM after retry - log as debug (not warning) since this might be intentional
+                    this.logger.debug('Button not yet attached to DOM, skipping', {
+                        elementId: element.id || `anonymous-${index}`,
+                        buttonType
+                    });
+                }
+            }, 100); // Retry after 100ms
             return;
         }
         

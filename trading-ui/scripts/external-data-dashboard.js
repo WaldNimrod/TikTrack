@@ -372,8 +372,13 @@
    */
   function setElementText(id, value) {
     const element = document.getElementById(id);
-    if (element) {
+    if (element && typeof element === 'object' && 'textContent' in element) {
       element.textContent = value;
+    } else if (element) {
+      // Fallback if element exists but textContent is not available
+      if (window.Logger && typeof window.Logger.warn === 'function') {
+        window.Logger.warn('Cannot set textContent - element is not a valid DOM element', { id, elementType: typeof element });
+      }
     }
   }
 
@@ -2305,7 +2310,7 @@
       const detailsElement = getElement('yahoo-details');
       if (detailsElement) {
         if (!yahooProvider) {
-          detailsElement.innerHTML.textContent = '';
+          detailsElement.innerHTML = '';
         const div = document.createElement('div');
         div.className = 'status-detail';
         div.textContent = 'לא נמצאו נתונים עבור Yahoo Finance';
@@ -2348,7 +2353,7 @@
       }
 
       if (!cacheData) {
-        detailsElement.innerHTML.textContent = '';
+        detailsElement.innerHTML = '';
         const div = document.createElement('div');
         div.className = 'status-detail';
         div.textContent = 'נתוני מטמון לא זמינים';
@@ -3255,7 +3260,7 @@
       }
 
       if (!history.length) {
-        container.innerHTML.textContent = '';
+        container.innerHTML = '';
         const div = document.createElement('div');
         div.className = 'text-center text-muted p-4';
         div.textContent = 'אין היסטוריית עדכונים קבוצתיים';

@@ -592,16 +592,10 @@
           });
 
           if (!response.ok) {
-            // Handle 401 authentication errors
+            // Handle 401 authentication errors - return empty array instead of throwing
             if (response.status === 401) {
-              window.Logger?.warn?.('⚠️ Authentication required - redirecting to login', PAGE_LOG_CONTEXT);
-              if (window.NotificationSystem) {
-                window.NotificationSystem.showError('נדרשת התחברות', 'system');
-              }
-              setTimeout(() => {
-                window.location.href = 'login.html';
-              }, 1000);
-              throw new Error('Authentication required');
+              window.Logger?.debug?.('ℹ️ Authentication required (expected for unauthenticated users)', PAGE_LOG_CONTEXT);
+              return []; // Return empty array instead of throwing error
             }
             throw new Error(`HTTP error! status: ${response.status}`);
           }
@@ -636,6 +630,11 @@
       });
 
       if (!response.ok) {
+        // Handle 401 authentication errors - return empty array instead of throwing
+        if (response.status === 401) {
+          window.Logger?.debug?.('ℹ️ Authentication required (expected for unauthenticated users)', PAGE_LOG_CONTEXT);
+          return []; // Return empty array instead of throwing error
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -650,12 +649,16 @@
       });
       return history;
     } catch (error) {
-      window.Logger?.error?.('❌ Error loading history', {
+      // Only log non-authentication errors as warnings
+      if (error?.message?.includes('Authentication required')) {
+        window.Logger?.debug?.('ℹ️ History not available (authentication required)', PAGE_LOG_CONTEXT);
+        return []; // Return empty array instead of throwing
+      }
+      window.Logger?.warn?.('⚠️ Error loading history (will continue without history)', {
         ...PAGE_LOG_CONTEXT,
         error: error?.message || error,
       });
-      window.showErrorNotification?.('שגיאה', 'שגיאה בטעינת היסטוריה');
-      throw error;
+      return []; // Return empty array instead of throwing to allow page to continue
     }
   }
 
@@ -672,16 +675,10 @@
           });
 
           if (!response.ok) {
-            // Handle 401 authentication errors
+            // Handle 401 authentication errors - return null instead of throwing
             if (response.status === 401) {
-              window.Logger?.warn?.('⚠️ Authentication required - redirecting to login', PAGE_LOG_CONTEXT);
-              if (window.NotificationSystem) {
-                window.NotificationSystem.showError('נדרשת התחברות', 'system');
-              }
-              setTimeout(() => {
-                window.location.href = 'login.html';
-              }, 1000);
-              throw new Error('Authentication required');
+              window.Logger?.debug?.('ℹ️ Authentication required (expected for unauthenticated users)', PAGE_LOG_CONTEXT);
+              return null; // Return null instead of throwing error
             }
             throw new Error(`HTTP error! status: ${response.status}`);
           }
@@ -697,17 +694,27 @@
       });
 
       if (!response.ok) {
+        // Handle 401 authentication errors - return null instead of throwing
+        if (response.status === 401) {
+          window.Logger?.debug?.('ℹ️ Authentication required (expected for unauthenticated users)', PAGE_LOG_CONTEXT);
+          return null; // Return null instead of throwing error
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
       return data.status === 'success' ? data.data : null;
     } catch (error) {
-      window.Logger?.error?.('❌ Error loading LLM provider settings', {
+      // Only log non-authentication errors as warnings
+      if (error?.message?.includes('Authentication required')) {
+        window.Logger?.debug?.('ℹ️ LLM provider settings not available (authentication required)', PAGE_LOG_CONTEXT);
+        return null; // Return null instead of throwing
+      }
+      window.Logger?.warn?.('⚠️ Error loading LLM provider settings (will use defaults)', {
         ...PAGE_LOG_CONTEXT,
         error: error?.message || error,
       });
-      throw error;
+      return null; // Return null instead of throwing to allow page to continue
     }
   }
 

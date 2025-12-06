@@ -846,7 +846,7 @@
                 const id = urlParams.get('tickerId');
                 const symbol = urlParams.get('tickerSymbol');
                 if (window.Logger) {
-                    window.Logger.error('❌ No ticker ID found in URL', { 
+                    window.Logger.warn('⚠️ No ticker ID found in URL (this may be expected for some pages)', { 
                         urlParams: Object.fromEntries(urlParams.entries()),
                         id,
                         symbol,
@@ -1085,7 +1085,7 @@
                 window.NotificationSystem.showError('שגיאה', `שגיאה בטעינת דשבורד טיקר: ${error.message}`);
             }
             if (window.Logger) {
-                window.Logger.error('❌ Error initializing ticker dashboard', { error, page: 'ticker-dashboard' });
+                window.Logger.warn('⚠️ Error initializing ticker dashboard (will continue with available data)', { error: error?.message || error, page: 'ticker-dashboard' });
             }
         }
     }

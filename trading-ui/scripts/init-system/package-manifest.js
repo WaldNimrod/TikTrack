@@ -388,6 +388,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 1
       },
       {
+        file: 'services/date-range-picker-service.js',
+        globalCheck: 'window.DateRangePickerService',
+        description: 'Date range picker service with preset options and calendar UI',
+        required: false,
+        loadOrder: 1.5
+      },
+      {
         file: 'services/field-renderer-service.js',
         globalCheck: 'window.FieldRendererService',
         description: 'Field rendering service',
@@ -1528,15 +1535,22 @@ const PACKAGE_MANIFEST = {
         loadOrder: 2
       },
       {
+        file: 'notes.js',
+        globalCheck: 'window.loadNotesData',
+        description: 'Notes system',
+        required: true,
+        loadOrder: 3
+      },
+      {
         file: 'research.js',
         globalCheck: 'window.initializeResearchPage',
         description: 'Research system',
         required: true,
-        loadOrder: 3
+        loadOrder: 4
       }
     ],
-    estimatedSize: '~45KB',
-    initTime: '~30ms'
+    estimatedSize: '~60KB',
+    initTime: '~40ms'
   },
 
   // 12. SYSTEM-MANAGEMENT PACKAGE - System management

@@ -113,6 +113,14 @@ python3 Backend/scripts/generate_demo_data.py --verbose --username admin
 - **רק טיקרים תקינים** - כל הטיקרים נלקחים מ-`SAMPLE_TICKERS` שיש להם נתונים חיצוניים זמינים
 - **לא יווצרו טיקרים "DEMO"** - רק טיקרים אמיתיים עם נתוני שוק זמינים
 - **אם אין מספיק טיקרים תקינים** - הסקריפט יצור פחות טיקרים ויציג אזהרה
+- **Symbol Mappings אוטומטיים** - הסקריפט יוצר אוטומטית symbol mappings לטיקרים אירופאיים:
+  - `SAN` -> `SAN.PA` (Paris Exchange)
+  - `SIE` -> `SIE.F` (Frankfurt Exchange)
+  - `SAP` -> `SAP.F` (Frankfurt Exchange)
+  - `BMW` -> `BMW.F` (Frankfurt Exchange)
+  - `ASML` -> `ASML.AS` (Amsterdam Exchange)
+  - `UL` -> `ULVR.L` (London Stock Exchange)
+  - `NOVN` -> `NOVN.SW` (Swiss Exchange)
 
 ### חשבונות מסחר (2)
 
@@ -330,7 +338,10 @@ python3 Backend/scripts/generate_demo_data.py
 8. **התראות** - תלויים בטיקרים, טריידים ותוכניות
 9. **הערות** - תלויות בכל הישויות
 10. **ניתוחי AI** (`ai_analysis_requests`) - תלויים בתבניות AI, טיקרים, טריידים ותוכניות
-11. **טעינת נתונים חיצוניים ראשוניים** - טעינת נתוני שוק (Yahoo Finance) לכל הטיקרים שנוצרו
+11. **יצירת Symbol Mappings** - יצירת mappings לטיקרים אירופאיים (SAN.PA, SIE.F, וכו')
+12. **טעינת נתונים חיצוניים ראשוניים** - טעינת נתוני שוק (Yahoo Finance) לכל הטיקרים שנוצרו:
+    - **Quote נוכחי** - מחיר, שינוי, נפח, וכו'
+    - **נתונים היסטוריים** - 150 quotes היסטוריים (לחישוב MA 150, ATR, וכו')
 
 ### פיזור תאריכים
 
@@ -450,10 +461,48 @@ DEMO_CONFIG = {
 
 ---
 
+## 🔧 עדכון נתוני דוגמה קיימים
+
+אם יש לך נתוני דוגמה קיימים שצריכים עדכון:
+
+### עדכון Symbol Mappings
+
+```bash
+# Dry run - רק הצגת מה היה מתעדכן
+python3 Backend/scripts/update_existing_ticker_mappings.py --dry-run
+
+# עדכון אמיתי
+python3 Backend/scripts/update_existing_ticker_mappings.py --verbose
+```
+
+סקריפט זה:
+- ✅ יוצר mappings חסרים לטיקרים אירופאיים (NOVN.SW, ULVR.L, וכו')
+- ✅ מתקן mappings לא נכונים (DIA.AS -> DIA, COST.L -> COST, וכו')
+- ✅ מעדכן mappings קיימים אם צריך
+
+### טעינת נתונים היסטוריים
+
+```bash
+# טעינת נתונים היסטוריים לכל הטיקרים
+python3 Backend/scripts/load_market_data_for_tickers.py
+
+# טעינה לטיקרים ספציפיים
+python3 Backend/scripts/load_market_data_for_tickers.py --tickers-only "NOVN,UL,SAN"
+```
+
+סקריפט זה:
+- ✅ טוען quote נוכחי לכל טיקר
+- ✅ טוען 150 quotes היסטוריים (לחישוב MA 150, ATR, וכו')
+- ✅ משתמש ב-symbol mappings אוטומטית
+
+---
+
 ## 🔗 קישורים
 
 - **מסמך תהליך הניקוי:** [USER_DATA_CLEANUP_PROCESS.md](USER_DATA_CLEANUP_PROCESS.md)
 - **מיקום הסקריפט:** `Backend/scripts/generate_demo_data.py`
+- **סקריפט לעדכון mappings:** `Backend/scripts/update_existing_ticker_mappings.py`
+- **סקריפט לטעינת נתוני שוק:** `Backend/scripts/load_market_data_for_tickers.py`
 - **מודלים:** `Backend/models/`
 
 ---

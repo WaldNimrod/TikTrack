@@ -86,6 +86,18 @@ DEMO_CONFIG = {
     }
 }
 
+# Symbol mappings for European tickers (Yahoo Finance format)
+# Maps internal symbol to provider symbol (Yahoo Finance)
+EUROPEAN_SYMBOL_MAPPINGS = {
+    'SAN': 'SAN.PA',      # Banco Santander - Paris Exchange
+    'SIE': 'SIE.F',       # Siemens AG - Frankfurt Exchange
+    'SAP': 'SAP.F',       # SAP SE - Frankfurt Exchange
+    'BMW': 'BMW.F',       # Bayerische Motoren Werke - Frankfurt Exchange
+    'ASML': 'ASML.AS',    # ASML Holding - Amsterdam Exchange
+    'UL': 'ULVR.L',       # Unilever PLC - London Stock Exchange
+    'NOVN': 'NOVN.SW',    # Novartis AG - Swiss Exchange
+}
+
 # Sample ticker symbols and names
 # NOTE: Only use major, liquid tickers with available market data
 # Exception: TIPU and 500X are kept even without data (as per requirements)
@@ -751,6 +763,63 @@ class DemoDataGenerator:
         
         self.created_count['tickers'] = created
         print(f"   ✅ נוצרו {created} טיקרים תקינים (רק טיקרים עם נתונים חיצוניים זמינים)")
+        
+        # Create symbol mappings for European tickers
+        self._create_symbol_mappings()
+    
+    def _create_symbol_mappings(self) -> None:
+        """יוצר symbol mappings לטיקרים אירופאיים"""
+        print(f"\n🔗 יוצר symbol mappings לטיקרים אירופאיים...")
+        
+        try:
+            from models.external_data import ExternalDataProvider
+            from services.ticker_symbol_mapping_service import TickerSymbolMappingService
+            
+            # Get Yahoo Finance provider
+            yahoo_provider = self.db.query(ExternalDataProvider).filter(
+                ExternalDataProvider.name == 'yahoo_finance'
+            ).first()
+            
+            if not yahoo_provider:
+                print("   ⚠️  Yahoo Finance provider לא נמצא - דילוג על יצירת mappings")
+                return
+            
+            mappings_created = 0
+            
+            # Create mappings for all created tickers that need them
+            for ticker in self.created_tickers_in_this_run:
+                if ticker.symbol in EUROPEAN_SYMBOL_MAPPINGS:
+                    provider_symbol = EUROPEAN_SYMBOL_MAPPINGS[ticker.symbol]
+                    
+                    # Check if mapping already exists
+                    existing = TickerSymbolMappingService.get_provider_symbol(
+                        self.db, ticker.id, yahoo_provider.id
+                    )
+                    
+                    if not existing or existing != provider_symbol:
+                        TickerSymbolMappingService.set_provider_symbol(
+                            self.db,
+                            ticker.id,
+                            yahoo_provider.id,
+                            provider_symbol,
+                            is_primary=True
+                        )
+                        mappings_created += 1
+                        if self.verbose:
+                            print(f"      ✅ {ticker.symbol} -> {provider_symbol}")
+            
+            if mappings_created > 0:
+                self.db.flush()
+                print(f"   ✅ נוצרו {mappings_created} symbol mappings")
+            else:
+                print(f"   ℹ️  כל ה-mappings כבר קיימים")
+                
+        except Exception as e:
+            print(f"   ⚠️  שגיאה ביצירת symbol mappings: {e}")
+            if self.verbose:
+                import traceback
+                traceback.print_exc()
+            # Don't raise - allow data generation to continue
     
     def _create_user_tickers(self) -> None:
         """יוצר שיוכי טיקרים למשתמש דרך user_tickers"""

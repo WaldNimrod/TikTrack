@@ -404,7 +404,7 @@ def get_quote_history(ticker_id):
 @quotes_bp.route('/<int:ticker_id>/refresh', methods=['POST'])
 @require_authentication()
 def refresh_ticker_quote(ticker_id):
-    """Manually refresh quote for a ticker"""
+    """Manually refresh quote for a ticker - optimized to only load missing data"""
     start_time = datetime.now(timezone.utc)
     try:
         # Validate ticker_id
@@ -417,7 +417,7 @@ def refresh_ticker_quote(ticker_id):
         
         data = request.get_json() or {}
         force_refresh = data.get('force_refresh', False)
-        include_historical = data.get('include_historical', True)  # Default to True
+        include_historical = data.get('include_historical', None)  # None = auto-detect
         days_back = data.get('days_back', 150)  # Default to 150 for MA 150 calculation
         
         # Validate days_back
@@ -428,7 +428,7 @@ def refresh_ticker_quote(ticker_id):
                 'error_code': 'INVALID_DAYS_BACK'
             }), 400
         
-        logger.info(f"🔄 Starting refresh_ticker_quote for ticker_id: {ticker_id}, days_back: {days_back}, include_historical: {include_historical}")
+        logger.info(f"🔄 Starting refresh_ticker_quote for ticker_id: {ticker_id}, force_refresh: {force_refresh}")
         
         # Get database session
         db_session = next(get_db())
@@ -445,6 +445,55 @@ def refresh_ticker_quote(ticker_id):
                 }), 404
             
             logger.info(f"✅ Found ticker: {ticker.symbol} (ID: {ticker_id})")
+            
+            # Check what data is missing before loading
+            from services.external_data.missing_data_checker import MissingDataChecker
+            missing_checker = MissingDataChecker(db_session)
+            missing_data = missing_checker.check_missing_data(ticker_id)
+            
+            # Determine what to load based on missing data check
+            should_load_quote = force_refresh or missing_data.get('should_refresh_quote', True)
+            should_load_historical = False
+            should_calculate_indicators = False
+            
+            if include_historical is None:
+                # Auto-detect: only load if missing or stale
+                should_load_historical = force_refresh or missing_data.get('should_refresh_historical', False)
+            else:
+                # Explicit request
+                should_load_historical = include_historical
+            
+            # Check if indicators need calculation
+            missing_indicators = missing_data.get('missing_indicators', [])
+            should_refresh_indicators = missing_data.get('should_refresh_indicators', [])
+            should_calculate_indicators = len(missing_indicators) > 0 or len(should_refresh_indicators) > 0
+            
+            # Log what will be loaded
+            actions = []
+            if should_load_quote:
+                actions.append('quote')
+            if should_load_historical:
+                actions.append('historical')
+            if should_calculate_indicators:
+                actions.append('indicators')
+            
+            if not actions:
+                logger.info(f"ℹ️ All data is fresh for {ticker.symbol}, skipping refresh")
+                return jsonify({
+                    'status': 'success',
+                    'message': f'All data is fresh for {ticker.symbol}, no refresh needed',
+                    'data': {
+                        'ticker_id': ticker_id,
+                        'ticker_symbol': ticker.symbol,
+                        'skipped': True,
+                        'reason': missing_data.get('recommendations', {}).get('reason', 'all data is fresh'),
+                        'data_freshness': missing_data.get('data_freshness', {}),
+                        'actions_taken': []
+                    },
+                    'timestamp': datetime.now(timezone.utc).isoformat()
+                }), 200
+            
+            logger.info(f"📊 Will load: {', '.join(actions)} for {ticker.symbol}")
             
             # Implement refresh logic using YahooFinanceAdapter
             from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
@@ -466,62 +515,83 @@ def refresh_ticker_quote(ticker_id):
             logger.info(f"🔄 Step 1: Initializing adapter for provider {provider.id} ({provider.name})")
             adapter = YahooFinanceAdapter(db_session, provider.id)
             
-            # Step 2: Clear cache if force_refresh
-            # Note: We don't delete quotes here because the adapter's _cache_quote_by_ticker
-            # will update existing quotes if they exist within the last 5 minutes.
-            # This ensures volume and other data are properly updated.
-            if force_refresh:
-                logger.info(f"🔄 Step 2: Force refresh enabled - will update existing quotes or create new ones")
-            else:
-                logger.info(f"🔄 Step 2: Skipping force refresh (force_refresh=False)")
+            actions_taken = []
+            skipped_actions = []
             
-            # Step 3: Fetch current quote
-            logger.info(f"🔄 Step 3: Fetching current quote for {ticker.symbol}")
+            # Step 2: Fetch current quote (only if needed)
             quote_data = None
-            try:
-                quote_data = adapter.get_quote(ticker.symbol, ticker=ticker)
-                if quote_data:
-                    logger.info(f"✅ Successfully fetched current quote for {ticker.symbol}: ${quote_data.price}, volume={quote_data.volume}")
-                    # If volume is None, try to get it from the database (might have been saved but not returned)
-                    if quote_data.volume is None:
-                        logger.warning(f"⚠️ Quote volume is None for {ticker.symbol}, checking database...")
-                        from models.external_data import MarketDataQuote
-                        latest_quote = db_session.query(MarketDataQuote).filter(
-                            MarketDataQuote.ticker_id == ticker_id
-                        ).order_by(MarketDataQuote.fetched_at.desc()).first()
-                        if latest_quote and latest_quote.volume is not None:
-                            logger.info(f"✅ Found volume in database for {ticker.symbol}: {latest_quote.volume}")
-                            quote_data.volume = latest_quote.volume
-                        else:
-                            logger.warning(f"⚠️ No volume found in database for {ticker.symbol}")
-                else:
-                    logger.warning(f"⚠️ No quote data returned for {ticker.symbol}")
-            except Exception as quote_error:
-                logger.error(f"❌ Error fetching quote for {ticker.symbol}: {quote_error}", exc_info=True)
-                # Continue - we'll check if we have existing data in database
+            if should_load_quote:
+                logger.info(f"🔄 Step 2: Fetching current quote for {ticker.symbol}")
+                try:
+                    quote_data = adapter.get_quote(ticker.symbol, ticker=ticker)
+                    if quote_data:
+                        logger.info(f"✅ Successfully fetched current quote for {ticker.symbol}: ${quote_data.price}, volume={quote_data.volume}")
+                        actions_taken.append('quote_loaded')
+                        # If volume is None, try to get it from the database (might have been saved but not returned)
+                        if quote_data.volume is None:
+                            logger.warning(f"⚠️ Quote volume is None for {ticker.symbol}, checking database...")
+                            from models.external_data import MarketDataQuote
+                            latest_quote = db_session.query(MarketDataQuote).filter(
+                                MarketDataQuote.ticker_id == ticker_id
+                            ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                            if latest_quote and latest_quote.volume is not None:
+                                logger.info(f"✅ Found volume in database for {ticker.symbol}: {latest_quote.volume}")
+                                quote_data.volume = latest_quote.volume
+                            else:
+                                logger.warning(f"⚠️ No volume found in database for {ticker.symbol}")
+                    else:
+                        logger.warning(f"⚠️ No quote data returned for {ticker.symbol}")
+                        actions_taken.append('quote_failed')
+                except Exception as quote_error:
+                    logger.error(f"❌ Error fetching quote for {ticker.symbol}: {quote_error}", exc_info=True)
+                    actions_taken.append('quote_error')
+                    # Continue - we'll check if we have existing data in database
+            else:
+                logger.info(f"⏭️ Skipping quote fetch - data is fresh (age: {missing_data.get('data_freshness', {}).get('quote_age_minutes', 'unknown')} minutes)")
+                skipped_actions.append('quote_skipped_fresh')
+                # Get existing quote for response
+                from models.external_data import MarketDataQuote
+                latest_quote = db_session.query(MarketDataQuote).filter(
+                    MarketDataQuote.ticker_id == ticker_id
+                ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                if latest_quote:
+                    quote_data = type('QuoteData', (), {
+                        'price': latest_quote.price,
+                        'volume': latest_quote.volume,
+                        'change_pct_day': latest_quote.change_pct_day,
+                        'change_pct': latest_quote.change_pct_day,
+                        'market_cap': latest_quote.market_cap,
+                        'asof_utc': latest_quote.asof_utc
+                    })()
             
-            # Step 4: Fetch historical data (days_back days for MA 150 calculation)
+            # Step 3: Fetch historical data (only if needed)
             historical_count = 0
-            if include_historical:
-                logger.info(f"🔄 Step 4: Fetching historical data for {ticker.symbol} ({days_back} days)")
+            if should_load_historical:
+                logger.info(f"🔄 Step 3: Fetching historical data for {ticker.symbol} ({days_back} days)")
                 try:
                     historical_count = adapter.fetch_and_save_historical_quotes(ticker, days_back=days_back)
                     if historical_count > 0:
                         logger.info(f"✅ Fetched {historical_count} historical quotes for {ticker.symbol} (requested {days_back} days)")
+                        actions_taken.append('historical_loaded')
                         if historical_count < 120:
                             logger.warning(f"⚠️ Only {historical_count} quotes fetched for {ticker.symbol}, expected at least 120 for MA 150")
                     else:
                         logger.warning(f"⚠️ No historical quotes fetched for {ticker.symbol}")
+                        actions_taken.append('historical_failed')
                 except Exception as hist_error:
                     logger.error(f"❌ Could not fetch historical data for {ticker.symbol}: {hist_error}", exc_info=True)
-                    # Continue even if historical fetch fails
+                    actions_taken.append('historical_error')
             else:
-                logger.info(f"🔄 Step 4: Skipping historical data fetch (include_historical=False)")
+                logger.info(f"⏭️ Skipping historical data fetch - data is fresh (age: {missing_data.get('data_freshness', {}).get('historical_age_hours', 'unknown')} hours)")
+                skipped_actions.append('historical_skipped_fresh')
+                # Count existing historical quotes for response
+                historical_count = missing_data.get('historical_count', 0)
             
-            # Step 5: Pre-calculate technical indicators after fetching historical data
+            # Step 4: Pre-calculate technical indicators (only missing ones)
             indicators_calculated = []
-            if historical_count > 0:
-                logger.info(f"🔄 Step 5: Pre-calculating technical indicators for {ticker.symbol} (have {historical_count} quotes)")
+            indicators_skipped = []
+            if should_calculate_indicators and historical_count > 0:
+                logger.info(f"🔄 Step 4: Pre-calculating missing technical indicators for {ticker.symbol} (have {historical_count} quotes)")
                 try:
                     from services.external_data.technical_indicators_calculator import TechnicalIndicatorsCalculator
                     from services.external_data.week52_calculator import Week52Calculator
@@ -530,8 +600,11 @@ def refresh_ticker_quote(ticker_id):
                     tech_calculator = TechnicalIndicatorsCalculator(db_session)
                     week52_calculator = Week52Calculator(db_session)
                     
+                    # Only calculate indicators that are missing or need refresh
+                    indicators_to_calculate = set(missing_indicators + should_refresh_indicators)
+                    
                     # Pre-calculate Volatility (needs 30+ days)
-                    if historical_count >= 30:
+                    if 'volatility_30' in indicators_to_calculate and historical_count >= 30:
                         try:
                             volatility = tech_calculator.calculate_volatility(ticker_id, period=30, db_session=db_session)
                             if volatility is not None:
@@ -543,9 +616,11 @@ def refresh_ticker_quote(ticker_id):
                                 logger.warning(f"⚠️ Volatility calculation returned None for {ticker.symbol} (have {historical_count} quotes)")
                         except Exception as vol_error:
                             logger.warning(f"⚠️ Error pre-calculating volatility for {ticker.symbol}: {vol_error}", exc_info=True)
+                    elif historical_count >= 30:
+                        indicators_skipped.append('volatility_30')
                     
                     # Pre-calculate MA 20 (needs 20+ days)
-                    if historical_count >= 20:
+                    if 'ma_20' in indicators_to_calculate and historical_count >= 20:
                         try:
                             sma_20 = tech_calculator.calculate_sma(ticker_id, period=20, db_session=db_session)
                             if sma_20 is not None:
@@ -557,11 +632,11 @@ def refresh_ticker_quote(ticker_id):
                                 logger.warning(f"⚠️ MA 20 calculation returned None for {ticker.symbol} (have {historical_count} quotes)")
                         except Exception as ma20_error:
                             logger.warning(f"⚠️ Error pre-calculating MA 20 for {ticker.symbol}: {ma20_error}", exc_info=True)
+                    elif historical_count >= 20:
+                        indicators_skipped.append('ma_20')
                     
                     # Pre-calculate MA 150 (needs 150 trading days ≈ 120+ quotes due to weekends/holidays)
-                    # With weekends and holidays, 150 trading days ≈ 210 calendar days
-                    # So we check if we have at least 120 quotes (80% of 150)
-                    if historical_count >= 120:
+                    if 'ma_150' in indicators_to_calculate and historical_count >= 120:
                         try:
                             sma_150 = tech_calculator.calculate_sma(ticker_id, period=150, db_session=db_session)
                             if sma_150 is not None:
@@ -573,9 +648,11 @@ def refresh_ticker_quote(ticker_id):
                                 logger.warning(f"⚠️ MA 150 calculation returned None for {ticker.symbol} (have {historical_count} quotes)")
                         except Exception as ma150_error:
                             logger.warning(f"⚠️ Error pre-calculating MA 150 for {ticker.symbol}: {ma150_error}", exc_info=True)
+                    elif historical_count >= 120:
+                        indicators_skipped.append('ma_150')
                     
                     # Pre-calculate 52W range (needs 10+ days, but better with more)
-                    if historical_count >= 10:
+                    if 'week52' in indicators_to_calculate and historical_count >= 10:
                         try:
                             week52_result = week52_calculator.calculate_52w_range(ticker_id, db_session=db_session)
                             if week52_result:
@@ -592,11 +669,28 @@ def refresh_ticker_quote(ticker_id):
                                 logger.warning(f"⚠️ 52W range calculation returned None for {ticker.symbol} (have {historical_count} quotes)")
                         except Exception as week52_error:
                             logger.warning(f"⚠️ Error pre-calculating 52W range for {ticker.symbol}: {week52_error}", exc_info=True)
+                    elif historical_count >= 10:
+                        indicators_skipped.append('week52')
                     
-                    logger.info(f"✅ Step 5 completed: Calculated {len(indicators_calculated)} indicators for {ticker.symbol}: {', '.join(indicators_calculated)}")
+                    # Check ATR (from quote)
+                    if 'atr' in indicators_to_calculate:
+                        # ATR is stored in the quote itself, so it's calculated when quote is loaded
+                        if quote_data and hasattr(quote_data, 'atr') and quote_data.atr:
+                            indicators_calculated.append('atr')
+                        else:
+                            # ATR will be calculated by the adapter if historical data is available
+                            pass
+                    
+                    if indicators_calculated:
+                        logger.info(f"✅ Step 4 completed: Calculated {len(indicators_calculated)} indicators for {ticker.symbol}: {', '.join(indicators_calculated)}")
+                    if indicators_skipped:
+                        logger.info(f"⏭️ Skipped {len(indicators_skipped)} indicators (already fresh): {', '.join(indicators_skipped)}")
                 except Exception as calc_error:
                     logger.warning(f"Error pre-calculating technical indicators for {ticker.symbol}: {calc_error}", exc_info=True)
                     # Continue even if pre-calculation fails - calculations will happen on-demand
+            elif historical_count > 0:
+                logger.info(f"⏭️ Skipping indicator calculation - all indicators are fresh")
+                skipped_actions.append('indicators_skipped_fresh')
             
             # Check if we got quote data or if we have existing data in database
             if quote_data and quote_data.price:
@@ -638,21 +732,31 @@ def refresh_ticker_quote(ticker_id):
                 end_time = datetime.now(timezone.utc)
                 duration_seconds = (end_time - start_time).total_seconds()
                 
-                logger.info(f"✅ refresh_ticker_quote completed for {ticker.symbol}: {historical_count} historical quotes, {len(indicators_calculated)} indicators, duration: {duration_seconds:.2f}s, volume={quote_data.volume}")
+                logger.info(f"✅ refresh_ticker_quote completed for {ticker.symbol}: {len(actions_taken)} actions taken, {len(skipped_actions)} skipped, duration: {duration_seconds:.2f}s")
                 
                 return jsonify({
                     'status': 'success',
-                    'message': f'Quote refreshed successfully for {ticker.symbol}',
+                    'message': f'Refresh completed for {ticker.symbol}',
                     'data': {
                         'ticker_id': ticker_id,
                         'ticker_symbol': ticker.symbol,
-                        'price': quote_data.price,
-                        'change_percent': quote_data.change_pct_day or quote_data.change_pct,
-                        'volume': quote_data.volume,
-                        'market_cap': quote_data.market_cap,
-                        'fetched_at': quote_data.asof_utc.isoformat() if quote_data.asof_utc else None,
+                        'price': quote_data.price if quote_data else None,
+                        'change_percent': (quote_data.change_pct_day or quote_data.change_pct) if quote_data else None,
+                        'volume': quote_data.volume if quote_data else None,
+                        'market_cap': quote_data.market_cap if quote_data and hasattr(quote_data, 'market_cap') else None,
+                        'fetched_at': quote_data.asof_utc.isoformat() if quote_data and quote_data.asof_utc else None,
                         'historical_quotes_count': historical_count,
                         'indicators_calculated': indicators_calculated,
+                        'indicators_skipped': indicators_skipped,
+                        'actions_taken': actions_taken,
+                        'actions_skipped': skipped_actions,
+                        'optimization': {
+                            'quote_loaded': 'quote_loaded' in actions_taken,
+                            'historical_loaded': 'historical_loaded' in actions_taken,
+                            'indicators_calculated_count': len(indicators_calculated),
+                            'data_freshness': missing_data.get('data_freshness', {}),
+                            'reason': missing_data.get('recommendations', {}).get('reason', 'refresh requested')
+                        },
                         'performance': {
                             'duration_seconds': round(duration_seconds, 2),
                             'start_time': start_time.isoformat(),

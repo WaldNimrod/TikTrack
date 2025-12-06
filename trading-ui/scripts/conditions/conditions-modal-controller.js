@@ -28,23 +28,16 @@
             lastEnabledAt: null
         };
 
-        window.location.reload = function patchedReload(forceReload) {
-            if (state.enabled) {
-                const attempt = {
-                    forceReload: Boolean(forceReload),
-                    timestamp: Date.now(),
-                    reason: state.reason,
-                    stack: new Error().stack
-                };
-                state.blockCount += 1;
-                state.lastAttempt = attempt;
-                window.Logger?.warn('[ConditionsReloadBypass] Prevented reload attempt', attempt, { page: 'conditions-modal-controller' });
-                if (typeof window.showNotification === 'function') {
-                    window.showNotification('חוסם ריענון אוטומטי לזמן דיבוג תנאים', 'info');
-                }
-                return;
-            }
-            return originalReload(forceReload);
+        // Note: window.location.reload is read-only and cannot be overridden in modern browsers
+        // This is a security feature. We'll skip the patching and just return a no-op state.
+        // The reload bypass functionality is not critical - it's only for debugging.
+        window.Logger?.debug('[ConditionsModalController] Skipping location.reload override (read-only property)', { page: 'conditions-modal-controller' });
+        
+        // Return state with enabled always false (no bypass functionality)
+        return {
+            ...state,
+            enabled: false,
+            bypassDisabled: true
         };
 
         window.ConditionsReloadBypass = {

@@ -1259,126 +1259,37 @@ def stop_scheduler():
 @status_bp.route('/tickers/missing-data', methods=['GET'])
 def get_tickers_missing_data():
     """
-    Get list of tickers with missing data
+    Get list of tickers with missing data - optimized with MissingDataChecker
     
     Returns:
     - JSON response with tickers missing current quotes, historical data, or technical indicators
+    - Includes detailed freshness information and recommendations
     """
     try:
-        from models.ticker import Ticker
-        from models.external_data import MarketDataQuote
-        from services.advanced_cache_service import advanced_cache_service
         from config.database import SessionLocal
+        from services.external_data.missing_data_checker import MissingDataChecker
         
         db_session = SessionLocal()
         
         try:
-            # Get all open tickers
-            open_tickers = db_session.query(Ticker).filter(Ticker.status == 'open').all()
-            
-            tickers_missing_current = []
-            tickers_missing_historical = []
-            tickers_missing_indicators = []
-            recommendations = []
-            
-            for ticker in open_tickers:
-                if not ticker.symbol:
-                    continue
-                
-                ticker_info = {
-                    'id': ticker.id,
-                    'symbol': ticker.symbol,
-                    'name': ticker.name
-                }
-                
-                # Check for current quote
-                current_quote = db_session.query(MarketDataQuote).filter(
-                    MarketDataQuote.ticker_id == ticker.id
-                ).order_by(MarketDataQuote.asof_utc.desc()).first()
-                
-                if not current_quote:
-                    tickers_missing_current.append(ticker_info)
-                    recommendations.append({
-                        'ticker_id': ticker.id,
-                        'symbol': ticker.symbol,
-                        'priority': 'high',
-                        'reason': 'missing_current_quote',
-                        'message': f'{ticker.symbol} - חסר quote נוכחי'
-                    })
-                    continue
-                
-                # Check for historical data (need at least 150 quotes)
-                historical_count = db_session.query(MarketDataQuote).filter(
-                    MarketDataQuote.ticker_id == ticker.id
-                ).count()
-                
-                if historical_count < 150:
-                    tickers_missing_historical.append({
-                        **ticker_info,
-                        'current_count': historical_count,
-                        'required_count': 150,
-                        'missing_count': 150 - historical_count
-                    })
-                    recommendations.append({
-                        'ticker_id': ticker.id,
-                        'symbol': ticker.symbol,
-                        'priority': 'medium' if historical_count >= 50 else 'high',
-                        'reason': 'insufficient_historical_data',
-                        'message': f'{ticker.symbol} - יש רק {historical_count} quotes היסטוריים (נדרש 150)'
-                    })
-                
-                # Check for technical indicators in cache
-                volatility_key = f"ticker_{ticker.id}_volatility_30"
-                ma20_key = f"ticker_{ticker.id}_ma_20"
-                ma150_key = f"ticker_{ticker.id}_ma_150"
-                week52_key = f"ticker_{ticker.id}_week52"
-                
-                missing_indicators = []
-                if historical_count >= 30:
-                    if not advanced_cache_service.get(volatility_key):
-                        missing_indicators.append('volatility_30')
-                if historical_count >= 20:
-                    if not advanced_cache_service.get(ma20_key):
-                        missing_indicators.append('ma_20')
-                if historical_count >= 120:
-                    if not advanced_cache_service.get(ma150_key):
-                        missing_indicators.append('ma_150')
-                if historical_count >= 10:
-                    if not advanced_cache_service.get(week52_key):
-                        missing_indicators.append('week52')
-                
-                if missing_indicators:
-                    tickers_missing_indicators.append({
-                        **ticker_info,
-                        'missing_indicators': missing_indicators,
-                        'historical_count': historical_count
-                    })
-                    recommendations.append({
-                        'ticker_id': ticker.id,
-                        'symbol': ticker.symbol,
-                        'priority': 'low',
-                        'reason': 'missing_technical_indicators',
-                        'message': f'{ticker.symbol} - חסרים חישובים טכניים: {", ".join(missing_indicators)}'
-                    })
-            
-            # Sort recommendations by priority
-            priority_order = {'high': 0, 'medium': 1, 'low': 2}
-            recommendations.sort(key=lambda x: priority_order.get(x['priority'], 3))
+            # Use MissingDataChecker for comprehensive analysis
+            missing_checker = MissingDataChecker(db_session)
+            result = missing_checker.get_all_tickers_missing_data()
             
             return jsonify({
                 'status': 'success',
                 'data': {
-                    'tickers_missing_current': tickers_missing_current,
-                    'tickers_missing_historical': tickers_missing_historical,
-                    'tickers_missing_indicators': tickers_missing_indicators,
-                    'recommendations': recommendations,
-                    'summary': {
-                        'total_open_tickers': len(open_tickers),
-                        'missing_current_count': len(tickers_missing_current),
-                        'missing_historical_count': len(tickers_missing_historical),
-                        'missing_indicators_count': len(tickers_missing_indicators),
-                        'total_recommendations': len(recommendations)
-                    }
+                    'tickers_missing_current': result.get('tickers_missing_current', []),
+                    'tickers_missing_historical': result.get('tickers_missing_historical', []),
+                    'tickers_missing_indicators': result.get('tickers_missing_indicators', []),
+                    'recommendations': result.get('recommendations', []),
+                    'summary': result.get('summary', {
+                        'total_open_tickers': 0,
+                        'missing_current_count': 0,
+                        'missing_historical_count': 0,
+                        'missing_indicators_count': 0,
+                        'total_recommendations': 0
+                    })
                 },
                 'timestamp': datetime.now(timezone.utc).isoformat()
             }), 200

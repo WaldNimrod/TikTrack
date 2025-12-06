@@ -1366,10 +1366,18 @@ def refresh_all_external_data() -> Any:
         tickers = session.query(Ticker).filter(Ticker.status == 'open').all()
         logger.info(f"📊 Found {len(tickers)} open tickers")
         
-        requested_symbols: List[str] = []
+        # Step 2: Check what data is missing for each ticker
+        from services.external_data.missing_data_checker import MissingDataChecker
+        missing_checker = MissingDataChecker(session)
+        
+        tickers_needing_quote: List[Ticker] = []
+        tickers_needing_historical: List[Ticker] = []
+        tickers_needing_indicators: List[Dict[str, Any]] = []
+        tickers_skipped_fresh: List[Dict[str, Any]] = []
         skipped_tickers: List[Dict[str, Any]] = []
         ticker_details: Dict[str, Ticker] = {}
-
+        
+        logger.info(f"🔍 Step 2: Checking missing data for {len(tickers)} tickers")
         for ticker in tickers:
             symbol = (ticker.symbol or '').strip()
             if not symbol:
@@ -1379,22 +1387,50 @@ def refresh_all_external_data() -> Any:
                 })
                 logger.warning(f"⚠️ Skipping ticker ID {ticker.id}: missing symbol")
                 continue
-            requested_symbols.append(symbol)
+            
             ticker_details[symbol] = ticker
-
-        if not requested_symbols:
-            logger.warning("❌ Manual external data refresh requested but no valid symbols were found")
-            response = {
-                "status": "error",
-                "error": "No open tickers with valid symbols",
-                "skipped": skipped_tickers,
+            missing_data = missing_checker.check_missing_data(ticker.id)
+            
+            needs_quote = missing_data.get('should_refresh_quote', True)
+            needs_historical = missing_data.get('should_refresh_historical', False)
+            needs_indicators = len(missing_data.get('should_refresh_indicators', [])) > 0
+            
+            if not needs_quote and not needs_historical and not needs_indicators:
+                tickers_skipped_fresh.append({
+                    'id': ticker.id,
+                    'symbol': ticker.symbol,
+                    'reason': 'all_data_fresh',
+                    'data_freshness': missing_data.get('data_freshness', {})
+                })
+                continue
+            
+            if needs_quote:
+                tickers_needing_quote.append(ticker)
+            if needs_historical:
+                tickers_needing_historical.append(ticker)
+            if needs_indicators:
+                tickers_needing_indicators.append({
+                    'ticker': ticker,
+                    'indicators': missing_data.get('should_refresh_indicators', [])
+                })
+        
+        logger.info(f"✅ Step 2 completed: {len(tickers_needing_quote)} need quotes, {len(tickers_needing_historical)} need historical, {len(tickers_needing_indicators)} need indicators, {len(tickers_skipped_fresh)} skipped (fresh)")
+        
+        if not tickers_needing_quote and not tickers_needing_historical and not tickers_needing_indicators:
+            logger.info("ℹ️ All tickers have fresh data, no refresh needed")
+            return jsonify({
+                "status": "success",
+                "message": "All tickers have fresh data, no refresh needed",
+                "data": {
+                    "total_tickers": len(tickers),
+                    "skipped_fresh": len(tickers_skipped_fresh),
+                    "skipped": skipped_tickers,
+                    "tickers_skipped_fresh": tickers_skipped_fresh
+                },
                 "timestamp": datetime.now().isoformat()
-            }
-            return jsonify(response), 400
+            }), 200
 
-        logger.info(f"✅ Step 1 completed: {len(requested_symbols)} valid symbols to process")
-
-        # Step 2: Get provider
+        # Step 3: Get provider
         provider = session.query(ExternalDataProvider).filter(
             ExternalDataProvider.name == 'yahoo_finance'
         ).first()
@@ -1407,28 +1443,53 @@ def refresh_all_external_data() -> Any:
                 "timestamp": datetime.now().isoformat()
             }), 500
 
-        logger.info(f"✅ Step 2 completed: Provider found (ID: {provider.id}, Name: {provider.name})")
+        logger.info(f"✅ Step 3 completed: Provider found (ID: {provider.id}, Name: {provider.name})")
 
-        # Step 3: Fetch current quotes
-        logger.info(f"🔄 Step 3: Fetching current quotes for {len(requested_symbols)} symbols")
-        adapter = YahooFinanceAdapter(session, provider.id)
-        quotes = adapter.get_quotes_batch(requested_symbols)
-
-        successful_symbols = {quote.symbol for quote in quotes}
-        failed_symbols = sorted(set(requested_symbols) - successful_symbols)
+        # Step 4: Fetch current quotes (only for tickers that need it)
+        successful_symbols: set = set()
+        failed_symbols: List[str] = []
+        quotes_loaded = 0
+        quotes_skipped = 0
         
-        logger.info(f"✅ Step 3 completed: {len(successful_symbols)} successful, {len(failed_symbols)} failed")
-        
-        if failed_symbols:
-            logger.warning(f"⚠️ Failed symbols: {', '.join(failed_symbols[:10])}{'...' if len(failed_symbols) > 10 else ''}")
+        if tickers_needing_quote:
+            symbols_to_fetch = [ticker.symbol for ticker in tickers_needing_quote]
+            logger.info(f"🔄 Step 4: Fetching current quotes for {len(symbols_to_fetch)} tickers (out of {len(tickers)} total)")
+            adapter = YahooFinanceAdapter(session, provider.id)
+            
+            # Process in batches of 25 (optimal batch size)
+            batch_size = 25
+            for i in range(0, len(symbols_to_fetch), batch_size):
+                batch = symbols_to_fetch[i:i + batch_size]
+                try:
+                    quotes = adapter.get_quotes_batch(batch)
+                    successful_symbols.update({quote.symbol for quote in quotes})
+                    quotes_loaded += len(quotes)
+                except Exception as batch_error:
+                    logger.error(f"❌ Error fetching batch {i//batch_size + 1}: {batch_error}")
+                    failed_symbols.extend(batch)
+            
+            failed_symbols.extend([s for s in symbols_to_fetch if s not in successful_symbols])
+            quotes_skipped = len(tickers) - len(tickers_needing_quote)
+            
+            logger.info(f"✅ Step 4 completed: {quotes_loaded} quotes loaded, {quotes_skipped} skipped (fresh), {len(failed_symbols)} failed")
+        else:
+            logger.info(f"⏭️ Step 4 skipped: All quotes are fresh")
+            quotes_skipped = len(tickers)
 
-        # Step 4: Load historical data and pre-calculate technical indicators for successful tickers
-        logger.info(f"🔄 Step 4: Loading historical data and pre-calculating indicators for {len(successful_symbols)} tickers")
+        # Step 5: Load historical data (only for tickers that need it)
+        logger.info(f"🔄 Step 5: Loading historical data for {len(tickers_needing_historical)} tickers")
         historical_loaded = 0
+        historical_skipped = 0
         indicators_calculated = 0
         ticker_errors: List[Dict[str, Any]] = []
         
-        for symbol in successful_symbols:
+        # Combine tickers needing historical with successful quote symbols
+        tickers_to_process = set()
+        for ticker in tickers_needing_historical:
+            if ticker.symbol in successful_symbols or not tickers_needing_quote:
+                tickers_to_process.add(ticker)
+        
+        for ticker in tickers_to_process:
             ticker = ticker_details.get(symbol)
             if not ticker:
                 logger.warning(f"⚠️ Ticker not found for symbol {symbol}")
@@ -1441,7 +1502,7 @@ def refresh_all_external_data() -> Any:
                 
                 if historical_count > 0:
                     historical_loaded += 1
-                    logger.info(f"✅ Loaded {historical_count} historical quotes for {ticker.symbol} (target: 150)")
+                    logger.debug(f"✅ Loaded {historical_count} historical quotes for {ticker.symbol} (target: 150)")
                     
                     # Validate we have enough quotes
                     if historical_count < 120:
@@ -1454,8 +1515,13 @@ def refresh_all_external_data() -> Any:
                         'error': 'no_historical_data'
                     })
                 
-                # Pre-calculate technical indicators if we have enough data
-                if historical_count > 0:
+                # Pre-calculate only missing indicators
+                missing_data = missing_checker.check_missing_data(ticker.id)
+                missing_indicators = missing_data.get('missing_indicators', [])
+                should_refresh_indicators = missing_data.get('should_refresh_indicators', [])
+                indicators_to_calculate = set(missing_indicators + should_refresh_indicators)
+                
+                if indicators_to_calculate and historical_count > 0:
                     try:
                         from services.external_data.technical_indicators_calculator import TechnicalIndicatorsCalculator
                         from services.external_data.week52_calculator import Week52Calculator
@@ -1464,8 +1530,8 @@ def refresh_all_external_data() -> Any:
                         week52_calculator = Week52Calculator(session)
                         ticker_indicators = []
                         
-                        # Pre-calculate Volatility (needs 30+ days)
-                        if historical_count >= 30:
+                        # Pre-calculate Volatility (needs 30+ days) - only if missing
+                        if 'volatility_30' in indicators_to_calculate and historical_count >= 30:
                             try:
                                 volatility = tech_calculator.calculate_volatility(ticker.id, period=30, db_session=session)
                                 if volatility is not None:
@@ -1477,8 +1543,8 @@ def refresh_all_external_data() -> Any:
                             except Exception as vol_error:
                                 logger.warning(f"⚠️ Error pre-calculating volatility for {ticker.symbol}: {vol_error}")
                         
-                        # Pre-calculate MA 20 (needs 20+ days)
-                        if historical_count >= 20:
+                        # Pre-calculate MA 20 (needs 20+ days) - only if missing
+                        if 'ma_20' in indicators_to_calculate and historical_count >= 20:
                             try:
                                 sma_20 = tech_calculator.calculate_sma(ticker.id, period=20, db_session=session)
                                 if sma_20 is not None:
@@ -1490,8 +1556,8 @@ def refresh_all_external_data() -> Any:
                             except Exception as ma20_error:
                                 logger.warning(f"⚠️ Error pre-calculating MA 20 for {ticker.symbol}: {ma20_error}")
                         
-                        # Pre-calculate MA 150 (needs 120+ quotes - 80% of 150)
-                        if historical_count >= 120:
+                        # Pre-calculate MA 150 (needs 120+ quotes) - only if missing
+                        if 'ma_150' in indicators_to_calculate and historical_count >= 120:
                             try:
                                 sma_150 = tech_calculator.calculate_sma(ticker.id, period=150, db_session=session)
                                 if sma_150 is not None:
@@ -1503,8 +1569,8 @@ def refresh_all_external_data() -> Any:
                             except Exception as ma150_error:
                                 logger.warning(f"⚠️ Error pre-calculating MA 150 for {ticker.symbol}: {ma150_error}")
                         
-                        # Pre-calculate 52W range (needs 10+ days)
-                        if historical_count >= 10:
+                        # Pre-calculate 52W range (needs 10+ days) - only if missing
+                        if 'week52' in indicators_to_calculate and historical_count >= 10:
                             try:
                                 week52_result = week52_calculator.calculate_52w_range(ticker.id, db_session=session)
                                 if week52_result:
@@ -1532,6 +1598,8 @@ def refresh_all_external_data() -> Any:
                             'error': 'indicator_calculation_failed',
                             'error_message': str(calc_error)
                         })
+                else:
+                    historical_skipped += 1
                         
             except Exception as hist_error:
                 logger.error(f"❌ Error loading historical data for {ticker.symbol}: {hist_error}", exc_info=True)
@@ -1542,7 +1610,8 @@ def refresh_all_external_data() -> Any:
                     'error_message': str(hist_error)
                 })
         
-        logger.info(f"✅ Step 4 completed: {historical_loaded} tickers with historical data, {indicators_calculated} indicators calculated")
+        historical_skipped = len(tickers) - len(tickers_needing_historical) - historical_loaded
+        logger.info(f"✅ Step 5 completed: {historical_loaded} tickers with historical data loaded, {historical_skipped} skipped (fresh), {indicators_calculated} indicators calculated")
 
         # Step 5: Invalidate cache
         logger.info("🔄 Step 5: Invalidating cache")
@@ -1574,20 +1643,35 @@ def refresh_all_external_data() -> Any:
             message = "External data refresh completed with partial failures"
             http_status = 207
 
-        logger.info(f"✅ refresh_all_external_data completed: {len(successful_symbols)} successful, {len(failed_symbols)} failed quotes, {len(ticker_errors)} ticker errors, duration: {duration_seconds:.2f}s")
+        logger.info(f"✅ refresh_all_external_data completed: {quotes_loaded} quotes loaded, {historical_loaded} historical loaded, {indicators_calculated} indicators calculated, {len(tickers_skipped_fresh)} skipped (fresh), duration: {duration_seconds:.2f}s")
 
         response_data = {
             "status": status,
             "message": message,
             "data": {
-                "requested": len(requested_symbols),
-                "fetched": len(successful_symbols),
-                "failed": len(failed_symbols),
-                "failed_symbols": failed_symbols,
+                "total_tickers": len(tickers),
+                "quotes": {
+                    "loaded": quotes_loaded,
+                    "skipped_fresh": quotes_skipped,
+                    "failed": len(failed_symbols),
+                    "failed_symbols": failed_symbols
+                },
+                "historical": {
+                    "loaded": historical_loaded,
+                    "skipped_fresh": historical_skipped
+                },
+                "indicators": {
+                    "calculated": indicators_calculated
+                },
+                "optimization": {
+                    "tickers_skipped_fresh": len(tickers_skipped_fresh),
+                    "tickers_needing_quote": len(tickers_needing_quote),
+                    "tickers_needing_historical": len(tickers_needing_historical),
+                    "tickers_needing_indicators": len(tickers_needing_indicators)
+                },
                 "skipped": skipped_tickers,
-                "ticker_errors": ticker_errors,
-                "historical_loaded": historical_loaded,
-                "indicators_calculated": indicators_calculated
+                "skipped_fresh": tickers_skipped_fresh,
+                "ticker_errors": ticker_errors
             },
             "duration_seconds": round(duration_seconds, 2),
             "timestamp": datetime.now().isoformat()
@@ -1627,10 +1711,19 @@ def refresh_full_external_data() -> Any:
 
         # Get all open tickers
         tickers = session.query(Ticker).filter(Ticker.status == 'open').all()
-        requested_symbols: List[str] = []
         skipped_tickers: List[Dict[str, Any]] = []
         ticker_map: Dict[str, Ticker] = {}
-
+        
+        # Check what data is missing for each ticker
+        from services.external_data.missing_data_checker import MissingDataChecker
+        missing_checker = MissingDataChecker(session)
+        
+        tickers_needing_quote: List[Ticker] = []
+        tickers_needing_historical: List[Ticker] = []
+        tickers_needing_indicators: List[Dict[str, Any]] = []
+        tickers_skipped_fresh: List[Dict[str, Any]] = []
+        
+        logger.info(f"🔍 Checking missing data for {len(tickers)} tickers")
         for ticker in tickers:
             symbol = (ticker.symbol or '').strip()
             if not symbol:
@@ -1639,17 +1732,48 @@ def refresh_full_external_data() -> Any:
                     'reason': 'missing_symbol'
                 })
                 continue
-            requested_symbols.append(symbol)
+            
             ticker_map[symbol] = ticker
-
-        if not requested_symbols:
-            logger.warning("Full external data refresh requested but no valid symbols were found")
+            missing_data = missing_checker.check_missing_data(ticker.id)
+            
+            needs_quote = missing_data.get('should_refresh_quote', True)
+            needs_historical = missing_data.get('should_refresh_historical', False)
+            needs_indicators = len(missing_data.get('should_refresh_indicators', [])) > 0
+            
+            if not needs_quote and not needs_historical and not needs_indicators:
+                tickers_skipped_fresh.append({
+                    'id': ticker.id,
+                    'symbol': ticker.symbol,
+                    'reason': 'all_data_fresh',
+                    'data_freshness': missing_data.get('data_freshness', {})
+                })
+                continue
+            
+            if needs_quote:
+                tickers_needing_quote.append(ticker)
+            if needs_historical:
+                tickers_needing_historical.append(ticker)
+            if needs_indicators:
+                tickers_needing_indicators.append({
+                    'ticker': ticker,
+                    'indicators': missing_data.get('should_refresh_indicators', [])
+                })
+        
+        logger.info(f"✅ Check completed: {len(tickers_needing_quote)} need quotes, {len(tickers_needing_historical)} need historical, {len(tickers_needing_indicators)} need indicators, {len(tickers_skipped_fresh)} skipped (fresh)")
+        
+        if not tickers_needing_quote and not tickers_needing_historical and not tickers_needing_indicators:
+            logger.info("ℹ️ All tickers have fresh data, no refresh needed")
             return jsonify({
-                "status": "error",
-                "error": "No open tickers with valid symbols",
-                "skipped": skipped_tickers,
+                "status": "success",
+                "message": "All tickers have fresh data, no refresh needed",
+                "data": {
+                    "total_tickers": len(tickers),
+                    "skipped_fresh": len(tickers_skipped_fresh),
+                    "skipped": skipped_tickers,
+                    "tickers_skipped_fresh": tickers_skipped_fresh
+                },
                 "timestamp": datetime.now().isoformat()
-            }), 400
+            }), 200
 
         provider = session.query(ExternalDataProvider).filter(
             ExternalDataProvider.name == 'yahoo_finance'
@@ -1665,25 +1789,55 @@ def refresh_full_external_data() -> Any:
 
         adapter = YahooFinanceAdapter(session, provider.id)
         
-        # Step 1: Load current quotes
-        logger.info(f"🔄 Step 1: Loading current quotes for {len(requested_symbols)} tickers")
-        quotes = adapter.get_quotes_batch(requested_symbols)
-        successful_symbols = {quote.symbol for quote in quotes}
-        failed_symbols = sorted(set(requested_symbols) - successful_symbols)
+        # Step 1: Load current quotes (only for tickers that need it)
+        successful_symbols: set = set()
+        failed_symbols: List[str] = []
+        quotes_loaded = 0
+        quotes_skipped = 0
         
-        current_quotes_count = len(quotes)
-        logger.info(f"✅ Step 1 completed: {current_quotes_count} current quotes loaded")
+        if tickers_needing_quote:
+            symbols_to_fetch = [ticker.symbol for ticker in tickers_needing_quote]
+            logger.info(f"🔄 Step 1: Loading current quotes for {len(symbols_to_fetch)} tickers (out of {len(tickers)} total)")
+            
+            # Process in batches of 25 (optimal batch size)
+            batch_size = 25
+            for i in range(0, len(symbols_to_fetch), batch_size):
+                batch = symbols_to_fetch[i:i + batch_size]
+                try:
+                    quotes = adapter.get_quotes_batch(batch)
+                    successful_symbols.update({quote.symbol for quote in quotes})
+                    quotes_loaded += len(quotes)
+                except Exception as batch_error:
+                    logger.error(f"❌ Error fetching batch {i//batch_size + 1}: {batch_error}")
+                    failed_symbols.extend(batch)
+            
+            failed_symbols.extend([s for s in symbols_to_fetch if s not in successful_symbols])
+            quotes_skipped = len(tickers) - len(tickers_needing_quote)
+            
+            logger.info(f"✅ Step 1 completed: {quotes_loaded} quotes loaded, {quotes_skipped} skipped (fresh), {len(failed_symbols)} failed")
+        else:
+            logger.info(f"⏭️ Step 1 skipped: All quotes are fresh")
+            quotes_skipped = len(tickers)
+            # Add all tickers to successful_symbols for historical processing
+            successful_symbols = {ticker.symbol for ticker in tickers if ticker.symbol}
 
-        # Step 2: Load historical data and pre-calculate technical indicators
+        # Step 2: Load historical data and pre-calculate technical indicators (only for tickers that need it)
         historical_loaded = 0
+        historical_skipped = 0
         total_historical_quotes = 0
         indicators_calculated = 0
         ticker_details: List[Dict[str, Any]] = []
         ticker_errors: List[Dict[str, Any]] = []
         
-        logger.info(f"🔄 Step 2: Loading historical data and pre-calculating indicators for {len(successful_symbols)} tickers")
+        # Combine tickers needing historical with successful quote symbols
+        tickers_to_process = set()
+        for ticker in tickers_needing_historical:
+            if ticker.symbol in successful_symbols or not tickers_needing_quote:
+                tickers_to_process.add(ticker)
         
-        for symbol in successful_symbols:
+        logger.info(f"🔄 Step 2: Loading historical data and pre-calculating indicators for {len(tickers_to_process)} tickers")
+        
+        for ticker in tickers_to_process:
             ticker = ticker_map.get(symbol)
             if not ticker:
                 logger.warning(f"⚠️ Ticker not found for symbol {symbol}")
@@ -1721,8 +1875,13 @@ def refresh_full_external_data() -> Any:
                         'error': 'no_historical_data'
                     })
                 
-                # Pre-calculate technical indicators if we have enough data
-                if historical_count > 0:
+                # Pre-calculate only missing indicators
+                missing_data = missing_checker.check_missing_data(ticker.id)
+                missing_indicators = missing_data.get('missing_indicators', [])
+                should_refresh_indicators = missing_data.get('should_refresh_indicators', [])
+                indicators_to_calculate = set(missing_indicators + should_refresh_indicators)
+                
+                if indicators_to_calculate and historical_count > 0:
                     try:
                         from services.external_data.technical_indicators_calculator import TechnicalIndicatorsCalculator
                         from services.external_data.week52_calculator import Week52Calculator
@@ -1730,8 +1889,8 @@ def refresh_full_external_data() -> Any:
                         tech_calculator = TechnicalIndicatorsCalculator(session)
                         week52_calculator = Week52Calculator(session)
                         
-                        # Pre-calculate Volatility (needs 30+ days)
-                        if historical_count >= 30:
+                        # Pre-calculate Volatility (needs 30+ days) - only if missing
+                        if 'volatility_30' in indicators_to_calculate and historical_count >= 30:
                             try:
                                 volatility = tech_calculator.calculate_volatility(ticker.id, period=30, db_session=session)
                                 if volatility is not None:
@@ -1743,8 +1902,8 @@ def refresh_full_external_data() -> Any:
                             except Exception as vol_error:
                                 logger.warning(f"Error pre-calculating volatility for {ticker.symbol}: {vol_error}")
                         
-                        # Pre-calculate MA 20 (needs 20+ days)
-                        if historical_count >= 20:
+                        # Pre-calculate MA 20 (needs 20+ days) - only if missing
+                        if 'ma_20' in indicators_to_calculate and historical_count >= 20:
                             try:
                                 sma_20 = tech_calculator.calculate_sma(ticker.id, period=20, db_session=session)
                                 if sma_20 is not None:
@@ -1756,8 +1915,8 @@ def refresh_full_external_data() -> Any:
                             except Exception as ma20_error:
                                 logger.warning(f"Error pre-calculating MA 20 for {ticker.symbol}: {ma20_error}")
                         
-                        # Pre-calculate MA 150 (needs 120+ quotes - 80% of 150)
-                        if historical_count >= 120:
+                        # Pre-calculate MA 150 (needs 120+ quotes) - only if missing
+                        if 'ma_150' in indicators_to_calculate and historical_count >= 120:
                             try:
                                 sma_150 = tech_calculator.calculate_sma(ticker.id, period=150, db_session=session)
                                 if sma_150 is not None:
@@ -1769,8 +1928,8 @@ def refresh_full_external_data() -> Any:
                             except Exception as ma150_error:
                                 logger.warning(f"Error pre-calculating MA 150 for {ticker.symbol}: {ma150_error}")
                         
-                        # Pre-calculate 52W range (needs 10+ days)
-                        if historical_count >= 10:
+                        # Pre-calculate 52W range (needs 10+ days) - only if missing
+                        if 'week52' in indicators_to_calculate and historical_count >= 10:
                             try:
                                 week52_result = week52_calculator.calculate_52w_range(ticker.id, db_session=session)
                                 if week52_result:
@@ -1821,7 +1980,8 @@ def refresh_full_external_data() -> Any:
         duration_seconds = (end_time - start_time).total_seconds()
 
         # Prepare response
-        logger.info(f"✅ refresh_full_external_data completed: {len(successful_symbols)} successful, {len(failed_symbols)} failed quotes, {len(ticker_errors)} ticker errors, duration: {duration_seconds:.2f}s")
+        historical_skipped = len(tickers) - len(tickers_needing_historical) - historical_loaded
+        logger.info(f"✅ refresh_full_external_data completed: {quotes_loaded} quotes loaded, {historical_loaded} historical loaded, {indicators_calculated} indicators calculated, {len(tickers_skipped_fresh)} skipped (fresh), duration: {duration_seconds:.2f}s")
         
         message = "Full external data refresh completed successfully"
         status = "success"
@@ -1835,21 +1995,32 @@ def refresh_full_external_data() -> Any:
             "status": status,
             "message": message,
             "data": {
-                "requested": len(requested_symbols),
-                "current_quotes_loaded": current_quotes_count,
-                "failed": len(failed_symbols),
-                "failed_symbols": failed_symbols,
-                "skipped": skipped_tickers,
-                "ticker_errors": ticker_errors,
-                "historical_data": {
-                    "tickers_with_historical": historical_loaded,
-                    "total_historical_quotes": total_historical_quotes,
+                "total_tickers": len(tickers),
+                "quotes": {
+                    "loaded": quotes_loaded,
+                    "skipped_fresh": quotes_skipped,
+                    "failed": len(failed_symbols),
+                    "failed_symbols": failed_symbols
+                },
+                "historical": {
+                    "loaded": historical_loaded,
+                    "skipped_fresh": historical_skipped,
+                    "total_quotes": total_historical_quotes,
                     "average_quotes_per_ticker": round(total_historical_quotes / historical_loaded, 2) if historical_loaded > 0 else 0
                 },
-                "technical_indicators": {
-                    "total_calculated": indicators_calculated,
+                "indicators": {
+                    "calculated": indicators_calculated,
                     "tickers_with_indicators": len([t for t in ticker_details if t.get('indicators_calculated')])
                 },
+                "optimization": {
+                    "tickers_skipped_fresh": len(tickers_skipped_fresh),
+                    "tickers_needing_quote": len(tickers_needing_quote),
+                    "tickers_needing_historical": len(tickers_needing_historical),
+                    "tickers_needing_indicators": len(tickers_needing_indicators)
+                },
+                "skipped": skipped_tickers,
+                "skipped_fresh": tickers_skipped_fresh,
+                "ticker_errors": ticker_errors,
                 "ticker_details": ticker_details[:20],  # Limit to first 20 for response size
                 "performance": {
                     "duration_seconds": round(duration_seconds, 2),

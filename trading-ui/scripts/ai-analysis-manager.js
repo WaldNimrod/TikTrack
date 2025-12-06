@@ -806,8 +806,12 @@
           label.textContent = variable.label || variable.key;
           label.setAttribute('for', `var_modal_${variable.key}`);
 
-          // Check if variable should be text input (text/number type without options, or date_range)
-          const shouldBeTextInput = (variable.type === 'text' || variable.type === 'number') && 
+          // Check if this is a date_range field - use DateRangePickerService
+          const isDateRange = variable.key === 'date_range' || variable.type === 'date-range';
+          
+          // Check if variable should be text input (text/number type without options)
+          const shouldBeTextInput = !isDateRange &&
+                                    (variable.type === 'text' || variable.type === 'number') && 
                                     (!variable.options || !Array.isArray(variable.options) || variable.options.length === 0) &&
                                     variable.key !== 'ticker_symbol' && 
                                     variable.key !== 'stock_ticker' &&
@@ -817,9 +821,14 @@
           
           let select, textInput;
           let isTextInput = false;
+          let isDateRangeField = false;
           
-            if (shouldBeTextInput) {
-            // Create text/number input for simple fields (like date_range, single_trade_id)
+          if (isDateRange && window.DateRangePickerService) {
+            // Use DateRangePickerService for date_range fields
+            isDateRangeField = true;
+            // Will render using DateRangePickerService.render() below
+          } else if (shouldBeTextInput) {
+            // Create text/number input for simple fields (like single_trade_id)
             textInput = document.createElement('input');
             textInput.type = variable.type === 'number' ? 'number' : 'text';
             textInput.className = 'form-control';
@@ -1081,6 +1090,49 @@
             col.appendChild(label);
             col.appendChild(textInput);
             container.appendChild(col);
+          }
+          
+          // Handle date range fields separately (after text/select handling)
+          if (isDateRangeField && window.DateRangePickerService) {
+            // Render date range picker using DateRangePickerService
+            const dateRangeConfig = {
+              id: `var_modal_${variable.key}`,
+              label: variable.label || variable.key,
+              required: variable.required || false,
+              defaultValue: variable.default_value || '',
+              onChange: null
+            };
+            
+            const dateRangeHTML = window.DateRangePickerService.render(dateRangeConfig);
+            col.innerHTML = dateRangeHTML;
+            
+            // Handle conditional display
+            if (variable.conditional_display) {
+              const dependsOn = variable.conditional_display.depends_on;
+              const showWhen = variable.conditional_display.show_when;
+              
+              col.style.display = 'none';
+              
+              const dependentSelect = document.getElementById(`var_modal_${dependsOn}`) || document.getElementById(`var_${dependsOn}`);
+              if (dependentSelect) {
+                const updateVisibility = () => {
+                  if (dependentSelect.value === showWhen) {
+                    col.style.display = '';
+                  } else {
+                    col.style.display = 'none';
+                  }
+                };
+                updateVisibility();
+                dependentSelect.addEventListener('change', updateVisibility);
+              }
+            }
+            
+            container.appendChild(col);
+            
+            // Initialize date range picker after a short delay
+            setTimeout(() => {
+              window.DateRangePickerService.initialize(dateRangeConfig.id);
+            }, 100);
           }
 
           // Populate tickers select if needed (after element is in DOM)
@@ -1635,6 +1687,15 @@
             variables[input.name] = input.value;
           }
         });
+        
+        // Collect date_range from DateRangePickerService if available
+        const dateRangeFieldId = 'var_modal_date_range';
+        if (window.DateRangePickerService && document.querySelector(`[data-date-range-picker-id="${dateRangeFieldId}"]`)) {
+          const dateRangeValue = window.DateRangePickerService.getRangeString(dateRangeFieldId);
+          if (dateRangeValue) {
+            variables['date_range'] = dateRangeValue;
+          }
+        }
         
         // Always collect response_language from the modal (it's not in fieldMap)
         const responseLanguageEl = document.getElementById('responseLanguageModal');

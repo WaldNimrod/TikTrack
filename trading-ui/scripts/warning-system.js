@@ -180,54 +180,70 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
     }
   };
 
+  // פונקציה לניקוי הפונקציות הגלובליות
+  const cleanupFunctions = () => {
+    // נקה את הפונקציות רק אחרי שהמודל נסגר לגמרי
+    setTimeout(() => {
+      if (window.confirmationModalConfirm && modal.dataset.confirmed === 'true') {
+        delete window.confirmationModalConfirm;
+      }
+      if (window.confirmationModalCancel && modal.dataset.cancelled === 'true') {
+        delete window.confirmationModalCancel;
+      }
+    }, 500); // המתן 500ms אחרי סגירת המודל
+  };
+
   // יצירת פונקציות גלובליות לכפתורים (עם data-onclick)
+  // תמיד צור מחדש את הפונקציות כדי למנוע בעיות עם מודלים מרובים
   window.confirmationModalConfirm = () => {
-    if (modal.dataset.confirmed === 'true') {
-      return; // Already confirmed, prevent double execution
+    if (!modal || modal.dataset.confirmed === 'true') {
+      return; // Already confirmed or modal removed, prevent double execution
     }
     modal.dataset.confirmed = 'true';
     // Remove aria-hidden before invoking callbacks to prevent accessibility warning
     modal.removeAttribute('aria-hidden');
     invokeCallbacks(true);
     closeModal();
-    // נקה את הפונקציה אחרי שימוש
-    delete window.confirmationModalConfirm;
-    delete window.confirmationModalCancel;
+    cleanupFunctions();
   };
 
   window.confirmationModalCancel = () => {
-    if (modal.dataset.cancelled === 'true') {
-      return; // Already cancelled, prevent double execution
+    if (!modal || modal.dataset.cancelled === 'true') {
+      return; // Already cancelled or modal removed, prevent double execution
     }
     modal.dataset.cancelled = 'true';
     // Remove aria-hidden before invoking callbacks to prevent accessibility warning
     modal.removeAttribute('aria-hidden');
     invokeCallbacks(false);
     closeModal();
-    // נקה את הפונקציה אחרי שימוש
-    delete window.confirmationModalConfirm;
-    delete window.confirmationModalCancel;
+    cleanupFunctions();
   };
 
   // סגירה בלחיצה על הרקע
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
-      modal.dataset.cancelled = 'true';
-      invokeCallbacks(false);
-      closeModal();
+      if (modal.dataset.cancelled !== 'true') {
+        modal.dataset.cancelled = 'true';
+        invokeCallbacks(false);
+        closeModal();
+        cleanupFunctions();
+      }
     }
   });
 
   // אירוע סגירה על ידי לחיצה מחוץ למודל או ESC
   modal.addEventListener('hidden.bs.modal', () => {
     // רק אם לא זומנו callbacks (כדי למנוע כפילות)
-    invokeCallbacks(false);
+    if (!callbacksInvoked) {
+      invokeCallbacks(false);
+    }
     // הסרת המודל מהדף
     setTimeout(() => {
       if (modal && modal.parentNode) {
         modal.parentNode.removeChild(modal);
       }
     }, 300);
+    cleanupFunctions();
   });
 
   // הצגת המודל דרך ModalManagerV2 או Bootstrap fallback
